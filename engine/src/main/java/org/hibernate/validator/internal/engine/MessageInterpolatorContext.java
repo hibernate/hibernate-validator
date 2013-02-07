@@ -60,7 +60,7 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 
 	@Override
 	public <T> T unwrap(Class<T> type) {
-		//allow unwrapping into the public types
+		//allow unwrapping into public super types
 		if ( type.isAssignableFrom( HibernateMessageInterpolatorContext.class ) ) {
 			return type.cast( this );
 		}

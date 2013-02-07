@@ -99,11 +99,16 @@ public class MessageInterpolatorContextTest {
 	public void testUnwrapToInterfaceTypesSucceeds() {
 		Context context = new MessageInterpolatorContext( null, null, null );
 
-		MessageInterpolator.Context unwrappedContext1 = context.unwrap( MessageInterpolator.Context.class );
-		assertSame( unwrappedContext1, context );
+		MessageInterpolator.Context asMessageInterpolatorContext = context.unwrap( MessageInterpolator.Context.class );
+		assertSame( asMessageInterpolatorContext, context );
 
-		HibernateMessageInterpolatorContext unwrappedContext2 = context.unwrap( HibernateMessageInterpolatorContext.class );
-		assertSame( unwrappedContext2, context );
+		HibernateMessageInterpolatorContext asHibernateMessageInterpolatorContext = context.unwrap(
+				HibernateMessageInterpolatorContext.class
+		);
+		assertSame( asHibernateMessageInterpolatorContext, context );
+
+		Object asObject = context.unwrap( Object.class );
+		assertSame( asObject, context );
 	}
 
 	@Test
