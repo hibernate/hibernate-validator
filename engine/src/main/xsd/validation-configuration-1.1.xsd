@@ -68,8 +68,8 @@
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
                         <xs:enumeration value="NONE"/>
-                        <xs:enumeration value="CONSTRUCTOR"/>
-                        <xs:enumeration value="NO_GETTER_METHODS"/>
+                        <xs:enumeration value="CONSTRUCTORS"/>
+                        <xs:enumeration value="NON_GETTER_METHODS"/>
                         <xs:enumeration value="GETTER_METHODS"/>
                         <xs:enumeration value="ALL"/>
                     </xs:restriction>

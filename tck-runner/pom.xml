@@ -31,7 +31,7 @@
     <description>Aggregates dependencies and runs the JSR-303 TCK</description>
 
     <properties>
-        <tck.version>1.1.0.Beta3</tck.version>
+        <tck.version>1.1.0-SNAPSHOT</tck.version>
         <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
         <arquillian.version>1.0.0.Final</arquillian.version>
         <jbossas.version>7.1.1.Final</jbossas.version>
