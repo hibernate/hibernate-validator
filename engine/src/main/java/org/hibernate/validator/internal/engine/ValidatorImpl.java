@@ -289,7 +289,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	@Override
 	public final <T> T unwrap(Class<T> type) {
-		if ( type.isAssignableFrom( getClass() ) ) {
+		//allow unwrapping into public super types; intentionally not exposing the
+		//fact that ExecutableValidator is implemented by this class as well as this
+		//might change
+		if ( type.isAssignableFrom( Validator.class ) ) {
 			return type.cast( this );
 		}
 		throw log.getTypeNotSupportedException( type );
@@ -308,7 +311,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private ValidationOrder determineGroupValidationOrder(Class<?>[] groups) {
 		Contracts.assertNotNull( groups, MESSAGES.groupMustNotBeNull() );
-		for ( Class clazz : groups ) {
+		for ( Class<?> clazz : groups ) {
 			if ( clazz == null ) {
 				throw new IllegalArgumentException( MESSAGES.groupMustNotBeNull() );
 			}
@@ -1327,8 +1330,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return path.getLeafNode().getElementDescriptor().getKind() == ElementDescriptor.Kind.RETURN_VALUE;
 	}
 
-	private boolean shouldFailFast(ValidationContext context) {
+	private boolean shouldFailFast(ValidationContext<?, ?> context) {
 		return context.isFailFastModeEnabled() && !context.getFailingConstraints().isEmpty();
 	}
 }
-

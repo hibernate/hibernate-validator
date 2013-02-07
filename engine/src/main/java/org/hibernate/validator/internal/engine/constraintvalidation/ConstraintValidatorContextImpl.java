@@ -60,6 +60,10 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	@Override
 	public <T> T unwrap(Class<T> type) {
+		//allow unwrapping into public super types
+		if ( type.isAssignableFrom( ConstraintValidatorContext.class ) ) {
+			return type.cast( this );
+		}
 		throw log.getTypeNotSupportedException( type );
 	}
 

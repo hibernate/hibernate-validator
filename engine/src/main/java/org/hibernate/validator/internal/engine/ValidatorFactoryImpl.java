@@ -132,7 +132,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
 			if ( hibernateSpecificConfig.getProgrammaticMappings().size() > 0 ) {
-				constraintMappings.addAll(hibernateSpecificConfig.getProgrammaticMappings());
+				constraintMappings.addAll( hibernateSpecificConfig.getProgrammaticMappings() );
 			}
 			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
@@ -177,7 +177,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	@Override
 	public <T> T unwrap(Class<T> type) {
-		if ( HibernateValidatorFactory.class.equals( type ) ) {
+		//allow unwrapping into public super types
+		if ( type.isAssignableFrom( HibernateValidatorFactory.class ) ) {
 			return type.cast( this );
 		}
 		throw log.getTypeNotSupportedException( type );

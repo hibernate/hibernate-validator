@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.ExecutableValidator;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
@@ -31,6 +33,7 @@ import javax.validation.metadata.BeanDescriptor;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.testutil.CountValidationCalls;
 import org.hibernate.validator.testutil.CountValidationCallsValidator;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -40,6 +43,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertC
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -186,6 +190,29 @@ public class ValidatorTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
+	@Test(expectedExceptions = ValidationException.class)
+	public void testUnwrapToImplementationCausesValidationException() {
+		Validator validator = getValidator();
+		validator.unwrap( ValidatorImpl.class );
+	}
+
+	@Test(expectedExceptions = ValidationException.class)
+	public void testUnwrapToExecutableValidatorCausesValidationException() {
+		Validator validator = getValidator();
+		validator.unwrap( ExecutableValidator.class );
+	}
+
+	@Test
+	public void testUnwrapToPublicTypesSucceeds() {
+		Validator validator = getValidator();
+
+		Validator asValidator = validator.unwrap( Validator.class );
+		assertSame( asValidator, validator );
+
+		Object asObject = validator.unwrap( Object.class );
+		assertSame( asObject, validator );
+	}
+
 	class A {
 		@NotNull
 		String b;
@@ -236,6 +263,7 @@ public class ValidatorTest {
 			super( e );
 		}
 
+		@Override
 		@Length(min = 2)
 		public String getE() {
 			return super.getE();
@@ -259,10 +287,12 @@ public class ValidatorTest {
 	}
 
 	class G implements F {
+		@Override
 		public String getFoo() {
 			return null;
 		}
 
+		@Override
 		public String getBar() {
 			return null;
 		}
@@ -273,7 +303,7 @@ public class ValidatorTest {
 
 	class Foo {
 		@Valid
-		private Collection<Bar> bar;
+		private final Collection<Bar> bar;
 
 		public Foo() {
 			bar = new ArrayList<Bar>();

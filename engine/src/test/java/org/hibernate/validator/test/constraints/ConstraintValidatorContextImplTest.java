@@ -28,6 +28,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathsAreEqual;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -151,9 +152,20 @@ public class ConstraintValidatorContextImplTest {
 	}
 
 	@Test(expectedExceptions = ValidationException.class)
-	public void testUnwrapToUnsupportedClassCausesValidationException() {
+	public void testUnwrapToImplementationCausesValidationException() {
 		ConstraintValidatorContext context = createEmptyConstraintValidatorContextImpl();
-		context.unwrap( Object.class );
+		context.unwrap( ConstraintValidatorContextImpl.class );
+	}
+
+	@Test
+	public void testUnwrapToPublicTypesSucceeds() {
+		ConstraintValidatorContext context = createEmptyConstraintValidatorContextImpl();
+
+		ConstraintValidatorContext asConstraintValidatorContext = context.unwrap( ConstraintValidatorContext.class );
+		assertSame( asConstraintValidatorContext, context );
+
+		java.lang.Object asObject = context.unwrap( java.lang.Object.class );
+		assertSame( asObject, context );
 	}
 
 	private ConstraintValidatorContextImpl createEmptyConstraintValidatorContextImpl() {
