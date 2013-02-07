@@ -29,4 +29,12 @@
             <jxb:property name="classType"/>
         </jxb:bindings>
     </jxb:bindings>
+
+    <jxb:bindings schemaLocation="../xsd/validation-configuration-1.1.xsd" node="/xs:schema">
+        <!-- Use existing enum type -->
+        <jxb:bindings node="//xs:element[@name='executable-type']">
+            <jxb:javaType name="javax.validation.executable.ExecutableType"
+                          parseMethod="javax.validation.executable.ExecutableType.valueOf"/>
+        </jxb:bindings>
+    </jxb:bindings>
 </jxb:bindings>

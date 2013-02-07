@@ -160,18 +160,21 @@ public class ValidationXmlParser {
 
 	/**
 	 * Returns an enum set with the executable types corresponding to the given
-	 * XML configuration.
+	 * XML configuration, considering the special elements
+	 * {@link ExecutableType#ALL} and {@link ExecutableType#NONE}.
 	 *
-	 * @param validatedExecutablesType Schema type with executable types.
+	 * @param validatedExecutables
+	 *            Schema type with executable types.
 	 *
 	 * @return An enum set representing the given executable types.
 	 */
-	private EnumSet<ExecutableType> getValidatedExecutableTypes(ValidatedExecutablesType validatedExecutablesType) {
-		if( validatedExecutablesType == null ) {
+	private EnumSet<ExecutableType> getValidatedExecutableTypes(ValidatedExecutablesType validatedExecutables) {
+		if( validatedExecutables == null ) {
 			return EnumSet.noneOf( ExecutableType.class );
 		}
 
-		EnumSet<ExecutableType> executableTypes = parseExecutableTypeNames( validatedExecutablesType.getExecutableType() );
+		EnumSet<ExecutableType> executableTypes = EnumSet.noneOf( ExecutableType.class );
+		executableTypes.addAll( validatedExecutables.getExecutableType() );
 
 		if ( executableTypes.contains( ExecutableType.ALL ) ) {
 			return EnumSet.complementOf( EnumSet.of( ExecutableType.ALL, ExecutableType.NONE ) );
@@ -182,24 +185,5 @@ public class ValidationXmlParser {
 		else {
 			return executableTypes;
 		}
-	}
-
-	private EnumSet<ExecutableType> parseExecutableTypeNames(Iterable<String> validatedExecutableTypeNames) {
-		EnumSet<ExecutableType> executableTypes = EnumSet.noneOf( ExecutableType.class );
-
-		for ( String executableTypeName : validatedExecutableTypeNames ) {
-			//TODO: Remove mappings once BVAL-378 is resolved
-			if ( "CONSTRUCTOR".equals( executableTypeName ) ) {
-				executableTypes.add( ExecutableType.CONSTRUCTORS );
-			}
-			else if ( "NO_GETTER_METHODS".equals( executableTypeName ) ) {
-				executableTypes.add( ExecutableType.NON_GETTER_METHODS );
-			}
-			else {
-				executableTypes.add( ExecutableType.valueOf( executableTypeName ) );
-			}
-		}
-
-		return executableTypes;
 	}
 }
