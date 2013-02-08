@@ -94,6 +94,10 @@
       </listitem>
 
       <listitem>
+        <para><package>javax.el.*</package>, [2.0.0,4.0.0)</para>
+      </listitem>
+
+      <listitem>
         <para><package>org.xml.sax.*</package></para>
       </listitem>
 
