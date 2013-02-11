@@ -28,7 +28,6 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData.ConstraintMetaDataKind;
@@ -36,6 +35,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -257,7 +257,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private Set<ConstraintDescriptorImpl<?>> getClassLevelConstraintsAsDescriptors() {
-
 		Set<MetaConstraint<?>> classLevelConstraints = getClassLevelConstraints( allMetaConstraints );
 
 		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
@@ -287,14 +286,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return theValue;
 	}
 
-	private Map<String, MethodDescriptor> getConstrainedMethodsAsDescriptors() {
-		Map<String, MethodDescriptor> constrainedMethodDescriptors = newHashMap();
+	private Map<String, ExecutableDescriptorImpl> getConstrainedMethodsAsDescriptors() {
+		Map<String, ExecutableDescriptorImpl> constrainedMethodDescriptors = newHashMap();
 
 		for ( ExecutableMetaData oneExecutable : executableMetaData.values() ) {
 			if ( oneExecutable.getKind() == ConstraintMetaDataKind.METHOD && oneExecutable.isConstrained() ) {
 				constrainedMethodDescriptors.put(
 						oneExecutable.getIdentifier(),
-						(MethodDescriptor) oneExecutable.asDescriptor(
+						oneExecutable.asDescriptor(
 								defaultGroupSequenceIsRedefined(),
 								getDefaultGroupSequence( null )
 						)
@@ -312,7 +311,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( oneExecutable.getKind() == ConstraintMetaDataKind.CONSTRUCTOR && oneExecutable.isConstrained() ) {
 				constrainedMethodDescriptors.put(
 						oneExecutable.getIdentifier(),
-						(ConstructorDescriptor) oneExecutable.asDescriptor(
+						oneExecutable.asDescriptor(
 								defaultGroupSequenceIsRedefined(),
 								getDefaultGroupSequence( null )
 						)
@@ -324,7 +323,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {
-
 		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
 			throw log.getInvalidDefaultGroupSequenceDefinitionException();
 		}
@@ -341,7 +339,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private Set<MetaConstraint<?>> getClassLevelConstraints(Set<MetaConstraint<?>> constraints) {
-
 		Set<MetaConstraint<?>> classLevelConstraints = partition(
 				constraints,
 				byElementType()
@@ -351,7 +348,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private Set<MetaConstraint<?>> buildDirectConstraintSets() {
-
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
 		Set<Class<?>> classAndInterfaces = computeAllImplementedInterfaces( beanClass );
@@ -372,7 +368,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Builds up the method meta data for this type
 	 */
 	private Map<String, ExecutableMetaData> byIdentifier(Set<ExecutableMetaData> executables) {
-
 		Map<String, ExecutableMetaData> theValue = newHashMap();
 
 		for ( ExecutableMetaData oneMethod : executables ) {
@@ -494,7 +489,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<BuilderDelegate> builders) {
-
 			for ( BuilderDelegate oneBuilder : builders ) {
 				boolean foundBuilder = oneBuilder.add( constrainableElement );
 
@@ -513,7 +507,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		public BeanMetaDataImpl<T> build() {
-
 			Set<ConstraintMetaData> aggregatedElements = newHashSet();
 
 			for ( BuilderDelegate oneBuilder : builders ) {
@@ -608,7 +601,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		public Set<ConstraintMetaData> build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-
 			Set<ConstraintMetaData> theValue = newHashSet();
 
 			if ( propertyBuilder != null ) {

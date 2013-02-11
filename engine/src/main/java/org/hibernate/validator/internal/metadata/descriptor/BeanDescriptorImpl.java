@@ -19,7 +19,6 @@ package org.hibernate.validator.internal.metadata.descriptor;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +29,9 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.util.Contracts;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -42,13 +44,13 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  */
 public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDescriptor {
 	private final Map<String, PropertyDescriptor> constrainedProperties;
-	private final Map<String, MethodDescriptor> constrainedMethods;
+	private final Map<String, ExecutableDescriptorImpl> constrainedMethods;
 	private final Map<String, ConstructorDescriptor> constrainedConstructors;
 
 	public BeanDescriptorImpl(Type beanClass,
 							  Set<ConstraintDescriptorImpl<?>> classLevelConstraints,
 							  Map<String, PropertyDescriptor> constrainedProperties,
-							  Map<String, MethodDescriptor> constrainedMethods,
+							  Map<String, ExecutableDescriptorImpl> constrainedMethods,
 							  Map<String, ConstructorDescriptor> constrainedConstructors,
 							  boolean defaultGroupSequenceRedefined,
 							  List<Class<?>> defaultGroupSequence) {
@@ -73,7 +75,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 
 	@Override
 	public final Set<PropertyDescriptor> getConstrainedProperties() {
-		return new HashSet<PropertyDescriptor>( constrainedProperties.values() );
+		return newHashSet( constrainedProperties.values() );
 	}
 
 	@Override
@@ -83,18 +85,28 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 
 	@Override
 	public Set<ConstructorDescriptor> getConstrainedConstructors() {
-		return new HashSet<ConstructorDescriptor>( constrainedConstructors.values() );
+		return newHashSet( constrainedConstructors.values() );
 	}
 
 	@Override
 	public Set<MethodDescriptor> getConstrainedMethods() {
-		return new HashSet<MethodDescriptor>( constrainedMethods.values() );
+		for( ExecutableDescriptorImpl constrainedMethod : constrainedMethods.values() ) {
+			constrainedMethod.assertCorrectnessOfConfiguration();
+		}
+
+		return CollectionHelper.<MethodDescriptor>newHashSet( constrainedMethods.values() );
 	}
 
 	@Override
 	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
 		Contracts.assertNotNull( methodName, MESSAGES.methodNameMustNotBeNull() );
-		return constrainedMethods.get( methodName + Arrays.toString( parameterTypes ) );
+
+		ExecutableDescriptorImpl methodDescriptor = constrainedMethods.get( methodName + Arrays.toString( parameterTypes ) );
+		if ( methodDescriptor != null ) {
+			methodDescriptor.assertCorrectnessOfConfiguration();
+		}
+
+		return methodDescriptor;
 	}
 
 	@Override

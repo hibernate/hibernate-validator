@@ -19,7 +19,8 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 import java.util.List;
 import java.util.Set;
 import javax.enterprise.inject.Default;
-import javax.validation.constraints.Min;
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.constraints.NotNull;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ElementDescriptor;
@@ -37,6 +38,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerExtension;
+import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -224,29 +226,35 @@ public class MethodDescriptorTest {
 		);
 	}
 
-	//TODO See https://hibernate.onjira.com/browse/HV-683; This test doesn't seem right
-	@TestForIssue(jiraKey = "HV-443")
 	@Test
+	@TestForIssue(jiraKey = "HV-443")
 	public void testFindParameterConstraintLookingAt() {
 		ParameterDescriptor parameterDescriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
-				"zap",
-				int.class
-		).getParameterDescriptors().get( 0 );
+				"createCustomer",
+				CharSequence.class,
+				String.class
+		).getParameterDescriptors().get( 1 );
 
 		Set<ConstraintDescriptor<?>> constraintDescriptors = parameterDescriptor.findConstraints()
 				.lookingAt( Scope.LOCAL_ELEMENT )
 				.getConstraintDescriptors();
-		assertEquals( constraintDescriptors.size(), 1 );
-		assertEquals(
-				constraintDescriptors.iterator().next().getAnnotation().annotationType(),
-				Min.class
-		);
+		assertEquals( constraintDescriptors.size(), 0 );
 
 		constraintDescriptors = parameterDescriptor.findConstraints()
 				.lookingAt( Scope.HIERARCHY )
 				.getConstraintDescriptors();
-		assertEquals( constraintDescriptors.size(), 2 );
+		assertEquals( constraintDescriptors.size(), 1 );
+		assertEquals(
+				constraintDescriptors.iterator().next().getAnnotation().annotationType(),
+				NotNull.class
+		);
+	}
+
+	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@TestForIssue(jiraKey = "HV-683")
+	public void testGetMethodDescriptorForIllegalyConfiguredMethodCausesConstraintDeclarationException() {
+		getMethodDescriptor( IllegalCustomerRepositoryExt.class, "zap", int.class );
 	}
 
 	@Test
@@ -284,8 +292,8 @@ public class MethodDescriptorTest {
 	public void testGetReturnValueDescriptorForVoidMethod() {
 		MethodDescriptor methodDescriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
-				"zap",
-				int.class
+				"saveCustomer",
+				Customer.class
 		);
 		assertThat( methodDescriptor.getReturnValueDescriptor() ).isNull();
 	}
@@ -323,8 +331,8 @@ public class MethodDescriptorTest {
 	public void testIsReturnValueConstrainedForVoidMethod() {
 		MethodDescriptor methodDescriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
-				"zap",
-				int.class
+				"saveCustomer",
+				Customer.class
 		);
 		assertThat( methodDescriptor.isReturnValueConstrained() ).isFalse();
 	}
