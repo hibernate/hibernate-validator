@@ -125,10 +125,6 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	}
 
 	@Override
-	public void zap(@Min(0) int i) {
-	}
-
-	@Override
 	public void methodWithCrossParameterConstraint(DateMidnight start, DateMidnight end) {
 	}
 

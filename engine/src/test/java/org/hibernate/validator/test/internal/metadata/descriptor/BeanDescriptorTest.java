@@ -19,6 +19,7 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.BeanDescriptor;
@@ -36,6 +37,7 @@ import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
+import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -181,6 +183,14 @@ public class BeanDescriptorTest {
 		assertNotNull( methodDescriptor );
 	}
 
+	@Test
+	public void testGetConstraintsForMethodSuceedsAlsoIfTypeContainsAnotherIllegalMethod() throws Exception {
+		BeanDescriptor descriptor = getBeanDescriptor( IllegalCustomerRepositoryExt.class );
+		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "foo" );
+
+		assertNotNull( methodDescriptor );
+	}
+
 	// A method descriptor can be retrieved by specifying an overridden method
 	// from a base type.
 	@Test
@@ -255,6 +265,12 @@ public class BeanDescriptorTest {
 				"methodWithParameterGroupConversion",
 				"methodWithReturnValueGroupConversion"
 		);
+	}
+
+	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@TestForIssue(jiraKey = "HV-683")
+	public void testGetConstrainedMethodsForTypeWithIllegalMethodCausesDeclarationException() {
+		getBeanDescriptor( IllegalCustomerRepositoryExt.class ).getConstrainedMethods();
 	}
 
 	@Test

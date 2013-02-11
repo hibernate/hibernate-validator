@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
@@ -36,6 +37,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 	private final String name;
 	private final List<ParameterDescriptor> parameters;
 	private final ReturnValueDescriptor returnValueDescriptor;
+	private final ConstraintDeclarationException constraintDeclarationException;
 
 	public ExecutableDescriptorImpl(
 			Kind kind,
@@ -45,7 +47,8 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 			ReturnValueDescriptor returnValueDescriptor,
 			List<ParameterDescriptor> parameters,
 			boolean defaultGroupSequenceRedefined,
-			List<Class<?>> defaultGroupSequence) {
+			List<Class<?>> defaultGroupSequence,
+			ConstraintDeclarationException constraintDeclarationException) {
 		super(
 				returnType,
 				crossParameterValueConstraints,
@@ -57,6 +60,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		this.name = name;
 		this.parameters = Collections.unmodifiableList( parameters );
 		this.returnValueDescriptor = returnValueDescriptor;
+		this.constraintDeclarationException = constraintDeclarationException;
 	}
 
 	@Override
@@ -74,6 +78,13 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		return returnValueDescriptor;
 	}
 
+	public void assertCorrectnessOfConfiguration()
+			throws ConstraintDeclarationException {
+
+		if ( constraintDeclarationException != null ) {
+			throw constraintDeclarationException;
+		}
+	}
 
 	@Override
 	public String toString() {

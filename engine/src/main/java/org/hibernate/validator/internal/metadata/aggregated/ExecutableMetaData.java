@@ -66,16 +66,21 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	private final List<ParameterMetaData> parameterMetaDataList;
 
 	/**
-	 * A declaration exception in case this method contains any illegal method
-	 * parameter constraints. Such illegal parameter constraints shall not
-	 * hinder standard bean/property validation as defined by the Bean
-	 * Validation API. Therefore this exception is created when building up the
-	 * meta data for validated beans, but it will only be thrown by the
-	 * validation engine when actually a method validation is performed.
+	 * <p>
+	 * A declaration exception in case this method violates the rules for
+	 * constraints in inheritance hierarchies, outlined in the Bean Validation
+	 * specification, section 4.5.5
+	 * ("Method constraints in inheritance hierarchies").
+	 * </p>
+	 * <p>
+	 * Such violations shall not hinder standard bean/property validation or
+	 * validation of other methods. Therefore this exception is created when
+	 * building this meta data object, but it will only be thrown by the
+	 * validation engine when actually a method validation is performed or meta
+	 * data for this method is requested.
+	 * </p>
 	 */
-	private final ConstraintDeclarationException parameterConstraintDeclarationException;
-
-	private final ConstraintDeclarationException returnValueConstraintDeclarationException;
+	private final ConstraintDeclarationException constraintDeclarationException;
 
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
 
@@ -94,8 +99,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
-			ConstraintDeclarationException parameterConstraintDeclarationException,
-			ConstraintDeclarationException returnValueConstraintDeclarationException,
+			ConstraintDeclarationException constraintDeclarationException,
 			boolean isCascading,
 			boolean isConstrained,
 			Map<Class<?>, Class<?>> returnValueGroupConversions) {
@@ -111,11 +115,9 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		this.parameterTypes = parameterTypes;
 		this.parameterMetaDataList = Collections.unmodifiableList( parameterMetaData );
-		this.parameterConstraintDeclarationException = parameterConstraintDeclarationException;
-		this.returnValueConstraintDeclarationException = returnValueConstraintDeclarationException;
 		this.crossParameterConstraints = Collections.unmodifiableSet( crossParameterConstraints );
 		this.identifier = name + Arrays.toString( parameterTypes );
-
+		this.constraintDeclarationException = constraintDeclarationException;
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,
 				returnValueConstraints,
@@ -184,8 +186,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		public ExecutableMetaData build() {
-
 			ExecutableElement executableElement = location.getExecutableElement();
+
+			ConstraintDeclarationException constraintDeclarationException = checkParameterConstraints();
+			if ( constraintDeclarationException == null ) {
+				constraintDeclarationException = checkReturnValueConfiguration();
+			}
 
 			return new ExecutableMetaData(
 					executableElement.getSimpleName(),
@@ -195,8 +201,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
-					checkParameterConstraints(),
-					checkReturnValueConfiguration(),
+					constraintDeclarationException,
 					isCascading(),
 					isConstrained,
 					getGroupConversions()
@@ -211,7 +216,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * @return The parameter meta data for this builder's executable.
 		 */
 		private List<ParameterMetaData> findParameterMetaData() {
-
 			List<ParameterMetaData.Builder> parameterBuilders = null;
 
 			for ( ConstrainedExecutable oneExecutable : constrainedExecutables ) {
@@ -256,7 +260,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 *         the methods of this builder have no such illegal constraints.
 		 */
 		private ConstraintDeclarationException checkParameterConstraints() {
-
 			Set<ConstrainedExecutable> executablesWithParameterConstraints = executablesWithParameterConstraints(
 					constrainedExecutables
 			);
@@ -361,11 +364,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	public void assertCorrectnessOfConfiguration()
 			throws ConstraintDeclarationException {
 
-		if ( parameterConstraintDeclarationException != null ) {
-			throw parameterConstraintDeclarationException;
-		}
-		if ( returnValueConstraintDeclarationException != null ) {
-			throw returnValueConstraintDeclarationException;
+		if ( constraintDeclarationException != null ) {
+			throw constraintDeclarationException;
 		}
 	}
 
@@ -377,7 +377,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * @return Meta data for the specified parameter. Will never be {@code null}.
 	 */
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
-
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaDataList.size() - 1 ) {
 			throw log.getInvalidMethodParameterIndexException( getName(), parameterIndex );
 		}
@@ -428,8 +427,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	@Override
-	public ElementDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-
+	public ExecutableDescriptorImpl asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new ExecutableDescriptorImpl(
 				getKind() == ConstraintMetaDataKind.METHOD ? Kind.METHOD : Kind.CONSTRUCTOR,
 				getType(),
@@ -441,7 +439,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				),
 				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
 				defaultGroupSequenceRedefined,
-				defaultGroupSequence
+				defaultGroupSequence,
+				constraintDeclarationException
 		);
 	}
 

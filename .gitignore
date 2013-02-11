@@ -6,22 +6,18 @@
 buildSrc/.gradle
 
 # Build output directories
-/target
-*/target
-/build
-*/build
-/bin
-*/bin
+target/
+build/
+bin/
 
 # Test output directories
-test-output
-*/test-output
+test-output/
 
 # Jmeter directory from perf test
-*/jmeter
+jmeter/
 
 # IntelliJ specific files/directories
-/out
+out/
 .idea
 *.ipr
 *.iws
