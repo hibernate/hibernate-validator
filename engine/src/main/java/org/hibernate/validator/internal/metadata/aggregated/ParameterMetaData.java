@@ -17,11 +17,10 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.metadata.ElementDescriptor;
+import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
@@ -58,7 +57,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				name,
 				type,
 				constraints,
-				ConstraintMetaDataKind.PARAMETER,
+				ElementKind.PARAMETER,
 				isCascading,
 				!constraints.isEmpty() || isCascading
 		);
@@ -103,11 +102,6 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				defaultGroupSequence,
 				getGroupConversionDescriptors()
 		);
-	}
-
-	@Override
-	public ElementDescriptor getDescriptor() {
-		return asDescriptor( false, Collections.<Class<?>>emptyList() );
 	}
 
 	public static class Builder extends MetaDataBuilder {

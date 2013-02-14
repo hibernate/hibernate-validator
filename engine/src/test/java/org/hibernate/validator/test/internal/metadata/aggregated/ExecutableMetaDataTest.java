@@ -19,6 +19,7 @@ package org.hibernate.validator.test.internal.metadata.aggregated;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import javax.validation.ElementKind;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
@@ -28,7 +29,6 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData.ConstraintMetaDataKind;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -158,7 +158,7 @@ public class ExecutableMetaDataTest {
 				)
 		);
 
-		assertThat( methodMetaData.getKind() ).isEqualTo( ConstraintMetaDataKind.METHOD );
+		assertThat( methodMetaData.getKind() ).isEqualTo( ElementKind.METHOD );
 	}
 
 	@Test
@@ -171,7 +171,7 @@ public class ExecutableMetaDataTest {
 				)
 		);
 
-		assertThat( constructorMetaData.getKind() ).isEqualTo( ConstraintMetaDataKind.CONSTRUCTOR );
+		assertThat( constructorMetaData.getKind() ).isEqualTo( ElementKind.CONSTRUCTOR );
 	}
 
 	@Test

@@ -19,15 +19,12 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 import java.util.Set;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.GroupConversionDescriptor;
-import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 import javax.validation.metadata.Scope;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
@@ -41,7 +38,6 @@ import org.hibernate.validator.testutil.TestForIssue;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintTypes;
 import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
 import static org.hibernate.validator.testutil.ValidatorUtil.getMethodReturnValueDescriptor;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -52,54 +48,21 @@ import static org.testng.Assert.assertTrue;
 public class ReturnValueDescriptorTest {
 
 	@Test
-	public void testElementDescriptorType() {
-		ElementDescriptor elementDescriptor = getMethodReturnValueDescriptor(
-				CustomerRepository.class,
-				"foo"
-		);
-		assertEquals( elementDescriptor.getKind(), ElementDescriptor.Kind.RETURN_VALUE );
-	}
-
-	@Test
 	public void testIsCascaded() {
-		ElementDescriptor elementDescriptor = getMethodReturnValueDescriptor(
+		ReturnValueDescriptor elementDescriptor = getMethodReturnValueDescriptor(
 				CustomerRepository.class,
 				"foo"
 		);
-		assertTrue( elementDescriptor.as( ReturnValueDescriptor.class ).isCascaded() );
+		assertTrue( elementDescriptor.isCascaded() );
 	}
 
 	@Test
 	public void testIsNotCascaded() {
-		ElementDescriptor elementDescriptor = getMethodReturnValueDescriptor(
+		ReturnValueDescriptor elementDescriptor = getMethodReturnValueDescriptor(
 				CustomerRepository.class,
 				"bar"
 		);
-		assertFalse( elementDescriptor.as( ReturnValueDescriptor.class ).isCascaded() );
-	}
-
-	@Test
-	public void testNarrowDescriptor() {
-		ElementDescriptor elementDescriptor = getMethodReturnValueDescriptor(
-				CustomerRepository.class,
-				"bar"
-		);
-
-		ReturnValueDescriptor returnValueDescriptor = elementDescriptor.as( ReturnValueDescriptor.class );
-		assertTrue( returnValueDescriptor != null );
-
-		returnValueDescriptor = elementDescriptor.as( ReturnValueDescriptorImpl.class );
-		assertTrue( returnValueDescriptor != null );
-	}
-
-	@Test(expectedExceptions = ClassCastException.class,
-			expectedExceptionsMessageRegExp = "HV000118.*")
-	public void testUnableToNarrowDescriptor() {
-		ElementDescriptor elementDescriptor = getMethodReturnValueDescriptor(
-				CustomerRepository.class,
-				"bar"
-		);
-		elementDescriptor.as( MethodDescriptor.class );
+		assertFalse( elementDescriptor.isCascaded() );
 	}
 
 	@Test

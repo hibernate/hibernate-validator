@@ -18,8 +18,8 @@ package org.hibernate.validator.integration.util;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
-import javax.validation.ExecutableValidator;
 import javax.validation.Validator;
+import javax.validation.executable.ExecutableValidator;
 import javax.validation.metadata.BeanDescriptor;
 
 /**

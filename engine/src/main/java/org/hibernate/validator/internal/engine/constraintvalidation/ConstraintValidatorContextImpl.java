@@ -19,6 +19,8 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
@@ -101,7 +103,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			if ( !propertyPath.isRootPath() && propertyPath.getLeafNode().getName() == null ) {
 				propertyPath = propertyPath.getPathWithoutLeafNode();
 			}
-			propertyPath.addNode( name );
+			propertyPath.addPropertyNode( name );
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
@@ -109,6 +111,24 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		public ConstraintValidatorContext addConstraintViolation() {
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
+		}
+
+		@Override
+		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			//TODO HV-709
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
+
+		@Override
+		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			//TODO HV-709
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
+
+		@Override
+		public NodeBuilderDefinedContext addParameterNode(int index) {
+			//TODO HV-709
+			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
 
@@ -131,6 +151,18 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
+
+		@Override
+		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			//TODO HV-709
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
+
+		@Override
+		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			//TODO HV-709
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
 	}
 
 	class InIterableNodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderCustomizableContext {
@@ -152,15 +184,27 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 		@Override
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			propertyPath.addNode( leafNodeName );
+			propertyPath.addPropertyNode( leafNodeName );
 			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
 		}
 
 		@Override
 		public ConstraintValidatorContext addConstraintViolation() {
-			propertyPath.addNode( leafNodeName );
+			propertyPath.addPropertyNode( leafNodeName );
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
+		}
+
+		@Override
+		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			//TODO HV-709
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
+
+		@Override
+		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			//TODO HV-709
+			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
 
@@ -178,28 +222,40 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		@Override
 		public ConstraintViolationBuilder.NodeBuilderDefinedContext atKey(Object key) {
 			propertyPath.setLeafNodeMapKey( key );
-			propertyPath.addNode( leafNodeName );
+			propertyPath.addPropertyNode( leafNodeName );
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		@Override
 		public ConstraintViolationBuilder.NodeBuilderDefinedContext atIndex(Integer index) {
 			propertyPath.setLeafNodeIndex( index );
-			propertyPath.addNode( leafNodeName );
+			propertyPath.addPropertyNode( leafNodeName );
 			return new NodeBuilderImpl( messageTemplate, propertyPath );
 		}
 
 		@Override
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			propertyPath.addNode( leafNodeName );
+			propertyPath.addPropertyNode( leafNodeName );
 			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
 		}
 
 		@Override
 		public ConstraintValidatorContext addConstraintViolation() {
-			propertyPath.addNode( leafNodeName );
+			propertyPath.addPropertyNode( leafNodeName );
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
+		}
+
+		@Override
+		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			//TODO HV-709
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
+
+		@Override
+		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			//TODO HV-709
+			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
 }

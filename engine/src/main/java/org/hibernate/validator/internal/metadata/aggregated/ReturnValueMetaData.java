@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.metadata.ElementDescriptor;
+import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
@@ -51,7 +51,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				RETURN_VALUE_NODE_NAME,
 				type,
 				constraints,
-				ConstraintMetaDataKind.RETURN_VALUE,
+				ElementKind.RETURN_VALUE,
 				isCascading,
 				!constraints.isEmpty() || isCascading
 		);
@@ -83,11 +83,6 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	@Override
 	public Object getValue(Object parent) {
 		return parent;
-	}
-
-	@Override
-	public ElementDescriptor getDescriptor() {
-		return asDescriptor( false, Collections.<Class<?>>emptyList() );
 	}
 
 	@Override

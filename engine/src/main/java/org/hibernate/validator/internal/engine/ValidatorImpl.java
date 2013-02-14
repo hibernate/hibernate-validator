@@ -28,14 +28,14 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
-import javax.validation.ExecutableValidator;
+import javax.validation.ElementKind;
 import javax.validation.MessageInterpolator;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
+import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ElementDescriptor;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -1317,17 +1317,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private boolean isCrossParameterValidation(PathImpl path) {
-		return path.getLeafNode().getElementDescriptor().getKind() == ElementDescriptor.Kind.METHOD ||
-				path.getLeafNode().getElementDescriptor().getKind() == ElementDescriptor.Kind.CONSTRUCTOR;
+		return path.getLeafNode().getKind() == ElementKind.METHOD ||
+				path.getLeafNode().getKind() == ElementKind.CONSTRUCTOR;
 
 	}
 
 	private boolean isParameterValidation(PathImpl path) {
-		return path.getLeafNode().getElementDescriptor().getKind() == ElementDescriptor.Kind.PARAMETER;
+		return path.getLeafNode().getKind() == ElementKind.PARAMETER;
 	}
 
 	private boolean isReturnValueValidation(PathImpl path) {
-		return path.getLeafNode().getElementDescriptor().getKind() == ElementDescriptor.Kind.RETURN_VALUE;
+		return path.getLeafNode().getKind() == ElementKind.RETURN_VALUE;
 	}
 
 	private boolean shouldFailFast(ValidationContext<?, ?> context) {

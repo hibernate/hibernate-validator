@@ -27,9 +27,8 @@ import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validator.internal.util.Contracts;
-
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.Contracts;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
@@ -90,7 +89,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 
 	@Override
 	public Set<MethodDescriptor> getConstrainedMethods() {
-		for( ExecutableDescriptorImpl constrainedMethod : constrainedMethods.values() ) {
+		for ( ExecutableDescriptorImpl constrainedMethod : constrainedMethods.values() ) {
 			constrainedMethod.assertCorrectnessOfConfiguration();
 		}
 
@@ -107,11 +106,6 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 		}
 
 		return methodDescriptor;
-	}
-
-	@Override
-	public Kind getKind() {
-		return Kind.BEAN;
 	}
 
 	@Override

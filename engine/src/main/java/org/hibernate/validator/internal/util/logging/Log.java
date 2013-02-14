@@ -428,7 +428,7 @@ public interface Log extends BasicLogger {
 	ValidationException getInvalidPropertyValue(String propertyName, String propertyValue, @Cause Exception e);
 
 	@Message(id = 118, value = "Unable to cast %s to %s")
-	ClassCastException unableToNarrowDescriptorType(String actualDescriptorType, String expectedDescriptorType);
+	ClassCastException unableToNarrowNodeType(String actualDescriptorType, String expectedDescriptorType);
 
 	@LogMessage(level = INFO)
 	@Message(id = 119, value = "Using %s as parameter name provider.")

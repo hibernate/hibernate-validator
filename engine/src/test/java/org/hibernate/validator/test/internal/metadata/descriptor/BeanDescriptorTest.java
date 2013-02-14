@@ -25,7 +25,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
-import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
@@ -33,7 +32,6 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
@@ -63,30 +61,6 @@ public class BeanDescriptorTest {
 	public void testGetElementClass() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		assertEquals( descriptor.getElementClass(), CustomerRepository.class );
-	}
-
-	@Test
-	public void testElementDescriptorType() {
-		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
-		assertEquals( descriptor.getKind(), ElementDescriptor.Kind.BEAN );
-	}
-
-	@Test
-	public void testNarrowDescriptor() {
-		ElementDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
-
-		BeanDescriptor beanDescriptor = descriptor.as( BeanDescriptor.class );
-		assertTrue( beanDescriptor != null );
-
-		beanDescriptor = descriptor.as( BeanDescriptorImpl.class );
-		assertTrue( beanDescriptor != null );
-	}
-
-	@Test(expectedExceptions = ClassCastException.class,
-			expectedExceptionsMessageRegExp = "HV000118.*")
-	public void testUnableToNarrowDescriptor() {
-		ElementDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
-		descriptor.as( MethodDescriptor.class );
 	}
 
 	@Test

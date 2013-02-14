@@ -63,11 +63,6 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 	}
 
 	@Override
-	public Kind getKind() {
-		return Kind.PROPERTY;
-	}
-
-	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "PropertyDescriptorImpl" );

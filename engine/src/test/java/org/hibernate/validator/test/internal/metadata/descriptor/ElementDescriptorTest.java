@@ -147,13 +147,4 @@ public class ElementDescriptorTest {
 		);
 		assertEquals( propertyDescriptor.getPropertyName(), "order" );
 	}
-
-	@Test
-	public void testPropertyDescriptorType() {
-		PropertyDescriptor propertyDescriptor = ValidatorUtil.getPropertyDescriptor(
-				ChildWithoutAtValid2.class,
-				"order"
-		);
-		assertEquals( propertyDescriptor.getKind(), ElementDescriptor.Kind.PROPERTY );
-	}
 }

@@ -71,11 +71,6 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	}
 
 	@Override
-	public Kind getKind() {
-		return Kind.PARAMETER;
-	}
-
-	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "ParameterDescriptorImpl" );

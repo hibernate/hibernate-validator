@@ -27,10 +27,9 @@ import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.Validator;
-import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.ParameterDescriptor;
 
 /**
  * An interceptor which performs a validation of the Bean Validation constraints specified at the parameters and/or return
@@ -111,18 +110,16 @@ public class ValidationInterceptor implements Serializable {
 
 		int i = 1;
 		for ( ConstraintViolation<?> constraintViolation : violations ) {
-			ElementDescriptor elementDescriptor = locateElementDescriptor( constraintViolation );
+			Path.Node leafNode = getLeafNode( constraintViolation );
 
 			message.append( "\n (" );
 			message.append( i );
 			message.append( ")" );
-			if ( elementDescriptor != null ) {
-				message.append( " Kind: " );
-				message.append( elementDescriptor.getKind() );
-				if ( elementDescriptor instanceof ParameterDescriptor ) {
-					message.append( "\n parameter index: " );
-					message.append( ( (ParameterDescriptor) elementDescriptor ).getIndex() );
-				}
+			message.append( " Kind: " );
+			message.append( leafNode.getKind() );
+			if ( leafNode.getKind() == ElementKind.PARAMETER ) {
+				message.append( "\n parameter index: " );
+				message.append( leafNode.as( Path.ParameterNode.class ).getParameterIndex() );
 			}
 			message.append( "\n message: " );
 			message.append( constraintViolation.getMessage() );
@@ -139,14 +136,12 @@ public class ValidationInterceptor implements Serializable {
 		return message.toString();
 	}
 
-	private ElementDescriptor locateElementDescriptor(ConstraintViolation<?> constraintViolation) {
+	private Path.Node getLeafNode(ConstraintViolation<?> constraintViolation) {
 		Iterator<Path.Node> nodes = constraintViolation.getPropertyPath().iterator();
 		Path.Node leafNode = null;
 		while ( nodes.hasNext() ) {
 			leafNode = nodes.next();
 		}
-		return leafNode == null ? null : leafNode.getElementDescriptor();
+		return leafNode;
 	}
 }
-
-
