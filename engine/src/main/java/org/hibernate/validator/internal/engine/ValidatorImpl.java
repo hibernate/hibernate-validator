@@ -29,11 +29,11 @@ import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
-import javax.validation.ExecutableValidator;
 import javax.validation.MessageInterpolator;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
+import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 

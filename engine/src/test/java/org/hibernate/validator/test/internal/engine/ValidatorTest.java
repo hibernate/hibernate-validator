@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
-import javax.validation.ExecutableValidator;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -28,6 +27,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.executable.ExecutableValidator;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.testng.annotations.Test;

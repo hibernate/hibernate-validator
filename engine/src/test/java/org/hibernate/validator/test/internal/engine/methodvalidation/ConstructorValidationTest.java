@@ -19,8 +19,8 @@ package org.hibernate.validator.test.internal.engine.methodvalidation;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
-import javax.validation.ExecutableValidator;
 import javax.validation.Path;
+import javax.validation.executable.ExecutableValidator;
 
 import org.testng.annotations.Test;
 

@@ -48,7 +48,7 @@ import static org.testng.Assert.assertEquals;
 /**
  * @author Hardy Ferentschik
  */
-public class ElementDescriptorFromNodeTest {
+public class NodeImplTest {
 	private Validator validator;
 
 	@BeforeClass
@@ -112,7 +112,7 @@ public class ElementDescriptorFromNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.BEAN, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.BEAN, "unexpected node kind" );
 	}
 
 	@Test
@@ -127,10 +127,10 @@ public class ElementDescriptorFromNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.BEAN, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.BEAN, "unexpected node kind" );
 	}
 
 	@Test
@@ -147,10 +147,10 @@ public class ElementDescriptorFromNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 	}
 
 	@Test
@@ -166,10 +166,10 @@ public class ElementDescriptorFromNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 	}
 
 	@Test
@@ -185,10 +185,10 @@ public class ElementDescriptorFromNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 	}
 
 	private void assertConstraintViolationToOneValidation(Set<ConstraintViolation<AWithB>> constraintViolations) {
@@ -199,10 +199,10 @@ public class ElementDescriptorFromNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 
 		node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 	}
 
 	private void assertConstraintViolationPropertyValidation(Set<ConstraintViolation<A>> constraintViolations) {
@@ -213,7 +213,7 @@ public class ElementDescriptorFromNodeTest {
 		Iterator<Path.Node> nodeIterator = path.iterator();
 
 		Path.Node node = nodeIterator.next();
-		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected descriptor type" );
+		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 	}
 
 	static class A {

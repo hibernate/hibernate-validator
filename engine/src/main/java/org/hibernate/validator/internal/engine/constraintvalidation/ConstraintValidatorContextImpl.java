@@ -115,16 +115,19 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			//TODO HV-709
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			//TODO HV-709
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 
 		@Override
 		public NodeBuilderDefinedContext addParameterNode(int index) {
+			//TODO HV-709
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
@@ -151,11 +154,13 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			//TODO HV-709
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			//TODO HV-709
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
@@ -192,11 +197,13 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			//TODO HV-709
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			//TODO HV-709
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
@@ -241,11 +248,13 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			//TODO HV-709
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			//TODO HV-709
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}

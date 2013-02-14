@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.ConstructorDescriptor;
+import javax.validation.metadata.CrossParameterDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
@@ -111,5 +112,11 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 	public boolean isReturnValueConstrained() {
 		return returnValueDescriptor != null && ( returnValueDescriptor.hasConstraints() || returnValueDescriptor
 				.isCascaded() );
+	}
+
+	@Override
+	public CrossParameterDescriptor getCrossParameterDescriptor() {
+		//TODO HV-709
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 }
