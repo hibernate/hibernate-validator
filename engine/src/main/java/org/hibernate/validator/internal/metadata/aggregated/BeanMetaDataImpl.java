@@ -24,13 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData.ConstraintMetaDataKind;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
@@ -146,7 +146,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Set<ExecutableMetaData> executableMetaDataSet = newHashSet();
 
 		for ( ConstraintMetaData oneElement : constraintMetaData ) {
-			if ( oneElement.getKind() == ConstraintMetaDataKind.PROPERTY ) {
+			if ( oneElement.getKind() == ElementKind.PROPERTY ) {
 				propertyMetaDataSet.add( (PropertyMetaData) oneElement );
 			}
 			else {
@@ -290,7 +290,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Map<String, ExecutableDescriptorImpl> constrainedMethodDescriptors = newHashMap();
 
 		for ( ExecutableMetaData oneExecutable : executableMetaData.values() ) {
-			if ( oneExecutable.getKind() == ConstraintMetaDataKind.METHOD && oneExecutable.isConstrained() ) {
+			if ( oneExecutable.getKind() == ElementKind.METHOD && oneExecutable.isConstrained() ) {
 				constrainedMethodDescriptors.put(
 						oneExecutable.getIdentifier(),
 						oneExecutable.asDescriptor(
@@ -308,7 +308,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Map<String, ConstructorDescriptor> constrainedMethodDescriptors = newHashMap();
 
 		for ( ExecutableMetaData oneExecutable : executableMetaData.values() ) {
-			if ( oneExecutable.getKind() == ConstraintMetaDataKind.CONSTRUCTOR && oneExecutable.isConstrained() ) {
+			if ( oneExecutable.getKind() == ElementKind.CONSTRUCTOR && oneExecutable.isConstrained() ) {
 				constrainedMethodDescriptors.put(
 						oneExecutable.getIdentifier(),
 						oneExecutable.asDescriptor(

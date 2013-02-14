@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
+import javax.validation.ElementKind;
 import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
@@ -94,7 +95,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			String name,
 			Class<?> returnType,
 			Class<?>[] parameterTypes,
-			ConstraintMetaDataKind kind,
+			ElementKind kind,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
@@ -196,7 +197,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					executableElement.getSimpleName(),
 					executableElement.getReturnType(),
 					executableElement.getParameterTypes(),
-					kind == ConstrainedElementKind.CONSTRUCTOR ? ConstraintMetaDataKind.CONSTRUCTOR : ConstraintMetaDataKind.METHOD,
+					kind == ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),

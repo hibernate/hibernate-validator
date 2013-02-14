@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import javax.validation.ElementKind;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -36,7 +37,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 
 	private final String name;
 	private final Type type;
-	private final ConstraintMetaDataKind constrainedMetaDataKind;
+	private final ElementKind constrainedMetaDataKind;
 	private final Set<MetaConstraint<?>> constraints;
 	private final boolean isCascading;
 	private final boolean isConstrained;
@@ -54,7 +55,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	public AbstractConstraintMetaData(String name,
 									  Type type,
 									  Set<MetaConstraint<?>> constraints,
-									  ConstraintMetaDataKind constrainedMetaDataKind,
+									  ElementKind constrainedMetaDataKind,
 									  boolean isCascading,
 									  boolean isConstrained) {
 		this.name = name;
@@ -65,14 +66,17 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		this.isConstrained = isConstrained;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public Type getType() {
 		return type;
 	}
 
+	@Override
 	public Iterator<MetaConstraint<?>> iterator() {
 		return constraints.iterator();
 	}
@@ -81,14 +85,17 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		return constraints;
 	}
 
-	public ConstraintMetaDataKind getKind() {
+	@Override
+	public ElementKind getKind() {
 		return constrainedMetaDataKind;
 	}
 
+	@Override
 	public boolean isCascading() {
 		return isCascading;
 	}
 
+	@Override
 	public boolean isConstrained() {
 		return isConstrained;
 	}

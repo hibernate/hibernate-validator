@@ -20,12 +20,11 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.metadata.ElementDescriptor;
+import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -75,7 +74,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				propertyName,
 				type,
 				constraints,
-				ConstraintMetaDataKind.PROPERTY,
+				ElementKind.PROPERTY,
 				cascadingMember != null,
 				cascadingMember != null || !constraints.isEmpty()
 		);
@@ -127,11 +126,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				defaultGroupSequence,
 				getGroupConversionDescriptors()
 		);
-	}
-
-	@Override
-	public ElementDescriptor getDescriptor() {
-		return asDescriptor( false, Collections.<Class<?>>emptyList() );
 	}
 
 	@Override
