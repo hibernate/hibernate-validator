@@ -42,11 +42,11 @@ public class ConstraintParameterBuilder {
 	private ConstraintParameterBuilder() {
 	}
 
-	public static List<ConstrainedParameter> buildParameterConstraints(List<ParameterType> parameterList,
-																	   ExecutableElement executableElement,
-																	   String defaultPackage,
-																	   ConstraintHelper constraintHelper,
-																	   ParameterNameProvider parameterNameProvider) {
+	public static List<ConstrainedParameter> buildConstrainedParameters(List<ParameterType> parameterList,
+																		ExecutableElement executableElement,
+																		String defaultPackage,
+																		ConstraintHelper constraintHelper,
+																		ParameterNameProvider parameterNameProvider) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
 		int i = 0;
 		String[] parameterNames = executableElement.getParameterNames( parameterNameProvider );
@@ -54,7 +54,7 @@ public class ConstraintParameterBuilder {
 			ExecutableConstraintLocation constraintLocation = new ExecutableConstraintLocation( executableElement, i );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : parameterType.getConstraint() ) {
-				ConstraintDescriptorImpl<?> constraintDescriptor = ConstraintBuilder.buildConstraintDescriptor(
+				ConstraintDescriptorImpl<?> constraintDescriptor = ConstraintDescriptorBuilder.buildConstraintDescriptor(
 						constraint,
 						executableElement.getElementType(),
 						defaultPackage,

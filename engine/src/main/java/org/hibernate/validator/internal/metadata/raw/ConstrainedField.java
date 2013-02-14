@@ -42,7 +42,10 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param isCascading Whether a cascaded validation of the represented field shall
 	 * be performed or not.
 	 */
-	public ConstrainedField(ConfigurationSource source, BeanConstraintLocation location, Set<MetaConstraint<?>> constraints, Map<Class<?>, Class<?>> groupConversions,
+	public ConstrainedField(ConfigurationSource source,
+							BeanConstraintLocation location,
+							Set<MetaConstraint<?>> constraints,
+							Map<Class<?>, Class<?>> groupConversions,
 							boolean isCascading) {
 
 		super( source, ConstrainedElementKind.FIELD, location, constraints, groupConversions, isCascading );
