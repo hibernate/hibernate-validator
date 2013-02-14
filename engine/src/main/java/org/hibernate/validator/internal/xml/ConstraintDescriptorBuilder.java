@@ -41,14 +41,14 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  *
  * @author Hardy Ferentschik
  */
-public class ConstraintBuilder {
+public class ConstraintDescriptorBuilder {
 	private static final Log log = LoggerFactory.make();
 
 	private static final String MESSAGE_PARAM = "message";
 	private static final String GROUPS_PARAM = "groups";
 	private static final String PAYLOAD_PARAM = "payload";
 
-	private ConstraintBuilder() {
+	private ConstraintDescriptorBuilder() {
 	}
 
 	@SuppressWarnings("unchecked")
@@ -56,7 +56,7 @@ public class ConstraintBuilder {
 																							   java.lang.annotation.ElementType type,
 																							   String defaultPackage,
 																							   ConstraintHelper constraintHelper) {
-		Class<A> annotationClass = null;
+		Class<A> annotationClass;
 		try {
 			annotationClass = (Class<A>) ReflectionHelper.loadClass( constraint.getAnnotation(), defaultPackage );
 		}
@@ -168,7 +168,7 @@ public class ConstraintBuilder {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
-				returnValue = ConstraintBuilder.buildAnnotation( annotationType, annotationClass );
+				returnValue = ConstraintDescriptorBuilder.buildAnnotation( annotationType, annotationClass );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getUnexpectedParameterValueException( e );
@@ -244,7 +244,7 @@ public class ConstraintBuilder {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ReflectionHelper.loadClass( value, ConstraintBuilder.class );
+			returnValue = ReflectionHelper.loadClass( value, ConstraintDescriptorBuilder.class );
 		}
 		else {
 			try {

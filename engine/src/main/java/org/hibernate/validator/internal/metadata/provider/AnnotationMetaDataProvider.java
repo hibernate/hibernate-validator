@@ -219,7 +219,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
 		for ( Field field : ReflectionHelper.getDeclaredFields( beanClass ) ) {
-
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) ||
 					annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored( field ) ||
