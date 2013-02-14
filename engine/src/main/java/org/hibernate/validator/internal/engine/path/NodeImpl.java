@@ -17,8 +17,11 @@
 package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serializable;
+import javax.validation.ElementKind;
 import javax.validation.Path;
-import javax.validation.metadata.ElementDescriptor;
+
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Immutable implementation of a {@code Path.Node}.
@@ -27,6 +30,8 @@ import javax.validation.metadata.ElementDescriptor;
  */
 public class NodeImpl implements Path.Node, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
+
+	private static final Log log = LoggerFactory.make();
 
 	public static final String INDEX_OPEN = "[";
 	public static final String INDEX_CLOSE = "]";
@@ -38,18 +43,16 @@ public class NodeImpl implements Path.Node, Serializable {
 	private final Integer index;
 	private final Object key;
 	private final int hashCode;
-	private final ElementDescriptor elementDescriptor;
 
 	private String asString;
 
-	public NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementDescriptor descriptor) {
+	public NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
 		this.key = key;
 		this.isIterable = indexable;
 		this.hashCode = buildHashCode();
-		this.elementDescriptor = descriptor;
 	}
 
 	@Override
@@ -91,8 +94,16 @@ public class NodeImpl implements Path.Node, Serializable {
 	}
 
 	@Override
-	public ElementDescriptor getElementDescriptor() {
-		return elementDescriptor;
+	public ElementKind getKind() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public <T extends Path.Node> T as(Class<T> nodeType) {
+		if ( nodeType.isAssignableFrom( this.getClass() ) ) {
+			return nodeType.cast( this );
+		}
+		throw log.unableToNarrowDescriptorType( this.getClass().getName(), nodeType.getName() );
 	}
 
 	@Override
@@ -110,27 +121,18 @@ public class NodeImpl implements Path.Node, Serializable {
 	private String buildToString() {
 		StringBuilder builder = new StringBuilder();
 
-		if ( elementDescriptor != null ) {
-			if ( ElementDescriptor.Kind.BEAN.equals( elementDescriptor.getKind() ) ) {
-				// class level constraints don't contribute to path
-				builder.append( "" );
-			}
-			else if ( ElementDescriptor.Kind.RETURN_VALUE.equals( elementDescriptor.getKind() ) ) {
-				// special handling of return value nodes. per spec the name is null, but in toString we add $retval
-				builder.append( RETURN_VALUE_TO_STRING );
-			}
-			else {
-				builder.append( getName() );
-			}
+		if ( ElementKind.BEAN.equals( getKind() ) ) {
+			// class level constraints don't contribute to path
+			builder.append( "" );
+		}
+		else if ( ElementKind.RETURN_VALUE.equals( getKind() ) ) {
+			// special handling of return value nodes. per spec the name is null, but in toString we add $retval
+			builder.append( RETURN_VALUE_TO_STRING );
 		}
 		else {
-			if ( getName() != null ) {
-				builder.append( getName() );
-			}
-			else {
-				builder.append( "" );
-			}
+			builder.append( getName() );
 		}
+
 		if ( isIterable() ) {
 			builder.append( INDEX_OPEN );
 			if ( index != null ) {

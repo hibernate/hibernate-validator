@@ -19,6 +19,8 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
@@ -110,6 +112,21 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
 		}
+
+		@Override
+		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
+
+		@Override
+		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
+
+		@Override
+		public NodeBuilderDefinedContext addParameterNode(int index) {
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
 	}
 
 	class NodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderDefinedContext {
@@ -130,6 +147,16 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		public ConstraintValidatorContext addConstraintViolation() {
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
+		}
+
+		@Override
+		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
+
+		@Override
+		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
 
@@ -161,6 +188,16 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			propertyPath.addNode( leafNodeName );
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
+		}
+
+		@Override
+		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
+
+		@Override
+		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
 
@@ -200,6 +237,16 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			propertyPath.addNode( leafNodeName );
 			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
 			return ConstraintValidatorContextImpl.this;
+		}
+
+		@Override
+		public NodeBuilderCustomizableContext addPropertyNode(String name) {
+			throw new UnsupportedOperationException( "Not implemented yet" );
+		}
+
+		@Override
+		public LeafNodeBuilderCustomizableContext addBeanNode() {
+			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
 	}
 }

@@ -33,14 +33,12 @@ import javax.validation.metadata.ReturnValueDescriptor;
  */
 public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		implements ConstructorDescriptor, MethodDescriptor {
-	private final Kind kind;
 	private final String name;
 	private final List<ParameterDescriptor> parameters;
 	private final ReturnValueDescriptor returnValueDescriptor;
 	private final ConstraintDeclarationException constraintDeclarationException;
 
 	public ExecutableDescriptorImpl(
-			Kind kind,
 			Type returnType,
 			String name,
 			Set<ConstraintDescriptorImpl<?>> crossParameterValueConstraints,
@@ -56,7 +54,6 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 				defaultGroupSequence
 		);
 
-		this.kind = kind;
 		this.name = name;
 		this.parameters = Collections.unmodifiableList( parameters );
 		this.returnValueDescriptor = returnValueDescriptor;
@@ -93,11 +90,6 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		sb.append( "{name='" ).append( name ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();
-	}
-
-	@Override
-	public Kind getKind() {
-		return kind;
 	}
 
 	@Override

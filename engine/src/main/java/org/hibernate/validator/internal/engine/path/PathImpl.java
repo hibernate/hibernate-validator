@@ -125,7 +125,7 @@ public final class PathImpl implements Path, Serializable {
 
 	public NodeImpl addNode(String nodeName, ElementDescriptor descriptor) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null, descriptor );
+		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
@@ -137,8 +137,7 @@ public final class PathImpl implements Path, Serializable {
 				currentLeafNode.getParent(),
 				true,
 				null,
-				null,
-				currentLeafNode.getElementDescriptor()
+				null
 		);
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
@@ -152,8 +151,7 @@ public final class PathImpl implements Path, Serializable {
 				currentLeafNode.getParent(),
 				true,
 				index,
-				null,
-				currentLeafNode.getElementDescriptor()
+				null
 		);
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
@@ -167,8 +165,7 @@ public final class PathImpl implements Path, Serializable {
 				currentLeafNode.getParent(),
 				true,
 				null,
-				key,
-				currentLeafNode.getElementDescriptor()
+				key
 		);
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );

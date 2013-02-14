@@ -36,8 +36,6 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Describes a validated element (class, field or property).
@@ -47,7 +45,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 public abstract class ElementDescriptorImpl implements ElementDescriptor, Serializable {
-	private static final Log log = LoggerFactory.make();
+
 	/**
 	 * The type of the element
 	 */
@@ -86,17 +84,6 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 	public final ConstraintFinder findConstraints() {
 		return new ConstraintFinderImpl();
 	}
-
-	@Override
-	public <T extends ElementDescriptor> T as(Class<T> descriptorType) {
-		if ( descriptorType.isAssignableFrom( this.getClass() ) ) {
-			return descriptorType.cast( this );
-		}
-		throw log.unableToNarrowDescriptorType( this.getClass().getName(), descriptorType.getName() );
-	}
-
-	@Override
-	public abstract Kind getKind();
 
 	private class ConstraintFinderImpl implements ConstraintFinder {
 		private List<Class<?>> groups;

@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.ElementDescriptor.Kind;
 import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -429,7 +428,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	@Override
 	public ExecutableDescriptorImpl asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new ExecutableDescriptorImpl(
-				getKind() == ConstraintMetaDataKind.METHOD ? Kind.METHOD : Kind.CONSTRUCTOR,
 				getType(),
 				getName(),
 				asDescriptors( getCrossParameterConstraints() ),
