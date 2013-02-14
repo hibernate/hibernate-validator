@@ -67,10 +67,9 @@ public class ValidationXmlParser {
 	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of {@code ConfigurationImpl.ValidationBootstrapParameters}.
 	 */
 	public final BootstrapConfiguration parseValidationXml() {
-
 		InputStream inputStream = getInputStream();
 		if ( inputStream == null ) {
-			return new BootstrapConfigurationImpl();
+			return BootstrapConfigurationImpl.getDefaultBootstrapConfiguration();
 		}
 
 		try {
@@ -163,27 +162,18 @@ public class ValidationXmlParser {
 	 * XML configuration, considering the special elements
 	 * {@link ExecutableType#ALL} and {@link ExecutableType#NONE}.
 	 *
-	 * @param validatedExecutables
-	 *            Schema type with executable types.
+	 * @param validatedExecutables Schema type with executable types.
 	 *
 	 * @return An enum set representing the given executable types.
 	 */
 	private EnumSet<ExecutableType> getValidatedExecutableTypes(ValidatedExecutablesType validatedExecutables) {
-		if( validatedExecutables == null ) {
-			return EnumSet.noneOf( ExecutableType.class );
+		if ( validatedExecutables == null ) {
+			return null;
 		}
 
 		EnumSet<ExecutableType> executableTypes = EnumSet.noneOf( ExecutableType.class );
 		executableTypes.addAll( validatedExecutables.getExecutableType() );
 
-		if ( executableTypes.contains( ExecutableType.ALL ) ) {
-			return EnumSet.complementOf( EnumSet.of( ExecutableType.ALL, ExecutableType.NONE ) );
-		}
-		else if ( executableTypes.contains( ExecutableType.NONE ) ) {
-			return EnumSet.noneOf( ExecutableType.class );
-		}
-		else {
-			return executableTypes;
-		}
+		return executableTypes;
 	}
 }

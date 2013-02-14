@@ -17,16 +17,27 @@
 package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.validation.ElementKind;
 import javax.validation.Path;
-import javax.validation.metadata.ElementDescriptor;
+
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Immutable implementation of a {@code Path.Node}.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
-public class NodeImpl implements Path.Node, Serializable {
+public class NodeImpl
+		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
+
+	private static final Log log = LoggerFactory.make();
 
 	public static final String INDEX_OPEN = "[";
 	public static final String INDEX_CLOSE = "]";
@@ -37,19 +48,126 @@ public class NodeImpl implements Path.Node, Serializable {
 	private final boolean isIterable;
 	private final Integer index;
 	private final Object key;
+	private final ElementKind kind;
 	private final int hashCode;
-	private final ElementDescriptor elementDescriptor;
+
+	//type-specific attributes
+	private final List<Class<?>> parameterTypes;
+	private final Integer parameterIndex;
 
 	private String asString;
 
-	public NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementDescriptor descriptor) {
+	private NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementKind kind, List<Class<?>> parameterTypes, Integer parameterIndex) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
 		this.key = key;
 		this.isIterable = indexable;
+		this.kind = kind;
+		this.parameterTypes = parameterTypes;
+		this.parameterIndex = parameterIndex;
 		this.hashCode = buildHashCode();
-		this.elementDescriptor = descriptor;
+	}
+
+	//TODO It would be nicer if we could return PropertyNode
+	public static NodeImpl createPropertyNode(String name, NodeImpl parent) {
+		return new NodeImpl(
+				name,
+				parent,
+				false,
+				null,
+				null,
+				ElementKind.PROPERTY,
+				Collections.<Class<?>>emptyList(),
+				null
+		);
+	}
+
+	public static NodeImpl createParameterNode(String name, NodeImpl parent, int parameterIndex) {
+		return new NodeImpl(
+				name,
+				parent,
+				false,
+				null,
+				null,
+				ElementKind.PARAMETER,
+				Collections.<Class<?>>emptyList(),
+				parameterIndex
+		);
+	}
+
+	public static NodeImpl createMethodNode(String name, NodeImpl parent, List<Class<?>> parameterTypes) {
+		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null );
+	}
+
+	public static NodeImpl createConstructorNode(String name, NodeImpl parent, List<Class<?>> parameterTypes) {
+		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null );
+	}
+
+	public static NodeImpl createBeanNode(NodeImpl parent) {
+		return new NodeImpl(
+				null,
+				parent,
+				false,
+				null,
+				null,
+				ElementKind.BEAN,
+				Collections.<Class<?>>emptyList(),
+				null
+		);
+	}
+
+	public static NodeImpl createReturnValue(NodeImpl parent) {
+		return new NodeImpl(
+				null,
+				parent,
+				false,
+				null,
+				null,
+				ElementKind.RETURN_VALUE,
+				Collections.<Class<?>>emptyList(),
+				null
+		);
+	}
+
+	public static NodeImpl makeIterable(NodeImpl node) {
+		return new NodeImpl(
+				node.name,
+				node.parent,
+				true,
+				null,
+				null,
+				node.kind,
+				node.parameterTypes,
+				node.parameterIndex
+
+		);
+	}
+
+	public static NodeImpl setIndex(NodeImpl node, Integer index) {
+		return new NodeImpl(
+				node.name,
+				node.parent,
+				true,
+				index,
+				null,
+				node.kind,
+				node.parameterTypes,
+				node.parameterIndex
+		);
+	}
+
+	public static NodeImpl setMapKey(NodeImpl node, Object key) {
+		return new NodeImpl(
+				node.name,
+				node.parent,
+				true,
+				null,
+				key,
+				node.kind,
+				node.parameterTypes,
+				node.parameterIndex
+		);
 	}
 
 	@Override
@@ -91,8 +209,30 @@ public class NodeImpl implements Path.Node, Serializable {
 	}
 
 	@Override
-	public ElementDescriptor getElementDescriptor() {
-		return elementDescriptor;
+	public ElementKind getKind() {
+		return kind;
+	}
+
+	@Override
+	public <T extends Path.Node> T as(Class<T> nodeType) {
+		if ( nodeType.isAssignableFrom( this.getClass() ) ) {
+			return nodeType.cast( this );
+		}
+		throw log.unableToNarrowNodeType( this.getClass().getName(), nodeType.getName() );
+	}
+
+	@Override
+	public List<Class<?>> getParameterTypes() {
+		return new ArrayList<Class<?>>( parameterTypes );
+	}
+
+	@Override
+	public int getParameterIndex() {
+		Contracts.assertTrue(
+				kind == ElementKind.PARAMETER,
+				"getParameterIndex() may only be invoked for nodes of ElementKind.PARAMETER."
+		);
+		return parameterIndex.intValue();
 	}
 
 	@Override
@@ -110,27 +250,18 @@ public class NodeImpl implements Path.Node, Serializable {
 	private String buildToString() {
 		StringBuilder builder = new StringBuilder();
 
-		if ( elementDescriptor != null ) {
-			if ( ElementDescriptor.Kind.BEAN.equals( elementDescriptor.getKind() ) ) {
-				// class level constraints don't contribute to path
-				builder.append( "" );
-			}
-			else if ( ElementDescriptor.Kind.RETURN_VALUE.equals( elementDescriptor.getKind() ) ) {
-				// special handling of return value nodes. per spec the name is null, but in toString we add $retval
-				builder.append( RETURN_VALUE_TO_STRING );
-			}
-			else {
-				builder.append( getName() );
-			}
+		if ( ElementKind.BEAN.equals( getKind() ) ) {
+			// class level constraints don't contribute to path
+			builder.append( "" );
+		}
+		else if ( ElementKind.RETURN_VALUE.equals( getKind() ) ) {
+			// special handling of return value nodes. per spec the name is null, but in toString we add $retval
+			builder.append( RETURN_VALUE_TO_STRING );
 		}
 		else {
-			if ( getName() != null ) {
-				builder.append( getName() );
-			}
-			else {
-				builder.append( "" );
-			}
+			builder.append( getName() );
 		}
+
 		if ( isIterable() ) {
 			builder.append( INDEX_OPEN );
 			if ( index != null ) {
@@ -150,7 +281,10 @@ public class NodeImpl implements Path.Node, Serializable {
 		result = prime * result + ( ( index == null ) ? 0 : index.hashCode() );
 		result = prime * result + ( isIterable ? 1231 : 1237 );
 		result = prime * result + ( ( key == null ) ? 0 : key.hashCode() );
+		result = prime * result + ( ( kind == null ) ? 0 : kind.hashCode() );
 		result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
+		result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
+		result = prime * result + ( ( parameterTypes == null ) ? 0 : parameterTypes.hashCode() );
 		result = prime * result + ( ( parent == null ) ? 0 : parent.hashCode() );
 		return result;
 	}
@@ -191,12 +325,31 @@ public class NodeImpl implements Path.Node, Serializable {
 		else if ( !key.equals( other.key ) ) {
 			return false;
 		}
+		if ( kind != other.kind ) {
+			return false;
+		}
 		if ( name == null ) {
 			if ( other.name != null ) {
 				return false;
 			}
 		}
 		else if ( !name.equals( other.name ) ) {
+			return false;
+		}
+		if ( parameterIndex == null ) {
+			if ( other.parameterIndex != null ) {
+				return false;
+			}
+		}
+		else if ( !parameterIndex.equals( other.parameterIndex ) ) {
+			return false;
+		}
+		if ( parameterTypes == null ) {
+			if ( other.parameterTypes != null ) {
+				return false;
+			}
+		}
+		else if ( !parameterTypes.equals( other.parameterTypes ) ) {
 			return false;
 		}
 		if ( parent == null ) {

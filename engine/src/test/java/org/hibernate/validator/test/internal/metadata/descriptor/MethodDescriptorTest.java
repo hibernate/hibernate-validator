@@ -21,9 +21,7 @@ import java.util.Set;
 import javax.enterprise.inject.Default;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.constraints.NotNull;
-import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.Scope;
@@ -31,7 +29,6 @@ import javax.validation.metadata.Scope;
 import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.test.internal.metadata.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
@@ -62,32 +59,6 @@ public class MethodDescriptorTest {
 				"foo"
 		);
 		assertEquals( methodDescriptor.getName(), "foo" );
-	}
-
-	@Test
-	public void testPropertyDescriptorType() {
-		MethodDescriptor methodDescriptor = getMethodDescriptor(
-				CustomerRepositoryExt.class,
-				"foo"
-		);
-		assertEquals( methodDescriptor.getKind(), ElementDescriptor.Kind.METHOD );
-	}
-
-	@Test
-	public void testNarrowDescriptor() {
-		ElementDescriptor descriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
-		MethodDescriptor methodDescriptor = descriptor.as( MethodDescriptor.class );
-		assertTrue( methodDescriptor != null );
-
-		methodDescriptor = descriptor.as( ExecutableDescriptorImpl.class );
-		assertTrue( methodDescriptor != null );
-	}
-
-	@Test(expectedExceptions = ClassCastException.class,
-			expectedExceptionsMessageRegExp = "HV000118.*")
-	public void testUnableToNarrowDescriptor() {
-		ElementDescriptor descriptor = getMethodDescriptor( CustomerRepositoryExt.class, "foo" );
-		descriptor.as( BeanDescriptor.class );
 	}
 
 	@Test

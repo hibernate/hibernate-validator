@@ -20,16 +20,13 @@ import java.util.Set;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.GroupConversionDescriptor;
-import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.Scope;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorImpl;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
@@ -78,26 +75,6 @@ public class ParameterDescriptorTest {
 	public void testGetElementClass() {
 		assertEquals( createCustomerParameter1.getElementClass(), CharSequence.class );
 		assertEquals( createCustomerParameter2.getElementClass(), String.class );
-	}
-
-	@Test
-	public void testElementDescriptorType() {
-		assertEquals( createCustomerParameter1.getKind(), ElementDescriptor.Kind.PARAMETER );
-		assertEquals( createCustomerParameter2.getKind(), ElementDescriptor.Kind.PARAMETER );
-	}
-
-	@Test
-	public void testNarrowDescriptor() {
-		createCustomerParameter1 = createCustomerParameter1.as( ParameterDescriptor.class );
-		assertTrue( createCustomerParameter1 != null );
-
-		createCustomerParameter1 = createCustomerParameter1.as( ParameterDescriptorImpl.class );
-		assertTrue( createCustomerParameter1 != null );
-	}
-
-	@Test(expectedExceptions = ClassCastException.class, expectedExceptionsMessageRegExp = "HV000118.*")
-	public void testUnableToNarrowDescriptor() {
-		createCustomerParameter1.as( MethodDescriptor.class );
 	}
 
 	@Test

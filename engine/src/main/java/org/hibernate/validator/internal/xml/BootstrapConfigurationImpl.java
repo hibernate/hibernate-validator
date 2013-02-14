@@ -16,6 +16,7 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +32,14 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  */
 public class BootstrapConfigurationImpl implements BootstrapConfiguration {
+
+	private static final Set<ExecutableType> DEFAULT_VALIDATED_EXECUTABLE_TYPES =
+			Collections.unmodifiableSet(
+					EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
+			);
+
+	private static final BootstrapConfiguration DEFAULT_BOOTSTRAP_CONFIGURATION = new BootstrapConfigurationImpl();
+
 	private final String defaultProviderClassName;
 	private final String constraintValidatorFactoryClassName;
 	private final String messageInterpolatorClassName;
@@ -40,13 +49,13 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	private final Map<String, String> properties;
 	private final Set<ExecutableType> validatedExecutableTypes;
 
-	public BootstrapConfigurationImpl() {
+	private BootstrapConfigurationImpl() {
 		this.defaultProviderClassName = null;
 		this.constraintValidatorFactoryClassName = null;
 		this.messageInterpolatorClassName = null;
 		this.traversableResolverClassName = null;
 		this.parameterNameProviderClassName = null;
-		this.validatedExecutableTypes = newHashSet();
+		this.validatedExecutableTypes = DEFAULT_VALIDATED_EXECUTABLE_TYPES;
 		this.constraintMappingResourcePaths = newHashSet();
 		this.properties = newHashMap();
 	}
@@ -64,9 +73,28 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.messageInterpolatorClassName = messageInterpolatorClassName;
 		this.traversableResolverClassName = traversableResolverClassName;
 		this.parameterNameProviderClassName = parameterNameProviderClassName;
-		this.validatedExecutableTypes = validatedExecutableTypes;
+		this.validatedExecutableTypes = prepareValidatedExecutableTypes( validatedExecutableTypes );
 		this.constraintMappingResourcePaths = constraintMappingResourcePaths;
 		this.properties = properties;
+	}
+
+	public static BootstrapConfiguration getDefaultBootstrapConfiguration() {
+		return DEFAULT_BOOTSTRAP_CONFIGURATION;
+	}
+
+	private Set<ExecutableType> prepareValidatedExecutableTypes(EnumSet<ExecutableType> validatedExecutableTypes) {
+		if ( validatedExecutableTypes == null ) {
+			return DEFAULT_VALIDATED_EXECUTABLE_TYPES;
+		}
+		if ( validatedExecutableTypes.contains( ExecutableType.ALL ) ) {
+			return EnumSet.complementOf( EnumSet.of( ExecutableType.ALL, ExecutableType.NONE ) );
+		}
+		else if ( validatedExecutableTypes.contains( ExecutableType.NONE ) ) {
+			return EnumSet.noneOf( ExecutableType.class );
+		}
+		else {
+			return validatedExecutableTypes;
+		}
 	}
 
 	@Override

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
-import javax.validation.metadata.ElementDescriptor.Kind;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
@@ -37,16 +36,6 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getConstructorDescr
  * @author Gunnar Morling
  */
 public class ConstructorDescriptorTest {
-
-	@Test
-	public void testGetKind() {
-		ConstructorDescriptor constructorDescriptor = getConstructorDescriptor(
-				CustomerRepositoryExt.class,
-				String.class
-		);
-
-		assertThat( constructorDescriptor.getKind() ).isEqualTo( Kind.CONSTRUCTOR );
-	}
 
 	@Test
 	public void testGetElementClass() {
@@ -71,7 +60,6 @@ public class ConstructorDescriptorTest {
 
 		ParameterDescriptor parameterDescriptor1 = parameterDescriptors.get( 0 );
 		assertThat( parameterDescriptor1.getElementClass() ).isEqualTo( String.class );
-		assertThat( parameterDescriptor1.getKind() ).isEqualTo( Kind.PARAMETER );
 		assertThat( parameterDescriptor1.getIndex() ).isEqualTo( 0 );
 		assertThat( parameterDescriptor1.getName() ).isEqualTo( "arg0" );
 		assertThat( parameterDescriptor1.hasConstraints() ).isTrue();
@@ -79,7 +67,6 @@ public class ConstructorDescriptorTest {
 
 		ParameterDescriptor parameterDescriptor2 = parameterDescriptors.get( 1 );
 		assertThat( parameterDescriptor2.getElementClass() ).isEqualTo( Customer.class );
-		assertThat( parameterDescriptor2.getKind() ).isEqualTo( Kind.PARAMETER );
 		assertThat( parameterDescriptor2.getIndex() ).isEqualTo( 1 );
 		assertThat( parameterDescriptor2.getName() ).isEqualTo( "arg1" );
 		assertThat( parameterDescriptor2.hasConstraints() ).isFalse();
@@ -95,7 +82,6 @@ public class ConstructorDescriptorTest {
 
 		ReturnValueDescriptor returnValueDescriptor = constructorDescriptor.getReturnValueDescriptor();
 		assertThat( returnValueDescriptor ).isNotNull();
-		assertThat( returnValueDescriptor.getKind() ).isEqualTo( Kind.RETURN_VALUE );
 		assertThat( returnValueDescriptor.getElementClass() ).isEqualTo( CustomerRepositoryExt.class );
 		assertThat( returnValueDescriptor.hasConstraints() ).isTrue();
 		assertThat( returnValueDescriptor.isCascaded() ).isTrue();

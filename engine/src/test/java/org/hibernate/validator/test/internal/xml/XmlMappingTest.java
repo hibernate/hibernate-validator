@@ -27,6 +27,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.executable.ExecutableType;
 import javax.validation.groups.Default;
 import javax.validation.metadata.MethodDescriptor;
 
@@ -39,6 +40,7 @@ import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.testng.Assert.assertEquals;
 
@@ -51,7 +53,6 @@ public class XmlMappingTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-214")
 	public void testConstraintInheritanceWithXmlConfiguration() {
-
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "mapping.xml" ) );
 
@@ -66,7 +67,6 @@ public class XmlMappingTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-252")
 	public void testListOfString() {
-
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "properties-mapping.xml" ) );
 
@@ -88,7 +88,6 @@ public class XmlMappingTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-262")
 	public void testInterfaceConfiguration() {
-
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "my-interface-mapping.xml" ) );
 
@@ -102,7 +101,6 @@ public class XmlMappingTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-262")
 	public void testInterfaceImplementationConfiguration() {
-
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "my-interface-impl-mapping.xml" ) );
 
@@ -116,7 +114,6 @@ public class XmlMappingTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-263")
 	public void testEmptyInterfaceConfiguration() {
-
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "empty-my-interface-mapping.xml" ) );
 
@@ -163,7 +160,6 @@ public class XmlMappingTest {
 
 	@Test
 	public void shouldLoadBv11ConstraintMapping() {
-
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "my-interface-impl-mapping-bv-1.1.xml" ) );
 
@@ -179,7 +175,6 @@ public class XmlMappingTest {
 			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for constraint mapping file: 2\\.0\\."
 	)
 	public void shouldFailToLoadConstraintMappingWithUnsupportedVersion() {
-
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping(
 				XmlMappingTest.class.getResourceAsStream(
@@ -196,7 +191,6 @@ public class XmlMappingTest {
 
 	@Test
 	public void testParameterNameProviderConfiguration() {
-
 		runWithCustomValidationXml(
 				"parameter-name-provider-validation.xml", new Runnable() {
 
@@ -224,8 +218,45 @@ public class XmlMappingTest {
 	}
 
 	@Test
-	public void testLoadingOfBv10ValidationXml() {
+	@TestForIssue(jiraKey = "HV-707")
+	public void shouldReturnDefaultExecutableTypesForValidationXmlWithoutTypesGiven() {
+		runWithCustomValidationXml(
+				"bv-1.0-validation.xml", new Runnable() {
 
+			@Override
+			public void run() {
+				//given
+				BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
+						.getBootstrapConfiguration();
+
+				//when
+				//then
+				assertEquals(
+						bootstrapConfiguration.getValidatedExecutableTypes(),
+						asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
+				);
+			}
+		}
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-707")
+	public void shouldReturnDefaultExecutableTypesIfNoValidationXmlIsGiven() {
+		//given
+		BootstrapConfiguration bootstrapConfiguration = ValidatorUtil.getConfiguration()
+				.getBootstrapConfiguration();
+
+		//when
+		//then
+		assertEquals(
+				bootstrapConfiguration.getValidatedExecutableTypes(),
+				asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
+		);
+	}
+
+	@Test
+	public void testLoadingOfBv10ValidationXml() {
 		runWithCustomValidationXml(
 				"bv-1.0-validation.xml", new Runnable() {
 
@@ -251,7 +282,6 @@ public class XmlMappingTest {
 			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for META-INF/validation.xml: 2\\.0\\."
 	)
 	public void shouldFailToLoadValidationXmlWithUnsupportedVersion() {
-
 		runWithCustomValidationXml(
 				"unsupported-validation.xml", new Runnable() {
 
@@ -268,7 +298,6 @@ public class XmlMappingTest {
 			expectedExceptionsMessageRegExp = "HV000100: Unable to parse META-INF/validation.xml."
 	)
 	public void shouldFailToLoad10ValidationXmlWithParameterNameProvider() {
-
 		runWithCustomValidationXml(
 				"invalid-bv-1.0-validation.xml", new Runnable() {
 
@@ -288,7 +317,6 @@ public class XmlMappingTest {
 	 * @param runnable The runnable to execute.
 	 */
 	private void runWithCustomValidationXml(final String validationXmlName, Runnable runnable) {
-
 		ClassLoader previousContextCl = Thread.currentThread().getContextClassLoader();
 
 		try {

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.ConstructorDescriptor;
+import javax.validation.metadata.CrossParameterDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
@@ -33,14 +34,12 @@ import javax.validation.metadata.ReturnValueDescriptor;
  */
 public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		implements ConstructorDescriptor, MethodDescriptor {
-	private final Kind kind;
 	private final String name;
 	private final List<ParameterDescriptor> parameters;
 	private final ReturnValueDescriptor returnValueDescriptor;
 	private final ConstraintDeclarationException constraintDeclarationException;
 
 	public ExecutableDescriptorImpl(
-			Kind kind,
 			Type returnType,
 			String name,
 			Set<ConstraintDescriptorImpl<?>> crossParameterValueConstraints,
@@ -56,7 +55,6 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 				defaultGroupSequence
 		);
 
-		this.kind = kind;
 		this.name = name;
 		this.parameters = Collections.unmodifiableList( parameters );
 		this.returnValueDescriptor = returnValueDescriptor;
@@ -96,11 +94,6 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 	}
 
 	@Override
-	public Kind getKind() {
-		return kind;
-	}
-
-	@Override
 	public boolean areParametersConstrained() {
 		if ( hasConstraints() ) {
 			return true;
@@ -119,5 +112,11 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 	public boolean isReturnValueConstrained() {
 		return returnValueDescriptor != null && ( returnValueDescriptor.hasConstraints() || returnValueDescriptor
 				.isCascaded() );
+	}
+
+	@Override
+	public CrossParameterDescriptor getCrossParameterDescriptor() {
+		//TODO HV-709
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 }

@@ -59,11 +59,6 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 	}
 
 	@Override
-	public Kind getKind() {
-		return Kind.RETURN_VALUE;
-	}
-
-	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "ReturnValueDescriptorImpl" );

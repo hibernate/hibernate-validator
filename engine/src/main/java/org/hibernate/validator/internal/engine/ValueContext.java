@@ -18,10 +18,12 @@ package org.hibernate.validator.internal.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
+import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 
@@ -117,12 +119,21 @@ public class ValueContext<T, V> {
 
 	public final void appendNode(Cascadable node) {
 		propertyPath = PathImpl.createCopy( propertyPath );
-		propertyPath.addNode( node.getName(), node.getDescriptor() );
+
+		if ( node.getKind() == ElementKind.PROPERTY ) {
+			propertyPath.addPropertyNode( node.getName() );
+		}
+		else if ( node.getKind() == ElementKind.PARAMETER ) {
+			propertyPath.addParameterNode( node.getName(), ( (ParameterMetaData) node ).getIndex() );
+		}
+		else if ( node.getKind() == ElementKind.RETURN_VALUE ) {
+			propertyPath.addReturnValueNode();
+		}
 	}
 
 	public final void appendNode(BeanMetaData<?> node) {
 		propertyPath = PathImpl.createCopy( propertyPath );
-		propertyPath.addNode( null, node.getDescriptor() );
+		propertyPath.addBeanNode();
 	}
 
 	public final void markCurrentPropertyAsIterable() {

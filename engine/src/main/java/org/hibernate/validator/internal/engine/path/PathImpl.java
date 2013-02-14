@@ -18,17 +18,17 @@ package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.validation.ElementKind;
 import javax.validation.Path;
-import javax.validation.metadata.ElementDescriptor;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
-import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -88,7 +88,7 @@ public final class PathImpl implements Path, Serializable {
 		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
 		if ( propertyPath.length() == 0 ) {
-			return createNewPath( null );
+			return createRootPath();
 		}
 
 		return parseProperty( propertyPath, metaDataManager, rootBeanClass );
@@ -98,13 +98,21 @@ public final class PathImpl implements Path, Serializable {
 		Contracts.assertNotNull( executable, "A method is required to create a method return value path." );
 
 		PathImpl path = createRootPath();
-		path.addNode( executable.getName(), executable.getDescriptor() );
+
+		if ( executable.getKind() == ElementKind.CONSTRUCTOR ) {
+			path.addConstructorNode( executable.getName(), Arrays.asList( executable.getParameterTypes() ) );
+		}
+		else {
+			path.addMethodNode( executable.getName(), Arrays.asList( executable.getParameterTypes() ) );
+		}
 
 		return path;
 	}
 
 	public static PathImpl createRootPath() {
-		return createNewPath( null );
+		PathImpl path = new PathImpl();
+		path.addBeanNode();
+		return path;
 	}
 
 	public static PathImpl createCopy(PathImpl path) {
@@ -119,27 +127,57 @@ public final class PathImpl implements Path, Serializable {
 		return new PathImpl( nodeList.subList( 0, nodeList.size() - 1 ) );
 	}
 
-	public NodeImpl addNode(String nodeName) {
-		return addNode( nodeName, null );
+	public NodeImpl addPropertyNode(String nodeName) {
+		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		currentLeafNode = NodeImpl.createPropertyNode( nodeName, parent );
+		nodeList.add( currentLeafNode );
+		hashCode = -1;
+		return currentLeafNode;
 	}
 
-	public NodeImpl addNode(String nodeName, ElementDescriptor descriptor) {
+	public NodeImpl addParameterNode(String nodeName, int index) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-		currentLeafNode = new NodeImpl( nodeName, parent, false, null, null, descriptor );
+		currentLeafNode = NodeImpl.createParameterNode( nodeName, parent, index );
+		nodeList.add( currentLeafNode );
+		hashCode = -1;
+		return currentLeafNode;
+	}
+
+	public NodeImpl addBeanNode() {
+		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		currentLeafNode = NodeImpl.createBeanNode( parent );
+		nodeList.add( currentLeafNode );
+		hashCode = -1;
+		return currentLeafNode;
+	}
+
+	public NodeImpl addReturnValueNode() {
+		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		currentLeafNode = NodeImpl.createReturnValue( parent );
+		nodeList.add( currentLeafNode );
+		hashCode = -1;
+		return currentLeafNode;
+	}
+
+	private NodeImpl addConstructorNode(String name, List<Class<?>> parameterTypes) {
+		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		currentLeafNode = NodeImpl.createConstructorNode( name, parent, parameterTypes );
+		nodeList.add( currentLeafNode );
+		hashCode = -1;
+		return currentLeafNode;
+	}
+
+	private NodeImpl addMethodNode(String name, List<Class<?>> parameterTypes) {
+		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		currentLeafNode = NodeImpl.createMethodNode( name, parent, parameterTypes );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
 	}
 
 	public NodeImpl makeLeafNodeIterable() {
-		currentLeafNode = new NodeImpl(
-				currentLeafNode.getName(),
-				currentLeafNode.getParent(),
-				true,
-				null,
-				null,
-				currentLeafNode.getElementDescriptor()
-		);
+		currentLeafNode = NodeImpl.makeIterable( currentLeafNode );
+
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -147,14 +185,8 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl setLeafNodeIndex(Integer index) {
-		currentLeafNode = new NodeImpl(
-				currentLeafNode.getName(),
-				currentLeafNode.getParent(),
-				true,
-				index,
-				null,
-				currentLeafNode.getElementDescriptor()
-		);
+		currentLeafNode = NodeImpl.setIndex( currentLeafNode, index );
+
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -162,14 +194,8 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	public NodeImpl setLeafNodeMapKey(Object key) {
-		currentLeafNode = new NodeImpl(
-				currentLeafNode.getName(),
-				currentLeafNode.getParent(),
-				true,
-				null,
-				key,
-				currentLeafNode.getElementDescriptor()
-		);
+		currentLeafNode = NodeImpl.setMapKey( currentLeafNode, key );
+
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
@@ -259,12 +285,6 @@ public final class PathImpl implements Path, Serializable {
 		return result;
 	}
 
-	private static PathImpl createNewPath(String name) {
-		PathImpl path = new PathImpl();
-		path.addNode( name );
-		return path;
-	}
-
 	/**
 	 * Copy constructor.
 	 *
@@ -284,7 +304,7 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	private static PathImpl parseProperty(String propertyName, BeanMetaDataManager metaDataManager, Class<?> parentType) {
-		PathImpl path = createNewPath( null );
+		PathImpl path = createRootPath();
 		String tmp = propertyName;
 		do {
 			Matcher matcher = PATH_PATTERN.matcher( tmp );
@@ -296,18 +316,7 @@ public final class PathImpl implements Path, Serializable {
 				}
 
 				// create the node
-				if ( parentType != null ) {
-					PropertyMetaData property = metaDataManager.getBeanMetaData( parentType ).getMetaDataFor( value );
-					if ( property == null ) {
-						throw log.getUnableToParsePropertyPathException( propertyName );
-					}
-
-					path.addNode( property.getName(), property.getDescriptor() );
-					parentType = property.getRawType();
-				}
-				else {
-					path.addNode( value );
-				}
+				path.addPropertyNode( value );
 
 				// is the node indexable
 				if ( matcher.group( INDEXED_GROUP ) != null ) {
@@ -335,7 +344,7 @@ public final class PathImpl implements Path, Serializable {
 		} while ( tmp != null );
 
 		if ( path.getLeafNode().isIterable() ) {
-			path.addNode( null );
+			path.addBeanNode();
 		}
 
 		return path;

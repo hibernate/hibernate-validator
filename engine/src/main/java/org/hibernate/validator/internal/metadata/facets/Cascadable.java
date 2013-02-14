@@ -18,8 +18,7 @@ package org.hibernate.validator.internal.metadata.facets;
 
 import java.lang.annotation.ElementType;
 import java.util.Set;
-
-import javax.validation.metadata.ElementDescriptor;
+import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 /**
@@ -72,9 +71,9 @@ public interface Cascadable {
 	String getName();
 
 	/**
-	 * Returns a BV meta-data API descriptor representing this element
+	 * Returns the element kind of this cascadable.
 	 *
-	 * @return A descriptor representing this element.
+	 * @return The kind of this cascadable.
 	 */
-	ElementDescriptor getDescriptor();
+	ElementKind getKind();
 }
