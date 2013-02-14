@@ -18,9 +18,9 @@ package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.ElementKind;
 import javax.validation.ExecutableValidator;
 import javax.validation.Path;
-import javax.validation.metadata.ElementDescriptor.Kind;
 
 import org.testng.annotations.Test;
 
@@ -30,7 +30,6 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertDescriptorKinds;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertElementClasses;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
@@ -59,8 +58,8 @@ public class ConstructorValidationTest {
 
 		assertDescriptorKinds(
 				constraintViolation.getPropertyPath(),
-				Kind.CONSTRUCTOR,
-				Kind.PARAMETER
+				ElementKind.CONSTRUCTOR,
+				ElementKind.PARAMETER
 		);
 		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", "arg0" );
 	}
@@ -83,9 +82,8 @@ public class ConstructorValidationTest {
 		assertThat( constraintViolation.getInvalidValue() ).isNull();
 
 		Path path = constraintViolation.getPropertyPath();
-		assertDescriptorKinds( path, Kind.CONSTRUCTOR, Kind.PARAMETER, Kind.PROPERTY );
+		assertDescriptorKinds( path, ElementKind.CONSTRUCTOR, ElementKind.PARAMETER, ElementKind.PROPERTY );
 		assertNodeNames( path, "CustomerRepositoryImpl", "arg0", "name" );
-		assertElementClasses( path, CustomerRepositoryImpl.class, Customer.class, String.class );
 	}
 
 	@Test
@@ -112,8 +110,8 @@ public class ConstructorValidationTest {
 
 		assertDescriptorKinds(
 				constraintViolation.getPropertyPath(),
-				Kind.CONSTRUCTOR,
-				Kind.RETURN_VALUE
+				ElementKind.CONSTRUCTOR,
+				ElementKind.RETURN_VALUE
 		);
 		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", null );
 	}
@@ -138,14 +136,8 @@ public class ConstructorValidationTest {
 		assertThat( constraintViolation.getInvalidValue() ).isNull();
 
 		Path path = constraintViolation.getPropertyPath();
-		assertDescriptorKinds( path, Kind.CONSTRUCTOR, Kind.RETURN_VALUE, Kind.PROPERTY );
+		assertDescriptorKinds( path, ElementKind.CONSTRUCTOR, ElementKind.RETURN_VALUE, ElementKind.PROPERTY );
 		assertNodeNames( path, "CustomerRepositoryImpl", null, "customer" );
-		assertElementClasses(
-				path,
-				CustomerRepositoryImpl.class,
-				CustomerRepositoryImpl.class,
-				Customer.class
-		);
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)

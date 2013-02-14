@@ -29,7 +29,6 @@ import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.metadata.ParameterDescriptor;
 
 import org.testng.annotations.Test;
 
@@ -139,16 +138,14 @@ public class BootstrappingTest {
 		while ( pathIterator.hasNext() ) {
 			leafNode = pathIterator.next();
 		}
-		assertTrue( leafNode.getElementDescriptor() instanceof ParameterDescriptor );
-		ParameterDescriptor parameterDescriptor = (ParameterDescriptor) leafNode.getElementDescriptor();
 		assertEquals(
-				parameterDescriptor.getName(),
+				leafNode.getName(),
 				"foo0",
 				"The name should be provided from the dummy provider and be foo0"
 		);
 	}
 
-	private void assertDefaultBuilderAndFactory(Configuration configuration) {
+	private void assertDefaultBuilderAndFactory(Configuration<?> configuration) {
 		assertNotNull( configuration );
 		assertTrue( configuration instanceof ConfigurationImpl );
 

@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ElementDescriptor;
 
 import static org.hibernate.validator.internal.engine.path.PathImpl.createPathFromString;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -198,12 +198,12 @@ public final class ConstraintViolationAssert {
 	 * @param path The path under test
 	 * @param kinds The node kinds
 	 */
-	public static void assertDescriptorKinds(Path path, ElementDescriptor.Kind... kinds) {
+	public static void assertDescriptorKinds(Path path, ElementKind... kinds) {
 		Iterator<Path.Node> pathIterator = path.iterator();
 
-		for ( ElementDescriptor.Kind kind : kinds ) {
+		for ( ElementKind kind : kinds ) {
 			assertTrue( pathIterator.hasNext() );
-			assertEquals( pathIterator.next().getElementDescriptor().getKind(), kind );
+			assertEquals( pathIterator.next().getKind(), kind );
 		}
 
 		assertFalse( pathIterator.hasNext() );
@@ -221,23 +221,6 @@ public final class ConstraintViolationAssert {
 		for ( String name : names ) {
 			assertTrue( pathIterator.hasNext() );
 			assertEquals( pathIterator.next().getName(), name );
-		}
-
-		assertFalse( pathIterator.hasNext() );
-	}
-
-	/**
-	 * Asserts that the nodes in the path have the specified element classes.
-	 *
-	 * @param path The path under test
-	 * @param elementClasses The element classes
-	 */
-	public static void assertElementClasses(Path path, Class<?>... elementClasses) {
-		Iterator<Path.Node> pathIterator = path.iterator();
-
-		for ( Class<?> clazz : elementClasses ) {
-			assertTrue( pathIterator.hasNext() );
-			assertEquals( pathIterator.next().getElementDescriptor().getElementClass(), clazz );
 		}
 
 		assertFalse( pathIterator.hasNext() );
