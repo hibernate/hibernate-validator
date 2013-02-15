@@ -22,7 +22,6 @@ import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
@@ -131,9 +130,14 @@ public class ValueContext<T, V> {
 		}
 	}
 
-	public final void appendNode(BeanMetaData<?> node) {
+	public final void appendBeanNode() {
 		propertyPath = PathImpl.createCopy( propertyPath );
 		propertyPath.addBeanNode();
+	}
+
+	public final void appendCrossParameterNode() {
+		propertyPath = PathImpl.createCopy( propertyPath );
+		propertyPath.addCrossParameterNode();
 	}
 
 	public final void markCurrentPropertyAsIterable() {

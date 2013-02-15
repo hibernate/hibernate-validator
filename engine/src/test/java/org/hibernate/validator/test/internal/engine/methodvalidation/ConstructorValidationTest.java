@@ -29,7 +29,7 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertDescriptorKinds;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeKinds;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
@@ -56,7 +56,7 @@ public class ConstructorValidationTest {
 		assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
 		assertThat( constraintViolation.getInvalidValue() ).isNull();
 
-		assertDescriptorKinds(
+		assertNodeKinds(
 				constraintViolation.getPropertyPath(),
 				ElementKind.CONSTRUCTOR,
 				ElementKind.PARAMETER
@@ -82,7 +82,7 @@ public class ConstructorValidationTest {
 		assertThat( constraintViolation.getInvalidValue() ).isNull();
 
 		Path path = constraintViolation.getPropertyPath();
-		assertDescriptorKinds( path, ElementKind.CONSTRUCTOR, ElementKind.PARAMETER, ElementKind.PROPERTY );
+		assertNodeKinds( path, ElementKind.CONSTRUCTOR, ElementKind.PARAMETER, ElementKind.PROPERTY );
 		assertNodeNames( path, "CustomerRepositoryImpl", "arg0", "name" );
 	}
 
@@ -108,7 +108,7 @@ public class ConstructorValidationTest {
 						ValidB2BRepository.class
 				);
 
-		assertDescriptorKinds(
+		assertNodeKinds(
 				constraintViolation.getPropertyPath(),
 				ElementKind.CONSTRUCTOR,
 				ElementKind.RETURN_VALUE
@@ -136,7 +136,7 @@ public class ConstructorValidationTest {
 		assertThat( constraintViolation.getInvalidValue() ).isNull();
 
 		Path path = constraintViolation.getPropertyPath();
-		assertDescriptorKinds( path, ElementKind.CONSTRUCTOR, ElementKind.RETURN_VALUE, ElementKind.PROPERTY );
+		assertNodeKinds( path, ElementKind.CONSTRUCTOR, ElementKind.RETURN_VALUE, ElementKind.PROPERTY );
 		assertNodeNames( path, "CustomerRepositoryImpl", "<return value>", "customer" );
 	}
 

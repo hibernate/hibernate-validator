@@ -34,7 +34,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 public class NodeImpl
-		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Serializable {
+		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
 
 	private static final Log log = LoggerFactory.make();
@@ -42,6 +42,7 @@ public class NodeImpl
 	public static final String INDEX_OPEN = "[";
 	public static final String INDEX_CLOSE = "]";
 	private static final String RETURN_VALUE_NODE_NAME = "<return value>";
+	private static final String CROSS_PARAMETER_NODE_NAME = "<cross-parameter>";
 
 	private final String name;
 	private final NodeImpl parent;
@@ -93,6 +94,19 @@ public class NodeImpl
 				ElementKind.PARAMETER,
 				Collections.<Class<?>>emptyList(),
 				parameterIndex
+		);
+	}
+
+	public static NodeImpl createCrossParameterNode(NodeImpl parent) {
+		return new NodeImpl(
+				CROSS_PARAMETER_NODE_NAME,
+				parent,
+				false,
+				null,
+				null,
+				ElementKind.CROSS_PARAMETER,
+				Collections.<Class<?>>emptyList(),
+				null
 		);
 	}
 

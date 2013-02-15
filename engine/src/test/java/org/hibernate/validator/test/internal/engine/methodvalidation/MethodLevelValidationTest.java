@@ -47,6 +47,8 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeKinds;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
@@ -585,6 +587,13 @@ public class MethodLevelValidationTest {
 					DateMidnight.class,
 					DateMidnight.class
 			);
+
+			assertNodeNames(
+					constraintViolation.getPropertyPath(),
+					"methodWithCrossParameterConstraint",
+					"<cross-parameter>"
+			);
+			assertNodeKinds( constraintViolation.getPropertyPath(), ElementKind.METHOD, ElementKind.CROSS_PARAMETER );
 		}
 	}
 
