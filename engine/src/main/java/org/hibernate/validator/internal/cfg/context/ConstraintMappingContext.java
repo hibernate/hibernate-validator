@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
@@ -44,7 +44,7 @@ public class ConstraintMappingContext {
 	private final Set<Class<?>> configuredClasses;
 	private final Map<Class<?>, List<Class<?>>> defaultGroupSequences;
 	private final Map<Class<?>, Class<? extends DefaultGroupSequenceProvider<?>>> defaultGroupSequenceProviders;
-	private final AnnotationProcessingOptions annotationProcessingOptions;
+	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 
 	public ConstraintMappingContext() {
 		this.constraintConfig = newHashMap();
@@ -54,7 +54,7 @@ public class ConstraintMappingContext {
 		this.configuredClasses = newHashSet();
 		this.defaultGroupSequences = newHashMap();
 		this.defaultGroupSequenceProviders = newHashMap();
-		this.annotationProcessingOptions = new AnnotationProcessingOptions();
+		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class ConstraintMappingContext {
 		return defaultGroupSequences.get( beanType );
 	}
 
-	public final AnnotationProcessingOptions getAnnotationProcessingOptions() {
+	public final AnnotationProcessingOptionsImpl getAnnotationProcessingOptions() {
 		return annotationProcessingOptions;
 	}
 

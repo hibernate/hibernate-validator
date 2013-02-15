@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -52,7 +52,7 @@ public class ConstraintGetterBuilder {
 																	 Class<?> beanClass,
 																	 String defaultPackage,
 																	 ConstraintHelper constraintHelper,
-																	 AnnotationProcessingOptions annotationProcessingOptions) {
+																	 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<String> alreadyProcessedGetterNames = newArrayList();
 		for ( GetterType getterType : getterList ) {
@@ -91,7 +91,7 @@ public class ConstraintGetterBuilder {
 			// ignore annotations
 			boolean ignoreGetterAnnotation = getterType.getIgnoreAnnotations() == null ? false : getterType.getIgnoreAnnotations();
 			if ( ignoreGetterAnnotation ) {
-				annotationProcessingOptions.ignorePropertyLevelConstraintAnnotationsOnMember( getter );
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnMember( getter );
 			}
 		}
 

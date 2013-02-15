@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -50,7 +50,7 @@ public class ConstraintFieldBuilder {
 																Class<?> beanClass,
 																String defaultPackage,
 																ConstraintHelper constraintHelper,
-																AnnotationProcessingOptions annotationProcessingOptions) {
+																AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		Set<ConstrainedField> constrainedFields = newHashSet();
 		List<String> alreadyProcessedFieldNames = newArrayList();
 		for ( FieldType fieldType : fields ) {
@@ -85,7 +85,7 @@ public class ConstraintFieldBuilder {
 			// ignore annotations
 			boolean ignoreFieldAnnotation = fieldType.getIgnoreAnnotations() == null ? false : fieldType.getIgnoreAnnotations();
 			if ( ignoreFieldAnnotation ) {
-				annotationProcessingOptions.ignorePropertyLevelConstraintAnnotationsOnMember( field );
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnMember( field );
 			}
 		}
 

@@ -43,8 +43,12 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	private final Map<Class<?>, Class<?>> groupConversions;
 	private final boolean isCascading;
 
-	public AbstractConstrainedElement(ConfigurationSource source, ConstrainedElementKind kind, ConstraintLocation location, Set<MetaConstraint<?>> constraints, Map<Class<?>, Class<?>> groupConversions, boolean isCascading) {
-
+	public AbstractConstrainedElement(ConfigurationSource source,
+									  ConstrainedElementKind kind,
+									  ConstraintLocation location,
+									  Set<MetaConstraint<?>> constraints,
+									  Map<Class<?>, Class<?>> groupConversions,
+									  boolean isCascading) {
 		this.kind = kind;
 		this.source = source;
 		this.location = location;

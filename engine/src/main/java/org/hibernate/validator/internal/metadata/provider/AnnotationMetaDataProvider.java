@@ -36,6 +36,7 @@ import javax.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -101,7 +102,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	@Override
 	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
-		return new AnnotationProcessingOptions();
+		return new AnnotationProcessingOptionsImpl();
 	}
 
 	@Override
@@ -140,7 +141,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return Retrieves constraint related meta data from the annotations of the given type.
 	 */
 	private <T> BeanConfiguration<T> retrieveBeanConfiguration(Class<T> beanClass) {
-		Set<ConstrainedElement> constrainedElements = getPropertyMetaData( beanClass );
+		Set<ConstrainedElement> constrainedElements = getFieldMetaData( beanClass );
 		constrainedElements.addAll( getMethodMetaData( beanClass ) );
 		constrainedElements.addAll( getConstructorMetaData( beanClass ) );
 
@@ -199,7 +200,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<MetaConstraint<?>> getClassLevelConstraints(Class<?> clazz) {
-		if ( annotationProcessingOptions.areClassLevelConstraintAnnotationsIgnored( clazz ) ) {
+		if ( annotationProcessingOptions.areClassLevelConstraintsIgnoredFor( clazz ) ) {
 			return Collections.emptySet();
 		}
 
@@ -215,13 +216,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return classLevelConstraints;
 	}
 
-	private Set<ConstrainedElement> getPropertyMetaData(Class<?> beanClass) {
+	private Set<ConstrainedElement> getFieldMetaData(Class<?> beanClass) {
 		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
 		for ( Field field : ReflectionHelper.getDeclaredFields( beanClass ) ) {
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) ||
-					annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored( field ) ||
+					annotationProcessingOptions.areMemberConstraintsIgnoredFor( field ) ||
 					field.isSynthetic() ) {
 
 				continue;
@@ -286,10 +287,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
 			// anyway and possibly hide the actual method with the same signature in the built meta model
 			Member member = executable.getMember();
-			if ( Modifier.isStatic( member.getModifiers() ) ||
-					annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored( member ) ||
-					member.isSynthetic() ) {
-
+			if ( Modifier.isStatic( member.getModifiers() ) || member.isSynthetic() ) {
 				continue;
 			}
 
@@ -309,13 +307,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	private ConstrainedExecutable findExecutableMetaData(ExecutableElement executable) {
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
-		boolean isCascading = executable.getAccessibleObject().isAnnotationPresent( Valid.class );
-		AccessibleObject member = executable.getAccessibleObject();
 
-		Map<Class<?>, Class<?>> groupConversions = getGroupConversions(
-				member.getAnnotation( ConvertGroup.class ),
-				member.getAnnotation( ConvertGroup.List.class )
-		);
+		AccessibleObject member = executable.getAccessibleObject();
 
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = partition(
 				findConstraints(
@@ -324,14 +317,36 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				), byType()
 		);
 
-		Set<MetaConstraint<?>> returnValueConstraints = convertToMetaConstraints(
-				executableConstraints.get( ConstraintType.GENERIC ),
-				executable
-		);
-		Set<MetaConstraint<?>> crossParameterConstraints = convertToMetaConstraints(
-				executableConstraints.get( ConstraintType.CROSS_PARAMETER ),
-				executable
-		);
+		Set<MetaConstraint<?>> crossParameterConstraints;
+		if ( annotationProcessingOptions.areMemberConstraintsIgnoredFor( executable.getMember() ) ) {
+			crossParameterConstraints = Collections.emptySet();
+		}
+		else {
+			crossParameterConstraints = convertToMetaConstraints(
+					executableConstraints.get( ConstraintType.CROSS_PARAMETER ),
+					executable
+			);
+		}
+
+		Set<MetaConstraint<?>> returnValueConstraints;
+		Map<Class<?>, Class<?>> groupConversions;
+		boolean isCascading;
+		if ( annotationProcessingOptions.areReturnValueConstraintsIgnored( executable.getMember() ) ) {
+			returnValueConstraints = Collections.emptySet();
+			groupConversions = Collections.emptyMap();
+			isCascading = false;
+		}
+		else {
+			returnValueConstraints = convertToMetaConstraints(
+					executableConstraints.get( ConstraintType.GENERIC ),
+					executable
+			);
+			groupConversions = getGroupConversions(
+					member.getAnnotation( ConvertGroup.class ),
+					member.getAnnotation( ConvertGroup.List.class )
+			);
+			isCascading = executable.getAccessibleObject().isAnnotationPresent( Valid.class );
+		}
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.ANNOTATION,
@@ -374,24 +389,36 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		List<ConstrainedParameter> metaData = newArrayList();
 
 		String[] parameterNames = executable.getParameterNames( parameterNameProvider );
-
 		int i = 0;
-
-		for ( Annotation[] annotationsOfOneParameter : executable.getParameterAnnotations() ) {
-
+		for ( Annotation[] parameterAnnotations : executable.getParameterAnnotations() ) {
 			boolean parameterIsCascading = false;
 			String parameterName = parameterNames[i];
-			Set<MetaConstraint<?>> constraintsOfOneParameter = newHashSet();
+			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
 			ConvertGroup groupConversion = null;
 			ConvertGroup.List groupConversionList = null;
-			for ( Annotation parameterAnnotation : annotationsOfOneParameter ) {
 
+			if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( executable.getMember(), i ) ) {
+				metaData.add(
+						new ConstrainedParameter(
+								ConfigurationSource.ANNOTATION,
+								new ExecutableConstraintLocation( executable, i ),
+								parameterName,
+								parameterConstraints,
+								getGroupConversions( groupConversion, groupConversionList ),
+								false
+						)
+				);
+				i++;
+				continue;
+			}
+
+			for ( Annotation parameterAnnotation : parameterAnnotations ) {
 				//1. collect constraints if this annotation is a constraint annotation
 				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
 						parameterAnnotation, ElementType.PARAMETER
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
-					constraintsOfOneParameter.add(
+					parameterConstraints.add(
 							createParameterMetaConstraint(
 									executable, i, constraintDescriptorImpl
 							)
@@ -416,7 +443,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 							ConfigurationSource.ANNOTATION,
 							new ExecutableConstraintLocation( executable, i ),
 							parameterName,
-							constraintsOfOneParameter,
+							parameterConstraints,
 							getGroupConversions( groupConversion, groupConversionList ),
 							parameterIsCascading
 					)
@@ -492,6 +519,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraintDescriptors;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {
 		Map<Class<?>, Class<?>> groupConversions = newHashMap();
 
@@ -501,7 +529,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		if ( groupConversionList != null ) {
 			for ( ConvertGroup conversion : groupConversionList.value() ) {
-
 				if ( groupConversions.containsKey( conversion.from() ) ) {
 					throw log.getMultipleGroupConversionsForSameSourceException(
 							conversion.from(),
