@@ -16,7 +16,7 @@
 */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
@@ -26,7 +26,7 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
  * @author Hardy Ferentschik
  */
 public class AnnotationBasedConstructorValidationTest extends AbstractConstructorValidationTest {
-	@BeforeTest
+	@BeforeMethod
 	public void setUp() {
 		this.executableValidator = getValidator().forExecutables();
 	}

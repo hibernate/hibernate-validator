@@ -68,7 +68,7 @@ public class IgnoreAnnotationConfiguredConstructorValidationViaXmlTest {
 			BeanDescriptor beanDescriptor = validator.getConstraintsForClass( clazz );
 			assertFalse(
 					beanDescriptor.isBeanConstrained(),
-					"All classes should be unconstrained due to xml configuration"
+					"All classes should be unconstrained due to xml configuration but " + clazz.getName() + "is not."
 			);
 		}
 	}

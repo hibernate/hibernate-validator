@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -46,7 +46,7 @@ public class ConstraintTypeBuilder {
 													   Class<?> beanClass,
 													   String defaultPackage,
 													   ConstraintHelper constraintHelper,
-													   AnnotationProcessingOptions annotationProcessingOptions,
+													   AnnotationProcessingOptionsImpl annotationProcessingOptions,
 													   Map<Class<?>, List<Class<?>>> defaultSequences) {
 		if ( classType == null ) {
 			return null;

@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.ParameterNameProvider;
 
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -46,7 +47,8 @@ public class ConstraintParameterBuilder {
 																		ExecutableElement executableElement,
 																		String defaultPackage,
 																		ConstraintHelper constraintHelper,
-																		ParameterNameProvider parameterNameProvider) {
+																		ParameterNameProvider parameterNameProvider,
+																		AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
 		int i = 0;
 		String[] parameterNames = executableElement.getParameterNames( parameterNameProvider );
@@ -68,6 +70,13 @@ public class ConstraintParameterBuilder {
 					parameterType.getConvertGroup(),
 					defaultPackage
 			);
+
+			// ignore annotations
+			boolean ignoreConstructorAnnotations = parameterType.getIgnoreAnnotations() == null ? false : parameterType
+					.getIgnoreAnnotations();
+			if ( ignoreConstructorAnnotations ) {
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnParameter( executableElement.getMember(), i );
+			}
 
 			ConstrainedParameter constrainedParameter = new ConstrainedParameter(
 					ConfigurationSource.XML,

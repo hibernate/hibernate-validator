@@ -26,6 +26,7 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
@@ -185,7 +186,7 @@ public class BeanMetaDataManager {
 	 * @return returns the annotation ignores from the non annotation based meta data providers
 	 */
 	private AnnotationProcessingOptions getAnnotationProcessingOptionsFromNonDefaultProviders() {
-		AnnotationProcessingOptions options = new AnnotationProcessingOptions();
+		AnnotationProcessingOptions options = new AnnotationProcessingOptionsImpl();
 		for ( MetaDataProvider metaDataProvider : metaDataProviders ) {
 			options.merge( metaDataProvider.getAnnotationProcessingOptions() );
 		}

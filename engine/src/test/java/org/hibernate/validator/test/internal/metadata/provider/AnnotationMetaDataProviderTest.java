@@ -42,7 +42,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
-import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -75,7 +75,7 @@ public class AnnotationMetaDataProviderTest {
 		provider = new AnnotationMetaDataProvider(
 				new ConstraintHelper(),
 				new DefaultParameterNameProvider(),
-				new AnnotationProcessingOptions()
+				new AnnotationProcessingOptionsImpl()
 		);
 	}
 

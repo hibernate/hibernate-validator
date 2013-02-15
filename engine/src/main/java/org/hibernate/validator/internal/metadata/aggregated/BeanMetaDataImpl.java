@@ -489,8 +489,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<BuilderDelegate> builders) {
-			for ( BuilderDelegate oneBuilder : builders ) {
-				boolean foundBuilder = oneBuilder.add( constrainableElement );
+			for ( BuilderDelegate builder : builders ) {
+				boolean foundBuilder = builder.add( constrainableElement );
 
 				if ( foundBuilder ) {
 					return;
@@ -509,13 +509,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		public BeanMetaDataImpl<T> build() {
 			Set<ConstraintMetaData> aggregatedElements = newHashSet();
 
-			for ( BuilderDelegate oneBuilder : builders ) {
-				aggregatedElements.addAll(
-						oneBuilder.build(
-								( defaultGroupSequence != null && defaultGroupSequence.size() > 1 ) || defaultGroupSequenceProvider != null,
-								defaultGroupSequence
-						)
-				);
+			for ( BuilderDelegate builder : builders ) {
+				aggregatedElements.addAll( builder.build() );
 			}
 
 			return new BeanMetaDataImpl<T>(
@@ -585,7 +580,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( propertyBuilder != null && propertyBuilder.accepts( constrainedElement ) ) {
 				propertyBuilder.add( constrainedElement );
 
-				if ( added == false && constrainedElement.getKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
+				if ( !added && constrainedElement.getKind() == ConstrainedElementKind.METHOD && methodBuilder == null ) {
 					ConstrainedExecutable constrainedMethod = (ConstrainedExecutable) constrainedElement;
 					methodBuilder = new ExecutableMetaData.Builder(
 							beanClass,
@@ -600,18 +595,18 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			return added;
 		}
 
-		public Set<ConstraintMetaData> build(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-			Set<ConstraintMetaData> theValue = newHashSet();
+		public Set<ConstraintMetaData> build() {
+			Set<ConstraintMetaData> metaDataSet = newHashSet();
 
 			if ( propertyBuilder != null ) {
-				theValue.add( propertyBuilder.build() );
+				metaDataSet.add( propertyBuilder.build() );
 			}
 
 			if ( methodBuilder != null ) {
-				theValue.add( methodBuilder.build() );
+				metaDataSet.add( methodBuilder.build() );
 			}
 
-			return theValue;
+			return metaDataSet;
 		}
 	}
 }

@@ -19,7 +19,7 @@ package org.hibernate.validator.test.internal.engine.methodvalidation;
 import javax.validation.Configuration;
 import javax.validation.ValidatorFactory;
 
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
@@ -31,7 +31,7 @@ import org.hibernate.validator.testutil.ValidatorUtil;
  */
 @TestForIssue(jiraKey = "HV-373")
 public class XmlBasedConstructorValidationTest extends AbstractConstructorValidationTest {
-	@BeforeTest
+	@BeforeMethod
 	public void setUp() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping(

@@ -24,7 +24,7 @@ import java.util.Set;
 import javax.validation.ParameterNameProvider;
 import javax.validation.ValidationException;
 
-import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -58,7 +58,7 @@ public class ConstraintExecutableBuilder {
 																			  String defaultPackage,
 																			  ParameterNameProvider parameterNameProvider,
 																			  ConstraintHelper constraintHelper,
-																			  AnnotationProcessingOptions annotationProcessingOptions) {
+																			  AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		for ( MethodType methodType : methods ) {
 			// parse the parameters
@@ -90,7 +90,7 @@ public class ConstraintExecutableBuilder {
 			boolean ignoreConstructorAnnotations = methodType.getIgnoreAnnotations() == null ? false : methodType
 					.getIgnoreAnnotations();
 			if ( ignoreConstructorAnnotations ) {
-				annotationProcessingOptions.ignoreConstraintAnnotationsOnMethod( method );
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnMember( method );
 			}
 
 			ConstrainedExecutable constrainedExecutable = parseExecutableType(
@@ -100,7 +100,8 @@ public class ConstraintExecutableBuilder {
 					methodType.getReturnValue(),
 					constructorExecutableElement,
 					constraintHelper,
-					parameterNameProvider
+					parameterNameProvider,
+					annotationProcessingOptions
 			);
 
 			constrainedExecutables.add( constrainedExecutable );
@@ -113,7 +114,7 @@ public class ConstraintExecutableBuilder {
 																				   String defaultPackage,
 																				   ParameterNameProvider parameterNameProvider,
 																				   ConstraintHelper constraintHelper,
-																				   AnnotationProcessingOptions annotationProcessingOptions) {
+																				   AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		for ( ConstructorType constructorType : constructors ) {
 			// parse the parameters
@@ -137,7 +138,7 @@ public class ConstraintExecutableBuilder {
 			boolean ignoreConstructorAnnotations = constructorType.getIgnoreAnnotations() == null ? false : constructorType
 					.getIgnoreAnnotations();
 			if ( ignoreConstructorAnnotations ) {
-				annotationProcessingOptions.ignoreConstraintAnnotationsOnConstructor( constructor );
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnMember( constructor );
 			}
 
 			ConstrainedExecutable constrainedExecutable = parseExecutableType(
@@ -147,7 +148,8 @@ public class ConstraintExecutableBuilder {
 					constructorType.getReturnValue(),
 					constructorExecutableElement,
 					constraintHelper,
-					parameterNameProvider
+					parameterNameProvider,
+					annotationProcessingOptions
 
 			);
 			constrainedExecutables.add( constrainedExecutable );
@@ -161,13 +163,15 @@ public class ConstraintExecutableBuilder {
 															 ReturnValueType returnValueType,
 															 ExecutableElement executableElement,
 															 ConstraintHelper constraintHelper,
-															 ParameterNameProvider parameterNameProvider) {
+															 ParameterNameProvider parameterNameProvider,
+															 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		List<ConstrainedParameter> parameterMetaData = ConstraintParameterBuilder.buildConstrainedParameters(
 				parameterTypeList,
 				executableElement,
 				defaultPackage,
 				constraintHelper,
-				parameterNameProvider
+				parameterNameProvider,
+				annotationProcessingOptions
 		);
 
 		Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
@@ -195,10 +199,11 @@ public class ConstraintExecutableBuilder {
 				returnValueConstraints,
 				groupConversions,
 				defaultPackage,
-				constraintHelper
+				constraintHelper,
+				annotationProcessingOptions
 		);
 
-		ConstrainedExecutable constrainedExecutable = new ConstrainedExecutable(
+		return new ConstrainedExecutable(
 				ConfigurationSource.XML,
 				new ExecutableConstraintLocation( executableElement ),
 				parameterMetaData,
@@ -207,8 +212,6 @@ public class ConstraintExecutableBuilder {
 				groupConversions,
 				isCascaded
 		);
-
-		return constrainedExecutable;
 	}
 
 	private static boolean parseReturnValueType(ReturnValueType returnValueType,
@@ -216,7 +219,8 @@ public class ConstraintExecutableBuilder {
 												Set<MetaConstraint<?>> returnValueConstraints,
 												Map<Class<?>, Class<?>> groupConversions,
 												String defaultPackage,
-												ConstraintHelper constraintHelper) {
+												ConstraintHelper constraintHelper,
+												AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		if ( returnValueType == null ) {
 			return false;
 		}
@@ -241,6 +245,13 @@ public class ConstraintExecutableBuilder {
 						defaultPackage
 				)
 		);
+
+		// ignore annotations
+		boolean ignoreConstructorAnnotations = returnValueType.getIgnoreAnnotations() == null ? false : returnValueType
+				.getIgnoreAnnotations();
+		if ( ignoreConstructorAnnotations ) {
+			annotationProcessingOptions.ignoreConstraintAnnotationsOnReturnValue( executableElement.getMember() );
+		}
 
 		return returnValueType.getValid() != null;
 	}
