@@ -295,7 +295,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( type.isAssignableFrom( Validator.class ) ) {
 			return type.cast( this );
 		}
-		throw log.getTypeNotSupportedException( type );
+		throw log.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override

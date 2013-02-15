@@ -22,12 +22,15 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
 public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Serializable {
-
+	private static final Log log = LoggerFactory.make();
 	private static final long serialVersionUID = -4970067626703103139L;
 
 	private final String interpolatedMessage;
@@ -92,6 +95,14 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	@Override
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {
 		return this.constraintDescriptor;
+	}
+
+	@Override
+	public <T> T unwrap(Class<T> type) {
+		if ( type.isAssignableFrom( ConstraintViolation.class ) ) {
+			return type.cast( this );
+		}
+		throw log.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override

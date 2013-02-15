@@ -171,8 +171,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 35, value = "Unable to parse property path %s.")
 	IllegalArgumentException getUnableToParsePropertyPathException(String propertyPath);
 
-	@Message(id = 36, value = "Type %s not supported.")
-	ValidationException getTypeNotSupportedException(Class<?> type);
+	@Message(id = 36, value = "Type %s not supported for unwrapping.")
+	ValidationException getTypeNotSupportedForUnwrappingException(Class<?> type);
 
 	@Message(id = 37,
 			value = "Inconsistent fail fast configuration. Fail fast enabled via programmatic API, but explicitly disabled via properties.")

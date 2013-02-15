@@ -66,7 +66,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		if ( type.isAssignableFrom( ConstraintValidatorContext.class ) ) {
 			return type.cast( this );
 		}
-		throw log.getTypeNotSupportedException( type );
+		throw log.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {

@@ -64,7 +64,7 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		if ( type.isAssignableFrom( HibernateMessageInterpolatorContext.class ) ) {
 			return type.cast( this );
 		}
-		throw log.getTypeNotSupportedException( type );
+		throw log.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override

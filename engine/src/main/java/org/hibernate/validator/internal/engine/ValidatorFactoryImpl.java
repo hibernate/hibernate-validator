@@ -181,7 +181,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( type.isAssignableFrom( HibernateValidatorFactory.class ) ) {
 			return type.cast( this );
 		}
-		throw log.getTypeNotSupportedException( type );
+		throw log.getTypeNotSupportedForUnwrappingException( type );
 	}
 
 	@Override
