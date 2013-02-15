@@ -113,7 +113,7 @@ public class ConstructorValidationTest {
 				ElementKind.CONSTRUCTOR,
 				ElementKind.RETURN_VALUE
 		);
-		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", null );
+		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", "<return value>" );
 	}
 
 	@Test
@@ -137,7 +137,7 @@ public class ConstructorValidationTest {
 
 		Path path = constraintViolation.getPropertyPath();
 		assertDescriptorKinds( path, ElementKind.CONSTRUCTOR, ElementKind.RETURN_VALUE, ElementKind.PROPERTY );
-		assertNodeNames( path, "CustomerRepositoryImpl", null, "customer" );
+		assertNodeNames( path, "CustomerRepositoryImpl", "<return value>", "customer" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)

@@ -41,7 +41,7 @@ public class NodeImpl
 
 	public static final String INDEX_OPEN = "[";
 	public static final String INDEX_CLOSE = "]";
-	private static final String RETURN_VALUE_TO_STRING = "$retval";
+	private static final String RETURN_VALUE_NODE_NAME = "<return value>";
 
 	private final String name;
 	private final NodeImpl parent;
@@ -119,7 +119,7 @@ public class NodeImpl
 
 	public static NodeImpl createReturnValue(NodeImpl parent) {
 		return new NodeImpl(
-				null,
+				RETURN_VALUE_NODE_NAME,
 				parent,
 				false,
 				null,
@@ -253,10 +253,6 @@ public class NodeImpl
 		if ( ElementKind.BEAN.equals( getKind() ) ) {
 			// class level constraints don't contribute to path
 			builder.append( "" );
-		}
-		else if ( ElementKind.RETURN_VALUE.equals( getKind() ) ) {
-			// special handling of return value nodes. per spec the name is null, but in toString we add $retval
-			builder.append( RETURN_VALUE_TO_STRING );
 		}
 		else {
 			builder.append( getName() );

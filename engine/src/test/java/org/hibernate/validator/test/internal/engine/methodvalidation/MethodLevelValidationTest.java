@@ -359,7 +359,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getPropertyPath().toString(), "baz.$retval" );
+			assertEquals( constraintViolation.getPropertyPath().toString(), "baz.<return value>" );
 			assertEquals( constraintViolation.getLeafBean(), customerRepository );
 			assertEquals( constraintViolation.getInvalidValue(), 9 );
 		}
@@ -383,7 +383,7 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"cascadingReturnValue.$retval.name"
+					"cascadingReturnValue.<return value>.name"
 			);
 			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
 			assertEquals( constraintViolation.getInvalidValue(), null );
@@ -408,7 +408,7 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"overriddenMethodWithCascadingReturnValue.$retval.name"
+					"overriddenMethodWithCascadingReturnValue.<return value>.name"
 			);
 			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
 			assertEquals( constraintViolation.getInvalidValue(), null );
@@ -432,7 +432,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"cascadingIterableReturnValue.$retval[1].name"
+					"cascadingIterableReturnValue.<return value>[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -458,7 +458,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"cascadingMapReturnValue.$retval[Bob].name"
+					"cascadingMapReturnValue.<return value>[Bob].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -484,7 +484,7 @@ public class MethodLevelValidationTest {
 			assertMethodValidationType( constraintViolation, ElementKind.RETURN_VALUE );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"cascadingArrayReturnValue.$retval[1].name"
+					"cascadingArrayReturnValue.<return value>[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
