@@ -24,6 +24,7 @@ import javax.validation.CrossParameterConstraint;
 import javax.validation.Payload;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.METHOD;
 
 /**
@@ -33,7 +34,7 @@ import static java.lang.annotation.ElementType.METHOD;
  *
  * @author Gunnar Morling
  */
-@Target({ METHOD, ANNOTATION_TYPE })
+@Target({ METHOD, CONSTRUCTOR, ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @CrossParameterConstraint(validatedBy = ConsistentDateParametersValidator.class)
 @Documented
