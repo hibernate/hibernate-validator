@@ -57,7 +57,6 @@ public abstract class ExecutableElement {
 	}
 
 	public static List<ExecutableElement> forConstructors(Constructor<?>[] constructors) {
-
 		List<ExecutableElement> executableElements = newArrayList( constructors.length );
 
 		for ( Constructor<?> constructor : constructors ) {
@@ -72,7 +71,6 @@ public abstract class ExecutableElement {
 	}
 
 	public static List<ExecutableElement> forMethods(Method[] methods) {
-
 		List<ExecutableElement> executableElements = newArrayList( methods.length );
 
 		for ( Method method : methods ) {
@@ -118,7 +116,6 @@ public abstract class ExecutableElement {
 	 *         {@code false} otherwise.
 	 */
 	public boolean overrides(ExecutableElement other) {
-
 		Contracts.assertValueNotNull( other, "other" );
 
 		if ( !getMember().getName().equals( other.getMember().getName() ) ) {
@@ -281,6 +278,38 @@ public abstract class ExecutableElement {
 
 			return dest;
 		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ( ( constructor == null ) ? 0 : constructor.hashCode() );
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			ConstructorElement other = (ConstructorElement) obj;
+			if ( constructor == null ) {
+				if ( other.constructor != null ) {
+					return false;
+				}
+			}
+			else if ( !constructor.equals( other.constructor ) ) {
+				return false;
+			}
+			return true;
+		}
 	}
 
 	private static class MethodElement extends ExecutableElement {
@@ -344,6 +373,38 @@ public abstract class ExecutableElement {
 		@Override
 		public String toString() {
 			return method.toGenericString();
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ ( ( method == null ) ? 0 : method.hashCode() );
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			MethodElement other = (MethodElement) obj;
+			if ( method == null ) {
+				if ( other.method != null ) {
+					return false;
+				}
+			}
+			else if ( !method.equals( other.method ) ) {
+				return false;
+			}
+			return true;
 		}
 	}
 

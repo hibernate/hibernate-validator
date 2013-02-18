@@ -167,10 +167,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			ExecutableElement executableElement = ( (ConstrainedExecutable) constrainedElement ).getLocation()
 					.getExecutableElement();
 
+			//are the locations equal (created by different builders) or
 			//does one of the executables override the other one?
-			return location.getExecutableElement()
-					.overrides( executableElement ) || executableElement.overrides(
-					location.getExecutableElement()
+			return
+					location.getExecutableElement().equals(executableElement) ||
+					location.getExecutableElement().overrides( executableElement ) ||
+					executableElement.overrides( location.getExecutableElement()
 			);
 		}
 

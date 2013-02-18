@@ -888,6 +888,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
 
+		if ( executableMetaData == null ) {
+			// nothing to validate
+			return;
+		}
+
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( object ) );
 		}
@@ -1008,21 +1013,23 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	private <T> ValueContext<T, Object> getExecutableValueContext(T object, Class<T> clazz, ExecutableMetaData executable, Class<?> oneGroup) {
+	private <T> ValueContext<T, Object> getExecutableValueContext(T object, Class<T> clazz,
+																  ExecutableMetaData executableMetaData,
+																  Class<?> oneGroup) {
 		ValueContext<T, Object> valueContext;
 
 		if ( object != null ) {
 			valueContext = ValueContext.getLocalExecutionContext(
 					object,
 					null,
-					PathImpl.createPathForExecutable( executable )
+					PathImpl.createPathForExecutable( executableMetaData )
 			);
 		}
 		else {
 			valueContext = ValueContext.getLocalExecutionContext(
 					clazz,
 					null,
-					PathImpl.createPathForExecutable( executable )
+					PathImpl.createPathForExecutable( executableMetaData )
 			);
 		}
 
@@ -1034,6 +1041,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private <V, T> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, V value, ValidationOrder validationOrder) {
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( context.getRootBeanClass() );
 		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( context.getExecutable() );
+
+		if ( executableMetaData == null ) {
+			return;
+		}
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( bean ) );
@@ -1049,10 +1060,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 		}
 
-		ValueContext<V, Object> cascadingvalueContext = null;
+		ValueContext<V, Object> cascadingValueContext = null;
 
 		if ( value != null ) {
-			cascadingvalueContext = ValueContext.getLocalExecutionContext(
+			cascadingValueContext = ValueContext.getLocalExecutionContext(
 					value,
 					executableMetaData.getReturnValueMetaData(),
 					PathImpl.createPathForExecutable( executableMetaData )
@@ -1061,8 +1072,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			groupIterator = validationOrder.getGroupIterator();
 			while ( groupIterator.hasNext() ) {
 				Group group = groupIterator.next();
-				cascadingvalueContext.setCurrentGroup( group.getDefiningClass() );
-				validateCascadedConstraints( context, cascadingvalueContext );
+				cascadingValueContext.setCurrentGroup( group.getDefiningClass() );
+				validateCascadedConstraints( context, cascadingValueContext );
 				if ( shouldFailFast( context ) ) {
 					return;
 				}
@@ -1082,8 +1093,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				}
 
 				if ( value != null ) {
-					cascadingvalueContext.setCurrentGroup( group.getDefiningClass() );
-					validateCascadedConstraints( context, cascadingvalueContext );
+					cascadingValueContext.setCurrentGroup( group.getDefiningClass() );
+					validateCascadedConstraints( context, cascadingValueContext );
 
 					if ( shouldFailFast( context ) ) {
 						return;
@@ -1103,6 +1114,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
+
+		if ( executableMetaData == null ) {
+			// nothing to validate
+			return 0;
+		}
 
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in

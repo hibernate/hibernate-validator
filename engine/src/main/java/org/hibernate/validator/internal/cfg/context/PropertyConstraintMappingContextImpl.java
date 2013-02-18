@@ -62,7 +62,7 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 	}
 
 	public PropertyConstraintMappingContext ignoreAnnotations() {
-		mapping.getAnnotationProcessingOptions().ignorePropertyLevelConstraintAnnotationsOnMember( member );
+		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnMember( member );
 		return this;
 	}
 

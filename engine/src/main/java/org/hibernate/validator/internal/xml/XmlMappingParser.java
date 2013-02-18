@@ -19,12 +19,7 @@ package org.hibernate.validator.internal.xml;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
-import javax.validation.Payload;
+import javax.validation.ParameterNameProvider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -43,14 +38,13 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
-import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -59,24 +53,22 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
+ * XML parser for validation-mapping files.
+ *
  * @author Hardy Ferentschik
  */
 public class XmlMappingParser {
 
 	private static final Log log = LoggerFactory.make();
-	private static final String MESSAGE_PARAM = "message";
-	private static final String GROUPS_PARAM = "groups";
-	private static final String PAYLOAD_PARAM = "payload";
-	private static final String PACKAGE_SEPARATOR = ".";
 
 	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
-	private final AnnotationProcessingOptions annotationProcessingOptions;
-	private final Map<Class<?>, Set<MetaConstraint<?>>> constraintMap;
-	private final Map<Class<?>, List<Member>> cascadedMembers;
+	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
+	private final Map<Class<?>, Set<ConstrainedElement>> constrainedElements;
 
-	private final XmlParserHelper xmlParserHelper = new XmlParserHelper();
+	private final XmlParserHelper xmlParserHelper;
+	private final ParameterNameProvider parameterNameProvider;
 
 	private static final ConcurrentMap<String, String> SCHEMAS_BY_VERSION = new ConcurrentHashMap<String, String>(
 			2,
@@ -89,12 +81,13 @@ public class XmlMappingParser {
 		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
 	}
 
-	public XmlMappingParser(ConstraintHelper constraintHelper) {
+	public XmlMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
 		this.constraintHelper = constraintHelper;
-		this.annotationProcessingOptions = new AnnotationProcessingOptions();
-		this.constraintMap = newHashMap();
-		this.cascadedMembers = newHashMap();
+		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.defaultSequences = newHashMap();
+		this.constrainedElements = newHashMap();
+		this.xmlParserHelper = new XmlParserHelper();
+		this.parameterNameProvider = parameterNameProvider;
 	}
 
 	/**
@@ -104,12 +97,10 @@ public class XmlMappingParser {
 	 * @param mappingStreams The streams to parse. Must support the mark/reset contract.
 	 */
 	public final void parse(Set<InputStream> mappingStreams) {
-
 		try {
 			JAXBContext jc = JAXBContext.newInstance( ConstraintMappingsType.class );
 
 			for ( InputStream in : mappingStreams ) {
-
 				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", in );
 				String schemaResourceName = getSchemaResourceName( schemaVersion );
 				Schema schema = xmlParserHelper.getSchema( schemaResourceName );
@@ -123,15 +114,65 @@ public class XmlMappingParser {
 				parseConstraintDefinitions( mapping.getConstraintDefinition(), defaultPackage );
 
 				for ( BeanType bean : mapping.getBean() ) {
-					Class<?> beanClass = getClass( bean.getClazz(), defaultPackage );
+					Class<?> beanClass = ReflectionHelper.loadClass( bean.getClazz(), defaultPackage );
 					checkClassHasNotBeenProcessed( processedClasses, beanClass );
+
+					// update annotation ignores
 					annotationProcessingOptions.ignoreAnnotationConstraintForClass(
 							beanClass,
 							bean.getIgnoreAnnotations()
 					);
-					parseClassLevelOverrides( bean.getClassType(), beanClass, defaultPackage );
-					parseFieldLevelOverrides( bean.getField(), beanClass, defaultPackage );
-					parsePropertyLevelOverrides( bean.getGetter(), beanClass, defaultPackage );
+
+					ConstrainedType constrainedType = ConstrainedTypeBuilder.buildConstrainedType(
+							bean.getClassType(),
+							beanClass,
+							defaultPackage,
+							constraintHelper,
+							annotationProcessingOptions,
+							defaultSequences
+					);
+					if ( constrainedType != null ) {
+						addConstrainedElement( beanClass, constrainedType );
+					}
+
+					Set<ConstrainedField> constrainedFields = ConstrainedFieldBuilder.buildConstrainedFields(
+							bean.getField(),
+							beanClass,
+							defaultPackage,
+							constraintHelper,
+							annotationProcessingOptions
+					);
+					addConstrainedElements( beanClass, constrainedFields );
+
+					Set<ConstrainedExecutable> constrainedGetters = ConstrainedGetterBuilder.buildConstrainedGetters(
+							bean.getGetter(),
+							beanClass,
+							defaultPackage,
+							constraintHelper,
+							annotationProcessingOptions
+					);
+					addConstrainedElements( beanClass, constrainedGetters );
+
+					Set<ConstrainedExecutable> constrainedConstructors = ConstrainedExecutableBuilder.buildConstructorConstrainedExecutable(
+							bean.getConstructor(),
+							beanClass,
+							defaultPackage,
+							parameterNameProvider,
+							constraintHelper,
+							annotationProcessingOptions
+					);
+					addConstrainedElements( beanClass, constrainedConstructors );
+
+					Set<ConstrainedExecutable> constrainedMethods = ConstrainedExecutableBuilder.buildMethodConstrainedExecutable(
+							bean.getMethod(),
+							beanClass,
+							defaultPackage,
+							parameterNameProvider,
+							constraintHelper,
+							annotationProcessingOptions
+					);
+					addConstrainedElements( beanClass, constrainedMethods );
+
 					processedClasses.add( beanClass );
 				}
 			}
@@ -149,19 +190,12 @@ public class XmlMappingParser {
 		return annotationProcessingOptions;
 	}
 
-	public final <T> Set<MetaConstraint<?>> getConstraintsForClass(Class<T> beanClass) {
-
-		Set<MetaConstraint<?>> theValue = constraintMap.get( beanClass );
-
-		return theValue != null ? theValue : Collections.<MetaConstraint<?>>emptySet();
-	}
-
-	public final List<Member> getCascadedMembersForClass(Class<?> beanClass) {
-		if ( cascadedMembers.containsKey( beanClass ) ) {
-			return cascadedMembers.get( beanClass );
+	public final Set<ConstrainedElement> getConstrainedElementsForClass(Class<?> beanClass) {
+		if ( constrainedElements.containsKey( beanClass ) ) {
+			return constrainedElements.get( beanClass );
 		}
 		else {
-			return Collections.emptyList();
+			return Collections.emptySet();
 		}
 	}
 
@@ -174,7 +208,7 @@ public class XmlMappingParser {
 		for ( ConstraintDefinitionType constraintDefinition : constraintDefinitionList ) {
 			String annotationClassName = constraintDefinition.getAnnotation();
 
-			Class<?> clazz = getClass( annotationClassName, defaultPackage );
+			Class<?> clazz = ReflectionHelper.loadClass( annotationClassName, defaultPackage );
 			if ( !clazz.isAnnotation() ) {
 				throw log.getIsNotAnAnnotationException( annotationClassName );
 			}
@@ -225,392 +259,27 @@ public class XmlMappingParser {
 		}
 	}
 
-	private void parseFieldLevelOverrides(List<FieldType> fields, Class<?> beanClass, String defaultPackage) {
-		List<String> fieldNames = newArrayList();
-		for ( FieldType fieldType : fields ) {
-			String fieldName = fieldType.getName();
-			if ( fieldNames.contains( fieldName ) ) {
-				throw log.getIsDefinedTwiceInMappingXmlForBeanException( fieldName, beanClass.getName() );
-			}
-			else {
-				fieldNames.add( fieldName );
-			}
-			final boolean containsField = ReflectionHelper.containsDeclaredField( beanClass, fieldName );
-			if ( !containsField ) {
-				throw log.getBeanDoesNotContainTheFieldException( beanClass.getName(), fieldName );
-			}
-			final Field field = ReflectionHelper.getDeclaredField( beanClass, fieldName );
 
-			// ignore annotations
-			boolean ignoreFieldAnnotation = fieldType.getIgnoreAnnotations() == null ? false : fieldType.getIgnoreAnnotations();
-			if ( ignoreFieldAnnotation ) {
-				annotationProcessingOptions.ignorePropertyLevelConstraintAnnotationsOnMember( field );
-			}
-
-			// valid
-			if ( fieldType.getValid() != null ) {
-				addCascadedMember( beanClass, field );
-			}
-
-			// constraints
-			for ( ConstraintType constraint : fieldType.getConstraint() ) {
-				MetaConstraint<?> metaConstraint = createMetaConstraint(
-						constraint, beanClass, field, defaultPackage
-				);
-				addMetaConstraint( beanClass, metaConstraint );
-			}
-		}
-	}
-
-	private void parsePropertyLevelOverrides(List<GetterType> getters, Class<?> beanClass, String defaultPackage) {
-		List<String> getterNames = newArrayList();
-		for ( GetterType getterType : getters ) {
-			String getterName = getterType.getName();
-			if ( getterNames.contains( getterName ) ) {
-				throw log.getIsDefinedTwiceInMappingXmlForBeanException( getterName, beanClass.getName() );
-			}
-			else {
-				getterNames.add( getterName );
-			}
-			boolean containsMethod = ReflectionHelper.containsMethodWithPropertyName( beanClass, getterName );
-			if ( !containsMethod ) {
-				throw log.getBeanDoesNotContainThePropertyException( beanClass.getName(), getterName );
-			}
-			final Method method = ReflectionHelper.getMethodFromPropertyName( beanClass, getterName );
-
-			// ignore annotations
-			boolean ignoreGetterAnnotation = getterType.getIgnoreAnnotations() == null ? false : getterType.getIgnoreAnnotations();
-			if ( ignoreGetterAnnotation ) {
-				annotationProcessingOptions.ignorePropertyLevelConstraintAnnotationsOnMember( method );
-			}
-
-			// valid
-			if ( getterType.getValid() != null ) {
-				addCascadedMember( beanClass, method );
-			}
-
-			// constraints
-			for ( ConstraintType constraint : getterType.getConstraint() ) {
-				MetaConstraint<?> metaConstraint = createMetaConstraint(
-						constraint, beanClass, method, defaultPackage
-				);
-				addMetaConstraint( beanClass, metaConstraint );
-			}
-		}
-	}
-
-	private void parseClassLevelOverrides(ClassType classType, Class<?> beanClass, String defaultPackage) {
-		if ( classType == null ) {
-			return;
-		}
-
-		// ignore annotation
-		if ( classType.getIgnoreAnnotations() != null ) {
-			annotationProcessingOptions.ignoreClassLevelConstraintAnnotations(
-					beanClass,
-					classType.getIgnoreAnnotations()
-			);
-		}
-
-		// group sequence
-		List<Class<?>> groupSequence = createGroupSequence( classType.getGroupSequence(), defaultPackage );
-		if ( !groupSequence.isEmpty() ) {
-			defaultSequences.put( beanClass, groupSequence );
-		}
-
-		// constraints
-		for ( ConstraintType constraint : classType.getConstraint() ) {
-			MetaConstraint<?> metaConstraint = createMetaConstraint( constraint, beanClass, null, defaultPackage );
-			addMetaConstraint( beanClass, metaConstraint );
-		}
-	}
-
-	private void addMetaConstraint(Class<?> beanClass, MetaConstraint<?> metaConstraint) {
-		if ( constraintMap.containsKey( beanClass ) ) {
-			constraintMap.get( beanClass ).add( metaConstraint );
+	private void addConstrainedElement(Class<?> beanClass, ConstrainedElement constrainedElement) {
+		if ( constrainedElements.containsKey( beanClass ) ) {
+			constrainedElements.get( beanClass ).add( constrainedElement );
 		}
 		else {
-			Set<MetaConstraint<?>> constraintList = newHashSet();
-			constraintList.add( metaConstraint );
-			constraintMap.put( beanClass, constraintList );
+			Set<ConstrainedElement> tmpList = newHashSet();
+			tmpList.add( constrainedElement );
+			constrainedElements.put( beanClass, tmpList );
 		}
 	}
 
-	private void addCascadedMember(Class<?> beanClass, Member member) {
-		if ( cascadedMembers.containsKey( beanClass ) ) {
-			cascadedMembers.get( beanClass ).add( member );
+	private void addConstrainedElements(Class<?> beanClass, Set<? extends ConstrainedElement> newConstrainedElements) {
+		if ( constrainedElements.containsKey( beanClass ) ) {
+			constrainedElements.get( beanClass ).addAll( newConstrainedElements );
 		}
 		else {
-			List<Member> tmpList = newArrayList();
-			tmpList.add( member );
-			cascadedMembers.put( beanClass, tmpList );
+			Set<ConstrainedElement> tmpSet = newHashSet();
+			tmpSet.addAll( newConstrainedElements );
+			constrainedElements.put( beanClass, tmpSet );
 		}
-	}
-
-	private List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {
-		List<Class<?>> groupSequence = newArrayList();
-		if ( groupSequenceType != null ) {
-			for ( String groupName : groupSequenceType.getValue() ) {
-				Class<?> group = getClass( groupName, defaultPackage );
-				groupSequence.add( group );
-			}
-		}
-		return groupSequence;
-	}
-
-	private <A extends Annotation, T> MetaConstraint<?> createMetaConstraint(ConstraintType constraint, Class<T> beanClass, Member member, String defaultPackage) {
-		@SuppressWarnings("unchecked")
-		Class<A> annotationClass = (Class<A>) getClass( constraint.getAnnotation(), defaultPackage );
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( annotationClass );
-
-		if ( constraint.getMessage() != null ) {
-			annotationDescriptor.setValue( MESSAGE_PARAM, constraint.getMessage() );
-		}
-		annotationDescriptor.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
-		annotationDescriptor.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
-
-		for ( ElementType elementType : constraint.getElement() ) {
-			String name = elementType.getName();
-			checkNameIsValid( name );
-			Class<?> returnType = getAnnotationParameterType( annotationClass, name );
-			Object elementValue = getElementValue( elementType, returnType );
-			annotationDescriptor.setValue( name, elementValue );
-		}
-
-		A annotation;
-		try {
-			annotation = AnnotationFactory.create( annotationDescriptor );
-		}
-		catch ( RuntimeException e ) {
-			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
-		}
-
-		java.lang.annotation.ElementType type = java.lang.annotation.ElementType.TYPE;
-		if ( member instanceof Method ) {
-			type = java.lang.annotation.ElementType.METHOD;
-		}
-		else if ( member instanceof Field ) {
-			type = java.lang.annotation.ElementType.FIELD;
-		}
-
-		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
-		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
-		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
-		);
-
-		return new MetaConstraint<A>( constraintDescriptor, new BeanConstraintLocation( beanClass, member ) );
-	}
-
-	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
-		Method m = ReflectionHelper.getMethod( annotationClass, name );
-		if ( m == null ) {
-			throw log.getAnnotationDoesNotContainAParameterException( annotationClass.getName(), name );
-		}
-		return m.getReturnType();
-	}
-
-	private Object getElementValue(ElementType elementType, Class<?> returnType) {
-		removeEmptyContentElements( elementType );
-
-		boolean isArray = returnType.isArray();
-		if ( !isArray ) {
-			if ( elementType.getContent().size() != 1 ) {
-				throw log.getAttemptToSpecifyAnArrayWhereSingleValueIsExpectedException();
-			}
-			return getSingleValue( elementType.getContent().get( 0 ), returnType );
-		}
-		else {
-			List<Object> values = newArrayList();
-			for ( Serializable s : elementType.getContent() ) {
-				values.add( getSingleValue( s, returnType.getComponentType() ) );
-			}
-			return values.toArray( (Object[]) Array.newInstance( returnType.getComponentType(), values.size() ) );
-		}
-	}
-
-	private void removeEmptyContentElements(ElementType elementType) {
-		List<Serializable> contentToDelete = newArrayList();
-		for ( Serializable content : elementType.getContent() ) {
-			if ( content instanceof String && ( (String) content ).matches( "[\\n ].*" ) ) {
-				contentToDelete.add( content );
-			}
-		}
-		elementType.getContent().removeAll( contentToDelete );
-	}
-
-	private Object getSingleValue(Serializable serializable, Class<?> returnType) {
-
-		Object returnValue;
-		if ( serializable instanceof String ) {
-			String value = (String) serializable;
-			returnValue = convertStringToReturnType( returnType, value );
-		}
-		else if ( serializable instanceof JAXBElement && ( (JAXBElement<?>) serializable ).getDeclaredType()
-				.equals( String.class ) ) {
-			JAXBElement<?> elem = (JAXBElement<?>) serializable;
-			String value = (String) elem.getValue();
-			returnValue = convertStringToReturnType( returnType, value );
-		}
-		else if ( serializable instanceof JAXBElement && ( (JAXBElement<?>) serializable ).getDeclaredType()
-				.equals( AnnotationType.class ) ) {
-			JAXBElement<?> elem = (JAXBElement<?>) serializable;
-			AnnotationType annotationType = (AnnotationType) elem.getValue();
-			try {
-				@SuppressWarnings("unchecked")
-				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
-				returnValue = createAnnotation( annotationType, annotationClass );
-			}
-			catch ( ClassCastException e ) {
-				throw log.getUnexpectedParameterValueException( e );
-			}
-		}
-		else {
-			throw log.getUnexpectedParameterValueException();
-		}
-		return returnValue;
-
-	}
-
-	private <A extends Annotation> Annotation createAnnotation(AnnotationType annotationType, Class<A> returnType) {
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
-		for ( ElementType elementType : annotationType.getElement() ) {
-			String name = elementType.getName();
-			Class<?> parameterType = getAnnotationParameterType( returnType, name );
-			Object elementValue = getElementValue( elementType, parameterType );
-			annotationDescriptor.setValue( name, elementValue );
-		}
-		return AnnotationFactory.create( annotationDescriptor );
-	}
-
-	private Object convertStringToReturnType(Class<?> returnType, String value) {
-		Object returnValue;
-		if ( returnType.getName().equals( byte.class.getName() ) ) {
-			try {
-				returnValue = Byte.parseByte( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "byte", e );
-			}
-		}
-		else if ( returnType.getName().equals( short.class.getName() ) ) {
-			try {
-				returnValue = Short.parseShort( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "short", e );
-			}
-		}
-		else if ( returnType.getName().equals( int.class.getName() ) ) {
-			try {
-				returnValue = Integer.parseInt( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "int", e );
-			}
-		}
-		else if ( returnType.getName().equals( long.class.getName() ) ) {
-			try {
-				returnValue = Long.parseLong( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "long", e );
-			}
-		}
-		else if ( returnType.getName().equals( float.class.getName() ) ) {
-			try {
-				returnValue = Float.parseFloat( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "float", e );
-			}
-		}
-		else if ( returnType.getName().equals( double.class.getName() ) ) {
-			try {
-				returnValue = Double.parseDouble( value );
-			}
-			catch ( NumberFormatException e ) {
-				throw log.getInvalidNumberFormatException( "double", e );
-			}
-		}
-		else if ( returnType.getName().equals( boolean.class.getName() ) ) {
-			returnValue = Boolean.parseBoolean( value );
-		}
-		else if ( returnType.getName().equals( char.class.getName() ) ) {
-			if ( value.length() != 1 ) {
-				throw log.getInvalidCharValueException( value );
-			}
-			returnValue = value.charAt( 0 );
-		}
-		else if ( returnType.getName().equals( String.class.getName() ) ) {
-			returnValue = value;
-		}
-		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ReflectionHelper.loadClass( value, this.getClass() );
-		}
-		else {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<Enum> enumClass = (Class<Enum>) returnType;
-				returnValue = Enum.valueOf( enumClass, value );
-			}
-			catch ( ClassCastException e ) {
-				throw log.getInvalidReturnTypeException( returnType, e );
-			}
-		}
-		return returnValue;
-	}
-
-	private void checkNameIsValid(String name) {
-		if ( MESSAGE_PARAM.equals( name ) || GROUPS_PARAM.equals( name ) ) {
-			throw log.getReservedParameterNamesException( MESSAGE_PARAM, GROUPS_PARAM, PAYLOAD_PARAM );
-		}
-	}
-
-	private Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
-		if ( groupsType == null ) {
-			return new Class[] { };
-		}
-
-		List<Class<?>> groupList = newArrayList();
-		for ( String groupClass : groupsType.getValue() ) {
-			groupList.add( getClass( groupClass, defaultPackage ) );
-		}
-		return groupList.toArray( new Class[groupList.size()] );
-	}
-
-	@SuppressWarnings("unchecked")
-	private Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
-		if ( payloadType == null ) {
-			return new Class[] { };
-		}
-
-		List<Class<? extends Payload>> payloadList = newArrayList();
-		for ( String groupClass : payloadType.getValue() ) {
-			Class<?> payload = getClass( groupClass, defaultPackage );
-			if ( !Payload.class.isAssignableFrom( payload ) ) {
-				throw log.getWrongPayloadClassException( payload.getName() );
-			}
-			else {
-				payloadList.add( (Class<? extends Payload>) payload );
-			}
-		}
-		return payloadList.toArray( new Class[payloadList.size()] );
-	}
-
-	private Class<?> getClass(String clazz, String defaultPackage) {
-		String fullyQualifiedClass;
-		if ( isQualifiedClass( clazz ) ) {
-			fullyQualifiedClass = clazz;
-		}
-		else {
-			fullyQualifiedClass = defaultPackage + PACKAGE_SEPARATOR + clazz;
-		}
-		return ReflectionHelper.loadClass( fullyQualifiedClass, this.getClass() );
-	}
-
-	private boolean isQualifiedClass(String clazz) {
-		return clazz.contains( PACKAGE_SEPARATOR );
 	}
 
 	private ConstraintMappingsType getValidationConfig(InputStream in, Unmarshaller unmarshaller) {

@@ -67,7 +67,9 @@ public class XmlParserHelper {
 	 */
 	private static final int READ_LIMIT = 1024 * 1024;
 
-	private static final ConcurrentMap<String, Schema> schemaCache = new ConcurrentHashMap<String, Schema>( NUMBER_OF_SCHEMAS );
+	private static final ConcurrentMap<String, Schema> schemaCache = new ConcurrentHashMap<String, Schema>(
+			NUMBER_OF_SCHEMAS
+	);
 
 	/**
 	 * Retrieves the schema version applying for the given XML input stream as
@@ -83,7 +85,6 @@ public class XmlParserHelper {
 	 *         "version" attribute.
 	 */
 	public String getSchemaVersion(String resourceName, InputStream xmlInputStream) {
-
 		Contracts.assertNotNull( xmlInputStream, MESSAGES.parameterMustNotBeNull( "xmlInputStream" ) );
 
 		xmlInputStream.mark( READ_LIMIT );
@@ -108,7 +109,6 @@ public class XmlParserHelper {
 	}
 
 	private String getVersionValue(StartElement startElement) {
-
 		if ( startElement == null ) {
 			return null;
 		}
@@ -118,7 +118,6 @@ public class XmlParserHelper {
 	}
 
 	private StartElement getRootElement(XMLEventReader xmlEventReader) throws XMLStreamException {
-
 		while ( xmlEventReader.hasNext() ) {
 			XMLEvent nextEvent = xmlEventReader.nextEvent();
 			if ( nextEvent.isStartElement() ) {
@@ -134,7 +133,6 @@ public class XmlParserHelper {
 	}
 
 	public Schema getSchema(String schemaResource) {
-
 		Schema schema = schemaCache.get( schemaResource );
 
 		if ( schema != null ) {
@@ -148,7 +146,6 @@ public class XmlParserHelper {
 	}
 
 	private Schema loadSchema(String schemaResource) {
-
 		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( XmlParserHelper.class );
 
 		URL schemaUrl = loader.getResource( schemaResource );

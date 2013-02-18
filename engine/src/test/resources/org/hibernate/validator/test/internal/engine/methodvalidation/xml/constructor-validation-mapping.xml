@@ -1,0 +1,53 @@
+<constraint-mappings
+        xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation=
+                "http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.1.xsd" version="1.1">
+
+    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.model.Address"
+          ignore-annotations="true"/>
+    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer"
+          ignore-annotations="true">
+        <getter name="name">
+            <constraint annotation="javax.validation.constraints.NotNull">
+                <message>[XML] - may not be null</message>
+            </constraint>
+        </getter>
+    </bean>
+
+    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository"
+          ignore-annotations="true"/>
+    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl"
+          ignore-annotations="true">
+        <field name="customer">
+            <constraint annotation="javax.validation.constraints.NotNull">
+                <message>[XML] - may not be null</message>
+            </constraint>
+        </field>
+        <constructor>
+            <return-value>
+                <constraint annotation="org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl$ValidB2BRepository">
+                    <message>[XML] - {ValidB2BRepository.message}</message>
+                </constraint>
+            </return-value>
+        </constructor>
+        <constructor>
+            <parameter type="org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer">
+                <valid/>
+            </parameter>
+        </constructor>
+        <constructor>
+            <parameter type="java.lang.String">
+                <constraint annotation="javax.validation.constraints.NotNull">
+                    <message>[XML] - may not be null</message>
+                </constraint>
+            </parameter>
+            <return-value>
+                <valid/>
+            </return-value>
+        </constructor>
+    </bean>
+
+    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.service.RepositoryBase"
+          ignore-annotations="true"/>
+</constraint-mappings>

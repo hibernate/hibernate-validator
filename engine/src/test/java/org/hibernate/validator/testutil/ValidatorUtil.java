@@ -204,7 +204,10 @@ public final class ValidatorUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T, I extends T> T getValidatingProxy(I implementor, Class<?>[] interfaces, Validator executableValidator, Class<?>... validationGroups) {
+	public static <T, I extends T> T getValidatingProxy(I implementor,
+														Class<?>[] interfaces,
+														Validator executableValidator,
+														Class<?>... validationGroups) {
 		InvocationHandler handler = new ValidationInvocationHandler(
 				implementor, executableValidator, validationGroups
 		);

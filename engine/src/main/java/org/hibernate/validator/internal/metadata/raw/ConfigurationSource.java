@@ -23,10 +23,17 @@ package org.hibernate.validator.internal.metadata.raw;
  */
 public enum ConfigurationSource {
 
+	/**
+	 * The source of configuration are annotation in the source code
+	 */
 	ANNOTATION( 0 ),
-
+	/**
+	 * The source of configuration is xml configuration
+	 */
 	XML( 1 ),
-
+	/**
+	 * The source of configuration is the programmatic API
+	 */
 	API( 2 );
 
 	private int priority;

@@ -63,7 +63,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			ExecutableConstraintLocation location,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			boolean isCascading) {
-
 		this(
 				source,
 				location,
@@ -98,7 +97,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
 			boolean isCascading) {
-
 		super(
 				source,
 				location.getElementType() == ElementType.CONSTRUCTOR ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
@@ -127,17 +125,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		}
 	}
 
-	private boolean hasParameterConstraints(List<ConstrainedParameter> parameterMetaData) {
-
-		for ( ConstrainedParameter oneParameter : parameterMetaData ) {
-			if ( oneParameter.isConstrained() ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	@Override
 	public ExecutableConstraintLocation getLocation() {
 		return (ExecutableConstraintLocation) super.getLocation();
@@ -155,7 +142,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * specified index.
 	 */
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
-
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
 			throw log.getInvalidMethodParameterIndexException( getLocation().getMember().getName(), parameterIndex );
 		}
@@ -222,4 +208,13 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				+ ", hasParameterConstraints=" + hasParameterConstraints + "]";
 	}
 
+	private boolean hasParameterConstraints(List<ConstrainedParameter> parameterMetaData) {
+		for ( ConstrainedParameter oneParameter : parameterMetaData ) {
+			if ( oneParameter.isConstrained() ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

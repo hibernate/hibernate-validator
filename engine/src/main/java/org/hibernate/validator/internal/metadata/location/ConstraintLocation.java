@@ -28,6 +28,11 @@ import java.lang.reflect.Type;
  */
 public interface ConstraintLocation {
 
+	/**
+	 * Returns the class on which the constraint is defined.
+	 *
+	 * @return the class on which the constraint is defined.
+	 */
 	Class<?> getBeanClass();
 
 	/**
@@ -38,7 +43,17 @@ public interface ConstraintLocation {
 	 */
 	Type typeOfAnnotatedElement();
 
+	/**
+	 * Returns the {@code ElementType} on which the constraint is defined.
+	 *
+	 * @return the {@code ElementType} on which the constraint is defined.
+	 */
 	ElementType getElementType();
 
+	/**
+	 * Returns the member the constraint is defined on.
+	 *
+	 * @return the member the constraint is defined on.
+	 */
 	Member getMember();
 }
