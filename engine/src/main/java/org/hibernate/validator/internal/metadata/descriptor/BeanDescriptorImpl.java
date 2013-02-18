@@ -67,6 +67,11 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 	}
 
 	@Override
+	public boolean hasConstrainedExecutables() {
+		return false; // TODO https://hibernate.onjira.com/browse/HV-717
+	}
+
+	@Override
 	public final PropertyDescriptor getConstraintsForProperty(String propertyName) {
 		assertNotNull( propertyName, "The property name cannot be null" );
 		return constrainedProperties.get( propertyName );
