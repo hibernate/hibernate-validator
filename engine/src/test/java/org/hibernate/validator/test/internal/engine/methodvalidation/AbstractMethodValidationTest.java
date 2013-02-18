@@ -384,7 +384,7 @@ public abstract class AbstractMethodValidationTest {
 			assertEquals( constraintViolation.getLeafBean(), customerRepository );
 			assertEquals( constraintViolation.getInvalidValue(), 9 );
 			assertEquals( constraintViolation.getExecutableParameters(), null );
-			assertEquals( constraintViolation.getExecutableReturnValue(), Integer.valueOf( 9 ) );
+			assertEquals( constraintViolation.getExecutableReturnValue(), 9 );
 		}
 	}
 
@@ -599,8 +599,6 @@ public abstract class AbstractMethodValidationTest {
 					ConsistentDateParameters.class
 			);
 			assertThat( constraintViolation.getInvalidValue() ).isEqualTo( new Object[] { startDate, endDate } );
-
-			//TODO BVAL-337: Does that make sense?
 			assertEquals( constraintViolation.getLeafBean(), customerRepository );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
 			assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
