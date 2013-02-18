@@ -57,12 +57,17 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	@ValidB2BRepository
 	@Valid
 	public CustomerRepositoryExt(@NotNull String foo) {
+		super();
 	}
 
 	public CustomerRepositoryExt(@NotNull String foo, @Valid Customer customer) {
 	}
 
 	public CustomerRepositoryExt(int bar) {
+	}
+
+	@Valid
+	public CustomerRepositoryExt(DateMidnight start, DateMidnight end) {
 	}
 
 	@Override

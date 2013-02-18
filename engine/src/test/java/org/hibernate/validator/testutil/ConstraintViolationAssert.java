@@ -198,7 +198,7 @@ public final class ConstraintViolationAssert {
 	 * @param path The path under test
 	 * @param kinds The node kinds
 	 */
-	public static void assertDescriptorKinds(Path path, ElementKind... kinds) {
+	public static void assertNodeKinds(Path path, ElementKind... kinds) {
 		Iterator<Path.Node> pathIterator = path.iterator();
 
 		for ( ElementKind kind : kinds ) {

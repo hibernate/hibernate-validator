@@ -486,7 +486,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 		}
 		else {
-			valueContext.appendNode( beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() ) );
+			valueContext.appendBeanNode();
 		}
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
@@ -971,6 +971,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ValueContext<T, Object> valueContext = getExecutableValueContext(
 					object, validationContext.getRootBeanClass(), executableMetaData, currentValidatedGroup
 			);
+			valueContext.appendCrossParameterNode();
 			valueContext.setCurrentValidatedValue( parameterValues );
 
 			// 1. validate cross-parameter constraints
@@ -980,6 +981,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			if ( shouldFailFast( validationContext ) ) {
 				return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 			}
+
+			valueContext = getExecutableValueContext(
+					object, validationContext.getRootBeanClass(), executableMetaData, currentValidatedGroup
+			);
+			valueContext.setCurrentValidatedValue( parameterValues );
 
 			// 2. validate parameter constraints
 			for ( int i = 0; i < parameterValues.length; i++ ) {

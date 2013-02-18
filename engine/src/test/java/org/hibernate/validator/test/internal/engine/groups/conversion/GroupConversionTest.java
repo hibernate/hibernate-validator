@@ -85,8 +85,8 @@ public class GroupConversionTest {
 
 		assertCorrectPropertyPaths(
 				violations,
-				"findAddresses.$retval[0].street1",
-				"findAddresses.$retval[0].zipCode"
+				"findAddresses.<return value>[0].street1",
+				"findAddresses.<return value>[0].zipCode"
 		);
 	}
 

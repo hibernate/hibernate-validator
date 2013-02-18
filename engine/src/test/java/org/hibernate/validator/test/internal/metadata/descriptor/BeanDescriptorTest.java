@@ -17,6 +17,7 @@
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
@@ -29,6 +30,7 @@ import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -255,7 +257,9 @@ public class BeanDescriptorTest {
 		assertThat( constrainedConstructors ).isNotNull();
 		assertThat( getSignatures( constrainedConstructors ) ).containsOnly(
 				Arrays.<Class<?>>asList( String.class ),
-				Arrays.<Class<?>>asList( String.class, Customer.class )
+				Arrays.<Class<?>>asList( String.class, Customer.class ),
+				Collections.emptyList(),
+				Arrays.<Class<?>>asList( DateMidnight.class, DateMidnight.class )
 		);
 	}
 

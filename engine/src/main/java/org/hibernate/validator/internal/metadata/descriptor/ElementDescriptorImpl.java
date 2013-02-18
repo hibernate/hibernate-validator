@@ -19,7 +19,6 @@ package org.hibernate.validator.internal.metadata.descriptor;
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,6 +35,9 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.util.TypeHelper;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Describes a validated element (class, field or property).
@@ -100,7 +102,7 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 			//for a bean descriptor there will be no parameter constraints, so we can safely add this element type here
 			elementTypes.add( ElementType.PARAMETER );
 
-			definedInSet = new HashSet<ConstraintOrigin>();
+			definedInSet = newHashSet();
 			definedInSet.add( ConstraintOrigin.DEFINED_LOCALLY );
 			definedInSet.add( ConstraintOrigin.DEFINED_IN_HIERARCHY );
 			groups = Collections.emptyList();
@@ -108,7 +110,7 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 
 		@Override
 		public ConstraintFinder unorderedAndMatchingGroups(Class<?>... classes) {
-			this.groups = new ArrayList<Class<?>>();
+			this.groups = newArrayList();
 			for ( Class<?> clazz : classes ) {
 				if ( Default.class.equals( clazz ) && defaultGroupSequenceRedefined ) {
 					this.groups.addAll( defaultGroupSequence );
@@ -137,7 +139,6 @@ public abstract class ElementDescriptorImpl implements ElementDescriptor, Serial
 
 		@Override
 		public Set<ConstraintDescriptor<?>> getConstraintDescriptors() {
-
 			Set<ConstraintDescriptor<?>> matchingDescriptors = new HashSet<ConstraintDescriptor<?>>();
 			findMatchingDescriptors( matchingDescriptors );
 			return Collections.unmodifiableSet( matchingDescriptors );

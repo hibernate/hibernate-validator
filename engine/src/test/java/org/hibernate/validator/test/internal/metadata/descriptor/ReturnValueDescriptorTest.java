@@ -35,6 +35,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.Cust
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtReturnValueComplex;
 import org.hibernate.validator.testutil.TestForIssue;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintTypes;
 import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
 import static org.hibernate.validator.testutil.ValidatorUtil.getMethodReturnValueDescriptor;
@@ -170,5 +171,19 @@ public class ReturnValueDescriptorTest {
 				CustomerRepositoryExtReturnValueComplex.class,
 				CustomerComplex.class
 		);
+	}
+
+	@Test
+	public void testDescriptorForVoidMethod() {
+		ReturnValueDescriptor returnValueDescriptor = getMethodReturnValueDescriptor(
+				CustomerRepositoryExt.class, "saveCustomer", Customer.class
+		);
+
+		assertThat( returnValueDescriptor.getElementClass() ).isSameAs( void.class );
+		assertThat( returnValueDescriptor.hasConstraints() ).isFalse();
+		assertThat( returnValueDescriptor.isCascaded() ).isFalse();
+		assertThat( returnValueDescriptor.getConstraintDescriptors() ).isEmpty();
+		assertThat( returnValueDescriptor.getGroupConversions() ).isEmpty();
+		assertThat( returnValueDescriptor.findConstraints().getConstraintDescriptors() ).isEmpty();
 	}
 }

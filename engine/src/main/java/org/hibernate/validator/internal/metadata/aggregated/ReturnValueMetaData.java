@@ -87,10 +87,8 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 
 	@Override
 	public ReturnValueDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		Type returnType = getType();
-
-		return returnType.equals( void.class ) ? null : new ReturnValueDescriptorImpl(
-				returnType,
+		return new ReturnValueDescriptorImpl(
+				getType(),
 				asDescriptors( getConstraints() ),
 				isCascading(),
 				defaultGroupSequenceRedefined,

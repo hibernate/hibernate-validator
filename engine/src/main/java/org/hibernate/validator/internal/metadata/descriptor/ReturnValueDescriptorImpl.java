@@ -67,5 +67,3 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 		return sb.toString();
 	}
 }
-
-

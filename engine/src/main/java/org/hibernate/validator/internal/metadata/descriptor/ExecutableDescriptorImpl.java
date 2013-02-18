@@ -36,13 +36,14 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		implements ConstructorDescriptor, MethodDescriptor {
 	private final String name;
 	private final List<ParameterDescriptor> parameters;
+	private final CrossParameterDescriptor crossParameterDescriptor;
 	private final ReturnValueDescriptor returnValueDescriptor;
 	private final ConstraintDeclarationException constraintDeclarationException;
 
 	public ExecutableDescriptorImpl(
 			Type returnType,
 			String name,
-			Set<ConstraintDescriptorImpl<?>> crossParameterValueConstraints,
+			Set<ConstraintDescriptorImpl<?>> crossParameterConstraints,
 			ReturnValueDescriptor returnValueDescriptor,
 			List<ParameterDescriptor> parameters,
 			boolean defaultGroupSequenceRedefined,
@@ -50,7 +51,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 			ConstraintDeclarationException constraintDeclarationException) {
 		super(
 				returnType,
-				crossParameterValueConstraints,
+				Collections.<ConstraintDescriptorImpl<?>>emptySet(),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence
 		);
@@ -59,6 +60,11 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		this.parameters = Collections.unmodifiableList( parameters );
 		this.returnValueDescriptor = returnValueDescriptor;
 		this.constraintDeclarationException = constraintDeclarationException;
+		this.crossParameterDescriptor = new CrossParameterDescriptorImpl(
+				crossParameterConstraints,
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence
+		);
 	}
 
 	@Override
@@ -95,7 +101,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 
 	@Override
 	public boolean areParametersConstrained() {
-		if ( hasConstraints() ) {
+		if ( crossParameterDescriptor.hasConstraints() ) {
 			return true;
 		}
 
@@ -116,7 +122,6 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 
 	@Override
 	public CrossParameterDescriptor getCrossParameterDescriptor() {
-		//TODO HV-709
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return crossParameterDescriptor;
 	}
 }

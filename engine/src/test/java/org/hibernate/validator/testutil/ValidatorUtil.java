@@ -192,8 +192,7 @@ public final class ValidatorUtil {
 	 * @param methodName The method name.
 	 * @param parameterTypes The method parameter types.
 	 *
-	 * @return an instance of {@code ReturnValueDescriptor} for the given method signature or {@code null} if no such method exists or
-	 *         the method has no return value.
+	 * @return an instance of {@code ReturnValueDescriptor} for the given method signature or {@code null} if no such method exists.
 	 */
 	public static ReturnValueDescriptor getMethodReturnValueDescriptor(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
 		MethodDescriptor methodDescriptor = getBeanDescriptor( clazz ).getConstraintsForMethod(
