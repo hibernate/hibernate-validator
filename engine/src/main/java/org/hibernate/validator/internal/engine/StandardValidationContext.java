@@ -34,7 +34,7 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-public class StandardValidationContext<T> extends ValidationContext<T, ConstraintViolation<T>> {
+public class StandardValidationContext<T> extends ValidationContext<T> {
 
 	protected StandardValidationContext(BeanMetaDataManager beanMetaDataManager,
 										ConstraintValidatorManager constraintValidatorManager,
@@ -58,9 +58,9 @@ public class StandardValidationContext<T> extends ValidationContext<T, Constrain
 	}
 
 	@Override
-	public <U, V> ConstraintViolation<T> createConstraintViolation(ValueContext<U, V> localContext,
-																   MessageAndPath messageAndPath,
-																   ConstraintDescriptor<?> descriptor) {
+	public ConstraintViolation<T> createConstraintViolation(ValueContext<?, ?> localContext,
+															MessageAndPath messageAndPath,
+															ConstraintDescriptor<?> descriptor) {
 
 		String messageTemplate = messageAndPath.getMessage();
 		String interpolatedMessage = messageInterpolator.interpolate(

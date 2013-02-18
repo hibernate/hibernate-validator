@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.internal.engine;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -39,6 +37,10 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.IdentitySet;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 /**
  * Context object keeping track of all required data for a validation call.
  *
@@ -49,7 +51,7 @@ import org.hibernate.validator.internal.util.IdentitySet;
  * @author Emmanuel Bernard
  * @author Gunnar Morling
  */
-public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
+public abstract class ValidationContext<T> {
 
 	/**
 	 * Access to the cached bean meta data
@@ -85,7 +87,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	/**
 	 * Contains all failing constraints so far.
 	 */
-	private final Set<C> failingConstraintViolations;
+	private final Set<ConstraintViolation<T>> failingConstraintViolations;
 
 	/**
 	 * The message resolver which should be used in this context.
@@ -107,7 +109,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 	 */
 	private final boolean failFast;
 
-	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidate(
+	public static <T> ValidationContext<T> getContextForValidate(
 			BeanMetaDataManager beanMetaDataManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			T object,
@@ -128,7 +130,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		);
 	}
 
-	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateProperty(
+	public static <T> ValidationContext<T> getContextForValidateProperty(
 			BeanMetaDataManager beanMetaDataManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			T rootBean,
@@ -150,7 +152,7 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		);
 	}
 
-	public static <T> ValidationContext<T, ConstraintViolation<T>> getContextForValidateValue(
+	public static <T> ValidationContext<T> getContextForValidateValue(
 			BeanMetaDataManager beanMetaDataManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			Class<T> rootBeanClass,
@@ -212,9 +214,9 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		this.traversableResolver = traversableResolver;
 		this.failFast = failFast;
 
-		processedObjects = new HashMap<Class<?>, IdentitySet>();
+		processedObjects = newHashMap();
 		processedPaths = new IdentityHashMap<Object, Set<PathImpl>>();
-		failingConstraintViolations = new HashSet<C>();
+		failingConstraintViolations = newHashSet();
 	}
 
 	public final T getRootBean() {
@@ -241,11 +243,11 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		return constraintValidatorManager;
 	}
 
-	public final <U, V> List<C> createConstraintViolations(ValueContext<U, V> localContext,
-														   ConstraintValidatorContextImpl constraintValidatorContext) {
-		List<C> constraintViolations = new ArrayList<C>();
+	public final List<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
+																		 ConstraintValidatorContextImpl constraintValidatorContext) {
+		List<ConstraintViolation<T>> constraintViolations = newArrayList();
 		for ( MessageAndPath messageAndPath : constraintValidatorContext.getMessageAndPathList() ) {
-			C violation = createConstraintViolation(
+			ConstraintViolation<T> violation = createConstraintViolation(
 					localContext, messageAndPath, constraintValidatorContext.getConstraintDescriptor()
 			);
 			constraintViolations.add( violation );
@@ -273,11 +275,11 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		markProcessedForCurrentPath( valueContext.getCurrentBean(), valueContext.getPropertyPath() );
 	}
 
-	public final void addConstraintFailures(Set<C> failingConstraintViolations) {
+	public final void addConstraintFailures(Set<ConstraintViolation<T>> failingConstraintViolations) {
 		this.failingConstraintViolations.addAll( failingConstraintViolations );
 	}
 
-	public Set<C> getFailingConstraints() {
+	public Set<ConstraintViolation<T>> getFailingConstraints() {
 		return failingConstraintViolations;
 	}
 
@@ -290,9 +292,9 @@ public abstract class ValidationContext<T, C extends ConstraintViolation<T>> {
 		return sb.toString();
 	}
 
-	public abstract <U, V> C createConstraintViolation(ValueContext<U, V> localContext,
-													   MessageAndPath messageAndPath,
-													   ConstraintDescriptor<?> descriptor);
+	public abstract ConstraintViolation<T> createConstraintViolation(ValueContext<?, ?> localContext,
+																	 MessageAndPath messageAndPath,
+																	 ConstraintDescriptor<?> descriptor);
 
 	private boolean isAlreadyValidatedForPath(Object value, PathImpl path) {
 		Set<PathImpl> pathSet = processedPaths.get( value );

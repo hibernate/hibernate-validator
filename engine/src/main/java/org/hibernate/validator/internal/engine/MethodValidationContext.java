@@ -36,7 +36,7 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
  *
  * @author Gunnar Morling
  */
-public class MethodValidationContext<T> extends ValidationContext<T, ConstraintViolation<T>> {
+public class MethodValidationContext<T> extends ValidationContext<T> {
 
 	/**
 	 * The method of the current validation call.
@@ -73,8 +73,8 @@ public class MethodValidationContext<T> extends ValidationContext<T, ConstraintV
 	}
 
 	@Override
-	public <U, V> ConstraintViolation<T> createConstraintViolation(
-			ValueContext<U, V> localContext, MessageAndPath messageAndPath,
+	public ConstraintViolation<T> createConstraintViolation(
+			ValueContext<?, ?> localContext, MessageAndPath messageAndPath,
 			ConstraintDescriptor<?> descriptor) {
 
 		String messageTemplate = messageAndPath.getMessage();
