@@ -956,11 +956,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( executable );
 
-		if ( executableMetaData == null ) {
-			// nothing to validate
-			return 0;
-		}
-
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
 		// the inheritance tree?

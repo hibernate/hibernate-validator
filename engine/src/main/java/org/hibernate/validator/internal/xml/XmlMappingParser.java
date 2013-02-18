@@ -20,9 +20,6 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -43,9 +40,6 @@ import javax.xml.validation.Schema;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
@@ -129,7 +123,7 @@ public class XmlMappingParser {
 							bean.getIgnoreAnnotations()
 					);
 
-					ConstrainedType constrainedType = ConstraintTypeBuilder.buildConstrainedType(
+					ConstrainedType constrainedType = ConstrainedTypeBuilder.buildConstrainedType(
 							bean.getClassType(),
 							beanClass,
 							defaultPackage,
@@ -141,7 +135,7 @@ public class XmlMappingParser {
 						addConstrainedElement( beanClass, constrainedType );
 					}
 
-					Set<ConstrainedField> constrainedFields = ConstraintFieldBuilder.buildConstrainedFields(
+					Set<ConstrainedField> constrainedFields = ConstrainedFieldBuilder.buildConstrainedFields(
 							bean.getField(),
 							beanClass,
 							defaultPackage,
@@ -150,7 +144,7 @@ public class XmlMappingParser {
 					);
 					addConstrainedElements( beanClass, constrainedFields );
 
-					Set<ConstrainedExecutable> constrainedGetters = ConstraintGetterBuilder.buildConstrainedGetters(
+					Set<ConstrainedExecutable> constrainedGetters = ConstrainedGetterBuilder.buildConstrainedGetters(
 							bean.getGetter(),
 							beanClass,
 							defaultPackage,
@@ -159,7 +153,7 @@ public class XmlMappingParser {
 					);
 					addConstrainedElements( beanClass, constrainedGetters );
 
-					Set<ConstrainedExecutable> constrainedConstructors = ConstraintExecutableBuilder.buildConstructorConstrainedExecutable(
+					Set<ConstrainedExecutable> constrainedConstructors = ConstrainedExecutableBuilder.buildConstructorConstrainedExecutable(
 							bean.getConstructor(),
 							beanClass,
 							defaultPackage,
@@ -169,7 +163,7 @@ public class XmlMappingParser {
 					);
 					addConstrainedElements( beanClass, constrainedConstructors );
 
-					Set<ConstrainedExecutable> constrainedMethods = ConstraintExecutableBuilder.buildMethodConstrainedExecutable(
+					Set<ConstrainedExecutable> constrainedMethods = ConstrainedExecutableBuilder.buildMethodConstrainedExecutable(
 							bean.getMethod(),
 							beanClass,
 							defaultPackage,
@@ -286,28 +280,6 @@ public class XmlMappingParser {
 			tmpSet.addAll( newConstrainedElements );
 			constrainedElements.put( beanClass, tmpSet );
 		}
-	}
-
-	private <A extends Annotation, T> MetaConstraint<?> createMetaConstraint(ConstraintType constraint,
-																			 Class<T> beanClass,
-																			 Member member,
-																			 String defaultPackage) {
-		java.lang.annotation.ElementType type = java.lang.annotation.ElementType.TYPE;
-		if ( member instanceof Method ) {
-			type = java.lang.annotation.ElementType.METHOD;
-		}
-		else if ( member instanceof Field ) {
-			type = java.lang.annotation.ElementType.FIELD;
-		}
-
-		ConstraintDescriptorImpl<A> constraintDescriptor = ConstraintDescriptorBuilder.buildConstraintDescriptor(
-				constraint,
-				type,
-				defaultPackage,
-				constraintHelper
-		);
-
-		return new MetaConstraint<A>( constraintDescriptor, new BeanConstraintLocation( beanClass, member ) );
 	}
 
 	private ConstraintMappingsType getValidationConfig(InputStream in, Unmarshaller unmarshaller) {

@@ -23,7 +23,6 @@ import java.util.Set;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
@@ -37,9 +36,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  */
-public class ConstraintTypeBuilder {
+public class ConstrainedTypeBuilder {
 
-	private ConstraintTypeBuilder() {
+	private ConstrainedTypeBuilder() {
 	}
 
 	public static ConstrainedType buildConstrainedType(ClassType classType,
@@ -62,14 +61,13 @@ public class ConstraintTypeBuilder {
 		BeanConstraintLocation constraintLocation = new BeanConstraintLocation( beanClass );
 		Set<MetaConstraint<?>> metaConstraints = newHashSet();
 		for ( ConstraintType constraint : classType.getConstraint() ) {
-			ConstraintDescriptorImpl<?> constraintDescriptor = ConstraintDescriptorBuilder.buildConstraintDescriptor(
+			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+					constraintLocation,
 					constraint,
 					java.lang.annotation.ElementType.TYPE,
 					defaultPackage,
 					constraintHelper
 			);
-			@SuppressWarnings("unchecked")
-			MetaConstraint<?> metaConstraint = new MetaConstraint( constraintDescriptor, constraintLocation );
 			metaConstraints.add( metaConstraint );
 		}
 
@@ -81,13 +79,11 @@ public class ConstraintTypeBuilder {
 			);
 		}
 
-		ConstrainedType constrainedType = new ConstrainedType(
+		return new ConstrainedType(
 				ConfigurationSource.XML,
 				constraintLocation,
 				metaConstraints
 		);
-
-		return constrainedType;
 	}
 
 	private static List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {

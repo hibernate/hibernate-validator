@@ -27,7 +27,9 @@ import javax.xml.bind.JAXBElement;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
@@ -37,25 +39,26 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
- * Build constraint descriptor from XML
+ * Build meta constraint from XML
  *
  * @author Hardy Ferentschik
  */
-public class ConstraintDescriptorBuilder {
+public class MetaConstraintBuilder {
 	private static final Log log = LoggerFactory.make();
 
 	private static final String MESSAGE_PARAM = "message";
 	private static final String GROUPS_PARAM = "groups";
 	private static final String PAYLOAD_PARAM = "payload";
 
-	private ConstraintDescriptorBuilder() {
+	private MetaConstraintBuilder() {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(ConstraintType constraint,
-																							   java.lang.annotation.ElementType type,
-																							   String defaultPackage,
-																							   ConstraintHelper constraintHelper) {
+	public static <A extends Annotation> MetaConstraint<A> buildMetaConstraint(ConstraintLocation constraintLocation,
+																			   ConstraintType constraint,
+																			   java.lang.annotation.ElementType type,
+																			   String defaultPackage,
+																			   ConstraintHelper constraintHelper) {
 		Class<A> annotationClass;
 		try {
 			annotationClass = (Class<A>) ReflectionHelper.loadClass( constraint.getAnnotation(), defaultPackage );
@@ -89,9 +92,11 @@ public class ConstraintDescriptorBuilder {
 
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
 		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
-		return new ConstraintDescriptorImpl<A>(
+		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
 		);
+
+		return new MetaConstraint( constraintDescriptor, constraintLocation );
 	}
 
 	public static <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType) {
@@ -168,7 +173,7 @@ public class ConstraintDescriptorBuilder {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
-				returnValue = ConstraintDescriptorBuilder.buildAnnotation( annotationType, annotationClass );
+				returnValue = MetaConstraintBuilder.buildAnnotation( annotationType, annotationClass );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getUnexpectedParameterValueException( e );
@@ -244,7 +249,7 @@ public class ConstraintDescriptorBuilder {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ReflectionHelper.loadClass( value, ConstraintDescriptorBuilder.class );
+			returnValue = ReflectionHelper.loadClass( value, MetaConstraintBuilder.class );
 		}
 		else {
 			try {

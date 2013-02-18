@@ -27,7 +27,6 @@ import javax.validation.ValidationException;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.CrossParameterConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -47,10 +46,10 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  */
-public class ConstraintExecutableBuilder {
+public class ConstrainedExecutableBuilder {
 	private static final Log log = LoggerFactory.make();
 
-	private ConstraintExecutableBuilder() {
+	private ConstrainedExecutableBuilder() {
 	}
 
 	public static Set<ConstrainedExecutable> buildMethodConstrainedExecutable(List<MethodType> methods,
@@ -60,6 +59,7 @@ public class ConstraintExecutableBuilder {
 																			  ConstraintHelper constraintHelper,
 																			  AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
+		List<Method> alreadyProcessedMethods = newArrayList();
 		for ( MethodType methodType : methods ) {
 			// parse the parameters
 			List<Class<?>> parameterTypes = createParameterTypes(
@@ -84,7 +84,14 @@ public class ConstraintExecutableBuilder {
 				);
 			}
 
-			ExecutableElement constructorExecutableElement = ExecutableElement.forMethod( method );
+			if ( alreadyProcessedMethods.contains( method ) ) {
+				throw log.getMethodIsDefinedTwiceInMappingXmlForBeanException( method.toString(), beanClass.getName() );
+			}
+			else {
+				alreadyProcessedMethods.add( method );
+			}
+
+			ExecutableElement methodExecutableElement = ExecutableElement.forMethod( method );
 
 			// ignore annotations
 			boolean ignoreConstructorAnnotations = methodType.getIgnoreAnnotations() == null ? false : methodType
@@ -98,7 +105,7 @@ public class ConstraintExecutableBuilder {
 					methodType.getParameter(),
 					methodType.getCrossParameterConstraint(),
 					methodType.getReturnValue(),
-					constructorExecutableElement,
+					methodExecutableElement,
 					constraintHelper,
 					parameterNameProvider,
 					annotationProcessingOptions
@@ -116,6 +123,7 @@ public class ConstraintExecutableBuilder {
 																				   ConstraintHelper constraintHelper,
 																				   AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
+		List<Constructor> alreadyProcessedConstructors = newArrayList();
 		for ( ConstructorType constructorType : constructors ) {
 			// parse the parameters
 			List<Class<?>> constructorParameterTypes = createParameterTypes(
@@ -128,8 +136,18 @@ public class ConstraintExecutableBuilder {
 					beanClass,
 					constructorParameterTypes.toArray( new Class[constructorParameterTypes.size()] )
 			);
+
 			if ( constructor == null ) {
 				throw log.getBeanDoesNotContainConstructorException( beanClass.getName(), constructorParameterTypes );
+			}
+			if ( alreadyProcessedConstructors.contains( constructor ) ) {
+				throw log.getConstructorIsDefinedTwiceInMappingXmlForBeanException(
+						constructor.toString(),
+						beanClass.getName()
+				);
+			}
+			else {
+				alreadyProcessedConstructors.add( constructor );
 			}
 
 			ExecutableElement constructorExecutableElement = ExecutableElement.forConstructor( constructor );
@@ -165,7 +183,7 @@ public class ConstraintExecutableBuilder {
 															 ConstraintHelper constraintHelper,
 															 ParameterNameProvider parameterNameProvider,
 															 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
-		List<ConstrainedParameter> parameterMetaData = ConstraintParameterBuilder.buildConstrainedParameters(
+		List<ConstrainedParameter> parameterMetaData = ConstrainedParameterBuilder.buildConstrainedParameters(
 				parameterTypeList,
 				executableElement,
 				defaultPackage,
@@ -179,14 +197,13 @@ public class ConstraintExecutableBuilder {
 				executableElement
 		);
 		for ( ConstraintType constraintType : crossParameterConstraintList ) {
-			ConstraintDescriptorImpl<?> constraintDescriptor = ConstraintDescriptorBuilder.buildConstraintDescriptor(
+			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+					constraintLocation,
 					constraintType,
 					executableElement.getElementType(),
 					defaultPackage,
 					constraintHelper
 			);
-			@SuppressWarnings("unchecked")
-			MetaConstraint<?> metaConstraint = new MetaConstraint( constraintDescriptor, constraintLocation );
 			crossParameterConstraints.add( metaConstraint );
 		}
 
@@ -225,18 +242,15 @@ public class ConstraintExecutableBuilder {
 			return false;
 		}
 
-		ExecutableConstraintLocation constraintLocation = new ExecutableConstraintLocation(
-				executableElement
-		);
+		ExecutableConstraintLocation constraintLocation = new ExecutableConstraintLocation( executableElement );
 		for ( ConstraintType constraintType : returnValueType.getConstraint() ) {
-			ConstraintDescriptorImpl<?> constraintDescriptor = ConstraintDescriptorBuilder.buildConstraintDescriptor(
+			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+					constraintLocation,
 					constraintType,
 					executableElement.getElementType(),
 					defaultPackage,
 					constraintHelper
 			);
-			@SuppressWarnings("unchecked")
-			MetaConstraint<?> metaConstraint = new MetaConstraint( constraintDescriptor, constraintLocation );
 			returnValueConstraints.add( metaConstraint );
 		}
 		groupConversions.putAll(

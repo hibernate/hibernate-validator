@@ -18,7 +18,6 @@ package org.hibernate.validator.internal.metadata.core;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +83,7 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	}
 
 	@Override
-	public boolean areReturnValueConstraintsIgnored(Member member) {
+	public boolean areReturnValueConstraintsIgnoredFor(Member member) {
 		if ( annotationIgnoresForReturnValues.contains( member ) ) {
 			return true;
 		}
@@ -158,7 +157,7 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 
 	public void ignoreConstraintAnnotationsOnParameter(Member member, int index) {
 		if ( annotationIgnoresForMethodParameter.get( member ) == null ) {
-			List<Integer> tmpList = new ArrayList<Integer>();
+			List<Integer> tmpList = newArrayList();
 			tmpList.add( index );
 			annotationIgnoresForMethodParameter.put( member, tmpList );
 		}

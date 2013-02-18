@@ -24,7 +24,6 @@ import java.util.Set;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
@@ -40,17 +39,17 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  */
-public class ConstraintFieldBuilder {
+public class ConstrainedFieldBuilder {
 	private static final Log log = LoggerFactory.make();
 
-	private ConstraintFieldBuilder() {
+	private ConstrainedFieldBuilder() {
 	}
 
 	public static Set<ConstrainedField> buildConstrainedFields(List<FieldType> fields,
-																Class<?> beanClass,
-																String defaultPackage,
-																ConstraintHelper constraintHelper,
-																AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+															   Class<?> beanClass,
+															   String defaultPackage,
+															   ConstraintHelper constraintHelper,
+															   AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		Set<ConstrainedField> constrainedFields = newHashSet();
 		List<String> alreadyProcessedFieldNames = newArrayList();
 		for ( FieldType fieldType : fields ) {
@@ -58,14 +57,13 @@ public class ConstraintFieldBuilder {
 			BeanConstraintLocation constraintLocation = new BeanConstraintLocation( field );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : fieldType.getConstraint() ) {
-				ConstraintDescriptorImpl<?> constraintDescriptor = ConstraintDescriptorBuilder.buildConstraintDescriptor(
+				MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+						constraintLocation,
 						constraint,
 						java.lang.annotation.ElementType.FIELD,
 						defaultPackage,
 						constraintHelper
 				);
-				@SuppressWarnings("unchecked")
-				MetaConstraint<?> metaConstraint = new MetaConstraint( constraintDescriptor, constraintLocation );
 				metaConstraints.add( metaConstraint );
 			}
 			Map<Class<?>, Class<?>> groupConversions = GroupConversionBuilder.buildGroupConversionMap(

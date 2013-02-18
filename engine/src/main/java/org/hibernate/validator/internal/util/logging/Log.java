@@ -490,4 +490,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 136, value = "The specified constraint annotation class %1$s cannot be loaded.")
 	ValidationException unableToLoadConstraintAnnotationClassException(String constraintAnnotationClass, @Cause Exception e);
+
+	@Message(id = 137, value = "The method '%1$s' is defined twice in the mapping xml for bean %2$s.")
+	ValidationException getMethodIsDefinedTwiceInMappingXmlForBeanException(String name, String beanClassName);
+
+	@Message(id = 138, value = "The constructor '%1$s' is defined twice in the mapping xml for bean %2$s.")
+	ValidationException getConstructorIsDefinedTwiceInMappingXmlForBeanException(String name, String beanClassName);
 }

@@ -331,7 +331,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		Set<MetaConstraint<?>> returnValueConstraints;
 		Map<Class<?>, Class<?>> groupConversions;
 		boolean isCascading;
-		if ( annotationProcessingOptions.areReturnValueConstraintsIgnored( executable.getMember() ) ) {
+		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable.getMember() ) ) {
 			returnValueConstraints = Collections.emptySet();
 			groupConversions = Collections.emptyMap();
 			isCascading = false;
