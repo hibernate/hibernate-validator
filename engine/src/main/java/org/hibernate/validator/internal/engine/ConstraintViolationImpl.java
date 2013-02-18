@@ -98,11 +98,21 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	}
 
 	@Override
-	public <T> T unwrap(Class<T> type) {
+	public <C> C unwrap(Class<C> type) {
 		if ( type.isAssignableFrom( ConstraintViolation.class ) ) {
 			return type.cast( this );
 		}
 		throw log.getTypeNotSupportedForUnwrappingException( type );
+	}
+
+	@Override
+	public Object[] getExecutableParameters() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
+	public Object getExecutableReturnValue() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
