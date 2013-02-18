@@ -30,7 +30,7 @@ public interface AnnotationProcessingOptions {
 
 	boolean areMemberConstraintsIgnoredFor(Member member);
 
-	boolean areReturnValueConstraintsIgnored(Member member);
+	boolean areReturnValueConstraintsIgnoredFor(Member member);
 
 	boolean areParameterConstraintsIgnoredFor(Member member, int index);
 

@@ -14,38 +14,37 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodvalidation;
+package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
 import javax.validation.Configuration;
-import javax.validation.ValidatorFactory;
 
 import org.testng.annotations.BeforeMethod;
 
-import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.test.internal.engine.methodvalidation.AbstractMethodValidationTest;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 /**
- * Tests for XML configured constructor validation.
- *
  * @author Hardy Ferentschik
  */
-@TestForIssue(jiraKey = "HV-373")
-public class XmlBasedConstructorValidationTest extends AbstractConstructorValidationTest {
+public class XmlBasedMethodValidationTest extends AbstractMethodValidationTest {
+
+	@Override
 	@BeforeMethod
-	public void setUp() {
+	protected void setUp() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping(
-				XmlBasedConstructorValidationTest.class.getResourceAsStream(
-						"constructor-validation-mapping.xml"
+				XmlBasedMethodValidationTest.class.getResourceAsStream(
+						"method-validation-mapping.xml"
 				)
 		);
-
-		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
-		this.executableValidator = validatorFactory.getValidator().forExecutables();
+		validator = configuration.buildValidatorFactory().getValidator();
+		createProxy(  );
 	}
 
 	@Override
-	public String messagePrefix() {
+	protected String messagePrefix() {
 		return "[XML] - ";
 	}
 }
+
+

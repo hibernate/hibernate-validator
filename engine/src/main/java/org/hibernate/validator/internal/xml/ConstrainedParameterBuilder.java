@@ -24,7 +24,6 @@ import javax.validation.ParameterNameProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
@@ -38,9 +37,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  */
-public class ConstraintParameterBuilder {
+public class ConstrainedParameterBuilder {
 
-	private ConstraintParameterBuilder() {
+	private ConstrainedParameterBuilder() {
 	}
 
 	public static List<ConstrainedParameter> buildConstrainedParameters(List<ParameterType> parameterList,
@@ -56,14 +55,13 @@ public class ConstraintParameterBuilder {
 			ExecutableConstraintLocation constraintLocation = new ExecutableConstraintLocation( executableElement, i );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : parameterType.getConstraint() ) {
-				ConstraintDescriptorImpl<?> constraintDescriptor = ConstraintDescriptorBuilder.buildConstraintDescriptor(
+				MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+						constraintLocation,
 						constraint,
 						executableElement.getElementType(),
 						defaultPackage,
 						constraintHelper
 				);
-				@SuppressWarnings("unchecked")
-				MetaConstraint<?> metaConstraint = new MetaConstraint( constraintDescriptor, constraintLocation );
 				metaConstraints.add( metaConstraint );
 			}
 			Map<Class<?>, Class<?>> groupConversions = GroupConversionBuilder.buildGroupConversionMap(
