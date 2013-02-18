@@ -143,6 +143,14 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
+	public NodeImpl addCrossParameterNode() {
+		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		currentLeafNode = NodeImpl.createCrossParameterNode( parent );
+		nodeList.add( currentLeafNode );
+		hashCode = -1;
+		return currentLeafNode;
+	}
+
 	public NodeImpl addBeanNode() {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = NodeImpl.createBeanNode( parent );

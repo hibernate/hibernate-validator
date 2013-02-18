@@ -18,7 +18,6 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import java.util.List;
 import java.util.Set;
-import javax.enterprise.inject.Default;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -29,10 +28,8 @@ import javax.validation.metadata.Scope;
 import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.internal.metadata.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
-import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerExtension;
 import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
@@ -40,7 +37,6 @@ import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintTypes;
 import static org.hibernate.validator.testutil.ValidatorUtil.getMethodDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -78,38 +74,24 @@ public class MethodDescriptorTest {
 
 	@Test
 	public void testHasConstraints() {
-		MethodDescriptor unconstrainedMethodDescriptor = getMethodDescriptor(
+		MethodDescriptor descriptor = getMethodDescriptor(
 				CustomerRepository.class,
 				"bar"
 		);
 		assertFalse(
-				unconstrainedMethodDescriptor.hasConstraints(),
-				"Method has no cross-parameter constraints."
+				descriptor.hasConstraints(),
+				"Method has no constraints."
 		);
 
-		MethodDescriptor constrainedMethodDescriptor = getMethodDescriptor(
+		descriptor = getMethodDescriptor(
 				CustomerRepository.class,
 				"methodWithCrossParameterConstraint",
 				DateMidnight.class,
 				DateMidnight.class
 		);
-		assertTrue(
-				constrainedMethodDescriptor.hasConstraints(),
-				"Method has one cross-parameter constraint."
-		);
-	}
-
-	@Test
-	public void testHasConstraintsConsidersConstraintsFromSuperType() {
-		MethodDescriptor methodDescriptor = getMethodDescriptor(
-				CustomerRepositoryExt.class,
-				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
-		);
-		assertTrue(
-				methodDescriptor.hasConstraints(),
-				"Method has one cross-parameter constraint defined in supertype."
+		assertFalse(
+				descriptor.hasConstraints(),
+				"Cross-parameter constraints shouldn't be reported on MethodDescriptor."
 		);
 	}
 
@@ -126,58 +108,24 @@ public class MethodDescriptorTest {
 
 	@Test
 	public void testGetConstraintDescriptors() {
-		MethodDescriptor unConstrainedMethodDescriptor = getMethodDescriptor(
+		MethodDescriptor descriptor = getMethodDescriptor(
 				CustomerRepository.class,
 				"bar"
 		);
-		assertTrue( unConstrainedMethodDescriptor.getConstraintDescriptors().isEmpty() );
+		assertTrue( descriptor.getConstraintDescriptors().isEmpty() );
 
-		MethodDescriptor constrainedMethodDescriptor = getMethodDescriptor(
+		descriptor = getMethodDescriptor(
 				CustomerRepository.class,
 				"methodWithCrossParameterConstraint",
 				DateMidnight.class,
 				DateMidnight.class
 		);
-		assertConstraintTypes(
-				constrainedMethodDescriptor.getConstraintDescriptors(),
-				ConsistentDateParameters.class
-		);
+		assertTrue( descriptor.getConstraintDescriptors().isEmpty() );
 	}
-
-	@Test
-	public void testGetConstraintDescriptorsConsidersConstraintsFromSuperType() {
-		MethodDescriptor constrainedMethodDescriptor = getMethodDescriptor(
-				CustomerRepositoryExt.class,
-				"methodWithCrossParameterConstraint",
-				DateMidnight.class,
-				DateMidnight.class
-		);
-		assertConstraintTypes(
-				constrainedMethodDescriptor.getConstraintDescriptors(),
-				ConsistentDateParameters.class
-		);
-	}
-
-	//TODO Currently fails, likely due to https://hibernate.onjira.com/browse/HV-682
-//	@Test
-//	public void testFindConstraintsLookingAt() {
-//		MethodDescriptor methodDescriptor = getMethodDescriptor( CustomerRepositoryExt.class, "methodWithCrossParameterConstraint", DateMidnight.class, DateMidnight.class );
-//
-//		Set<ConstraintDescriptor<?>> constraintDescriptors = methodDescriptor.findConstraints()
-//				.lookingAt( Scope.LOCAL_ELEMENT )
-//				.getConstraintDescriptors();
-//		assertEquals( constraintDescriptors.size(), 0 );
-//
-//		constraintDescriptors = methodDescriptor.findConstraints()
-//				.lookingAt( Scope.HIERARCHY )
-//				.getConstraintDescriptors();
-//		assertEquals( constraintDescriptors.size(), 1 );
-//		assertEquals( constraintDescriptors.iterator().next().getAnnotation().annotationType(), ConsistentDateParameters.class );
-//	}
 
 	@Test
 	public void testFindConstraintsMatchingGroups() {
-		MethodDescriptor methodDescriptor = getMethodDescriptor(
+		MethodDescriptor descriptor = getMethodDescriptor(
 				CustomerRepositoryExt.class,
 				"methodWithCrossParameterConstraint",
 				DateMidnight.class,
@@ -185,15 +133,9 @@ public class MethodDescriptorTest {
 		);
 
 		assertTrue(
-				methodDescriptor.findConstraints()
-						.unorderedAndMatchingGroups( Default.class )
+				descriptor.findConstraints()
 						.getConstraintDescriptors()
 						.isEmpty()
-		);
-		assertConstraintTypes(
-				methodDescriptor.findConstraints()
-						.unorderedAndMatchingGroups( ValidationGroup.class )
-						.getConstraintDescriptors(), ConsistentDateParameters.class
 		);
 	}
 
@@ -266,7 +208,7 @@ public class MethodDescriptorTest {
 				"saveCustomer",
 				Customer.class
 		);
-		assertThat( methodDescriptor.getReturnValueDescriptor() ).isNull();
+		assertThat( methodDescriptor.getReturnValueDescriptor() ).isNotNull();
 	}
 
 	@Test

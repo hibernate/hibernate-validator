@@ -36,6 +36,14 @@ public class CustomerRepository {
 	public interface ValidationGroup {
 	}
 
+	@Valid
+	public CustomerRepository() {
+	}
+
+	@ConsistentDateParameters
+	public CustomerRepository(DateMidnight start, DateMidnight end) {
+	}
+
 	public Customer createCustomer(CharSequence firstName, @NotNull String lastName) {
 		return null;
 	}

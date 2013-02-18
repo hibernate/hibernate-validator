@@ -34,14 +34,15 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 public class NodeImpl
-		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Serializable {
+		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
 
 	private static final Log log = LoggerFactory.make();
 
 	public static final String INDEX_OPEN = "[";
 	public static final String INDEX_CLOSE = "]";
-	private static final String RETURN_VALUE_TO_STRING = "$retval";
+	private static final String RETURN_VALUE_NODE_NAME = "<return value>";
+	private static final String CROSS_PARAMETER_NODE_NAME = "<cross-parameter>";
 
 	private final String name;
 	private final NodeImpl parent;
@@ -96,6 +97,19 @@ public class NodeImpl
 		);
 	}
 
+	public static NodeImpl createCrossParameterNode(NodeImpl parent) {
+		return new NodeImpl(
+				CROSS_PARAMETER_NODE_NAME,
+				parent,
+				false,
+				null,
+				null,
+				ElementKind.CROSS_PARAMETER,
+				Collections.<Class<?>>emptyList(),
+				null
+		);
+	}
+
 	public static NodeImpl createMethodNode(String name, NodeImpl parent, List<Class<?>> parameterTypes) {
 		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null );
 	}
@@ -119,7 +133,7 @@ public class NodeImpl
 
 	public static NodeImpl createReturnValue(NodeImpl parent) {
 		return new NodeImpl(
-				null,
+				RETURN_VALUE_NODE_NAME,
 				parent,
 				false,
 				null,
@@ -253,10 +267,6 @@ public class NodeImpl
 		if ( ElementKind.BEAN.equals( getKind() ) ) {
 			// class level constraints don't contribute to path
 			builder.append( "" );
-		}
-		else if ( ElementKind.RETURN_VALUE.equals( getKind() ) ) {
-			// special handling of return value nodes. per spec the name is null, but in toString we add $retval
-			builder.append( RETURN_VALUE_TO_STRING );
 		}
 		else {
 			builder.append( getName() );

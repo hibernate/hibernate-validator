@@ -80,7 +80,7 @@ public class MethodConstraintMappingTest {
 		}
 		catch ( ConstraintViolationException e ) {
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.$retval.message" );
+			assertCorrectPropertyPaths( e, "greet.<return value>.message" );
 		}
 	}
 
@@ -363,7 +363,7 @@ public class MethodConstraintMappingTest {
 		catch ( ConstraintViolationException e ) {
 
 			assertCorrectConstraintViolationMessages( e, "size must be between 1 and 10" );
-			assertCorrectPropertyPaths( e, "greet.$retval" );
+			assertCorrectPropertyPaths( e, "greet.<return value>" );
 		}
 	}
 
@@ -391,7 +391,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
 			);
-			assertCorrectPropertyPaths( e, "greet.$retval", "greet.$retval" );
+			assertCorrectPropertyPaths( e, "greet.<return value>", "greet.<return value>" );
 		}
 	}
 
@@ -418,7 +418,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10"
 			);
-			assertCorrectPropertyPaths( e, "greet.$retval" );
+			assertCorrectPropertyPaths( e, "greet.<return value>" );
 		}
 	}
 
@@ -445,7 +445,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
 			);
-			assertCorrectPropertyPaths( e, "greet.$retval", "greet.$retval" );
+			assertCorrectPropertyPaths( e, "greet.<return value>", "greet.<return value>" );
 		}
 	}
 
@@ -471,7 +471,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "may not be null"
 			);
-			assertCorrectPropertyPaths( e, "getHello.$retval" );
+			assertCorrectPropertyPaths( e, "getHello.<return value>" );
 		}
 	}
 
@@ -497,7 +497,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "may not be null"
 			);
-			assertCorrectPropertyPaths( e, "getUser.$retval.name" );
+			assertCorrectPropertyPaths( e, "getUser.<return value>.name" );
 		}
 	}
 
