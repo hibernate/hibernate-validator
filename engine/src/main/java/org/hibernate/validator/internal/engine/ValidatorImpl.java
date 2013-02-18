@@ -252,6 +252,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				constraintValidatorManager,
 				executable,
 				object,
+				parameterValues,
 				messageInterpolator,
 				constraintValidatorFactory,
 				getCachingTraversableResolver(),
@@ -266,11 +267,12 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, ExecutableElement executable, Object returnValue, Class<?>... groups) {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
-		ValidationContext<T> context = ValidationContext.getContextForValidateParameters(
+		ValidationContext<T> context = ValidationContext.getContextForValidateReturnValue(
 				beanMetaDataManager,
 				constraintValidatorManager,
 				executable,
 				object,
+				returnValue,
 				messageInterpolator,
 				constraintValidatorFactory,
 				getCachingTraversableResolver(),

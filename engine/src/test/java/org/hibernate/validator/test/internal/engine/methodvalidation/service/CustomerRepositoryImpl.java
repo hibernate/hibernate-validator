@@ -63,32 +63,26 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	@Override
 	public void persistCustomer(Customer customer) {
-
 	}
 
 	@Override
 	public void cascadingMapParameter(Map<String, Customer> customer) {
-
 	}
 
 	@Override
 	public void cascadingIterableParameter(List<Customer> customer) {
-
 	}
 
 	@Override
 	public void cascadingArrayParameter(Customer... customer) {
-
 	}
 
 	@Override
 	public void findCustomerByAgeAndName(Integer age, String name) {
-
 	}
 
 	@Override
 	public void cascadingParameter(Customer param1, Customer param2) {
-
 	}
 
 	@Override
@@ -98,17 +92,14 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	@Override
 	public void foo(Long id) {
-
 	}
 
 	@Override
 	public void bar(Customer customer) {
-
 	}
 
 	@Override
 	public void boz() {
-
 	}
 
 	@Override
@@ -128,7 +119,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	@Override
 	public Map<String, Customer> cascadingMapReturnValue() {
-
 		Map<String, Customer> theValue = newHashMap();
 		theValue.put( "Bob", new Customer( null ) );
 		return theValue;
@@ -146,7 +136,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	@Override
 	public void parameterConstraintInGroup(String name) {
-
 	}
 
 	@Override

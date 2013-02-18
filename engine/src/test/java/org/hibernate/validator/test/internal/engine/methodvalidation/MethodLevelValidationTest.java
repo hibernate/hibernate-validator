@@ -110,6 +110,8 @@ public class MethodLevelValidationTest {
 			);
 			assertEquals( constraintViolation.getLeafBean(), customerRepository );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { null } );
+			assertEquals( constraintViolation.getExecutableReturnValue(), null );
 		}
 	}
 
@@ -132,6 +134,8 @@ public class MethodLevelValidationTest {
 					constraintViolation.getPropertyPath().toString(),
 					"findCustomerByAgeAndName.arg1"
 			);
+			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { 30, null } );
+			assertEquals( constraintViolation.getExecutableReturnValue(), null );
 		}
 	}
 
@@ -171,6 +175,8 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
 			assertEquals( constraintViolation.getLeafBean(), customer );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customer } );
+			assertEquals( constraintViolation.getExecutableReturnValue(), null );
 		}
 	}
 
@@ -199,6 +205,8 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
 			assertEquals( constraintViolation.getLeafBean(), address );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customer } );
+			assertEquals( constraintViolation.getExecutableReturnValue(), null );
 		}
 	}
 
@@ -228,15 +236,18 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
 			assertEquals( constraintViolation.getLeafBean(), bob );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
+			assertEquals( constraintViolation.getExecutableReturnValue(), null );
 		}
 	}
 
 	@Test
 	public void cascadingIterableParameter() {
 		Customer customer = new Customer( null );
+		List<Customer> customers = Arrays.asList( null, customer );
 
 		try {
-			customerRepository.cascadingIterableParameter( Arrays.asList( null, customer ) );
+			customerRepository.cascadingIterableParameter( customers );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch ( ConstraintViolationException e ) {
@@ -255,6 +266,8 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
 			assertEquals( constraintViolation.getLeafBean(), customer );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { customers } );
+			assertEquals( constraintViolation.getExecutableReturnValue(), null );
 		}
 	}
 
@@ -282,6 +295,11 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
 			assertEquals( constraintViolation.getLeafBean(), customer );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals(
+					constraintViolation.getExecutableParameters(),
+					new Object[] { new Object[] { null, customer } }
+			);
+			assertEquals( constraintViolation.getExecutableReturnValue(), null );
 		}
 	}
 
@@ -364,6 +382,8 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getPropertyPath().toString(), "baz.<return value>" );
 			assertEquals( constraintViolation.getLeafBean(), customerRepository );
 			assertEquals( constraintViolation.getInvalidValue(), 9 );
+			assertEquals( constraintViolation.getExecutableParameters(), null );
+			assertEquals( constraintViolation.getExecutableReturnValue(), Integer.valueOf( 9 ) );
 		}
 	}
 
@@ -389,6 +409,8 @@ public class MethodLevelValidationTest {
 			);
 			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals( constraintViolation.getExecutableParameters(), null );
+			assertEquals( constraintViolation.getExecutableReturnValue(), new Customer( null ) );
 		}
 	}
 
@@ -414,6 +436,8 @@ public class MethodLevelValidationTest {
 			);
 			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals( constraintViolation.getExecutableParameters(), null );
+			assertEquals( constraintViolation.getExecutableReturnValue(), new Customer( null ) );
 		}
 	}
 
@@ -438,8 +462,10 @@ public class MethodLevelValidationTest {
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
-			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
+			assertEquals( constraintViolation.getLeafBean(), new Customer( null ) );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals( constraintViolation.getExecutableParameters(), null );
+			assertEquals( constraintViolation.getExecutableReturnValue(), Arrays.asList( null, new Customer( null ) ) );
 		}
 	}
 
@@ -451,6 +477,9 @@ public class MethodLevelValidationTest {
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch ( ConstraintViolationException e ) {
+			Customer customer = new Customer( null );
+			Map<String, Customer> expectedReturnValue = newHashMap();
+			expectedReturnValue.put( "Bob", customer );
 
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
@@ -464,8 +493,10 @@ public class MethodLevelValidationTest {
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
-			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
+			assertEquals( constraintViolation.getLeafBean(), customer );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals( constraintViolation.getExecutableParameters(), null );
+			assertEquals( constraintViolation.getExecutableReturnValue(), expectedReturnValue );
 		}
 	}
 
@@ -490,8 +521,10 @@ public class MethodLevelValidationTest {
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
-			assertEquals( constraintViolation.getLeafBean().getClass(), Customer.class );
+			assertEquals( constraintViolation.getLeafBean(), new Customer( null ) );
 			assertEquals( constraintViolation.getInvalidValue(), null );
+			assertEquals( constraintViolation.getExecutableParameters(), null );
+			assertEquals( constraintViolation.getExecutableReturnValue(), new Object[] { null, new Customer( null ) } );
 		}
 	}
 
@@ -580,6 +613,8 @@ public class MethodLevelValidationTest {
 			assertEquals( constraintViolation.getLeafBean(), customerRepository );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
 			assertThat( constraintViolation.getRootBeanClass() ).isEqualTo( CustomerRepositoryImpl.class );
+			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { startDate, endDate } );
+			assertEquals( constraintViolation.getExecutableReturnValue(), null );
 
 			assertMethod(
 					constraintViolation,

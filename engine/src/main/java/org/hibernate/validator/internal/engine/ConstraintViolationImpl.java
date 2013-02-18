@@ -42,10 +42,58 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	private final String messageTemplate;
 	private final Class<T> rootBeanClass;
 	private final ElementType elementType;
+	private final Object[] executableParameters;
+	private final Object executableReturnValue;
 
-	public ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass,
-								   T rootBean, Object leafBeanInstance, Object value,
-								   Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType) {
+	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, T rootBean, Object leafBeanInstance, Object value, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType) {
+		return new ConstraintViolationImpl<T>(
+				messageTemplate,
+				interpolatedMessage,
+				rootBeanClass,
+				rootBean,
+				leafBeanInstance,
+				value,
+				propertyPath,
+				constraintDescriptor,
+				elementType,
+				null,
+				null
+		);
+	}
+
+	public static <T> ConstraintViolation<T> forParameterValidation(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, T rootBean, Object leafBeanInstance, Object value, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType, Object[] executableParameters) {
+		return new ConstraintViolationImpl<T>(
+				messageTemplate,
+				interpolatedMessage,
+				rootBeanClass,
+				rootBean,
+				leafBeanInstance,
+				value,
+				propertyPath,
+				constraintDescriptor,
+				elementType,
+				executableParameters,
+				null
+		);
+	}
+
+	public static <T> ConstraintViolation<T> forReturnValueValidation(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, T rootBean, Object leafBeanInstance, Object value, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType, Object executableReturnValue) {
+		return new ConstraintViolationImpl<T>(
+				messageTemplate,
+				interpolatedMessage,
+				rootBeanClass,
+				rootBean,
+				leafBeanInstance,
+				value,
+				propertyPath,
+				constraintDescriptor,
+				elementType,
+				null,
+				executableReturnValue
+		);
+	}
+
+	private ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, T rootBean, Object leafBeanInstance, Object value, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType, Object[] executableParameters, Object executableReturnValue) {
 		this.messageTemplate = messageTemplate;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
@@ -55,6 +103,8 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		this.constraintDescriptor = constraintDescriptor;
 		this.rootBeanClass = rootBeanClass;
 		this.elementType = elementType;
+		this.executableParameters = executableParameters;
+		this.executableReturnValue = executableReturnValue;
 	}
 
 	@Override
@@ -107,12 +157,12 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 
 	@Override
 	public Object[] getExecutableParameters() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return executableParameters;
 	}
 
 	@Override
 	public Object getExecutableReturnValue() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return executableReturnValue;
 	}
 
 	@Override
