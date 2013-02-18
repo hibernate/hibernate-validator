@@ -162,7 +162,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
-		Contracts.assertNotNull( stream, MESSAGES.parameterMustNotBeNull( "stream" ) );
+		Contracts.assertNotNull( stream, MESSAGES.inputStreamCannotBeNull() );
 
 		validationBootstrapParameters.addMapping( stream.markSupported() ? stream : new BufferedInputStream( stream ) );
 		return this;
