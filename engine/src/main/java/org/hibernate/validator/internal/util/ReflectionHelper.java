@@ -76,6 +76,8 @@ public final class ReflectionHelper {
 	private static final String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };
 	private static final String PACKAGE_SEPARATOR = ".";
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
+	private static final String ARRAY_CLASS_NAME_PREFIX = "[L";
+	private static final String ARRAY_CLASS_NAME_SUFFIX = ";";
 
 	static {
 		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
@@ -111,18 +113,39 @@ public final class ReflectionHelper {
 		return run( LoadClass.action( className, caller ) );
 	}
 
-	public static  Class<?> loadClass(String clazz, String defaultPackage) {
-		String fullyQualifiedClass;
-		if ( isQualifiedClass( clazz ) ) {
-			fullyQualifiedClass = clazz;
+	public static Class<?> loadClass(String className, String defaultPackage) {
+		StringBuilder fullyQualifiedClass = new StringBuilder();
+		String tmpClassName = className;
+		if ( isArrayClassName( className ) ) {
+			fullyQualifiedClass.append( ARRAY_CLASS_NAME_PREFIX );
+			tmpClassName = getArrayElementClassName( className );
+		}
+
+		if ( isQualifiedClass( tmpClassName ) ) {
+			fullyQualifiedClass.append( tmpClassName );
 		}
 		else {
-			fullyQualifiedClass = defaultPackage + PACKAGE_SEPARATOR + clazz;
+			fullyQualifiedClass.append( defaultPackage );
+			fullyQualifiedClass.append( PACKAGE_SEPARATOR );
+			fullyQualifiedClass.append( tmpClassName );
 		}
-		return ReflectionHelper.loadClass( fullyQualifiedClass, ReflectionHelper.class );
+
+		if ( isArrayClassName( className ) ) {
+			fullyQualifiedClass.append( ARRAY_CLASS_NAME_SUFFIX );
+		}
+
+		return ReflectionHelper.loadClass( fullyQualifiedClass.toString(), ReflectionHelper.class );
 	}
 
-	public static  boolean isQualifiedClass(String clazz) {
+	private static boolean isArrayClassName(String className) {
+		return className.startsWith( ARRAY_CLASS_NAME_PREFIX ) && className.endsWith( ARRAY_CLASS_NAME_SUFFIX );
+	}
+
+	private static String getArrayElementClassName(String className) {
+		return className.substring( 2, className.length() - 1 );
+	}
+
+	public static boolean isQualifiedClass(String clazz) {
 		return clazz.contains( PACKAGE_SEPARATOR );
 	}
 

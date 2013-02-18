@@ -1,0 +1,22 @@
+<constraint-mappings
+        xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation=
+                "http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.1.xsd" version="1.1">
+
+    <default-package>org.hibernate.validator.test.internal.xml</default-package>
+    <bean class="DefaultPackageInVarargParameterTest$Foo">
+        <method name="fubar">
+            <parameter type="[Lorg.hibernate.validator.test.internal.xml.DefaultPackageInVarargParameterTest$Bar;">
+                <valid/>
+            </parameter>
+        </method>
+
+        <method name="snafu">
+            <parameter type="[LDefaultPackageInVarargParameterTest$Bar;">
+                <valid/>
+            </parameter>
+        </method>
+    </bean>
+
+</constraint-mappings>
