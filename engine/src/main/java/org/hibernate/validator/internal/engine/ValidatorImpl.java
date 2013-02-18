@@ -37,6 +37,7 @@ import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
+import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
@@ -137,16 +138,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
-
-		ValidationContext<T> validationContext = ValidationContext.getContextForValidate(
-				beanMetaDataManager,
-				constraintValidatorManager,
-				object,
-				messageInterpolator,
-				constraintValidatorFactory,
-				getCachingTraversableResolver(),
-				failFast
-		);
+		ValidationContext<T> validationContext = getValidationContext().forValidate( object );
 
 		ValueContext<?, T> valueContext = ValueContext.getLocalExecutionContext(
 				object,
@@ -163,16 +155,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		sanityCheckPropertyPath( propertyName );
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
-
-		ValidationContext<T> context = ValidationContext.getContextForValidateProperty(
-				beanMetaDataManager,
-				constraintValidatorManager,
-				object,
-				messageInterpolator,
-				constraintValidatorFactory,
-				getCachingTraversableResolver(),
-				failFast
-		);
+		ValidationContext<T> context = getValidationContext().forValidateProperty( object );
 
 		return validatePropertyInContext(
 				context,
@@ -187,16 +170,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		sanityCheckPropertyPath( propertyName );
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
-
-		ValidationContext<T> context = ValidationContext.getContextForValidateValue(
-				beanMetaDataManager,
-				constraintValidatorManager,
-				beanType,
-				messageInterpolator,
-				constraintValidatorFactory,
-				getCachingTraversableResolver(),
-				failFast
-		);
+		ValidationContext<T> context = getValidationContext().forValidateValue( beanType );
 
 		return validateValueInContext(
 				context,
@@ -247,16 +221,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
-		ValidationContext<T> context = ValidationContext.getContextForValidateParameters(
-				beanMetaDataManager,
-				constraintValidatorManager,
-				executable,
+		ValidationContext<T> context = getValidationContext().forValidateParameters(
 				object,
-				parameterValues,
-				messageInterpolator,
-				constraintValidatorFactory,
-				getCachingTraversableResolver(),
-				failFast
+				executable,
+				parameterValues
 		);
 
 		validateParametersInContext( context, object, parameterValues, validationOrder );
@@ -267,16 +235,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, ExecutableElement executable, Object returnValue, Class<?>... groups) {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
-		ValidationContext<T> context = ValidationContext.getContextForValidateReturnValue(
-				beanMetaDataManager,
-				constraintValidatorManager,
-				executable,
+		ValidationContext<T> context = getValidationContext().forValidateReturnValue(
 				object,
-				returnValue,
-				messageInterpolator,
-				constraintValidatorFactory,
-				getCachingTraversableResolver(),
-				failFast
+				executable,
+				returnValue
 		);
 
 		validateReturnValueInContext( context, object, returnValue, validationOrder );
@@ -303,6 +265,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	@Override
 	public ExecutableValidator forExecutables() {
 		return this;
+	}
+
+	private ValidationContextBuilder getValidationContext() {
+		return ValidationContext.getValidationContext(
+				beanMetaDataManager,
+				constraintValidatorManager,
+				messageInterpolator,
+				constraintValidatorFactory,
+				getCachingTraversableResolver(),
+				failFast
+		);
 	}
 
 	private void sanityCheckPropertyPath(String propertyName) {
