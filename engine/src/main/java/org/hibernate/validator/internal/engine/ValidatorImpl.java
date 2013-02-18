@@ -1313,9 +1313,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private boolean isCrossParameterValidation(PathImpl path) {
-		return path.getLeafNode().getKind() == ElementKind.METHOD ||
-				path.getLeafNode().getKind() == ElementKind.CONSTRUCTOR;
-
+		return path.getLeafNode().getKind() == ElementKind.CROSS_PARAMETER;
 	}
 
 	private boolean isParameterValidation(PathImpl path) {
