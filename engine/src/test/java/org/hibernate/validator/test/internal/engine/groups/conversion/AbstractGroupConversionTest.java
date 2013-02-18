@@ -29,7 +29,6 @@ import javax.validation.constraints.Size;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
@@ -41,14 +40,11 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
  *
  * @author Gunnar Morling
  */
-public class GroupConversionTest {
+public abstract class AbstractGroupConversionTest {
 
-	private Validator validator;
+	protected Validator validator;
 
-	@BeforeMethod
-	public void setupValidator() {
-		validator = getValidator();
-	}
+	public abstract void setupValidator();
 
 	@Test
 	public void groupConversionOnField() {
@@ -64,7 +60,6 @@ public class GroupConversionTest {
 
 	@Test
 	public void groupConversionOnParameter() throws Exception {
-
 		Set<ConstraintViolation<User6>> violations = getValidator().forExecutables().validateParameters(
 				new User6(),
 				User6.class.getMethod( "setAddresses", List.class ),
@@ -76,7 +71,6 @@ public class GroupConversionTest {
 
 	@Test
 	public void groupConversionOnReturnValue() throws Exception {
-
 		Set<ConstraintViolation<User7>> violations = getValidator().forExecutables().validateReturnValue(
 				new User7(),
 				User7.class.getMethod( "findAddresses" ),
