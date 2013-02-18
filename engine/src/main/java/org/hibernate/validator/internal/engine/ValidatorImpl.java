@@ -247,7 +247,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
-		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
+		ValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				beanMetaDataManager,
 				constraintValidatorManager,
 				executable,
@@ -266,7 +266,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, ExecutableElement executable, Object returnValue, Class<?>... groups) {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
-		MethodValidationContext<T> context = ValidationContext.getContextForValidateParameters(
+		ValidationContext<T> context = ValidationContext.getContextForValidateParameters(
 				beanMetaDataManager,
 				constraintValidatorManager,
 				executable,
@@ -880,7 +880,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
 	}
 
-	private <T> void validateParametersInContext(MethodValidationContext<T> validationContext,
+	private <T> void validateParametersInContext(ValidationContext<T> validationContext,
 												 T object,
 												 Object[] parameterValues,
 												 ValidationOrder validationOrder) {
@@ -942,7 +942,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <T> int validateParametersForGroup(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, Group group) {
+	private <T> int validateParametersForGroup(ValidationContext<T> validationContext, T object, Object[] parameterValues, Group group) {
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
 		ExecutableElement executable = validationContext.getExecutable();
@@ -1036,7 +1036,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return valueContext;
 	}
 
-	private <V, T> void validateReturnValueInContext(MethodValidationContext<T> context, T bean, V value, ValidationOrder validationOrder) {
+	private <V, T> void validateReturnValueInContext(ValidationContext<T> context, T bean, V value, ValidationOrder validationOrder) {
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( context.getRootBeanClass() );
 		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( context.getExecutable() );
 
@@ -1103,7 +1103,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	//TODO GM: if possible integrate with validateParameterForGroup()
-	private <T, V> int validateReturnValueForGroup(MethodValidationContext<T> validationContext, T bean, V value, Group group) {
+	private <T, V> int validateReturnValueForGroup(ValidationContext<T> validationContext, T bean, V value, Group group) {
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
@@ -1156,7 +1156,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	private <T> int validateConstraintsForGroup(MethodValidationContext<T> validationContext,
+	private <T> int validateConstraintsForGroup(ValidationContext<T> validationContext,
 												ValueContext<T, ?> valueContext,
 												Iterable<MetaConstraint<?>> constraints) {
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
