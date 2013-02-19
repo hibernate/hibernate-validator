@@ -110,7 +110,7 @@
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy</artifactId>
+            <artifactId>groovy-jsr223</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
