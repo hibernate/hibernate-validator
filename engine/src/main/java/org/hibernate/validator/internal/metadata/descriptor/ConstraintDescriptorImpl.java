@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
-import javax.validation.CrossParameterConstraint;
 import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
@@ -251,10 +250,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			constraintDefinitionClasses.addAll( Arrays.asList( validatedBy ) );
 		}
 		else if ( constraintType == ConstraintType.CROSS_PARAMETER ) {
-			Class<? extends ConstraintValidator<?, ?>> validatedBy = annotationType
-					.getAnnotation( CrossParameterConstraint.class )
-					.validatedBy();
-			constraintDefinitionClasses.add( validatedBy );
+			// TODO - implement https://hibernate.onjira.com/browse/HV-720
+//			Class<? extends ConstraintValidator<?, ?>> validatedBy = annotationType
+//					.getAnnotation( CrossParameterConstraint.class )
+//					.validatedBy();
+//			constraintDefinitionClasses.add( validatedBy );
 		}
 
 		constraintHelper.addConstraintValidatorDefinition(
@@ -273,9 +273,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		if ( annotationType.isAnnotationPresent( Constraint.class ) ) {
 			return ConstraintType.GENERIC;
 		}
-		else if ( annotationType.isAnnotationPresent( CrossParameterConstraint.class ) ) {
-			return ConstraintType.CROSS_PARAMETER;
-		}
+		// TODO - implement https://hibernate.onjira.com/browse/HV-720
+//		else if ( annotationType.isAnnotationPresent( CrossParameterConstraint.class ) ) {
+//			return ConstraintType.CROSS_PARAMETER;
+//		}
 		else {
 			throw log.getAnnotationIsNoConstraintTypeException( annotationType );
 		}

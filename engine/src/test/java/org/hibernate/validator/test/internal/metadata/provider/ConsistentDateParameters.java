@@ -20,7 +20,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import javax.validation.CrossParameterConstraint;
+import javax.validation.Constraint;
 import javax.validation.Payload;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -35,7 +35,8 @@ import static java.lang.annotation.ElementType.METHOD;
  */
 @Target({ METHOD, ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@CrossParameterConstraint(validatedBy = ConsistentDateParametersValidator.class)
+// TODO - https://hibernate.onjira.com/browse/HV-720 verify test
+@Constraint(validatedBy = ConsistentDateParametersValidator.class)
 @Documented
 public @interface ConsistentDateParameters {
 	String message() default "{ConsistentDateParameters.message}";
