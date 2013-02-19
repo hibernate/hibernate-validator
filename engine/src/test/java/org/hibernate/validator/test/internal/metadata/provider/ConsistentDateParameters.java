@@ -35,7 +35,6 @@ import static java.lang.annotation.ElementType.METHOD;
  */
 @Target({ METHOD, ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-// TODO - https://hibernate.onjira.com/browse/HV-720 verify test
 @Constraint(validatedBy = ConsistentDateParametersValidator.class)
 @Documented
 public @interface ConsistentDateParameters {

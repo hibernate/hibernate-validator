@@ -112,6 +112,11 @@
                 <version>${bv.api.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.1.1.GA</version>
+            </dependency>
+            <dependency>
                 <groupId>de.odysseus.juel</groupId>
                 <artifactId>juel-spi</artifactId>
                 <version>${juel.version}</version>
@@ -180,11 +185,6 @@
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
                 <version>3.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.logging</groupId>
-                <artifactId>jboss-logging</artifactId>
-                <version>3.1.2.GA</version>
             </dependency>
             <dependency>
                 <groupId>org.easytesting</groupId>

@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.methodvalidation.service;
+package org.hibernate.validator.test.internal.engine.methodvalidation.crossparameter;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -27,17 +27,13 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
 
 /**
- * Cross-parameter constraint that checks that two date parameters are in the
- * correct order. Applies to methods with the signature
- * {@code methodName(DateMidnight start, DateMidnight end)}.
- *
- * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 @Target({ METHOD, ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ConsistentDateParametersValidator.class)
+@Constraint(validatedBy = { CrossParameterValidator1.class, CrossParameterValidator2.class })
 @Documented
-public @interface ConsistentDateParameters {
+public @interface InvalidCrossParameterConstraint {
 	String message() default "{ConsistentDateParameters.message}";
 
 	Class<?>[] groups() default { };

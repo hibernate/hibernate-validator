@@ -51,6 +51,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		NotNull notNull = AnnotationFactory.create( descriptor );
 		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
+				null,
 				notNull,
 				new ConstraintHelper(),
 				java.lang.annotation.ElementType.FIELD,
@@ -60,7 +61,11 @@ public class ExpressionLanguageMessageInterpolationTest {
 		AnnotationDescriptor<Size> sizeAnnotationDescriptor = new AnnotationDescriptor<Size>( Size.class );
 		Size size = AnnotationFactory.create( sizeAnnotationDescriptor );
 		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
-				size, new ConstraintHelper(), java.lang.annotation.ElementType.FIELD, ConstraintOrigin.DEFINED_LOCALLY
+				null,
+				size,
+				new ConstraintHelper(),
+				java.lang.annotation.ElementType.FIELD,
+				ConstraintOrigin.DEFINED_LOCALLY
 		);
 
 		interpolatorUnderTest = new ResourceBundleMessageInterpolator();

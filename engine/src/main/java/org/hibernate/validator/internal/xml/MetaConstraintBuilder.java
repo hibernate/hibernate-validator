@@ -93,7 +93,7 @@ public class MetaConstraintBuilder {
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
 		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
+				constraintLocation.getMember(), annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
 		return new MetaConstraint( constraintDescriptor, constraintLocation );

@@ -18,12 +18,15 @@ package org.hibernate.validator.test.internal.metadata;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraintvalidation.SupportedValidationTarget;
+import javax.validation.constraintvalidation.ValidationTarget;
 
 import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling
  */
+@SupportedValidationTarget(value = ValidationTarget.PARAMETERS)
 public class ConsistentDateParametersValidator implements ConstraintValidator<ConsistentDateParameters, Object[]> {
 
 	@Override
@@ -45,6 +48,6 @@ public class ConsistentDateParametersValidator implements ConstraintValidator<Co
 			throw new IllegalArgumentException( "Unexpected method signature" );
 		}
 
-		return ( ( DateMidnight ) value[0] ).isBefore( ( DateMidnight ) value[1] );
+		return ( (DateMidnight) value[0] ).isBefore( (DateMidnight) value[1] );
 	}
 }

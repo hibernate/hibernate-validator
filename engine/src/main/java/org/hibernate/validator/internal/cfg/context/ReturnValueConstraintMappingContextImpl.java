@@ -37,18 +37,12 @@ public final class ReturnValueConstraintMappingContextImpl
 	private final Method method;
 
 	public ReturnValueConstraintMappingContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
-
 		super( beanClass, mapping );
-
 		this.method = method;
 	}
 
 	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		mapping.addMethodConstraintConfig(
-				ConfiguredConstraint.forReturnValue(
-						definition, method
-				)
-		);
+		mapping.addMethodConstraintConfig( ConfiguredConstraint.forReturnValue( definition, method ) );
 		return this;
 	}
 
@@ -70,9 +64,6 @@ public final class ReturnValueConstraintMappingContextImpl
 	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
 	 */
 	public ParameterConstraintMappingContext parameter(int index) {
-		return new ParameterConstraintMappingContextImpl(
-				beanClass, method, index, mapping
-		);
+		return new ParameterConstraintMappingContextImpl( beanClass, method, index, mapping );
 	}
-
 }

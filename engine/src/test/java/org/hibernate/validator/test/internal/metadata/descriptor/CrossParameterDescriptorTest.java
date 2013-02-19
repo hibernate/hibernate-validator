@@ -178,7 +178,7 @@ public class CrossParameterDescriptorTest {
 		).getCrossParameterDescriptor();
 		assertFalse(
 				descriptor.hasConstraints(),
-				"Construcot has no cross-parameter."
+				"Constructor has no cross-parameter."
 		);
 	}
 

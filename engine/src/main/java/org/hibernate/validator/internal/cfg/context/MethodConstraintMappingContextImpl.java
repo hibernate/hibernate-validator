@@ -36,7 +36,6 @@ public class MethodConstraintMappingContextImpl implements MethodConstraintMappi
 	private final ConstraintMappingContext mapping;
 
 	public MethodConstraintMappingContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
-
 		this.beanClass = beanClass;
 		this.method = method;
 		this.mapping = mapping;
@@ -53,5 +52,4 @@ public class MethodConstraintMappingContextImpl implements MethodConstraintMappi
 				beanClass, method, mapping
 		);
 	}
-
 }

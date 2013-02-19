@@ -100,11 +100,9 @@ public class ConstraintMappingContext {
 	 *
 	 * @return The default group sequence provider defined class or {@code null} if none.
 	 */
+	@SuppressWarnings( "unchecked" )
 	public final <T> Class<? extends DefaultGroupSequenceProvider<? super T>> getDefaultGroupSequenceProvider(Class<T> beanType) {
-		@SuppressWarnings("unchecked")
-		Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass = (Class<? extends DefaultGroupSequenceProvider<? super T>>) defaultGroupSequenceProviders
-				.get( beanType );
-		return providerClass;
+		return (Class<? extends DefaultGroupSequenceProvider<? super T>>) defaultGroupSequenceProviders.get( beanType );
 	}
 
 	@Override

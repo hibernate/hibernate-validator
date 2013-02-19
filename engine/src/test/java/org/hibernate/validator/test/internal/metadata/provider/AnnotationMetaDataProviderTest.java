@@ -81,7 +81,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void testGetConstructorMetaData() throws Exception {
-
 		List<BeanConfiguration<? super Foo>> beanConfigurations = provider.getBeanConfigurationForHierarchy( Foo.class );
 
 		assertThat( beanConfigurations ).hasSize( 2 );
@@ -103,7 +102,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void testGetCrossParameterMetaData() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super Calendar>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
 				Calendar.class
@@ -144,7 +142,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void configurationsHaveAnnotationSource() {
-
 		for ( BeanConfiguration<? super User> configuration : provider.getBeanConfigurationForHierarchy( User.class ) ) {
 			assertThat( configuration.getSource() ).isEqualTo( ConfigurationSource.ANNOTATION );
 		}
@@ -152,7 +149,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void noGroupConversionOnField() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "mail" ) );
@@ -163,7 +159,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void singleGroupConversionOnField() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "phone" ) );
@@ -177,7 +172,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void multipleGroupConversionsOnField() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "address" ) );
@@ -203,7 +197,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void noGroupConversionOnMethod() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedExecutable method = findConstrainedExecutable(
@@ -217,7 +210,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void singleGroupConversionOnMethod() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedExecutable method = findConstrainedExecutable(
@@ -234,7 +226,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void multipleGroupConversionsOnMethod() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedExecutable method = findConstrainedExecutable(
@@ -258,7 +249,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void noGroupConversionOnParameter() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedExecutable method = findConstrainedExecutable(
@@ -272,7 +262,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void singleGroupConversionOnParameter() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedExecutable method = findConstrainedExecutable(
@@ -289,7 +278,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void multipleGroupConversionsOnParameter() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedExecutable method = findConstrainedExecutable(
@@ -319,7 +307,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void singleGroupConversionOnConstructor() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedExecutable constructor = findConstrainedExecutable(
@@ -336,7 +323,6 @@ public class AnnotationMetaDataProviderTest {
 
 	@Test
 	public void multipleGroupConversionsOnConstructorParameter() throws Exception {
-
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
 		ConstrainedExecutable constructor = findConstrainedExecutable(
@@ -355,7 +341,6 @@ public class AnnotationMetaDataProviderTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-626")
 	public void onlyLocallyDefinedConstraintsAreConsidered() {
-
 		List<BeanConfiguration<? super Person>> beanConfigurations = provider.getBeanConfigurationForHierarchy( Person.class );
 
 		ConstrainedType personType = findConstrainedType( beanConfigurations, Person.class );
@@ -409,7 +394,6 @@ public class AnnotationMetaDataProviderTest {
 	}
 
 	private ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Member member) {
-
 		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
 			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
 				if ( constrainedElement.getLocation().getMember().equals( member ) ) {
