@@ -68,66 +68,98 @@ public class BeanDescriptorTest {
 	public void testIsTypeConstrainedForUnconstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( UnconstrainedType.class );
 		assertFalse( descriptor.isBeanConstrained() );
+		assertFalse( descriptor.hasConstrainedExecutables() );
+	}
+
+	@Test
+	public void testIsBeanConstrainedClassLevelConstraint() {
+		BeanDescriptor descriptor = getBeanDescriptor( ClassLevelConstrainedType.class );
+		assertTrue( descriptor.isBeanConstrained() );
+		assertFalse( descriptor.hasConstrainedExecutables() );
+	}
+
+	@Test
+	public void testIsBeanConstrainedFieldConstraint() {
+		BeanDescriptor descriptor = getBeanDescriptor( FieldConstrainedType.class );
+		assertTrue( descriptor.isBeanConstrained() );
+		assertFalse( descriptor.hasConstrainedExecutables() );
+	}
+
+	@Test
+	public void testIsBeanConstrainedGetterConstraint() {
+		BeanDescriptor descriptor = getBeanDescriptor( GetterConstrainedType.class );
+		assertTrue( descriptor.isBeanConstrained() );
+		assertFalse( descriptor.hasConstrainedExecutables() );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForBeanConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		assertTrue( descriptor.isBeanConstrained() );
+		assertTrue( descriptor.hasConstrainedExecutables() );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForParameterConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ParameterConstrainedType.class );
-		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
+		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForConstructorParameterConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ConstructorParameterConstrainedType.class );
-		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
+		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForCascadingParameterType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CascadingParameterType.class );
-		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
+		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForConstructorCascadingParameterType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ConstructorCascadingParameterType.class );
-		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
+		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForReturnValueConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ReturnValueConstrainedType.class );
-		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
+		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForConstructorReturnValueConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ConstructorReturnValueConstrainedType.class );
-		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
+		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForCascadingReturnValueType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CascadingReturnValueType.class );
-		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
+		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForConstructorCascadingReturnValueType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ConstructorCascadingReturnValueType.class );
-		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
+		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForDerivedConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( DerivedConstrainedType.class );
-		assertTrue( descriptor.isBeanConstrained(), "The entity should be constrained" );
+		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
+		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
 	}
 
 	@Test
@@ -336,14 +368,12 @@ public class BeanDescriptorTest {
 	private static class CascadingParameterType {
 		@SuppressWarnings("unused")
 		public void foo(@Valid List<String> foo) {
-
 		}
 	}
 
 	private static class ConstructorCascadingParameterType {
 		@SuppressWarnings("unused")
 		public ConstructorCascadingParameterType(@Valid List<String> foo) {
-
 		}
 	}
 
@@ -385,5 +415,19 @@ public class BeanDescriptorTest {
 
 	@ScriptAssert(lang = "", script = "")
 	private static class ClassLevelConstrainedType {
+	}
+
+	private static class FieldConstrainedType {
+		@NotNull
+		private String foo;
+	}
+
+	private static class GetterConstrainedType {
+		private String foo;
+
+		@NotNull
+		public String getFoo() {
+			return foo;
+		}
 	}
 }

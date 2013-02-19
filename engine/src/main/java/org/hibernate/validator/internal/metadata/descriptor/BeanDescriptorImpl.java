@@ -62,13 +62,12 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 
 	@Override
 	public final boolean isBeanConstrained() {
-		return hasConstraints() || !constrainedProperties.isEmpty() || !constrainedMethods.isEmpty() || !constrainedConstructors
-				.isEmpty();
+		return hasConstraints() || !constrainedProperties.isEmpty();
 	}
 
 	@Override
 	public boolean hasConstrainedExecutables() {
-		return false; // TODO https://hibernate.onjira.com/browse/HV-717
+		return !constrainedMethods.isEmpty() || !constrainedConstructors.isEmpty();
 	}
 
 	@Override
