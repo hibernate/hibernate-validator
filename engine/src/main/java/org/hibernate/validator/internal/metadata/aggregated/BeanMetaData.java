@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ElementDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
@@ -105,11 +104,4 @@ public interface BeanMetaData<T> extends Validatable {
 	 *         element itself and goes up the hierarchy chain. Interfaces are not included.
 	 */
 	List<Class<?>> getClassHierarchy();
-
-	/**
-	 * Returns a BV meta-data API descriptor representing this element.
-	 *
-	 * @return A descriptor representing this element.
-	 */
-	ElementDescriptor getDescriptor();
 }

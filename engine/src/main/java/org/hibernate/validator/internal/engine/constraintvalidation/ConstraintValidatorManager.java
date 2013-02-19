@@ -31,6 +31,8 @@ import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
 /**
  * Manager in charge of providing and caching initialized {@code ConstraintValidator} instances.
  *
@@ -217,7 +219,7 @@ public class ConstraintValidatorManager {
 	}
 
 	private List<Type> findSuitableValidatorTypes(Type type, Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes) {
-		List<Type> determinedSuitableTypes = new ArrayList<Type>();
+		List<Type> determinedSuitableTypes = newArrayList();
 		for ( Type validatorType : availableValidatorTypes.keySet() ) {
 			if ( TypeHelper.isAssignable( validatorType, type )
 					&& !determinedSuitableTypes.contains( validatorType ) ) {
