@@ -17,6 +17,7 @@
 package org.hibernate.validator.testutil;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -28,12 +29,14 @@ import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.fest.assertions.CollectionAssert;
+
+import static org.fest.assertions.Formatting.format;
 import static org.hibernate.validator.internal.engine.path.PathImpl.createPathFromString;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
 /**
  * This class provides useful functions to assert correctness of constraint violations raised
  * during tests.
@@ -43,6 +46,12 @@ import static org.testng.Assert.assertTrue;
  * @author Gunnar Morling
  */
 public final class ConstraintViolationAssert {
+
+	/**
+	 * Expected name for cross-parameter nodes.
+	 */
+	private static final String CROSS_PARAMETER_NODE_NAME = "<cross-parameter>";
+
 	/**
 	 * Private constructor in order to avoid instantiation.
 	 */
@@ -107,6 +116,10 @@ public final class ConstraintViolationAssert {
 		Collections.sort( actualPaths );
 
 		assertEquals( actualPaths, expectedPathsAsList );
+	}
+
+	public static ConstraintViolationSetAssert assertThat(Set<? extends ConstraintViolation<?>> actualViolations) {
+		return new ConstraintViolationSetAssert( actualViolations );
 	}
 
 	public static void assertCorrectPropertyPaths(ConstraintViolationException e, String... expectedPropertyPaths) {
@@ -314,5 +327,268 @@ public final class ConstraintViolationAssert {
 				expectedConstraintTypeNames,
 				String.format( "Expected %s, but got %s", expectedConstraintTypeNames, actualConstraintTypeNames )
 		);
+	}
+
+	public static PathExpectation pathWith() {
+		return new PathExpectation();
+	}
+
+	public static class ConstraintViolationSetAssert extends CollectionAssert {
+
+		private final Set<? extends ConstraintViolation<?>> actualViolations;
+
+		protected ConstraintViolationSetAssert(Set<? extends ConstraintViolation<?>> actualViolations) {
+			super( actualViolations );
+			this.actualViolations = actualViolations;
+		}
+
+		public void containsOnlyPaths(PathExpectation... paths) {
+			isNotNull();
+
+			List<PathExpectation> expectedPaths = Arrays.asList( paths );
+			List<PathExpectation> actualPaths = newArrayList();
+
+			for ( ConstraintViolation<?> violation : actualViolations ) {
+				actualPaths.add( new PathExpectation( violation.getPropertyPath() ) );
+			}
+
+			List<PathExpectation> actualPathsTmp = new ArrayList<PathExpectation>( actualPaths );
+			actualPathsTmp.removeAll( expectedPaths );
+
+			if ( !actualPathsTmp.isEmpty() ) {
+				fail( format( "Found unexpected path(s): <%s>. Expected: <%s>", actualPathsTmp, expectedPaths ) );
+			}
+
+			List<PathExpectation> expectedPathsTmp = new ArrayList<PathExpectation>( expectedPaths );
+			expectedPathsTmp.removeAll( actualPaths );
+
+			if ( !expectedPathsTmp.isEmpty() ) {
+				fail( format( "Missing expected path(s) <%s>. Actual paths: <%s>", expectedPathsTmp, actualPaths ) );
+			}
+		}
+
+		public void containsPath(PathExpectation expectedPath) {
+			isNotNull();
+
+			List<PathExpectation> actualPaths = newArrayList();
+			for ( ConstraintViolation<?> violation : actualViolations ) {
+				PathExpectation actual = new PathExpectation( violation.getPropertyPath() );
+				if ( actual.equals( expectedPath ) ) {
+					return;
+				}
+				actualPaths.add( actual );
+			}
+
+			fail( format( "Didn't find path <%s> in actual paths <%s>.", expectedPath, actualPaths ) );
+		}
+
+		public void containsPaths(PathExpectation... expectedPaths) {
+			for ( PathExpectation pathExpectation : expectedPaths ) {
+				containsPath( pathExpectation );
+			}
+		}
+	}
+
+	public static class PathExpectation {
+
+		private final List<NodeExpectation> nodes = newArrayList();
+
+		private PathExpectation() {
+		}
+
+		private PathExpectation(Path propertyPath) {
+			for ( Path.Node node : propertyPath ) {
+				Integer parameterIndex = null;
+				if ( node.getKind() == ElementKind.PARAMETER ) {
+					parameterIndex = node.as( Path.ParameterNode.class ).getParameterIndex();
+				}
+				nodes.add(
+						new NodeExpectation(
+								node.getName(),
+								node.getKind(),
+								node.isInIterable(),
+								node.getKey(),
+								node.getIndex(),
+								parameterIndex
+						)
+				);
+			}
+		}
+
+		public PathExpectation property(String name) {
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, false, null, null, null ) );
+			return this;
+		}
+
+		public PathExpectation property(String name, boolean inIterable, Object key, Integer index) {
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null ) );
+			return this;
+		}
+
+		public PathExpectation bean() {
+			nodes.add( new NodeExpectation( null, ElementKind.BEAN, false, null, null, null ) );
+			return this;
+		}
+
+		public PathExpectation bean(boolean inIterable, Object key, Integer index) {
+			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null ) );
+			return this;
+		}
+
+		public PathExpectation method(String name) {
+			nodes.add( new NodeExpectation( name, ElementKind.METHOD, false, null, null, null ) );
+			return this;
+		}
+
+		public PathExpectation parameter(String name, int index) {
+			nodes.add( new NodeExpectation( name, ElementKind.PARAMETER, false, null, null, index ) );
+			return this;
+		}
+
+		public PathExpectation crossParameter() {
+			nodes.add(
+					new NodeExpectation(
+							CROSS_PARAMETER_NODE_NAME,
+							ElementKind.CROSS_PARAMETER,
+							false,
+							null,
+							null,
+							null
+					)
+			);
+			return this;
+		}
+
+		@Override
+		public String toString() {
+			String lineBreak = System.getProperty( "line.separator" );
+			StringBuilder asString = new StringBuilder( lineBreak + "PathExpectation(" + lineBreak );
+			for ( NodeExpectation node : nodes ) {
+				asString.append( "  " ).append( node ).append( lineBreak );
+			}
+
+			return asString.append( ")" ).toString();
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ( ( nodes == null ) ? 0 : nodes.hashCode() );
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			PathExpectation other = (PathExpectation) obj;
+			if ( nodes == null ) {
+				if ( other.nodes != null ) {
+					return false;
+				}
+			}
+			else if ( !nodes.equals( other.nodes ) ) {
+				return false;
+			}
+			return true;
+		}
+	}
+
+	private static class NodeExpectation {
+		private final String name;
+		private final ElementKind kind;
+		private final boolean inIterable;
+		private final Object key;
+		private final Integer index;
+		private final Integer parameterIndex;
+
+		private NodeExpectation(String name, ElementKind kind, boolean inIterable, Object key, Integer index, Integer parameterIndex) {
+			this.name = name;
+			this.kind = kind;
+			this.inIterable = inIterable;
+			this.key = key;
+			this.index = index;
+			this.parameterIndex = parameterIndex;
+		}
+
+		@Override
+		public String toString() {
+			return "NodeExpectation(" + name + ", " + kind + ", " + inIterable
+					+ ", " + key + ", " + index + ", " + parameterIndex + ")";
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ( inIterable ? 1231 : 1237 );
+			result = prime * result + ( ( index == null ) ? 0 : index.hashCode() );
+			result = prime * result + ( ( key == null ) ? 0 : key.hashCode() );
+			result = prime * result + ( ( kind == null ) ? 0 : kind.hashCode() );
+			result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
+			result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			NodeExpectation other = (NodeExpectation) obj;
+			if ( inIterable != other.inIterable ) {
+				return false;
+			}
+			if ( index == null ) {
+				if ( other.index != null ) {
+					return false;
+				}
+			}
+			else if ( !index.equals( other.index ) ) {
+				return false;
+			}
+			if ( key == null ) {
+				if ( other.key != null ) {
+					return false;
+				}
+			}
+			else if ( !key.equals( other.key ) ) {
+				return false;
+			}
+			if ( kind != other.kind ) {
+				return false;
+			}
+			if ( name == null ) {
+				if ( other.name != null ) {
+					return false;
+				}
+			}
+			else if ( !name.equals( other.name ) ) {
+				return false;
+			}
+			if ( parameterIndex == null ) {
+				if ( other.parameterIndex != null ) {
+					return false;
+				}
+			}
+			else if ( !parameterIndex.equals( other.parameterIndex ) ) {
+				return false;
+			}
+			return true;
+		}
 	}
 }

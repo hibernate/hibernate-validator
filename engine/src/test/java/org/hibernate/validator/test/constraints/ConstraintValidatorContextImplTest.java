@@ -169,8 +169,11 @@ public class ConstraintValidatorContextImplTest {
 	}
 
 	private ConstraintValidatorContextImpl createEmptyConstraintValidatorContextImpl() {
+		PathImpl path = PathImpl.createRootPath();
+		path.addBeanNode();
+
 		ConstraintValidatorContextImpl context = new ConstraintValidatorContextImpl(
-				PathImpl.createRootPath(), null
+				null, path, null
 		);
 		context.disableDefaultConstraintViolation();
 		return context;

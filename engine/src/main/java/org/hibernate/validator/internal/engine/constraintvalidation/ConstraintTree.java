@@ -122,7 +122,7 @@ public class ConstraintTree<A extends Annotation> {
 
 			// create a constraint validator context
 			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-					valueContext.getPropertyPath(), descriptor
+					executionContext.getParameterNames(), valueContext.getPropertyPath(), descriptor
 			);
 
 			// get the initialized validator

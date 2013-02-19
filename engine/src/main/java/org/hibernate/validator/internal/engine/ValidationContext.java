@@ -16,6 +16,10 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -25,6 +29,7 @@ import java.util.Set;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -120,9 +125,15 @@ public class ValidationContext<T> {
 	private final TraversableResolver traversableResolver;
 
 	/**
+	 * Parameter name provider which should be used in this context.
+	 */
+	private final ParameterNameProvider parameterNameProvider;
+
+	/**
 	 * Whether or not validation should fail on the first constraint violation.
 	 */
 	private final boolean failFast;
+
 
 	/**
 	 * Builder for creating {@link ValidationContext}s suited for the different
@@ -166,11 +177,13 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
+					null, //parameter name provider
 					failFast,
 					rootBean,
 					rootBeanClass,
-					null,
-					null, null
+					null, //executable
+					null, //executable parameters
+					null //executable return value
 			);
 		}
 
@@ -183,11 +196,13 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
+					null, //parameter name provider
 					failFast,
 					rootBean,
 					rootBeanClass,
-					null,
-					null, null
+					null, //executable
+					null, //executable parameters
+					null //executable return value
 			);
 		}
 
@@ -198,15 +213,18 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
+					null, //parameter name provider
 					failFast,
-					null,
+					null, //root bean
 					rootBeanClass,
-					null,
-					null, null
+					null, //executable
+					null, //executable parameters
+					null //executable return value
 			);
 		}
 
 		public <T> ValidationContext<T> forValidateParameters(
+				ParameterNameProvider parameterNameProvider,
 				T rootBean,
 				ExecutableElement executable,
 				Object[] executableParameters) {
@@ -219,12 +237,13 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
+					parameterNameProvider,
 					failFast,
 					rootBean,
 					rootBeanClass,
 					executable,
 					executableParameters,
-					null
+					null //executable return value
 			);
 		}
 
@@ -241,11 +260,12 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
+					null, //parameter name provider
 					failFast,
 					rootBean,
 					rootBeanClass,
 					executable,
-					null,
+					null, //executable parameters
 					executableReturnValue
 			);
 		}
@@ -274,6 +294,7 @@ public class ValidationContext<T> {
 							  MessageInterpolator messageInterpolator,
 							  ConstraintValidatorFactory constraintValidatorFactory,
 							  TraversableResolver traversableResolver,
+							  ParameterNameProvider parameterNameProvider,
 							  boolean failFast,
 							  T rootBean,
 							  Class<T> rootBeanClass,
@@ -282,15 +303,16 @@ public class ValidationContext<T> {
 							  Object executableReturnValue) {
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.constraintValidatorManager = constraintValidatorManager;
+		this.messageInterpolator = messageInterpolator;
+		this.constraintValidatorFactory = constraintValidatorFactory;
+		this.traversableResolver = traversableResolver;
+		this.parameterNameProvider = parameterNameProvider;
+		this.failFast = failFast;
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
 		this.executable = executable;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
-		this.messageInterpolator = messageInterpolator;
-		this.constraintValidatorFactory = constraintValidatorFactory;
-		this.traversableResolver = traversableResolver;
-		this.failFast = failFast;
 
 		processedObjects = newHashMap();
 		processedPaths = new IdentityHashMap<Object, Set<PathImpl>>();
@@ -323,6 +345,25 @@ public class ValidationContext<T> {
 
 	public ConstraintValidatorManager getConstraintValidatorManager() {
 		return constraintValidatorManager;
+	}
+
+	/**
+	 * Returns a list with the current executable's parameter names as retrieved
+	 * from the current {@link ParameterNameProvider}.
+	 *
+	 * @return The current executable's parameter names,if this context was
+	 *         created for parameter validation, {@code null} otherwise.
+	 */
+	public List<String> getParameterNames() {
+		if ( parameterNameProvider == null ) {
+			return null;
+		}
+		else if ( executable.getElementType() == ElementType.METHOD ) {
+			return parameterNameProvider.getParameterNames( (Method) executable.getMember() );
+		}
+		else {
+			return parameterNameProvider.getParameterNames( (Constructor<?>) executable.getMember() );
+		}
 	}
 
 	public List<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,

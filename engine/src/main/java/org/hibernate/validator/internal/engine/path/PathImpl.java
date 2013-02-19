@@ -27,7 +27,6 @@ import java.util.regex.Pattern;
 import javax.validation.ElementKind;
 import javax.validation.Path;
 
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -81,17 +80,13 @@ public final class PathImpl implements Path, Serializable {
 	 * {@code property} cannot be parsed.
 	 */
 	public static PathImpl createPathFromString(String propertyPath) {
-		return createPathFromString( propertyPath, null, null );
-	}
-
-	public static PathImpl createPathFromString(String propertyPath, BeanMetaDataManager metaDataManager, Class<?> rootBeanClass) {
 		Contracts.assertNotNull( propertyPath, MESSAGES.propertyPathCannotBeNull() );
 
 		if ( propertyPath.length() == 0 ) {
 			return createRootPath();
 		}
 
-		return parseProperty( propertyPath, metaDataManager, rootBeanClass );
+		return parseProperty( propertyPath );
 	}
 
 	public static PathImpl createPathForExecutable(ExecutableMetaData executable) {
@@ -311,7 +306,7 @@ public final class PathImpl implements Path, Serializable {
 		this.nodeList = new ArrayList<Node>( nodeList );
 	}
 
-	private static PathImpl parseProperty(String propertyName, BeanMetaDataManager metaDataManager, Class<?> parentType) {
+	private static PathImpl parseProperty(String propertyName) {
 		PathImpl path = createRootPath();
 		String tmp = propertyName;
 		do {

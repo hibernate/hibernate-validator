@@ -220,6 +220,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				messageInterpolator,
 				traversableResolver,
 				beanMetaDataManager,
+				parameterNameProvider,
 				constraintValidatorManager,
 				failFast
 		);
