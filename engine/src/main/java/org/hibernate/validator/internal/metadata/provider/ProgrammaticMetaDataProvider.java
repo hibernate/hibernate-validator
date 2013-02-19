@@ -66,7 +66,9 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 	private final ParameterNameProvider parameterNameProvider;
 
-	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider, Set<ConstraintMapping> programmaticMappings) {
+	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper,
+										ParameterNameProvider parameterNameProvider,
+										Set<ConstraintMapping> programmaticMappings) {
 		super( constraintHelper );
 		Contracts.assertNotNull( programmaticMappings );
 		this.parameterNameProvider = parameterNameProvider;
@@ -188,7 +190,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		Set<ConstrainedElement> allMethodMetaData = newHashSet();
 
 		for ( Method method : allConfiguredMethods ) {
-			String[] parameterNames = parameterNameProvider.getParameterNames( method );
+			List<String> parameterNames = parameterNameProvider.getParameterNames( method );
 
 			Map<Integer, Set<ExecutableConstraintLocation>> cascadesByParameter = partition(
 					cascadesByMethod.get(
@@ -205,7 +207,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 						new ConstrainedParameter(
 								ConfigurationSource.API,
 								new ExecutableConstraintLocation( method, i ),
-								parameterNames[i],
+								parameterNames.get( i ),
 								asMetaConstraints( constraintsByParameter.get( i ) ),
 								Collections.<Class<?>, Class<?>>emptyMap(),
 								cascadesByParameter.containsKey( i )

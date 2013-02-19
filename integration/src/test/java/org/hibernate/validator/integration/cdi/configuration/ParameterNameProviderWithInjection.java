@@ -18,6 +18,8 @@ package org.hibernate.validator.integration.cdi.configuration;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 import javax.inject.Inject;
 import javax.validation.ParameterNameProvider;
 
@@ -31,13 +33,13 @@ public class ParameterNameProviderWithInjection implements ParameterNameProvider
 	private PingService pingService;
 
 	@Override
-	public String[] getParameterNames(Constructor<?> constructor) {
-		return new String[0];
+	public List<String> getParameterNames(Constructor<?> constructor) {
+		return Collections.emptyList();
 	}
 
 	@Override
-	public String[] getParameterNames(Method method) {
-		return new String[0];
+	public List<String> getParameterNames(Method method) {
+		return Collections.emptyList();
 	}
 }
 

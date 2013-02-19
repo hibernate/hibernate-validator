@@ -18,7 +18,10 @@ package org.hibernate.validator.internal.engine;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.List;
 import javax.validation.ParameterNameProvider;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
  * A default {@link ParameterNameProvider} implementation which returns
@@ -31,20 +34,20 @@ import javax.validation.ParameterNameProvider;
 public class DefaultParameterNameProvider implements ParameterNameProvider {
 
 	@Override
-	public String[] getParameterNames(Constructor<?> constructor) {
+	public List<String> getParameterNames(Constructor<?> constructor) {
 		return getParameterNames( constructor.getParameterTypes().length );
 	}
 
 	@Override
-	public String[] getParameterNames(Method method) {
+	public List<String> getParameterNames(Method method) {
 		return getParameterNames( method.getParameterTypes().length );
 	}
 
-	private String[] getParameterNames(int parameterCount) {
-		String[] parameterNames = new String[parameterCount];
+	private List<String> getParameterNames(int parameterCount) {
+		List<String> parameterNames = newArrayList();
 
 		for ( int i = 0; i < parameterCount; i++ ) {
-			parameterNames[i] = getPrefix() + i;
+			parameterNames.add( getPrefix() + i );
 		}
 
 		return parameterNames;

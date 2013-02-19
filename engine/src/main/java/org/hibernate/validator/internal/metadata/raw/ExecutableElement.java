@@ -83,7 +83,7 @@ public abstract class ExecutableElement {
 	private ExecutableElement() {
 	}
 
-	public abstract String[] getParameterNames(ParameterNameProvider parameterNameProvider);
+	public abstract List<String> getParameterNames(ParameterNameProvider parameterNameProvider);
 
 	public abstract Annotation[][] getParameterAnnotations();
 
@@ -186,7 +186,7 @@ public abstract class ExecutableElement {
 		}
 
 		@Override
-		public String[] getParameterNames(ParameterNameProvider parameterNameProvider) {
+		public List<String> getParameterNames(ParameterNameProvider parameterNameProvider) {
 			return parameterNameProvider.getParameterNames( constructor );
 		}
 
@@ -321,7 +321,7 @@ public abstract class ExecutableElement {
 		}
 
 		@Override
-		public String[] getParameterNames(ParameterNameProvider parameterNameProvider) {
+		public List<String> getParameterNames(ParameterNameProvider parameterNameProvider) {
 			return parameterNameProvider.getParameterNames( method );
 		}
 

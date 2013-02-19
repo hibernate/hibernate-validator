@@ -50,7 +50,7 @@ public class ConstrainedParameterBuilder {
 																		AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
 		int i = 0;
-		String[] parameterNames = executableElement.getParameterNames( parameterNameProvider );
+		List<String> parameterNames = executableElement.getParameterNames( parameterNameProvider );
 		for ( ParameterType parameterType : parameterList ) {
 			ExecutableConstraintLocation constraintLocation = new ExecutableConstraintLocation( executableElement, i );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
@@ -79,7 +79,7 @@ public class ConstrainedParameterBuilder {
 			ConstrainedParameter constrainedParameter = new ConstrainedParameter(
 					ConfigurationSource.XML,
 					constraintLocation,
-					parameterNames[i],
+					parameterNames.get( i ),
 					metaConstraints,
 					groupConversions,
 					parameterType.getValid() != null

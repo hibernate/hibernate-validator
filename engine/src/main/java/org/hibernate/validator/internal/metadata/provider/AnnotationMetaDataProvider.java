@@ -388,11 +388,11 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private List<ConstrainedParameter> getParameterMetaData(ExecutableElement executable) {
 		List<ConstrainedParameter> metaData = newArrayList();
 
-		String[] parameterNames = executable.getParameterNames( parameterNameProvider );
+		List<String> parameterNames = executable.getParameterNames( parameterNameProvider );
 		int i = 0;
 		for ( Annotation[] parameterAnnotations : executable.getParameterAnnotations() ) {
 			boolean parameterIsCascading = false;
-			String parameterName = parameterNames[i];
+			String parameterName = parameterNames.get( i );
 			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
 			ConvertGroup groupConversion = null;
 			ConvertGroup.List groupConversionList = null;

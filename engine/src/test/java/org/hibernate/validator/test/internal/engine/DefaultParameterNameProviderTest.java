@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.test.internal.engine;
 
+import java.util.Collections;
+import java.util.List;
 import javax.validation.ParameterNameProvider;
 
 import org.testng.annotations.BeforeClass;
@@ -23,6 +25,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -43,7 +46,7 @@ public class DefaultParameterNameProviderTest {
 	public void getParametersForParameterlessConstructor() throws Exception {
 		assertEquals(
 				parameterNameProvider.getParameterNames( Foo.class.getConstructor() ),
-				new String[] { }
+				buildExpectedArgumentNameList()
 		);
 	}
 
@@ -51,7 +54,7 @@ public class DefaultParameterNameProviderTest {
 	public void getParametersForConstructorWithOneParameter() throws Exception {
 		assertEquals(
 				parameterNameProvider.getParameterNames( Foo.class.getConstructor( String.class ) ),
-				new String[] { "arg0" }
+				buildExpectedArgumentNameList( "arg0" )
 		);
 	}
 
@@ -59,7 +62,7 @@ public class DefaultParameterNameProviderTest {
 	public void getParametersForConstructorWithSeveralParameters() throws Exception {
 		assertEquals(
 				parameterNameProvider.getParameterNames( Foo.class.getConstructor( String.class, String.class ) ),
-				new String[] { "arg0", "arg1" }
+				buildExpectedArgumentNameList( "arg0", "arg1" )
 		);
 	}
 
@@ -67,7 +70,7 @@ public class DefaultParameterNameProviderTest {
 	public void getParametersForParameterlessMethod() throws Exception {
 		assertEquals(
 				parameterNameProvider.getParameterNames( Foo.class.getMethod( "foo" ) ),
-				new String[] { }
+				buildExpectedArgumentNameList()
 		);
 	}
 
@@ -75,7 +78,7 @@ public class DefaultParameterNameProviderTest {
 	public void getParametersForMethodWithOneParameter() throws Exception {
 		assertEquals(
 				parameterNameProvider.getParameterNames( Foo.class.getMethod( "foo", String.class ) ),
-				new String[] { "arg0" }
+				buildExpectedArgumentNameList( "arg0" )
 		);
 	}
 
@@ -83,8 +86,14 @@ public class DefaultParameterNameProviderTest {
 	public void getParametersForMethodWithSeveralParameters() throws Exception {
 		assertEquals(
 				parameterNameProvider.getParameterNames( Foo.class.getMethod( "foo", String.class, String.class ) ),
-				new String[] { "arg0", "arg1" }
+				buildExpectedArgumentNameList( "arg0", "arg1" )
 		);
+	}
+
+	private List<String> buildExpectedArgumentNameList(String... names) {
+		List<String> parameterNames = newArrayList();
+		Collections.addAll( parameterNames, names );
+		return parameterNames;
 	}
 
 	@SuppressWarnings("unused")
