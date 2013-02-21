@@ -1,6 +1,6 @@
 # Hibernate Validator
 
-*Version: 5.0.0.Beta1, 06.02.2013*
+*Version: 5.0.0.CR1, 21.02.2013*
 
 
 ## What is it?
@@ -35,7 +35,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>5.0.0.Beta1</version>
+            <version>5.0.0.CR1</version>
         </dependency>
 
 * _hibernate-validator-annotation-processor-&lt;version&gt;.jar_ is an optional jar which can be integrated with your build

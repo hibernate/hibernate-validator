@@ -1,6 +1,34 @@
 Hibernate Validator Changelog
 =============================
 
+5.0.0.CR1 (21.02.2013)
+------------------------
+
+** Bug
+    * [HV-683] - Meta model should not be retrievable in case of illegal parameter constraints in hierarchies
+    * [HV-699] - Import EL packages in OSGi manifest
+    * [HV-703] - Upgrade Jsoups dependency
+    * [HV-707] - BootstrapConfiguration#getValidatedExecutableTypes() returns wrong default value
+    * [HV-708] - Adapt to API changes around Node#getKind()
+    * [HV-710] - Implement CrossParameterNode and ExecutableDescriptor#getCrossParameterDescriptor()
+    * [HV-711] - Updates around ReturnValueNode and ReturnValueDescriptor
+    * [HV-717] - Implement Beandescriptor#hasConstrainedExecutables
+    * [HV-719] - Use List instead of arrays in ParameterNameProvider
+    * [HV-720] - Use @SupportValidationTarget instead of @CrossParameterConstraint for cross paramter constraints
+
+** Improvement
+    * [HV-713] - Implement new methods on ConstraintViolation
+    * [HV-722] - Temporarily disable CDI portable extension
+
+** New Feature
+    * [HV-373] - XML-based configuration of method-level constraints and group conversions
+    * [HV-698] - Don't support unwrapping to internal implementation classes
+    * [HV-709] - Implement new methods in node builder API
+
+** Task
+    * [HV-690] - Update XML schema and parsing code
+
+
 5.0.0.Beta1 (06.02.2013)
 ------------------------
 
