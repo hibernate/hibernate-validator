@@ -20,12 +20,11 @@ import javax.inject.Inject;
 import javax.validation.ValidatorFactory;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.integration.cdi.service.PingService;
@@ -37,7 +36,8 @@ import static junit.framework.Assert.assertEquals;
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
+//TODO HV-723 Re-enable
+//@RunWith(Arquillian.class)
 public class ConfigurationInjectionUnitIT {
 	private static final String WAR_FILE_NAME = ConfigurationInjectionUnitIT.class.getSimpleName() + ".war";
 
@@ -66,7 +66,9 @@ public class ConfigurationInjectionUnitIT {
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
+	//TODO HV-723 Re-enable
 	@Test
+	@Ignore
 	public void testConstraintValidatorFactoryGotInjected() {
 		ConstraintValidatorFactoryWithInjection constraintValidatorFactory = (ConstraintValidatorFactoryWithInjection) validatorFactory
 				.getConstraintValidatorFactory();
@@ -74,7 +76,9 @@ public class ConfigurationInjectionUnitIT {
 		assertPingService( constraintValidatorFactory.getPingService() );
 	}
 
+	//TODO HV-723 Re-enable
 	@Test
+	@Ignore
 	public void testMessageInterpolatorGotInjected() {
 		MessageInterpolatorWithInjection messageInterpolator = (MessageInterpolatorWithInjection) validatorFactory
 				.getMessageInterpolator();
@@ -82,7 +86,9 @@ public class ConfigurationInjectionUnitIT {
 		assertPingService( messageInterpolator.getPingService() );
 	}
 
+	//TODO HV-723 Re-enable
 	@Test
+	@Ignore
 	public void testTraversableResolverGotInjected() {
 		TraversableResolverWithInjection traversableResolver = (TraversableResolverWithInjection) validatorFactory
 				.getTraversableResolver();
@@ -94,5 +100,3 @@ public class ConfigurationInjectionUnitIT {
 		assertEquals( "The ping service should respond", "pong", pingService.ping() );
 	}
 }
-
-
