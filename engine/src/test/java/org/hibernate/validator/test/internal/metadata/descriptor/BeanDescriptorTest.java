@@ -90,6 +90,7 @@ public class BeanDescriptorTest {
 		BeanDescriptor descriptor = getBeanDescriptor( GetterConstrainedType.class );
 		assertTrue( descriptor.isBeanConstrained() );
 		assertFalse( descriptor.hasConstrainedExecutables() );
+		assertTrue( descriptor.getConstrainedMethods().isEmpty() );
 	}
 
 	@Test
