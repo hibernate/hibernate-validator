@@ -29,6 +29,7 @@ import java.util.regex.PatternSyntaxException;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.GroupDefinitionException;
+import javax.validation.Path;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBException;
@@ -524,4 +525,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 145,
 			value = "Unable to determine whether the constraint %1$s is a generic or cross parameter constraint.")
 	ConstraintDefinitionException getUnableToDetermineConstraintType(String constraint);
+
+	@Message(id = 146,
+			value = "No parameter nodes may be added since path %s doesn't refer to a cross-parameter constraint.")
+	IllegalStateException getParameterNodeAddedForNonCrossParameterConstraintException(Path path);
 }

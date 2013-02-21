@@ -30,6 +30,7 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
@@ -113,6 +114,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final ConstraintValidatorManager constraintValidatorManager;
 
 	/**
+	 * Used for retrieving parameter names to be used in constraint violations or node names.
+	 */
+	private final ParameterNameProvider parameterNameProvider;
+
+	/**
 	 * Indicates if validation has to be stopped on first constraint violation.
 	 */
 	private final boolean failFast;
@@ -121,12 +127,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						 MessageInterpolator messageInterpolator,
 						 TraversableResolver traversableResolver,
 						 BeanMetaDataManager beanMetaDataManager,
+						 ParameterNameProvider parameterNameProvider,
 						 ConstraintValidatorManager constraintValidatorManager,
 						 boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
+		this.parameterNameProvider = parameterNameProvider;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
 
@@ -159,7 +167,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		return validatePropertyInContext(
 				context,
-				PathImpl.createPathFromString( propertyName, beanMetaDataManager, object.getClass() ),
+				PathImpl.createPathFromString( propertyName ),
 				validationOrder
 		);
 	}
@@ -175,7 +183,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validateValueInContext(
 				context,
 				value,
-				PathImpl.createPathFromString( propertyName, beanMetaDataManager, beanType ),
+				PathImpl.createPathFromString( propertyName ),
 				validationOrder
 		);
 	}
@@ -222,6 +230,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		ValidationContext<T> context = getValidationContext().forValidateParameters(
+				parameterNameProvider,
 				object,
 				executable,
 				parameterValues

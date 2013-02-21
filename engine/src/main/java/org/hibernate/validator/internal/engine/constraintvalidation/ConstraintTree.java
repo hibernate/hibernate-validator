@@ -90,7 +90,7 @@ public class ConstraintTree<A extends Annotation> {
 		return descriptor;
 	}
 
-	public final <T, U, V> boolean validateConstraints(ValidationContext<T> executionContext, ValueContext<U, V> valueContext) {
+	public final <T> boolean validateConstraints(ValidationContext<T> executionContext, ValueContext<?, ?> valueContext) {
 		Set<ConstraintViolation<T>> constraintViolations = newHashSet();
 		validateConstraints( executionContext, valueContext, constraintViolations );
 		if ( !constraintViolations.isEmpty() ) {
@@ -100,9 +100,9 @@ public class ConstraintTree<A extends Annotation> {
 		return true;
 	}
 
-	private <T, U, V> void validateConstraints(ValidationContext<T> executionContext,
-																				 ValueContext<U, V> valueContext,
-																				 Set<ConstraintViolation<T>> constraintViolations) {
+	private <T, V> void validateConstraints(ValidationContext<T> executionContext,
+											ValueContext<?, V> valueContext,
+											Set<ConstraintViolation<T>> constraintViolations) {
 		CompositionResult compositionResult = validateComposingConstraints(
 				executionContext, valueContext, constraintViolations
 		);
@@ -122,7 +122,7 @@ public class ConstraintTree<A extends Annotation> {
 
 			// create a constraint validator context
 			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-					valueContext.getPropertyPath(), descriptor
+					executionContext.getParameterNames(), valueContext.getPropertyPath(), descriptor
 			);
 
 			// get the initialized validator
@@ -187,7 +187,7 @@ public class ConstraintTree<A extends Annotation> {
 	 * @param constraintViolations Used to accumulate constraint violations
 	 * @param localViolationList List of constraint violations of top level constraint
 	 */
-	private <T, U, V> void prepareFinalConstraintViolations(ValidationContext<T> executionContext, ValueContext<U, V> valueContext, Set<ConstraintViolation<T>> constraintViolations, Set<ConstraintViolation<T>> localViolationList) {
+	private <T> void prepareFinalConstraintViolations(ValidationContext<T> executionContext, ValueContext<?, ?> valueContext, Set<ConstraintViolation<T>> constraintViolations, Set<ConstraintViolation<T>> localViolationList) {
 		if ( reportAsSingleViolation() ) {
 			// We clear the current violations list anyway
 			constraintViolations.clear();
@@ -226,9 +226,9 @@ public class ConstraintTree<A extends Annotation> {
 	 *
 	 * @return Returns an instance of {@code CompositionResult} relevant for boolean composition of constraints
 	 */
-	private <T, U, V> CompositionResult validateComposingConstraints(ValidationContext<T> executionContext,
-																									   ValueContext<U, V> valueContext,
-																									   Set<ConstraintViolation<T>> constraintViolations) {
+	private <T> CompositionResult validateComposingConstraints(ValidationContext<T> executionContext,
+															   ValueContext<?, ?> valueContext,
+															   Set<ConstraintViolation<T>> constraintViolations) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
 		for ( ConstraintTree<?> tree : getChildren() ) {
 			Set<ConstraintViolation<T>> tmpViolationList = newHashSet();
@@ -274,11 +274,11 @@ public class ConstraintTree<A extends Annotation> {
 		return passedValidation;
 	}
 
-	private <T, U, V> Set<ConstraintViolation<T>> validateSingleConstraint(ValidationContext<T> executionContext,
-																						ValueContext<U, V> valueContext,
-																						ConstraintValidatorContextImpl constraintValidatorContext,
-																						ConstraintValidator<A, V> validator,
-																						Set<ConstraintViolation<T>> constraintViolations) {
+	private <T, V> Set<ConstraintViolation<T>> validateSingleConstraint(ValidationContext<T> executionContext,
+																		ValueContext<?, V> valueContext,
+																		ConstraintValidatorContextImpl constraintValidatorContext,
+																		ConstraintValidator<A, V> validator,
+																		Set<ConstraintViolation<T>> constraintViolations) {
 		boolean isValid;
 		try {
 			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );

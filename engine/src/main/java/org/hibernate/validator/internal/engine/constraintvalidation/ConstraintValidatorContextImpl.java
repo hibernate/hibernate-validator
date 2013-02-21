@@ -20,7 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderDefinedContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeContextBuilder;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderDefinedContext;
+import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeContextBuilder;
+import javax.validation.ElementKind;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.engine.path.MessageAndPath;
@@ -28,20 +33,25 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
 /**
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ConstraintValidatorContextImpl implements ConstraintValidatorContext {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final List<MessageAndPath> messageAndPaths = new ArrayList<MessageAndPath>( 3 );
+	private final List<String> parameterNameProvider;
+	private final List<MessageAndPath> messageAndPaths = newArrayList( 3 );
 	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
 
-	public ConstraintValidatorContextImpl(PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
-		this.basePath = PathImpl.createCopy( propertyPath );
+	public ConstraintValidatorContextImpl(List<String> parameterNames, PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
+		this.parameterNameProvider = parameterNames;
+		this.basePath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
 
@@ -57,7 +67,11 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	@Override
 	public final ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
-		return new ErrorBuilderImpl( messageTemplate, PathImpl.createCopy( basePath ) );
+		return new ConstraintViolationBuilderImpl(
+				parameterNameProvider,
+				messageTemplate,
+				PathImpl.createCopy( basePath )
+		);
 	}
 
 	@Override
@@ -87,175 +101,164 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		return returnedMessageAndPaths;
 	}
 
-	class ErrorBuilderImpl implements ConstraintViolationBuilder {
-		private final String messageTemplate;
-		private PathImpl propertyPath;
+	private abstract class NodeBuilderBase {
+		protected final String messageTemplate;
+		protected PathImpl propertyPath;
 
-		ErrorBuilderImpl(String template, PathImpl path) {
+		protected NodeBuilderBase(String template, PathImpl path) {
 			messageTemplate = template;
 			propertyPath = path;
+		}
+
+		public ConstraintValidatorContext addConstraintViolation() {
+			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
+			return ConstraintValidatorContextImpl.this;
+		}
+	}
+
+	private class ConstraintViolationBuilderImpl extends NodeBuilderBase implements ConstraintViolationBuilder {
+
+		private final List<String> parameterNames;
+
+		private ConstraintViolationBuilderImpl(List<String> parameterNames, String template, PathImpl path) {
+			super( template, path );
+			this.parameterNames = parameterNames;
 		}
 
 		@Override
 		public NodeBuilderDefinedContext addNode(String name) {
-			// in case we are in a class level constraint and we want to add a node we drop the node representing the
-			// class level (HF)
-			if ( !propertyPath.isRootPath() && propertyPath.getLeafNode().getName() == null ) {
-				propertyPath = propertyPath.getPathWithoutLeafNode();
-			}
+			dropLeafNodeIfRequired();
 			propertyPath.addPropertyNode( name );
-			return new NodeBuilderImpl( messageTemplate, propertyPath );
-		}
 
-		@Override
-		public ConstraintValidatorContext addConstraintViolation() {
-			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
-			return ConstraintValidatorContextImpl.this;
+			return new NodeBuilder( messageTemplate, propertyPath );
 		}
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
-			//TODO HV-709
-			throw new UnsupportedOperationException( "Not implemented yet" );
+			dropLeafNodeIfRequired();
+
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, name );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
-			//TODO HV-709
-			throw new UnsupportedOperationException( "Not implemented yet" );
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, null );
 		}
 
 		@Override
 		public NodeBuilderDefinedContext addParameterNode(int index) {
-			//TODO HV-709
-			throw new UnsupportedOperationException( "Not implemented yet" );
+			if ( propertyPath.getLeafNode().getKind() != ElementKind.CROSS_PARAMETER ) {
+				throw log.getParameterNodeAddedForNonCrossParameterConstraintException( propertyPath );
+			}
+
+			dropLeafNodeIfRequired();
+			propertyPath.addParameterNode( parameterNames.get( index ), index );
+
+			return new NodeBuilder( messageTemplate, propertyPath );
+		}
+
+		/**
+		 * In case nodes are added from within a class-level or cross-parameter
+		 * constraint, the node representing the constraint element will be
+		 * dropped. inIterable(), getKey() etc.
+		 */
+		private void dropLeafNodeIfRequired() {
+			if ( propertyPath.getLeafNode().getKind() == ElementKind.BEAN || propertyPath.getLeafNode()
+					.getKind() == ElementKind.CROSS_PARAMETER ) {
+				propertyPath = propertyPath.getPathWithoutLeafNode();
+			}
 		}
 	}
 
-	class NodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderDefinedContext {
-		private final String messageTemplate;
-		private final PathImpl propertyPath;
+	private class NodeBuilder extends NodeBuilderBase
+			implements NodeBuilderDefinedContext, LeafNodeBuilderDefinedContext {
 
-		NodeBuilderImpl(String template, PathImpl path) {
-			messageTemplate = template;
-			propertyPath = path;
+		private NodeBuilder(String template, PathImpl path) {
+			super( template, path );
 		}
 
 		@Override
+		@Deprecated
 		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
-		}
-
-		@Override
-		public ConstraintValidatorContext addConstraintViolation() {
-			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
-			return ConstraintValidatorContextImpl.this;
+			return addPropertyNode( name );
 		}
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
-			//TODO HV-709
-			throw new UnsupportedOperationException( "Not implemented yet" );
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, name );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
-			//TODO HV-709
-			throw new UnsupportedOperationException( "Not implemented yet" );
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, null );
 		}
 	}
 
-	class InIterableNodeBuilderImpl implements ConstraintViolationBuilder.NodeBuilderCustomizableContext {
-		private final String messageTemplate;
-		private final PathImpl propertyPath;
+	private class DeferredNodeBuilder extends NodeBuilderBase
+			implements NodeBuilderCustomizableContext, LeafNodeBuilderCustomizableContext, NodeContextBuilder, LeafNodeContextBuilder {
+
 		private final String leafNodeName;
 
-		InIterableNodeBuilderImpl(String template, PathImpl path, String nodeName) {
-			this.messageTemplate = template;
-			this.propertyPath = path;
+		private DeferredNodeBuilder(String template, PathImpl path, String nodeName) {
+			super( template, path );
 			this.leafNodeName = nodeName;
 		}
 
 		@Override
-		public ConstraintViolationBuilder.NodeContextBuilder inIterable() {
-			this.propertyPath.makeLeafNodeIterable();
-			return new InIterablePropertiesBuilderImpl( messageTemplate, propertyPath, leafNodeName );
+		public DeferredNodeBuilder inIterable() {
+			propertyPath.makeLeafNodeIterable();
+			return this;
 		}
 
 		@Override
-		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			propertyPath.addPropertyNode( leafNodeName );
-			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
-		}
-
-		@Override
-		public ConstraintValidatorContext addConstraintViolation() {
-			propertyPath.addPropertyNode( leafNodeName );
-			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
-			return ConstraintValidatorContextImpl.this;
-		}
-
-		@Override
-		public NodeBuilderCustomizableContext addPropertyNode(String name) {
-			//TODO HV-709
-			throw new UnsupportedOperationException( "Not implemented yet" );
-		}
-
-		@Override
-		public LeafNodeBuilderCustomizableContext addBeanNode() {
-			//TODO HV-709
-			throw new UnsupportedOperationException( "Not implemented yet" );
-		}
-	}
-
-	class InIterablePropertiesBuilderImpl implements ConstraintViolationBuilder.NodeContextBuilder {
-		private final String messageTemplate;
-		private final PathImpl propertyPath;
-		private final String leafNodeName;
-
-		InIterablePropertiesBuilderImpl(String template, PathImpl path, String nodeName) {
-			this.messageTemplate = template;
-			this.propertyPath = path;
-			this.leafNodeName = nodeName;
-		}
-
-		@Override
-		public ConstraintViolationBuilder.NodeBuilderDefinedContext atKey(Object key) {
+		public NodeBuilder atKey(Object key) {
 			propertyPath.setLeafNodeMapKey( key );
-			propertyPath.addPropertyNode( leafNodeName );
-			return new NodeBuilderImpl( messageTemplate, propertyPath );
+			addLeafNode();
+			return new NodeBuilder( messageTemplate, propertyPath );
 		}
 
 		@Override
-		public ConstraintViolationBuilder.NodeBuilderDefinedContext atIndex(Integer index) {
+		public NodeBuilder atIndex(Integer index) {
 			propertyPath.setLeafNodeIndex( index );
-			propertyPath.addPropertyNode( leafNodeName );
-			return new NodeBuilderImpl( messageTemplate, propertyPath );
+			addLeafNode();
+			return new NodeBuilder( messageTemplate, propertyPath );
 		}
 
 		@Override
-		public ConstraintViolationBuilder.NodeBuilderCustomizableContext addNode(String name) {
-			propertyPath.addPropertyNode( leafNodeName );
-			return new InIterableNodeBuilderImpl( messageTemplate, propertyPath, name );
-		}
-
-		@Override
-		public ConstraintValidatorContext addConstraintViolation() {
-			propertyPath.addPropertyNode( leafNodeName );
-			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
-			return ConstraintValidatorContextImpl.this;
+		@Deprecated
+		public NodeBuilderCustomizableContext addNode(String name) {
+			return addPropertyNode( name );
 		}
 
 		@Override
 		public NodeBuilderCustomizableContext addPropertyNode(String name) {
-			//TODO HV-709
-			throw new UnsupportedOperationException( "Not implemented yet" );
+			addLeafNode();
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, name );
 		}
 
 		@Override
 		public LeafNodeBuilderCustomizableContext addBeanNode() {
-			//TODO HV-709
-			throw new UnsupportedOperationException( "Not implemented yet" );
+			addLeafNode();
+			return new DeferredNodeBuilder( messageTemplate, propertyPath, null );
+		}
+
+		@Override
+		public ConstraintValidatorContext addConstraintViolation() {
+			addLeafNode();
+			return super.addConstraintViolation();
+		}
+
+		/**
+		 * Adds the leaf node stored for deferred addition. Either a bean or
+		 * property node.
+		 */
+		private void addLeafNode() {
+			if ( leafNodeName == null ) {
+				propertyPath.addBeanNode();
+			}
+			else {
+				propertyPath.addPropertyNode( leafNodeName );
+			}
 		}
 	}
 }
