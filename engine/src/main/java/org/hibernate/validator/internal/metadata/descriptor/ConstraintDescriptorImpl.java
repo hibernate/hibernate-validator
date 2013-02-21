@@ -75,6 +75,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 	private static final String GROUPS = "groups";
 	private static final String PAYLOAD = "payload";
+	private static final String MESSAGE = "message";
 	private static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
 
 	/**
@@ -202,6 +203,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	@Override
+	public String getMessageTemplate() {
+		return (String) getAttributes().get( MESSAGE );
+	}
+
+	@Override
 	public Set<Class<?>> getGroups() {
 		return groups;
 	}
@@ -209,6 +215,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	@Override
 	public Set<Class<? extends Payload>> getPayload() {
 		return payloads;
+	}
+
+	@Override
+	public ConstraintTarget getValidationAppliesTo() {
+		return (ConstraintTarget) attributes.get( VALIDATION_APPLIES_TO );
 	}
 
 	@Override
@@ -345,7 +356,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private boolean crossParameterValidatorOnly() {
-		return crossParameterConstraintValidatorClass != null && constraintValidatorDefinitionClasses.size() == 1;
+		return crossParameterConstraintValidatorClass != null && constraintValidatorDefinitionClasses.size() == 1 && !supportsValidationTarget(
+				crossParameterConstraintValidatorClass,
+				ValidationTarget.ANNOTATED_ELEMENT
+		);
 	}
 
 	private int getParameterCount(Member member) {
@@ -453,24 +467,33 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		Class<? extends ConstraintValidator<T, ?>> crossParameterValidatorClass = null;
 		boolean crossParameterValidatorFound = false;
 		for ( Class<? extends ConstraintValidator<T, ?>> validatorClass : constraintValidatorDefinitionClasses ) {
-			SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
-					SupportedValidationTarget.class
-			);
-			if ( supportedTargetAnnotation == null ) {
-				continue;
+			if ( crossParameterValidatorFound ) {
+				throw log.getMultipleCrossParameterValidatorClassesException( annotationType.getName() );
 			}
-			ValidationTarget[] targets = supportedTargetAnnotation.value();
-			for ( ValidationTarget target : targets ) {
-				if ( ValidationTarget.PARAMETERS.equals( target ) ) {
-					if ( crossParameterValidatorFound ) {
-						throw log.getMultipleCrossParameterValidatorClassesException( annotationType.getName() );
-					}
-					crossParameterValidatorClass = validatorClass;
-					crossParameterValidatorFound = true;
-				}
+
+			crossParameterValidatorFound = supportsValidationTarget( validatorClass, ValidationTarget.PARAMETERS );
+			if ( crossParameterValidatorFound ) {
+				crossParameterValidatorClass = validatorClass;
+				crossParameterValidatorFound = true;
 			}
 		}
 		return crossParameterValidatorClass;
+	}
+
+	private boolean supportsValidationTarget(Class<?> validatorClass, ValidationTarget target) {
+		SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
+				SupportedValidationTarget.class
+		);
+		if ( supportedTargetAnnotation == null ) {
+			return false;
+		}
+		ValidationTarget[] targets = supportedTargetAnnotation.value();
+		for ( ValidationTarget configuredTarget : targets ) {
+			if ( configuredTarget.equals( target ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {

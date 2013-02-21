@@ -45,7 +45,6 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Hardy Ferentschik
  */
-@Test
 public class ReturnValueDescriptorTest {
 
 	@Test

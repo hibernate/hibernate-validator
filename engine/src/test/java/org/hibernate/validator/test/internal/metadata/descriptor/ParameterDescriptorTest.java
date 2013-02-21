@@ -43,7 +43,6 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Gunnar Morling
  */
-@Test
 public class ParameterDescriptorTest {
 	private ParameterDescriptor createCustomerParameter1;
 	private ParameterDescriptor createCustomerParameter2;
