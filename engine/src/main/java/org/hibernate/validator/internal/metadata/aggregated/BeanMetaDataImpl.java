@@ -90,12 +90,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * values are an aggregated view on each executable together with all the
 	 * executables from the inheritance hierarchy with the same signature.
 	 */
-	private final Map<String, ExecutableMetaData> executableMetaData;
+	private final Map<String, ExecutableMetaData> executableMetaDataMap;
 
 	/**
 	 * Property meta data keyed against the property name
 	 */
-	private final Map<String, PropertyMetaData> propertyMetaData;
+	private final Map<String, PropertyMetaData> propertyMetaDataMap;
 
 	/**
 	 * The cascaded properties of this bean.
@@ -132,40 +132,39 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @param beanClass The Java type represented by this meta data object.
 	 * @param defaultGroupSequence The default group sequence.
 	 * @param defaultGroupSequenceProvider The default group sequence provider if set.
-	 * @param constraintMetaData All constraint meta data relating to the represented type.
+	 * @param constraintMetaDataSet All constraint meta data relating to the represented type.
 	 */
 	public BeanMetaDataImpl(Class<T> beanClass,
 							List<Class<?>> defaultGroupSequence,
 							DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider,
-							Set<ConstraintMetaData> constraintMetaData) {
+							Set<ConstraintMetaData> constraintMetaDataSet) {
 
 		this.beanClass = beanClass;
-		this.propertyMetaData = newHashMap();
+		this.propertyMetaDataMap = newHashMap();
 
 		Set<PropertyMetaData> propertyMetaDataSet = newHashSet();
 		Set<ExecutableMetaData> executableMetaDataSet = newHashSet();
 
-		for ( ConstraintMetaData oneElement : constraintMetaData ) {
-			if ( oneElement.getKind() == ElementKind.PROPERTY ) {
-				propertyMetaDataSet.add( (PropertyMetaData) oneElement );
+		for ( ConstraintMetaData constraintMetaData : constraintMetaDataSet ) {
+			if ( constraintMetaData.getKind() == ElementKind.PROPERTY ) {
+				propertyMetaDataSet.add( (PropertyMetaData) constraintMetaData );
 			}
 			else {
-				executableMetaDataSet.add( (ExecutableMetaData) oneElement );
+				executableMetaDataSet.add( (ExecutableMetaData) constraintMetaData );
 			}
 		}
 
 		Set<Cascadable> cascadedProperties = newHashSet();
 		Set<MetaConstraint<?>> allMetaConstraints = newHashSet();
 
-		for ( PropertyMetaData oneProperty : propertyMetaDataSet ) {
+		for ( PropertyMetaData propertyMetaData : propertyMetaDataSet ) {
+			propertyMetaDataMap.put( propertyMetaData.getName(), propertyMetaData );
 
-			propertyMetaData.put( oneProperty.getName(), oneProperty );
-
-			if ( oneProperty.isCascading() ) {
-				cascadedProperties.add( oneProperty );
+			if ( propertyMetaData.isCascading() ) {
+				cascadedProperties.add( propertyMetaData );
 			}
 
-			allMetaConstraints.addAll( oneProperty.getConstraints() );
+			allMetaConstraints.addAll( propertyMetaData.getConstraints() );
 		}
 
 		this.cascadedProperties = Collections.unmodifiableSet( cascadedProperties );
@@ -177,7 +176,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		this.directMetaConstraints = buildDirectConstraintSets();
 
-		this.executableMetaData = Collections.unmodifiableMap( byIdentifier( executableMetaDataSet ) );
+		this.executableMetaDataMap = Collections.unmodifiableMap( byIdentifier( executableMetaDataSet ) );
 
 		this.beanDescriptor = new BeanDescriptorImpl(
 				beanClass,
@@ -207,7 +206,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@Override
 	public PropertyMetaData getMetaDataFor(String propertyName) {
-		return propertyMetaData.get( propertyName );
+		return propertyMetaDataMap.get( propertyName );
 	}
 
 	@Override
@@ -222,7 +221,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@Override
 	public ExecutableMetaData getMetaDataFor(ExecutableElement executable) {
-		ExecutableMetaData metaData = executableMetaData.get( executable.getIdentifier() );
+		ExecutableMetaData metaData = executableMetaDataMap.get( executable.getIdentifier() );
 
 		if ( metaData != null ) {
 			metaData.assertCorrectnessOfConfiguration();
@@ -261,8 +260,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
 
-		for ( MetaConstraint<?> oneConstraint : classLevelConstraints ) {
-			theValue.add( oneConstraint.getDescriptor() );
+		for ( MetaConstraint<?> metaConstraint : classLevelConstraints ) {
+			theValue.add( metaConstraint.getDescriptor() );
 		}
 
 		return theValue;
@@ -271,7 +270,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<String, PropertyDescriptor> getConstrainedPropertiesAsDescriptors() {
 		Map<String, PropertyDescriptor> theValue = newHashMap();
 
-		for ( Entry<String, PropertyMetaData> entry : propertyMetaData.entrySet() ) {
+		for ( Entry<String, PropertyMetaData> entry : propertyMetaDataMap.entrySet() ) {
 			if ( entry.getValue().isConstrained() && entry.getValue().getName() != null ) {
 				theValue.put(
 						entry.getKey(),
@@ -289,11 +288,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<String, ExecutableDescriptorImpl> getConstrainedMethodsAsDescriptors() {
 		Map<String, ExecutableDescriptorImpl> constrainedMethodDescriptors = newHashMap();
 
-		for ( ExecutableMetaData oneExecutable : executableMetaData.values() ) {
-			if ( oneExecutable.getKind() == ElementKind.METHOD && oneExecutable.isConstrained() ) {
+		for ( ExecutableMetaData executableMetaData : executableMetaDataMap.values() ) {
+			if ( executableMetaData.getKind() == ElementKind.METHOD
+					&& executableMetaData.isConstrained()
+					&& !executableMetaData.isGetter() ) {
 				constrainedMethodDescriptors.put(
-						oneExecutable.getIdentifier(),
-						oneExecutable.asDescriptor(
+						executableMetaData.getIdentifier(),
+						executableMetaData.asDescriptor(
 								defaultGroupSequenceIsRedefined(),
 								getDefaultGroupSequence( null )
 						)
@@ -307,11 +308,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<String, ConstructorDescriptor> getConstrainedConstructorsAsDescriptors() {
 		Map<String, ConstructorDescriptor> constrainedMethodDescriptors = newHashMap();
 
-		for ( ExecutableMetaData oneExecutable : executableMetaData.values() ) {
-			if ( oneExecutable.getKind() == ElementKind.CONSTRUCTOR && oneExecutable.isConstrained() ) {
+		for ( ExecutableMetaData executableMetaData : executableMetaDataMap.values() ) {
+			if ( executableMetaData.getKind() == ElementKind.CONSTRUCTOR && executableMetaData.isConstrained() ) {
 				constrainedMethodDescriptors.put(
-						oneExecutable.getIdentifier(),
-						oneExecutable.asDescriptor(
+						executableMetaData.getIdentifier(),
+						executableMetaData.asDescriptor(
 								defaultGroupSequenceIsRedefined(),
 								getDefaultGroupSequence( null )
 						)
@@ -354,9 +355,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		classAndInterfaces.add( beanClass );
 
 		for ( Class<?> clazz : classAndInterfaces ) {
-			for ( MetaConstraint<?> oneConstraint : allMetaConstraints ) {
-				if ( oneConstraint.getLocation().getBeanClass().equals( clazz ) ) {
-					constraints.add( oneConstraint );
+			for ( MetaConstraint<?> metaConstraint : allMetaConstraints ) {
+				if ( metaConstraint.getLocation().getBeanClass().equals( clazz ) ) {
+					constraints.add( metaConstraint );
 				}
 			}
 		}
@@ -370,8 +371,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private Map<String, ExecutableMetaData> byIdentifier(Set<ExecutableMetaData> executables) {
 		Map<String, ExecutableMetaData> theValue = newHashMap();
 
-		for ( ExecutableMetaData oneMethod : executables ) {
-			theValue.put( oneMethod.getIdentifier(), oneMethod );
+		for ( ExecutableMetaData executableMetaData : executables ) {
+			theValue.put( executableMetaData.getIdentifier(), executableMetaData );
 		}
 
 		return theValue;
@@ -483,8 +484,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				}
 			}
 
-			for ( ConstrainedElement oneConstrainedElement : configuration.getConstrainedElements() ) {
-				addMetaDataToBuilder( oneConstrainedElement, builders );
+			for ( ConstrainedElement constrainedElement : configuration.getConstrainedElements() ) {
+				addMetaDataToBuilder( constrainedElement, builders );
 			}
 		}
 

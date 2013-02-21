@@ -31,7 +31,6 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
@@ -83,6 +82,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	private final ConstraintDeclarationException constraintDeclarationException;
 
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
+	private final boolean isGetter;
 
 	/**
 	 * An identifier for storing this object in maps etc.
@@ -100,10 +100,10 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			ConstraintDeclarationException constraintDeclarationException,
+			Map<Class<?>, Class<?>> returnValueGroupConversions,
 			boolean isCascading,
 			boolean isConstrained,
-			Map<Class<?>, Class<?>> returnValueGroupConversions) {
-
+			boolean isGetter) {
 		super(
 				name,
 				returnType,
@@ -124,6 +124,172 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				isCascading,
 				returnValueGroupConversions
 		);
+		this.isGetter = isGetter;
+	}
+
+	/**
+	 * <p>
+	 * Checks the configuration of this method for correctness as per the rules
+	 * outlined in the Bean Validation specification, section 4.5.5
+	 * ("Method constraints in inheritance hierarchies").
+	 * </p>
+	 * <p>
+	 * In particular, overriding methods in sub-types may not add parameter
+	 * constraints and the return value of an overriding method may not be
+	 * marked as cascaded if the return value is marked as cascaded already on
+	 * the overridden method.
+	 * </p>
+	 *
+	 * @throws ConstraintDeclarationException In case any of the rules mandated by the specification is
+	 * violated.
+	 */
+	public void assertCorrectnessOfConfiguration()
+			throws ConstraintDeclarationException {
+
+		if ( constraintDeclarationException != null ) {
+			throw constraintDeclarationException;
+		}
+	}
+
+	/**
+	 * Returns meta data for the specified parameter of the represented executable.
+	 *
+	 * @param parameterIndex the index of the parameter
+	 *
+	 * @return Meta data for the specified parameter. Will never be {@code null}.
+	 */
+	public ParameterMetaData getParameterMetaData(int parameterIndex) {
+		if ( parameterIndex < 0 || parameterIndex > parameterMetaDataList.size() - 1 ) {
+			throw log.getInvalidMethodParameterIndexException( getName(), parameterIndex );
+		}
+
+		return parameterMetaDataList.get( parameterIndex );
+	}
+
+	public Class<?>[] getParameterTypes() {
+		return parameterTypes;
+	}
+
+	/**
+	 * Returns an identifier for this meta data object, based on the represented
+	 * executable's name and its parameter types.
+	 *
+	 * @return An identifier for this meta data object.
+	 */
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	public boolean isGetter() {
+		return isGetter;
+	}
+
+	/**
+	 * Returns the cross-parameter constraints declared for the represented
+	 * method or constructor.
+	 *
+	 * @return the cross-parameter constraints declared for the represented
+	 *         method or constructor. May be empty but will never be
+	 *         {@code null}.
+	 */
+	public Set<MetaConstraint<?>> getCrossParameterConstraints() {
+		return crossParameterConstraints;
+	}
+
+	public ValidatableParametersMetaData getValidatableParametersMetaData() {
+		Set<ParameterMetaData> cascadedParameters = newHashSet();
+
+		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
+			if ( parameterMetaData.isCascading() ) {
+				cascadedParameters.add( parameterMetaData );
+			}
+		}
+
+		return new ValidatableParametersMetaData( cascadedParameters );
+	}
+
+	public ReturnValueMetaData getReturnValueMetaData() {
+		return returnValueMetaData;
+	}
+
+	@Override
+	public ExecutableDescriptorImpl asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		return new ExecutableDescriptorImpl(
+				getType(),
+				getName(),
+				asDescriptors( getCrossParameterConstraints() ),
+				returnValueMetaData.asDescriptor(
+						defaultGroupSequenceRedefined,
+						defaultGroupSequence
+				),
+				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
+				defaultGroupSequenceRedefined,
+				defaultGroupSequence,
+				constraintDeclarationException
+		);
+	}
+
+	public ElementDescriptor getDescriptor() {
+		return asDescriptor( false, Collections.<Class<?>>emptyList() );
+	}
+
+	private List<ParameterDescriptor> parametersAsDescriptors(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
+		List<ParameterDescriptor> parameterDescriptorList = newArrayList();
+
+		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
+			parameterDescriptorList.add(
+					parameterMetaData.asDescriptor(
+							defaultGroupSequenceRedefined,
+							defaultGroupSequence
+					)
+			);
+		}
+
+		return parameterDescriptorList;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder parameterBuilder = new StringBuilder();
+
+		for ( Class<?> oneParameterType : getParameterTypes() ) {
+			parameterBuilder.append( oneParameterType.getSimpleName() );
+			parameterBuilder.append( ", " );
+		}
+
+		String parameters =
+				parameterBuilder.length() > 0 ?
+						parameterBuilder.substring( 0, parameterBuilder.length() - 2 ) :
+						parameterBuilder.toString();
+
+		return "ExecutableMetaData [executable=" + getType() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
+				+ isConstrained() + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Arrays.hashCode( parameterTypes );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( !super.equals( obj ) ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ExecutableMetaData other = (ExecutableMetaData) obj;
+		if ( !Arrays.equals( parameterTypes, other.parameterTypes ) ) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -137,7 +303,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		/**
 		 * Either CONSTRUCTOR or METHOD.
 		 */
-		private final ConstrainedElementKind kind;
+		private final ConstrainedElement.ConstrainedElementKind kind;
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		private final ExecutableConstraintLocation location;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
@@ -170,10 +336,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			//are the locations equal (created by different builders) or
 			//does one of the executables override the other one?
 			return
-					location.getExecutableElement().equals(executableElement) ||
-					location.getExecutableElement().overrides( executableElement ) ||
-					executableElement.overrides( location.getExecutableElement()
-			);
+					location.getExecutableElement().equals( executableElement ) ||
+							location.getExecutableElement().overrides( executableElement ) ||
+							executableElement.overrides(
+									location.getExecutableElement()
+							);
 		}
 
 		@Override
@@ -199,14 +366,15 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					executableElement.getSimpleName(),
 					executableElement.getReturnType(),
 					executableElement.getParameterTypes(),
-					kind == ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
+					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
 					constraintDeclarationException,
+					getGroupConversions(),
 					isCascading(),
 					isConstrained,
-					getGroupConversions()
+					executableElement.isGetterMethod()
 			);
 		}
 
@@ -345,166 +513,5 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 			return theValue;
 		}
-	}
-
-	/**
-	 * <p>
-	 * Checks the configuration of this method for correctness as per the rules
-	 * outlined in the Bean Validation specification, section 4.5.5
-	 * ("Method constraints in inheritance hierarchies").
-	 * </p>
-	 * <p>
-	 * In particular, overriding methods in sub-types may not add parameter
-	 * constraints and the return value of an overriding method may not be
-	 * marked as cascaded if the return value is marked as cascaded already on
-	 * the overridden method.
-	 * </p>
-	 *
-	 * @throws ConstraintDeclarationException In case any of the rules mandated by the specification is
-	 * violated.
-	 */
-	public void assertCorrectnessOfConfiguration()
-			throws ConstraintDeclarationException {
-
-		if ( constraintDeclarationException != null ) {
-			throw constraintDeclarationException;
-		}
-	}
-
-	/**
-	 * Returns meta data for the specified parameter of the represented executable.
-	 *
-	 * @param parameterIndex the index of the parameter
-	 *
-	 * @return Meta data for the specified parameter. Will never be {@code null}.
-	 */
-	public ParameterMetaData getParameterMetaData(int parameterIndex) {
-		if ( parameterIndex < 0 || parameterIndex > parameterMetaDataList.size() - 1 ) {
-			throw log.getInvalidMethodParameterIndexException( getName(), parameterIndex );
-		}
-
-		return parameterMetaDataList.get( parameterIndex );
-	}
-
-	public Class<?>[] getParameterTypes() {
-		return parameterTypes;
-	}
-
-	/**
-	 * Returns an identifier for this meta data object, based on the represented
-	 * executable's name and its parameter types.
-	 *
-	 * @return An identifier for this meta data object.
-	 */
-	public String getIdentifier() {
-		return identifier;
-	}
-
-	/**
-	 * Returns the cross-parameter constraints declared for the represented
-	 * method or constructor.
-	 *
-	 * @return the cross-parameter constraints declared for the represented
-	 *         method or constructor. May be empty but will never be
-	 *         {@code null}.
-	 */
-	public Set<MetaConstraint<?>> getCrossParameterConstraints() {
-		return crossParameterConstraints;
-	}
-
-	public ValidatableParametersMetaData getValidatableParametersMetaData() {
-		Set<ParameterMetaData> cascadedParameters = newHashSet();
-
-		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
-			if ( parameterMetaData.isCascading() ) {
-				cascadedParameters.add( parameterMetaData );
-			}
-		}
-
-		return new ValidatableParametersMetaData( cascadedParameters );
-	}
-
-	public ReturnValueMetaData getReturnValueMetaData() {
-		return returnValueMetaData;
-	}
-
-	@Override
-	public ExecutableDescriptorImpl asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		return new ExecutableDescriptorImpl(
-				getType(),
-				getName(),
-				asDescriptors( getCrossParameterConstraints() ),
-				returnValueMetaData.asDescriptor(
-						defaultGroupSequenceRedefined,
-						defaultGroupSequence
-				),
-				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
-				defaultGroupSequenceRedefined,
-				defaultGroupSequence,
-				constraintDeclarationException
-		);
-	}
-
-	public ElementDescriptor getDescriptor() {
-		return asDescriptor( false, Collections.<Class<?>>emptyList() );
-	}
-
-	private List<ParameterDescriptor> parametersAsDescriptors(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
-		List<ParameterDescriptor> parameterDescriptorList = newArrayList();
-
-		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
-			parameterDescriptorList.add(
-					parameterMetaData.asDescriptor(
-							defaultGroupSequenceRedefined,
-							defaultGroupSequence
-					)
-			);
-		}
-
-		return parameterDescriptorList;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder parameterBuilder = new StringBuilder();
-
-		for ( Class<?> oneParameterType : getParameterTypes() ) {
-			parameterBuilder.append( oneParameterType.getSimpleName() );
-			parameterBuilder.append( ", " );
-		}
-
-		String parameters =
-				parameterBuilder.length() > 0 ?
-						parameterBuilder.substring( 0, parameterBuilder.length() - 2 ) :
-						parameterBuilder.toString();
-
-		return "ExecutableMetaData [executable=" + getType() + " " + getName() + "(" + parameters + "), isCascading=" + isCascading() + ", isConstrained="
-				+ isConstrained() + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + Arrays.hashCode( parameterTypes );
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( !super.equals( obj ) ) {
-			return false;
-		}
-		if ( getClass() != obj.getClass() ) {
-			return false;
-		}
-		ExecutableMetaData other = (ExecutableMetaData) obj;
-		if ( !Arrays.equals( parameterTypes, other.parameterTypes ) ) {
-			return false;
-		}
-		return true;
 	}
 }
