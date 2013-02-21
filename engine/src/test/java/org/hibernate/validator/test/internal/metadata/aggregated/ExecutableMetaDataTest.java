@@ -59,7 +59,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getNameOfMethod() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -72,7 +71,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getNameOfConstructor() throws Exception {
-
 		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( String.class );
 		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forConstructor(
@@ -85,7 +83,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getTypeForMethod() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -98,7 +95,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getTypeForVoidMethod() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "zap" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -111,7 +107,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getTypeForConstructor() throws Exception {
-
 		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( String.class );
 		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forConstructor(
@@ -124,7 +119,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getParameterTypes() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -137,7 +131,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getParameterTypesForParameterlessExcutable() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -150,7 +143,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getKindForMethod() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -176,7 +168,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getIdentifierForMethod() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -191,7 +182,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getIdentifierForParameterlessMethod() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -204,7 +194,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void getIdentifierForConstructor() throws Exception {
-
 		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( String.class );
 		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forConstructor(
@@ -217,7 +206,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void methodWithConstrainedParameter() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -251,7 +239,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void methodWithCascadedParameter() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "saveCustomer", Customer.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -273,7 +260,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void methodWithCrossParameterConstraint() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod(
 				"methodWithCrossParameterConstraint",
 				DateMidnight.class,
@@ -302,7 +288,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void methodWithConstrainedReturnValue() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "bar" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -322,7 +307,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void returnValueConstraintFromSuperType() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "bar" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -341,7 +325,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void returnValueConstraintsAddUpInHierarchy() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "baz" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -356,7 +339,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void methodWithCascadedReturnValue() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "foo" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -372,7 +354,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void locallyDefinedGroupConversion() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "methodWithReturnValueGroupConversion" );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(
@@ -391,7 +372,6 @@ public class ExecutableMetaDataTest {
 
 	@Test
 	public void unconstrainedMethod() throws Exception {
-
 		Method method = CustomerRepositoryExt.class.getMethod( "updateCustomer", Customer.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
 				ExecutableElement.forMethod(

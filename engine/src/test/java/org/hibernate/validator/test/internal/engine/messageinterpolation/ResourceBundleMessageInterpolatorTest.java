@@ -62,6 +62,7 @@ public class ResourceBundleMessageInterpolatorTest {
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		notNull = AnnotationFactory.create( descriptor );
 		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
+				null,
 				notNull,
 				new ConstraintHelper(),
 				java.lang.annotation.ElementType.FIELD,
@@ -71,7 +72,11 @@ public class ResourceBundleMessageInterpolatorTest {
 		AnnotationDescriptor<Size> sizeAnnotationDescriptor = new AnnotationDescriptor<Size>( Size.class );
 		size = AnnotationFactory.create( sizeAnnotationDescriptor );
 		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
-				size, new ConstraintHelper(), java.lang.annotation.ElementType.FIELD, ConstraintOrigin.DEFINED_LOCALLY
+				null,
+				size,
+				new ConstraintHelper(),
+				java.lang.annotation.ElementType.FIELD,
+				ConstraintOrigin.DEFINED_LOCALLY
 		);
 	}
 
@@ -216,7 +221,11 @@ public class ResourceBundleMessageInterpolatorTest {
 		Max max = AnnotationFactory.create( descriptor );
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
-				max, new ConstraintHelper(), java.lang.annotation.ElementType.FIELD, ConstraintOrigin.DEFINED_LOCALLY
+				null,
+				max,
+				new ConstraintHelper(),
+				java.lang.annotation.ElementType.FIELD,
+				ConstraintOrigin.DEFINED_LOCALLY
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator(
@@ -242,7 +251,11 @@ public class ResourceBundleMessageInterpolatorTest {
 
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
-				max, new ConstraintHelper(), java.lang.annotation.ElementType.FIELD, ConstraintOrigin.DEFINED_LOCALLY
+				null,
+				max,
+				new ConstraintHelper(),
+				java.lang.annotation.ElementType.FIELD,
+				ConstraintOrigin.DEFINED_LOCALLY
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator(

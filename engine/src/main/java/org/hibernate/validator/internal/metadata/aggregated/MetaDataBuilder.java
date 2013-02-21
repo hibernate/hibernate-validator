@@ -91,6 +91,7 @@ public abstract class MetaDataBuilder {
 	 */
 	public abstract ConstraintMetaData build();
 
+	@SuppressWarnings("unchecked")
 	private void addGroupConversions(Map<Class<?>, Class<?>> groupConversions) {
 		for ( Entry<Class<?>, Class<?>> oneConversion : groupConversions.entrySet() ) {
 			if ( this.groupConversions.containsKey( oneConversion.getKey() ) ) {
@@ -129,7 +130,6 @@ public abstract class MetaDataBuilder {
 	 * constraint is defined on an interface, the interface type will
 	 * additionally be part of the constraint's groups (implicit grouping).
 	 *
-	 * @param beanClass The bean type to which the constraint shall be adapted.
 	 * @param constraints The constraints that shall be adapted. The constraints themselves
 	 * will not be altered.
 	 *
@@ -145,7 +145,6 @@ public abstract class MetaDataBuilder {
 	}
 
 	private <A extends Annotation> MetaConstraint<A> adaptOriginAndImplicitGroup(MetaConstraint<A> constraint) {
-
 		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getBeanClass() );
 
 		if ( definedIn == ConstraintOrigin.DEFINED_LOCALLY ) {
@@ -159,7 +158,8 @@ public abstract class MetaDataBuilder {
 				constraintHelper,
 				constraintClass.isInterface() ? constraintClass : null,
 				constraint.getElementType(),
-				definedIn
+				definedIn,
+				constraint.getLocation().getMember()
 		);
 
 		return new MetaConstraint<A>(

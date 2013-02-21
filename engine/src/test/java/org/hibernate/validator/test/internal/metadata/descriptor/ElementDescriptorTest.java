@@ -46,7 +46,6 @@ import static org.testng.Assert.fail;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-@Test
 public class ElementDescriptorTest {
 
 	@Test

@@ -331,7 +331,7 @@ public class ConstraintHelper {
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
 		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
 		for ( Method m : methods ) {
-			if ( m.getName().startsWith( "valid" ) ) {
+			if ( m.getName().startsWith( "valid" ) && !m.getName().equals( "validationAppliesTo" )) {
 				throw log.getConstraintParametersCannotStartWithValidException();
 			}
 		}
@@ -379,9 +379,8 @@ public class ConstraintHelper {
 		}
 	}
 
-	public <T extends Annotation> List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorDefinition
-			(Class<T> annotationClass) {
-
+	public <T extends Annotation> List<Class<? extends ConstraintValidator<T, ?>>>
+	getConstraintValidatorDefinition(Class<T> annotationClass) {
 		Contracts.assertNotNull( annotationClass, MESSAGES.classCannotBeNull() );
 
 		final List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> list = constraintValidatorDefinitions.get(
@@ -404,7 +403,7 @@ public class ConstraintHelper {
 		constraintValidatorDefinitions.putIfAbsent( annotationClass, definitionClasses );
 	}
 
-	public boolean containsConstraintValidatorDefinition(Class<? extends Annotation> annotationClass) {
+	public boolean areConstraintValidatorDefinitionsCached(Class<? extends Annotation> annotationClass) {
 		return constraintValidatorDefinitions.containsKey( annotationClass );
 	}
 

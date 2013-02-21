@@ -45,7 +45,6 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Gunnar Morling
  */
-@Test
 public class MethodDescriptorTest {
 
 	@Test

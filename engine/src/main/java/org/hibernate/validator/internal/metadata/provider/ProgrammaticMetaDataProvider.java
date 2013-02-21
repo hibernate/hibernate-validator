@@ -245,6 +245,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A, ? extends ConstraintLocation> config) {
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
+				config.getLocation().getMember(),
 				config.createAnnotationProxy(),
 				constraintHelper,
 				config.getLocation().getElementType(),
@@ -258,7 +259,6 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		return new Partitioner<Method, ExecutableConstraintLocation>() {
 			@Override
 			public Method getPartition(ExecutableConstraintLocation location) {
-				//TODO HV-571
 				return (Method) location.getMember();
 			}
 		};
@@ -277,7 +277,6 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		return new Partitioner<Method, ConfiguredConstraint<?, ExecutableConstraintLocation>>() {
 			@Override
 			public Method getPartition(ConfiguredConstraint<?, ExecutableConstraintLocation> constraint) {
-				//TODO HV-571
 				return (Method) constraint.getLocation().getMember();
 			}
 		};

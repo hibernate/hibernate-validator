@@ -496,4 +496,32 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 138, value = "The constructor '%1$s' is defined twice in the mapping xml for bean %2$s.")
 	ValidationException getConstructorIsDefinedTwiceInMappingXmlForBeanException(String name, String beanClassName);
+
+	@Message(id = 139,
+			value = "The constraint '%1$s' defines multiple cross parameter constraints. Only one is allowed.")
+	ConstraintDefinitionException getMultipleCrossParameterValidatorClassesException(String constraint);
+
+	@Message(id = 140,
+			value = "The constraint %1$s has both generic and cross-parameter validators, but does not specify the parameter 'validationAppliesTo'")
+	ConstraintDefinitionException getGenericAndCrossParameterValidatorWithoutConstraintTargetException(String constraint);
+
+	@Message(id = 141,
+			value = "The constraint %1$s used ConstraintTarget#IMPLICIT where the target cannot be inferred.")
+	ConstraintDeclarationException getImplicitConstraintTargetInAmbiguousConfigurationException(String constraint);
+
+	@Message(id = 142,
+			value = "Cross parameter constraint %1$s is illegally placed on a parameterless method or constructor '%2$s'.")
+	ConstraintDeclarationException getCrossParameterConstraintOnMethodWithoutParametersException(String constraint, String member);
+
+	@Message(id = 143,
+			value = "Cross parameter constraint %1$s is illegally placed on class level.")
+	ConstraintDeclarationException getCrossParameterConstraintOnClassException(String constraint);
+
+	@Message(id = 144,
+			value = "Cross parameter constraint %1$s is illegally placed on field '%2$s'.")
+	ConstraintDeclarationException getCrossParameterConstraintOnFieldException(String constraint, String field);
+
+	@Message(id = 145,
+			value = "Unable to determine whether the constraint %1$s is a generic or cross parameter constraint.")
+	ConstraintDefinitionException getUnableToDetermineConstraintType(String constraint);
 }

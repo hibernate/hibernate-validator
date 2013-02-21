@@ -21,6 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
+import javax.validation.ConstraintTarget;
 import javax.validation.Payload;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -36,7 +37,6 @@ import static java.lang.annotation.ElementType.METHOD;
  */
 @Target({ METHOD, CONSTRUCTOR, ANNOTATION_TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-// TODO - https://hibernate.onjira.com/browse/HV-720 verify test
 @Constraint(validatedBy = ConsistentDateParametersValidator.class)
 @Documented
 public @interface ConsistentDateParameters {
@@ -45,4 +45,8 @@ public @interface ConsistentDateParameters {
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
+
+	ConstraintTarget validationAppliesTo() default ConstraintTarget.PARAMETERS;
+
+
 }

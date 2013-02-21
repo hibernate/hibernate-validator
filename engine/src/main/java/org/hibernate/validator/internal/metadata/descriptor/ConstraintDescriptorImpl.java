@@ -22,7 +22,10 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,11 +36,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.Constraint;
+import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
 import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.ValidationException;
+import javax.validation.constraintvalidation.SupportedValidationTarget;
+import javax.validation.constraintvalidation.ValidationTarget;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 
@@ -52,6 +58,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.constraints.CompositionType.AND;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
  * Describes a single constraint (including it's composing constraints).
@@ -63,29 +70,13 @@ import static org.hibernate.validator.constraints.CompositionType.AND;
  */
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
 
-	/**
-	 * The type of a constraint.
-	 *
-	 * @author Gunnar Morling
-	 */
-	public enum ConstraintType {
-
-		/**
-		 * A non cross parameter constraint.
-		 */
-		GENERIC,
-
-		/**
-		 * A cross parameter constraint.
-		 */
-		CROSS_PARAMETER;
-	}
-
 	private static final long serialVersionUID = -2563102960314069246L;
 	private static final Log log = LoggerFactory.make();
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 	private static final String GROUPS = "groups";
 	private static final String PAYLOAD = "payload";
+	private static final String MESSAGE = "message";
+	private static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
 
 	/**
 	 * A list of annotations which can be ignored when investigating for composing constraints.
@@ -115,6 +106,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * {@code ConstraintValidator} resolution algorithm.
 	 */
 	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDefinitionClasses;
+
+	/**
+	 * The single cross parameter constraint validator if there is one. {@code null} otherwise.
+	 */
+	private final Class<? extends ConstraintValidator<T, ?>> crossParameterConstraintValidatorClass;
 
 	/**
 	 * The groups for which to apply this constraint.
@@ -149,14 +145,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private final ElementType elementType;
 
 	/**
-	 * The origin of the constraint. Defined on the actual root class or somehwere in the class hierarchy
+	 * The origin of the constraint. Defined on the actual root class or somewhere in the class hierarchy
 	 */
 	private final ConstraintOrigin definedOn;
-
-	/**
-	 * Type indicating how composing constraints should be combined. By default this is set to {@code ConstraintComposition.CompositionType.AND}.
-	 */
-	private CompositionType compositionType = AND;
 
 	/**
 	 * The type of this constraint.
@@ -164,127 +155,56 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private final ConstraintType constraintType;
 
 	/**
-	 * Handle to the built-in constraint implementations.
+	 * Type indicating how composing constraints should be combined. By default this is set to
+	 * {@code ConstraintComposition.CompositionType.AND}.
 	 */
-	//TODO Can be made transient since it is only used during object construction. It would be better if we would not have to pass it at all
-	private final transient ConstraintHelper constraintHelper;
+	private CompositionType compositionType = AND;
 
-	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, Class<?> implicitGroup, ElementType type, ConstraintOrigin definedOn) {
+	@SuppressWarnings("unchecked")
+	public ConstraintDescriptorImpl(T annotation,
+									ConstraintHelper constraintHelper,
+									Class<?> implicitGroup,
+									ElementType type,
+									ConstraintOrigin definedOn,
+									Member member) {
 		this.annotation = annotation;
 		this.annotationType = (Class<T>) this.annotation.annotationType();
-		this.constraintHelper = constraintHelper;
 		this.elementType = type;
 		this.definedOn = definedOn;
 		this.isReportAsSingleInvalidConstraint = annotationType.isAnnotationPresent(
 				ReportAsSingleViolation.class
 		);
 
-		// HV-181 - To avoid and thread visibility issues we are building the different data structures in tmp variables and
+		// HV-181 - To avoid any thread visibility issues we are building the different data structures in tmp variables and
 		// then assign them to the final variables
 		this.attributes = buildAnnotationParameterMap( annotation );
 		this.groups = buildGroupSet( implicitGroup );
 		this.payloads = buildPayloadSet( annotation );
-		this.constraintType = determineConstraintType( annotationType );
-		this.constraintValidatorDefinitionClasses = findConstraintValidatorClasses();
-		this.composingConstraints = parseComposingConstraints();
-	}
-
-	public ConstraintDescriptorImpl(T annotation, ConstraintHelper constraintHelper, ElementType type, ConstraintOrigin definedOn) {
-		this( annotation, constraintHelper, null, type, definedOn );
-	}
-
-	private Set<Class<? extends Payload>> buildPayloadSet(T annotation) {
-		Set<Class<? extends Payload>> payloadSet = new HashSet<Class<? extends Payload>>();
-		Class<Payload>[] payloadFromAnnotation;
-		try {
-			//TODO be extra safe and make sure this is an array of Payload
-			payloadFromAnnotation = ReflectionHelper.getAnnotationParameter( annotation, PAYLOAD, Class[].class );
-		}
-		catch ( ValidationException e ) {
-			//ignore people not defining payloads
-			payloadFromAnnotation = null;
-		}
-		if ( payloadFromAnnotation != null ) {
-			payloadSet.addAll( Arrays.asList( payloadFromAnnotation ) );
-		}
-		return Collections.unmodifiableSet( payloadSet );
-	}
-
-	private Set<Class<?>> buildGroupSet(Class<?> implicitGroup) {
-		Set<Class<?>> groupSet = new HashSet<Class<?>>();
-		final Class<?>[] groupsFromAnnotation = ReflectionHelper.getAnnotationParameter(
-				annotation, GROUPS, Class[].class
-		);
-		if ( groupsFromAnnotation.length == 0 ) {
-			groupSet.add( Default.class );
-		}
-		else {
-			groupSet.addAll( Arrays.asList( groupsFromAnnotation ) );
-		}
-
-		// if the constraint is part of the Default group it is automatically part of the implicit group as well
-		if ( implicitGroup != null && groupSet.contains( Default.class ) ) {
-			groupSet.add( implicitGroup );
-		}
-		return Collections.unmodifiableSet( groupSet );
-	}
-
-	private List<Class<? extends ConstraintValidator<T, ?>>> findConstraintValidatorClasses() {
-		final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses = new ArrayList<Class<? extends ConstraintValidator<T, ?>>>();
-		if ( constraintHelper.containsConstraintValidatorDefinition( annotationType ) ) {
-			for ( Class<? extends ConstraintValidator<T, ?>> validator : constraintHelper
-					.getConstraintValidatorDefinition( annotationType ) ) {
-				constraintValidatorClasses.add( validator );
-			}
-			return Collections.unmodifiableList( constraintValidatorClasses );
-		}
-
-		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintDefinitionClasses = new ArrayList<Class<? extends ConstraintValidator<? extends Annotation, ?>>>();
-		if ( constraintHelper.isBuiltinConstraint( annotationType ) ) {
-			constraintDefinitionClasses.addAll( constraintHelper.getBuiltInConstraints( annotationType ) );
-		}
-		else if ( constraintType == ConstraintType.GENERIC ) {
-			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
-					.getAnnotation( Constraint.class )
-					.validatedBy();
-			constraintDefinitionClasses.addAll( Arrays.asList( validatedBy ) );
-		}
-		else if ( constraintType == ConstraintType.CROSS_PARAMETER ) {
-			// TODO - implement https://hibernate.onjira.com/browse/HV-720
-//			Class<? extends ConstraintValidator<?, ?>> validatedBy = annotationType
-//					.getAnnotation( CrossParameterConstraint.class )
-//					.validatedBy();
-//			constraintDefinitionClasses.add( validatedBy );
-		}
-
-		constraintHelper.addConstraintValidatorDefinition(
-				annotationType, constraintDefinitionClasses
+		this.constraintValidatorDefinitionClasses = findConstraintValidatorClasses( constraintHelper );
+		this.crossParameterConstraintValidatorClass = findCrossParameterValidatorClass(
+				constraintValidatorDefinitionClasses
 		);
 
-		for ( Class<? extends ConstraintValidator<? extends Annotation, ?>> validator : constraintDefinitionClasses ) {
-			@SuppressWarnings("unchecked")
-			Class<? extends ConstraintValidator<T, ?>> safeValidator = (Class<? extends ConstraintValidator<T, ?>>) validator;
-			constraintValidatorClasses.add( safeValidator );
-		}
-		return Collections.unmodifiableList( constraintValidatorClasses );
+		this.constraintType = determineConstraintType( member );
+		this.composingConstraints = parseComposingConstraints( member, constraintHelper );
 	}
 
-	private ConstraintType determineConstraintType(Class<T> annotationType) {
-		if ( annotationType.isAnnotationPresent( Constraint.class ) ) {
-			return ConstraintType.GENERIC;
-		}
-		// TODO - implement https://hibernate.onjira.com/browse/HV-720
-//		else if ( annotationType.isAnnotationPresent( CrossParameterConstraint.class ) ) {
-//			return ConstraintType.CROSS_PARAMETER;
-//		}
-		else {
-			throw log.getAnnotationIsNoConstraintTypeException( annotationType );
-		}
+	public ConstraintDescriptorImpl(Member member,
+									T annotation,
+									ConstraintHelper constraintHelper,
+									ElementType type,
+									ConstraintOrigin definedOn) {
+		this( annotation, constraintHelper, null, type, definedOn, member );
 	}
 
 	@Override
 	public T getAnnotation() {
 		return annotation;
+	}
+
+	@Override
+	public String getMessageTemplate() {
+		return (String) getAttributes().get( MESSAGE );
 	}
 
 	@Override
@@ -295,6 +215,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	@Override
 	public Set<Class<? extends Payload>> getPayload() {
 		return payloads;
+	}
+
+	@Override
+	public ConstraintTarget getValidationAppliesTo() {
+		return (ConstraintTarget) attributes.get( VALIDATION_APPLIES_TO );
 	}
 
 	@Override
@@ -367,6 +292,208 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		sb.append( ", constraintType=" ).append( constraintType );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	private ConstraintType determineConstraintType(Member member) {
+		if ( crossParameterConstraintValidatorClass == null ) {
+			return ConstraintType.GENERIC;
+		}
+
+		// check parameter count and return value
+		int parameterCount = getParameterCount( member );
+		boolean hasReturnValue = hasReturnValue( member );
+
+		if ( parameterCount == 0 && crossParameterValidatorOnly() ) {
+			if ( member == null ) {
+				throw log.getCrossParameterConstraintOnClassException( annotationType.getName() );
+			}
+			else if ( member instanceof Field ) {
+				throw log.getCrossParameterConstraintOnFieldException(
+						annotationType.getName(),
+						member.toString()
+				);
+			}
+			else {
+				throw log.getCrossParameterConstraintOnMethodWithoutParametersException(
+						annotationType.getName(),
+						member.toString()
+				);
+			}
+		}
+
+		if ( member == null || member instanceof Field ) {
+			return ConstraintType.GENERIC;
+		}
+
+		if ( parameterCount > 0 && !hasReturnValue ) {
+			return ConstraintType.CROSS_PARAMETER;
+		}
+
+		// we have parameters and return value but only a single cross parameter validator
+		if ( parameterCount > 0 && hasReturnValue && crossParameterValidatorOnly() ) {
+			return ConstraintType.CROSS_PARAMETER;
+		}
+
+		// Now we are out of luck. We have cross parameter and generic validators.
+		if ( !attributes.containsKey( VALIDATION_APPLIES_TO ) ) {
+			throw log.getGenericAndCrossParameterValidatorWithoutConstraintTargetException( annotationType.getName() );
+		}
+
+		ConstraintTarget constraintTarget = (ConstraintTarget) attributes.get( VALIDATION_APPLIES_TO );
+		switch ( constraintTarget ) {
+			case IMPLICIT: {
+				throw log.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType.getName() );
+			}
+			case RETURN_VALUE: {
+				return ConstraintType.GENERIC;
+			}
+			case PARAMETERS: {
+				return ConstraintType.CROSS_PARAMETER;
+			}
+		}
+
+		throw log.getUnableToDetermineConstraintType( annotationType.getName() );
+	}
+
+	private boolean crossParameterValidatorOnly() {
+		return crossParameterConstraintValidatorClass != null && constraintValidatorDefinitionClasses.size() == 1 && !supportsValidationTarget(
+				crossParameterConstraintValidatorClass,
+				ValidationTarget.ANNOTATED_ELEMENT
+		);
+	}
+
+	private int getParameterCount(Member member) {
+		int parameterCount;
+		if ( member instanceof Constructor ) {
+			Constructor constructor = (Constructor) member;
+			parameterCount = constructor.getParameterTypes().length;
+		}
+		else if ( member instanceof Method ) {
+			Method method = (Method) member;
+			parameterCount = method.getParameterTypes().length;
+		}
+		else {
+			// field or type
+			parameterCount = 0;
+		}
+		return parameterCount;
+	}
+
+	private boolean hasReturnValue(Member member) {
+		boolean hasReturnValue;
+		if ( member instanceof Constructor ) {
+			hasReturnValue = true;
+		}
+		else if ( member instanceof Method ) {
+			Method method = (Method) member;
+			hasReturnValue = method.getGenericReturnType() != void.class;
+		}
+		else {
+			// field or type
+			hasReturnValue = false;
+		}
+		return hasReturnValue;
+	}
+
+	@SuppressWarnings("unchecked")
+	private Set<Class<? extends Payload>> buildPayloadSet(T annotation) {
+		Set<Class<? extends Payload>> payloadSet = new HashSet<Class<? extends Payload>>();
+		Class<Payload>[] payloadFromAnnotation;
+		try {
+			//TODO be extra safe and make sure this is an array of Payload
+			payloadFromAnnotation = ReflectionHelper.getAnnotationParameter( annotation, PAYLOAD, Class[].class );
+		}
+		catch ( ValidationException e ) {
+			//ignore people not defining payloads
+			payloadFromAnnotation = null;
+		}
+		if ( payloadFromAnnotation != null ) {
+			payloadSet.addAll( Arrays.asList( payloadFromAnnotation ) );
+		}
+		return Collections.unmodifiableSet( payloadSet );
+	}
+
+	private Set<Class<?>> buildGroupSet(Class<?> implicitGroup) {
+		Set<Class<?>> groupSet = new HashSet<Class<?>>();
+		final Class<?>[] groupsFromAnnotation = ReflectionHelper.getAnnotationParameter(
+				annotation, GROUPS, Class[].class
+		);
+		if ( groupsFromAnnotation.length == 0 ) {
+			groupSet.add( Default.class );
+		}
+		else {
+			groupSet.addAll( Arrays.asList( groupsFromAnnotation ) );
+		}
+
+		// if the constraint is part of the Default group it is automatically part of the implicit group as well
+		if ( implicitGroup != null && groupSet.contains( Default.class ) ) {
+			groupSet.add( implicitGroup );
+		}
+		return Collections.unmodifiableSet( groupSet );
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<Class<? extends ConstraintValidator<T, ?>>> findConstraintValidatorClasses(ConstraintHelper constraintHelper) {
+		final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses = newArrayList();
+		if ( constraintHelper.areConstraintValidatorDefinitionsCached( annotationType ) ) {
+			constraintValidatorClasses.addAll( constraintHelper.getConstraintValidatorDefinition( annotationType ) );
+			return Collections.unmodifiableList( constraintValidatorClasses );
+		}
+
+		// nothing cached, we need to process Constraint#validatedBy
+		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintDefinitionClasses = newArrayList();
+		if ( constraintHelper.isBuiltinConstraint( annotationType ) ) {
+			constraintDefinitionClasses.addAll( constraintHelper.getBuiltInConstraints( annotationType ) );
+		}
+		else {
+			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
+					.getAnnotation( Constraint.class )
+					.validatedBy();
+			constraintDefinitionClasses.addAll( Arrays.asList( validatedBy ) );
+		}
+
+		constraintHelper.addConstraintValidatorDefinition(
+				annotationType, constraintDefinitionClasses
+		);
+
+		for ( Class<? extends ConstraintValidator<? extends Annotation, ?>> validator : constraintDefinitionClasses ) {
+			Class<? extends ConstraintValidator<T, ?>> safeValidator = (Class<? extends ConstraintValidator<T, ?>>) validator;
+			constraintValidatorClasses.add( safeValidator );
+		}
+		return Collections.unmodifiableList( constraintValidatorClasses );
+	}
+
+	private Class<? extends ConstraintValidator<T, ?>> findCrossParameterValidatorClass(List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDefinitionClasses) {
+		Class<? extends ConstraintValidator<T, ?>> crossParameterValidatorClass = null;
+		boolean crossParameterValidatorFound = false;
+		for ( Class<? extends ConstraintValidator<T, ?>> validatorClass : constraintValidatorDefinitionClasses ) {
+			if ( crossParameterValidatorFound ) {
+				throw log.getMultipleCrossParameterValidatorClassesException( annotationType.getName() );
+			}
+
+			crossParameterValidatorFound = supportsValidationTarget( validatorClass, ValidationTarget.PARAMETERS );
+			if ( crossParameterValidatorFound ) {
+				crossParameterValidatorClass = validatorClass;
+				crossParameterValidatorFound = true;
+			}
+		}
+		return crossParameterValidatorClass;
+	}
+
+	private boolean supportsValidationTarget(Class<?> validatorClass, ValidationTarget target) {
+		SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
+				SupportedValidationTarget.class
+		);
+		if ( supportedTargetAnnotation == null ) {
+			return false;
+		}
+		ValidationTarget[] targets = supportedTargetAnnotation.value();
+		for ( ValidationTarget configuredTarget : targets ) {
+			if ( configuredTarget.equals( target ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
@@ -453,7 +580,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 	}
 
-	private Set<ConstraintDescriptor<?>> parseComposingConstraints() {
+	private Set<ConstraintDescriptor<?>> parseComposingConstraints(Member member, ConstraintHelper constraintHelper) {
 		Set<ConstraintDescriptor<?>> composingConstraintsSet = new HashSet<ConstraintDescriptor<?>>();
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
 
@@ -476,7 +603,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotationType )
 					|| constraintHelper.isBuiltinConstraint( declaredAnnotationType ) ) {
 				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
-						declaredAnnotation, overrideParameters, OVERRIDES_PARAMETER_DEFAULT_INDEX
+						member,
+						declaredAnnotation,
+						overrideParameters,
+						OVERRIDES_PARAMETER_DEFAULT_INDEX,
+						constraintHelper
 				);
 				composingConstraintsSet.add( descriptor );
 				log.debugf( "Adding composing constraint: %s.", descriptor );
@@ -486,7 +617,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				int index = 0;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
 					ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
-							constraintAnnotation, overrideParameters, index
+							member, constraintAnnotation, overrideParameters, index, constraintHelper
 					);
 					composingConstraintsSet.add( descriptor );
 					log.debugf( "Adding composing constraint: %s.", descriptor );
@@ -497,18 +628,31 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return Collections.unmodifiableSet( composingConstraintsSet );
 	}
 
-	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(U declaredAnnotation, Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, int index) {
+	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(
+			Member member,
+			U declaredAnnotation,
+			Map<ClassIndexWrapper, Map<String, Object>> overrideParameters,
+			int index,
+			ConstraintHelper constraintHelper) {
 		@SuppressWarnings("unchecked")
 		final Class<U> annotationType = (Class<U>) declaredAnnotation.annotationType();
 		return createComposingConstraintDescriptor(
+				member,
 				overrideParameters,
 				index,
 				declaredAnnotation,
-				annotationType
+				annotationType,
+				constraintHelper
 		);
 	}
 
-	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, int index, U constraintAnnotation, Class<U> annotationType) {
+	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(
+			Member member,
+			Map<ClassIndexWrapper, Map<String, Object>> overrideParameters,
+			int index,
+			U constraintAnnotation,
+			Class<U> annotationType,
+			ConstraintHelper constraintHelper) {
 		// use a annotation proxy
 		AnnotationDescriptor<U> annotationDescriptor = new AnnotationDescriptor<U>(
 				annotationType, buildAnnotationParameterMap( constraintAnnotation )
@@ -534,7 +678,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
 		return new ConstraintDescriptorImpl<U>(
-				annotationProxy, constraintHelper, elementType, definedOn
+				member, annotationProxy, constraintHelper, elementType, definedOn
 		);
 	}
 
@@ -596,5 +740,20 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			result = 31 * result + index;
 			return result;
 		}
+	}
+
+	/**
+	 * The type of a constraint.
+	 */
+	public enum ConstraintType {
+		/**
+		 * A non cross parameter constraint.
+		 */
+		GENERIC,
+
+		/**
+		 * A cross parameter constraint.
+		 */
+		CROSS_PARAMETER
 	}
 }

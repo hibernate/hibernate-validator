@@ -584,7 +584,6 @@ public abstract class AbstractMethodValidationTest {
 		try {
 			//when
 			customerRepository.methodWithCrossParameterConstraint( startDate, endDate );
-
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch ( ConstraintViolationException e ) {

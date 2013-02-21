@@ -312,7 +312,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = partition(
 				findConstraints(
-						executable.getAccessibleObject(),
+						executable.getMember(),
 						executable.getElementType()
 				), byType()
 		);
@@ -415,7 +415,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
 				//1. collect constraints if this annotation is a constraint annotation
 				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						parameterAnnotation, ElementType.PARAMETER
+						executable.getMember(), parameterAnnotation, ElementType.PARAMETER
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					parameterConstraints.add(
@@ -463,10 +463,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given member.
 	 */
-	private List<ConstraintDescriptorImpl<?>> findConstraints(AccessibleObject member, ElementType type) {
+	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type) {
 		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
-		for ( Annotation annotation : member.getDeclaredAnnotations() ) {
-			metaData.addAll( findConstraintAnnotations( annotation, type ) );
+		for ( Annotation annotation : ( (AccessibleObject) member ).getDeclaredAnnotations() ) {
+			metaData.addAll( findConstraintAnnotations( member, annotation, type ) );
 		}
 
 		return metaData;
@@ -483,7 +483,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private List<ConstraintDescriptorImpl<?>> findClassLevelConstraints(Class<?> beanClass) {
 		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
 		for ( Annotation annotation : beanClass.getDeclaredAnnotations() ) {
-			metaData.addAll( findConstraintAnnotations( annotation, ElementType.TYPE ) );
+			metaData.addAll( findConstraintAnnotations( null, annotation, ElementType.TYPE ) );
 		}
 		return metaData;
 	}
@@ -497,7 +497,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
 	 *         single nor multi-valued annotation.
 	 */
-	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(A annotation, ElementType type) {
+	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
+																							   A annotation,
+																							   ElementType type) {
 		List<ConstraintDescriptorImpl<?>> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl<?>>();
 
 		List<Annotation> constraints = new ArrayList<Annotation>();
@@ -512,7 +514,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		for ( Annotation constraint : constraints ) {
 			final ConstraintDescriptorImpl<?> constraintDescriptor = buildConstraintDescriptor(
-					constraint, type
+					member, constraint, type
 			);
 			constraintDescriptors.add( constraintDescriptor );
 		}
@@ -556,27 +558,41 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		};
 	}
 
-	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass, ConstraintDescriptorImpl<A> descriptor) {
+	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass,
+																		  ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( declaringClass ) );
 	}
 
-	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor) {
+	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member,
+																		  ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( member ) );
 	}
 
-	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(ExecutableElement member, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(ExecutableElement member,
+																				   int parameterIndex,
+																				   ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member, parameterIndex ) );
 	}
 
-	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member, ConstraintDescriptorImpl<A> descriptor) {
+	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member,
+																					 ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member ) );
 	}
 
-	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(ExecutableElement member, ConstraintDescriptorImpl<A> descriptor) {
+	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(ExecutableElement member,
+																						ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new CrossParameterConstraintLocation( member ) );
 	}
 
-	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(A annotation, ElementType type) {
-		return new ConstraintDescriptorImpl<A>( annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY );
+	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Member member,
+																						 A annotation,
+																						 ElementType type) {
+		return new ConstraintDescriptorImpl<A>(
+				member,
+				annotation,
+				constraintHelper,
+				type,
+				ConstraintOrigin.DEFINED_LOCALLY
+		);
 	}
 }

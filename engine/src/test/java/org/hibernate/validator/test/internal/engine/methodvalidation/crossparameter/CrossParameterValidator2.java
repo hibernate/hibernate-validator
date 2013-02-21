@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.metadata.provider;
+package org.hibernate.validator.test.internal.engine.methodvalidation.crossparameter;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -22,14 +22,13 @@ import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 
 /**
- * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 @SupportedValidationTarget(value = ValidationTarget.PARAMETERS)
-public class ConsistentDateParametersValidator implements ConstraintValidator<ConsistentDateParameters, Object[]> {
+public class CrossParameterValidator2 implements ConstraintValidator<InvalidCrossParameterConstraint, Object[]> {
 
 	@Override
-	public void initialize(ConsistentDateParameters constraintAnnotation) {
-		//nothing to do
+	public void initialize(InvalidCrossParameterConstraint constraintAnnotation) {
 	}
 
 	@Override

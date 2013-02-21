@@ -56,7 +56,6 @@ import static org.testng.Assert.assertTrue;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-@Test
 public class BeanDescriptorTest {
 
 	@Test
@@ -160,7 +159,7 @@ public class BeanDescriptorTest {
 	}
 
 	@Test
-	public void testGetConstraintsForMethodSuceedsAlsoIfTypeContainsAnotherIllegalMethod() throws Exception {
+	public void testGetConstraintsForMethodSucceedsAlsoIfTypeContainsAnotherIllegalMethod() throws Exception {
 		BeanDescriptor descriptor = getBeanDescriptor( IllegalCustomerRepositoryExt.class );
 		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "foo" );
 
