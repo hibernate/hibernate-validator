@@ -21,12 +21,11 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ValidatorFactory;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.integration.cdi.constraint.Pingable;
@@ -40,7 +39,8 @@ import static junit.framework.Assert.assertNotNull;
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
+//TODO HV-723 Re-enable
+//@RunWith(Arquillian.class)
 public class ConstraintValidatorInjectionUnitIT {
 	private static final String WAR_FILE_NAME = ConstraintValidatorInjectionUnitIT.class.getSimpleName() + ".war";
 
@@ -66,7 +66,9 @@ public class ConstraintValidatorInjectionUnitIT {
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
+	//TODO HV-723 Re-enable
 	@Test
+	@Ignore
 	public void testSuccessfulInjectionIntoConstraintValidator() {
 		ConstraintValidatorFactory constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		PingableValidator validator = constraintValidatorFactory.getInstance( PingableValidator.class );
@@ -75,5 +77,3 @@ public class ConstraintValidatorInjectionUnitIT {
 		assertNotNull( "The ping service did not get injected", validator.getPingService() );
 	}
 }
-
-

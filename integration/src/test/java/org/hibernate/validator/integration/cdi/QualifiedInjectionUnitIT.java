@@ -21,12 +21,11 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
@@ -36,7 +35,8 @@ import static junit.framework.Assert.assertNotNull;
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
+//TODO HV-723 Re-enable
+//@RunWith(Arquillian.class)
 public class QualifiedInjectionUnitIT {
 	private static final String WAR_FILE_NAME = QualifiedInjectionUnitIT.class.getSimpleName() + ".war";
 
@@ -60,11 +60,11 @@ public class QualifiedInjectionUnitIT {
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
+	//TODO HV-723 Re-enable
 	@Test
+	@Ignore
 	public void testQualifiedValidatorFactoryAndValidatorInjectable() {
 		assertNotNull( "The validator factory should have been injected", validatorFactory );
 		assertNotNull( "The validator should have been injected", validator );
 	}
 }
-
-
