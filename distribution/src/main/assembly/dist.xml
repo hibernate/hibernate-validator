@@ -21,6 +21,7 @@
     <formats>
         <format>tar.gz</format>
         <format>zip</format>
+        <format>dir</format>
     </formats>
 
     <!-- Configure the artifacts to include  -->
