@@ -317,7 +317,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @param context the global validation context
 	 * @param validationOrder Contains the information which and in which order groups have to be executed
 	 * @param <T> The root bean type
-	 * @param <V> The type of the current object on the validation stack
 	 *
 	 * @return Set of constraint violations or the empty set if there were no violations.
 	 */
