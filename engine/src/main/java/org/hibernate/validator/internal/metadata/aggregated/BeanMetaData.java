@@ -103,5 +103,5 @@ public interface BeanMetaData<T> extends Validatable {
 	 * @return Returns a list of classes representing the class hierarchy for the entity. The list start with the
 	 *         element itself and goes up the hierarchy chain. Interfaces are not included.
 	 */
-	List<Class<?>> getClassHierarchy();
+	List<Class<? super T>> getClassHierarchy();
 }

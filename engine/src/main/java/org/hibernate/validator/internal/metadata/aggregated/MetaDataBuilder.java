@@ -91,7 +91,6 @@ public abstract class MetaDataBuilder {
 	 */
 	public abstract ConstraintMetaData build();
 
-	@SuppressWarnings("unchecked")
 	private void addGroupConversions(Map<Class<?>, Class<?>> groupConversions) {
 		for ( Entry<Class<?>, Class<?>> oneConversion : groupConversions.entrySet() ) {
 			if ( this.groupConversions.containsKey( oneConversion.getKey() ) ) {

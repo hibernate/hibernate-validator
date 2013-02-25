@@ -47,14 +47,12 @@ public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvid
 		this.configuredBeans = newHashMap();
 	}
 
+	@Override
 	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
 		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
-		for ( Class<?> clazz : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
-			@SuppressWarnings("unchecked")
-			BeanConfiguration<? super T> configuration = (BeanConfiguration<? super T>) getBeanConfiguration(
-					clazz
-			);
+		for ( Class<? super T> clazz : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
+			BeanConfiguration<? super T> configuration = getBeanConfiguration( clazz );
 			if ( configuration != null ) {
 				configurations.add( configuration );
 			}
@@ -67,9 +65,10 @@ public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvid
 		configuredBeans.put( beanClass.getName(), beanConfiguration );
 	}
 
-	protected BeanConfiguration<?> getBeanConfiguration(Class<?> beanClass) {
+	@SuppressWarnings("unchecked")
+	protected <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
 		Contracts.assertNotNull( beanClass );
-		return configuredBeans.get( beanClass.getName() );
+		return (BeanConfiguration<T>) configuredBeans.get( beanClass.getName() );
 	}
 
 	protected <T> BeanConfiguration<T> createBeanConfiguration(ConfigurationSource source,

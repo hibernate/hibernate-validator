@@ -123,7 +123,7 @@ public class ConstrainedExecutableBuilder {
 																				   ConstraintHelper constraintHelper,
 																				   AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
-		List<Constructor> alreadyProcessedConstructors = newArrayList();
+		List<Constructor<?>> alreadyProcessedConstructors = newArrayList();
 		for ( ConstructorType constructorType : constructors ) {
 			// parse the parameters
 			List<Class<?>> constructorParameterTypes = createParameterTypes(
@@ -132,7 +132,7 @@ public class ConstrainedExecutableBuilder {
 					defaultPackage
 			);
 
-			final Constructor constructor = ReflectionHelper.getConstructor(
+			final Constructor<?> constructor = ReflectionHelper.getConstructor(
 					beanClass,
 					constructorParameterTypes.toArray( new Class[constructorParameterTypes.size()] )
 			);

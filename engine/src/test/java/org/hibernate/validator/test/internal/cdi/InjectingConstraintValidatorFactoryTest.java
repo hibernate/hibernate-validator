@@ -63,12 +63,8 @@ public class InjectingConstraintValidatorFactoryTest {
 	public void testCreateInstance() {
 		// setup the mocks
 
-		expect( (AnnotatedType) beanManagerMock.createAnnotatedType( MyValidator.class ) ).andReturn(
-				annotatedTypeMock
-		);
-		expect( (InjectionTarget) beanManagerMock.createInjectionTarget( annotatedTypeMock ) ).andReturn(
-				injectionTargetMock
-		);
+		expect( beanManagerMock.createAnnotatedType( MyValidator.class ) ).andReturn( annotatedTypeMock );
+		expect( beanManagerMock.createInjectionTarget( annotatedTypeMock ) ).andReturn( injectionTargetMock );
 		expect( (CreationalContext) beanManagerMock.createCreationalContext( null ) ).andReturn(
 				creationalContextMock
 		);
@@ -103,5 +99,3 @@ public class InjectingConstraintValidatorFactoryTest {
 		}
 	}
 }
-
-

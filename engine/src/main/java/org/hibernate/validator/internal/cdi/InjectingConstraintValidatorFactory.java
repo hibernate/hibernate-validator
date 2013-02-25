@@ -47,7 +47,6 @@ public class InjectingConstraintValidatorFactory implements ConstraintValidatorF
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
 		DestructibleBeanInstance<T> destructibleBeanInstance = new DestructibleBeanInstance<T>( beanManager, key );
 		constraintValidatorMap.put( destructibleBeanInstance.getInstance(), destructibleBeanInstance );
@@ -60,5 +59,3 @@ public class InjectingConstraintValidatorFactory implements ConstraintValidatorF
 		destructibleBeanInstance.destroy();
 	}
 }
-
-

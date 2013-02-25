@@ -96,7 +96,7 @@ public class MetaConstraintBuilder {
 				constraintLocation.getMember(), annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
 		);
 
-		return new MetaConstraint( constraintDescriptor, constraintLocation );
+		return new MetaConstraint<A>( constraintDescriptor, constraintLocation );
 	}
 
 	public static <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType) {

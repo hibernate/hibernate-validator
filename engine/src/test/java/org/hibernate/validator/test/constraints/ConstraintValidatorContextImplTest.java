@@ -44,8 +44,8 @@ public class ConstraintValidatorContextImplTest {
 	public void testIterableIndexed() {
 		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
 		context.buildConstraintViolationWithTemplate( message )
-				.addNode( "foo" )
-				.addNode( "bar" ).inIterable().atIndex( 3 )
+				.addPropertyNode( "foo" )
+				.addPropertyNode( "bar" ).inIterable().atIndex( 3 )
 				.addConstraintViolation();
 
 		List<MessageAndPath> messageAndPathList = context.getMessageAndPathList();
@@ -56,8 +56,8 @@ public class ConstraintValidatorContextImplTest {
 	public void testIterableKeyed() {
 		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
 		context.buildConstraintViolationWithTemplate( message )
-				.addNode( "foo" )
-				.addNode( null ).inIterable().atKey( "test" )
+				.addPropertyNode( "foo" )
+				.addPropertyNode( null ).inIterable().atKey( "test" )
 				.addConstraintViolation();
 
 		List<MessageAndPath> messageAndPathList = context.getMessageAndPathList();
@@ -69,9 +69,9 @@ public class ConstraintValidatorContextImplTest {
 		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
 
 		context.buildConstraintViolationWithTemplate( message )
-				.addNode( "foo" )
-				.addNode( "bar" ).inIterable().atKey( "test" )
-				.addNode( "fubar" )
+				.addPropertyNode( "foo" )
+				.addPropertyNode( "bar" ).inIterable().atKey( "test" )
+				.addPropertyNode( "fubar" )
 				.addConstraintViolation();
 
 		List<MessageAndPath> messageAndPathList = context.getMessageAndPathList();
@@ -82,9 +82,9 @@ public class ConstraintValidatorContextImplTest {
 	public void testIterableKeyedAndIndexed() {
 		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
 		context.buildConstraintViolationWithTemplate( message )
-				.addNode( "foo" )
-				.addNode( "bar" ).inIterable().atKey( "test" )
-				.addNode( "fubar" ).inIterable().atIndex( 10 )
+				.addPropertyNode( "foo" )
+				.addPropertyNode( "bar" ).inIterable().atKey( "test" )
+				.addPropertyNode( "fubar" ).inIterable().atIndex( 10 )
 				.addConstraintViolation();
 
 		List<MessageAndPath> messageAndPathList = context.getMessageAndPathList();
@@ -95,9 +95,9 @@ public class ConstraintValidatorContextImplTest {
 	public void testMultipleInIterable() {
 		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
 		context.buildConstraintViolationWithTemplate( message )
-				.addNode( "foo" )
-				.addNode( "bar" ).inIterable().atKey( "test" )
-				.addNode( "fubar" ).inIterable()
+				.addPropertyNode( "foo" )
+				.addPropertyNode( "bar" ).inIterable().atKey( "test" )
+				.addPropertyNode( "fubar" ).inIterable()
 				.addConstraintViolation();
 
 		List<MessageAndPath> messageAndPathList = context.getMessageAndPathList();
@@ -108,9 +108,9 @@ public class ConstraintValidatorContextImplTest {
 	public void testMultipleSimpleNodes() {
 		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
 		context.buildConstraintViolationWithTemplate( message )
-				.addNode( "foo" )
-				.addNode( "bar" )
-				.addNode( "test" )
+				.addPropertyNode( "foo" )
+				.addPropertyNode( "bar" )
+				.addPropertyNode( "test" )
 				.addConstraintViolation();
 
 		List<MessageAndPath> messageAndPathList = context.getMessageAndPathList();
@@ -121,12 +121,12 @@ public class ConstraintValidatorContextImplTest {
 	public void testLongPath() {
 		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
 		context.buildConstraintViolationWithTemplate( message )
-				.addNode( "a" )
-				.addNode( "b" ).inIterable().atKey( "key1" )
-				.addNode( "c" ).inIterable()
-				.addNode( "d" )
-				.addNode( "e" )
-				.addNode( "f" ).inIterable().atKey( "key2" )
+				.addPropertyNode( "a" )
+				.addPropertyNode( "b" ).inIterable().atKey( "key1" )
+				.addPropertyNode( "c" ).inIterable()
+				.addPropertyNode( "d" )
+				.addPropertyNode( "e" )
+				.addPropertyNode( "f" ).inIterable().atKey( "key2" )
 				.addConstraintViolation();
 
 		List<MessageAndPath> messageAndPathList = context.getMessageAndPathList();
@@ -139,8 +139,8 @@ public class ConstraintValidatorContextImplTest {
 		String message2 = "message2";
 		ConstraintValidatorContextImpl context = createEmptyConstraintValidatorContextImpl();
 		context.buildConstraintViolationWithTemplate( message1 )
-				.addNode( "foo" )
-				.addNode( "bar" ).inIterable().atKey( "key" )
+				.addPropertyNode( "foo" )
+				.addPropertyNode( "bar" ).inIterable().atKey( "key" )
 				.addConstraintViolation();
 		context.buildConstraintViolationWithTemplate( message2 )
 				.addConstraintViolation();

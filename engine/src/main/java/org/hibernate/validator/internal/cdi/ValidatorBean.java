@@ -66,7 +66,6 @@ public class ValidatorBean implements Bean<Validator> {
 		return null;
 	}
 
-	@SuppressWarnings("serial")
 	@Override
 	public Set<Annotation> getQualifiers() {
 		return qualifiers;
@@ -126,5 +125,3 @@ public class ValidatorBean implements Bean<Validator> {
 		return null;
 	}
 }
-
-

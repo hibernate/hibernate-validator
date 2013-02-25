@@ -35,7 +35,7 @@ public class ValidationEnabledAnnotatedType<T> implements AnnotatedType<T> {
 	private final Set<AnnotatedMethod<? super T>> wrappedMethods;
 	private final Set<AnnotatedConstructor<T>> wrappedConstructors;
 
-	public ValidationEnabledAnnotatedType(AnnotatedType<T> type, Set<AnnotatedCallable<T>> constrainedCallables) {
+	public ValidationEnabledAnnotatedType(AnnotatedType<T> type, Set<AnnotatedCallable<? super T>> constrainedCallables) {
 		this.wrappedType = type;
 		this.wrappedMethods = CollectionHelper.newHashSet();
 		this.wrappedConstructors = CollectionHelper.newHashSet();
@@ -73,7 +73,7 @@ public class ValidationEnabledAnnotatedType<T> implements AnnotatedType<T> {
 	}
 
 	@Override
-	public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
+	public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
 		return wrappedType.getAnnotation( annotationType );
 	}
 
@@ -87,9 +87,9 @@ public class ValidationEnabledAnnotatedType<T> implements AnnotatedType<T> {
 		return wrappedType.isAnnotationPresent( annotationType );
 	}
 
-	private void buildWrappedCallable(Set<AnnotatedCallable<T>> constrainedCallable) {
+	private void buildWrappedCallable(Set<AnnotatedCallable<? super T>> constrainedCallables) {
 		for ( AnnotatedConstructor<T> constructor : wrappedType.getConstructors() ) {
-			if ( constrainedCallable.contains( constructor ) ) {
+			if ( constrainedCallables.contains( constructor ) ) {
 				ValidationEnabledAnnotatedConstructor<T> wrappedConstructor = new ValidationEnabledAnnotatedConstructor<T>(
 						constructor
 				);
@@ -101,8 +101,8 @@ public class ValidationEnabledAnnotatedType<T> implements AnnotatedType<T> {
 		}
 
 		for ( AnnotatedMethod<? super T> method : wrappedType.getMethods() ) {
-			if ( constrainedCallable.contains( method ) ) {
-				ValidationEnabledAnnotatedMethod<T> wrappedMethod = new ValidationEnabledAnnotatedMethod<T>( (AnnotatedMethod<T>) method );
+			if ( constrainedCallables.contains( method ) ) {
+				ValidationEnabledAnnotatedMethod<? super T> wrappedMethod = wrap( method );
 				wrappedMethods.add( wrappedMethod );
 			}
 			else {
@@ -110,6 +110,8 @@ public class ValidationEnabledAnnotatedType<T> implements AnnotatedType<T> {
 			}
 		}
 	}
+
+	private <U> ValidationEnabledAnnotatedMethod<U> wrap(AnnotatedMethod<U> method) {
+		return new ValidationEnabledAnnotatedMethod<U>( method );
+	}
 }
-
-

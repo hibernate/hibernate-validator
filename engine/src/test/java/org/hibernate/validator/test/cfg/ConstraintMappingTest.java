@@ -17,6 +17,7 @@
 package org.hibernate.validator.test.cfg;
 
 import java.lang.annotation.ElementType;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -53,7 +54,6 @@ import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
-import static java.util.Arrays.asList;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
@@ -492,9 +492,9 @@ public class ConstraintMappingTest {
 	private static class User {
 
 		@Size(min = 1, max = 10)
-		private String firstName;
+		private final String firstName;
 
-		private String lastName;
+		private final String lastName;
 
 		private User(String firstName, String lastName) {
 			this.firstName = firstName;
@@ -508,23 +508,23 @@ public class ConstraintMappingTest {
 	}
 
 	public static class MarathonDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Marathon> {
-		@SuppressWarnings("unchecked")
+		@Override
 		public List<Class<?>> getValidationGroups(Marathon object) {
-			return asList( Foo.class, Marathon.class );
+			return Arrays.<Class<?>>asList( Foo.class, Marathon.class );
 		}
 	}
 
 	public static class BDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<B> {
-		@SuppressWarnings("unchecked")
+		@Override
 		public List<Class<?>> getValidationGroups(B object) {
-			return asList( Foo.class, B.class );
+			return Arrays.<Class<?>>asList( Foo.class, B.class );
 		}
 	}
 
 	public static class ADefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<A> {
-		@SuppressWarnings("unchecked")
+		@Override
 		public List<Class<?>> getValidationGroups(A object) {
-			return asList( Foo.class, A.class );
+			return Arrays.<Class<?>>asList( Foo.class, A.class );
 		}
 	}
 }

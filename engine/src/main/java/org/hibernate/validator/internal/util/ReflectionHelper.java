@@ -30,7 +30,6 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -633,8 +632,8 @@ public final class ReflectionHelper {
 	 * @return List of all super classes and interfaces of {@code clazz}. The list contains the class itself! The empty
 	 *         list is returned if {@code clazz} is {@code null}.
 	 */
-	public static List<Class<?>> computeClassHierarchy(Class<?> clazz, boolean includeInterfaces) {
-		List<Class<?>> classes = new ArrayList<Class<?>>();
+	public static <T> List<Class<? super T>> computeClassHierarchy(Class<T> clazz, boolean includeInterfaces) {
+		List<Class<? super T>> classes = newArrayList();
 		computeClassHierarchy( clazz, classes, includeInterfaces );
 		return classes;
 	}
@@ -646,15 +645,17 @@ public final class ReflectionHelper {
 	 * @param classes List of classes to which to add all found super classes and interfaces
 	 * @param includeInterfaces whether or not to include interfaces
 	 */
-	private static void computeClassHierarchy(Class<?> clazz, List<Class<?>> classes, boolean includeInterfaces) {
-		for ( Class<?> current = clazz; current != null; current = current.getSuperclass() ) {
+	private static <T> void computeClassHierarchy(Class<? super T> clazz, List<Class<? super T>> classes, boolean includeInterfaces) {
+		for ( Class<? super T> current = clazz; current != null; current = current.getSuperclass() ) {
 			if ( classes.contains( current ) ) {
 				return;
 			}
 			classes.add( current );
 			if ( includeInterfaces ) {
 				for ( Class<?> currentInterface : current.getInterfaces() ) {
-					computeClassHierarchy( currentInterface, classes, includeInterfaces );
+					@SuppressWarnings("unchecked") //safe since interfaces are super-types
+					Class<? super T> currentInterfaceCasted = (Class<? super T>) currentInterface;
+					computeClassHierarchy( currentInterfaceCasted, classes, includeInterfaces );
 				}
 			}
 		}

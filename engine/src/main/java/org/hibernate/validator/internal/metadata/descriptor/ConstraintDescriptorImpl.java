@@ -59,6 +59,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.constraints.CompositionType.AND;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Describes a single constraint (including it's composing constraints).
@@ -365,7 +366,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private int getParameterCount(Member member) {
 		int parameterCount;
 		if ( member instanceof Constructor ) {
-			Constructor constructor = (Constructor) member;
+			Constructor<?> constructor = (Constructor<?>) member;
 			parameterCount = constructor.getParameterTypes().length;
 		}
 		else if ( member instanceof Method ) {
@@ -397,7 +398,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@SuppressWarnings("unchecked")
 	private Set<Class<? extends Payload>> buildPayloadSet(T annotation) {
-		Set<Class<? extends Payload>> payloadSet = new HashSet<Class<? extends Payload>>();
+		Set<Class<? extends Payload>> payloadSet = newHashSet();
 		Class<Payload>[] payloadFromAnnotation;
 		try {
 			//TODO be extra safe and make sure this is an array of Payload
@@ -709,7 +710,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 
 		@Override
-		@SuppressWarnings("SimplifiableIfStatement")
 		public boolean equals(Object o) {
 			if ( this == o ) {
 				return true;

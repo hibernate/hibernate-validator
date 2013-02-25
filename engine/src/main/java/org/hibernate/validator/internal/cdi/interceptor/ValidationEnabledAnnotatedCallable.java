@@ -31,7 +31,7 @@ import javax.enterprise.util.AnnotationLiteral;
  */
 public abstract class ValidationEnabledAnnotatedCallable<T> implements AnnotatedCallable<T> {
 	private final AnnotatedCallable<T> wrappedCallable;
-	private final AnnotationLiteral methodValidationAnnotation;
+	private final AnnotationLiteral<MethodValidated> methodValidationAnnotation;
 
 	public ValidationEnabledAnnotatedCallable(AnnotatedCallable<T> callable) {
 		this.wrappedCallable = callable;
@@ -65,9 +65,11 @@ public abstract class ValidationEnabledAnnotatedCallable<T> implements Annotated
 	}
 
 	@Override
-	public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
+	public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
 		if ( MethodValidated.class.equals( annotationType ) ) {
-			return (T) methodValidationAnnotation;
+			@SuppressWarnings("unchecked")
+			A annotation = (A) methodValidationAnnotation;
+			return annotation;
 		}
 		else {
 			return wrappedCallable.getAnnotation( annotationType );
@@ -95,5 +97,3 @@ public abstract class ValidationEnabledAnnotatedCallable<T> implements Annotated
 		return wrappedCallable;
 	}
 }
-
-

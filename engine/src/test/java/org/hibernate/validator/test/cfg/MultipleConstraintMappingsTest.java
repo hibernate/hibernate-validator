@@ -177,9 +177,9 @@ public class MultipleConstraintMappingsTest {
 	}
 
 	public static class MarathonDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Marathon> {
-		@SuppressWarnings("unchecked")
+		@Override
 		public List<Class<?>> getValidationGroups(Marathon object) {
-			return Arrays.asList( Foo.class, Marathon.class );
+			return Arrays.<Class<?>>asList( Foo.class, Marathon.class );
 		}
 	}
 }
