@@ -169,7 +169,7 @@ public class DefaultGroupSequenceProviderTest {
 
 		@Override
 		public List<Class<?>> getValidationGroups(CImpl object) {
-			return Arrays.asList( TestGroup.class, CImpl.class );
+			return Arrays.<Class<?>>asList( TestGroup.class, CImpl.class );
 		}
 	}
 

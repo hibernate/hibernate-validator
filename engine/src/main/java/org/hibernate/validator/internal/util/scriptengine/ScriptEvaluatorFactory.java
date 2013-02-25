@@ -24,9 +24,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 
@@ -39,8 +36,6 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  */
 public class ScriptEvaluatorFactory {
 
-	private static final Log log = LoggerFactory.make();
-
 	/**
 	 * A reference with an instance of this factory. Allows the factory to be reused several times, but can be GC'ed if required.
 	 */
@@ -49,7 +44,7 @@ public class ScriptEvaluatorFactory {
 	/**
 	 * A cache of script executors (keyed by language name).
 	 */
-	private ConcurrentMap<String, ScriptEvaluator> scriptExecutorCache = new ConcurrentHashMap<String, ScriptEvaluator>();
+	private final ConcurrentMap<String, ScriptEvaluator> scriptExecutorCache = new ConcurrentHashMap<String, ScriptEvaluator>();
 
 	private ScriptEvaluatorFactory() {
 	}
@@ -60,7 +55,6 @@ public class ScriptEvaluatorFactory {
 	 * @return A script evaluator factory. Never null.
 	 */
 	public static synchronized ScriptEvaluatorFactory getInstance() {
-
 		ScriptEvaluatorFactory theValue = INSTANCE.get();
 
 		if ( theValue == null ) {
@@ -81,7 +75,6 @@ public class ScriptEvaluatorFactory {
 	 * @throws ScriptException In case no JSR 223 compatible engine for the given language could be found.
 	 */
 	public ScriptEvaluator getScriptEvaluatorByLanguageName(String languageName) throws ScriptException {
-
 		if ( !scriptExecutorCache.containsKey( languageName ) ) {
 
 			ScriptEvaluator scriptExecutor = createNewScriptEvaluator( languageName );
@@ -101,7 +94,6 @@ public class ScriptEvaluatorFactory {
 	 * @throws ScriptException In case no JSR 223 compatible engine for the given language could be found.
 	 */
 	private ScriptEvaluator createNewScriptEvaluator(String languageName) throws ScriptException {
-
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName( languageName );
 
 		if ( engine == null ) {

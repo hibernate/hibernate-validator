@@ -64,7 +64,7 @@ public class ConstraintValidatorCachingTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-564")
 	public void testConstraintValidatorInstancesAreCached() {
-		Configuration config = getConfiguration();
+		Configuration<?> config = getConfiguration();
 		OnceInstanceOnlyConstraintValidatorFactory constraintValidatorFactory = new OnceInstanceOnlyConstraintValidatorFactory();
 
 		config.constraintValidatorFactory( constraintValidatorFactory );
@@ -104,7 +104,7 @@ public class ConstraintValidatorCachingTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-564")
 	public void testConstraintValidatorInstancesAreCachedPerConstraintValidatorFactory() {
-		Configuration config = getConfiguration();
+		Configuration<?> config = getConfiguration();
 		OnceInstanceOnlyConstraintValidatorFactory constraintValidatorFactory1 = new OnceInstanceOnlyConstraintValidatorFactory();
 		OnceInstanceOnlyConstraintValidatorFactory constraintValidatorFactory2 = new OnceInstanceOnlyConstraintValidatorFactory();
 

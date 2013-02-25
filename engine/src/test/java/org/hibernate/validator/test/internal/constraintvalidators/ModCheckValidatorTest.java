@@ -98,8 +98,6 @@ public class ModCheckValidatorTest {
 	}
 
 	private ModCheck createModCheckAnnotation(ModCheck.ModType modType, int multiplier, int start, int end, int checkDigit, boolean ignoreNonDigits) {
-		ModCheckValidator validator = new ModCheckValidator();
-
 		AnnotationDescriptor<ModCheck> descriptor = new AnnotationDescriptor<ModCheck>( ModCheck.class );
 		descriptor.setValue( "modType", modType );
 		descriptor.setValue( "multiplier", multiplier );

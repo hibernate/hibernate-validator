@@ -110,7 +110,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 
 	@Override
 	public ValidatorFactory create(CreationalContext<ValidatorFactory> ctx) {
-		Configuration config = Validation.byProvider( org.hibernate.validator.HibernateValidator.class )
+		Configuration<?> config = Validation.byProvider( org.hibernate.validator.HibernateValidator.class )
 				.configure();
 
 		config.constraintValidatorFactory( createConstraintValidatorFactory( config ) );
@@ -129,7 +129,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 		instance.close();
 	}
 
-	private MessageInterpolator createMessageInterpolator(Configuration config) {
+	private MessageInterpolator createMessageInterpolator(Configuration<?> config) {
 		BootstrapConfiguration bootstrapConfiguration = config.getBootstrapConfiguration();
 		String messageInterpolatorFqcn = bootstrapConfiguration.getMessageInterpolatorClassName();
 
@@ -146,7 +146,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 		return createInstance( messageInterpolatorClass );
 	}
 
-	private TraversableResolver createTraversableResolver(Configuration config) {
+	private TraversableResolver createTraversableResolver(Configuration<?> config) {
 		BootstrapConfiguration bootstrapConfiguration = config.getBootstrapConfiguration();
 		String traversableResolverFqcn = bootstrapConfiguration.getTraversableResolverClassName();
 
@@ -163,7 +163,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 		return createInstance( traversableResolverClass );
 	}
 
-	private ParameterNameProvider createParameterNameProvider(Configuration config) {
+	private ParameterNameProvider createParameterNameProvider(Configuration<?> config) {
 		BootstrapConfiguration bootstrapConfiguration = config.getBootstrapConfiguration();
 		String parameterNameProviderFqcn = bootstrapConfiguration.getParameterNameProviderClassName();
 
@@ -180,7 +180,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 		return createInstance( parameterNameProviderClass );
 	}
 
-	private ConstraintValidatorFactory createConstraintValidatorFactory(Configuration config) {
+	private ConstraintValidatorFactory createConstraintValidatorFactory(Configuration<?> config) {
 		BootstrapConfiguration configSource = config.getBootstrapConfiguration();
 		String constraintValidatorFactoryFqcn = configSource.getConstraintValidatorFactoryClassName();
 

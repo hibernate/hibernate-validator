@@ -17,7 +17,6 @@
 package org.hibernate.validator.internal.cdi;
 
 import java.lang.annotation.Annotation;
-import java.util.HashSet;
 import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -43,6 +42,8 @@ import org.hibernate.validator.internal.cdi.interceptor.MethodValidated;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotatedType;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.Contracts;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * A CDI portable extension which registers beans for {@link ValidatorFactory} and {@link javax.xml.validation.Validator},
@@ -83,7 +84,7 @@ public class ValidationExtension implements Extension {
 	 *
 	 * @param processBeanEvent event fired for each enabled bean.
 	 */
-	public void processBean(@Observes ProcessBean processBeanEvent) {
+	public void processBean(@Observes ProcessBean<?> processBeanEvent) {
 		Contracts.assertNotNull( processBeanEvent, "The ProcessBean event cannot be null" );
 
 		Bean<?> bean = processBeanEvent.getBean();
@@ -122,7 +123,7 @@ public class ValidationExtension implements Extension {
 	public <T> void processAnnotatedType(@Observes ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
 		Contracts.assertNotNull( processAnnotatedTypeEvent, "The ProcessAnnotatedType event cannot be null" );
 		final AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
-		Set<AnnotatedCallable<T>> constrainedCallables = determineConstrainedCallables( type );
+		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables( type );
 		if ( !constrainedCallables.isEmpty() ) {
 			ValidationEnabledAnnotatedType<T> wrappedType = new ValidationEnabledAnnotatedType<T>(
 					type,
@@ -132,8 +133,8 @@ public class ValidationExtension implements Extension {
 		}
 	}
 
-	private <T> Set<AnnotatedCallable<T>> determineConstrainedCallables(AnnotatedType<T> type) {
-		Set<AnnotatedCallable<T>> callables = new HashSet<AnnotatedCallable<T>>();
+	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type) {
+		Set<AnnotatedCallable<? super T>> callables = newHashSet();
 
 		for ( AnnotatedConstructor<T> constructor : type.getConstructors() ) {
 			if ( isCallableConstrained( constructor ) ) {
@@ -143,7 +144,7 @@ public class ValidationExtension implements Extension {
 
 		for ( AnnotatedMethod<? super T> method : type.getMethods() ) {
 			if ( isCallableConstrained( method ) ) {
-				callables.add( (AnnotatedMethod<T>) method );
+				callables.add( method );
 			}
 		}
 
@@ -181,7 +182,7 @@ public class ValidationExtension implements Extension {
 	 *         under.
 	 */
 	private Set<Annotation> determineMissingQualifiers() {
-		Set<Annotation> annotations = new HashSet<Annotation>( 2 );
+		Set<Annotation> annotations = newHashSet( 2 );
 
 		if ( !validatorRegisteredUnderDefaultQualifier ) {
 			annotations.add(
@@ -199,5 +200,3 @@ public class ValidationExtension implements Extension {
 		return annotations;
 	}
 }
-
-

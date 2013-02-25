@@ -109,11 +109,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
 		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
-		for ( Class<?> hierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
-			@SuppressWarnings("unchecked")
-			BeanConfiguration<? super T> configuration = (BeanConfiguration<? super T>) getBeanConfiguration(
-					hierarchyClass
-			);
+		for ( Class<? super T> hierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
+			BeanConfiguration<? super T> configuration = getBeanConfiguration( hierarchyClass );
 			if ( configuration != null ) {
 				configurations.add( configuration );
 			}
@@ -122,8 +119,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return configurations;
 	}
 
-	private BeanConfiguration<?> getBeanConfiguration(Class<?> beanClass) {
-		BeanConfiguration<?> configuration = configuredBeans.get( beanClass );
+	private <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
+		@SuppressWarnings("unchecked")
+		BeanConfiguration<T> configuration = (BeanConfiguration<T>) configuredBeans.get( beanClass );
 
 		if ( configuration != null ) {
 			return configuration;
@@ -176,21 +174,23 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
 
 		if ( groupSequenceProviderAnnotation != null ) {
-			return newGroupSequenceProviderClassInstance( beanClass, groupSequenceProviderAnnotation.value() );
+			@SuppressWarnings("unchecked")
+			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass = (Class<? extends DefaultGroupSequenceProvider<? super T>>) groupSequenceProviderAnnotation
+					.value();
+			return newGroupSequenceProviderClassInstance( beanClass, providerClass );
 		}
 
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass, Class<?> providerClass) {
+	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass, Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
 		Method[] providerMethods = getMethods( providerClass );
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
 					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
 
-				return (DefaultGroupSequenceProvider<? super T>) newInstance(
+				return newInstance(
 						providerClass, "the default group sequence provider"
 				);
 			}
@@ -521,7 +521,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraintDescriptors;
 	}
 
-	@SuppressWarnings("unchecked")
 	private Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {
 		Map<Class<?>, Class<?>> groupConversions = newHashMap();
 

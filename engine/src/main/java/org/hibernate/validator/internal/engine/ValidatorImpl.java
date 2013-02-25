@@ -148,7 +148,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 		ValidationContext<T> validationContext = getValidationContext().forValidate( object );
 
-		ValueContext<?, T> valueContext = ValueContext.getLocalExecutionContext(
+		ValueContext<?, Object> valueContext = ValueContext.getLocalExecutionContext(
 				object,
 				beanMetaDataManager.getBeanMetaData( object.getClass() ),
 				PathImpl.createRootPath()
@@ -321,7 +321,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 *
 	 * @return Set of constraint violations or the empty set if there were no violations.
 	 */
-	private <T, U, V> Set<ConstraintViolation<T>> validateInContext(ValueContext<U, V> valueContext, ValidationContext<T> context, ValidationOrder validationOrder) {
+	private <T, U> Set<ConstraintViolation<T>> validateInContext(ValueContext<U, Object> valueContext, ValidationContext<T> context, ValidationOrder validationOrder) {
 		if ( valueContext.getCurrentBean() == null ) {
 			return Collections.emptySet();
 		}
@@ -378,7 +378,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return context.getFailingConstraints();
 	}
 
-	private <T, U, V> void validateConstraintsForCurrentGroup(ValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
+	private void validateConstraintsForCurrentGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		// we are not validating the default group there is nothing special to consider. If we are validating the default
 		// group sequence we have to consider that a class in the hierarchy could redefine the default group sequence.
 		if ( !valueContext.validatingDefault() ) {
@@ -389,14 +389,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <T, U, V> void validateConstraintsForDefaultGroup(ValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
+	private <U> void validateConstraintsForDefaultGroup(ValidationContext<?> validationContext, ValueContext<U, Object> valueContext) {
 		final BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
 
 		// evaluating the constraints of a bean per class in hierarchy, this is necessary to detect potential default group re-definitions
-		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
-			@SuppressWarnings("unchecked")
-			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
+		for ( Class<? super U> clazz : beanMetaData.getClassHierarchy() ) {
+			BeanMetaData<? super U> hostingBeanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
 			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
@@ -442,8 +441,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <T, U, V> void validateConstraintsForNonDefaultGroup(ValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
-		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
+	private void validateConstraintsForNonDefaultGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
+		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( MetaConstraint<?> metaConstraint : beanMetaData.getMetaConstraints() ) {
 			validateConstraint( validationContext, valueContext, metaConstraint );
@@ -456,9 +455,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		validationContext.markProcessed( valueContext );
 	}
 
-	private <T, U, V> boolean validateConstraint(ValidationContext<T> validationContext,
-												 ValueContext<U, V> valueContext,
-												 MetaConstraint<?> metaConstraint) {
+	private boolean validateConstraint(ValidationContext<?> validationContext,
+									   ValueContext<?, Object> valueContext,
+									   MetaConstraint<?> metaConstraint) {
 
 		boolean validationSuccessful = true;
 
@@ -474,8 +473,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-			@SuppressWarnings("unchecked")
-			V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
+			Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
 			valueContext.setCurrentValidatedValue( valueToValidate );
 			validationSuccessful = metaConstraint.validateConstraint( validationContext, valueContext );
 		}
@@ -490,7 +488,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @param validationContext The execution context
 	 * @param valueContext Collected information for single validation
 	 */
-	private <T, U, V> void validateCascadedConstraints(ValidationContext<T> validationContext, ValueContext<U, V> valueContext) {
+	private void validateCascadedConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext) {
 		Validatable validatable = valueContext.getCurrentValidatable();
 		PathImpl originalPath = valueContext.getPropertyPath();
 		Class<?> originalGroup = valueContext.getCurrentGroup();
@@ -587,7 +585,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return isIndexable;
 	}
 
-	private <T> void validateCascadedConstraint(ValidationContext<T> context, Iterator<?> iter, boolean isIndexable, ValueContext<?, ?> valueContext) {
+	private void validateCascadedConstraint(ValidationContext<?> context, Iterator<?> iter, boolean isIndexable, ValueContext<?, ?> valueContext) {
 		Object value;
 		Object mapKey;
 		int i = 0;
@@ -609,7 +607,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						Arrays.<Class<?>>asList( valueContext.getCurrentGroup() )
 				);
 
-				ValueContext<?, T> newValueContext;
+				ValueContext<?, Object> newValueContext;
 				if ( value != null ) {
 					newValueContext = ValueContext.getLocalExecutionContext(
 							value,
@@ -634,10 +632,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <T, U, V> Set<ConstraintViolation<T>> validatePropertyInContext(ValidationContext<T> context, PathImpl propertyPath, ValidationOrder validationOrder) {
+	private <T> Set<ConstraintViolation<T>> validatePropertyInContext(ValidationContext<T> context, PathImpl propertyPath, ValidationOrder validationOrder) {
 		List<MetaConstraint<?>> metaConstraints = newArrayList();
 		Iterator<Path.Node> propertyIter = propertyPath.iterator();
-		ValueContext<U, V> valueContext = collectMetaConstraintsForPath(
+		ValueContext<?, Object> valueContext = collectMetaConstraintsForPath(
 				context.getRootBeanClass(),
 				context.getRootBean(),
 				propertyIter,
@@ -653,10 +651,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return context.getFailingConstraints();
 		}
 
-		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
-		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
-			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
-		}
+		assertDefaultGroupSequenceIsExpandable( valueContext, validationOrder );
 
 		// process first single groups
 		Iterator<Group> groupIterator = validationOrder.getGroupIterator();
@@ -690,9 +685,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return context.getFailingConstraints();
 	}
 
-	private <T, U, V> Set<ConstraintViolation<T>> validateValueInContext(ValidationContext<T> context, V value, PathImpl propertyPath, ValidationOrder validationOrder) {
+	private <T> void assertDefaultGroupSequenceIsExpandable(ValueContext<T, ?> valueContext, ValidationOrder validationOrder) {
+		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
+		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
+			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() ) );
+		}
+	}
+
+	private <T> Set<ConstraintViolation<T>> validateValueInContext(ValidationContext<T> context, Object value, PathImpl propertyPath, ValidationOrder validationOrder) {
 		List<MetaConstraint<?>> metaConstraints = newArrayList();
-		ValueContext<U, V> valueContext = collectMetaConstraintsForPath(
+		ValueContext<?, Object> valueContext = collectMetaConstraintsForPath(
 				context.getRootBeanClass(), null, propertyPath.iterator(), propertyPath, metaConstraints
 		);
 		valueContext.setCurrentValidatedValue( value );
@@ -701,7 +703,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			return context.getFailingConstraints();
 		}
 
-		BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
+		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
 			validationOrder.assertDefaultGroupSequenceIsExpandable( beanMetaData.getDefaultGroupSequence( null ) );
 		}
@@ -747,7 +749,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 *
 	 * @return The number of constraint violations raised when validating the {@code ValueContext} current group.
 	 */
-	private <T, U, V> int validatePropertyForCurrentGroup(ValueContext<U, V> valueContext, ValidationContext<T> validationContext, List<MetaConstraint<?>> metaConstraints) {
+	private int validatePropertyForCurrentGroup(ValueContext<?, Object> valueContext, ValidationContext<?> validationContext, List<MetaConstraint<?>> metaConstraints) {
 		// we do not validate the default group, nothing special to do
 		if ( !valueContext.validatingDefault() ) {
 			return validatePropertyForNonDefaultGroup( valueContext, validationContext, metaConstraints );
@@ -769,14 +771,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 *
 	 * @return The number of constraint violations raised when validating the {@code ValueContext} current group.
 	 */
-	private <T, U, V> int validatePropertyForNonDefaultGroup(ValueContext<U, V> valueContext, ValidationContext<T> validationContext, List<MetaConstraint<?>> metaConstraints) {
+	private int validatePropertyForNonDefaultGroup(ValueContext<?, Object> valueContext, ValidationContext<?> validationContext, List<MetaConstraint<?>> metaConstraints) {
 		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 
 		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 			if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 				if ( valueContext.getCurrentBean() != null ) {
-					@SuppressWarnings("unchecked")
-					V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
+					Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
 					valueContext.setCurrentValidatedValue( valueToValidate );
 				}
 				metaConstraint.validateConstraint( validationContext, valueContext );
@@ -802,17 +803,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 *
 	 * @return The number of constraint violations raised when validating the default group.
 	 */
-	private <T, U, V> int validatePropertyForDefaultGroup(ValueContext<U, V> valueContext,
-														  ValidationContext<T> validationContext,
-														  List<MetaConstraint<?>> constraintList) {
+	private <U> int validatePropertyForDefaultGroup(ValueContext<U, Object> valueContext,
+													ValidationContext<?> validationContext,
+													List<MetaConstraint<?>> constraintList) {
 		final int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 		final BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
 
 		// evaluating the constraints of a bean per class in hierarchy. this is necessary to detect potential default group re-definitions
-		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
-			@SuppressWarnings("unchecked")
-			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
+		for ( Class<? super U> clazz : beanMetaData.getClassHierarchy() ) {
+			BeanMetaData<? super U> hostingBeanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
@@ -840,8 +840,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							&& isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 
 						if ( valueContext.getCurrentBean() != null ) {
-							@SuppressWarnings("unchecked")
-							V valueToValidate = (V) metaConstraint.getValue( valueContext.getCurrentBean() );
+							Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
 							valueContext.setCurrentValidatedValue( valueToValidate );
 						}
 						boolean tmp = metaConstraint.validateConstraint( validationContext, valueContext );
@@ -1098,7 +1097,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	//TODO GM: if possible integrate with validateParameterForGroup()
-	private <T, V> int validateReturnValueForGroup(ValidationContext<T> validationContext, T bean, V value, Group group) {
+	private <T> int validateReturnValueForGroup(ValidationContext<T> validationContext, T bean, Object value, Group group) {
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
@@ -1189,7 +1188,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 *
 	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to the given property path.
 	 */
-	private <T, U, V> ValueContext<U, V> collectMetaConstraintsForPath(Class<T> clazz, Object value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, List<MetaConstraint<?>> metaConstraintsList) {
+	private <V> ValueContext<?, V> collectMetaConstraintsForPath(Class<?> clazz, Object value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, List<MetaConstraint<?>> metaConstraintsList) {
 		Path.Node elem = propertyIter.next();
 		Object newValue = value;
 
@@ -1234,9 +1233,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		if ( newValue == null ) {
-			return ValueContext.getLocalExecutionContext( (Class<U>) clazz, null, propertyPath );
+			return ValueContext.getLocalExecutionContext( clazz, null, propertyPath );
 		}
-		return ValueContext.getLocalExecutionContext( (U) value, null, propertyPath );
+		return ValueContext.getLocalExecutionContext( value, null, propertyPath );
 	}
 
 	/**

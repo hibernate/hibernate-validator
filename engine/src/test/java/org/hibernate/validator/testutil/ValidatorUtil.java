@@ -229,7 +229,6 @@ public final class ValidatorUtil {
 	 *
 	 * @return A proxy performing an automatic method validation.
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T, I extends T> T getValidatingProxy(I implementor, Validator executableValidator, Class<?>... validationGroups) {
 		return getValidatingProxy(
 				implementor,

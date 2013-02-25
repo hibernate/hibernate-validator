@@ -18,16 +18,17 @@ package org.hibernate.validator.test.internal.engine.serialization;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.NotSerializableException;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
@@ -37,10 +38,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
  */
 public class ConstraintViolationSerializationTest {
 
-	/**
-	 * HV-245
-	 */
 	@Test
+	@TestForIssue(jiraKey = "HV-245")
 	public void testSuccessfulSerialization() throws Exception {
 		Validator validator = ValidatorUtil.getValidator();
 		SerializableClass testInstance = new SerializableClass();
@@ -51,9 +50,7 @@ public class ConstraintViolationSerializationTest {
 		assertNumberOfViolations( deserializedViolations, 1 );
 	}
 
-	/**
-	 * HV-245
-	 */
+	@TestForIssue(jiraKey = "HV-245")
 	@Test(expectedExceptions = NotSerializableException.class)
 	public void testUnSuccessfulSerialization() throws Exception {
 		Validator validator = ValidatorUtil.getValidator();
@@ -77,7 +74,8 @@ public class ConstraintViolationSerializationTest {
 	private Set<ConstraintViolation<?>> deserialize(byte[] byteData) throws Exception {
 		ByteArrayInputStream byteIn = new ByteArrayInputStream( byteData );
 		ObjectInputStream in = new ObjectInputStream( byteIn );
-		Set<ConstraintViolation<?>> deserializedViolations = ( Set<ConstraintViolation<?>> ) in.readObject();
+		@SuppressWarnings("unchecked")
+		Set<ConstraintViolation<?>> deserializedViolations = (Set<ConstraintViolation<?>>) in.readObject();
 		in.close();
 		byteIn.close();
 		return deserializedViolations;

@@ -123,7 +123,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * The class hierarchy for this class starting with the class itself going up the inheritance chain. Interfaces
 	 * are not included.
 	 */
-	private final List<Class<?>> classHierarchyWithoutInterfaces;
+	private final List<Class<? super T>> classHierarchyWithoutInterfaces;
 
 	/**
 	 * Creates a new {@link BeanMetaDataImpl}
@@ -245,7 +245,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
-	public List<Class<?>> getClassHierarchy() {
+	public List<Class<? super T>> getClassHierarchy() {
 		return classHierarchyWithoutInterfaces;
 	}
 
