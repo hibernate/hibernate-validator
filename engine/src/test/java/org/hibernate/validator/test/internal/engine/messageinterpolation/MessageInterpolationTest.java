@@ -41,6 +41,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -60,6 +61,7 @@ public class MessageInterpolationTest {
 		lines.append( "baz=Message is US$ {value}" ).append( "\r\n" );
 		lines.append( "buz=Message is {values}" ).append( "\r\n" );
 		lines.append( "qux=Message is {missing}" ).append( "\r\n" );
+		lines.append( "zap=Message is \\\\${value}" ).append( "\r\n" );
 		lines.append( "escaped=wrong" ).append( "\r\n" );
 		final ResourceBundle bundle = new PropertyResourceBundle(
 				new ByteArrayInputStream( lines.toString().getBytes() )
@@ -84,28 +86,39 @@ public class MessageInterpolationTest {
 		validator = factory.getValidator();
 	}
 
-	@Test(description = "HV-184")
+	@Test
+	@TestForIssue(jiraKey = "HV-184")
 	public void testCurlyBracesEscapingShouldBeRespected() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Bar.class ).iterator().next();
 		assertEquals( violation.getMessage(), "Message is {escaped}" );
 	}
 
-	@Test(description = "HV-184")
+	@Test
+	@TestForIssue(jiraKey = "HV-184")
 	public void testAppendReplacementNeedsToEscapeBackslashAndDollarSign() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Baz.class ).iterator().next();
 		assertEquals( violation.getMessage(), "Message is US$ 5" );
 	}
 
-	@Test(description = "HV-184")
+	@Test
+	@TestForIssue(jiraKey = "HV-184")
 	public void testUnknownParametersShouldBePreserved() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Qux.class ).iterator().next();
 		assertEquals( violation.getMessage(), "Message is {missing}" );
 	}
 
-	@Test(description = "HV-506")
+	@Test
+	@TestForIssue(jiraKey = "HV-506")
 	public void testInterpolationOfArrayParameter() {
 		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Buz.class ).iterator().next();
 		assertEquals( violation.getMessage(), "Message is [bar, baz, qux]" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-729")
+	public void testDollarSignEscapingShouldBeRespected() {
+		final ConstraintViolation<Foo> violation = validator.validate( new Foo(), Zap.class ).iterator().next();
+		assertEquals( violation.getMessage(), "Message is $10" );
 	}
 
 	public interface Bar {
@@ -118,6 +131,9 @@ public class MessageInterpolationTest {
 	}
 
 	public interface Qux {
+	}
+
+	public interface Zap {
 	}
 
 	@Target(METHOD)
@@ -170,6 +186,11 @@ public class MessageInterpolationTest {
 		@NotNull(message = "{qux}", groups = Qux.class)
 		public String getQux() {
 			return null;
+		}
+
+		@Min(value = 10, message = "{zap}", groups = Zap.class)
+		public int getZap() {
+			return 0;
 		}
 	}
 }
