@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ElementKind;
-import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -227,10 +226,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				defaultGroupSequence,
 				constraintDeclarationException
 		);
-	}
-
-	public ElementDescriptor getDescriptor() {
-		return asDescriptor( false, Collections.<Class<?>>emptyList() );
 	}
 
 	private List<ParameterDescriptor> parametersAsDescriptors(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {

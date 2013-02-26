@@ -19,7 +19,6 @@ package org.hibernate.validator.messageinterpolation;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +28,8 @@ import org.hibernate.validator.internal.engine.messageinterpolation.Interpolatio
 import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
 
 /**
  * Resource bundle backed message interpolator.
@@ -78,7 +79,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	/**
 	 * Step 1-3 of message interpolation can be cached. We do this in this map.
 	 */
-	private final ConcurrentMap<LocalizedMessage, String> resolvedMessages = new ConcurrentHashMap<LocalizedMessage, String>();
+	private final ConcurrentMap<LocalizedMessage, String> resolvedMessages = newConcurrentHashMap();
 
 	/**
 	 * Flag indicating whether this interpolator should chance some of the interpolation steps.
@@ -107,12 +108,14 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		this.cacheMessages = cacheMessages;
 	}
 
+	@Override
 	public String interpolate(String message, Context context) {
 		// probably no need for caching, but it could be done by parameters since the map
 		// is immutable and uniquely built per Validation definition, the comparison has to be based on == and not equals though
 		return interpolateMessage( message, context, defaultLocale );
 	}
 
+	@Override
 	public String interpolate(String message, Context context, Locale locale) {
 		return interpolateMessage( message, context, locale );
 	}
@@ -190,6 +193,8 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		resolvedMessage = resolvedMessage.replace( "\\{", "{" );
 		resolvedMessage = resolvedMessage.replace( "\\}", "}" );
 		resolvedMessage = resolvedMessage.replace( "\\\\", "\\" );
+		resolvedMessage = resolvedMessage.replace( "\\$", "$" );
+
 		return resolvedMessage;
 	}
 

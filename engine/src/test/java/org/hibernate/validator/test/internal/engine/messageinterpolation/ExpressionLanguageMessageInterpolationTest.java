@@ -116,7 +116,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 	public void testEscapedExpressionLanguage() {
 		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 
-		String expected = "\\${1+1}";
+		String expected = "${1+1}";
 		String actual = interpolatorUnderTest.interpolate( "\\${1+1}", context );
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
