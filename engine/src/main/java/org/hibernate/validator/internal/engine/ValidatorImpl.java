@@ -955,7 +955,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			int numberOfViolationsOfCurrentGroup = 0;
 
 			ValueContext<T, Object> valueContext = getExecutableValueContext(
-					object, validationContext.getRootBeanClass(), executableMetaData, currentValidatedGroup
+					object, executableMetaData, currentValidatedGroup
 			);
 			valueContext.appendCrossParameterNode();
 			valueContext.setCurrentValidatedValue( parameterValues );
@@ -969,7 +969,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			valueContext = getExecutableValueContext(
-					object, validationContext.getRootBeanClass(), executableMetaData, currentValidatedGroup
+					object, executableMetaData, currentValidatedGroup
 			);
 			valueContext.setCurrentValidatedValue( parameterValues );
 
@@ -1000,9 +1000,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	private <T> ValueContext<T, Object> getExecutableValueContext(T object, Class<T> clazz,
-																  ExecutableMetaData executableMetaData,
-																  Class<?> oneGroup) {
+	private <T> ValueContext<T, Object> getExecutableValueContext(T object, ExecutableMetaData executableMetaData, Class<?> group) {
 		ValueContext<T, Object> valueContext;
 
 		if ( object != null ) {
@@ -1014,13 +1012,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 		else {
 			valueContext = ValueContext.getLocalExecutionContext(
-					clazz,
+					(Class<T>) null, //the type is not required in this case (only for cascaded validation)
 					null,
 					PathImpl.createPathForExecutable( executableMetaData )
 			);
 		}
 
-		valueContext.setCurrentGroup( oneGroup );
+		valueContext.setCurrentGroup( group );
 
 		return valueContext;
 	}
@@ -1127,9 +1125,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			int numberOfViolationsOfCurrentGroup = 0;
 
 			// validate constraints at return value itself
-			ValueContext<T, Object> valueContext = getExecutableValueContext(
-					bean,
-					validationContext.getRootBeanClass(),
+			ValueContext<?, Object> valueContext = getExecutableValueContext(
+					executableMetaData.getKind() == ElementKind.CONSTRUCTOR ? value : bean,
 					executableMetaData,
 					oneGroup
 			);
@@ -1154,9 +1151,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
 	}
 
-	private <T> int validateConstraintsForGroup(ValidationContext<T> validationContext,
-												ValueContext<T, ?> valueContext,
-												Iterable<MetaConstraint<?>> constraints) {
+	private int validateConstraintsForGroup(ValidationContext<?> validationContext,
+											ValueContext<?, ?> valueContext,
+											Iterable<MetaConstraint<?>> constraints) {
 		int numberOfViolationsBefore = validationContext.getFailingConstraints().size();
 
 		for ( MetaConstraint<?> metaConstraint : constraints ) {
