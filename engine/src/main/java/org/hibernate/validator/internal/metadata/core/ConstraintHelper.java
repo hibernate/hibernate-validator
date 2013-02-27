@@ -19,8 +19,10 @@ package org.hibernate.validator.internal.metadata.core;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
@@ -87,13 +89,13 @@ import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCha
 import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.URLValidator;
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
@@ -106,10 +108,10 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 public class ConstraintHelper {
 	private static final Log log = LoggerFactory.make();
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
-	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<?, ?>>>> builtinConstraints =
-			CollectionHelper.newConcurrentHashMap();
-	private final ConcurrentHashMap<Class<? extends Annotation>, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>>> constraintValidatorDefinitions =
-			CollectionHelper.newConcurrentHashMap();
+
+	private final ConcurrentMap<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints = newConcurrentHashMap();
+
+	private final ValidatorClassMap validatorClasses = new ValidatorClassMap();
 
 	public ConstraintHelper() {
 		List<Class<? extends ConstraintValidator<?, ?>>> constraintList = newArrayList();
@@ -218,26 +220,74 @@ public class ConstraintHelper {
 		builtinConstraints.put( URL.class, constraintList );
 	}
 
-	public List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> getBuiltInConstraints(Class<? extends Annotation> annotationClass) {
-		final List<Class<? extends ConstraintValidator<?, ?>>> builtInList = builtinConstraints.get( annotationClass );
+	private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getBuiltInConstraints(Class<A> annotationClass) {
+		//safe cause all CV for a given annotation A are CV<A, ?>
+		@SuppressWarnings("unchecked")
+		final List<Class<? extends ConstraintValidator<A, ?>>> builtInList = (List<Class<? extends ConstraintValidator<A, ?>>>) builtinConstraints
+				.get( annotationClass );
 
 		if ( builtInList == null || builtInList.size() == 0 ) {
 			throw log.getUnableToFindAnnotationConstraintsException( annotationClass );
 		}
 
-		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraints = newArrayList( builtInList.size() );
-		for ( Class<? extends ConstraintValidator<?, ?>> validatorClass : builtInList ) {
-			//safe cause all CV for a given annotation A are CV<A, ?>
-			@SuppressWarnings("unchecked")
-			Class<ConstraintValidator<? extends Annotation, ?>> safeValidatorClass = (Class<ConstraintValidator<? extends Annotation, ?>>) validatorClass;
-			constraints.add( safeValidatorClass );
-		}
-
-		return constraints;
+		return builtInList;
 	}
 
-	public boolean isBuiltinConstraint(Class<? extends Annotation> annotationType) {
+	private boolean isBuiltinConstraint(Class<? extends Annotation> annotationType) {
 		return builtinConstraints.containsKey( annotationType );
+	}
+
+	/**
+	 * Returns the constraint validator classes for the given constraint
+	 * annotation type, as retrieved from
+	 *
+	 * <ul>
+	 * <li>{@link Constraint#validatedBy()},
+	 * <li>internally registered validators for built-in constraints and</li>
+	 * <li>XML configuration.</li>
+	 * </ul>
+	 *
+	 * The result is cached internally.
+	 *
+	 * @param annotationType The constraint annotation type.
+	 *
+	 * @return The validator classes for the given type.
+	 */
+	public <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getValidatorClasses(Class<A> annotationType) {
+		Contracts.assertNotNull( annotationType, MESSAGES.classCannotBeNull() );
+
+		List<Class<? extends ConstraintValidator<A, ?>>> classes = validatorClasses.get( annotationType );
+
+		if ( classes == null ) {
+			classes = getDefaultValidatorClasses( annotationType );
+
+			List<Class<? extends ConstraintValidator<A, ?>>> cachedValidatorClasses = validatorClasses.putIfAbsent(
+					annotationType,
+					classes
+			);
+
+			if ( cachedValidatorClasses != null ) {
+				classes = cachedValidatorClasses;
+			}
+		}
+
+		return Collections.unmodifiableList( classes );
+	}
+
+	/**
+	 * Registers the given validator classes with the given constraint
+	 * annotation type.
+	 *
+	 * @param annotationType The constraint annotation type
+	 * @param definitionClasses The validators to register
+	 * @param keepDefaultClasses Whether any default validators should be kept or not
+	 */
+	public <A extends Annotation> void putValidatorClasses(Class<A> annotationType, List<Class<? extends ConstraintValidator<A, ?>>> definitionClasses, boolean keepDefaultClasses) {
+		if ( keepDefaultClasses ) {
+			definitionClasses.addAll( getDefaultValidatorClasses( annotationType ) );
+		}
+
+		validatorClasses.put( annotationType, definitionClasses );
 	}
 
 	/**
@@ -331,7 +381,7 @@ public class ConstraintHelper {
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
 		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
 		for ( Method m : methods ) {
-			if ( m.getName().startsWith( "valid" ) && !m.getName().equals( "validationAppliesTo" )) {
+			if ( m.getName().startsWith( "valid" ) && !m.getName().equals( "validationAppliesTo" ) ) {
 				throw log.getConstraintParametersCannotStartWithValidException();
 			}
 		}
@@ -379,34 +429,6 @@ public class ConstraintHelper {
 		}
 	}
 
-	public <T extends Annotation> List<Class<? extends ConstraintValidator<T, ?>>>
-	getConstraintValidatorDefinition(Class<T> annotationClass) {
-		Contracts.assertNotNull( annotationClass, MESSAGES.classCannotBeNull() );
-
-		final List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> list = constraintValidatorDefinitions.get(
-				annotationClass
-		);
-
-		List<Class<? extends ConstraintValidator<T, ?>>> constraintsValidators = newArrayList( list.size() );
-
-		for ( Class<? extends ConstraintValidator<?, ?>> validatorClass : list ) {
-			//safe cause all CV for a given annotation A are CV<A, ?>
-			@SuppressWarnings("unchecked")
-			Class<ConstraintValidator<T, ?>> safeValidatorClass = (Class<ConstraintValidator<T, ?>>) validatorClass;
-			constraintsValidators.add( safeValidatorClass );
-		}
-
-		return constraintsValidators;
-	}
-
-	public <A extends Annotation> void addConstraintValidatorDefinition(Class<A> annotationClass, List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> definitionClasses) {
-		constraintValidatorDefinitions.putIfAbsent( annotationClass, definitionClasses );
-	}
-
-	public boolean areConstraintValidatorDefinitionsCached(Class<? extends Annotation> annotationClass) {
-		return constraintValidatorDefinitions.containsKey( annotationClass );
-	}
-
 	public boolean isConstraintComposition(Class<? extends Annotation> annotationType) {
 		return annotationType == ConstraintComposition.class;
 	}
@@ -421,5 +443,55 @@ public class ConstraintHelper {
 			isInClasspath = false;
 		}
 		return isInClasspath;
+	}
+
+	/**
+	 * Returns the default validators for the given constraint type.
+	 *
+	 * @param annotationType The constraint annotation type.
+	 *
+	 * @return A list with the default validators as retrieved from
+	 *         {@link Constraint#validatedBy()} or the list of validators for
+	 *         built-in constraints.
+	 */
+	private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getDefaultValidatorClasses(Class<A> annotationType) {
+		if ( isBuiltinConstraint( annotationType ) ) {
+			return getBuiltInConstraints( annotationType );
+		}
+		else {
+			@SuppressWarnings("unchecked")
+			Class<? extends ConstraintValidator<A, ?>>[] validatedBy = (Class<? extends ConstraintValidator<A, ?>>[]) annotationType
+					.getAnnotation( Constraint.class )
+					.validatedBy();
+			return Arrays.asList( validatedBy );
+		}
+	}
+
+	/**
+	 * A type-safe wrapper around a concurrent map from constraint types to
+	 * associated validator classes. The casts are safe as data is added trough
+	 * the typed API only.
+	 *
+	 * @author Gunnar Morling
+	 */
+	@SuppressWarnings("unchecked")
+	private static class ValidatorClassMap {
+
+		private final ConcurrentMap<Class<? extends Annotation>, List<? extends Class<?>>> constraintValidatorClasses = newConcurrentHashMap();
+
+		private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> get(Class<A> annotationType) {
+			return (List<Class<? extends ConstraintValidator<A, ?>>>) constraintValidatorClasses.get( annotationType );
+		}
+
+		private <A extends Annotation> void put(Class<A> annotationType, List<Class<? extends ConstraintValidator<A, ?>>> validatorClasses) {
+			constraintValidatorClasses.put( annotationType, validatorClasses );
+		}
+
+		private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> putIfAbsent(Class<A> annotationType, List<Class<? extends ConstraintValidator<A, ?>>> classes) {
+			return (List<Class<? extends ConstraintValidator<A, ?>>>) constraintValidatorClasses.putIfAbsent(
+					annotationType,
+					classes
+			);
+		}
 	}
 }

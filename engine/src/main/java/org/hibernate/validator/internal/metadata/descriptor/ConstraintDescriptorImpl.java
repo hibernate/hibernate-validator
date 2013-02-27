@@ -27,11 +27,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +55,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.constraints.CompositionType.AND;
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
@@ -82,15 +79,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	/**
 	 * A list of annotations which can be ignored when investigating for composing constraints.
 	 */
-	private static final List<String> NON_COMPOSING_CONSTRAINT_ANNOTATIONS = new ArrayList<String>();
-
-	static {
-		NON_COMPOSING_CONSTRAINT_ANNOTATIONS.add( Documented.class.getName() );
-		NON_COMPOSING_CONSTRAINT_ANNOTATIONS.add( Retention.class.getName() );
-		NON_COMPOSING_CONSTRAINT_ANNOTATIONS.add( Target.class.getName() );
-		NON_COMPOSING_CONSTRAINT_ANNOTATIONS.add( Constraint.class.getName() );
-		NON_COMPOSING_CONSTRAINT_ANNOTATIONS.add( ReportAsSingleViolation.class.getName() );
-	}
+	private static final List<String> NON_COMPOSING_CONSTRAINT_ANNOTATIONS = Arrays.asList(
+			Documented.class.getName(),
+			Retention.class.getName(),
+			Target.class.getName(),
+			Constraint.class.getName(),
+			ReportAsSingleViolation.class.getName()
+	);
 
 	/**
 	 * The actual constraint annotation.
@@ -181,7 +176,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.attributes = buildAnnotationParameterMap( annotation );
 		this.groups = buildGroupSet( implicitGroup );
 		this.payloads = buildPayloadSet( annotation );
-		this.constraintValidatorDefinitionClasses = findConstraintValidatorClasses( constraintHelper );
+		this.constraintValidatorDefinitionClasses = constraintHelper.getValidatorClasses( annotationType );
 		this.crossParameterConstraintValidatorClass = findCrossParameterValidatorClass(
 				constraintValidatorDefinitionClasses
 		);
@@ -415,7 +410,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private Set<Class<?>> buildGroupSet(Class<?> implicitGroup) {
-		Set<Class<?>> groupSet = new HashSet<Class<?>>();
+		Set<Class<?>> groupSet = newHashSet();
 		final Class<?>[] groupsFromAnnotation = ReflectionHelper.getAnnotationParameter(
 				annotation, GROUPS, Class[].class
 		);
@@ -431,37 +426,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			groupSet.add( implicitGroup );
 		}
 		return Collections.unmodifiableSet( groupSet );
-	}
-
-	@SuppressWarnings("unchecked")
-	private List<Class<? extends ConstraintValidator<T, ?>>> findConstraintValidatorClasses(ConstraintHelper constraintHelper) {
-		final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses = newArrayList();
-		if ( constraintHelper.areConstraintValidatorDefinitionsCached( annotationType ) ) {
-			constraintValidatorClasses.addAll( constraintHelper.getConstraintValidatorDefinition( annotationType ) );
-			return Collections.unmodifiableList( constraintValidatorClasses );
-		}
-
-		// nothing cached, we need to process Constraint#validatedBy
-		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintDefinitionClasses = newArrayList();
-		if ( constraintHelper.isBuiltinConstraint( annotationType ) ) {
-			constraintDefinitionClasses.addAll( constraintHelper.getBuiltInConstraints( annotationType ) );
-		}
-		else {
-			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
-					.getAnnotation( Constraint.class )
-					.validatedBy();
-			constraintDefinitionClasses.addAll( Arrays.asList( validatedBy ) );
-		}
-
-		constraintHelper.addConstraintValidatorDefinition(
-				annotationType, constraintDefinitionClasses
-		);
-
-		for ( Class<? extends ConstraintValidator<? extends Annotation, ?>> validator : constraintDefinitionClasses ) {
-			Class<? extends ConstraintValidator<T, ?>> safeValidator = (Class<? extends ConstraintValidator<T, ?>>) validator;
-			constraintValidatorClasses.add( safeValidator );
-		}
-		return Collections.unmodifiableList( constraintValidatorClasses );
 	}
 
 	private Class<? extends ConstraintValidator<T, ?>> findCrossParameterValidatorClass(List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDefinitionClasses) {
@@ -499,7 +463,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
 		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotation.annotationType() );
-		Map<String, Object> parameters = new HashMap<String, Object>( declaredMethods.length );
+		Map<String, Object> parameters = newHashMap( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
 			try {
 				parameters.put( m.getName(), m.invoke( annotation ) );
@@ -530,7 +494,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
-		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = new HashMap<ClassIndexWrapper, Map<String, Object>>();
+		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = newHashMap();
 		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
 		for ( Method m : methods ) {
 			if ( m.getAnnotation( OverridesAttribute.class ) != null ) {
@@ -560,7 +524,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			);
 			Map<String, Object> map = overrideParameters.get( wrapper );
 			if ( map == null ) {
-				map = new HashMap<String, Object>();
+				map = newHashMap();
 				overrideParameters.put( wrapper, map );
 			}
 			map.put( overridesAttribute.name(), value );
@@ -582,7 +546,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private Set<ConstraintDescriptor<?>> parseComposingConstraints(Member member, ConstraintHelper constraintHelper) {
-		Set<ConstraintDescriptor<?>> composingConstraintsSet = new HashSet<ConstraintDescriptor<?>>();
+		Set<ConstraintDescriptor<?>> composingConstraintsSet = newHashSet();
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
 
 		for ( Annotation declaredAnnotation : annotationType.getDeclaredAnnotations() ) {
@@ -601,8 +565,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				continue;
 			}
 
-			if ( constraintHelper.isConstraintAnnotation( declaredAnnotationType )
-					|| constraintHelper.isBuiltinConstraint( declaredAnnotationType ) ) {
+			if ( constraintHelper.isConstraintAnnotation( declaredAnnotationType ) ) {
 				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
 						member,
 						declaredAnnotation,
@@ -687,7 +650,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	/**
 	 * @param compositionType the compositionType to set
 	 */
-	public void setCompositionType(CompositionType compositionType) {
+	private void setCompositionType(CompositionType compositionType) {
 		this.compositionType = compositionType;
 	}
 

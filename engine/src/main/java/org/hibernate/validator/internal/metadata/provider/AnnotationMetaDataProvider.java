@@ -23,7 +23,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -464,7 +463,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return A list of constraint descriptors for all constraint specified for the given member.
 	 */
 	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type) {
-		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
+		List<ConstraintDescriptorImpl<?>> metaData = newArrayList();
 		for ( Annotation annotation : ( (AccessibleObject) member ).getDeclaredAnnotations() ) {
 			metaData.addAll( findConstraintAnnotations( member, annotation, type ) );
 		}
@@ -481,7 +480,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return A list of constraint descriptors for all constraint specified on the given class.
 	 */
 	private List<ConstraintDescriptorImpl<?>> findClassLevelConstraints(Class<?> beanClass) {
-		List<ConstraintDescriptorImpl<?>> metaData = new ArrayList<ConstraintDescriptorImpl<?>>();
+		List<ConstraintDescriptorImpl<?>> metaData = newArrayList();
 		for ( Annotation annotation : beanClass.getDeclaredAnnotations() ) {
 			metaData.addAll( findConstraintAnnotations( null, annotation, ElementType.TYPE ) );
 		}
@@ -500,12 +499,11 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
 																							   A annotation,
 																							   ElementType type) {
-		List<ConstraintDescriptorImpl<?>> constraintDescriptors = new ArrayList<ConstraintDescriptorImpl<?>>();
+		List<ConstraintDescriptorImpl<?>> constraintDescriptors = newArrayList();
 
-		List<Annotation> constraints = new ArrayList<Annotation>();
+		List<Annotation> constraints = newArrayList();
 		Class<? extends Annotation> annotationType = annotation.annotationType();
-		if ( constraintHelper.isConstraintAnnotation( annotationType )
-				|| constraintHelper.isBuiltinConstraint( annotationType ) ) {
+		if ( constraintHelper.isConstraintAnnotation( annotationType ) ) {
 			constraints.add( annotation );
 		}
 		else if ( constraintHelper.isMultiValueConstraint( annotationType ) ) {
