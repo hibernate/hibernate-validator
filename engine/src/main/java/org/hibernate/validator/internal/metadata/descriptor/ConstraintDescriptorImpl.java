@@ -671,11 +671,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			}
 		}
 
-		// groups get inherited from the parent
+		//propagate inherited attributes to composing constraints
 		annotationDescriptor.setValue( GROUPS, groups.toArray( new Class<?>[groups.size()] ) );
-
-		// HV-183 - payloads are propagated to composing constraints
 		annotationDescriptor.setValue( PAYLOAD, payloads.toArray( new Class<?>[payloads.size()] ) );
+		if ( annotationDescriptor.getElements().containsKey( VALIDATION_APPLIES_TO ) ) {
+			annotationDescriptor.setValue( VALIDATION_APPLIES_TO, getValidationAppliesTo() );
+		}
 
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
 		return new ConstraintDescriptorImpl<U>(
