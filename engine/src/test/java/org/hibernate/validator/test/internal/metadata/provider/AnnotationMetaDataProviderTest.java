@@ -189,12 +189,6 @@ public class AnnotationMetaDataProviderTest {
 		provider.getBeanConfigurationForHierarchy( User2.class );
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "HV000125.*.*User5#address.*")
-	public void groupConversionOnNonCascadingFieldCausesException() {
-		provider.getBeanConfigurationForHierarchy( User5.class );
-	}
-
 	@Test
 	public void noGroupConversionOnMethod() throws Exception {
 		//when
@@ -239,12 +233,6 @@ public class AnnotationMetaDataProviderTest {
 		expected.put( Complete.class, FullPostal.class );
 
 		assertThat( method.getGroupConversions() ).isEqualTo( expected );
-	}
-
-	@Test(expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "HV000125.*User7#getAddress\\(\\).*")
-	public void groupConversionOnNonCascadingMethodCausesException() {
-		provider.getBeanConfigurationForHierarchy( User7.class );
 	}
 
 	@Test
@@ -294,16 +282,9 @@ public class AnnotationMetaDataProviderTest {
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
-	public void multipleGroupConversionsOnParameterdWithSameFromCauseException() {
+	public void multipleGroupConversionsOnParameterWithSameFromCauseException() {
 		provider.getBeanConfigurationForHierarchy( User4.class );
 	}
-
-	@Test(expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "HV000125.*.*User6#setAddress\\(0\\).*")
-	public void groupConversionOnNonCascadingParameterCausesException() {
-		provider.getBeanConfigurationForHierarchy( User6.class );
-	}
-
 
 	@Test
 	public void singleGroupConversionOnConstructor() throws Exception {

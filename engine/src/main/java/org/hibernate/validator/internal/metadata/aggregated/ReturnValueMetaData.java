@@ -46,7 +46,10 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	private final List<Cascadable> cascadables;
 	private final GroupConversionHelper groupConversionHelper;
 
-	public ReturnValueMetaData(Type type, Set<MetaConstraint<?>> constraints, boolean isCascading, Map<Class<?>, Class<?>> groupConversions) {
+	public ReturnValueMetaData(Type type,
+							   Set<MetaConstraint<?>> constraints,
+							   boolean isCascading,
+							   Map<Class<?>, Class<?>> groupConversions) {
 		super(
 				RETURN_VALUE_NODE_NAME,
 				type,
@@ -58,6 +61,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 
 		this.cascadables = Collections.unmodifiableList( isCascading ? Arrays.asList( this ) : Collections.<Cascadable>emptyList() );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
+		validateGroupConversions( groupConversions );
 	}
 
 	@Override

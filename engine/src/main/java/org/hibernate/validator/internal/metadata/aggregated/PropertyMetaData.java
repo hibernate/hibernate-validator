@@ -79,8 +79,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				cascadingMember != null || !constraints.isEmpty()
 		);
 
-		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
-
 		if ( cascadingMember != null ) {
 			this.cascadingMember = cascadingMember;
 			this.elementType = cascadingMember instanceof Field ? ElementType.FIELD : ElementType.METHOD;
@@ -89,6 +87,9 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			this.cascadingMember = null;
 			this.elementType = ElementType.TYPE;
 		}
+
+		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
+		validateGroupConversions( groupConversions );
 	}
 
 	@Override
