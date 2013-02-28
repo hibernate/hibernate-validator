@@ -67,9 +67,10 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				!constraints.isEmpty() || isCascading
 		);
 
-		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.index = index;
-		validateGroupConversions( groupConversions );
+
+		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
+		this.groupConversionHelper.validateGroupConversions( groupConversions, isCascading(), this.toString() );
 	}
 
 	public int getIndex() {

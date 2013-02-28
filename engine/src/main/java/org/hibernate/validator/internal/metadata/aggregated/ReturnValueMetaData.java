@@ -61,7 +61,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 
 		this.cascadables = Collections.unmodifiableList( isCascading ? Arrays.asList( this ) : Collections.<Cascadable>emptyList() );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
-		validateGroupConversions( groupConversions );
+		this.groupConversionHelper.validateGroupConversions( groupConversions, isCascading(), this.toString() );
 	}
 
 	@Override

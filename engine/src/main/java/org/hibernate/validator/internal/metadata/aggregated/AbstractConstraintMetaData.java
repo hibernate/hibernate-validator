@@ -19,15 +19,11 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import javax.validation.ElementKind;
-import javax.validation.GroupSequence;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -38,8 +34,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
-	private static final Log log = LoggerFactory.make();
-
 	private final String name;
 	private final Type type;
 	private final ElementKind constrainedMetaDataKind;
@@ -152,23 +146,5 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		}
 
 		return theValue;
-	}
-
-	protected void validateGroupConversions(Map<Class<?>, Class<?>> groupConversions) {
-		//group conversions may only be configured for cascadable elements
-		if ( !isCascading() && !groupConversions.isEmpty() ) {
-			throw log.getGroupConversionOnNonCascadingElementException( this.toString() );
-		}
-
-		//group conversions may not be configured using a sequence as source
-		for ( Class<?> oneGroup : groupConversions.keySet() ) {
-			if ( isGroupSequence( oneGroup ) ) {
-				throw log.getGroupConversionForSequenceException( oneGroup );
-			}
-		}
-	}
-
-	private boolean isGroupSequence(Class<?> oneGroup) {
-		return oneGroup.isAnnotationPresent( GroupSequence.class );
 	}
 }

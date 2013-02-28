@@ -89,7 +89,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		}
 
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
-		validateGroupConversions( groupConversions );
+		this.groupConversionHelper.validateGroupConversions( groupConversions, isCascading(), this.toString() );
 	}
 
 	@Override
