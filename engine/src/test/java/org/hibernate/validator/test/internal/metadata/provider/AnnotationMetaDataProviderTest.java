@@ -513,29 +513,6 @@ public class AnnotationMetaDataProviderTest {
 		}
 	}
 
-	private static class User5 {
-
-		@ConvertGroup(from = Default.class, to = BasicPostal.class)
-		private final Address address = null;
-	}
-
-	private static class User6 {
-
-		@SuppressWarnings("unused")
-		public void setAddress(
-				@ConvertGroup(from = Default.class, to = BasicPostal.class)
-				Address address) {
-		}
-	}
-
-	private static class User7 {
-
-		@ConvertGroup(from = Default.class, to = BasicPostal.class)
-		public Address getAddress() {
-			return null;
-		}
-	}
-
 	@ClassLevelConstraint("some script")
 	private static class PersonBase {
 	}
