@@ -34,7 +34,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
-
 	private final String name;
 	private final Type type;
 	private final ElementKind constrainedMetaDataKind;
@@ -100,16 +99,6 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 		return isConstrained;
 	}
 
-	protected Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
-		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
-
-		for ( MetaConstraint<?> oneConstraint : constraints ) {
-			theValue.add( oneConstraint.getDescriptor() );
-		}
-
-		return theValue;
-	}
-
 	@Override
 	public String toString() {
 		return "AbstractConstraintMetaData [name=" + name
@@ -147,5 +136,15 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 			return false;
 		}
 		return true;
+	}
+
+	protected Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
+		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
+
+		for ( MetaConstraint<?> oneConstraint : constraints ) {
+			theValue.add( oneConstraint.getDescriptor() );
+		}
+
+		return theValue;
 	}
 }

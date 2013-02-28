@@ -52,7 +52,12 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	 * @param isCascading should cascading constraints be evaluated. Returns {@code true} is the constrained element
 	 * is marked for cascaded validation ({@code @Valid}), {@code false} otherwise.
 	 */
-	private ParameterMetaData(int index, String name, Class<?> type, Set<MetaConstraint<?>> constraints, boolean isCascading, Map<Class<?>, Class<?>> groupConversions) {
+	private ParameterMetaData(int index,
+							  String name,
+							  Class<?> type,
+							  Set<MetaConstraint<?>> constraints,
+							  boolean isCascading,
+							  Map<Class<?>, Class<?>> groupConversions) {
 		super(
 				name,
 				type,
@@ -62,8 +67,10 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				!constraints.isEmpty() || isCascading
 		);
 
-		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.index = index;
+
+		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
+		this.groupConversionHelper.validateGroupConversions( groupConversions, isCascading(), this.toString() );
 	}
 
 	public int getIndex() {
