@@ -80,7 +80,7 @@ public class GroupConversionHelper {
 		return Collections.unmodifiableSet( descriptors );
 	}
 
-	public void validateGroupConversions(Map<Class<?>, Class<?>> groupConversions, boolean isCascaded, String location) {
+	public void validateGroupConversions(boolean isCascaded, String location) {
 		//group conversions may only be configured for cascadable elements
 		if ( !isCascaded && !groupConversions.isEmpty() ) {
 			throw log.getGroupConversionOnNonCascadingElementException( location );
