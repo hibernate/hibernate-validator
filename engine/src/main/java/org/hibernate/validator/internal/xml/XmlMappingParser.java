@@ -20,14 +20,12 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ParameterNameProvider;
 import javax.xml.bind.JAXBContext;
@@ -214,43 +212,33 @@ public class XmlMappingParser {
 			}
 			Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) clazz;
 
-			ValidatedByType validatedByType = constraintDefinition.getValidatedBy();
-			List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorClasses = newArrayList();
-			if ( validatedByType.getIncludeExistingValidators() != null && validatedByType.getIncludeExistingValidators() ) {
-				constraintValidatorClasses.addAll( findConstraintValidatorClasses( annotationClass ) );
-			}
-			for ( String validatorClassName : validatedByType.getValue() ) {
-				Class<? extends ConstraintValidator<?, ?>> validatorClass;
-				validatorClass = (Class<? extends ConstraintValidator<?, ?>>) ReflectionHelper.loadClass(
-						validatorClassName,
-						this.getClass()
-				);
-
-
-				if ( !ConstraintValidator.class.isAssignableFrom( validatorClass ) ) {
-					throw log.getIsNotAConstraintValidatorClassException( validatorClass );
-				}
-
-				constraintValidatorClasses.add( validatorClass );
-			}
-			constraintHelper.addConstraintValidatorDefinition(
-					annotationClass, constraintValidatorClasses
-			);
+			addValidatorDefinitions( annotationClass, constraintDefinition.getValidatedBy() );
 		}
 	}
 
-	private List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> findConstraintValidatorClasses(Class<? extends Annotation> annotationType) {
-		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorDefinitionClasses = newArrayList();
-		if ( constraintHelper.isBuiltinConstraint( annotationType ) ) {
-			constraintValidatorDefinitionClasses.addAll( constraintHelper.getBuiltInConstraints( annotationType ) );
+	private <A extends Annotation> void addValidatorDefinitions(Class<A> annotationClass, ValidatedByType validatedByType) {
+		List<Class<? extends ConstraintValidator<A, ?>>> constraintValidatorClasses = newArrayList();
+
+		for ( String validatorClassName : validatedByType.getValue() ) {
+			@SuppressWarnings("unchecked")
+			Class<? extends ConstraintValidator<A, ?>> validatorClass = (Class<? extends ConstraintValidator<A, ?>>) ReflectionHelper
+					.loadClass(
+							validatorClassName,
+							this.getClass()
+					);
+
+
+			if ( !ConstraintValidator.class.isAssignableFrom( validatorClass ) ) {
+				throw log.getIsNotAConstraintValidatorClassException( validatorClass );
+			}
+
+			constraintValidatorClasses.add( validatorClass );
 		}
-		else {
-			Class<? extends ConstraintValidator<?, ?>>[] validatedBy = annotationType
-					.getAnnotation( Constraint.class )
-					.validatedBy();
-			constraintValidatorDefinitionClasses.addAll( Arrays.asList( validatedBy ) );
-		}
-		return constraintValidatorDefinitionClasses;
+		constraintHelper.putValidatorClasses(
+				annotationClass,
+				constraintValidatorClasses,
+				Boolean.TRUE.equals( validatedByType.getIncludeExistingValidators() )
+		);
 	}
 
 	private void checkClassHasNotBeenProcessed(Set<Class<?>> processedClasses, Class<?> beanClass) {
@@ -258,7 +246,6 @@ public class XmlMappingParser {
 			throw log.getBeanClassHasAlreadyBeConfiguredInXmlException( beanClass.getName() );
 		}
 	}
-
 
 	private void addConstrainedElement(Class<?> beanClass, ConstrainedElement constrainedElement) {
 		if ( constrainedElements.containsKey( beanClass ) ) {
