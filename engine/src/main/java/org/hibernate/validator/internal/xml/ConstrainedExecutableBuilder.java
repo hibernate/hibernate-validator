@@ -103,7 +103,7 @@ public class ConstrainedExecutableBuilder {
 			ConstrainedExecutable constrainedExecutable = parseExecutableType(
 					defaultPackage,
 					methodType.getParameter(),
-					methodType.getCrossParameterConstraint(),
+					methodType.getCrossParameter(),
 					methodType.getReturnValue(),
 					methodExecutableElement,
 					constraintHelper,
@@ -162,13 +162,12 @@ public class ConstrainedExecutableBuilder {
 			ConstrainedExecutable constrainedExecutable = parseExecutableType(
 					defaultPackage,
 					constructorType.getParameter(),
-					constructorType.getCrossParameterConstraint(),
+					constructorType.getCrossParameter(),
 					constructorType.getReturnValue(),
 					constructorExecutableElement,
 					constraintHelper,
 					parameterNameProvider,
 					annotationProcessingOptions
-
 			);
 			constrainedExecutables.add( constrainedExecutable );
 		}
@@ -177,7 +176,7 @@ public class ConstrainedExecutableBuilder {
 
 	private static ConstrainedExecutable parseExecutableType(String defaultPackage,
 															 List<ParameterType> parameterTypeList,
-															 List<ConstraintType> crossParameterConstraintList,
+															 CrossParameterType crossParameterType,
 															 ReturnValueType returnValueType,
 															 ExecutableElement executableElement,
 															 ConstraintHelper constraintHelper,
@@ -192,20 +191,13 @@ public class ConstrainedExecutableBuilder {
 				annotationProcessingOptions
 		);
 
-		Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
-		CrossParameterConstraintLocation constraintLocation = new CrossParameterConstraintLocation(
-				executableElement
+		Set<MetaConstraint<?>> crossParameterConstraints = parseCrossParameterConstraints(
+				defaultPackage,
+				crossParameterType,
+				executableElement,
+				constraintHelper,
+				annotationProcessingOptions
 		);
-		for ( ConstraintType constraintType : crossParameterConstraintList ) {
-			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
-					constraintLocation,
-					constraintType,
-					executableElement.getElementType(),
-					defaultPackage,
-					constraintHelper
-			);
-			crossParameterConstraints.add( metaConstraint );
-		}
 
 		// parse the return value
 		Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
@@ -229,6 +221,42 @@ public class ConstrainedExecutableBuilder {
 				groupConversions,
 				isCascaded
 		);
+	}
+
+	private static Set<MetaConstraint<?>> parseCrossParameterConstraints(String defaultPackage,
+																		 CrossParameterType crossParameterType,
+																		 ExecutableElement executableElement,
+																		 ConstraintHelper constraintHelper,
+																		 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+
+		Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
+		if ( crossParameterType == null ) {
+			return crossParameterConstraints;
+		}
+
+
+		CrossParameterConstraintLocation constraintLocation = new CrossParameterConstraintLocation(
+				executableElement
+		);
+
+		for ( ConstraintType constraintType : crossParameterType.getConstraint() ) {
+			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+					constraintLocation,
+					constraintType,
+					executableElement.getElementType(),
+					defaultPackage,
+					constraintHelper
+			);
+			crossParameterConstraints.add( metaConstraint );
+		}
+
+		// ignore annotations
+		boolean ignoreConstructorAnnotations = crossParameterType.getIgnoreAnnotations() == null ? false : crossParameterType
+				.getIgnoreAnnotations();
+		if ( ignoreConstructorAnnotations ) {
+			annotationProcessingOptions.ignoreConstraintAnnotationsForCrossParameterConstraint( executableElement.getMember() );
+		}
+		return crossParameterConstraints;
 	}
 
 	private static boolean parseReturnValueType(ReturnValueType returnValueType,
@@ -264,7 +292,7 @@ public class ConstrainedExecutableBuilder {
 		boolean ignoreConstructorAnnotations = returnValueType.getIgnoreAnnotations() == null ? false : returnValueType
 				.getIgnoreAnnotations();
 		if ( ignoreConstructorAnnotations ) {
-			annotationProcessingOptions.ignoreConstraintAnnotationsOnReturnValue( executableElement.getMember() );
+			annotationProcessingOptions.ignoreConstraintAnnotationsForReturnValue( executableElement.getMember() );
 		}
 
 		return returnValueType.getValid() != null;
@@ -288,7 +316,6 @@ public class ConstrainedExecutableBuilder {
 
 		return parameterTypes;
 	}
-
 }
 
 

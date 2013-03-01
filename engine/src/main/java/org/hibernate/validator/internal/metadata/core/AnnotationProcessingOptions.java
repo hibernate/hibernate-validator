@@ -32,6 +32,8 @@ public interface AnnotationProcessingOptions {
 
 	boolean areReturnValueConstraintsIgnoredFor(Member member);
 
+	boolean areCrossParameterConstraintsIgnoredFor(Member member);
+
 	boolean areParameterConstraintsIgnoredFor(Member member, int index);
 
 	void merge(AnnotationProcessingOptions annotationProcessingOptions);

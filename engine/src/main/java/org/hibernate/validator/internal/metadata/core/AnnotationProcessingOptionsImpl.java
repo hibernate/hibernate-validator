@@ -62,6 +62,11 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	private final List<Member> annotationIgnoresForReturnValues = newArrayList();
 
 	/**
+	 * Keeps track of explicitly excluded cross parameter constraints for methods/constructors.
+	 */
+	private final List<Member> annotationIgnoresForCrossParameter = newArrayList();
+
+	/**
 	 * Keeps track whether the 'ignore-annotations' flag is set on a method/constructor parameter
 	 */
 	private final Map<Member, List<Integer>> annotationIgnoresForMethodParameter = newHashMap();
@@ -85,6 +90,16 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	@Override
 	public boolean areReturnValueConstraintsIgnoredFor(Member member) {
 		if ( annotationIgnoresForReturnValues.contains( member ) ) {
+			return true;
+		}
+		else {
+			return areMemberConstraintsIgnoredFor( member );
+		}
+	}
+
+	@Override
+	public boolean areCrossParameterConstraintsIgnoredFor(Member member) {
+		if ( annotationIgnoresForCrossParameter.contains( member ) ) {
 			return true;
 		}
 		else {
@@ -124,8 +139,8 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 		this.ignoreAnnotationDefaults.putAll( annotationProcessingOptionsImpl.ignoreAnnotationDefaults );
 		this.annotationIgnoresForClasses.putAll( annotationProcessingOptionsImpl.annotationIgnoresForClasses );
 		this.annotationIgnoredForMembers.addAll( annotationProcessingOptionsImpl.annotationIgnoredForMembers );
-		this.annotationIgnoresForReturnValues
-				.addAll( annotationProcessingOptionsImpl.annotationIgnoresForReturnValues );
+		this.annotationIgnoresForReturnValues.addAll( annotationProcessingOptionsImpl.annotationIgnoresForReturnValues );
+		this.annotationIgnoresForCrossParameter.addAll( annotationProcessingOptionsImpl.annotationIgnoresForCrossParameter );
 		for ( Map.Entry<Member, List<Integer>> entry : annotationProcessingOptionsImpl.annotationIgnoresForMethodParameter
 				.entrySet() ) {
 			if ( this.annotationIgnoresForMethodParameter.containsKey( entry.getKey() ) ) {
@@ -151,8 +166,12 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 		annotationIgnoredForMembers.add( member );
 	}
 
-	public void ignoreConstraintAnnotationsOnReturnValue(Member member) {
+	public void ignoreConstraintAnnotationsForReturnValue(Member member) {
 		annotationIgnoresForReturnValues.add( member );
+	}
+
+	public void ignoreConstraintAnnotationsForCrossParameterConstraint(Member member) {
+		annotationIgnoresForCrossParameter.add( member );
 	}
 
 	public void ignoreConstraintAnnotationsOnParameter(Member member, int index) {

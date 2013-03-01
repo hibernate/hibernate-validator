@@ -125,9 +125,11 @@
                     <message>[XML] - may not be null</message>
                 </constraint>
             </parameter>
-            <cross-parameter-constraint annotation="ConsistentDateParameters">
-                <message>[XML] - {ConsistentDateParameters.message}</message>
-            </cross-parameter-constraint>
+            <cross-parameter>
+                <constraint annotation="ConsistentDateParameters">
+                    <message>[XML] - {ConsistentDateParameters.message}</message>
+                </constraint>
+            </cross-parameter>
         </method>
 
         <method name="getFoo">
@@ -203,7 +205,9 @@
                 <constraint annotation="javax.validation.constraints.NotNull">
                     <message>[XML] - may not be null</message>
                     <groups>
-                        <value>org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository$ValidationGroup</value>
+                        <value>
+                            org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository$ValidationGroup
+                        </value>
                     </groups>
                 </constraint>
             </parameter>
