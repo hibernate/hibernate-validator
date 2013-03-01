@@ -93,22 +93,22 @@ public class IgnoreCrossParameterConstraintTest {
 		Validator validator = getXmlConfiguredValidator( "ignore-annotations-for-cross-parameter-constraints.xml" );
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( this.getClass() );
 
-		// check that the test constructor has a cross parameter constraint
+		// check that the test constructor has no cross parameter constraint
 		ConstructorDescriptor constructorDescriptor = beanDescriptor.getConstraintsForConstructor(
 				String.class,
 				String.class
 		);
 		CrossParameterDescriptor crossParameterDescriptor = constructorDescriptor.getCrossParameterDescriptor();
-		assertFalse( crossParameterDescriptor.hasConstraints(), "There should be cross parameter constraints." );
+		assertFalse( crossParameterDescriptor.hasConstraints(), "There should be no cross parameter constraints." );
 
-		// check that the test method has a cross parameter constraint
+		// check that the test method has no cross parameter constraint
 		MethodDescriptor methodDescriptor = beanDescriptor.getConstraintsForMethod(
 				"snafu",
 				String.class,
 				String.class
 		);
 		crossParameterDescriptor = methodDescriptor.getCrossParameterDescriptor();
-		assertFalse( crossParameterDescriptor.hasConstraints(), "There should be cross parameter constraints." );
+		assertFalse( crossParameterDescriptor.hasConstraints(), "There should be no cross parameter constraints." );
 	}
 
 	private Validator getXmlConfiguredValidator(String fileName) {
