@@ -70,10 +70,12 @@ public class ConstrainedParameterBuilder {
 			);
 
 			// ignore annotations
-			boolean ignoreConstructorAnnotations = parameterType.getIgnoreAnnotations() == null ? false : parameterType
-					.getIgnoreAnnotations();
-			if ( ignoreConstructorAnnotations ) {
-				annotationProcessingOptions.ignoreConstraintAnnotationsOnParameter( executableElement.getMember(), i );
+			if ( parameterType.getIgnoreAnnotations() != null ) {
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnParameter(
+						executableElement.getMember(),
+						i,
+						parameterType.getIgnoreAnnotations()
+				);
 			}
 
 			ConstrainedParameter constrainedParameter = new ConstrainedParameter(

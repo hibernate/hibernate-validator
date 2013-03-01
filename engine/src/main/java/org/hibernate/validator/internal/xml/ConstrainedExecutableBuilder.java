@@ -94,10 +94,11 @@ public class ConstrainedExecutableBuilder {
 			ExecutableElement methodExecutableElement = ExecutableElement.forMethod( method );
 
 			// ignore annotations
-			boolean ignoreConstructorAnnotations = methodType.getIgnoreAnnotations() == null ? false : methodType
-					.getIgnoreAnnotations();
-			if ( ignoreConstructorAnnotations ) {
-				annotationProcessingOptions.ignoreConstraintAnnotationsOnMember( method );
+			if ( methodType.getIgnoreAnnotations() != null ) {
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
+						method,
+						methodType.getIgnoreAnnotations()
+				);
 			}
 
 			ConstrainedExecutable constrainedExecutable = parseExecutableType(
@@ -153,10 +154,11 @@ public class ConstrainedExecutableBuilder {
 			ExecutableElement constructorExecutableElement = ExecutableElement.forConstructor( constructor );
 
 			// ignore annotations
-			boolean ignoreConstructorAnnotations = constructorType.getIgnoreAnnotations() == null ? false : constructorType
-					.getIgnoreAnnotations();
-			if ( ignoreConstructorAnnotations ) {
-				annotationProcessingOptions.ignoreConstraintAnnotationsOnMember( constructor );
+			if ( constructorType.getIgnoreAnnotations() != null ) {
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
+						constructor,
+						constructorType.getIgnoreAnnotations()
+				);
 			}
 
 			ConstrainedExecutable constrainedExecutable = parseExecutableType(
@@ -251,11 +253,13 @@ public class ConstrainedExecutableBuilder {
 		}
 
 		// ignore annotations
-		boolean ignoreConstructorAnnotations = crossParameterType.getIgnoreAnnotations() == null ? false : crossParameterType
-				.getIgnoreAnnotations();
-		if ( ignoreConstructorAnnotations ) {
-			annotationProcessingOptions.ignoreConstraintAnnotationsForCrossParameterConstraint( executableElement.getMember() );
+		if ( crossParameterType.getIgnoreAnnotations() != null ) {
+			annotationProcessingOptions.ignoreConstraintAnnotationsForCrossParameterConstraint(
+					executableElement.getMember(),
+					crossParameterType.getIgnoreAnnotations()
+			);
 		}
+
 		return crossParameterConstraints;
 	}
 
@@ -289,10 +293,11 @@ public class ConstrainedExecutableBuilder {
 		);
 
 		// ignore annotations
-		boolean ignoreConstructorAnnotations = returnValueType.getIgnoreAnnotations() == null ? false : returnValueType
-				.getIgnoreAnnotations();
-		if ( ignoreConstructorAnnotations ) {
-			annotationProcessingOptions.ignoreConstraintAnnotationsForReturnValue( executableElement.getMember() );
+		if ( returnValueType.getIgnoreAnnotations() != null ) {
+			annotationProcessingOptions.ignoreConstraintAnnotationsForReturnValue(
+					executableElement.getMember(),
+					returnValueType.getIgnoreAnnotations()
+			);
 		}
 
 		return returnValueType.getValid() != null;
