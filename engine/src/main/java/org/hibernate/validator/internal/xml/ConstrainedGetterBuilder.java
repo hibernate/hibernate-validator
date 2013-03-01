@@ -87,9 +87,11 @@ public class ConstrainedGetterBuilder {
 			constrainedExecutables.add( constrainedGetter );
 
 			// ignore annotations
-			boolean ignoreGetterAnnotation = getterType.getIgnoreAnnotations() == null ? false : getterType.getIgnoreAnnotations();
-			if ( ignoreGetterAnnotation ) {
-				annotationProcessingOptions.ignoreConstraintAnnotationsOnMember( getter );
+			if ( getterType.getIgnoreAnnotations() != null ) {
+				annotationProcessingOptions.ignoreConstraintAnnotationsOnMember(
+						getter,
+						getterType.getIgnoreAnnotations()
+				);
 			}
 		}
 

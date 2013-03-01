@@ -37,7 +37,7 @@ public final class GetConstructor<T> implements PrivilegedAction<Constructor<T>>
 
 	public Constructor<T> run() {
 		try {
-			return clazz.getConstructor(params);
+			return clazz.getDeclaredConstructor(params);
 		}
 		catch ( NoSuchMethodException e ) {
 			return null;

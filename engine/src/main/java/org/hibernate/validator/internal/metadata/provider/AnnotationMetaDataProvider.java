@@ -317,7 +317,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 
 		Set<MetaConstraint<?>> crossParameterConstraints;
-		if ( annotationProcessingOptions.areMemberConstraintsIgnoredFor( executable.getMember() ) ) {
+		if ( annotationProcessingOptions.areCrossParameterConstraintsIgnoredFor( executable.getMember() ) ) {
 			crossParameterConstraints = Collections.emptySet();
 		}
 		else {

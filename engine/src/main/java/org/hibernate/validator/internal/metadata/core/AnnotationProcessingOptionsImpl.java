@@ -16,15 +16,12 @@
 */
 package org.hibernate.validator.internal.metadata.core;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
@@ -50,42 +47,50 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	private final Map<Class<?>, Boolean> annotationIgnoresForClasses = newHashMap();
 
 	/**
-	 * Keeps track of explicitly excluded members (fields and properties). If a member appears in
-	 * the list 'ignore-annotations' was explicitly set to {@code true} in the configuration
-	 * for this class.
+	 * Keeps track of explicitly excluded members (fields and properties).
 	 */
-	private final List<Member> annotationIgnoredForMembers = newArrayList();
+	private final Map<Member, Boolean> annotationIgnoredForMembers = newHashMap();
 
 	/**
 	 * Keeps track of explicitly excluded return value constraints for methods/constructors.
 	 */
-	private final List<Member> annotationIgnoresForReturnValues = newArrayList();
+	private final Map<Member, Boolean> annotationIgnoresForReturnValues = newHashMap();
+
+	/**
+	 * Keeps track of explicitly excluded cross parameter constraints for methods/constructors.
+	 */
+	private final Map<Member, Boolean> annotationIgnoresForCrossParameter = newHashMap();
 
 	/**
 	 * Keeps track whether the 'ignore-annotations' flag is set on a method/constructor parameter
 	 */
-	private final Map<Member, List<Integer>> annotationIgnoresForMethodParameter = newHashMap();
+	private final Map<ExecutableParameterKey, Boolean> annotationIgnoresForMethodParameter = newHashMap();
 
 	@Override
 	public boolean areMemberConstraintsIgnoredFor(Member member) {
-		boolean ignoreAnnotation;
 		Class<?> clazz = member.getDeclaringClass();
-		if ( !annotationIgnoredForMembers.contains( member ) ) {
-			ignoreAnnotation = areAllConstraintAnnotationsIgnoredFor( clazz );
+		if ( annotationIgnoredForMembers.containsKey( member ) ) {
+			return annotationIgnoredForMembers.get( member );
 		}
 		else {
-			ignoreAnnotation = annotationIgnoredForMembers.contains( member );
+			return areAllConstraintAnnotationsIgnoredFor( clazz );
 		}
-		if ( ignoreAnnotation ) {
-			logMessage( member, clazz );
-		}
-		return ignoreAnnotation;
 	}
 
 	@Override
 	public boolean areReturnValueConstraintsIgnoredFor(Member member) {
-		if ( annotationIgnoresForReturnValues.contains( member ) ) {
-			return true;
+		if ( annotationIgnoresForReturnValues.containsKey( member ) ) {
+			return annotationIgnoresForReturnValues.get( member );
+		}
+		else {
+			return areMemberConstraintsIgnoredFor( member );
+		}
+	}
+
+	@Override
+	public boolean areCrossParameterConstraintsIgnoredFor(Member member) {
+		if ( annotationIgnoresForCrossParameter.containsKey( member ) ) {
+			return annotationIgnoresForCrossParameter.get( member );
 		}
 		else {
 			return areMemberConstraintsIgnoredFor( member );
@@ -94,9 +99,9 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 
 	@Override
 	public boolean areParameterConstraintsIgnoredFor(Member member, int index) {
-		List<Integer> parameterIndexes = annotationIgnoresForMethodParameter.get( member );
-		if ( parameterIndexes != null && parameterIndexes.contains( index ) ) {
-			return true;
+		ExecutableParameterKey key = new ExecutableParameterKey( member, index );
+		if ( annotationIgnoresForMethodParameter.containsKey( key ) ) {
+			return annotationIgnoresForMethodParameter.get( key );
 		}
 		else {
 			return areMemberConstraintsIgnoredFor( member );
@@ -121,21 +126,16 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 	@Override
 	public void merge(AnnotationProcessingOptions annotationProcessingOptions) {
 		AnnotationProcessingOptionsImpl annotationProcessingOptionsImpl = (AnnotationProcessingOptionsImpl) annotationProcessingOptions;
+
+		// TODO rethink the "merging" of these options. It will depend on the order of merging (HF)
 		this.ignoreAnnotationDefaults.putAll( annotationProcessingOptionsImpl.ignoreAnnotationDefaults );
 		this.annotationIgnoresForClasses.putAll( annotationProcessingOptionsImpl.annotationIgnoresForClasses );
-		this.annotationIgnoredForMembers.addAll( annotationProcessingOptionsImpl.annotationIgnoredForMembers );
+		this.annotationIgnoredForMembers.putAll( annotationProcessingOptionsImpl.annotationIgnoredForMembers );
 		this.annotationIgnoresForReturnValues
-				.addAll( annotationProcessingOptionsImpl.annotationIgnoresForReturnValues );
-		for ( Map.Entry<Member, List<Integer>> entry : annotationProcessingOptionsImpl.annotationIgnoresForMethodParameter
-				.entrySet() ) {
-			if ( this.annotationIgnoresForMethodParameter.containsKey( entry.getKey() ) ) {
-				this.annotationIgnoresForMethodParameter.get( entry.getKey() ).addAll( entry.getValue() );
-			}
-			else {
-				this.annotationIgnoresForMethodParameter.put( entry.getKey(), entry.getValue() );
-			}
-		}
-
+				.putAll( annotationProcessingOptionsImpl.annotationIgnoresForReturnValues );
+		this.annotationIgnoresForCrossParameter
+				.putAll( annotationProcessingOptionsImpl.annotationIgnoresForCrossParameter );
+		this.annotationIgnoresForMethodParameter.putAll( annotationProcessingOptionsImpl.annotationIgnoresForMethodParameter );
 	}
 
 	public void ignoreAnnotationConstraintForClass(Class<?> clazz, Boolean b) {
@@ -147,23 +147,21 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 		}
 	}
 
-	public void ignoreConstraintAnnotationsOnMember(Member member) {
-		annotationIgnoredForMembers.add( member );
+	public void ignoreConstraintAnnotationsOnMember(Member member, Boolean b) {
+		annotationIgnoredForMembers.put( member, b );
 	}
 
-	public void ignoreConstraintAnnotationsOnReturnValue(Member member) {
-		annotationIgnoresForReturnValues.add( member );
+	public void ignoreConstraintAnnotationsForReturnValue(Member member, Boolean b) {
+		annotationIgnoresForReturnValues.put( member, b );
 	}
 
-	public void ignoreConstraintAnnotationsOnParameter(Member member, int index) {
-		if ( annotationIgnoresForMethodParameter.get( member ) == null ) {
-			List<Integer> tmpList = newArrayList();
-			tmpList.add( index );
-			annotationIgnoresForMethodParameter.put( member, tmpList );
-		}
-		else {
-			annotationIgnoresForMethodParameter.get( member ).add( index );
-		}
+	public void ignoreConstraintAnnotationsForCrossParameterConstraint(Member member, Boolean b) {
+		annotationIgnoresForCrossParameter.put( member, b );
+	}
+
+	public void ignoreConstraintAnnotationsOnParameter(Member member, int index, Boolean b) {
+		ExecutableParameterKey key = new ExecutableParameterKey( member, index );
+		annotationIgnoresForMethodParameter.put( key, b );
 	}
 
 	public void ignoreClassLevelConstraintAnnotations(Class<?> clazz, boolean b) {
@@ -174,22 +172,41 @@ public class AnnotationProcessingOptionsImpl implements AnnotationProcessingOpti
 		return ignoreAnnotationDefaults.containsKey( clazz ) && ignoreAnnotationDefaults.get( clazz );
 	}
 
-	private void logMessage(Member member, Class<?> clazz) {
-		if ( log.isTraceEnabled() ) {
-			String type;
-			if ( member instanceof Field ) {
-				type = "Field";
+	public class ExecutableParameterKey {
+		private final Member member;
+		private final int index;
+
+		public ExecutableParameterKey(Member member, int index) {
+			this.member = member;
+			this.index = index;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
 			}
-			else {
-				type = "Property";
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
 			}
 
-			log.debugf(
-					"%s level annotations are getting ignored for %s.%s.",
-					type,
-					clazz.getName(),
-					member.getName()
-			);
+			ExecutableParameterKey that = (ExecutableParameterKey) o;
+
+			if ( index != that.index ) {
+				return false;
+			}
+			if ( member != null ? !member.equals( that.member ) : that.member != null ) {
+				return false;
+			}
+
+			return true;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = member != null ? member.hashCode() : 0;
+			result = 31 * result + index;
+			return result;
 		}
 	}
 }

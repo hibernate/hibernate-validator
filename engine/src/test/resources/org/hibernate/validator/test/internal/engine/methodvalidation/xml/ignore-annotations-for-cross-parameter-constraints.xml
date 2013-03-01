@@ -1,0 +1,23 @@
+<constraint-mappings
+        xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation=
+                "http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.1.xsd" version="1.1">
+
+    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.xml.IgnoreCrossParameterConstraintTest"
+          ignore-annotations="false">
+
+        <constructor>
+            <parameter type="java.lang.String"/>
+            <parameter type="java.lang.String"/>
+            <cross-parameter ignore-annotations="true"/>
+        </constructor>
+
+        <method name="snafu">
+            <parameter type="java.lang.String"/>
+            <parameter type="java.lang.String"/>
+            <cross-parameter ignore-annotations="true"/>
+        </method>
+    </bean>
+
+</constraint-mappings>

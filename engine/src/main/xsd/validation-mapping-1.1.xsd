@@ -168,12 +168,12 @@
     <xs:complexType name="getterType">
         <xs:sequence>
             <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
-            <xs:element type="map:constraintType"
-                        name="constraint"
-                        minOccurs="0"
-                        maxOccurs="unbounded"/>
             <xs:element type="map:groupConversionType"
                         name="convert-group"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
         </xs:sequence>
@@ -186,14 +186,14 @@
                         name="parameter"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
+            <xs:element type="map:crossParameterType"
+                        name="cross-parameter"
+                        minOccurs="0"
+                        maxOccurs="1"/>
             <xs:element type="map:returnValueType"
                         name="return-value"
                         minOccurs="0"
                         maxOccurs="1"/>
-            <xs:element type="map:constraintType"
-                        name="cross-parameter-constraint"
-                        minOccurs="0"
-                        maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute type="xs:string" name="name" use="required"/>
         <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
@@ -204,26 +204,26 @@
                         name="parameter"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
+            <xs:element type="map:crossParameterType"
+                        name="cross-parameter"
+                        minOccurs="0"
+                        maxOccurs="1"/>
             <xs:element type="map:returnValueType"
                         name="return-value"
                         minOccurs="0"
                         maxOccurs="1"/>
-            <xs:element type="map:constraintType"
-                        name="cross-parameter-constraint"
-                        minOccurs="0"
-                        maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
     </xs:complexType>
     <xs:complexType name="parameterType">
         <xs:sequence>
             <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
-            <xs:element type="map:constraintType"
-                        name="constraint"
-                        minOccurs="0"
-                        maxOccurs="unbounded"/>
             <xs:element type="map:groupConversionType"
                         name="convert-group"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
         </xs:sequence>
@@ -233,12 +233,21 @@
     <xs:complexType name="returnValueType">
         <xs:sequence>
             <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
+            <xs:element type="map:groupConversionType"
+                        name="convert-group"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
             <xs:element type="map:constraintType"
                         name="constraint"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
-            <xs:element type="map:groupConversionType"
-                        name="convert-group"
+        </xs:sequence>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="crossParameterType">
+        <xs:sequence>
+            <xs:element type="map:constraintType"
+                        name="constraint"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
         </xs:sequence>
@@ -254,12 +263,12 @@
     <xs:complexType name="fieldType">
         <xs:sequence>
             <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
-            <xs:element type="map:constraintType"
-                        name="constraint"
-                        minOccurs="0"
-                        maxOccurs="unbounded"/>
             <xs:element type="map:groupConversionType"
                         name="convert-group"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
                         minOccurs="0"
                         maxOccurs="unbounded"/>
         </xs:sequence>
