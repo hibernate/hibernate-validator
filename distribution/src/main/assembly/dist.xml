@@ -49,6 +49,7 @@
             </includes>
         </dependencySet>
         <dependencySet>
+            <scope>provided</scope>
             <outputDirectory>dist/lib/provided</outputDirectory>
             <includes>
                 <include>javax.el:*</include>

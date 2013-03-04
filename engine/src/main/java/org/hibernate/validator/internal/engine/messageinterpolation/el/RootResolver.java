@@ -90,13 +90,13 @@ public class RootResolver extends ELResolver {
 		// due to bugs in most EL implementations when it comes to evaluating varargs we take care of the formatter call
 		// ourselves.
 		if ( base instanceof FormatterWrapper ) {
-			returnValue = evaluateFormatExpression( context, base, method, paramTypes, params );
+			returnValue = evaluateFormatExpression( context, params );
 		}
 
 		return returnValue;
 	}
 
-	private Object evaluateFormatExpression(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
+	private Object evaluateFormatExpression(ELContext context, Object[] params) {
 		if ( params.length == 0 ) {
 			throw new ELException( "Invalid number of arguments to Formatter#format" );
 		}
@@ -117,7 +117,7 @@ public class RootResolver extends ELResolver {
 			context.setPropertyResolved( true );
 		}
 		catch ( IllegalFormatException e ) {
-			throw new ELException("Error in Formatter#format call", e);
+			throw new ELException( "Error in Formatter#format call", e );
 		}
 
 		return returnValue;
