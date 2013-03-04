@@ -528,4 +528,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 146,
 			value = "No parameter nodes may be added since path %s doesn't refer to a cross-parameter constraint.")
 	IllegalStateException getParameterNodeAddedForNonCrossParameterConstraintException(Path path);
+
+	@Message(id = 147,
+			value = "%1$s is configured multiple times (note, <getter> and <method> nodes for the same method are not allowed)")
+	ValidationException getConstrainedElementConfiguredMultipleTimesException(String location);
 }
