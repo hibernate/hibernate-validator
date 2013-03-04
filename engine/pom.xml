@@ -41,7 +41,7 @@
 
     <dependencies>
         <!--
-        Compile time dependencies
+        Runtime time dependencies
         -->
         <dependency>
             <groupId>javax.validation</groupId>
@@ -68,6 +68,14 @@
             <groupId>org.glassfish.web</groupId>
             <artifactId>javax.el</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <!--
+        Compile dependencies
+        -->
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-processor</artifactId>
         </dependency>
 
         <!--
