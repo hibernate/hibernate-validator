@@ -188,4 +188,20 @@ public class ExpressionLanguageMessageInterpolationTest {
 		);
 		assertEquals( actual, expected, "Wrong substitution" );
 	}
+
+	@Test
+	public void testMissingFormatArgument() {
+		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		String expected = "${formatter.format('%1$s')}";
+		String actual = interpolatorUnderTest.interpolate( "${formatter.format('%1$s')}", context );
+		assertEquals( actual, expected, "Wrong substitution, exception should be ignored" );
+	}
+
+	@Test
+	public void testNoParametersToFormatter() {
+		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		String expected = "${formatter.format()}";
+		String actual = interpolatorUnderTest.interpolate( "${formatter.format()}", context );
+		assertEquals( actual, expected, "Wrong substitution, exception should be ignored" );
+	}
 }

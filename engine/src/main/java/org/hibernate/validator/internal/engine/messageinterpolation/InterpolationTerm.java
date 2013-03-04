@@ -27,6 +27,7 @@ import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
 import javax.validation.MessageInterpolator;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver;
 import org.hibernate.validator.internal.engine.messageinterpolation.el.SimpleELContext;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -44,11 +45,6 @@ public class InterpolationTerm {
 	 * Name under which the currently validate value is bound to the EL context.
 	 */
 	private static final String VALIDATED_VALUE_NAME = "validatedValue";
-
-	/**
-	 * Name under which to bind a formatter to the EL context.
-	 */
-	private static final String FORMATTER = "formatter";
 
 	/**
 	 * Meta character to designate an EL expression.
@@ -179,7 +175,7 @@ public class InterpolationTerm {
 				new FormatterWrapper( locale ),
 				FormatterWrapper.class
 		);
-		elContext.setVariable( FORMATTER, valueExpression );
+		elContext.setVariable( RootResolver.FORMATTER, valueExpression );
 
 		// map the annotation values
 		for ( Map.Entry<String, Object> entry : messageInterpolatorContext.getConstraintDescriptor()

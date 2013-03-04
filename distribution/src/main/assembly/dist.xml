@@ -46,7 +46,13 @@
                 <include>javax.validation:validation-api</include>
                 <include>org.jboss.logging:jboss-logging</include>
                 <include>com.fasterxml:classmate</include>
-                <include>de.odysseus.juel:*</include>
+            </includes>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>dist/lib/provided</outputDirectory>
+            <includes>
+                <include>javax.el:*</include>
+                <include>org.glassfish.web:*</include>
             </includes>
         </dependencySet>
         <dependencySet>
