@@ -204,4 +204,12 @@ public class ExpressionLanguageMessageInterpolationTest {
 		String actual = interpolatorUnderTest.interpolate( "${formatter.format()}", context );
 		assertEquals( actual, expected, "Wrong substitution, exception should be ignored" );
 	}
+
+	@Test
+	public void testNonFormatterFunction() {
+		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		String expected = "foo";
+		String actual = interpolatorUnderTest.interpolate( "${'foobar'.substring(0,3)}", context );
+		assertEquals( actual, expected, "Wrong substitution, exception should be ignored" );
+	}
 }
