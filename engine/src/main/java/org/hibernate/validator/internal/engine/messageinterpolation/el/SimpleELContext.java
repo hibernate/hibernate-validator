@@ -34,7 +34,7 @@ import javax.el.VariableMapper;
 public class SimpleELContext extends ELContext {
 	private static final ELResolver DEFAULT_RESOLVER = new CompositeELResolver() {
 		{
-			add( new RootPropertyResolver() );
+			add( new RootResolver() );
 			add( new ArrayELResolver( false ) );
 			add( new ListELResolver( false ) );
 			add( new MapELResolver( false ) );

@@ -38,6 +38,20 @@ Logging will delegate any log requests to that provider.
             <version>5.0.0.CR1</version>
         </dependency>
 
+      You also need an API and implementation of the Unified Expression Language. This dependencies must be explicitly added in an SE environment.
+      In an EE environment they are often already provided.
+
+        <dependency>
+           <groupId>javax.el</groupId>
+           <artifactId>javax.el-api</artifactId>
+           <version>2.2.4</version>
+        </dependency>
+        <dependency>
+           <groupId>org.glassfish.web</groupId>
+           <artifactId>javax.el</artifactId>
+           <version>2.2.4</version>
+        </dependency>
+
 * _hibernate-validator-annotation-processor-&lt;version&gt;.jar_ is an optional jar which can be integrated with your build
 environment respectively IDE to verify that constraint annotations are correctly used. Refer to the [online
 documentation](http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html/validator-annotation-processor.html) for more information.
