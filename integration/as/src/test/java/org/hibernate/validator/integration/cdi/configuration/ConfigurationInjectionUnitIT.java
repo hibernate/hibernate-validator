@@ -14,35 +14,32 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi;
+package org.hibernate.validator.integration.cdi.configuration;
 
 import javax.inject.Inject;
-import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ValidatorFactory;
 
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import org.hibernate.validator.cdi.HibernateValidator;
-import org.hibernate.validator.integration.cdi.constraint.Pingable;
-import org.hibernate.validator.integration.cdi.constraint.PingableValidator;
 import org.hibernate.validator.integration.cdi.service.PingService;
 import org.hibernate.validator.integration.cdi.service.PingServiceImpl;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
-import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
  */
-//TODO HV-723 Re-enable
-//@RunWith(Arquillian.class)
-public class ConstraintValidatorInjectionUnitIT {
-	private static final String WAR_FILE_NAME = ConstraintValidatorInjectionUnitIT.class.getSimpleName() + ".war";
+@RunWith(Arquillian.class)
+public class ConfigurationInjectionUnitIT {
+	private static final String WAR_FILE_NAME = ConfigurationInjectionUnitIT.class.getSimpleName() + ".war";
 
 	@Inject
 	@HibernateValidator
@@ -53,27 +50,47 @@ public class ConstraintValidatorInjectionUnitIT {
 		return ShrinkWrap
 				.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses(
-						Pingable.class,
 						PingService.class,
 						PingServiceImpl.class,
-						PingableValidator.class
+						ConstraintValidatorFactoryWithInjection.class,
+						MessageInterpolatorWithInjection.class,
+						ParameterNameProviderWithInjection.class,
+						TraversableResolverWithInjection.class
 				)
 				.addAsLibraries( IntegrationTestUtil.bundleHibernateValidatorWithDependencies( false ) )
 				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
 				.addAsLibraries( IntegrationTestUtil.bundleOptionalDependencies() )
 				.addAsResource( "log4j.properties" )
+				.addAsResource( "validation-custom-config.xml", "META-INF/validation.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
-	//TODO HV-723 Re-enable
 	@Test
-	@Ignore
-	public void testSuccessfulInjectionIntoConstraintValidator() {
-		ConstraintValidatorFactory constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
-		PingableValidator validator = constraintValidatorFactory.getInstance( PingableValidator.class );
+	public void testConstraintValidatorFactoryGotInjected() {
+		ConstraintValidatorFactoryWithInjection constraintValidatorFactory = (ConstraintValidatorFactoryWithInjection) validatorFactory
+				.getConstraintValidatorFactory();
 
-		assertNotNull( "Constraint Validator could not be created", validator );
-		assertNotNull( "The ping service did not get injected", validator.getPingService() );
+		assertPingService( constraintValidatorFactory.getPingService() );
+	}
+
+	@Test
+	public void testMessageInterpolatorGotInjected() {
+		MessageInterpolatorWithInjection messageInterpolator = (MessageInterpolatorWithInjection) validatorFactory
+				.getMessageInterpolator();
+
+		assertPingService( messageInterpolator.getPingService() );
+	}
+
+	@Test
+	public void testTraversableResolverGotInjected() {
+		TraversableResolverWithInjection traversableResolver = (TraversableResolverWithInjection) validatorFactory
+				.getTraversableResolver();
+
+		assertPingService( traversableResolver.getPingService() );
+	}
+
+	private void assertPingService(PingService pingService) {
+		assertEquals( "The ping service should respond", "pong", pingService.ping() );
 	}
 }
