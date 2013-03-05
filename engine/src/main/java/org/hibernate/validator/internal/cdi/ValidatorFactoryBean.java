@@ -36,6 +36,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
@@ -60,7 +61,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 
 	@Override
 	public Class<?> getBeanClass() {
-		return ValidatorFactory.class;
+		return ValidatorFactoryImpl.class;
 	}
 
 	@Override

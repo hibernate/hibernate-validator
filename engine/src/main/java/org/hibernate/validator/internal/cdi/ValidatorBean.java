@@ -32,6 +32,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.cdi.HibernateValidator;
+import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 
 /**
@@ -53,7 +54,7 @@ public class ValidatorBean implements Bean<Validator> {
 
 	@Override
 	public Class<?> getBeanClass() {
-		return Validator.class;
+		return ValidatorImpl.class;
 	}
 
 	@Override
@@ -113,7 +114,7 @@ public class ValidatorBean implements Bean<Validator> {
 
 	@SuppressWarnings("unchecked")
 	private <T> T getReference(BeanManager beanManager, Class<T> clazz) {
-		Set<Bean<?>> beans = beanManager.getBeans( clazz );
+		Set<Bean<?>> beans = beanManager.getBeans( clazz, qualifiers.toArray( new Annotation[] { } ) );
 		for ( Bean<?> bean : beans ) {
 			for ( Annotation annotation : bean.getQualifiers() ) {
 				if ( annotation.annotationType().getName().equals( HibernateValidator.class.getName() ) ) {

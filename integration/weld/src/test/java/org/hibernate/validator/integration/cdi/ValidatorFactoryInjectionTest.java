@@ -14,8 +14,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package org.hibernate.validator.integration.cdi;
 
 import javax.inject.Inject;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -25,41 +29,42 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static junit.framework.Assert.assertEquals;
+import org.hibernate.validator.cdi.HibernateValidator;
+
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class MathImplTest {
+public class ValidatorFactoryInjectionTest {
 
-	/**
-	 * Since Arquillian actually creates JAR files under the covers, the @Deployment
-	 * is your way of controlling what is included in that Archive. Note, each
-	 * class utilized in your test case - whether directly or indirectly - must be
-	 * added to the deployment archive.
-	 */
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
-				.addClass( Math.class )
-				.addClass( MathImpl.class )
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
-	// Arquillian enables @Inject directly in the test case class itself!
+	@HibernateValidator
 	@Inject
-	Math m;
+	ValidatorFactory validatorFactory;
 
+	@HibernateValidator
+	@Inject
+	Validator validator;
 
 	@Test
-	public void testAdd() throws Exception {
-		assertEquals( 5, m.add( 2, 3 ) );
+	public void testValidatorFactoryGotInjected() throws Exception {
+		assertNotNull( validatorFactory );
+		assertNotNull( validator );
+
+		assertTrue( validator.validate( new TestEntity() ).size() == 1 );
 	}
 
-	@Test
-	public void testSubtract() throws Exception {
-		assertEquals( -1, m.subtract( 2, 3 ) );
+	public static class TestEntity {
+		@NotNull
+		private String foo;
 	}
 }
 
