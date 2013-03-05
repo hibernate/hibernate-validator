@@ -22,12 +22,12 @@
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
         <version>5.0.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-validator-integrationtest</artifactId>
+    <artifactId>hibernate-validator-integrationtest-as</artifactId>
 
-    <name>Hibernate Validator Integration Tests</name>
+    <name>Hibernate Validator AS Integration Tests</name>
     <description>Hibernate Validator integration tests.</description>
 
     <properties>
@@ -39,11 +39,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -65,11 +60,6 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.0-api</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>

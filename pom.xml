@@ -75,7 +75,8 @@
     <modules>
         <module>engine</module>
         <module>tck-runner</module>
-        <module>integration</module>
+        <module>integration/as</module>
+        <module>integration/weld</module>
         <module>annotation-processor</module>
         <module>performance</module>
     </modules>
@@ -130,11 +131,6 @@
                 <groupId>de.odysseus.juel</groupId>
                 <artifactId>juel-impl</artifactId>
                 <version>${juel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.enterprise</groupId>
-                <artifactId>cdi-api</artifactId>
-                <version>1.0-SP3</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml</groupId>
@@ -199,9 +195,14 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>javax.enterprise</groupId>
+                <artifactId>cdi-api</artifactId>
+                <version>1.1-PFD</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jboss.weld</groupId>
                 <artifactId>weld-core</artifactId>
-                <version>1.1.9.Final</version>
+                <version>2.0.0.Beta4</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.spec</groupId>
@@ -220,6 +221,11 @@
                 <groupId>org.jboss.as</groupId>
                 <artifactId>jboss-as-arquillian-container-managed</artifactId>
                 <version>${jbossas.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian.container</groupId>
+                <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+                <version>1.0.0.CR5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
