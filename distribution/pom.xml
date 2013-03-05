@@ -51,12 +51,10 @@
         <dependency>
             <groupId>javax.el</groupId>
             <artifactId>javax.el-api</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>javax.el</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Need to list out optional dependencies here again in order to include them via assembly dependency set -->

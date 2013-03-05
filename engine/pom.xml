@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>javax.el</artifactId>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
 
         <!--
