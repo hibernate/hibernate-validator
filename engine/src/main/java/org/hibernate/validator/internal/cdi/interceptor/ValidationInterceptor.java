@@ -30,6 +30,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.Validator;
+import javax.validation.executable.ExecutableValidator;
 
 /**
  * An interceptor which performs a validation of the Bean Validation constraints specified at the parameters and/or return
@@ -66,7 +67,8 @@ public class ValidationInterceptor implements Serializable {
 	 */
 	@AroundInvoke
 	public Object validateMethodInvocation(InvocationContext ctx) throws Exception {
-		Set<ConstraintViolation<Object>> violations = validator.forExecutables().validateParameters(
+		ExecutableValidator executableValidator = validator.forExecutables();
+		Set<ConstraintViolation<Object>> violations = executableValidator.validateParameters(
 				ctx.getTarget(),
 				ctx.getMethod(),
 				ctx.getParameters()
