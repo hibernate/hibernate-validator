@@ -191,27 +191,8 @@ public class ValidationExtensionTest<T> {
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testBeforeBeanDiscoveryNullParameter() {
-		extension.beforeBeanDiscovery( null, beanManagerMock );
-	}
-
-	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testProcessAnnotatedTypeNullParameter() {
 		extension.processAnnotatedType( null );
-	}
-
-	@Test
-	public void testInterceptorBindingIsAddedProgrammatically() {
-		beforeBeanDiscoveryMock.addInterceptorBinding( MethodValidated.class );
-
-		// get the mocks ready
-		replay( beforeBeanDiscoveryMock, beanManagerMock );
-
-		// run the code
-		extension.beforeBeanDiscovery( beforeBeanDiscoveryMock, beanManagerMock );
-
-		// verify the mocks
-		verify( beforeBeanDiscoveryMock, beanManagerMock );
 	}
 
 	@Test

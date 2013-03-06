@@ -30,6 +30,7 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
@@ -87,6 +88,7 @@ public class ValidatorBean implements Bean<Validator> {
 		Set<Type> types = new HashSet<Type>();
 
 		types.add( Validator.class );
+		types.add( ExecutableValidator.class );
 		types.add( Object.class );
 
 		return types;

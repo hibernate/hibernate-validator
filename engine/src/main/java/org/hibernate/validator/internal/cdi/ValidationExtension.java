@@ -29,7 +29,6 @@ import javax.enterprise.inject.spi.AnnotatedParameter;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessBean;
@@ -38,7 +37,6 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.cdi.HibernateValidator;
-import org.hibernate.validator.internal.cdi.interceptor.MethodValidated;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotatedType;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.Contracts;
@@ -102,17 +100,6 @@ public class ValidationExtension implements Extension {
 				validatorRegisteredUnderDefaultQualifier = true;
 			}
 		}
-	}
-
-	/**
-	 * Used to register the method validation interceptor binding annotation.
-	 *
-	 * @param beforeBeanDiscoveryEvent event fired before the bean discovery process starts
-	 * @param beanManager the bean manager.
-	 */
-	public void beforeBeanDiscovery(@Observes BeforeBeanDiscovery beforeBeanDiscoveryEvent, final BeanManager beanManager) {
-		Contracts.assertNotNull( beforeBeanDiscoveryEvent, "The BeforeBeanDiscovery event cannot be null" );
-		beforeBeanDiscoveryEvent.addInterceptorBinding( MethodValidated.class );
 	}
 
 	/**
