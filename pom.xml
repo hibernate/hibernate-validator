@@ -89,7 +89,6 @@
         <org.codehaus.mojo.chronos.version>1.0-beta-3</org.codehaus.mojo.chronos.version>
         <bv.api.version>1.1.0.CR1</bv.api.version>
         <classmate.version>0.8.0</classmate.version>
-        <juel.version>2.2.5</juel.version>
         <jbossas.version>7.1.1.Final</jbossas.version>
         <arquillian.version>1.0.2.Final</arquillian.version>
     </properties>
@@ -117,19 +116,14 @@
                 <version>3.1.1.GA</version>
             </dependency>
             <dependency>
-                <groupId>de.odysseus.juel</groupId>
-                <artifactId>juel-spi</artifactId>
-                <version>${juel.version}</version>
+                <groupId>javax.el</groupId>
+                <artifactId>javax.el-api</artifactId>
+                <version>2.2.4</version>
             </dependency>
             <dependency>
-                <groupId>de.odysseus.juel</groupId>
-                <artifactId>juel-api</artifactId>
-                <version>${juel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>de.odysseus.juel</groupId>
-                <artifactId>juel-impl</artifactId>
-                <version>${juel.version}</version>
+                <groupId>org.glassfish.web</groupId>
+                <artifactId>javax.el</artifactId>
+                <version>2.2.4</version>
             </dependency>
             <dependency>
                 <groupId>javax.enterprise</groupId>
