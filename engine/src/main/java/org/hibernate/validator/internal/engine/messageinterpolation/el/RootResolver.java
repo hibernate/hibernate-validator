@@ -38,6 +38,7 @@ public class RootResolver extends ELResolver {
 	 * Name under which to bind a formatter to the EL context.
 	 */
 	public static final String FORMATTER = "formatter";
+	private static final String FORMAT = "format";
 
 	private final Map<String, Object> map = Collections.synchronizedMap( new HashMap<String, Object>() );
 
@@ -90,13 +91,17 @@ public class RootResolver extends ELResolver {
 		// due to bugs in most EL implementations when it comes to evaluating varargs we take care of the formatter call
 		// ourselves.
 		if ( base instanceof FormatterWrapper ) {
-			returnValue = evaluateFormatExpression( context, params );
+			returnValue = evaluateFormatExpression( context, method, params );
 		}
 
 		return returnValue;
 	}
 
-	private Object evaluateFormatExpression(ELContext context, Object[] params) {
+	private Object evaluateFormatExpression(ELContext context, Object method, Object[] params) {
+		if ( !FORMAT.equals( method ) ) {
+			throw new ELException( "Wrong method name 'formatter#" + method + "' does not exist. Only formatter#format is supported." );
+		}
+
 		if ( params.length == 0 ) {
 			throw new ELException( "Invalid number of arguments to Formatter#format" );
 		}

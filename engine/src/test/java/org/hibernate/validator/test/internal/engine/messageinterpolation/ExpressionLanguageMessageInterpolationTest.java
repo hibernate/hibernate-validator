@@ -194,7 +194,11 @@ public class ExpressionLanguageMessageInterpolationTest {
 		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 		String expected = "${formatter.format('%1$s')}";
 		String actual = interpolatorUnderTest.interpolate( "${formatter.format('%1$s')}", context );
-		assertEquals( actual, expected, "Wrong substitution, exception should be ignored" );
+		assertEquals(
+				actual,
+				expected,
+				"Calling of formatter#format w/o format parameter. No substitution should occur"
+		);
 	}
 
 	@Test
@@ -202,7 +206,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 		String expected = "${formatter.format()}";
 		String actual = interpolatorUnderTest.interpolate( "${formatter.format()}", context );
-		assertEquals( actual, expected, "Wrong substitution, exception should be ignored" );
+		assertEquals( actual, expected, "Calling of formatter#format w/o parameters. No substitution should occur" );
 	}
 
 	@Test
@@ -210,6 +214,23 @@ public class ExpressionLanguageMessageInterpolationTest {
 		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
 		String expected = "foo";
 		String actual = interpolatorUnderTest.interpolate( "${'foobar'.substring(0,3)}", context );
-		assertEquals( actual, expected, "Wrong substitution, exception should be ignored" );
+		assertEquals( actual, expected, "Calling of String#substring should work" );
+	}
+
+	@Test
+	public void testCallingWrongFormatterMethod() {
+		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, 42.00000d, null );
+
+		String expected = "${formatter.foo('%1$.2f', validatedValue)}";
+		String actual = interpolatorUnderTest.interpolate(
+				"${formatter.foo('%1$.2f', validatedValue)}",
+				context,
+				Locale.GERMAN
+		);
+		assertEquals(
+				actual,
+				expected,
+				"Wrong substitution, no formatting should occur, because the wrong method name is used"
+		);
 	}
 }
