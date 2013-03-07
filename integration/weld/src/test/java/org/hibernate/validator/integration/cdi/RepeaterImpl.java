@@ -16,14 +16,14 @@
 */
 package org.hibernate.validator.integration.cdi;
 
-import org.hibernate.validator.internal.cdi.interceptor.MethodValidated;
-
 /**
  * @author Hardy Ferentschik
  */
 public class RepeaterImpl implements Repeater {
-	// TODO - for now explicitly added interceptor binding
-	@MethodValidated
+
+	public RepeaterImpl() {
+	}
+
 	public String repeat(String in) {
 		return in;
 	}

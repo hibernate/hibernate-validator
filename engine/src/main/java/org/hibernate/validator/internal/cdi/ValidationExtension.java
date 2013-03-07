@@ -35,9 +35,12 @@ import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessBean;
 import javax.enterprise.util.AnnotationLiteral;
+import javax.validation.BootstrapConfiguration;
+import javax.validation.Configuration;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.executable.ExecutableType;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.cdi.HibernateValidator;
@@ -60,13 +63,18 @@ public class ValidationExtension implements Extension {
 	private static final Log log = LoggerFactory.make();
 
 	private final Validator validator;
+	private final Set<ExecutableType> globalExecutableTypes;
 	private boolean validatorRegisteredUnderDefaultQualifier;
 	private boolean validatorRegisteredUnderHibernateQualifier;
 
 	public ValidationExtension() {
-		validator = Validation.buildDefaultValidatorFactory().getValidator();
 		validatorRegisteredUnderDefaultQualifier = false;
 		validatorRegisteredUnderHibernateQualifier = false;
+
+		Configuration<?> config = Validation.byDefaultProvider().configure();
+		BootstrapConfiguration bootstrap = config.getBootstrapConfiguration();
+		globalExecutableTypes = bootstrap.getValidatedExecutableTypes();
+		validator = config.buildValidatorFactory().getValidator();
 	}
 
 	/**
@@ -137,9 +145,10 @@ public class ValidationExtension implements Extension {
 	 */
 	public <T> void processAnnotatedType(@Observes ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
 		Contracts.assertNotNull( processAnnotatedTypeEvent, "The ProcessAnnotatedType event cannot be null" );
+
 		final AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
 
-		// TODO we need to take @@ValidateExecutable into account as well
+		// TODO we need to take @ValidateExecutable into account as well
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( type.getJavaClass() );
 		if ( !beanDescriptor.hasConstrainedExecutables() ) {
 			return;

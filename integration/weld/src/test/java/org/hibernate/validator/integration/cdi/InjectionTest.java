@@ -17,7 +17,9 @@
 package org.hibernate.validator.integration.cdi;
 
 import javax.inject.Inject;
-import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -27,39 +29,55 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
+import org.hibernate.validator.cdi.HibernateValidator;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class InterceptorTest {
+public class InjectionTest {
+
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
-				.addClass( Repeater.class )
-				.addClass( RepeaterImpl.class )
-				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
+	@HibernateValidator
 	@Inject
-	Repeater repeater;
+	ValidatorFactory validatorFactory;
+
+	@HibernateValidator
+	@Inject
+	Validator validator;
+
+	@Inject
+	ValidatorFactory defaultValidatorFactory;
+
+	@Inject
+	Validator defaultValidator;
 
 	@Test
-	public void testInjection() throws Exception {
-		assertNotNull( repeater );
-		try {
-			repeater.repeat( null );
-			fail( "CDI method interceptor should have thrown an exception" );
-		}
-		catch ( ConstraintViolationException e ) {
-			// success
-		}
+	public void testInjectionOfQualifiedBeans() throws Exception {
+		assertNotNull( validatorFactory );
+		assertNotNull( validator );
+
+		assertTrue( validator.validate( new TestEntity() ).size() == 1 );
+	}
+
+	@Test
+	public void testInjectionOfDefaultBeans() throws Exception {
+		assertNotNull( defaultValidatorFactory );
+		assertNotNull( defaultValidator );
+
+		assertTrue( defaultValidator.validate( new TestEntity() ).size() == 1 );
+	}
+
+	public static class TestEntity {
+		@NotNull
+		private String foo;
 	}
 }
-
-

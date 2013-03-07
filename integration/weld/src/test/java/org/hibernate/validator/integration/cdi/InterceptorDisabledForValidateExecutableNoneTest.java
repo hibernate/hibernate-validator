@@ -17,55 +17,54 @@
 package org.hibernate.validator.integration.cdi;
 
 import javax.inject.Inject;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotNull;
+import javax.validation.ConstraintViolationException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.hibernate.validator.cdi.HibernateValidator;
+import org.hibernate.validator.integration.util.TestHelper;
+import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 
 /**
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class ValidatorFactoryInjectionTest {
-
+public class InterceptorDisabledForValidateExecutableNoneTest {
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
+				.addClass( Repeater.class )
+				.addClass( RepeaterImpl.class )
+				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
+				.addAsResource(
+						TestHelper.getTestPackagePath( InterceptorDisabledForValidateExecutableNoneTest.class ) + "validation-validate-executable-none.xml",
+						"META-INF/validation.xml"
+				)
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
-	@HibernateValidator
 	@Inject
-	ValidatorFactory validatorFactory;
-
-	@HibernateValidator
-	@Inject
-	Validator validator;
+	Repeater repeater;
 
 	@Test
-	public void testValidatorFactoryGotInjected() throws Exception {
-		assertNotNull( validatorFactory );
-		assertNotNull( validator );
-
-		assertTrue( validator.validate( new TestEntity() ).size() == 1 );
-	}
-
-	public static class TestEntity {
-		@NotNull
-		private String foo;
+	@Ignore
+	public void testInjection() throws Exception {
+		assertNotNull( repeater );
+		try {
+			repeater.repeat( null );
+		}
+		catch ( ConstraintViolationException e ) {
+			fail( "method validation should be disabled via validation.xml" );
+		}
 	}
 }
-
-
