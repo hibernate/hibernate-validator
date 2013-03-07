@@ -24,25 +24,32 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.hibernate.validator.integration.util.TestHelper;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+
 /**
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class InterceptorTest {
+public class InterceptorDisabledForValidateExecutableNoneTest {
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Repeater.class )
 				.addClass( RepeaterImpl.class )
 				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
+				.addAsResource(
+						TestHelper.getTestPackagePath( InterceptorDisabledForValidateExecutableNoneTest.class ) + "validation-validate-executable-none.xml",
+						"META-INF/validation.xml"
+				)
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
@@ -50,14 +57,14 @@ public class InterceptorTest {
 	Repeater repeater;
 
 	@Test
+	@Ignore
 	public void testInjection() throws Exception {
 		assertNotNull( repeater );
 		try {
 			repeater.repeat( null );
-			fail( "CDI method interceptor should have thrown an exception" );
 		}
 		catch ( ConstraintViolationException e ) {
-			// success
+			fail( "method validation should be disabled via validation.xml" );
 		}
 	}
 }

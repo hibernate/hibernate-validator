@@ -89,8 +89,10 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		if ( validatedExecutableTypes.contains( ExecutableType.ALL ) ) {
 			return EnumSet.complementOf( EnumSet.of( ExecutableType.ALL, ExecutableType.NONE ) );
 		}
-		else if ( validatedExecutableTypes.contains( ExecutableType.NONE ) ) {
-			return EnumSet.noneOf( ExecutableType.class );
+		else if ( validatedExecutableTypes.contains( ExecutableType.NONE ) && validatedExecutableTypes.size() > 1 ) {
+			EnumSet<ExecutableType> enumSet = EnumSet.copyOf( validatedExecutableTypes );
+			enumSet.remove( ExecutableType.NONE );
+			return enumSet;
 		}
 		else {
 			return validatedExecutableTypes;

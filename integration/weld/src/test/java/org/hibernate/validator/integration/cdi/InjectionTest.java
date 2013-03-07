@@ -31,14 +31,14 @@ import org.junit.runner.RunWith;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class ValidatorFactoryInjectionTest {
+public class InjectionTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -54,12 +54,26 @@ public class ValidatorFactoryInjectionTest {
 	@Inject
 	Validator validator;
 
+	@Inject
+	ValidatorFactory defaultValidatorFactory;
+
+	@Inject
+	Validator defaultValidator;
+
 	@Test
-	public void testValidatorFactoryGotInjected() throws Exception {
+	public void testInjectionOfQualifiedBeans() throws Exception {
 		assertNotNull( validatorFactory );
 		assertNotNull( validator );
 
 		assertTrue( validator.validate( new TestEntity() ).size() == 1 );
+	}
+
+	@Test
+	public void testInjectionOfDefaultBeans() throws Exception {
+		assertNotNull( defaultValidatorFactory );
+		assertNotNull( defaultValidator );
+
+		assertTrue( defaultValidator.validate( new TestEntity() ).size() == 1 );
 	}
 
 	public static class TestEntity {
