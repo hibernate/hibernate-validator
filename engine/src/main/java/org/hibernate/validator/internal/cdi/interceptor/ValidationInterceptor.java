@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
@@ -41,6 +42,7 @@ import javax.validation.executable.ExecutableValidator;
  */
 @MethodValidated
 @Interceptor
+@Priority( 3090 )
 public class ValidationInterceptor implements Serializable {
 
 	private static final long serialVersionUID = 604440259030722151L;
@@ -98,6 +100,12 @@ public class ValidationInterceptor implements Serializable {
 
 		return result;
 	}
+
+//	@AroundConstruct
+//	public Object validateConstructorInvocation(InvocationContext ctx) throws Exception {
+//		// TODO implement
+//		return null;
+//	}
 
 	private String getMessage(Method method, Object[] args, Set<? extends ConstraintViolation<?>> violations) {
 

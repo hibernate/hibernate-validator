@@ -44,17 +44,14 @@ import static junit.framework.Assert.fail;
 public class InterceptorTest {
 	private static final String VALIDATOR_VERSION = Version.getVersionString();
 
-	private static BeansDescriptor beans = Descriptors.create( BeansDescriptor.class )
-			.createInterceptors()
-			.clazz( "org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor" )
-			.up();
+	private static BeansDescriptor beans = Descriptors.create( BeansDescriptor.class );
 
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Repeater.class )
 				.addClass( RepeaterImpl.class )
-				// TODO - adding the interceptor package to avoid WELD-001417
+				// adding interceptor package
 				.addPackage( "org.hibernate.validator.internal.cdi.interceptor" )
 				.addAsManifestResource( new StringAsset( beans.exportAsString() ), "beans.xml" );
 	}

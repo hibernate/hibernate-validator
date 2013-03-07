@@ -17,6 +17,8 @@
 package org.hibernate.validator.internal.cdi;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -25,21 +27,24 @@ import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedCallable;
 import javax.enterprise.inject.spi.AnnotatedConstructor;
 import javax.enterprise.inject.spi.AnnotatedMethod;
-import javax.enterprise.inject.spi.AnnotatedParameter;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessBean;
 import javax.enterprise.util.AnnotationLiteral;
+import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotatedType;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -52,9 +57,32 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  */
 public class ValidationExtension implements Extension {
-	private final ConstraintHelper constraintHelper = new ConstraintHelper();
-	private boolean validatorRegisteredUnderDefaultQualifier = false;
-	private boolean validatorRegisteredUnderHibernateQualifier = false;
+	private static final Log log = LoggerFactory.make();
+
+	private final Validator validator;
+	private boolean validatorRegisteredUnderDefaultQualifier;
+	private boolean validatorRegisteredUnderHibernateQualifier;
+
+	public ValidationExtension() {
+		validator = Validation.buildDefaultValidatorFactory().getValidator();
+		validatorRegisteredUnderDefaultQualifier = false;
+		validatorRegisteredUnderHibernateQualifier = false;
+	}
+
+	/**
+	 * Used to register the method validation interceptor binding annotation.
+	 *
+	 * @param beforeBeanDiscoveryEvent event fired before the bean discovery process starts
+	 * @param beanManager the bean manager.
+	 */
+	public void beforeBeanDiscovery(@Observes BeforeBeanDiscovery beforeBeanDiscoveryEvent, final BeanManager beanManager) {
+		Contracts.assertNotNull( beforeBeanDiscoveryEvent, "The BeforeBeanDiscovery event cannot be null" );
+		Contracts.assertNotNull( beanManager, "The BeanManager cannot be null" );
+
+		// Register the interceptor explicitly. This way, no beans.xml is needed
+		AnnotatedType<ValidationExtension> annotatedType = beanManager.createAnnotatedType( ValidationExtension.class );
+		beforeBeanDiscoveryEvent.addAnnotatedType( annotatedType );
+	}
 
 	/**
 	 * Registers the Hibernate specific {@code ValidatorFactory} and {@code Validator}. The qualifiers used for registration
@@ -110,7 +138,18 @@ public class ValidationExtension implements Extension {
 	public <T> void processAnnotatedType(@Observes ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
 		Contracts.assertNotNull( processAnnotatedTypeEvent, "The ProcessAnnotatedType event cannot be null" );
 		final AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
-		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables( type );
+
+		// TODO we need to take @@ValidateExecutable into account as well
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( type.getJavaClass() );
+		if ( !beanDescriptor.hasConstrainedExecutables() ) {
+			return;
+		}
+
+		if ( log.isDebugEnabled() ) {
+			log.debug( type.getJavaClass() + " contains executable constraints" );
+		}
+
+		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables( type, beanDescriptor );
 		if ( !constrainedCallables.isEmpty() ) {
 			ValidationEnabledAnnotatedType<T> wrappedType = new ValidationEnabledAnnotatedType<T>(
 					type,
@@ -120,45 +159,24 @@ public class ValidationExtension implements Extension {
 		}
 	}
 
-	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type) {
+	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type, BeanDescriptor beanDescriptor) {
 		Set<AnnotatedCallable<? super T>> callables = newHashSet();
 
-		for ( AnnotatedConstructor<T> constructor : type.getConstructors() ) {
-			if ( isCallableConstrained( constructor ) ) {
-				callables.add( constructor );
+		for ( AnnotatedConstructor<T> annotatedConstructor : type.getConstructors() ) {
+			Constructor constructor = annotatedConstructor.getJavaMember();
+			if ( beanDescriptor.getConstraintsForConstructor( constructor.getParameterTypes() ) != null ) {
+				callables.add( annotatedConstructor );
 			}
 		}
 
-		for ( AnnotatedMethod<? super T> method : type.getMethods() ) {
-			if ( isCallableConstrained( method ) ) {
-				callables.add( method );
+		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
+			Method method = annotatedMethod.getJavaMember();
+			if ( beanDescriptor.getConstraintsForMethod( method.getName(), method.getParameterTypes() ) != null ) {
+				callables.add( annotatedMethod );
 			}
 		}
 
 		return callables;
-	}
-
-	private <T> boolean isCallableConstrained(AnnotatedCallable<? super T> callable) {
-		if ( containsConstraintAnnotation( callable.getAnnotations() ) ) {
-			return true;
-		}
-
-		for ( AnnotatedParameter<? super T> parameter : callable.getParameters() ) {
-			if ( containsConstraintAnnotation( parameter.getAnnotations() ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private boolean containsConstraintAnnotation(Set<Annotation> annotations) {
-		for ( Annotation annotation : annotations ) {
-			if ( constraintHelper.isConstraintAnnotation( annotation.annotationType() ) ) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
