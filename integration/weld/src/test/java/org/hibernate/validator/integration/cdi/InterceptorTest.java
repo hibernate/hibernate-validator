@@ -25,7 +25,6 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -45,6 +44,8 @@ public class InterceptorTest {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Repeater.class )
 				.addClass( RepeaterImpl.class )
+				.addClass( Broken.class )
+				.addClass( BrokenRepeaterImpl.class )
 				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
@@ -53,6 +54,7 @@ public class InterceptorTest {
 	Repeater repeater;
 
 	@Inject
+	@Broken
 	Instance<Repeater> repeaterInstance;
 
 	@Test
@@ -68,7 +70,6 @@ public class InterceptorTest {
 	}
 
 	@Test
-	@Ignore
 	public void testInstanceInjection() throws Exception {
 		assertNotNull( repeaterInstance );
 		try {
