@@ -201,12 +201,18 @@
 		<version>1.0.0.Alpha1</version>
 	    </dependency>
 	    <dependency>
-                <groupId>javax.enterprise</groupId>
-                <artifactId>cdi-api</artifactId>
+		<groupId>javax.enterprise</groupId>
+		<artifactId>cdi-api</artifactId>
 		<version>1.1-20130305</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.weld</groupId>
+		<exclusions>
+		    <exclusion>
+			<groupId>org.jboss.spec.javax.interceptor</groupId>
+			<artifactId>jboss-interceptors-api_1.1_spec</artifactId>
+		    </exclusion>
+		</exclusions>
+	    </dependency>
+	    <dependency>
+		<groupId>org.jboss.weld</groupId>
                 <artifactId>weld-core</artifactId>
 		<version>2.0.0.Beta5</version>
             </dependency>

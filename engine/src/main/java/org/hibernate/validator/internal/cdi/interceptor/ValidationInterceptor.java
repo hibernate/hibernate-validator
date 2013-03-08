@@ -102,9 +102,19 @@ public class ValidationInterceptor implements Serializable {
 		return result;
 	}
 
+	/**
+	 * Validates the Bean Validation constraints specified at the parameters and/or return value of the intercepted constructor.
+	 *
+	 * @param ctx The context of the intercepted constructor invocation.
+	 *
+	 * @return The result of the constructor invocation.
+	 *
+	 * @throws Exception Any exception caused by the intercepted constructor invocation. A {@link ConstraintViolationException}
+	 * in case at least one constraint violation occurred either during parameter or return value validation.
+	 */
 	@AroundConstruct
 	@SuppressWarnings("unchecked")
-	public Object validateConstructorInvocation(InvocationContext ctx) throws Exception {
+	public void validateConstructorInvocation(InvocationContext ctx) throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
 		Set<ConstraintViolation<Object>> violations = executableValidator.validateConstructorParameters(
 				ctx.getConstructor(),
@@ -131,16 +141,14 @@ public class ValidationInterceptor implements Serializable {
 					violations
 			);
 		}
-
-		return result;
 	}
 
 	private String getMessage(Member member, Object[] args, Set<? extends ConstraintViolation<?>> violations) {
 
 		StringBuilder message = new StringBuilder();
 		message.append( violations.size() );
-		message.append( " constraint violation(s) occurred during method invocation." );
-		message.append( "\nMethod: " );
+		message.append( " constraint violation(s) occurred during method validation." );
+		message.append( "\nConstructor or Method: " );
 		message.append( member );
 		message.append( "\nArgument values: " );
 		message.append( Arrays.toString( args ) );

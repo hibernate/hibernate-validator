@@ -70,6 +70,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+	    <groupId>org.jboss.spec.javax.interceptor</groupId>
+	    <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
+	    <scope>test</scope>
+	</dependency>
+	<dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
             <artifactId>shrinkwrap-resolver-api-maven</artifactId>
             <scope>test</scope>
