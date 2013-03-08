@@ -136,6 +136,10 @@ public class InterpolationTerm {
 		catch ( ELException e ) {
 			log.errorInExpressionLanguage( expression, e );
 		}
+		catch ( Exception e ) {
+			log.evaluatingExpressionLanguageExpressionCausedException( expression, e );
+		}
+
 		return leadingEscapeCharacters + resolvedExpression;
 	}
 
