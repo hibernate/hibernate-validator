@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.Set;
 import javax.annotation.Priority;
 import javax.inject.Inject;
-import javax.interceptor.AroundConstruct;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
@@ -107,12 +106,10 @@ public class ValidationInterceptor implements Serializable {
 	 *
 	 * @param ctx The context of the intercepted constructor invocation.
 	 *
-	 * @return The result of the constructor invocation.
-	 *
 	 * @throws Exception Any exception caused by the intercepted constructor invocation. A {@link ConstraintViolationException}
 	 * in case at least one constraint violation occurred either during parameter or return value validation.
 	 */
-	@AroundConstruct
+//	@AroundConstruct
 	@SuppressWarnings("unchecked")
 	public void validateConstructorInvocation(InvocationContext ctx) throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
@@ -128,11 +125,12 @@ public class ValidationInterceptor implements Serializable {
 			);
 		}
 
-		Object result = ctx.proceed();
+		ctx.proceed();
+		Object createdObject = ctx.getTarget();
 
 		violations = validator.forExecutables().validateConstructorReturnValue(
 				ctx.getConstructor(),
-				result
+				createdObject
 		);
 
 		if ( !violations.isEmpty() ) {
