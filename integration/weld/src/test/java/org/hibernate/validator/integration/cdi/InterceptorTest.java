@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.integration.cdi;
 
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
@@ -37,6 +38,7 @@ import static org.junit.Assert.fail;
  */
 @RunWith(Arquillian.class)
 public class InterceptorTest {
+
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
@@ -49,11 +51,26 @@ public class InterceptorTest {
 	@Inject
 	Repeater repeater;
 
+	@Inject
+	Instance<Repeater> repeaterInstance;
+
 	@Test
 	public void testInjection() throws Exception {
 		assertNotNull( repeater );
 		try {
 			repeater.repeat( null );
+			fail( "CDI method interceptor should have thrown an exception" );
+		}
+		catch ( ConstraintViolationException e ) {
+			// success
+		}
+	}
+
+	@Test
+	public void testInstanceInjection() throws Exception {
+		assertNotNull( repeaterInstance );
+		try {
+			repeaterInstance.get();
 			fail( "CDI method interceptor should have thrown an exception" );
 		}
 		catch ( ConstraintViolationException e ) {
