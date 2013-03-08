@@ -25,6 +25,8 @@ import org.hibernate.validator.internal.cdi.interceptor.MethodValidated;
 public class RepeaterImpl implements Repeater {
 
 	public RepeaterImpl() {
+		System.err.print( "foo" );
+
 	}
 
 	public String repeat(String in) {
