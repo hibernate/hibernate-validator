@@ -17,12 +17,13 @@
 package org.hibernate.validator.internal.cdi.interceptor;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
+import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
 import javax.annotation.Priority;
 import javax.inject.Inject;
+import javax.interceptor.AroundConstruct;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
@@ -42,7 +43,7 @@ import javax.validation.executable.ExecutableValidator;
  */
 @MethodValidated
 @Interceptor
-@Priority( 3090 )
+@Priority(3090)
 public class ValidationInterceptor implements Serializable {
 
 	private static final long serialVersionUID = 604440259030722151L;
@@ -101,19 +102,46 @@ public class ValidationInterceptor implements Serializable {
 		return result;
 	}
 
-//	@AroundConstruct
-//	public Object validateConstructorInvocation(InvocationContext ctx) throws Exception {
-//		// TODO implement
-//		return null;
-//	}
+	@AroundConstruct
+	@SuppressWarnings("unchecked")
+	public Object validateConstructorInvocation(InvocationContext ctx) throws Exception {
+		ExecutableValidator executableValidator = validator.forExecutables();
+		Set<ConstraintViolation<Object>> violations = executableValidator.validateConstructorParameters(
+				ctx.getConstructor(),
+				ctx.getParameters()
+		);
 
-	private String getMessage(Method method, Object[] args, Set<? extends ConstraintViolation<?>> violations) {
+		if ( !violations.isEmpty() ) {
+			throw new ConstraintViolationException(
+					getMessage( ctx.getConstructor(), ctx.getParameters(), violations ),
+					violations
+			);
+		}
+
+		Object result = ctx.proceed();
+
+		violations = validator.forExecutables().validateConstructorReturnValue(
+				ctx.getConstructor(),
+				result
+		);
+
+		if ( !violations.isEmpty() ) {
+			throw new ConstraintViolationException(
+					getMessage( ctx.getConstructor(), ctx.getParameters(), violations ),
+					violations
+			);
+		}
+
+		return result;
+	}
+
+	private String getMessage(Member member, Object[] args, Set<? extends ConstraintViolation<?>> violations) {
 
 		StringBuilder message = new StringBuilder();
 		message.append( violations.size() );
 		message.append( " constraint violation(s) occurred during method invocation." );
 		message.append( "\nMethod: " );
-		message.append( method );
+		message.append( member );
 		message.append( "\nArgument values: " );
 		message.append( Arrays.toString( args ) );
 		message.append( "\nConstraint violations: " );
