@@ -16,9 +16,12 @@
 */
 package org.hibernate.validator.integration.cdi;
 
+import org.hibernate.validator.internal.cdi.interceptor.MethodValidated;
+
 /**
  * @author Hardy Ferentschik
  */
+@MethodValidated
 public class RepeaterImpl implements Repeater {
 
 	public RepeaterImpl() {
