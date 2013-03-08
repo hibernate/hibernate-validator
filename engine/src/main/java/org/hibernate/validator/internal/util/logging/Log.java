@@ -536,4 +536,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = 148, value = "An exception ocurred during evaluation of EL expression '%s'")
 	void evaluatingExpressionLanguageExpressionCausedException(String expression, @Cause Exception e);
+
+	@Message(id = 149, value = "An exception occured during message interpolation")
+	ValidationException getExceptionOcurredDuringMessageInterpolationException(@Cause Exception e);
 }

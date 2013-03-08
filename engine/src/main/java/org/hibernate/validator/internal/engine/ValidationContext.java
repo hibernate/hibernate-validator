@@ -31,6 +31,7 @@ import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
@@ -40,6 +41,8 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.IdentitySet;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -56,6 +59,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public class ValidationContext<T> {
+
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * Access to the cached bean meta data
@@ -415,13 +420,10 @@ public class ValidationContext<T> {
 
 	public ConstraintViolation<T> createConstraintViolation(ValueContext<?, ?> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
 		String messageTemplate = messageAndPath.getMessage();
-		String interpolatedMessage = messageInterpolator.interpolate(
+		String interpolatedMessage = interpolate(
 				messageTemplate,
-				new MessageInterpolatorContext(
-						descriptor,
-						localContext.getCurrentValidatedValue(),
-						getRootBeanClass()
-				)
+				localContext.getCurrentValidatedValue(),
+				descriptor
 		);
 		Path path = messageAndPath.getPath();
 
@@ -465,6 +467,27 @@ public class ValidationContext<T> {
 					descriptor,
 					localContext.getElementType()
 			);
+		}
+	}
+
+	private String interpolate(String messageTemplate, Object validatedValue, ConstraintDescriptor<?> descriptor) {
+		MessageInterpolatorContext context = new MessageInterpolatorContext(
+				descriptor,
+				validatedValue,
+				getRootBeanClass()
+		);
+
+		try {
+			return messageInterpolator.interpolate(
+					messageTemplate,
+					context
+			);
+		}
+		catch ( ValidationException ve ) {
+			throw ve;
+		}
+		catch ( Exception e ) {
+			throw log.getExceptionOcurredDuringMessageInterpolationException( e );
 		}
 	}
 
