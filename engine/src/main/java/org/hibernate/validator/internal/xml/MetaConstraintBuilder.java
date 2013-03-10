@@ -78,7 +78,7 @@ public class MetaConstraintBuilder {
 			String name = elementType.getName();
 			checkNameIsValid( name );
 			Class<?> returnType = getAnnotationParameterType( annotationClass, name );
-			Object elementValue = getElementValue( elementType, returnType );
+			Object elementValue = getElementValue( elementType, returnType, defaultPackage );
 			annotationDescriptor.setValue( name, elementValue );
 		}
 
@@ -99,12 +99,12 @@ public class MetaConstraintBuilder {
 		return new MetaConstraint<A>( constraintDescriptor, constraintLocation );
 	}
 
-	public static <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType) {
+	private static <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage) {
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
 		for ( ElementType elementType : annotationType.getElement() ) {
 			String name = elementType.getName();
 			Class<?> parameterType = getAnnotationParameterType( returnType, name );
-			Object elementValue = getElementValue( elementType, parameterType );
+			Object elementValue = getElementValue( elementType, parameterType, defaultPackage );
 			annotationDescriptor.setValue( name, elementValue );
 		}
 		return AnnotationFactory.create( annotationDescriptor );
@@ -124,7 +124,7 @@ public class MetaConstraintBuilder {
 		return m.getReturnType();
 	}
 
-	private static Object getElementValue(ElementType elementType, Class<?> returnType) {
+	private static Object getElementValue(ElementType elementType, Class<?> returnType, String defaultPackage) {
 		removeEmptyContentElements( elementType );
 
 		boolean isArray = returnType.isArray();
@@ -132,12 +132,12 @@ public class MetaConstraintBuilder {
 			if ( elementType.getContent().size() != 1 ) {
 				throw log.getAttemptToSpecifyAnArrayWhereSingleValueIsExpectedException();
 			}
-			return getSingleValue( elementType.getContent().get( 0 ), returnType );
+			return getSingleValue( elementType.getContent().get( 0 ), returnType, defaultPackage );
 		}
 		else {
 			List<Object> values = newArrayList();
 			for ( Serializable s : elementType.getContent() ) {
-				values.add( getSingleValue( s, returnType.getComponentType() ) );
+				values.add( getSingleValue( s, returnType.getComponentType(), defaultPackage ) );
 			}
 			return values.toArray( (Object[]) Array.newInstance( returnType.getComponentType(), values.size() ) );
 		}
@@ -153,18 +153,18 @@ public class MetaConstraintBuilder {
 		elementType.getContent().removeAll( contentToDelete );
 	}
 
-	private static Object getSingleValue(Serializable serializable, Class<?> returnType) {
+	private static Object getSingleValue(Serializable serializable, Class<?> returnType, String defaultPackage) {
 
 		Object returnValue;
 		if ( serializable instanceof String ) {
 			String value = (String) serializable;
-			returnValue = convertStringToReturnType( returnType, value );
+			returnValue = convertStringToReturnType( returnType, value, defaultPackage );
 		}
 		else if ( serializable instanceof JAXBElement && ( (JAXBElement<?>) serializable ).getDeclaredType()
 				.equals( String.class ) ) {
 			JAXBElement<?> elem = (JAXBElement<?>) serializable;
 			String value = (String) elem.getValue();
-			returnValue = convertStringToReturnType( returnType, value );
+			returnValue = convertStringToReturnType( returnType, value, defaultPackage );
 		}
 		else if ( serializable instanceof JAXBElement && ( (JAXBElement<?>) serializable ).getDeclaredType()
 				.equals( AnnotationType.class ) ) {
@@ -173,7 +173,7 @@ public class MetaConstraintBuilder {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
-				returnValue = MetaConstraintBuilder.buildAnnotation( annotationType, annotationClass );
+				returnValue = MetaConstraintBuilder.buildAnnotation( annotationType, annotationClass, defaultPackage );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getUnexpectedParameterValueException( e );
@@ -186,7 +186,7 @@ public class MetaConstraintBuilder {
 
 	}
 
-	private static Object convertStringToReturnType(Class<?> returnType, String value) {
+	private static Object convertStringToReturnType(Class<?> returnType, String value, String defaultPackage) {
 		Object returnValue;
 		if ( returnType.getName().equals( byte.class.getName() ) ) {
 			try {
@@ -249,19 +249,24 @@ public class MetaConstraintBuilder {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ReflectionHelper.loadClass( value, MetaConstraintBuilder.class );
+			returnValue = ReflectionHelper.loadClass( value, defaultPackage, MetaConstraintBuilder.class );
 		}
 		else {
 			try {
-				@SuppressWarnings("unchecked")
-				Class<Enum> enumClass = (Class<Enum>) returnType;
-				returnValue = Enum.valueOf( enumClass, value );
+				returnValue = getEnumValue( returnType, value );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getInvalidReturnTypeException( returnType, e );
 			}
 		}
 		return returnValue;
+	}
+
+	private static <E extends Enum<E>> E getEnumValue(Class<?> enumClass, String value) {
+		//safe since the method is only called in the enum case
+		@SuppressWarnings("unchecked")
+		Class<E> enumType = (Class<E>) enumClass;
+		return Enum.valueOf( enumType, value );
 	}
 
 	private static Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
