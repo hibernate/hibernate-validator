@@ -113,6 +113,11 @@ public final class ReflectionHelper {
 	}
 
 	public static Class<?> loadClass(String className, String defaultPackage) {
+		return loadClass( className, defaultPackage, ReflectionHelper.class );
+
+	}
+
+	public static Class<?> loadClass(String className, String defaultPackage, Class<?> caller) {
 		StringBuilder fullyQualifiedClass = new StringBuilder();
 		String tmpClassName = className;
 		if ( isArrayClassName( className ) ) {
@@ -133,7 +138,7 @@ public final class ReflectionHelper {
 			fullyQualifiedClass.append( ARRAY_CLASS_NAME_SUFFIX );
 		}
 
-		return ReflectionHelper.loadClass( fullyQualifiedClass.toString(), ReflectionHelper.class );
+		return loadClass( fullyQualifiedClass.toString(), caller );
 	}
 
 	private static boolean isArrayClassName(String className) {
