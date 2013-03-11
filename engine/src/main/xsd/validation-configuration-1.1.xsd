@@ -56,13 +56,13 @@
             <xs:element type="xs:string" name="traversable-resolver" minOccurs="0"/>
             <xs:element type="xs:string" name="constraint-validator-factory" minOccurs="0"/>
             <xs:element type="xs:string" name="parameter-name-provider" minOccurs="0"/>
-            <xs:element type="config:validated-executablesType" name="validated-executables" minOccurs="0"/>
+            <xs:element type="config:default-validated-executablesType" name="default-validated-executables" minOccurs="0"/>
             <xs:element type="xs:string" name="constraint-mapping" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="config:propertyType" name="property" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="version" type="config:versionType" fixed="1.1" use="required"/>
     </xs:complexType>
-    <xs:complexType name="validated-executablesType">
+    <xs:complexType name="default-validated-executablesType">
         <xs:sequence>
             <xs:element name="executable-type" maxOccurs="unbounded" minOccurs="1">
                 <xs:simpleType>

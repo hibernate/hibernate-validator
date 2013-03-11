@@ -151,7 +151,7 @@ public class ValidationXmlParser {
 				config.getMessageInterpolator(),
 				config.getTraversableResolver(),
 				config.getParameterNameProvider(),
-				getValidatedExecutableTypes( config.getValidatedExecutables() ),
+				getValidatedExecutableTypes( config.getDefaultValidatedExecutables() ),
 				new HashSet<String>( config.getConstraintMapping() ),
 				properties
 		);
@@ -166,7 +166,7 @@ public class ValidationXmlParser {
 	 *
 	 * @return An enum set representing the given executable types.
 	 */
-	private EnumSet<ExecutableType> getValidatedExecutableTypes(ValidatedExecutablesType validatedExecutables) {
+	private EnumSet<ExecutableType> getValidatedExecutableTypes(DefaultValidatedExecutablesType validatedExecutables) {
 		if ( validatedExecutables == null ) {
 			return null;
 		}
