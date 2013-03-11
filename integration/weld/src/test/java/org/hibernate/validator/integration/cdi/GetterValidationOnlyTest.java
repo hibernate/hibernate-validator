@@ -56,7 +56,7 @@ public class GetterValidationOnlyTest {
 			assertNull( repeater.repeat( null ) );
 		}
 		catch ( ConstraintViolationException e ) {
-			fail( "CDI method interceptor should not thrown an exception" );
+			fail( "CDI method interceptor should not throw an exception" );
 		}
 	}
 
