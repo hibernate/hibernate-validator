@@ -55,6 +55,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.constraints.CompositionType.AND;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -107,6 +108,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * The single cross parameter constraint validator if there is one. {@code null} otherwise.
 	 */
 	private final Class<? extends ConstraintValidator<T, ?>> crossParameterConstraintValidatorClass;
+
+	private final List<Class<? extends ConstraintValidator<T, ?>>> matchingConstraintValidatorClasses;
 
 	/**
 	 * The groups for which to apply this constraint.
@@ -176,13 +179,27 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.attributes = buildAnnotationParameterMap( annotation );
 		this.groups = buildGroupSet( implicitGroup );
 		this.payloads = buildPayloadSet( annotation );
+
 		this.constraintValidatorDefinitionClasses = constraintHelper.getValidatorClasses( annotationType );
 		this.crossParameterConstraintValidatorClass = findCrossParameterValidatorClass(
 				constraintValidatorDefinitionClasses
 		);
+		List<Class<? extends ConstraintValidator<T, ?>>> genericValidatorClasses = findGenericValidatorClasses(
+				constraintValidatorDefinitionClasses
+		);
+
 
 		this.constraintType = determineConstraintType( member );
 		this.composingConstraints = parseComposingConstraints( member, constraintHelper );
+
+		if ( constraintType == ConstraintType.GENERIC ) {
+			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( genericValidatorClasses );
+		}
+		else {
+			List<Class<? extends ConstraintValidator<T, ?>>> validatorClasses = newArrayList();
+			validatorClasses.add( crossParameterConstraintValidatorClass );
+			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( validatorClasses );
+		}
 	}
 
 	public ConstraintDescriptorImpl(Member member,
@@ -196,6 +213,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	@Override
 	public T getAnnotation() {
 		return annotation;
+	}
+
+	public Class<T> getAnnotationType() {
+		return annotationType;
 	}
 
 	@Override
@@ -221,6 +242,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	@Override
 	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
 		return constraintValidatorDefinitionClasses;
+	}
+
+	/**
+	 * Returns those validators registered with this constraint which apply to
+	 * the given constraint type (either generic or cross-parameter).
+	 *
+	 * @return The validators applying to type of this constraint.
+	 */
+	public List<Class<? extends ConstraintValidator<T, ?>>> getMatchingConstraintValidatorClasses() {
+		return matchingConstraintValidatorClasses;
 	}
 
 	@Override
@@ -445,12 +476,26 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return crossParameterValidatorClass;
 	}
 
+	private List<Class<? extends ConstraintValidator<T, ?>>> findGenericValidatorClasses(List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDefinitionClasses) {
+		List<Class<? extends ConstraintValidator<T, ?>>> genericValidatorClasses = newArrayList();
+
+		for ( Class<? extends ConstraintValidator<T, ?>> validatorClass : constraintValidatorDefinitionClasses ) {
+			if ( supportsValidationTarget( validatorClass, ValidationTarget.ANNOTATED_ELEMENT ) ) {
+				genericValidatorClasses.add( validatorClass );
+			}
+		}
+
+		return genericValidatorClasses;
+	}
+
 	private boolean supportsValidationTarget(Class<?> validatorClass, ValidationTarget target) {
 		SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
 				SupportedValidationTarget.class
 		);
+
+		//by default constraints target the annotated element
 		if ( supportedTargetAnnotation == null ) {
-			return false;
+			return target == ValidationTarget.ANNOTATED_ELEMENT;
 		}
 		ValidationTarget[] targets = supportedTargetAnnotation.value();
 		for ( ValidationTarget configuredTarget : targets ) {

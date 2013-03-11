@@ -33,6 +33,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -68,7 +69,7 @@ public class ConstraintValidatorManagerTest {
 
 	@Test
 	public void testGetInitializedValidator() {
-		ConstraintDescriptor<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
+		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
 
 		ConstraintValidator<?, ?> constraintValidator = constraintValidatorManager.getInitializedValidator(
 				String.class,
@@ -81,7 +82,7 @@ public class ConstraintValidatorManagerTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNullValidatedValueThrowsIllegalArgumentException() {
-		ConstraintDescriptor<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
+		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
 
 		constraintValidatorManager.getInitializedValidator(
 				null,
@@ -102,7 +103,7 @@ public class ConstraintValidatorManagerTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNullFactoryThrowsIllegalArgumentException() {
-		ConstraintDescriptor<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
+		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
 
 		constraintValidatorManager.getInitializedValidator(
 				String.class,
@@ -114,7 +115,7 @@ public class ConstraintValidatorManagerTest {
 	@Test(expectedExceptions = UnexpectedTypeException.class,
 			expectedExceptionsMessageRegExp = "HV000030.*")
 	public void testUnexpectedTypeException() {
-		ConstraintDescriptor<?> constraintDescriptor = getConstraintDescriptorForProperty( "s2" );
+		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s2" );
 
 		constraintValidatorManager.getInitializedValidator(
 				Object.class,
@@ -125,7 +126,7 @@ public class ConstraintValidatorManagerTest {
 
 	@Test
 	public void testConstraintValidatorInstancesAreCachedPerFactory() {
-		ConstraintDescriptor<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
+		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
 
 		ConstraintValidator<?, ?> constraintValidator1 = constraintValidatorManager.getInitializedValidator(
 				String.class,
@@ -158,7 +159,7 @@ public class ConstraintValidatorManagerTest {
 
 	@Test
 	public void testOnlyTheInstancesForTheLeastRecentlyUsedCustomFactoryAreCached() {
-		ConstraintDescriptor<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
+		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
 
 		for ( int i = 0; i < 10; i++ ) {
 			constraintValidatorManager.getInitializedValidator(
@@ -193,10 +194,10 @@ public class ConstraintValidatorManagerTest {
 				.buildValidatorFactory()
 				.getValidator();
 
-		ConstraintDescriptor<?> notNullOnFirstNameDescriptor = getSingleConstraintDescriptorForProperty(
+		ConstraintDescriptorImpl<?> notNullOnFirstNameDescriptor = getSingleConstraintDescriptorForProperty(
 				validator, User.class, "firstName"
 		);
-		ConstraintDescriptor<?> notNullOnLastNameDescriptor = getSingleConstraintDescriptorForProperty(
+		ConstraintDescriptorImpl<?> notNullOnLastNameDescriptor = getSingleConstraintDescriptorForProperty(
 				validator, User.class, "lastName"
 		);
 
@@ -226,13 +227,13 @@ public class ConstraintValidatorManagerTest {
 				.buildValidatorFactory()
 				.getValidator();
 
-		ConstraintDescriptor<?> sizeOnMiddleNameDescriptor = getSingleConstraintDescriptorForProperty(
+		ConstraintDescriptorImpl<?> sizeOnMiddleNameDescriptor = getSingleConstraintDescriptorForProperty(
 				validator, User.class, "middleName"
 		);
-		ConstraintDescriptor<?> sizeOnAddress1Descriptor = getSingleConstraintDescriptorForProperty(
+		ConstraintDescriptorImpl<?> sizeOnAddress1Descriptor = getSingleConstraintDescriptorForProperty(
 				validator, User.class, "address1"
 		);
-		ConstraintDescriptor<?> sizeOnAddress2Descriptor = getSingleConstraintDescriptorForProperty(
+		ConstraintDescriptorImpl<?> sizeOnAddress2Descriptor = getSingleConstraintDescriptorForProperty(
 				validator, User.class, "address2"
 		);
 
@@ -250,11 +251,11 @@ public class ConstraintValidatorManagerTest {
 		assertThat( sizeValidatorForAddress1 ).isSameAs( sizeValidatorForAddress2 );
 	}
 
-	private ConstraintDescriptor<?> getConstraintDescriptorForProperty(String propertyName) {
+	private ConstraintDescriptorImpl<?> getConstraintDescriptorForProperty(String propertyName) {
 		return getSingleConstraintDescriptorForProperty( validator, Foo.class, propertyName );
 	}
 
-	private ConstraintDescriptor<?> getSingleConstraintDescriptorForProperty(Validator validator, Class<?> clazz, String propertyName) {
+	private ConstraintDescriptorImpl<?> getSingleConstraintDescriptorForProperty(Validator validator, Class<?> clazz, String propertyName) {
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( clazz );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty(
 				propertyName
@@ -265,7 +266,7 @@ public class ConstraintValidatorManagerTest {
 				1,
 				"There should be only one constraint descriptor"
 		);
-		return constraintDescriptorSet.iterator().next();
+		return (ConstraintDescriptorImpl<?>) constraintDescriptorSet.iterator().next();
 	}
 
 	public class Foo {
@@ -290,6 +291,7 @@ public class ConstraintValidatorManagerTest {
 
 		@Override
 		public void releaseInstance(ConstraintValidator<?, ?> instance) {
-			delegate.releaseInstance( instance );		}
+			delegate.releaseInstance( instance );
+		}
 	}
 }

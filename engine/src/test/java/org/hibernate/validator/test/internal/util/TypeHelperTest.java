@@ -36,6 +36,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.TypeHelper;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
@@ -852,11 +853,10 @@ public class TypeHelperTest {
 
 	@Test
 	public void testTypeDiscovery() {
-		List<Class<? extends ConstraintValidator<Positive, ?>>> validators =
-				new ArrayList<Class<? extends ConstraintValidator<Positive, ?>>>();
+		List<Class<? extends ConstraintValidator<Positive, ?>>> validators = newArrayList();
 		validators.add( PositiveConstraintValidator.class );
 		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes = TypeHelper
-				.getValidatorsTypes( validators );
+				.getValidatorsTypes( Positive.class, validators );
 
 		assertEquals( validatorsTypes.get( Integer.class ), PositiveConstraintValidator.class );
 		assertNull( validatorsTypes.get( String.class ) );
@@ -928,6 +928,3 @@ public class TypeHelperTest {
 		};
 	}
 }
-
-
-

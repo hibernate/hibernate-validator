@@ -27,8 +27,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +36,9 @@ import javax.validation.ConstraintValidator;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Provides utility methods for working with types.
@@ -51,7 +52,7 @@ public final class TypeHelper {
 	private static final Log log = LoggerFactory.make();
 
 	static {
-		Map<Class<?>, Set<Class<?>>> subtypesByPrimitive = new HashMap<Class<?>, Set<Class<?>>>();
+		Map<Class<?>, Set<Class<?>>> subtypesByPrimitive = newHashMap();
 
 		putPrimitiveSubtypes( subtypesByPrimitive, Void.TYPE );
 		putPrimitiveSubtypes( subtypesByPrimitive, Boolean.TYPE );
@@ -219,6 +220,7 @@ public final class TypeHelper {
 	public static GenericArrayType genericArrayType(final Type componentType) {
 		return new GenericArrayType() {
 
+			@Override
 			public Type getGenericComponentType() {
 				return componentType;
 			}
@@ -241,14 +243,17 @@ public final class TypeHelper {
 	 */
 	public static ParameterizedType parameterizedType(final Class<?> rawType, final Type... actualTypeArguments) {
 		return new ParameterizedType() {
+			@Override
 			public Type[] getActualTypeArguments() {
 				return actualTypeArguments;
 			}
 
+			@Override
 			public Type getRawType() {
 				return rawType;
 			}
 
+			@Override
 			public Type getOwnerType() {
 				return null;
 			}
@@ -289,18 +294,25 @@ public final class TypeHelper {
 	 *         key is the type the validator accepts and value the validator class itself.
 	 */
 	public static <T extends Annotation> Map<Type, Class<? extends ConstraintValidator<?, ?>>> getValidatorsTypes(
+			Class<T> annotationType,
 			List<Class<? extends ConstraintValidator<T, ?>>> validators) {
 		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
-				new HashMap<Type, Class<? extends ConstraintValidator<?, ?>>>();
+				newHashMap();
 		for ( Class<? extends ConstraintValidator<?, ?>> validator : validators ) {
-			validatorsTypes.put( extractType( validator ), validator );
+			Type type = extractType( validator );
+
+			if ( validatorsTypes.containsKey( type ) ) {
+				throw log.getMultipleValidatorsForSameTypeException( annotationType.getName(), type.toString() );
+			}
+
+			validatorsTypes.put( type, validator );
 		}
 		return validatorsTypes;
 
 	}
 
 	private static Type extractType(Class<? extends ConstraintValidator<?, ?>> validator) {
-		Map<Type, Type> resolvedTypes = new HashMap<Type, Type>();
+		Map<Type, Type> resolvedTypes = newHashMap();
 		Type constraintValidatorType = resolveTypes( resolvedTypes, validator );
 
 		//we now have all bind from a type to its resolution at one level
@@ -375,7 +387,7 @@ public final class TypeHelper {
 
 	private static void putPrimitiveSubtypes(Map<Class<?>, Set<Class<?>>> subtypesByPrimitive, Class<?> primitiveType,
 											 Class<?>... directSubtypes) {
-		Set<Class<?>> subtypes = new HashSet<Class<?>>();
+		Set<Class<?>> subtypes = newHashSet();
 
 		for ( Class<?> directSubtype : directSubtypes ) {
 			subtypes.add( directSubtype );
