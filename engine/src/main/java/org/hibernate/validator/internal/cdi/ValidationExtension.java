@@ -53,6 +53,7 @@ import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotatedType;
+import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
@@ -96,7 +97,7 @@ public class ValidationExtension implements Extension {
 		Contracts.assertNotNull( beanManager, "The BeanManager cannot be null" );
 
 		// Register the interceptor explicitly. This way, no beans.xml is needed
-		AnnotatedType<ValidationExtension> annotatedType = beanManager.createAnnotatedType( ValidationExtension.class );
+		AnnotatedType<ValidationInterceptor> annotatedType = beanManager.createAnnotatedType( ValidationInterceptor.class );
 		beforeBeanDiscoveryEvent.addAnnotatedType( annotatedType );
 	}
 
