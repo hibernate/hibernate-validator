@@ -5,6 +5,6 @@
 	xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.1.xsd"
 	version="1.1">
     <validated-executables>
-	<executable-type>NONE</executable-type>
+	<executable-type>GETTER_METHODS</executable-type>
     </validated-executables>
 </validation-config>

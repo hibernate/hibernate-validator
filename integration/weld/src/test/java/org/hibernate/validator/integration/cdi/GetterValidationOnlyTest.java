@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.integration.cdi;
 
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
@@ -30,22 +29,20 @@ import org.junit.runner.RunWith;
 
 import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class InterceptorTest {
+public class GetterValidationOnlyTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Repeater.class )
-				.addClass( RepeaterImpl.class )
-				.addClass( Broken.class )
-				.addClass( BrokenRepeaterImpl.class )
+				.addClass( OnlyGetterValidatedRepeater.class )
 				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
@@ -53,33 +50,24 @@ public class InterceptorTest {
 	@Inject
 	Repeater repeater;
 
-	@Inject
-	@Broken
-	Instance<Repeater> repeaterInstance;
-
 	@Test
-	public void testInjection() throws Exception {
-		assertNotNull( repeater );
+	public void testNonGetterValidationDoesNotOccur() throws Exception {
 		try {
-			repeater.repeat( null );
-			fail( "CDI method interceptor should have thrown an exception" );
+			assertNull( repeater.repeat( null ) );
 		}
 		catch ( ConstraintViolationException e ) {
-			// success
+			fail( "CDI method interceptor should not thrown an exception" );
 		}
 	}
 
 	@Test
-	public void testInstanceInjection() throws Exception {
-		assertNotNull( repeaterInstance );
+	public void testGetterValidationOccurs() throws Exception {
 		try {
-			repeaterInstance.get();
-			fail( "CDI method interceptor should have thrown an exception" );
+			repeater.getHelloWorld();
+			fail( "CDI method interceptor should throw an exception" );
 		}
 		catch ( ConstraintViolationException e ) {
 			// success
 		}
 	}
 }
-
-

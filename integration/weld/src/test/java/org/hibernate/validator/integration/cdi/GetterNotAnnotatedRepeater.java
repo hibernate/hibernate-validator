@@ -16,17 +16,21 @@
 */
 package org.hibernate.validator.integration.cdi;
 
-import org.hibernate.validator.internal.cdi.interceptor.MethodValidated;
+import javax.validation.executable.ValidateExecutable;
 
 /**
  * @author Hardy Ferentschik
  */
-@MethodValidated
-public class RepeaterImpl implements Repeater {
+public class GetterNotAnnotatedRepeater implements Repeater {
 
+	@Override
+	@ValidateExecutable
 	public String repeat(String in) {
 		return in;
 	}
+
+	@Override
+	public String getHelloWorld() {
+		return null;
+	}
 }
-
-
