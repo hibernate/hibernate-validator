@@ -59,7 +59,7 @@ public class EnableGetterValidationPerDefaultTest {
 		assertNotNull( repeater );
 		try {
 			repeater.getHelloWorld();
-			fail( "method validation should be disabled via validation.xml" );
+			fail( "method validation should be enabled via validation.xml" );
 		}
 		catch ( ConstraintViolationException e ) {
 			// success
