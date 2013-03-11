@@ -253,20 +253,15 @@ public class MetaConstraintBuilder {
 		}
 		else {
 			try {
-				returnValue = getEnumValue( returnType, value );
+				@SuppressWarnings("unchecked")
+				Class<Enum> enumClass = (Class<Enum>) returnType;
+				returnValue = Enum.valueOf( enumClass, value );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getInvalidReturnTypeException( returnType, e );
 			}
 		}
 		return returnValue;
-	}
-
-	private static <E extends Enum<E>> E getEnumValue(Class<?> enumClass, String value) {
-		//safe since the method is only called in the enum case
-		@SuppressWarnings("unchecked")
-		Class<E> enumType = (Class<E>) enumClass;
-		return Enum.valueOf( enumType, value );
 	}
 
 	private static Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
