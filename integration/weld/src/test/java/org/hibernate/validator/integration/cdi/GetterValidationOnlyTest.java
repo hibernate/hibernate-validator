@@ -24,32 +24,26 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.hibernate.validator.integration.util.TestHelper;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-
 
 /**
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class InterceptorDisabledForValidateExecutableNoneTest {
+public class GetterValidationOnlyTest {
+
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Repeater.class )
-				.addClass( RepeaterImpl.class )
+				.addClass( OnlyGetterValidatedRepeater.class )
 				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
-				.addAsResource(
-						TestHelper.getTestPackagePath( InterceptorDisabledForValidateExecutableNoneTest.class ) + "validation-validate-executable-none.xml",
-						"META-INF/validation.xml"
-				)
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
@@ -57,14 +51,23 @@ public class InterceptorDisabledForValidateExecutableNoneTest {
 	Repeater repeater;
 
 	@Test
-	@Ignore
-	public void testInjection() throws Exception {
-		assertNotNull( repeater );
+	public void testNonGetterValidationDoesNotOccur() throws Exception {
 		try {
-			repeater.repeat( null );
+			assertNull( repeater.repeat( null ) );
 		}
 		catch ( ConstraintViolationException e ) {
-			fail( "method validation should be disabled via validation.xml" );
+			fail( "CDI method interceptor should not thrown an exception" );
+		}
+	}
+
+	@Test
+	public void testGetterValidationOccurs() throws Exception {
+		try {
+			repeater.getHelloWorld();
+			fail( "CDI method interceptor should throw an exception" );
+		}
+		catch ( ConstraintViolationException e ) {
+			// success
 		}
 	}
 }

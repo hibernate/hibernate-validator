@@ -24,8 +24,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
-
-import org.hibernate.validator.internal.cdi.interceptor.MethodValidated;
+import javax.validation.executable.ValidateExecutable;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -33,18 +32,24 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Hardy Ferentschik
  */
 @Broken
-@MethodValidated
+@ValidateExecutable
 public class BrokenRepeaterImpl implements Repeater {
 
 	@BrokenConstraint
 	BrokenRepeaterImpl() {
 	}
 
+	@Override
 	public String repeat(String in) {
 		return in;
 	}
 
-	@Constraint(validatedBy = { BrokenConstraint.BrokenConstraintImpl.class, })
+	@Override
+	public String getHelloWorld() {
+		return null;
+	}
+
+	@Constraint(validatedBy = { BrokenConstraint.BrokenConstraintImpl.class })
 	@Documented
 	@Target({ ElementType.CONSTRUCTOR })
 	@Retention(RUNTIME)

@@ -17,13 +17,17 @@
 package org.hibernate.validator.internal.cdi;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.AnnotatedCallable;
 import javax.enterprise.inject.spi.AnnotatedConstructor;
 import javax.enterprise.inject.spi.AnnotatedMethod;
@@ -34,20 +38,23 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessBean;
+import javax.enterprise.inject.spi.WithAnnotations;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.BootstrapConfiguration;
 import javax.validation.Configuration;
+import javax.validation.Constraint;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.executable.ExecutableType;
+import javax.validation.executable.ValidateExecutable;
 import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotatedType;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -60,7 +67,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  */
 public class ValidationExtension implements Extension {
-	private static final Log log = LoggerFactory.make();
+	private static final EnumSet<ExecutableType> ALL_EXECUTABLE_TYPES =
+			EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS, ExecutableType.GETTER_METHODS );
 
 	private final Validator validator;
 	private final Set<ExecutableType> globalExecutableTypes;
@@ -143,22 +151,24 @@ public class ValidationExtension implements Extension {
 	 *
 	 * @param processAnnotatedTypeEvent event fired for each annotated type
 	 */
-	public <T> void processAnnotatedType(@Observes ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
+	public <T> void processAnnotatedType(@Observes @WithAnnotations({ Constraint.class, ValidateExecutable.class })
+										 ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
 		Contracts.assertNotNull( processAnnotatedTypeEvent, "The ProcessAnnotatedType event cannot be null" );
 
 		final AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
 
-		// TODO we need to take @ValidateExecutable into account as well
+		EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesForAnnotatedElement( type );
+
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( type.getJavaClass() );
 		if ( !beanDescriptor.hasConstrainedExecutables() ) {
 			return;
 		}
 
-		if ( log.isDebugEnabled() ) {
-			log.debug( type.getJavaClass() + " contains executable constraints" );
-		}
-
-		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables( type, beanDescriptor );
+		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables(
+				type,
+				beanDescriptor,
+				classLevelExecutableTypes
+		);
 		if ( !constrainedCallables.isEmpty() ) {
 			ValidationEnabledAnnotatedType<T> wrappedType = new ValidationEnabledAnnotatedType<T>(
 					type,
@@ -168,11 +178,19 @@ public class ValidationExtension implements Extension {
 		}
 	}
 
-	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type, BeanDescriptor beanDescriptor) {
+	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type,
+																				BeanDescriptor beanDescriptor,
+																				EnumSet<ExecutableType> classLevelExecutableTypes) {
 		Set<AnnotatedCallable<? super T>> callables = newHashSet();
 
 		for ( AnnotatedConstructor<T> annotatedConstructor : type.getConstructors() ) {
 			Constructor constructor = annotatedConstructor.getJavaMember();
+			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesForAnnotatedElement( annotatedConstructor );
+
+			if ( veto( classLevelExecutableTypes, memberLevelExecutableType, ExecutableType.CONSTRUCTORS ) ) {
+				continue;
+			}
+
 			if ( beanDescriptor.getConstraintsForConstructor( constructor.getParameterTypes() ) != null ) {
 				callables.add( annotatedConstructor );
 			}
@@ -180,12 +198,57 @@ public class ValidationExtension implements Extension {
 
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
-			if ( beanDescriptor.getConstraintsForMethod( method.getName(), method.getParameterTypes() ) != null ) {
+			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesForAnnotatedElement( annotatedMethod );
+			boolean isGetter = ReflectionHelper.isGetterMethod( method );
+			ExecutableType currentExecutableType = isGetter ? ExecutableType.GETTER_METHODS : ExecutableType.NON_GETTER_METHODS;
+
+			// validation is enabled per default, so explicit configuration can just veto whether
+			// validation occurs
+			if ( veto( classLevelExecutableTypes, memberLevelExecutableType, currentExecutableType ) ) {
+				continue;
+			}
+
+			boolean needsValidation;
+			if ( isGetter ) {
+				needsValidation = isGetterConstrained( method, beanDescriptor );
+
+			}
+			else {
+				needsValidation = isNonGetterConstrained( method, beanDescriptor );
+			}
+
+			if ( needsValidation ) {
 				callables.add( annotatedMethod );
 			}
 		}
 
 		return callables;
+	}
+
+	private boolean isNonGetterConstrained(Method method, BeanDescriptor beanDescriptor) {
+		return beanDescriptor.getConstraintsForMethod( method.getName(), method.getParameterTypes() ) != null;
+	}
+
+	private boolean isGetterConstrained(Method method, BeanDescriptor beanDescriptor) {
+		String propertyName = ReflectionHelper.getPropertyName( method );
+		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( propertyName );
+		return propertyDescriptor.findConstraints()
+				.declaredOn( ElementType.METHOD )
+				.hasConstraints();
+	}
+
+	private boolean veto(EnumSet<ExecutableType> classLevelExecutableTypes,
+						 EnumSet<ExecutableType> memberLevelExecutableType,
+						 ExecutableType currentExecutableType) {
+		if ( !memberLevelExecutableType.isEmpty() ) {
+			return !memberLevelExecutableType.contains( currentExecutableType );
+		}
+
+		if ( !classLevelExecutableTypes.isEmpty() ) {
+			return !classLevelExecutableTypes.contains( currentExecutableType );
+		}
+
+		return !globalExecutableTypes.contains( currentExecutableType );
 	}
 
 	/**
@@ -212,5 +275,26 @@ public class ValidationExtension implements Extension {
 			);
 		}
 		return annotations;
+	}
+
+	private EnumSet<ExecutableType> executableTypesForAnnotatedElement(Annotated annotated) {
+		if ( !annotated.isAnnotationPresent( ValidateExecutable.class ) ) {
+			return EnumSet.noneOf( ExecutableType.class );
+		}
+
+		ValidateExecutable executableAnnotation = annotated.getAnnotation( ValidateExecutable.class );
+
+		EnumSet<ExecutableType> executableTypes = EnumSet.noneOf( ExecutableType.class );
+		Collections.addAll( executableTypes, executableAnnotation.value() );
+
+		if ( executableTypes.contains( ExecutableType.ALL ) ) {
+			return ALL_EXECUTABLE_TYPES;
+		}
+
+		if ( executableTypes.contains( ExecutableType.NONE ) && executableTypes.size() > 1 ) {
+			executableTypes.remove( ExecutableType.NONE );
+		}
+
+		return executableTypes;
 	}
 }

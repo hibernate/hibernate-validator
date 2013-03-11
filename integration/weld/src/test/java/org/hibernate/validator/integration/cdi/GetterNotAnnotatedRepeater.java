@@ -16,16 +16,23 @@
 */
 package org.hibernate.validator.integration.cdi;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.executable.ValidateExecutable;
 
 /**
  * @author Hardy Ferentschik
  */
-public interface Repeater {
-	String repeat(@NotNull String in);
+public class GetterNotAnnotatedRepeater implements Repeater {
 
-	@NotNull
-	String getHelloWorld();
+	@Override
+	@ValidateExecutable
+	public String repeat(String in) {
+		return in;
+	}
+
+	@Override
+	public String getHelloWorld() {
+		return null;
+	}
 }
 
 
