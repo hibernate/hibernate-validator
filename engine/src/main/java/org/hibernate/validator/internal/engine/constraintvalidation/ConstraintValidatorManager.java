@@ -26,6 +26,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -76,7 +77,7 @@ public class ConstraintValidatorManager {
 	 * @return A initialized constraint validator for the given type and annotation of the value to be validated.
 	 */
 	public <V, A extends Annotation> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType,
-																					   ConstraintDescriptor<A> descriptor,
+																					   ConstraintDescriptorImpl<A> descriptor,
 																					   ConstraintValidatorFactory constraintFactory) {
 		Contracts.assertNotNull( validatedValueType );
 		Contracts.assertNotNull( descriptor );
@@ -180,9 +181,9 @@ public class ConstraintValidatorManager {
 	 *
 	 * @return The class of a matching validator.
 	 */
-	private <A extends Annotation> Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(ConstraintDescriptor<A> descriptor, Type validatedValueType) {
+	private <A extends Annotation> Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
 		Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
-				descriptor.getConstraintValidatorClasses()
+				descriptor.getApplyingConstraintValidatorClasses()
 		);
 
 		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType, availableValidatorTypes );

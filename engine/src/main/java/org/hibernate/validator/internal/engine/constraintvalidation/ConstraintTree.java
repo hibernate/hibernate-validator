@@ -161,7 +161,7 @@ public class ConstraintTree<A extends Annotation> {
 
 	private <T> boolean mainConstraintNeedsEvaluation(ValidationContext<T> executionContext, Set<ConstraintViolation<T>> constraintViolations) {
 		// there is no validator for the main constraints
-		if ( descriptor.getConstraintValidatorClasses().isEmpty() ) {
+		if ( descriptor.getApplyingConstraintValidatorClasses().isEmpty() ) {
 			return false;
 		}
 
