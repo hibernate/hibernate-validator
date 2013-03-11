@@ -294,11 +294,18 @@ public final class TypeHelper {
 	 *         key is the type the validator accepts and value the validator class itself.
 	 */
 	public static <T extends Annotation> Map<Type, Class<? extends ConstraintValidator<?, ?>>> getValidatorsTypes(
+			Class<T> annotationType,
 			List<Class<? extends ConstraintValidator<T, ?>>> validators) {
 		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes =
 				newHashMap();
 		for ( Class<? extends ConstraintValidator<?, ?>> validator : validators ) {
-			validatorsTypes.put( extractType( validator ), validator );
+			Type type = extractType( validator );
+
+			if ( validatorsTypes.containsKey( type ) ) {
+				throw log.getMultipleValidatorsForSameTypeException( annotationType.getName(), type.toString() );
+			}
+
+			validatorsTypes.put( type, validator );
 		}
 		return validatorsTypes;
 

@@ -109,7 +109,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private final Class<? extends ConstraintValidator<T, ?>> crossParameterConstraintValidatorClass;
 
-	private final List<Class<? extends ConstraintValidator<T, ?>>> applyingConstraintValidatorClasses;
+	private final List<Class<? extends ConstraintValidator<T, ?>>> matchingConstraintValidatorClasses;
 
 	/**
 	 * The groups for which to apply this constraint.
@@ -193,12 +193,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.composingConstraints = parseComposingConstraints( member, constraintHelper );
 
 		if ( constraintType == ConstraintType.GENERIC ) {
-			this.applyingConstraintValidatorClasses = Collections.unmodifiableList( genericValidatorClasses );
+			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( genericValidatorClasses );
 		}
 		else {
 			List<Class<? extends ConstraintValidator<T, ?>>> validatorClasses = newArrayList();
 			validatorClasses.add( crossParameterConstraintValidatorClass );
-			this.applyingConstraintValidatorClasses = Collections.unmodifiableList( validatorClasses );
+			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( validatorClasses );
 		}
 	}
 
@@ -213,6 +213,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	@Override
 	public T getAnnotation() {
 		return annotation;
+	}
+
+	public Class<T> getAnnotationType() {
+		return annotationType;
 	}
 
 	@Override
@@ -246,8 +250,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 *
 	 * @return The validators applying to type of this constraint.
 	 */
-	public List<Class<? extends ConstraintValidator<T, ?>>> getApplyingConstraintValidatorClasses() {
-		return applyingConstraintValidatorClasses;
+	public List<Class<? extends ConstraintValidator<T, ?>>> getMatchingConstraintValidatorClasses() {
+		return matchingConstraintValidatorClasses;
 	}
 
 	@Override

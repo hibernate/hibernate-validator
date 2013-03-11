@@ -498,7 +498,7 @@ public interface Log extends BasicLogger {
 	ValidationException getConstructorIsDefinedTwiceInMappingXmlForBeanException(String name, String beanClassName);
 
 	@Message(id = 139,
-			value = "The constraint '%1$s' defines multiple cross parameter constraints. Only one is allowed.")
+			value = "The constraint '%1$s' defines multiple cross parameter validators. Only one is allowed.")
 	ConstraintDefinitionException getMultipleCrossParameterValidatorClassesException(String constraint);
 
 	@Message(id = 140,
@@ -539,4 +539,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 149, value = "An exception occured during message interpolation")
 	ValidationException getExceptionOcurredDuringMessageInterpolationException(@Cause Exception e);
+
+	@Message(id = 150,
+			value = "The constraint '%s' defines multiple validators for the type '%s'. Only one is allowed.")
+	UnexpectedTypeException getMultipleValidatorsForSameTypeException(String constraint, String type);
 }
