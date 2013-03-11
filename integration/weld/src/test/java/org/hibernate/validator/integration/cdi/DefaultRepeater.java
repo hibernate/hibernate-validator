@@ -14,23 +14,26 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.cdi.interceptor;
+package org.hibernate.validator.integration.cdi;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import javax.interceptor.InterceptorBinding;
+import javax.validation.executable.ValidateExecutable;
 
 /**
- * Marker annotation for a type or method indicating that method constraints shall be
- * validated upon invocation of the given method or any methods of the given type.
- *
  * @author Hardy Ferentschik
- * @author Gunnar Morling
  */
-@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.CONSTRUCTOR })
-@Retention(RetentionPolicy.RUNTIME)
-@InterceptorBinding
-public @interface MethodValidated {
+public class DefaultRepeater implements Repeater {
+
+	@Override
+	@ValidateExecutable
+	public String repeat(String in) {
+		return in;
+	}
+
+	@Override
+	@ValidateExecutable
+	public String getHelloWorld() {
+		return null;
+	}
 }
+
+

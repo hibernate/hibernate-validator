@@ -15,7 +15,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hibernate</groupId>
@@ -189,27 +191,30 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>1.2-b02</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.spec.javax.interceptor</groupId>
+                <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
+                <version>1.0.0.Alpha1</version>
+            </dependency>
+            <dependency>
                 <groupId>javax.enterprise</groupId>
                 <artifactId>cdi-api</artifactId>
-                <version>1.1-20130222</version>
+                <version>1.1-20130305</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jboss.spec.javax.interceptor</groupId>
+                        <artifactId>jboss-interceptors-api_1.1_spec</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.jboss.weld</groupId>
                 <artifactId>weld-core</artifactId>
-                <version>2.0.0.Beta4</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.spec</groupId>
-                <artifactId>jboss-javaee-6.0</artifactId>
-                <version>1.0.0.Final</version>
-                <type>pom</type>
-                <exclusions>
-                    <!-- STAX is part of Java 1.6 -->
-                    <exclusion>
-                        <groupId>stax</groupId>
-                        <artifactId>stax-api</artifactId>
-                    </exclusion>
-                </exclusions>
+                <version>2.0.0.Beta5</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>
@@ -219,7 +224,7 @@
             <dependency>
                 <groupId>org.jboss.arquillian.container</groupId>
                 <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
-                <version>1.0.0.Final-SNAPSHOT</version>
+                <version>1.0.0.CR6</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

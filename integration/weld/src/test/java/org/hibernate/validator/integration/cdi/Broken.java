@@ -16,17 +16,17 @@
 */
 package org.hibernate.validator.integration.cdi;
 
-import org.hibernate.validator.internal.cdi.interceptor.MethodValidated;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import javax.inject.Qualifier;
 
 /**
  * @author Hardy Ferentschik
  */
-public class RepeaterImpl implements Repeater {
-	// TODO - for now explicitly added interceptor binding
-	@MethodValidated
-	public String repeat(String in) {
-		return in;
-	}
+@Qualifier
+@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.FIELD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Broken {
 }
-
-

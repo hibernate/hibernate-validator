@@ -23,6 +23,9 @@ import javax.validation.constraints.NotNull;
  */
 public interface Repeater {
 	String repeat(@NotNull String in);
+
+	@NotNull
+	String getHelloWorld();
 }
 
 
