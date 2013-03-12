@@ -54,7 +54,7 @@ public class DefaultPackageInVarargParameterTest {
 		Set<MethodDescriptor> methodDescriptors = beanDescriptor.getConstrainedMethods();
 		assertTrue( "There should be two constrained methods", methodDescriptors.size() == 2 );
 		for ( MethodDescriptor methodDescriptor : methodDescriptors ) {
-			assertTrue( "Parameter should be constrained", methodDescriptor.areParametersConstrained() );
+			assertTrue( "Parameter should be constrained", methodDescriptor.hasConstrainedParameters() );
 			List<ParameterDescriptor> parameterDescriptorList = methodDescriptor.getParameterDescriptors();
 			for ( ParameterDescriptor parameterDescriptor : parameterDescriptorList ) {
 				assertTrue( "Parameter should be constrained", parameterDescriptor.isCascaded() );

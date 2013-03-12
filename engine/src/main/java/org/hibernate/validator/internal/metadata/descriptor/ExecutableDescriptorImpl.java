@@ -82,25 +82,8 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		return returnValueDescriptor;
 	}
 
-	public void assertCorrectnessOfConfiguration()
-			throws ConstraintDeclarationException {
-
-		if ( constraintDeclarationException != null ) {
-			throw constraintDeclarationException;
-		}
-	}
-
 	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append( "ExecutableDescriptorImpl" );
-		sb.append( "{name='" ).append( name ).append( '\'' );
-		sb.append( '}' );
-		return sb.toString();
-	}
-
-	@Override
-	public boolean areParametersConstrained() {
+	public boolean hasConstrainedParameters() {
 		if ( crossParameterDescriptor.hasConstraints() ) {
 			return true;
 		}
@@ -115,13 +98,30 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 	}
 
 	@Override
-	public boolean isReturnValueConstrained() {
-		return returnValueDescriptor != null && ( returnValueDescriptor.hasConstraints() || returnValueDescriptor
-				.isCascaded() );
+	public boolean hasConstrainedReturnValue() {
+		return returnValueDescriptor != null && ( returnValueDescriptor.hasConstraints()
+				|| returnValueDescriptor.isCascaded() );
 	}
 
 	@Override
 	public CrossParameterDescriptor getCrossParameterDescriptor() {
 		return crossParameterDescriptor;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append( "ExecutableDescriptorImpl" );
+		sb.append( "{name='" ).append( name ).append( '\'' );
+		sb.append( '}' );
+		return sb.toString();
+	}
+
+	public void assertCorrectnessOfConfiguration()
+			throws ConstraintDeclarationException {
+
+		if ( constraintDeclarationException != null ) {
+			throw constraintDeclarationException;
+		}
 	}
 }

@@ -216,7 +216,7 @@ public class MethodDescriptorTest {
 				CustomerRepositoryExt.class,
 				"baz"
 		);
-		assertThat( methodDescriptor.isReturnValueConstrained() ).isTrue();
+		assertThat( methodDescriptor.hasConstrainedReturnValue() ).isTrue();
 	}
 
 	@Test
@@ -225,7 +225,7 @@ public class MethodDescriptorTest {
 				CustomerRepositoryExt.class,
 				"foo"
 		);
-		assertThat( methodDescriptor.isReturnValueConstrained() ).isTrue();
+		assertThat( methodDescriptor.hasConstrainedReturnValue() ).isTrue();
 	}
 
 	@Test
@@ -236,7 +236,7 @@ public class MethodDescriptorTest {
 				CharSequence.class,
 				String.class
 		);
-		assertThat( methodDescriptor.isReturnValueConstrained() ).isFalse();
+		assertThat( methodDescriptor.hasConstrainedReturnValue() ).isFalse();
 	}
 
 	@Test
@@ -246,7 +246,7 @@ public class MethodDescriptorTest {
 				"saveCustomer",
 				Customer.class
 		);
-		assertThat( methodDescriptor.isReturnValueConstrained() ).isFalse();
+		assertThat( methodDescriptor.hasConstrainedReturnValue() ).isFalse();
 	}
 
 	@Test
@@ -257,7 +257,7 @@ public class MethodDescriptorTest {
 				CharSequence.class,
 				String.class
 		);
-		assertThat( methodDescriptor.areParametersConstrained() ).isTrue();
+		assertThat( methodDescriptor.hasConstrainedParameters() ).isTrue();
 	}
 
 	@Test
@@ -267,7 +267,7 @@ public class MethodDescriptorTest {
 				"saveCustomer",
 				Customer.class
 		);
-		assertThat( methodDescriptor.areParametersConstrained() ).isTrue();
+		assertThat( methodDescriptor.hasConstrainedParameters() ).isTrue();
 	}
 
 	@Test
@@ -276,7 +276,7 @@ public class MethodDescriptorTest {
 				CustomerRepositoryExt.class,
 				"methodWithCrossParameterConstraint", DateMidnight.class, DateMidnight.class
 		);
-		assertThat( methodDescriptor.areParametersConstrained() ).isTrue();
+		assertThat( methodDescriptor.hasConstrainedParameters() ).isTrue();
 	}
 
 	@Test
@@ -286,7 +286,7 @@ public class MethodDescriptorTest {
 				"zip",
 				int.class
 		);
-		assertThat( methodDescriptor.areParametersConstrained() ).isFalse();
+		assertThat( methodDescriptor.hasConstrainedParameters() ).isFalse();
 	}
 
 	@Test
@@ -295,6 +295,6 @@ public class MethodDescriptorTest {
 				CustomerRepositoryExt.class,
 				"zip"
 		);
-		assertThat( methodDescriptor.areParametersConstrained() ).isFalse();
+		assertThat( methodDescriptor.hasConstrainedParameters() ).isFalse();
 	}
 }
