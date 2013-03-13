@@ -45,6 +45,11 @@ public class BrokenRepeaterImpl implements Repeater {
 	}
 
 	@Override
+	public String reverse(String in) {
+		return null;
+	}
+
+	@Override
 	public String getHelloWorld() {
 		return null;
 	}

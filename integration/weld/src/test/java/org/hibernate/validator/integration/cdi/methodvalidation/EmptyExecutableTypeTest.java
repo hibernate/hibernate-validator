@@ -36,38 +36,26 @@ import static org.junit.Assert.fail;
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class GetterValidationOnlyTest {
+public class EmptyExecutableTypeTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
-				.addClass( Repeater.class )
-				.addClass( OnlyGetterValidatedRepeater.class )
+				.addClass( Snafu.class )
 				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
 	@Inject
-	Repeater repeater;
+	Snafu snafu;
 
 	@Test
-	public void testNonGetterValidationDoesNotOccur() throws Exception {
+	public void testEmptyExecutableTypeParameterIsTreatedAsExecutableTypeNone() throws Exception {
 		try {
-			assertNull( repeater.repeat( null ) );
+			assertNull( snafu.foo() );
 		}
 		catch ( ConstraintViolationException e ) {
 			fail( "CDI method interceptor should not throw an exception" );
-		}
-	}
-
-	@Test
-	public void testGetterValidationOccurs() throws Exception {
-		try {
-			repeater.getHelloWorld();
-			fail( "CDI method interceptor should throw an exception" );
-		}
-		catch ( ConstraintViolationException e ) {
-			// success
 		}
 	}
 }

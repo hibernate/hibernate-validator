@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi.methodvalidation;
+package org.hibernate.validator.integration.cdi.methodvalidation.getter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableType;
@@ -23,15 +23,15 @@ import javax.validation.executable.ValidateExecutable;
 /**
  * @author Hardy Ferentschik
  */
-@ValidateExecutable({ ExecutableType.NON_GETTER_METHODS, ExecutableType.GETTER_METHODS })
-public interface Repeater {
-	String repeat(@NotNull String in);
+@ValidateExecutable(ExecutableType.GETTER_METHODS)
+public class OnlyGetterValidated {
+	@NotNull
+	public String foo() {
+		return null;
+	}
 
 	@NotNull
-	String reverse(String in);
-
-	@NotNull
-	String getHelloWorld();
+	public String getFoo() {
+		return null;
+	}
 }
-
-

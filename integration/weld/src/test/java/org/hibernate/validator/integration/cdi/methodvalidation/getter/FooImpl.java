@@ -14,23 +14,18 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi.methodvalidation;
+package org.hibernate.validator.integration.cdi.methodvalidation.getter;
 
+import javax.validation.executable.ExecutableType;
 import javax.validation.executable.ValidateExecutable;
 
 /**
  * @author Hardy Ferentschik
  */
-public class GetterNotAnnotatedRepeater implements Repeater {
-
+@ValidateExecutable(ExecutableType.NONE)
+public class FooImpl implements Foo {
 	@Override
-	@ValidateExecutable
-	public String repeat(String in) {
-		return in;
-	}
-
-	@Override
-	public String getHelloWorld() {
+	public String getFoo() {
 		return null;
 	}
 }

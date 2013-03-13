@@ -29,13 +29,14 @@ import org.junit.runner.RunWith;
 
 import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class InterceptionOnInheritedMethodTest {
+public class ValidationOfInheritedMethodTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -43,12 +44,17 @@ public class InterceptionOnInheritedMethodTest {
 				.addClass( Greeter.class )
 				.addClass( SimpleGreeter.class )
 				.addClass( AbstractGreeter.class )
+				.addClass( Encryptor.class )
+				.addClass( RefusingEncryptor.class )
 				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
 	@Inject
 	Greeter greeter;
+
+	@Inject
+	Encryptor encryptor;
 
 	@Test
 	public void testInheritedMethodGetsValidated() throws Exception {
@@ -58,6 +64,16 @@ public class InterceptionOnInheritedMethodTest {
 		}
 		catch ( ConstraintViolationException e ) {
 			// success
+		}
+	}
+
+	@Test
+	public void testInterfaceMethodWithExecutableTypeNoneDoesNotGetValidated() throws Exception {
+		try {
+			assertNull( encryptor.encrypt( "top secret" ) );
+		}
+		catch ( ConstraintViolationException e ) {
+			fail( "Encryptor#encrypt should not be validated, because it is explicitly excluded from executable validation" );
 		}
 	}
 }

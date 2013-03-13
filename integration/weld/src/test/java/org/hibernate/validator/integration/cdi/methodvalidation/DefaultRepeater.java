@@ -21,16 +21,20 @@ import javax.validation.executable.ValidateExecutable;
 /**
  * @author Hardy Ferentschik
  */
+@ValidateExecutable
 public class DefaultRepeater implements Repeater {
 
 	@Override
-	@ValidateExecutable
 	public String repeat(String in) {
 		return in;
 	}
 
 	@Override
-	@ValidateExecutable
+	public String reverse(String in) {
+		return null;
+	}
+
+	@Override
 	public String getHelloWorld() {
 		return null;
 	}

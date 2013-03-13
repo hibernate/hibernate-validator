@@ -20,14 +20,13 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.AnnotatedCallable;
 import javax.enterprise.inject.spi.AnnotatedConstructor;
 import javax.enterprise.inject.spi.AnnotatedMethod;
@@ -43,6 +42,7 @@ import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.BootstrapConfiguration;
 import javax.validation.Configuration;
 import javax.validation.Constraint;
+import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -60,9 +60,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * A CDI portable extension which registers beans for {@link ValidatorFactory} and {@link Validator},
- * if such beans not yet exist (which for instance would be the case in a Java EE 6 container).
- * All registered beans will be {@link ApplicationScoped}.
+ * A CDI portable extension which registers beans for {@link ValidatorFactory} and {@link javax.xml.validation.Validator}.
  *
  * @author Gunnar Morling
  * @author Hardy Ferentschik
@@ -152,19 +150,23 @@ public class ValidationExtension implements Extension {
 	 *
 	 * @param processAnnotatedTypeEvent event fired for each annotated type
 	 */
-	public <T> void processAnnotatedType(@Observes @WithAnnotations({ Constraint.class, ValidateExecutable.class })
-										 ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
+	public <T> void processAnnotatedType(@Observes @WithAnnotations({
+			Constraint.class,
+			Valid.class,
+			ValidateExecutable.class
+	}) ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
 		Contracts.assertNotNull( processAnnotatedTypeEvent, "The ProcessAnnotatedType event cannot be null" );
 
-		final AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
+		AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
+		Class<?> clazz = type.getJavaClass();
 
-		EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesForAnnotatedElement( type );
+		EnumSet<ExecutableType> classLevelExecutableTypes = executableTypes(
+				clazz.getAnnotation(
+						ValidateExecutable.class
+				)
+		);
 
-		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( type.getJavaClass() );
-		if ( !beanDescriptor.hasConstrainedExecutables() ) {
-			return;
-		}
-
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( clazz );
 		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables(
 				type,
 				beanDescriptor,
@@ -184,22 +186,28 @@ public class ValidationExtension implements Extension {
 																				EnumSet<ExecutableType> classLevelExecutableTypes) {
 		Set<AnnotatedCallable<? super T>> callables = newHashSet();
 
-		for ( AnnotatedConstructor<T> annotatedConstructor : type.getConstructors() ) {
-			Constructor constructor = annotatedConstructor.getJavaMember();
-			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesForAnnotatedElement( annotatedConstructor );
+		determineConstrainedConstructors( type, beanDescriptor, classLevelExecutableTypes, callables );
+		determineConstrainedMethod( type, beanDescriptor, callables );
 
-			if ( veto( classLevelExecutableTypes, memberLevelExecutableType, ExecutableType.CONSTRUCTORS ) ) {
-				continue;
-			}
+		return callables;
+	}
 
-			if ( beanDescriptor.getConstraintsForConstructor( constructor.getParameterTypes() ) != null ) {
-				callables.add( annotatedConstructor );
-			}
-		}
-
+	private <T> void determineConstrainedMethod(AnnotatedType<T> type,
+												BeanDescriptor beanDescriptor,
+												Set<AnnotatedCallable<? super T>> callables) {
+		Set<Method> interfaceMethods = ReflectionHelper.computeAllImplementedMethods( type.getJavaClass() );
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
-			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesForAnnotatedElement( annotatedMethod );
+
+			// if the method implements an interface we need to use the configuration of the interface
+			method = replaceWithInterfaceMethod( method, interfaceMethods );
+
+			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypes(
+					method.getDeclaringClass().getAnnotation( ValidateExecutable.class )
+			);
+			EnumSet<ExecutableType> memberLevelExecutableType = executableTypes(
+					method.getAnnotation( ValidateExecutable.class )
+			);
 			boolean isGetter = ReflectionHelper.isGetterMethod( method );
 			ExecutableType currentExecutableType = isGetter ? ExecutableType.GETTER_METHODS : ExecutableType.NON_GETTER_METHODS;
 
@@ -222,8 +230,24 @@ public class ValidationExtension implements Extension {
 				callables.add( annotatedMethod );
 			}
 		}
+	}
 
-		return callables;
+	private <T> void determineConstrainedConstructors(AnnotatedType<T> type, BeanDescriptor beanDescriptor, EnumSet<ExecutableType> classLevelExecutableTypes, Set<AnnotatedCallable<? super T>> callables) {
+		// no special inheritance rules to consider for constructors
+		for ( AnnotatedConstructor<T> annotatedConstructor : type.getConstructors() ) {
+			Constructor constructor = annotatedConstructor.getJavaMember();
+			EnumSet<ExecutableType> memberLevelExecutableType = executableTypes(
+					annotatedConstructor.getAnnotation( ValidateExecutable.class )
+			);
+
+			if ( veto( classLevelExecutableTypes, memberLevelExecutableType, ExecutableType.CONSTRUCTORS ) ) {
+				continue;
+			}
+
+			if ( beanDescriptor.getConstraintsForConstructor( constructor.getParameterTypes() ) != null ) {
+				callables.add( annotatedConstructor );
+			}
+		}
 	}
 
 	private boolean isNonGetterConstrained(Method method, BeanDescriptor beanDescriptor) {
@@ -278,15 +302,18 @@ public class ValidationExtension implements Extension {
 		return annotations;
 	}
 
-	private EnumSet<ExecutableType> executableTypesForAnnotatedElement(Annotated annotated) {
-		if ( !annotated.isAnnotationPresent( ValidateExecutable.class ) ) {
+	private EnumSet<ExecutableType> executableTypes(ValidateExecutable validateExecutableAnnotation) {
+		if ( validateExecutableAnnotation == null ) {
 			return EnumSet.noneOf( ExecutableType.class );
 		}
 
-		ValidateExecutable executableAnnotation = annotated.getAnnotation( ValidateExecutable.class );
-
 		EnumSet<ExecutableType> executableTypes = EnumSet.noneOf( ExecutableType.class );
-		Collections.addAll( executableTypes, executableAnnotation.value() );
+		if ( validateExecutableAnnotation.value().length == 0 ) {  // HV-757
+			executableTypes.add( ExecutableType.NONE );
+		}
+		else {
+			Collections.addAll( executableTypes, validateExecutableAnnotation.value() );
+		}
 
 		if ( executableTypes.contains( ExecutableType.ALL ) ) {
 			return ALL_EXECUTABLE_TYPES;
@@ -297,5 +324,15 @@ public class ValidationExtension implements Extension {
 		}
 
 		return executableTypes;
+	}
+
+	public Method replaceWithInterfaceMethod(Method method, Set<Method> interfaceMethods) {
+		for ( Method interfaceMethod : interfaceMethods ) {
+			if ( interfaceMethod.getName().equals( method.getName() ) &&
+					Arrays.equals( interfaceMethod.getParameterTypes(), method.getParameterTypes() ) ) {
+				return interfaceMethod;
+			}
+		}
+		return method;
 	}
 }
