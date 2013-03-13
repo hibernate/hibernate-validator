@@ -114,7 +114,6 @@ public final class ReflectionHelper {
 
 	public static Class<?> loadClass(String className, String defaultPackage) {
 		return loadClass( className, defaultPackage, ReflectionHelper.class );
-
 	}
 
 	public static Class<?> loadClass(String className, String defaultPackage, Class<?> caller) {
