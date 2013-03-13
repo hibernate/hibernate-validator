@@ -14,8 +14,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi;
+package org.hibernate.validator.integration.cdi.methodvalidation;
 
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
@@ -29,20 +30,21 @@ import org.junit.runner.RunWith;
 
 import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class GetterValidationOnlyTest {
+public class BasicMethodValidationTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Repeater.class )
-				.addClass( OnlyGetterValidatedRepeater.class )
+				.addClass( DefaultRepeater.class )
+				.addClass( Broken.class )
+				.addClass( BrokenRepeaterImpl.class )
 				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
@@ -50,21 +52,37 @@ public class GetterValidationOnlyTest {
 	@Inject
 	Repeater repeater;
 
+	@Inject
+	@Broken
+	Instance<Repeater> repeaterInstance;
+
 	@Test
-	public void testNonGetterValidationDoesNotOccur() throws Exception {
+	public void testParameterValidation() throws Exception {
 		try {
-			assertNull( repeater.repeat( null ) );
+			repeater.repeat( null );
+			fail( "CDI method interceptor should have thrown an exception" );
 		}
 		catch ( ConstraintViolationException e ) {
-			fail( "CDI method interceptor should not throw an exception" );
+			// success
 		}
 	}
 
 	@Test
-	public void testGetterValidationOccurs() throws Exception {
+	public void testGetterValidation() throws Exception {
 		try {
 			repeater.getHelloWorld();
-			fail( "CDI method interceptor should throw an exception" );
+			fail( "CDI method interceptor should have thrown an exception" );
+		}
+		catch ( ConstraintViolationException e ) {
+			// success
+		}
+	}
+
+	@Test
+	public void testConstructorValidation() throws Exception {
+		try {
+			repeaterInstance.get();
+			fail( "CDI method interceptor should have thrown an exception" );
 		}
 		catch ( ConstraintViolationException e ) {
 			// success

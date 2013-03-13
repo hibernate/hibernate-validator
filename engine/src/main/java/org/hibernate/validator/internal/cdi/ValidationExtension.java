@@ -233,7 +233,7 @@ public class ValidationExtension implements Extension {
 	private boolean isGetterConstrained(Method method, BeanDescriptor beanDescriptor) {
 		String propertyName = ReflectionHelper.getPropertyName( method );
 		PropertyDescriptor propertyDescriptor = beanDescriptor.getConstraintsForProperty( propertyName );
-		return propertyDescriptor.findConstraints()
+		return propertyDescriptor != null && propertyDescriptor.findConstraints()
 				.declaredOn( ElementType.METHOD )
 				.hasConstraints();
 	}

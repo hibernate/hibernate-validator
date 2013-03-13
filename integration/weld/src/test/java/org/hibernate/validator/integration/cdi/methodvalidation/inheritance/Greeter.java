@@ -14,23 +14,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi;
+package org.hibernate.validator.integration.cdi.methodvalidation.inheritance;
 
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.constraints.Size;
 
 /**
  * @author Hardy Ferentschik
  */
-public class GetterNotAnnotatedRepeater implements Repeater {
-
-	@Override
-	@ValidateExecutable
-	public String repeat(String in) {
-		return in;
-	}
-
-	@Override
-	public String getHelloWorld() {
-		return null;
-	}
+public interface Greeter {
+	String greet(@Size(max = 5) String greeting);
 }
+
+

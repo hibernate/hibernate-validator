@@ -14,9 +14,8 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi;
+package org.hibernate.validator.integration.cdi.methodvalidation;
 
-import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
@@ -28,61 +27,39 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.hibernate.validator.integration.util.TestHelper;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class BasicMethodValidationTest {
-
+public class EnableGetterValidationPerDefaultTest {
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Repeater.class )
-				.addClass( DefaultRepeater.class )
-				.addClass( Broken.class )
-				.addClass( BrokenRepeaterImpl.class )
+				.addClass( GetterNotAnnotatedRepeater.class )
 				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
+				.addAsResource(
+						TestHelper.getTestPackagePath( EnableGetterValidationPerDefaultTest.class ) + "validation-validate-executable-getter.xml",
+						"META-INF/validation.xml"
+				)
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
 	@Inject
 	Repeater repeater;
 
-	@Inject
-	@Broken
-	Instance<Repeater> repeaterInstance;
-
 	@Test
-	public void testParameterValidation() throws Exception {
-		try {
-			repeater.repeat( null );
-			fail( "CDI method interceptor should have thrown an exception" );
-		}
-		catch ( ConstraintViolationException e ) {
-			// success
-		}
-	}
-
-	@Test
-	public void testGetterValidation() throws Exception {
+	public void testGetterValidationOccursBecauseItIsEnabledInXml() throws Exception {
+		assertNotNull( repeater );
 		try {
 			repeater.getHelloWorld();
-			fail( "CDI method interceptor should have thrown an exception" );
-		}
-		catch ( ConstraintViolationException e ) {
-			// success
-		}
-	}
-
-	@Test
-	public void testConstructorValidation() throws Exception {
-		try {
-			repeaterInstance.get();
-			fail( "CDI method interceptor should have thrown an exception" );
+			fail( "method validation should be enabled via validation.xml" );
 		}
 		catch ( ConstraintViolationException e ) {
 			// success

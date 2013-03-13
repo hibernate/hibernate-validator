@@ -14,24 +14,17 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi;
-
-import javax.validation.executable.ValidateExecutable;
+package org.hibernate.validator.integration.cdi.methodvalidation.inheritance;
 
 /**
  * @author Hardy Ferentschik
  */
-public class DefaultRepeater implements Repeater {
-
-	@Override
-	@ValidateExecutable
-	public String repeat(String in) {
-		return in;
+public abstract class AbstractGreeter implements Greeter {
+	public String greet(String greeting) {
+		return "Hello" + getName() + ", " + greeting;
 	}
 
-	@Override
-	@ValidateExecutable
-	public String getHelloWorld() {
-		return null;
-	}
+	protected abstract String getName();
 }
+
+
