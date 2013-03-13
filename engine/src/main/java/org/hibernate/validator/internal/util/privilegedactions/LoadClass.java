@@ -69,7 +69,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 		try {
 			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 			if ( contextClassLoader != null ) {
-				return contextClassLoader.loadClass( className );
+				return Class.forName( className, false, contextClassLoader );
 			}
 			else {
 				throw log.getUnableToLoadClassException( className );
@@ -84,7 +84,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 		try {
 			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
 			if ( contextClassLoader != null ) {
-				return contextClassLoader.loadClass( className );
+				return Class.forName( className, false, contextClassLoader );
 			}
 		}
 		catch ( ClassNotFoundException e ) {
