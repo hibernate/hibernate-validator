@@ -28,7 +28,7 @@ public enum ConfigurationSource {
 	 */
 	ANNOTATION( 0 ),
 	/**
-	 * The source of configuration is xml configuration
+	 * The source of configuration is XML configuration
 	 */
 	XML( 1 ),
 	/**
@@ -51,5 +51,21 @@ public enum ConfigurationSource {
 	 */
 	public int getPriority() {
 		return priority;
+	}
+
+	/**
+	 * Returns that configuration source from the given two sources, which has
+	 * the higher priority.
+	 *
+	 * @param a
+	 *            A configuration source.
+	 * @param b
+	 *            Another configuration source.
+	 *
+	 * @return The source with the higher priority. Will be source {@link a} if
+	 *         both have the same priority.
+	 */
+	public static ConfigurationSource max(ConfigurationSource a, ConfigurationSource b) {
+		return a.getPriority() >= b.getPriority() ? a : b;
 	}
 }

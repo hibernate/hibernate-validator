@@ -32,11 +32,11 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
  */
 public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	private final ConstrainedElementKind kind;
-	private final ConfigurationSource source;
-	private final ConstraintLocation location;
-	private final Set<MetaConstraint<?>> constraints;
-	private final Map<Class<?>, Class<?>> groupConversions;
-	private final boolean isCascading;
+	protected final ConfigurationSource source;
+	protected final ConstraintLocation location;
+	protected final Set<MetaConstraint<?>> constraints;
+	protected final Map<Class<?>, Class<?>> groupConversions;
+	protected final boolean isCascading;
 
 	public AbstractConstrainedElement(ConfigurationSource source,
 									  ConstrainedElementKind kind,

@@ -543,4 +543,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 150,
 			value = "The constraint '%s' defines multiple validators for the type '%s'. Only one is allowed.")
 	UnexpectedTypeException getMultipleValidatorsForSameTypeException(String constraint, String type);
+
+	@Message(id = 151,
+			value = "A method overriding another method must not alter the parameter constraint configuration, but method %2$s changes the configuration of %1$s.")
+	ConstraintDeclarationException getParameterConfigurationAlteredInSubTypeException(Member superMethod, Member subMethod);
+
+	@Message(id = 152,
+			value = "Two methods defined in parallel types must not declare parameter constraints, if they are overridden by the same method, but methods %s and %s both define parameter constraints.")
+	ConstraintDeclarationException getParameterConstraintsDefinedInMethodsFromParallelTypesException(Member method1, Member method2);
 }

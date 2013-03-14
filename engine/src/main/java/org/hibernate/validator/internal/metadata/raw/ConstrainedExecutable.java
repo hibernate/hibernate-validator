@@ -21,12 +21,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Represents a method or constructor of a Java type and all its associated
@@ -216,5 +221,82 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Whether this and the given other executable have the same parameter
+	 * constraints.
+	 *
+	 * @param other The other executable to check.
+	 *
+	 * @return True if this and the other executable have the same parameter
+	 *         constraints (including cross- parameter constraints and parameter
+	 *         cascades), false otherwise.
+	 */
+	public boolean isEquallyParameterConstrained(ConstrainedExecutable other) {
+		if ( !getDescriptors( crossParameterConstraints ).equals( getDescriptors( other.crossParameterConstraints ) ) ) {
+			return false;
+		}
+
+		int i = 0;
+		for ( ConstrainedParameter parameter : parameterMetaData ) {
+			ConstrainedParameter otherParameter = other.getParameterMetaData( i );
+			if ( parameter.isCascading != otherParameter.isCascading || !getDescriptors( parameter.getConstraints() )
+					.equals( getDescriptors( otherParameter.getConstraints() ) ) ) {
+				return false;
+			}
+			i++;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Creates a new constrained executable object by merging this and the given
+	 * other executable. Both executables must have the same location, i.e.
+	 * represent the same executable on the same type.
+	 *
+	 * @param other The executable to merge.
+	 *
+	 * @return A merged executable.
+	 */
+	public ConstrainedExecutable merge(ConstrainedExecutable other) {
+		ConfigurationSource mergedSource = ConfigurationSource.max( source, other.source );
+
+		List<ConstrainedParameter> mergedParameterMetaData = newArrayList( parameterMetaData.size() );
+		int i = 0;
+		for ( ConstrainedParameter parameter : parameterMetaData ) {
+			mergedParameterMetaData.add( parameter.merge( other.getParameterMetaData( i ) ) );
+			i++;
+		}
+
+		Set<MetaConstraint<?>> mergedCrossParameterConstraints = newHashSet( crossParameterConstraints );
+		mergedCrossParameterConstraints.addAll( other.crossParameterConstraints );
+
+		Set<MetaConstraint<?>> mergedReturnValueConstraints = newHashSet( constraints );
+		mergedReturnValueConstraints.addAll( other.constraints );
+
+		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
+		mergedGroupConversions.putAll( other.groupConversions );
+
+		return new ConstrainedExecutable(
+				mergedSource,
+				getLocation(),
+				mergedParameterMetaData,
+				mergedCrossParameterConstraints,
+				mergedReturnValueConstraints,
+				mergedGroupConversions,
+				isCascading || other.isCascading
+		);
+	}
+
+	private Set<ConstraintDescriptor<?>> getDescriptors(Iterable<MetaConstraint<?>> constraints) {
+		Set<ConstraintDescriptor<?>> descriptors = newHashSet();
+
+		for ( MetaConstraint<?> constraint : constraints ) {
+			descriptors.add( constraint.getDescriptor() );
+		}
+
+		return descriptors;
 	}
 }
