@@ -21,7 +21,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
-import javax.validation.ConstraintTarget;
 import javax.validation.Payload;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -45,8 +44,4 @@ public @interface ConsistentDateParameters {
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
-
-	ConstraintTarget validationAppliesTo() default ConstraintTarget.PARAMETERS;
-
-
 }

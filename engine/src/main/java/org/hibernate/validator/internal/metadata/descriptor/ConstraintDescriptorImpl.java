@@ -39,7 +39,6 @@ import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.ValidationException;
-import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -55,7 +54,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.constraints.CompositionType.AND;
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -102,12 +100,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * The set of classes implementing the validation for this constraint. See also
 	 * {@code ConstraintValidator} resolution algorithm.
 	 */
-	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDefinitionClasses;
-
-	/**
-	 * The single cross parameter constraint validator if there is one. {@code null} otherwise.
-	 */
-	private final Class<? extends ConstraintValidator<T, ?>> crossParameterConstraintValidatorClass;
+	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses;
 
 	private final List<Class<? extends ConstraintValidator<T, ?>>> matchingConstraintValidatorClasses;
 
@@ -180,19 +173,25 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.groups = buildGroupSet( implicitGroup );
 		this.payloads = buildPayloadSet( annotation );
 
-		this.constraintValidatorDefinitionClasses = constraintHelper.getValidatorClasses( annotationType );
-		this.crossParameterConstraintValidatorClass = findCrossParameterValidatorClass(
-				constraintValidatorDefinitionClasses
+		this.constraintValidatorClasses = constraintHelper.getAllValidatorClasses( annotationType );
+		List<Class<? extends ConstraintValidator<T, ?>>> crossParameterValidatorClasses = constraintHelper.findValidatorClasses(
+				annotationType,
+				ValidationTarget.PARAMETERS
 		);
-		List<Class<? extends ConstraintValidator<T, ?>>> genericValidatorClasses = findGenericValidatorClasses(
-				constraintValidatorDefinitionClasses
+		List<Class<? extends ConstraintValidator<T, ?>>> genericValidatorClasses = constraintHelper.findValidatorClasses(
+				annotationType,
+				ValidationTarget.ANNOTATED_ELEMENT
 		);
+
+		if ( crossParameterValidatorClasses.size() > 1 ) {
+			throw log.getMultipleCrossParameterValidatorClassesException( annotationType.getName() );
+		}
 
 		this.constraintType = determineConstraintType(
 				member,
 				type,
 				!genericValidatorClasses.isEmpty(),
-				crossParameterConstraintValidatorClass != null
+				!crossParameterValidatorClasses.isEmpty()
 		);
 		this.composingConstraints = parseComposingConstraints( member, constraintHelper );
 		validateComposingConstraintTypes();
@@ -201,9 +200,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( genericValidatorClasses );
 		}
 		else {
-			List<Class<? extends ConstraintValidator<T, ?>>> validatorClasses = newArrayList();
-			validatorClasses.add( crossParameterConstraintValidatorClass );
-			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( validatorClasses );
+			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( crossParameterValidatorClasses );
 		}
 	}
 
@@ -246,7 +243,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
-		return constraintValidatorDefinitionClasses;
+		return constraintValidatorClasses;
 	}
 
 	/**
@@ -450,7 +447,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				);
 			}
 		}
-
 	}
 
 	private boolean hasParameters(Member member) {
@@ -521,53 +517,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			groupSet.add( implicitGroup );
 		}
 		return Collections.unmodifiableSet( groupSet );
-	}
-
-	private Class<? extends ConstraintValidator<T, ?>> findCrossParameterValidatorClass(List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDefinitionClasses) {
-		Class<? extends ConstraintValidator<T, ?>> crossParameterValidatorClass = null;
-		boolean crossParameterValidatorFound = false;
-		for ( Class<? extends ConstraintValidator<T, ?>> validatorClass : constraintValidatorDefinitionClasses ) {
-			if ( crossParameterValidatorFound ) {
-				throw log.getMultipleCrossParameterValidatorClassesException( annotationType.getName() );
-			}
-
-			crossParameterValidatorFound = supportsValidationTarget( validatorClass, ValidationTarget.PARAMETERS );
-			if ( crossParameterValidatorFound ) {
-				crossParameterValidatorClass = validatorClass;
-				crossParameterValidatorFound = true;
-			}
-		}
-		return crossParameterValidatorClass;
-	}
-
-	private List<Class<? extends ConstraintValidator<T, ?>>> findGenericValidatorClasses(List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDefinitionClasses) {
-		List<Class<? extends ConstraintValidator<T, ?>>> genericValidatorClasses = newArrayList();
-
-		for ( Class<? extends ConstraintValidator<T, ?>> validatorClass : constraintValidatorDefinitionClasses ) {
-			if ( supportsValidationTarget( validatorClass, ValidationTarget.ANNOTATED_ELEMENT ) ) {
-				genericValidatorClasses.add( validatorClass );
-			}
-		}
-
-		return genericValidatorClasses;
-	}
-
-	private boolean supportsValidationTarget(Class<?> validatorClass, ValidationTarget target) {
-		SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
-				SupportedValidationTarget.class
-		);
-
-		//by default constraints target the annotated element
-		if ( supportedTargetAnnotation == null ) {
-			return target == ValidationTarget.ANNOTATED_ELEMENT;
-		}
-		ValidationTarget[] targets = supportedTargetAnnotation.value();
-		for ( ValidationTarget configuredTarget : targets ) {
-			if ( configuredTarget.equals( target ) ) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {

@@ -560,4 +560,20 @@ public interface Log extends BasicLogger {
 	@Message(id = 155,
 			value = "Composed and composing constraints must have the same constraint type, but composed constraint %1$s has type %3$s, while composing constraint %2$s has type %4$s.")
 	ConstraintDefinitionException getComposedAndComposingConstraintsHaveDifferentTypesException(String composedConstraintTypeName, String composingConstraintTypeName, ConstraintType composedConstraintType, ConstraintType composingConstraintType);
+
+	@Message(id = 156,
+			value = "Constraints with generic as well as cross-parameter validators must define an attribute validationAppliesTo(), but constraint %s doesn't.")
+	ConstraintDefinitionException getGenericAndCrossParameterConstraintDoesNotDefineValidationAppliesToParameterException(String constraint);
+
+	@Message(id = 157,
+			value = "Return type of the attribute validationAppliesTo() of the constraint %s must be javax.validation.ConstraintTarget.")
+	ConstraintDefinitionException getValidationAppliesToParameterMustHaveReturnTypeConstraintTargetException(String constraint);
+
+	@Message(id = 158,
+			value = "Default value of the attribute validationAppliesTo() of the constraint %s must be ConstraintTarget#IMPLICIT.")
+	ConstraintDefinitionException getValidationAppliesToParameterMustHaveDefaultValueImplicitException(String constraint);
+
+	@Message(id = 159,
+			value = "Only constraints with generic as well as cross-parameter validators must define an attribute validationAppliesTo(), but constraint %s does.")
+	ConstraintDefinitionException getValidationAppliesToParameterMustNotBeDefinedForNonGenericAndCrossParameterConstraintException(String constraint);
 }
