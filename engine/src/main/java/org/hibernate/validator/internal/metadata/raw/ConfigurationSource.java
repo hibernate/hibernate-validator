@@ -62,7 +62,7 @@ public enum ConfigurationSource {
 	 * @param b
 	 *            Another configuration source.
 	 *
-	 * @return The source with the higher priority. Will be source {@link a} if
+	 * @return The source with the higher priority. Will be source {@code a} if
 	 *         both have the same priority.
 	 */
 	public static ConfigurationSource max(ConfigurationSource a, ConfigurationSource b) {
