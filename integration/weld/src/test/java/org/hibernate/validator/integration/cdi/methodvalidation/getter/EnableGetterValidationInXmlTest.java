@@ -42,7 +42,6 @@ public class EnableGetterValidationInXmlTest {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Foo.class )
 				.addClass( FooImpl.class )
-				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsResource(
 						TestHelper.getTestPackagePath( EnableGetterValidationInXmlTest.class ) + "validation-validate-executable-getter.xml",
 						"META-INF/validation.xml"

@@ -42,7 +42,6 @@ public class GetterValidationOnlyTest {
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( OnlyGetterValidated.class )
-				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 

@@ -42,7 +42,6 @@ public class EmptyExecutableTypeTest {
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Snafu.class )
-				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 

@@ -42,7 +42,6 @@ public class DisableExecutableValidationInXmlTest {
 		return ShrinkWrap.create( JavaArchive.class )
 				.addClass( Repeater.class )
 				.addClass( DefaultRepeater.class )
-				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsResource(
 						TestHelper.getTestPackagePath( DisableExecutableValidationInXmlTest.class ) + "validation-disable-executable-validation.xml",
 						"META-INF/validation.xml"

@@ -44,8 +44,8 @@ public class ValidationEnabledAnnotatedType<T> implements AnnotatedType<T> {
 		this.wrappedConstructors = CollectionHelper.newHashSet();
 		buildWrappedCallable( constrainedCallables );
 
-		// at the moment we need to apply @MethodValidated on class level for constructor validation to occur
-		// will be removed when interceptor binding can be applied on constructor
+		// TODO - HV-764 at the moment we need to apply @MethodValidated on class level for constructor validation to occur
+		// TODO - will be removed when interceptor binding can be applied on constructor
 		boolean containsWrappedConstructor = false;
 		for ( AnnotatedConstructor<T> constructor : wrappedConstructors ) {
 			if ( constructor instanceof ValidationEnabledAnnotatedConstructor ) {

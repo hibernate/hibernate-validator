@@ -46,7 +46,6 @@ public class ValidationOfInheritedMethodTest {
 				.addClass( AbstractGreeter.class )
 				.addClass( Encryptor.class )
 				.addClass( RefusingEncryptor.class )
-				.addClass( ValidationInterceptor.class ) // adding the interceptor explicitly so that is is visible for CDI
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
