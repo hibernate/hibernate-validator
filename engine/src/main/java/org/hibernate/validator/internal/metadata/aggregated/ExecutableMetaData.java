@@ -16,10 +16,12 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ElementKind;
@@ -37,6 +39,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
@@ -305,6 +308,14 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private boolean isConstrained = false;
 
 		/**
+		 * Holds a merged representation of the configurations for one method
+		 * from the hierarchy contributed by the different meta data providers.
+		 * Used to check for violations of the Liskov substitution principle by
+		 * e.g. adding parameter constraints in sub type methods.
+		 */
+		private final Map<Class<?>, ConstrainedExecutable> executablesByDeclaringType = newHashMap();
+
+		/**
 		 * Creates a new builder based on the given executable meta data.
 		 *
 		 * @param constrainedExecutable The base executable for this builder. This is the lowest
@@ -346,6 +357,28 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
+
+			addToExecutablesByDeclaringType( constrainedExecutable );
+		}
+
+		/**
+		 * Merges the given executable with the metadata contributed by other
+		 * providers for the same executable in the hierarchy.
+		 *
+		 * @param executable The executable to merge.
+		 */
+		private void addToExecutablesByDeclaringType(ConstrainedExecutable executable) {
+			Class<?> beanClass = executable.getLocation().getBeanClass();
+			ConstrainedExecutable mergedExecutable = executablesByDeclaringType.get( beanClass );
+
+			if ( mergedExecutable != null ) {
+				mergedExecutable = mergedExecutable.merge( executable );
+			}
+			else {
+				mergedExecutable = executable;
+			}
+
+			executablesByDeclaringType.put( beanClass, mergedExecutable.merge( executable ) );
 		}
 
 		@Override
@@ -425,44 +458,49 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 *         the methods of this builder have no such illegal constraints.
 		 */
 		private ConstraintDeclarationException checkParameterConstraints() {
-			Set<ConstrainedExecutable> executablesWithParameterConstraints = executablesWithParameterConstraints(
-					constrainedExecutables
-			);
+			for ( Entry<Class<?>, ConstrainedExecutable> entry : executablesByDeclaringType.entrySet() ) {
+				for ( Entry<Class<?>, ConstrainedExecutable> otherEntry : executablesByDeclaringType.entrySet() ) {
+					Class<?> beanClass = entry.getKey();
+					ConstrainedExecutable executableConfiguration = entry.getValue();
+					Member member = executableConfiguration.getLocation().getMember();
 
-			if ( executablesWithParameterConstraints.isEmpty() ) {
-				return null;
-			}
-			Set<Class<?>> definingTypes = newHashSet();
+					Class<?> otherBeanClass = otherEntry.getKey();
+					ConstrainedExecutable otherExecutableConfiguration = otherEntry.getValue();
+					Member otherMember = otherExecutableConfiguration.getLocation().getMember();
 
-			for ( ConstrainedExecutable constrainedExecutable : executablesWithParameterConstraints ) {
-				definingTypes.add( constrainedExecutable.getLocation().getBeanClass() );
-			}
-
-			if ( definingTypes.size() > 1 ) {
-				return new ConstraintDeclarationException(
-						"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, " +
-								"but there are parameter constraints defined at all of the following overridden methods: " +
-								executablesWithParameterConstraints
-				);
-			}
-
-			ConstrainedExecutable constrainedExecutable = executablesWithParameterConstraints.iterator()
-					.next();
-
-			for ( ConstrainedExecutable oneExecutable : constrainedExecutables ) {
-
-				if ( !constrainedExecutable.getLocation().getBeanClass()
-						.isAssignableFrom( oneExecutable.getLocation().getBeanClass() ) ) {
-					return new ConstraintDeclarationException(
-							"Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints. " +
-									"The following method itself has no parameter constraints but it is not defined on a sub-type of " +
-									constrainedExecutable.getLocation()
-											.getBeanClass() + ": " + oneExecutable
-					);
+					//overriding methods may only have the exact same constraints as the overridden method
+					if ( isStrictSubType( beanClass, otherBeanClass ) ) {
+						if ( otherExecutableConfiguration.hasParameterConstraints() &&
+								!executableConfiguration.isEquallyParameterConstrained( otherExecutableConfiguration ) ) {
+							return log.getParameterConfigurationAlteredInSubTypeException( member, otherMember );
+						}
+					}
+					//parallel methods may not define any parameter constraints
+					else if ( !otherBeanClass.isAssignableFrom( beanClass ) ) {
+						if ( executableConfiguration.hasParameterConstraints() || otherExecutableConfiguration.hasParameterConstraints() ) {
+							return log.getParameterConstraintsDefinedInMethodsFromParallelTypesException(
+									member,
+									otherMember
+							);
+						}
+					}
 				}
 			}
 
 			return null;
+		}
+
+		/**
+		 * Whether otherClazz is a strict subtype of clazz or not.
+		 *
+		 * @param clazz The superclass.
+		 * @param otherClazz The potential subclass to test.
+		 *
+		 * @return True if otherClazz is a strict subtype of clazz, false
+		 *         otherwise.
+		 */
+		private boolean isStrictSubType(Class<?> clazz, Class<?> otherClazz) {
+			return clazz.isAssignableFrom( otherClazz ) && !clazz.equals( otherClazz );
 		}
 
 		private ConstraintDeclarationException checkReturnValueConfiguration() {
@@ -486,27 +524,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			}
 
 			return null;
-		}
-
-		/**
-		 * Returns a set with those executables from the given pile of executables that have
-		 * at least one constrained parameter or at least one parameter annotated
-		 * with {@link javax.validation.Valid}.
-		 *
-		 * @param executables The executables to search in.
-		 *
-		 * @return A set with constrained executables. May be empty, but never null.
-		 */
-		private Set<ConstrainedExecutable> executablesWithParameterConstraints(Iterable<ConstrainedExecutable> executables) {
-			Set<ConstrainedExecutable> theValue = newHashSet();
-
-			for ( ConstrainedExecutable oneExecutable : executables ) {
-				if ( oneExecutable.hasParameterConstraints() ) {
-					theValue.add( oneExecutable );
-				}
-			}
-
-			return theValue;
 		}
 	}
 }

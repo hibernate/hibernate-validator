@@ -55,50 +55,35 @@ public class IllegalMethodParameterConstraintsTest {
 		);
 	}
 
-	@Test(
-			expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
-	)
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	public void parameterConstraintsAddedInSubTypeCausesDeclarationException() {
 		getValidator().forExecutables().validateParameters(
 				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
 
-	@Test(
-			expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
-	)
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	public void atValidAddedInSubTypeCausesDeclarationException() {
 		getValidator().forExecutables().validateParameters(
 				new ZapImpl(), ZapImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
 
-	@Test(
-			expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints, but there are.*"
-	)
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	public void constraintStrengtheningInSubTypeCausesDeclarationException() {
 		getValidator().forExecutables().validateParameters(
 				new BarImpl(), BarImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
 
-	@Test(
-			expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
-	)
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000152.*")
 	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDeclarationException() {
 		getValidator().forExecutables().validateParameters(
 				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
 
-	@Test(
-			expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints\\. The following.*"
-	)
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	//TODO HV-632: Add more tests
 	public void crossParameterConstraintStrengtheningInSubTypeCausesDeclarationException() {
 		getValidator().forExecutables().validateParameters(
@@ -106,11 +91,7 @@ public class IllegalMethodParameterConstraintsTest {
 		);
 	}
 
-
-	@Test(
-			expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = "Only the root method of an overridden method in an inheritance hierarchy may be annotated with parameter constraints.*"
-	)
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	public void standardBeanValidationCanBePerformedOnTypeWithIllegalMethodParameterConstraints() throws Exception {
 		QuxImpl qux = new QuxImpl();
 

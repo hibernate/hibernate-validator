@@ -22,6 +22,9 @@ import java.util.Set;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 /**
  * Contains constraint-related meta-data for one method parameter.
  *
@@ -67,6 +70,42 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 	public String getParameterName() {
 		return name;
+	}
+
+	/**
+	 * Creates a new constrained parameter object by merging this and the given
+	 * other parameter.
+	 *
+	 * @param other The parameter to merge.
+	 *
+	 * @return A merged parameter.
+	 */
+	public ConstrainedParameter merge(ConstrainedParameter other) {
+		ConfigurationSource mergedSource = ConfigurationSource.max( source, other.source );
+
+		String mergedName;
+
+		if ( source.getPriority() > other.source.getPriority() ) {
+			mergedName = name;
+		}
+		else {
+			mergedName = other.name;
+		}
+
+		Set<MetaConstraint<?>> mergedConstraints = newHashSet( constraints );
+		mergedConstraints.addAll( other.constraints );
+
+		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
+		mergedGroupConversions.putAll( other.groupConversions );
+
+		return new ConstrainedParameter(
+				mergedSource,
+				getLocation(),
+				mergedName,
+				mergedConstraints,
+				mergedGroupConversions,
+				isCascading || other.isCascading
+		);
 	}
 
 	@Override
