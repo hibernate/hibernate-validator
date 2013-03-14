@@ -4,7 +4,9 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.1.xsd"
         version="1.1">
-    <default-validated-executables>
-        <executable-type>GETTER_METHODS</executable-type>
-    </default-validated-executables>
+    <executable-validation>
+        <default-validated-executable-types>
+            <executable-type>GETTER_METHODS</executable-type>
+        </default-validated-executable-types>
+    </executable-validation>
 </validation-config>

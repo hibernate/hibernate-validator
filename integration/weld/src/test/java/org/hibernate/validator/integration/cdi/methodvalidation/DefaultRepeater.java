@@ -16,12 +16,12 @@
 */
 package org.hibernate.validator.integration.cdi.methodvalidation;
 
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik
  */
-@ValidateExecutable
+@ValidateOnExecution
 public class DefaultRepeater implements Repeater {
 
 	@Override

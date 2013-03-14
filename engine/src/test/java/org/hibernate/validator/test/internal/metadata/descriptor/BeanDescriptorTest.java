@@ -27,6 +27,7 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.MethodType;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
@@ -68,99 +69,138 @@ public class BeanDescriptorTest {
 	public void testIsTypeConstrainedForUnconstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( UnconstrainedType.class );
 		assertFalse( descriptor.isBeanConstrained() );
-		assertFalse( descriptor.hasConstrainedExecutables() );
 	}
 
 	@Test
 	public void testIsBeanConstrainedClassLevelConstraint() {
 		BeanDescriptor descriptor = getBeanDescriptor( ClassLevelConstrainedType.class );
 		assertTrue( descriptor.isBeanConstrained() );
-		assertFalse( descriptor.hasConstrainedExecutables() );
 	}
 
 	@Test
 	public void testIsBeanConstrainedFieldConstraint() {
 		BeanDescriptor descriptor = getBeanDescriptor( FieldConstrainedType.class );
 		assertTrue( descriptor.isBeanConstrained() );
-		assertFalse( descriptor.hasConstrainedExecutables() );
 	}
 
 	@Test
 	public void testIsBeanConstrainedGetterConstraint() {
 		BeanDescriptor descriptor = getBeanDescriptor( GetterConstrainedType.class );
 		assertTrue( descriptor.isBeanConstrained() );
-		assertFalse( descriptor.hasConstrainedExecutables() );
-		assertTrue( descriptor.getConstrainedMethods().isEmpty() );
+		assertTrue( descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty() );
+		assertFalse( descriptor.getConstrainedMethods( MethodType.GETTER ).isEmpty() );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForBeanConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
 		assertTrue( descriptor.isBeanConstrained() );
-		assertTrue( descriptor.hasConstrainedExecutables() );
 	}
 
 	@Test
 	public void testIsTypeConstrainedForParameterConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ParameterConstrainedType.class );
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
-		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
+		assertFalse(
+				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
+				"The entity should have constraint methods"
+		);
 	}
 
 	@Test
 	public void testIsTypeConstrainedForConstructorParameterConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ConstructorParameterConstrainedType.class );
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
-		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
+		assertTrue(
+				descriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER ).isEmpty(),
+				"The entity should have no constraint methods"
+		);
+		assertTrue(
+				descriptor.getConstrainedConstructors().size() == 1,
+				"The entity should have a constrained constructor"
+		);
 	}
 
 	@Test
 	public void testIsTypeConstrainedForCascadingParameterType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CascadingParameterType.class );
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
-		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
+		assertFalse(
+				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
+				"The entity should have constraint methods"
+		);
 	}
 
 	@Test
 	public void testIsTypeConstrainedForConstructorCascadingParameterType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ConstructorCascadingParameterType.class );
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
-		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
+		assertTrue(
+				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
+				"The entity should have no constraint methods"
+		);
+		assertTrue(
+				descriptor.getConstrainedConstructors().size() == 1,
+				"The entity should have a constrained constructor"
+		);
 	}
 
 	@Test
 	public void testIsTypeConstrainedForReturnValueConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ReturnValueConstrainedType.class );
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
-		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
+		assertFalse(
+				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
+				"The entity should have constraint methods"
+		);
 	}
 
 	@Test
 	public void testIsTypeConstrainedForConstructorReturnValueConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ConstructorReturnValueConstrainedType.class );
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
-		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
+		assertTrue(
+				descriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER ).isEmpty(),
+				"The entity should have no constraint methods"
+		);
+		assertTrue(
+				descriptor.getConstrainedConstructors().size() == 1,
+				"The entity should have a constrained constructor"
+		);
 	}
 
 	@Test
 	public void testIsTypeConstrainedForCascadingReturnValueType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CascadingReturnValueType.class );
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
-		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
+		assertFalse(
+				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
+				"The entity should have constraint methods"
+		);
 	}
 
 	@Test
 	public void testIsTypeConstrainedForConstructorCascadingReturnValueType() {
 		BeanDescriptor descriptor = getBeanDescriptor( ConstructorCascadingReturnValueType.class );
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
-		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
+		assertTrue(
+				descriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER ).isEmpty(),
+				"The entity should have no constraint methods"
+		);
+		assertTrue(
+				descriptor.getConstrainedConstructors().size() == 1,
+				"The entity should have a constrained constructor"
+		);
 	}
 
 	@Test
 	public void testIsTypeConstrainedForDerivedConstrainedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( DerivedConstrainedType.class );
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
-		assertTrue( descriptor.hasConstrainedExecutables(), "The entity should have constraint methods/constructors " );
+		assertFalse(
+				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
+				"The entity should have constraint methods"
+		);
 	}
 
 	@Test
@@ -238,7 +278,7 @@ public class BeanDescriptorTest {
 	@Test
 	public void testGetConstrainedMethods() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepository.class );
-		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
+		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods( MethodType.NON_GETTER );
 
 		assertThat( getMethodNames( constrainedMethods ) ).containsOnly(
 				"createCustomer",
@@ -257,7 +297,7 @@ public class BeanDescriptorTest {
 	@Test
 	public void testGetConstrainedMethodsForDerivedType() {
 		BeanDescriptor descriptor = getBeanDescriptor( CustomerRepositoryExt.class );
-		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods();
+		Set<MethodDescriptor> constrainedMethods = descriptor.getConstrainedMethods( MethodType.NON_GETTER );
 
 		assertThat( getMethodNames( constrainedMethods ) ).containsOnly(
 				"createCustomer",
@@ -278,7 +318,7 @@ public class BeanDescriptorTest {
 	@Test(expectedExceptions = ConstraintDeclarationException.class)
 	@TestForIssue(jiraKey = "HV-683")
 	public void testGetConstrainedMethodsForTypeWithIllegalMethodCausesDeclarationException() {
-		getBeanDescriptor( IllegalCustomerRepositoryExt.class ).getConstrainedMethods();
+		getBeanDescriptor( IllegalCustomerRepositoryExt.class ).getConstrainedMethods( MethodType.NON_GETTER );
 	}
 
 	@Test
@@ -321,6 +361,33 @@ public class BeanDescriptorTest {
 		Set<PropertyDescriptor> constrainedProperties = descriptor.getConstrainedProperties();
 
 		assertThat( constrainedProperties ).isEmpty();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-761")
+	public void testGetConstraintMethods() {
+		BeanDescriptor beanDescriptor = getBeanDescriptor( Mixed.class );
+
+		Set<MethodDescriptor> methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.GETTER );
+		assertEquals( methodDescriptors.size(), 1, "There should be only one getter" );
+		MethodDescriptor methodDescriptor = methodDescriptors.iterator().next();
+		assertEquals( methodDescriptor.getName(), "getFoo", "Unexpected method name" );
+
+		methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER );
+		assertEquals( methodDescriptors.size(), 1, "There should be only one non-getter" );
+		methodDescriptor = methodDescriptors.iterator().next();
+		assertEquals( methodDescriptor.getName(), "foo", "Unexpected method name" );
+
+		methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER );
+		assertEquals( methodDescriptors.size(), 2, "There should  be two methods" );
+
+		// passing null as main argument
+		methodDescriptors = beanDescriptor.getConstrainedMethods( null );
+		assertEquals( methodDescriptors.size(), 0, "There should be no match" );
+
+		// passing null as vararg
+		methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.GETTER, null );
+		assertEquals( methodDescriptors.size(), 1, "There should be only one getter" );
 	}
 
 	private Set<String> getMethodNames(Set<MethodDescriptor> descriptors) {
@@ -429,6 +496,18 @@ public class BeanDescriptorTest {
 		@NotNull
 		public String getFoo() {
 			return foo;
+		}
+	}
+
+	private static class Mixed {
+		@NotNull
+		String foo() {
+			return null;
+		}
+
+		@NotNull
+		String getFoo() {
+			return null;
 		}
 	}
 }

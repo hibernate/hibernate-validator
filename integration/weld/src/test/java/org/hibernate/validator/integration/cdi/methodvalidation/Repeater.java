@@ -18,12 +18,12 @@ package org.hibernate.validator.integration.cdi.methodvalidation;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik
  */
-@ValidateExecutable({ ExecutableType.NON_GETTER_METHODS, ExecutableType.GETTER_METHODS })
+@ValidateOnExecution(type = { ExecutableType.NON_GETTER_METHODS, ExecutableType.GETTER_METHODS })
 public interface Repeater {
 	String repeat(@NotNull String in);
 

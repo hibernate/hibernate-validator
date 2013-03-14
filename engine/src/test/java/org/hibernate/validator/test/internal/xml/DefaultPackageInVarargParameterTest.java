@@ -23,6 +23,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.MethodType;
 import javax.validation.metadata.ParameterDescriptor;
 
 import org.testng.annotations.Test;
@@ -51,7 +52,7 @@ public class DefaultPackageInVarargParameterTest {
 		validator = validatorFactory.getValidator();
 
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Foo.class );
-		Set<MethodDescriptor> methodDescriptors = beanDescriptor.getConstrainedMethods();
+		Set<MethodDescriptor> methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER );
 		assertTrue( "There should be two constrained methods", methodDescriptors.size() == 2 );
 		for ( MethodDescriptor methodDescriptor : methodDescriptors ) {
 			assertTrue( "Parameter should be constrained", methodDescriptor.hasConstrainedParameters() );

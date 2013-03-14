@@ -226,6 +226,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				),
 				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
 				defaultGroupSequenceRedefined,
+				isGetter,
 				defaultGroupSequence,
 				constraintDeclarationException
 		);

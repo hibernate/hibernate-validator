@@ -16,12 +16,12 @@
 */
 package org.hibernate.validator.integration.cdi.methodvalidation.inheritance;
 
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik
  */
-@ValidateExecutable
+@ValidateOnExecution
 public class RefusingEncryptor implements Encryptor {
 	@Override
 	public String encrypt(String secret) {

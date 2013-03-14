@@ -18,12 +18,12 @@ package org.hibernate.validator.integration.cdi.methodvalidation.getter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik
  */
-@ValidateExecutable(ExecutableType.GETTER_METHODS)
+@ValidateOnExecution(type = ExecutableType.GETTER_METHODS)
 public class OnlyGetterValidated {
 	@NotNull
 	public String foo() {

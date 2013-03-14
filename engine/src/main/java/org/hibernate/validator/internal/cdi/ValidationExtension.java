@@ -47,7 +47,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
@@ -71,6 +71,7 @@ public class ValidationExtension implements Extension {
 
 	private final Validator validator;
 	private final Set<ExecutableType> globalExecutableTypes;
+	private final boolean isExecutableValidationEnabled;
 	private boolean validatorRegisteredUnderDefaultQualifier;
 	private boolean validatorRegisteredUnderHibernateQualifier;
 
@@ -80,7 +81,8 @@ public class ValidationExtension implements Extension {
 
 		Configuration<?> config = Validation.byDefaultProvider().configure();
 		BootstrapConfiguration bootstrap = config.getBootstrapConfiguration();
-		globalExecutableTypes = bootstrap.getValidatedExecutableTypes();
+		globalExecutableTypes = bootstrap.getDefaultValidatedExecutableTypes();
+		isExecutableValidationEnabled = bootstrap.isExecutableValidationEnabled();
 		validator = config.buildValidatorFactory().getValidator();
 	}
 
@@ -153,17 +155,20 @@ public class ValidationExtension implements Extension {
 	public <T> void processAnnotatedType(@Observes @WithAnnotations({
 			Constraint.class,
 			Valid.class,
-			ValidateExecutable.class
+			ValidateOnExecution.class
 	}) ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
 		Contracts.assertNotNull( processAnnotatedTypeEvent, "The ProcessAnnotatedType event cannot be null" );
+
+		// validation globally disabled
+		if ( !isExecutableValidationEnabled ) {
+			return;
+		}
 
 		AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
 		Class<?> clazz = type.getJavaClass();
 
 		EnumSet<ExecutableType> classLevelExecutableTypes = executableTypes(
-				clazz.getAnnotation(
-						ValidateExecutable.class
-				)
+				clazz.getAnnotation( ValidateOnExecution.class )
 		);
 
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( clazz );
@@ -203,10 +208,10 @@ public class ValidationExtension implements Extension {
 			method = replaceWithInterfaceMethod( method, interfaceMethods );
 
 			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypes(
-					method.getDeclaringClass().getAnnotation( ValidateExecutable.class )
+					method.getDeclaringClass().getAnnotation( ValidateOnExecution.class )
 			);
 			EnumSet<ExecutableType> memberLevelExecutableType = executableTypes(
-					method.getAnnotation( ValidateExecutable.class )
+					method.getAnnotation( ValidateOnExecution.class )
 			);
 			boolean isGetter = ReflectionHelper.isGetterMethod( method );
 			ExecutableType currentExecutableType = isGetter ? ExecutableType.GETTER_METHODS : ExecutableType.NON_GETTER_METHODS;
@@ -237,7 +242,7 @@ public class ValidationExtension implements Extension {
 		for ( AnnotatedConstructor<T> annotatedConstructor : type.getConstructors() ) {
 			Constructor constructor = annotatedConstructor.getJavaMember();
 			EnumSet<ExecutableType> memberLevelExecutableType = executableTypes(
-					annotatedConstructor.getAnnotation( ValidateExecutable.class )
+					annotatedConstructor.getAnnotation( ValidateOnExecution.class )
 			);
 
 			if ( veto( classLevelExecutableTypes, memberLevelExecutableType, ExecutableType.CONSTRUCTORS ) ) {
@@ -266,11 +271,13 @@ public class ValidationExtension implements Extension {
 						 EnumSet<ExecutableType> memberLevelExecutableType,
 						 ExecutableType currentExecutableType) {
 		if ( !memberLevelExecutableType.isEmpty() ) {
-			return !memberLevelExecutableType.contains( currentExecutableType );
+			return !memberLevelExecutableType.contains( currentExecutableType )
+					&& !memberLevelExecutableType.contains(ExecutableType.IMPLICIT);
 		}
 
 		if ( !classLevelExecutableTypes.isEmpty() ) {
-			return !classLevelExecutableTypes.contains( currentExecutableType );
+			return !classLevelExecutableTypes.contains( currentExecutableType )
+					&& !classLevelExecutableTypes.contains(ExecutableType.IMPLICIT);
 		}
 
 		return !globalExecutableTypes.contains( currentExecutableType );
@@ -302,17 +309,17 @@ public class ValidationExtension implements Extension {
 		return annotations;
 	}
 
-	private EnumSet<ExecutableType> executableTypes(ValidateExecutable validateExecutableAnnotation) {
-		if ( validateExecutableAnnotation == null ) {
+	private EnumSet<ExecutableType> executableTypes(ValidateOnExecution validateOnExecutionAnnotation) {
+		if ( validateOnExecutionAnnotation == null ) {
 			return EnumSet.noneOf( ExecutableType.class );
 		}
 
 		EnumSet<ExecutableType> executableTypes = EnumSet.noneOf( ExecutableType.class );
-		if ( validateExecutableAnnotation.value().length == 0 ) {  // HV-757
+		if ( validateOnExecutionAnnotation.type().length == 0 ) {  // HV-757
 			executableTypes.add( ExecutableType.NONE );
 		}
 		else {
-			Collections.addAll( executableTypes, validateExecutableAnnotation.value() );
+			Collections.addAll( executableTypes, validateOnExecutionAnnotation.type() );
 		}
 
 		if ( executableTypes.contains( ExecutableType.ALL ) ) {

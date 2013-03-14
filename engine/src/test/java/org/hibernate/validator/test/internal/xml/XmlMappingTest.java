@@ -232,7 +232,7 @@ public class XmlMappingTest {
 				//when
 				//then
 				assertEquals(
-						bootstrapConfiguration.getValidatedExecutableTypes(),
+						bootstrapConfiguration.getDefaultValidatedExecutableTypes(),
 						asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
 				);
 			}
@@ -250,7 +250,7 @@ public class XmlMappingTest {
 		//when
 		//then
 		assertEquals(
-				bootstrapConfiguration.getValidatedExecutableTypes(),
+				bootstrapConfiguration.getDefaultValidatedExecutableTypes(),
 				asSet( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
 		);
 	}

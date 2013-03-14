@@ -18,13 +18,13 @@ package org.hibernate.validator.integration.cdi.methodvalidation.inheritance;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik
  */
 public interface Encryptor {
-	@ValidateExecutable(ExecutableType.NONE)
+	@ValidateOnExecution(type = ExecutableType.NONE)
 	@NotNull
 	String encrypt(String secret);
 }

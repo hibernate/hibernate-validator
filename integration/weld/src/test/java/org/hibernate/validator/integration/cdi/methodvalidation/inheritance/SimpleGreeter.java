@@ -16,12 +16,12 @@
 */
 package org.hibernate.validator.integration.cdi.methodvalidation.inheritance;
 
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik
  */
-@ValidateExecutable
+@ValidateOnExecution
 public class SimpleGreeter extends AbstractGreeter {
 	@Override
 	protected String getName() {

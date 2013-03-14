@@ -17,12 +17,12 @@
 package org.hibernate.validator.integration.cdi.methodvalidation.getter;
 
 import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik
  */
-@ValidateExecutable(ExecutableType.NONE)
+@ValidateOnExecution(type = ExecutableType.NONE)
 public class FooImpl implements Foo {
 	@Override
 	public String getFoo() {

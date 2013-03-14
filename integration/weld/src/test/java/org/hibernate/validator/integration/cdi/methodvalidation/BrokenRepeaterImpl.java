@@ -24,7 +24,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -32,7 +32,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Hardy Ferentschik
  */
 @Broken
-@ValidateExecutable
+@ValidateOnExecution
 public class BrokenRepeaterImpl implements Repeater {
 
 	@BrokenConstraint

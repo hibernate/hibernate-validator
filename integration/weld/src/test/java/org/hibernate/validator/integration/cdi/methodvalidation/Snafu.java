@@ -17,13 +17,13 @@
 package org.hibernate.validator.integration.cdi.methodvalidation;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik
  */
 public class Snafu {
-	@ValidateExecutable({ })
+	@ValidateOnExecution(type = { })
 	@NotNull
 	public String foo() {
 		return null;
