@@ -1,0 +1,23 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="JSR-349-TCK" verbose="1">
+    <test name="JSR-349-TCK">
+
+        <method-selectors>
+            <method-selector>
+                <selector-class name="org.hibernate.beanvalidation.tck.util.IntegrationTestsMethodSelector"/>
+            </method-selector>
+        </method-selectors>
+
+        <groups>
+            <run>
+                <exclude name="FAILING_IN_RI"/>
+                <exclude name="FAILING_ON_AS"/>
+            </run>
+        </groups>
+
+        <packages>
+            <package name="org.hibernate.beanvalidation.tck.tests.*"/>
+        </packages>
+    </test>
+</suite>
