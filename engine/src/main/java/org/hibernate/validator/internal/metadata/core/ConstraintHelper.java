@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 import javax.validation.Constraint;
+import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
 import javax.validation.ValidationException;
 import javax.validation.constraints.AssertFalse;
@@ -39,6 +40,8 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import javax.validation.constraintvalidation.SupportedValidationTarget;
+import javax.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.Email;
@@ -107,10 +110,14 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  */
 public class ConstraintHelper {
 	private static final Log log = LoggerFactory.make();
+
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
+	private static final String GROUPS = "groups";
+	private static final String PAYLOAD = "payload";
+	private static final String MESSAGE = "message";
+	private static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
 
 	private final ConcurrentMap<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints = newConcurrentHashMap();
-
 	private final ValidatorClassMap validatorClasses = new ValidatorClassMap();
 
 	public ConstraintHelper() {
@@ -253,7 +260,7 @@ public class ConstraintHelper {
 	 *
 	 * @return The validator classes for the given type.
 	 */
-	public <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getValidatorClasses(Class<A> annotationType) {
+	public <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getAllValidatorClasses(Class<A> annotationType) {
 		Contracts.assertNotNull( annotationType, MESSAGES.classCannotBeNull() );
 
 		List<Class<? extends ConstraintValidator<A, ?>>> classes = validatorClasses.get( annotationType );
@@ -272,6 +279,41 @@ public class ConstraintHelper {
 		}
 
 		return Collections.unmodifiableList( classes );
+	}
+
+	/**
+	 * Returns those validator classes for the given constraint annotation
+	 * matching the given target.
+	 *
+	 * @param annotationType The annotation of interest.
+	 * @param validationTarget The target, either annotated element or parameters.
+	 *
+	 * @return A list with matching validator classes.
+	 */
+	public <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> findValidatorClasses(Class<A> annotationType, ValidationTarget validationTarget) {
+		List<Class<? extends ConstraintValidator<A, ?>>> validatorClasses = getAllValidatorClasses( annotationType );
+		List<Class<? extends ConstraintValidator<A, ?>>> matchingValidatorClasses = newArrayList();
+
+		for ( Class<? extends ConstraintValidator<A, ?>> validatorClass : validatorClasses ) {
+			if ( supportsValidationTarget( validatorClass, validationTarget ) ) {
+				matchingValidatorClasses.add( validatorClass );
+			}
+		}
+
+		return matchingValidatorClasses;
+	}
+
+	private boolean supportsValidationTarget(Class<? extends ConstraintValidator<?, ?>> validatorClass, ValidationTarget target) {
+		SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
+				SupportedValidationTarget.class
+		);
+
+		//by default constraints target the annotated element
+		if ( supportedTargetAnnotation == null ) {
+			return target == ValidationTarget.ANNOTATED_ELEMENT;
+		}
+
+		return Arrays.asList( supportedTargetAnnotation.value() ).contains( target );
 	}
 
 	/**
@@ -373,6 +415,7 @@ public class ConstraintHelper {
 		assertMessageParameterExists( annotationType );
 		assertGroupsParameterExists( annotationType );
 		assertPayloadParameterExists( annotationType );
+		assertValidationAppliesToParameterSetUpCorrectly( annotationType );
 		assertNoParameterStartsWithValid( annotationType );
 
 		return true;
@@ -381,7 +424,7 @@ public class ConstraintHelper {
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
 		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
 		for ( Method m : methods ) {
-			if ( m.getName().startsWith( "valid" ) && !m.getName().equals( "validationAppliesTo" ) ) {
+			if ( m.getName().startsWith( "valid" ) && !m.getName().equals( VALIDATION_APPLIES_TO ) ) {
 				throw log.getConstraintParametersCannotStartWithValidException();
 			}
 		}
@@ -389,9 +432,9 @@ public class ConstraintHelper {
 
 	private void assertPayloadParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotationType, "payload" );
+			final Method method = ReflectionHelper.getMethod( annotationType, PAYLOAD );
 			if ( method == null ) {
-				throw log.getConstraintWithoutMandatoryParameterException( "payload", annotationType.getName() );
+				throw log.getConstraintWithoutMandatoryParameterException( PAYLOAD, annotationType.getName() );
 			}
 			Class<?>[] defaultPayload = (Class<?>[]) method.getDefaultValue();
 			if ( defaultPayload.length != 0 ) {
@@ -405,9 +448,9 @@ public class ConstraintHelper {
 
 	private void assertGroupsParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotationType, "groups" );
+			final Method method = ReflectionHelper.getMethod( annotationType, GROUPS );
 			if ( method == null ) {
-				throw log.getConstraintWithoutMandatoryParameterException( "groups", annotationType.getName() );
+				throw log.getConstraintWithoutMandatoryParameterException( GROUPS, annotationType.getName() );
 			}
 			Class<?>[] defaultGroups = (Class<?>[]) method.getDefaultValue();
 			if ( defaultGroups.length != 0 ) {
@@ -420,12 +463,44 @@ public class ConstraintHelper {
 	}
 
 	private void assertMessageParameterExists(Class<? extends Annotation> annotationType) {
-		final Method method = ReflectionHelper.getMethod( annotationType, "message" );
+		final Method method = ReflectionHelper.getMethod( annotationType, MESSAGE );
 		if ( method == null ) {
-			throw log.getConstraintWithoutMandatoryParameterException( "message", annotationType.getName() );
+			throw log.getConstraintWithoutMandatoryParameterException( MESSAGE, annotationType.getName() );
 		}
 		if ( method.getReturnType() != String.class ) {
 			throw log.getWrongTypeForMessageParameterException( annotationType.getName() );
+		}
+	}
+
+	private void assertValidationAppliesToParameterSetUpCorrectly(Class<? extends Annotation> annotationType) {
+		boolean hasGenericValidators = !findValidatorClasses(
+				annotationType,
+				ValidationTarget.ANNOTATED_ELEMENT
+		).isEmpty();
+		boolean hasCrossParameterValidator = !findValidatorClasses(
+				annotationType,
+				ValidationTarget.PARAMETERS
+		).isEmpty();
+		final Method method = ReflectionHelper.getMethod( annotationType, VALIDATION_APPLIES_TO );
+
+		if ( hasGenericValidators && hasCrossParameterValidator ) {
+			if ( method == null ) {
+				throw log.getGenericAndCrossParameterConstraintDoesNotDefineValidationAppliesToParameterException(
+						annotationType.getName()
+				);
+			}
+			if ( method.getReturnType() != ConstraintTarget.class ) {
+				throw log.getValidationAppliesToParameterMustHaveReturnTypeConstraintTargetException( annotationType.getName() );
+			}
+			ConstraintTarget defaultValue = (ConstraintTarget) method.getDefaultValue();
+			if ( defaultValue != ConstraintTarget.IMPLICIT ) {
+				throw log.getValidationAppliesToParameterMustHaveDefaultValueImplicitException( annotationType.getName() );
+			}
+		}
+		else if ( method != null ) {
+			throw log.getValidationAppliesToParameterMustNotBeDefinedForNonGenericAndCrossParameterConstraintException(
+					annotationType.getName()
+			);
 		}
 	}
 
