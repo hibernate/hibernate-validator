@@ -130,7 +130,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	/**
 	 * The composing constraints for this constraint.
 	 */
-	private final Set<ConstraintDescriptor<?>> composingConstraints;
+	private final Set<ConstraintDescriptorImpl<?>> composingConstraints;
 
 	/**
 	 * Flag indicating if in case of a composing constraint a single error or multiple errors should be raised.
@@ -195,6 +195,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				crossParameterConstraintValidatorClass != null
 		);
 		this.composingConstraints = parseComposingConstraints( member, constraintHelper );
+		validateComposingConstraintTypes();
 
 		if ( constraintType == ConstraintType.GENERIC ) {
 			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( genericValidatorClasses );
@@ -265,6 +266,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
+		return Collections.<ConstraintDescriptor<?>>unmodifiableSet( composingConstraints );
+	}
+
+	public Set<ConstraintDescriptorImpl<?>> getComposingConstraintImpls() {
 		return composingConstraints;
 	}
 
@@ -428,6 +433,24 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 					member.toString()
 			);
 		}
+	}
+
+	/**
+	 * Asserts that this constraint and all its composing constraints share the
+	 * same constraint type (generic or cross-parameter).
+	 */
+	private void validateComposingConstraintTypes() {
+		for ( ConstraintDescriptorImpl<?> composingConstraint : composingConstraints ) {
+			if ( composingConstraint.constraintType != constraintType ) {
+				throw log.getComposedAndComposingConstraintsHaveDifferentTypesException(
+						annotationType.getName(),
+						composingConstraint.annotationType.getName(),
+						constraintType,
+						composingConstraint.constraintType
+				);
+			}
+		}
+
 	}
 
 	private boolean hasParameters(Member member) {
@@ -631,8 +654,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 	}
 
-	private Set<ConstraintDescriptor<?>> parseComposingConstraints(Member member, ConstraintHelper constraintHelper) {
-		Set<ConstraintDescriptor<?>> composingConstraintsSet = newHashSet();
+	private Set<ConstraintDescriptorImpl<?>> parseComposingConstraints(Member member, ConstraintHelper constraintHelper) {
+		Set<ConstraintDescriptorImpl<?>> composingConstraintsSet = newHashSet();
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
 
 		for ( Annotation declaredAnnotation : annotationType.getDeclaredAnnotations() ) {
