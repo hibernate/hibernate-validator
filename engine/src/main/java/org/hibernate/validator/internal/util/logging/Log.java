@@ -42,6 +42,7 @@ import org.jboss.logging.LogMessage;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 import static org.jboss.logging.Logger.Level.INFO;
@@ -555,4 +556,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 154, value = "Cross parameter constraint %1$s has no cross-parameter validator.")
 	ConstraintDefinitionException getCrossParameterConstraintHasNoValidatorException(String constraint);
+
+	@Message(id = 155,
+			value = "Composed and composing constraints must have the same constraint type, but composed constraint %1$s has type %3$s, while composing constraint %2$s has type %4$s.")
+	ConstraintDefinitionException getComposedAndComposingConstraintsHaveDifferentTypesException(String composedConstraintTypeName, String composingConstraintTypeName, ConstraintType composedConstraintType, ConstraintType composingConstraintType);
 }

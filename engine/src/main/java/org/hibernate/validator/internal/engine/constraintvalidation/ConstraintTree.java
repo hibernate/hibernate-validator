@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
-import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.engine.ValidationContext;
@@ -65,11 +64,7 @@ public class ConstraintTree<A extends Annotation> {
 		this.parent = parent;
 		this.descriptor = descriptor;
 
-		final Set<ConstraintDescriptorImpl<?>> composingConstraints = newHashSet();
-		for ( ConstraintDescriptor<?> composingConstraint : descriptor.getComposingConstraints() ) {
-			composingConstraints.add( (ConstraintDescriptorImpl<?>) composingConstraint );
-		}
-
+		final Set<ConstraintDescriptorImpl<?>> composingConstraints = descriptor.getComposingConstraintImpls();
 		children = newArrayList( composingConstraints.size() );
 
 		for ( ConstraintDescriptorImpl<?> composingDescriptor : composingConstraints ) {
