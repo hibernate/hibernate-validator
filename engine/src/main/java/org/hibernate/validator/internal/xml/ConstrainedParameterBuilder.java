@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.xml;
 
+import java.lang.annotation.ElementType;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class ConstrainedParameterBuilder {
 				MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,
 						constraint,
-						executableElement.getElementType(),
+						ElementType.PARAMETER,
 						defaultPackage,
 						constraintHelper
 				);

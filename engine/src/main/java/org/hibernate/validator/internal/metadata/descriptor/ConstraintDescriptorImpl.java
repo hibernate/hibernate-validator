@@ -188,8 +188,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				constraintValidatorDefinitionClasses
 		);
 
-
-		this.constraintType = determineConstraintType( member );
+		this.constraintType = determineConstraintType(
+				member,
+				type,
+				!genericValidatorClasses.isEmpty(),
+				crossParameterConstraintValidatorClass != null
+		);
 		this.composingConstraints = parseComposingConstraints( member, constraintHelper );
 
 		if ( constraintType == ConstraintType.GENERIC ) {
@@ -321,89 +325,122 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return sb.toString();
 	}
 
-	private ConstraintType determineConstraintType(Member member) {
-		if ( crossParameterConstraintValidatorClass == null ) {
-			return ConstraintType.GENERIC;
-		}
-
-		// check parameter count and return value
-		int parameterCount = getParameterCount( member );
-		boolean hasReturnValue = hasReturnValue( member );
-
-		if ( parameterCount == 0 && crossParameterValidatorOnly() ) {
-			if ( member == null ) {
-				throw log.getCrossParameterConstraintOnClassException( annotationType.getName() );
-			}
-			else if ( member instanceof Field ) {
-				throw log.getCrossParameterConstraintOnFieldException(
-						annotationType.getName(),
-						member.toString()
-				);
-			}
-			else {
-				throw log.getCrossParameterConstraintOnMethodWithoutParametersException(
-						annotationType.getName(),
-						member.toString()
-				);
-			}
-		}
-
-		if ( member == null || member instanceof Field ) {
-			return ConstraintType.GENERIC;
-		}
-
-		if ( parameterCount > 0 && !hasReturnValue ) {
-			return ConstraintType.CROSS_PARAMETER;
-		}
-
-		// we have parameters and return value but only a single cross parameter validator
-		if ( parameterCount > 0 && hasReturnValue && crossParameterValidatorOnly() ) {
-			return ConstraintType.CROSS_PARAMETER;
-		}
-
-		// Now we are out of luck. We have cross parameter and generic validators.
-		if ( !attributes.containsKey( VALIDATION_APPLIES_TO ) ) {
-			throw log.getGenericAndCrossParameterValidatorWithoutConstraintTargetException( annotationType.getName() );
-		}
-
+	/**
+	 * Determines the type of this constraint. The following rules apply in
+	 * descending order:
+	 * <ul>
+	 * <li>If {@code validationAppliesTo()} is set to either
+	 * {@link ConstraintTarget#RETURN_VALUE} or
+	 * {@link ConstraintTarget#PARAMETERS}, this value will be considered.</li>
+	 * <li>Otherwise, if the constraint is either purely generic or purely
+	 * cross-parameter as per its validators, that value will be considered.</li>
+	 * <li>Otherwise, if the constraint is not on an executable, it is
+	 * considered generic.</li>
+	 * <li>Otherwise, the type will be determined based on exclusive existence
+	 * of parameters and return value.</li>
+	 * <li>If that also is not possible, determination fails (i.e. the user must
+	 * specify the target explicitly).</li>
+	 * </ul>
+	 *
+	 * @param member The annotated member
+	 * @param elementType The type of the annotated element
+	 * @param hasGenericValidators Whether the constraint has at least one generic validator or
+	 * not
+	 * @param hasCrossParameterValidator Whether the constraint has a cross-parameter validator
+	 *
+	 * @return The type of this constraint
+	 */
+	private ConstraintType determineConstraintType(Member member, ElementType elementType, boolean hasGenericValidators, boolean hasCrossParameterValidator) {
 		ConstraintTarget constraintTarget = (ConstraintTarget) attributes.get( VALIDATION_APPLIES_TO );
-		switch ( constraintTarget ) {
-			case IMPLICIT: {
-				throw log.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType.getName() );
+		ConstraintType constraintType = null;
+		boolean isExecutable = isExecutable( elementType );
+
+		//target explicitly set to RETURN_VALUE
+		if ( constraintTarget == ConstraintTarget.RETURN_VALUE ) {
+			if ( !isExecutable ) {
+				throw log.getParametersOrReturnValueConstraintTargetGivenAtNonExecutableException(
+						annotationType.getName(),
+						ConstraintTarget.RETURN_VALUE
+				);
 			}
-			case RETURN_VALUE: {
-				return ConstraintType.GENERIC;
+			constraintType = ConstraintType.GENERIC;
+		}
+		//target explicitly set to PARAMETERS
+		else if ( constraintTarget == ConstraintTarget.PARAMETERS ) {
+			if ( !isExecutable ) {
+				throw log.getParametersOrReturnValueConstraintTargetGivenAtNonExecutableException(
+						annotationType.getName(),
+						ConstraintTarget.PARAMETERS
+				);
 			}
-			case PARAMETERS: {
-				return ConstraintType.CROSS_PARAMETER;
+			constraintType = ConstraintType.CROSS_PARAMETER;
+		}
+		//target set to IMPLICIT or not set at all
+		else {
+			//try to derive the type from the existing validators
+			if ( hasGenericValidators && !hasCrossParameterValidator ) {
+				constraintType = ConstraintType.GENERIC;
+			}
+			else if ( !hasGenericValidators && hasCrossParameterValidator ) {
+				constraintType = ConstraintType.CROSS_PARAMETER;
+			}
+			else if ( !isExecutable ) {
+				constraintType = ConstraintType.GENERIC;
+			}
+			//try to derive from existence of parameters/return value
+			else {
+				boolean hasParameters = hasParameters( member );
+				boolean hasReturnValue = hasReturnValue( member );
+
+				if ( !hasParameters && hasReturnValue ) {
+					constraintType = ConstraintType.GENERIC;
+				}
+				else if ( hasParameters && !hasReturnValue ) {
+					constraintType = ConstraintType.CROSS_PARAMETER;
+				}
+				// Now we are out of luck
+				else {
+					throw log.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType.getName() );
+				}
 			}
 		}
 
-		throw log.getUnableToDetermineConstraintType( annotationType.getName() );
+		if ( constraintType == ConstraintType.CROSS_PARAMETER ) {
+			validateCrossParameterConstraintType( member, hasCrossParameterValidator );
+		}
+
+		return constraintType;
 	}
 
-	private boolean crossParameterValidatorOnly() {
-		return crossParameterConstraintValidatorClass != null && constraintValidatorDefinitionClasses.size() == 1 && !supportsValidationTarget(
-				crossParameterConstraintValidatorClass,
-				ValidationTarget.ANNOTATED_ELEMENT
-		);
+	private void validateCrossParameterConstraintType(Member member, boolean hasCrossParameterValidator) {
+		if ( !hasCrossParameterValidator ) {
+			throw log.getCrossParameterConstraintHasNoValidatorException( annotationType.getName() );
+		}
+		else if ( member == null ) {
+			throw log.getCrossParameterConstraintOnClassException( annotationType.getName() );
+		}
+		else if ( member instanceof Field ) {
+			throw log.getCrossParameterConstraintOnFieldException( annotationType.getName(), member.toString() );
+		}
+		else if ( !hasParameters( member ) ) {
+			throw log.getCrossParameterConstraintOnMethodWithoutParametersException(
+					annotationType.getName(),
+					member.toString()
+			);
+		}
 	}
 
-	private int getParameterCount(Member member) {
-		int parameterCount;
+	private boolean hasParameters(Member member) {
+		boolean hasParameters = false;
 		if ( member instanceof Constructor ) {
 			Constructor<?> constructor = (Constructor<?>) member;
-			parameterCount = constructor.getParameterTypes().length;
+			hasParameters = constructor.getParameterTypes().length > 0;
 		}
 		else if ( member instanceof Method ) {
 			Method method = (Method) member;
-			parameterCount = method.getParameterTypes().length;
+			hasParameters = method.getParameterTypes().length > 0;
 		}
-		else {
-			// field or type
-			parameterCount = 0;
-		}
-		return parameterCount;
+		return hasParameters;
 	}
 
 	private boolean hasReturnValue(Member member) {
@@ -420,6 +457,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			hasReturnValue = false;
 		}
 		return hasReturnValue;
+	}
+
+	private boolean isExecutable(ElementType elementType) {
+		return elementType == ElementType.METHOD || elementType == ElementType.CONSTRUCTOR;
 	}
 
 	@SuppressWarnings("unchecked")
