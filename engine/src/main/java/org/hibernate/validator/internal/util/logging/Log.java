@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintDefinitionException;
+import javax.validation.ConstraintTarget;
 import javax.validation.GroupDefinitionException;
 import javax.validation.Path;
 import javax.validation.UnexpectedTypeException;
@@ -521,10 +522,6 @@ public interface Log extends BasicLogger {
 			value = "Cross parameter constraint %1$s is illegally placed on field '%2$s'.")
 	ConstraintDeclarationException getCrossParameterConstraintOnFieldException(String constraint, String field);
 
-	@Message(id = 145,
-			value = "Unable to determine whether the constraint %1$s is a generic or cross parameter constraint.")
-	ConstraintDefinitionException getUnableToDetermineConstraintType(String constraint);
-
 	@Message(id = 146,
 			value = "No parameter nodes may be added since path %s doesn't refer to a cross-parameter constraint.")
 	IllegalStateException getParameterNodeAddedForNonCrossParameterConstraintException(Path path);
@@ -551,4 +548,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 152,
 			value = "Two methods defined in parallel types must not declare parameter constraints, if they are overridden by the same method, but methods %s and %s both define parameter constraints.")
 	ConstraintDeclarationException getParameterConstraintsDefinedInMethodsFromParallelTypesException(Member method1, Member method2);
+
+	@Message(id = 153,
+			value = "The constraint %1$s used ConstraintTarget#%2$s but is not specified on a method or constructor.")
+	ConstraintDeclarationException getParametersOrReturnValueConstraintTargetGivenAtNonExecutableException(String constraint, ConstraintTarget target);
+
+	@Message(id = 154, value = "Cross parameter constraint %1$s has no cross-parameter validator.")
+	ConstraintDefinitionException getCrossParameterConstraintHasNoValidatorException(String constraint);
 }
