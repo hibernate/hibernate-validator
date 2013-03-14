@@ -133,11 +133,32 @@ public class MethodConstraintMappingTest {
 		config.buildValidatorFactory().getValidator();
 	}
 
-	@Test(
-			expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = ".* there are parameter constraints defined at all of the following overridden methods: .*"
-	)
-	public void testCascadingMethodParameterRedefinedInHierarchy() {
+	@Test
+	public void testOverridingMethodMayDefineSameConstraintsAsOverriddenMethod() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class )
+				.parameter( 0 )
+				.constraint( new SizeDef().min( 5 ).max( 10 ) )
+				.type( GreetingServiceImpl.class )
+				.method( "greet", String.class )
+				.parameter( 0 )
+				.constraint( new SizeDef().min( 5 ).max( 10 ) );
+		config.addMapping( mapping );
+
+		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
+
+		try {
+			service.greet( "Hi" );
+		}
+		catch ( ConstraintViolationException e ) {
+			assertCorrectConstraintViolationMessages( e, "size must be between 5 and 10" );
+			assertCorrectPropertyPaths( e, "greet.arg0" );
+		}
+	}
+
+	@Test
+	public void testParameterCanMarkedAsCascadedSeveralTimesInTheHierarchy() {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingService.class )
 				.method( "greet", User.class )
@@ -151,13 +172,16 @@ public class MethodConstraintMappingTest {
 
 		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
 
-		service.greet( new User( null ) );
+		try {
+			service.greet( new User( null ) );
+		}
+		catch ( ConstraintViolationException e ) {
+			assertCorrectConstraintViolationMessages( e, "may not be null" );
+			assertCorrectPropertyPaths( e, "greet.arg0.name" );
+		}
 	}
 
-	@Test(
-			expectedExceptions = ConstraintDeclarationException.class,
-			expectedExceptionsMessageRegExp = ".* The following method itself has no parameter constraints but it is not defined on a sub-type of .*"
-	)
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	public void testCascadingMethodParameterDefinedOnlyOnSubType() {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( GreetingServiceImpl.class )
