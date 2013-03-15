@@ -70,10 +70,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private static final long serialVersionUID = -2563102960314069246L;
 	private static final Log log = LoggerFactory.make();
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
-	private static final String GROUPS = "groups";
-	private static final String PAYLOAD = "payload";
-	private static final String MESSAGE = "message";
-	private static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
 
 	/**
 	 * A list of annotations which can be ignored when investigating for composing constraints.
@@ -223,7 +219,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public String getMessageTemplate() {
-		return (String) getAttributes().get( MESSAGE );
+		return (String) getAttributes().get( ConstraintHelper.MESSAGE );
 	}
 
 	@Override
@@ -238,7 +234,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public ConstraintTarget getValidationAppliesTo() {
-		return (ConstraintTarget) attributes.get( VALIDATION_APPLIES_TO );
+		return (ConstraintTarget) attributes.get( ConstraintHelper.VALIDATION_APPLIES_TO );
 	}
 
 	@Override
@@ -352,9 +348,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 *
 	 * @return The type of this constraint
 	 */
-	private ConstraintType determineConstraintType(Member member, ElementType elementType, boolean hasGenericValidators, boolean hasCrossParameterValidator) {
-		ConstraintTarget constraintTarget = (ConstraintTarget) attributes.get( VALIDATION_APPLIES_TO );
-		ConstraintType constraintType = null;
+	private ConstraintType determineConstraintType(Member member,
+												   ElementType elementType,
+												   boolean hasGenericValidators,
+												   boolean hasCrossParameterValidator) {
+		ConstraintTarget constraintTarget = (ConstraintTarget) attributes.get( ConstraintHelper.VALIDATION_APPLIES_TO );
+		ConstraintType constraintType;
 		boolean isExecutable = isExecutable( elementType );
 
 		//target explicitly set to RETURN_VALUE
@@ -488,7 +487,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		Class<Payload>[] payloadFromAnnotation;
 		try {
 			//TODO be extra safe and make sure this is an array of Payload
-			payloadFromAnnotation = ReflectionHelper.getAnnotationParameter( annotation, PAYLOAD, Class[].class );
+			payloadFromAnnotation = ReflectionHelper.getAnnotationParameter(
+					annotation,
+					ConstraintHelper.PAYLOAD,
+					Class[].class
+			);
 		}
 		catch ( ValidationException e ) {
 			//ignore people not defining payloads
@@ -503,7 +506,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private Set<Class<?>> buildGroupSet(Class<?> implicitGroup) {
 		Set<Class<?>> groupSet = newHashSet();
 		final Class<?>[] groupsFromAnnotation = ReflectionHelper.getAnnotationParameter(
-				annotation, GROUPS, Class[].class
+				annotation, ConstraintHelper.GROUPS, Class[].class
 		);
 		if ( groupsFromAnnotation.length == 0 ) {
 			groupSet.add( Default.class );
@@ -693,10 +696,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 
 		//propagate inherited attributes to composing constraints
-		annotationDescriptor.setValue( GROUPS, groups.toArray( new Class<?>[groups.size()] ) );
-		annotationDescriptor.setValue( PAYLOAD, payloads.toArray( new Class<?>[payloads.size()] ) );
-		if ( annotationDescriptor.getElements().containsKey( VALIDATION_APPLIES_TO ) ) {
-			annotationDescriptor.setValue( VALIDATION_APPLIES_TO, getValidationAppliesTo() );
+		annotationDescriptor.setValue( ConstraintHelper.GROUPS, groups.toArray( new Class<?>[groups.size()] ) );
+		annotationDescriptor.setValue( ConstraintHelper.PAYLOAD, payloads.toArray( new Class<?>[payloads.size()] ) );
+		if ( annotationDescriptor.getElements().containsKey( ConstraintHelper.VALIDATION_APPLIES_TO ) ) {
+			annotationDescriptor.setValue( ConstraintHelper.VALIDATION_APPLIES_TO, getValidationAppliesTo() );
 		}
 
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );

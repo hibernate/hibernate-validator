@@ -109,13 +109,13 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Gunnar Morling
  */
 public class ConstraintHelper {
-	private static final Log log = LoggerFactory.make();
+	public static final String GROUPS = "groups";
+	public static final String PAYLOAD = "payload";
+	public static final String MESSAGE = "message";
+	public static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
 
+	private static final Log log = LoggerFactory.make();
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
-	private static final String GROUPS = "groups";
-	private static final String PAYLOAD = "payload";
-	private static final String MESSAGE = "message";
-	private static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
 
 	private final ConcurrentMap<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints = newConcurrentHashMap();
 	private final ValidatorClassMap validatorClasses = new ValidatorClassMap();
