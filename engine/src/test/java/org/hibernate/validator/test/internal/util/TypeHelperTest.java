@@ -855,7 +855,7 @@ public class TypeHelperTest {
 	public void testTypeDiscovery() {
 		List<Class<? extends ConstraintValidator<Positive, ?>>> validators = newArrayList();
 		validators.add( PositiveConstraintValidator.class );
-		Map<Type, Class<? extends ConstraintValidator<?, ?>>> validatorsTypes = TypeHelper
+		Map<Type, Class<? extends ConstraintValidator<Positive, ?>>> validatorsTypes = TypeHelper
 				.getValidatorsTypes( Positive.class, validators );
 
 		assertEquals( validatorsTypes.get( Integer.class ), PositiveConstraintValidator.class );

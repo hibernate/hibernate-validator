@@ -576,4 +576,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 159,
 			value = "Only constraints with generic as well as cross-parameter validators must define an attribute validationAppliesTo(), but constraint %s does.")
 	ConstraintDefinitionException getValidationAppliesToParameterMustNotBeDefinedForNonGenericAndCrossParameterConstraintException(String constraint);
+
+	@Message(id = 160,
+			value = "Validator for cross-parameter constraint %s does not validate Object nor Object[].")
+	ConstraintDefinitionException getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArray(String constraint);
 }
