@@ -33,9 +33,26 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 
+	/**
+	 * The executable types validated by default.
+	 */
 	private static final Set<ExecutableType> DEFAULT_VALIDATED_EXECUTABLE_TYPES =
 			Collections.unmodifiableSet(
 					EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
+			);
+
+	/**
+	 * The validated executable types, when ALL is given.
+	 */
+	private static final Set<ExecutableType> ALL_VALIDATED_EXECUTABLE_TYPES =
+			Collections.unmodifiableSet(
+					EnumSet.complementOf(
+							EnumSet.of(
+									ExecutableType.ALL,
+									ExecutableType.NONE,
+									ExecutableType.IMPLICIT
+							)
+					)
 			);
 
 	private static final BootstrapConfiguration DEFAULT_BOOTSTRAP_CONFIGURATION = new BootstrapConfigurationImpl();
@@ -87,7 +104,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 			return DEFAULT_VALIDATED_EXECUTABLE_TYPES;
 		}
 		if ( validatedExecutableTypes.contains( ExecutableType.ALL ) ) {
-			return EnumSet.complementOf( EnumSet.of( ExecutableType.ALL, ExecutableType.NONE ) );
+			return ALL_VALIDATED_EXECUTABLE_TYPES;
 		}
 		else if ( validatedExecutableTypes.contains( ExecutableType.NONE ) ) {
 			return EnumSet.noneOf( ExecutableType.class );
