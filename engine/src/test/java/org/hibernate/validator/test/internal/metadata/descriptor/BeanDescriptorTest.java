@@ -103,7 +103,7 @@ public class BeanDescriptorTest {
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
 		assertFalse(
 				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
-				"The entity should have constraint methods"
+				"The entity should have constrained methods"
 		);
 	}
 
@@ -113,7 +113,7 @@ public class BeanDescriptorTest {
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
 		assertTrue(
 				descriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER ).isEmpty(),
-				"The entity should have no constraint methods"
+				"The entity should have no constrained methods"
 		);
 		assertTrue(
 				descriptor.getConstrainedConstructors().size() == 1,
@@ -127,7 +127,7 @@ public class BeanDescriptorTest {
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
 		assertFalse(
 				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
-				"The entity should have constraint methods"
+				"The entity should have constrained methods"
 		);
 	}
 
@@ -137,7 +137,7 @@ public class BeanDescriptorTest {
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
 		assertTrue(
 				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
-				"The entity should have no constraint methods"
+				"The entity should have no constrained methods"
 		);
 		assertTrue(
 				descriptor.getConstrainedConstructors().size() == 1,
@@ -151,7 +151,7 @@ public class BeanDescriptorTest {
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
 		assertFalse(
 				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
-				"The entity should have constraint methods"
+				"The entity should have constrained methods"
 		);
 	}
 
@@ -161,7 +161,7 @@ public class BeanDescriptorTest {
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
 		assertTrue(
 				descriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER ).isEmpty(),
-				"The entity should have no constraint methods"
+				"The entity should have no constrained methods"
 		);
 		assertTrue(
 				descriptor.getConstrainedConstructors().size() == 1,
@@ -175,7 +175,7 @@ public class BeanDescriptorTest {
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
 		assertFalse(
 				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
-				"The entity should have constraint methods"
+				"The entity should have constrained methods"
 		);
 	}
 
@@ -185,7 +185,7 @@ public class BeanDescriptorTest {
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
 		assertTrue(
 				descriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER ).isEmpty(),
-				"The entity should have no constraint methods"
+				"The entity should have no constrained methods"
 		);
 		assertTrue(
 				descriptor.getConstrainedConstructors().size() == 1,
@@ -199,7 +199,7 @@ public class BeanDescriptorTest {
 		assertFalse( descriptor.isBeanConstrained(), "The entity should have no bean constraints" );
 		assertFalse(
 				descriptor.getConstrainedMethods( MethodType.NON_GETTER ).isEmpty(),
-				"The entity should have constraint methods"
+				"The entity should have constrained methods"
 		);
 	}
 

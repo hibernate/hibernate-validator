@@ -61,7 +61,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * A CDI portable extension which registers beans for {@link ValidatorFactory} and {@link javax.xml.validation.Validator}.
+ * A CDI portable extension which registers beans for {@link ValidatorFactory} and {@link Validator}.
  *
  * @author Gunnar Morling
  * @author Hardy Ferentschik
