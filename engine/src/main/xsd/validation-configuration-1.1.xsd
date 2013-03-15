@@ -42,7 +42,7 @@
                     http://jboss.org/xml/ns/javax/validation/configuration
                     validation-configuration-1.1.xsd"
                 version="1.1">
-                ...
+                [...]
             </validation-config>
         ]]>
         </xs:documentation>
@@ -56,13 +56,20 @@
             <xs:element type="xs:string" name="traversable-resolver" minOccurs="0"/>
             <xs:element type="xs:string" name="constraint-validator-factory" minOccurs="0"/>
             <xs:element type="xs:string" name="parameter-name-provider" minOccurs="0"/>
-            <xs:element type="config:default-validated-executablesType" name="default-validated-executables" minOccurs="0"/>
+            <xs:element type="config:executable-validationType" name="executable-validation" minOccurs="0"/>
             <xs:element type="xs:string" name="constraint-mapping" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="config:propertyType" name="property" maxOccurs="unbounded" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="version" type="config:versionType" fixed="1.1" use="required"/>
     </xs:complexType>
-    <xs:complexType name="default-validated-executablesType">
+
+    <xs:complexType name="executable-validationType">
+        <xs:sequence>
+            <xs:element type="config:default-validated-executable-typesType" name="default-validated-executable-types" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="enabled" use="optional" type="xs:boolean" default="true"/>
+    </xs:complexType>
+    <xs:complexType name="default-validated-executable-typesType">
         <xs:sequence>
             <xs:element name="executable-type" maxOccurs="unbounded" minOccurs="1">
                 <xs:simpleType>

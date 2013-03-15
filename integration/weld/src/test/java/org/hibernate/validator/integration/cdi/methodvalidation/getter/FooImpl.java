@@ -14,19 +14,18 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi;
+package org.hibernate.validator.integration.cdi.methodvalidation.getter;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import javax.inject.Qualifier;
+import javax.validation.executable.ExecutableType;
+import javax.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik
  */
-@Qualifier
-@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.FIELD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Broken {
+@ValidateOnExecution(type = ExecutableType.NONE)
+public class FooImpl implements Foo {
+	@Override
+	public String getFoo() {
+		return null;
+	}
 }

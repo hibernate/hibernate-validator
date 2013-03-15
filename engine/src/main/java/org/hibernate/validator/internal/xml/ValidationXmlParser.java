@@ -145,13 +145,20 @@ public class ValidationXmlParser {
 			properties.put( property.getName(), property.getValue() );
 		}
 
+		ExecutableValidationType executableValidationType = config.getExecutableValidation();
+		EnumSet<ExecutableType> defaultValidatedExecutableTypes = executableValidationType == null
+				? getValidatedExecutableTypes( null )
+				: getValidatedExecutableTypes( executableValidationType.getDefaultValidatedExecutableTypes() );
+		boolean executableValidationEnabled = executableValidationType == null || executableValidationType.getEnabled();
+
 		return new BootstrapConfigurationImpl(
 				config.getDefaultProvider(),
 				config.getConstraintValidatorFactory(),
 				config.getMessageInterpolator(),
 				config.getTraversableResolver(),
 				config.getParameterNameProvider(),
-				getValidatedExecutableTypes( config.getDefaultValidatedExecutables() ),
+				defaultValidatedExecutableTypes,
+				executableValidationEnabled,
 				new HashSet<String>( config.getConstraintMapping() ),
 				properties
 		);
@@ -166,7 +173,7 @@ public class ValidationXmlParser {
 	 *
 	 * @return An enum set representing the given executable types.
 	 */
-	private EnumSet<ExecutableType> getValidatedExecutableTypes(DefaultValidatedExecutablesType validatedExecutables) {
+	private EnumSet<ExecutableType> getValidatedExecutableTypes(DefaultValidatedExecutableTypesType validatedExecutables) {
 		if ( validatedExecutables == null ) {
 			return null;
 		}

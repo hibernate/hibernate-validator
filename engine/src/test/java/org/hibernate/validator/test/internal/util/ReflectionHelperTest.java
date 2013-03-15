@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 import javax.validation.Payload;
@@ -193,12 +194,23 @@ public class ReflectionHelperTest {
 	}
 
 	@Test
+	public void testComputeAllImplementedMethods() throws Exception {
+		assertTrue( ReflectionHelper.computeAllImplementedMethods( null ).isEmpty() );
+		assertTrue( ReflectionHelper.computeAllImplementedMethods( Foo.class ).isEmpty() );
+
+		Set<Method> interfaceMethods = ReflectionHelper.computeAllImplementedMethods( Fubar.class );
+		assertEquals( interfaceMethods.size(), 2, "There should be two implemented methods. One from each interface." );
+		assertTrue( interfaceMethods.contains( Snafu.class.getMethod( "snafu" ) ) );
+		assertTrue( interfaceMethods.contains( Susfu.class.getMethod( "susfu" ) ) );
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HV-622")
 	public void testIsGetterMethod() throws Exception {
 		Method method = Bar.class.getMethod( "getBar" );
 		assertTrue( ReflectionHelper.isGetterMethod( method ) );
 
-		method = Bar.class.getMethod( "getBar", String.class);
+		method = Bar.class.getMethod( "getBar", String.class );
 		assertFalse( ReflectionHelper.isGetterMethod( method ) );
 	}
 
@@ -223,6 +235,25 @@ public class ReflectionHelperTest {
 
 		public String getBar(String param) {
 			return null;
+		}
+	}
+
+	public interface Snafu {
+		void snafu();
+	}
+
+	public interface Susfu {
+		void susfu();
+	}
+
+	public class Fubar implements Snafu, Susfu {
+
+		@Override
+		public void snafu() {
+		}
+
+		@Override
+		public void susfu() {
 		}
 	}
 }

@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi;
+package org.hibernate.validator.integration.cdi.methodvalidation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -24,7 +24,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.executable.ValidateOnExecution;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -32,7 +32,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Hardy Ferentschik
  */
 @Broken
-@ValidateExecutable
+@ValidateOnExecution
 public class BrokenRepeaterImpl implements Repeater {
 
 	@BrokenConstraint
@@ -42,6 +42,11 @@ public class BrokenRepeaterImpl implements Repeater {
 	@Override
 	public String repeat(String in) {
 		return in;
+	}
+
+	@Override
+	public String reverse(String in) {
+		return null;
 	}
 
 	@Override

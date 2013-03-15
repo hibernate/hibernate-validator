@@ -14,24 +14,16 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi;
+package org.hibernate.validator.integration.cdi.methodvalidation.getter;
 
-import javax.validation.executable.ValidateExecutable;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Hardy Ferentschik
  */
-public class DefaultRepeater implements Repeater {
-
-	@Override
-	@ValidateExecutable
-	public String repeat(String in) {
-		return in;
-	}
-
-	@Override
-	@ValidateExecutable
-	public String getHelloWorld() {
-		return null;
-	}
+public interface Foo {
+	@NotNull
+	String getFoo();
 }
+
+

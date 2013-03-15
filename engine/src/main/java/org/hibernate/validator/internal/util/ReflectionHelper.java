@@ -59,6 +59,7 @@ import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
@@ -658,12 +659,32 @@ public final class ReflectionHelper {
 			if ( includeInterfaces ) {
 				for ( Class<?> currentInterface : current.getInterfaces() ) {
 					@SuppressWarnings("unchecked") //safe since interfaces are super-types
-					Class<? super T> currentInterfaceCasted = (Class<? super T>) currentInterface;
+							Class<? super T> currentInterfaceCasted = (Class<? super T>) currentInterface;
 					computeClassHierarchy( currentInterfaceCasted, classes, includeInterfaces );
 				}
 			}
 		}
 	}
+
+	/**
+	 * Get all interface method a class implements
+	 *
+	 * @param clazz The class for which to find the interface methods
+	 *
+	 * @return Set of all methods {@code clazz} implements. The empty list is returned if {@code clazz} does not
+	 *         implement any interfaces or {@code clazz} is {@code null}
+	 */
+	public static Set<Method> computeAllImplementedMethods(Class<?> clazz) {
+		Set<Method> methods = newHashSet();
+
+		Set<Class<?>> interfaces = computeAllImplementedInterfaces( clazz );
+		for(Class<?> interfaceClass : interfaces) {
+			Collections.addAll( methods, interfaceClass.getMethods() );
+		}
+
+		return methods;
+	}
+
 
 	/**
 	 * Get all interfaces a class directly implements.

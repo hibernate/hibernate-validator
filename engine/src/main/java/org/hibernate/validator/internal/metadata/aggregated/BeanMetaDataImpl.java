@@ -284,8 +284,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		for ( ExecutableMetaData executableMetaData : executableMetaDataMap.values() ) {
 			if ( executableMetaData.getKind() == ElementKind.METHOD
-					&& executableMetaData.isConstrained()
-					&& !executableMetaData.isGetter() ) {
+					&& executableMetaData.isConstrained() ) {
 				constrainedMethodDescriptors.put(
 						executableMetaData.getIdentifier(),
 						executableMetaData.asDescriptor(

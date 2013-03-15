@@ -39,6 +39,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 	private final CrossParameterDescriptor crossParameterDescriptor;
 	private final ReturnValueDescriptor returnValueDescriptor;
 	private final ConstraintDeclarationException constraintDeclarationException;
+	private final boolean isGetter;
 
 	public ExecutableDescriptorImpl(
 			Type returnType,
@@ -47,6 +48,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 			ReturnValueDescriptor returnValueDescriptor,
 			List<ParameterDescriptor> parameters,
 			boolean defaultGroupSequenceRedefined,
+			boolean isGetter,
 			List<Class<?>> defaultGroupSequence,
 			ConstraintDeclarationException constraintDeclarationException) {
 		super(
@@ -65,6 +67,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence
 		);
+		this.isGetter = isGetter;
 	}
 
 	@Override
@@ -117,11 +120,13 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		return sb.toString();
 	}
 
-	public void assertCorrectnessOfConfiguration()
-			throws ConstraintDeclarationException {
-
+	public void assertCorrectnessOfConfiguration() throws ConstraintDeclarationException {
 		if ( constraintDeclarationException != null ) {
 			throw constraintDeclarationException;
 		}
+	}
+
+	public boolean isGetter() {
+		return isGetter;
 	}
 }

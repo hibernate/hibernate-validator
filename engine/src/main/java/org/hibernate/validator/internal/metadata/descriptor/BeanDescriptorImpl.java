@@ -25,9 +25,9 @@ import java.util.Set;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.MethodType;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -66,11 +66,6 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 	}
 
 	@Override
-	public boolean hasConstrainedExecutables() {
-		return !constrainedMethods.isEmpty() || !constrainedConstructors.isEmpty();
-	}
-
-	@Override
 	public final PropertyDescriptor getConstraintsForProperty(String propertyName) {
 		assertNotNull( propertyName, "The property name cannot be null" );
 		return constrainedProperties.get( propertyName );
@@ -92,12 +87,34 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 	}
 
 	@Override
-	public Set<MethodDescriptor> getConstrainedMethods() {
-		for ( ExecutableDescriptorImpl constrainedMethod : constrainedMethods.values() ) {
-			constrainedMethod.assertCorrectnessOfConfiguration();
+	public Set<MethodDescriptor> getConstrainedMethods(MethodType methodType, MethodType... methodTypes) {
+		boolean includeGetters = MethodType.GETTER.equals( methodType );
+		boolean includeNonGetters = MethodType.NON_GETTER.equals( methodType );
+		if ( methodTypes != null ) {
+			for ( MethodType type : methodTypes ) {
+				if ( MethodType.GETTER.equals( type ) ) {
+					includeGetters = true;
+				}
+				if ( MethodType.NON_GETTER.equals( type ) ) {
+					includeNonGetters = true;
+				}
+			}
 		}
 
-		return CollectionHelper.<MethodDescriptor>newHashSet( constrainedMethods.values() );
+		Set<MethodDescriptor> matchingMethodDescriptors = newHashSet();
+		for ( ExecutableDescriptorImpl constrainedMethod : constrainedMethods.values() ) {
+			boolean addToSet = false;
+			if ( ( constrainedMethod.isGetter() && includeGetters ) || ( !constrainedMethod.isGetter() && includeNonGetters ) ) {
+				addToSet = true;
+			}
+
+			if ( addToSet ) {
+				constrainedMethod.assertCorrectnessOfConfiguration();
+				matchingMethodDescriptors.add( constrainedMethod );
+			}
+		}
+
+		return matchingMethodDescriptors;
 	}
 
 	@Override

@@ -48,6 +48,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	private final Set<String> constraintMappingResourcePaths;
 	private final Map<String, String> properties;
 	private final Set<ExecutableType> validatedExecutableTypes;
+	private final boolean isExecutableValidationEnabled;
 
 	private BootstrapConfigurationImpl() {
 		this.defaultProviderClassName = null;
@@ -56,6 +57,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.traversableResolverClassName = null;
 		this.parameterNameProviderClassName = null;
 		this.validatedExecutableTypes = DEFAULT_VALIDATED_EXECUTABLE_TYPES;
+		this.isExecutableValidationEnabled = true;
 		this.constraintMappingResourcePaths = newHashSet();
 		this.properties = newHashMap();
 	}
@@ -66,6 +68,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 									  String traversableResolverClassName,
 									  String parameterNameProviderClassName,
 									  EnumSet<ExecutableType> validatedExecutableTypes,
+									  boolean isExecutableValidationEnabled,
 									  Set<String> constraintMappingResourcePaths,
 									  Map<String, String> properties) {
 		this.defaultProviderClassName = defaultProviderClassName;
@@ -74,6 +77,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.traversableResolverClassName = traversableResolverClassName;
 		this.parameterNameProviderClassName = parameterNameProviderClassName;
 		this.validatedExecutableTypes = prepareValidatedExecutableTypes( validatedExecutableTypes );
+		this.isExecutableValidationEnabled = isExecutableValidationEnabled;
 		this.constraintMappingResourcePaths = constraintMappingResourcePaths;
 		this.properties = properties;
 	}
@@ -128,7 +132,12 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	}
 
 	@Override
-	public Set<ExecutableType> getValidatedExecutableTypes() {
+	public boolean isExecutableValidationEnabled() {
+		return isExecutableValidationEnabled;
+	}
+
+	@Override
+	public Set<ExecutableType> getDefaultValidatedExecutableTypes() {
 		return newHashSet( validatedExecutableTypes );
 	}
 

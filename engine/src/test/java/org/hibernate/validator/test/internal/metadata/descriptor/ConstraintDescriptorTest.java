@@ -33,6 +33,7 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.CrossParameterDescriptor;
 import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.MethodType;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.testng.annotations.Test;
@@ -72,7 +73,7 @@ public class ConstraintDescriptorTest {
 	@Test
 	public void testValidationAppliesTo() {
 		BeanDescriptor beanDescriptor = getBeanDescriptor( Bar.class );
-		Set<MethodDescriptor> methodDescriptors = beanDescriptor.getConstrainedMethods();
+		Set<MethodDescriptor> methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER );
 		assertEquals( methodDescriptors.size(), 1 );
 
 		CrossParameterDescriptor crossParameterDescriptor = methodDescriptors.iterator()

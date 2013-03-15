@@ -14,23 +14,19 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi;
+package org.hibernate.validator.integration.cdi.methodvalidation;
 
-import javax.validation.executable.ValidateExecutable;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import javax.inject.Qualifier;
 
 /**
  * @author Hardy Ferentschik
  */
-public class GetterNotAnnotatedRepeater implements Repeater {
-
-	@Override
-	@ValidateExecutable
-	public String repeat(String in) {
-		return in;
-	}
-
-	@Override
-	public String getHelloWorld() {
-		return null;
-	}
+@Qualifier
+@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.FIELD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Broken {
 }
