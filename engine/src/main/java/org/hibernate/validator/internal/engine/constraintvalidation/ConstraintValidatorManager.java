@@ -27,6 +27,7 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -181,33 +182,41 @@ public class ConstraintValidatorManager {
 	 *
 	 * @return The class of a matching validator.
 	 */
-	private <A extends Annotation> Class<? extends ConstraintValidator<?, ?>> findMatchingValidatorClass(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
-		Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
+	private <A extends Annotation> Class<? extends ConstraintValidator<A, ?>> findMatchingValidatorClass(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
+		Map<Type, Class<? extends ConstraintValidator<A, ?>>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
 				descriptor.getAnnotationType(),
 				descriptor.getMatchingConstraintValidatorClasses()
 		);
 
 		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType, availableValidatorTypes );
 		resolveAssignableTypes( discoveredSuitableTypes );
-		verifyResolveWasUnique( validatedValueType, discoveredSuitableTypes );
+		verifyResolveWasUnique( descriptor, validatedValueType, discoveredSuitableTypes );
 
 		Type suitableType = discoveredSuitableTypes.get( 0 );
 		return availableValidatorTypes.get( suitableType );
 	}
 
-	private void verifyResolveWasUnique(Type valueClass, List<Type> assignableClasses) {
+	private void verifyResolveWasUnique(ConstraintDescriptorImpl<?> descriptor, Type valueClass, List<Type> assignableClasses) {
 		if ( assignableClasses.size() == 0 ) {
-			String className = valueClass.toString();
-			if ( valueClass instanceof Class ) {
-				Class<?> clazz = (Class<?>) valueClass;
-				if ( clazz.isArray() ) {
-					className = clazz.getComponentType().toString() + "[]";
-				}
-				else {
-					className = clazz.getName();
-				}
+			if ( descriptor.getConstraintType() == ConstraintType.CROSS_PARAMETER ) {
+				throw log.getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArray(
+						descriptor.getAnnotationType()
+								.getName()
+				);
 			}
-			throw log.getNoValidatorFoundForTypeException( className );
+			else {
+				String className = valueClass.toString();
+				if ( valueClass instanceof Class ) {
+					Class<?> clazz = (Class<?>) valueClass;
+					if ( clazz.isArray() ) {
+						className = clazz.getComponentType().toString() + "[]";
+					}
+					else {
+						className = clazz.getName();
+					}
+				}
+				throw log.getNoValidatorFoundForTypeException( className );
+			}
 		}
 		else if ( assignableClasses.size() > 1 ) {
 			StringBuilder builder = new StringBuilder();
@@ -220,7 +229,7 @@ public class ConstraintValidatorManager {
 		}
 	}
 
-	private List<Type> findSuitableValidatorTypes(Type type, Map<Type, Class<? extends ConstraintValidator<?, ?>>> availableValidatorTypes) {
+	private <A extends Annotation> List<Type> findSuitableValidatorTypes(Type type, Map<Type, Class<? extends ConstraintValidator<A, ?>>> availableValidatorTypes) {
 		List<Type> determinedSuitableTypes = newArrayList();
 		for ( Type validatorType : availableValidatorTypes.keySet() ) {
 			if ( TypeHelper.isAssignable( validatorType, type )
