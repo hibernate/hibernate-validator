@@ -38,6 +38,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.classmate.Filter;
+import com.fasterxml.classmate.MemberResolver;
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.ResolvedTypeWithMembers;
+import com.fasterxml.classmate.TypeResolver;
+import com.fasterxml.classmate.members.RawMethod;
+import com.fasterxml.classmate.members.ResolvedMethod;
+
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -73,6 +81,10 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 public final class ReflectionHelper {
 
 	private static final Log log = LoggerFactory.make();
+	/**
+	 * Used for resolving type parameters. Thread-safe.
+	 */
+	private static final TypeResolver typeResolver = new TypeResolver();
 	private static final String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };
 	private static final String PACKAGE_SEPARATOR = ".";
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
@@ -678,13 +690,12 @@ public final class ReflectionHelper {
 		Set<Method> methods = newHashSet();
 
 		Set<Class<?>> interfaces = computeAllImplementedInterfaces( clazz );
-		for(Class<?> interfaceClass : interfaces) {
+		for ( Class<?> interfaceClass : interfaces ) {
 			Collections.addAll( methods, interfaceClass.getMethods() );
 		}
 
 		return methods;
 	}
-
 
 	/**
 	 * Get all interfaces a class directly implements.
@@ -699,6 +710,72 @@ public final class ReflectionHelper {
 		computeAllImplementedInterfaces( clazz, classes );
 		return classes;
 	}
+
+	/**
+	 * Checks, whether {@code subTypeMethod} overrides {@code superTypeMethod}.
+	 *
+	 * @param subTypeMethod The sub type method (cannot be {@code null}).
+	 * @param superTypeMethod The super type method (cannot be {@code null}).
+	 *
+	 * @return Returns {@code true} if {@code subTypeMethod} overrides {@code superTypeMethod},
+	 *         {@code false} otherwise.
+	 */
+	public static boolean overrides(Method subTypeMethod, Method superTypeMethod) {
+		Contracts.assertValueNotNull( subTypeMethod, "subTypeMethod" );
+		Contracts.assertValueNotNull( superTypeMethod, "superTypeMethod" );
+
+		if ( !subTypeMethod.getName().equals( superTypeMethod.getName() ) ) {
+			return false;
+		}
+
+		if ( subTypeMethod.getParameterTypes().length != superTypeMethod.getParameterTypes().length ) {
+			return false;
+		}
+
+		if ( !superTypeMethod.getDeclaringClass().isAssignableFrom( subTypeMethod.getDeclaringClass() ) ) {
+			return false;
+		}
+
+		return parametersResolveToSameTypes( subTypeMethod, superTypeMethod );
+	}
+
+	private static boolean parametersResolveToSameTypes(Method subTypeMethod, Method superTypeMethod) {
+		if ( subTypeMethod.getParameterTypes().length == 0 ) {
+			return true;
+		}
+
+		ResolvedType resolvedSubType = typeResolver.resolve( subTypeMethod.getDeclaringClass() );
+
+		MemberResolver memberResolver = new MemberResolver( typeResolver );
+		memberResolver.setMethodFilter( new SimpleMethodFilter( subTypeMethod, superTypeMethod ) );
+		ResolvedTypeWithMembers typeWithMembers = memberResolver.resolve(
+				resolvedSubType,
+				null,
+				null
+		);
+
+		ResolvedMethod[] resolvedMethods = typeWithMembers.getMemberMethods();
+
+		// The ClassMate doc says that overridden methods are flattened to one
+		// resolved method. But that is the case only for methods without any
+		// generic parameters.
+		if ( resolvedMethods.length == 1 ) {
+			return true;
+		}
+
+		// For methods with generic parameters I have to compare the argument
+		// types (which are resolved) of the two filtered member methods.
+		for ( int i = 0; i < resolvedMethods[0].getArgumentCount(); i++ ) {
+
+			if ( !resolvedMethods[0].getArgumentType( i )
+					.equals( resolvedMethods[1].getArgumentType( i ) ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 
 	private static void computeAllImplementedInterfaces(Class<?> clazz, Set<Class<?>> classes) {
 		if ( clazz == null ) {
@@ -740,5 +817,26 @@ public final class ReflectionHelper {
 			iter = list.iterator();
 		}
 		return iter;
+	}
+
+	/**
+	 * A filter implementation filtering methods matching given methods.
+	 *
+	 * @author Gunnar Morling
+	 */
+	private static class SimpleMethodFilter implements Filter<RawMethod> {
+		private final Method method1;
+		private final Method method2;
+
+		private SimpleMethodFilter(Method method1, Method method2) {
+			this.method1 = method1;
+			this.method2 = method2;
+		}
+
+		@Override
+		public boolean include(RawMethod element) {
+			return element.getRawMember().equals( method1 ) || element.getRawMember()
+					.equals( method2 );
+		}
 	}
 }
