@@ -31,7 +31,7 @@
     <description>Aggregates dependencies and runs the JSR-303 TCK</description>
 
     <properties>
-        <tck.version>1.1.0-SNAPSHOT</tck.version>
+        <tck.version>1.1.0.CR3</tck.version>
         <tck.suite.file>src/test/resources/tck-tests-without-RI-and-AS-failures.xml</tck.suite.file>
         <arquillian.version>1.0.0.Final</arquillian.version>
         <jbossas.version>7.1.1.Final</jbossas.version>
