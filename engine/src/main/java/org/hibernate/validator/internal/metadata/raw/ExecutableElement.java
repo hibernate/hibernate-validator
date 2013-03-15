@@ -27,15 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import javax.validation.ParameterNameProvider;
 
-import com.fasterxml.classmate.Filter;
-import com.fasterxml.classmate.MemberResolver;
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.ResolvedTypeWithMembers;
-import com.fasterxml.classmate.TypeResolver;
-import com.fasterxml.classmate.members.RawMethod;
-import com.fasterxml.classmate.members.ResolvedMethod;
-
-import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -46,11 +37,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  * @author Gunnar Morling
  */
 public abstract class ExecutableElement {
-
-	/**
-	 * Used for resolving type parameters. Thread-safe.
-	 */
-	private static TypeResolver typeResolver = new TypeResolver();
 
 	public static ExecutableElement forConstructor(Constructor<?> constructor) {
 		return new ConstructorElement( constructor );
@@ -116,65 +102,12 @@ public abstract class ExecutableElement {
 	 *         {@code false} otherwise.
 	 */
 	public boolean overrides(ExecutableElement other) {
-		Contracts.assertValueNotNull( other, "other" );
-
-		if ( !getMember().getName().equals( other.getMember().getName() ) ) {
-			return false;
-		}
-
-		if ( getParameterTypes().length != other.getParameterTypes().length ) {
-			return false;
-		}
-
-		if ( !other.getMember()
-				.getDeclaringClass()
-				.isAssignableFrom( getMember().getDeclaringClass() ) ) {
-			return false;
-		}
-
 		//constructors never override another constructor
 		if ( getMember() instanceof Constructor || other.getMember() instanceof Constructor ) {
 			return false;
 		}
 
-		return parametersResolveToSameTypes( (Method) getMember(), (Method) other.getMember() );
-	}
-
-	private boolean parametersResolveToSameTypes(Method subTypeMethod, Method superTypeMethod) {
-		if ( subTypeMethod.getParameterTypes().length == 0 ) {
-			return true;
-		}
-
-		ResolvedType resolvedSubType = typeResolver.resolve( subTypeMethod.getDeclaringClass() );
-
-		MemberResolver memberResolver = new MemberResolver( typeResolver );
-		memberResolver.setMethodFilter( new SimpleMethodFilter( subTypeMethod, superTypeMethod ) );
-		ResolvedTypeWithMembers typeWithMembers = memberResolver.resolve(
-				resolvedSubType,
-				null,
-				null
-		);
-
-		ResolvedMethod[] resolvedMethods = typeWithMembers.getMemberMethods();
-
-		// The ClassMate doc says that overridden methods are flattened to one
-		// resolved method. But that is the case only for methods without any
-		// generic parameters.
-		if ( resolvedMethods.length == 1 ) {
-			return true;
-		}
-
-		// For methods with generic parameters I have to compare the argument
-		// types (which are resolved) of the two filtered member methods.
-		for ( int i = 0; i < resolvedMethods[0].getArgumentCount(); i++ ) {
-
-			if ( !resolvedMethods[0].getArgumentType( i )
-					.equals( resolvedMethods[1].getArgumentType( i ) ) ) {
-				return false;
-			}
-		}
-
-		return true;
+		return ReflectionHelper.overrides( (Method) getMember(), (Method) other.getMember() );
 	}
 
 	private static class ConstructorElement extends ExecutableElement {
@@ -405,27 +338,6 @@ public abstract class ExecutableElement {
 				return false;
 			}
 			return true;
-		}
-	}
-
-	/**
-	 * A filter implementation filtering methods matching given methods.
-	 *
-	 * @author Gunnar Morling
-	 */
-	private static class SimpleMethodFilter implements Filter<RawMethod> {
-		private final Method method1;
-		private final Method method2;
-
-		private SimpleMethodFilter(Method method1, Method method2) {
-			this.method1 = method1;
-			this.method2 = method2;
-		}
-
-		@Override
-		public boolean include(RawMethod element) {
-			return element.getRawMember().equals( method1 ) || element.getRawMember()
-					.equals( method2 );
 		}
 	}
 }

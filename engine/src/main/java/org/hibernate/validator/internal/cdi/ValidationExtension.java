@@ -20,7 +20,6 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -341,8 +340,7 @@ public class ValidationExtension implements Extension {
 
 	public Method replaceWithInterfaceMethod(Method method, Set<Method> interfaceMethods) {
 		for ( Method interfaceMethod : interfaceMethods ) {
-			if ( interfaceMethod.getName().equals( method.getName() ) &&
-					Arrays.equals( interfaceMethod.getParameterTypes(), method.getParameterTypes() ) ) {
+			if ( ReflectionHelper.overrides( method, interfaceMethod ) ) {
 				return interfaceMethod;
 			}
 		}
