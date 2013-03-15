@@ -26,7 +26,6 @@ import java.util.Set;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.AfterTypeDiscovery;
 import javax.enterprise.inject.spi.AnnotatedCallable;
 import javax.enterprise.inject.spi.AnnotatedConstructor;
 import javax.enterprise.inject.spi.AnnotatedMethod;
@@ -84,11 +83,6 @@ public class ValidationExtension implements Extension {
 		globalExecutableTypes = bootstrap.getDefaultValidatedExecutableTypes();
 		isExecutableValidationEnabled = bootstrap.isExecutableValidationEnabled();
 		validator = config.buildValidatorFactory().getValidator();
-	}
-
-	// TODO - HV-764 remove once weld visibility bug is resolved
-	public void afterTypeDiscovery(@Observes AfterTypeDiscovery afterTypeDiscoveryEvent) {
-		afterTypeDiscoveryEvent.getInterceptors().add( ValidationInterceptor.class );
 	}
 
 	/**

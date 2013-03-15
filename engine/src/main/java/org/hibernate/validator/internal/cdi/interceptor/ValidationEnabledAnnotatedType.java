@@ -18,14 +18,12 @@ package org.hibernate.validator.internal.cdi.interceptor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.HashSet;
 import java.util.Set;
 import javax.enterprise.inject.spi.AnnotatedCallable;
 import javax.enterprise.inject.spi.AnnotatedConstructor;
 import javax.enterprise.inject.spi.AnnotatedField;
 import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedType;
-import javax.enterprise.util.AnnotationLiteral;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
 
@@ -36,29 +34,12 @@ public class ValidationEnabledAnnotatedType<T> implements AnnotatedType<T> {
 	private final AnnotatedType<T> wrappedType;
 	private final Set<AnnotatedMethod<? super T>> wrappedMethods;
 	private final Set<AnnotatedConstructor<T>> wrappedConstructors;
-	private final AnnotationLiteral<MethodValidated> methodValidationAnnotation;
 
 	public ValidationEnabledAnnotatedType(AnnotatedType<T> type, Set<AnnotatedCallable<? super T>> constrainedCallables) {
 		this.wrappedType = type;
 		this.wrappedMethods = CollectionHelper.newHashSet();
 		this.wrappedConstructors = CollectionHelper.newHashSet();
 		buildWrappedCallable( constrainedCallables );
-
-		// TODO - HV-764 at the moment we need to apply @MethodValidated on class level for constructor validation to occur
-		// TODO - will be removed when interceptor binding can be applied on constructor
-		boolean containsWrappedConstructor = false;
-		for ( AnnotatedConstructor<T> constructor : wrappedConstructors ) {
-			if ( constructor instanceof ValidationEnabledAnnotatedConstructor ) {
-				containsWrappedConstructor = true;
-			}
-		}
-		if ( containsWrappedConstructor ) {
-			this.methodValidationAnnotation = new AnnotationLiteral<MethodValidated>() {
-			};
-		}
-		else {
-			this.methodValidationAnnotation = null;
-		}
 	}
 
 	@Override
@@ -93,31 +74,17 @@ public class ValidationEnabledAnnotatedType<T> implements AnnotatedType<T> {
 
 	@Override
 	public <A extends Annotation> A getAnnotation(Class<A> annotationType) {
-		if ( MethodValidated.class.equals( annotationType ) && methodValidationAnnotation != null ) {
-			@SuppressWarnings("unchecked")
-			A annotation = (A) methodValidationAnnotation;
-			return annotation;
-		}
 		return wrappedType.getAnnotation( annotationType );
 	}
 
 	@Override
 	public Set<Annotation> getAnnotations() {
-		Set<Annotation> annotations = new HashSet<Annotation>( wrappedType.getAnnotations() );
-		if ( methodValidationAnnotation != null ) {
-			annotations.add( methodValidationAnnotation );
-		}
-		return annotations;
+		return wrappedType.getAnnotations();
 	}
 
 	@Override
 	public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
-		if ( MethodValidated.class.equals( annotationType ) && methodValidationAnnotation != null ) {
-			return true;
-		}
-		else {
-			return wrappedType.isAnnotationPresent( annotationType );
-		}
+		return wrappedType.isAnnotationPresent( annotationType );
 	}
 
 	private void buildWrappedCallable(Set<AnnotatedCallable<? super T>> constrainedCallables) {
