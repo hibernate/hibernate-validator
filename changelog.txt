@@ -1,6 +1,33 @@
 Hibernate Validator Changelog
 =============================
 
+5.0.0.CR3 (15.03.2013)
+----------------------
+
+** Bug
+    * [HV-704] - Mark dependency to UEL as provided
+    * [HV-728] - ConstraintViolation#getLeafBean() returns null for constructor return value validation
+    * [HV-729] - Consider "\$" as the literal "$" instead of considering it as the beginning of a message expression
+    * [HV-730] - Propagate "validationAppliesTo" to composing constraints
+    * [HV-732] - Verification whether group conversions is specified on cascaded element cannot be made in raw model
+    * [HV-734] - Align XML parsing code with the latest xsd in the BV API
+    * [HV-735] - Xml parsing needs to track whether 'ignore-annotations' is set to true or false or not at all
+    * [HV-737] - A getter method can only by configured via XML by either a getter or method node, not both
+    * [HV-743] - Messages using EL should stay unchanged also if RuntimeExceptions are raised
+    * [HV-744] - Wrap exceptions from message interpolators into ValidationException
+    * [HV-747] - Wrong validator used when constraint has generic and cross-parameter validator for the same type
+    * [HV-748] - Throw UnexpectedTypeException if there are two validators for the same type
+
+** Improvement
+    * [HV-723] - Re-enable CDI portable extension
+    * [HV-736] - Provide patched JAR for making AS 7.1.1 usable with HV 5.x
+
+** Task
+    * [HV-439] - Revisit the use of generics in ValidatorImpl
+    * [HV-740] - Implement programmatic addition of method validation interceptor binding
+    * [HV-745] - Default package is not taken into account for class-typed constraint attributes configured via XML
+
+
 5.0.0.CR2 (11.03.2013)
 ----------------------
 

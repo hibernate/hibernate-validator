@@ -30,6 +30,7 @@
                     <exclude name="testValidationOfConstrainedMethodAnnotatedWithValidateOnExecutionContainingExecutableType"/>
                     <exclude name="testValidationOfConstrainedMethodOnClassAnnotatedWithValidateOnExecutionContainingExecutableType"/>
                     <exclude name="testValidationOfConstrainedMethodOnTypeAnnotatedWithValidateOnExecutionContainingExecutableType"/>
+                    <exclude name="testValidationOfConstrainedMethodOnInterfaceAnnotatedWithValidateOnExecutionContainingExecutableType"/>
                 </methods>
             </class>
             <class name="org.hibernate.beanvalidation.tck.tests.integration.cdi.factory.ConstraintValidatorInjectionTest">

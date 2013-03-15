@@ -1,6 +1,6 @@
 # Hibernate Validator
 
-*Version: 5.0.0.CR2, 11.03.2013*
+*Version: 5.0.0.CR3, 15.03.2013*
 
 
 ## What is it?
