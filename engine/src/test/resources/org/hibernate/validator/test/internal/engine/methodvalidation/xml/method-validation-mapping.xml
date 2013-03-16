@@ -105,15 +105,6 @@
             </parameter>
         </method>
 
-        <method name="voidMethodWithIllegalReturnValueConstraint">
-            <return-value>
-                <constraint annotation="javax.validation.constraints.Min">
-                    <message>[XML] - must be greater than or equal to 10</message>
-                    <element name="value">10</element>
-                </constraint>
-            </return-value>
-        </method>
-
         <method name="methodWithCrossParameterConstraint">
             <parameter type="org.joda.time.DateMidnight">
                 <constraint annotation="javax.validation.constraints.NotNull">
@@ -211,6 +202,17 @@
                     </groups>
                 </constraint>
             </parameter>
+        </method>
+    </bean>
+    
+    <bean class="CustomerRepositoryWithConstrainedVoidMethod" ignore-annotations="true">
+        <method name="voidMethodWithIllegalReturnValueConstraint">
+            <return-value>
+                <constraint annotation="javax.validation.constraints.Min">
+                    <message>[XML] - must be greater than or equal to 10</message>
+                    <element name="value">10</element>
+                </constraint>
+            </return-value>
         </method>
     </bean>
 

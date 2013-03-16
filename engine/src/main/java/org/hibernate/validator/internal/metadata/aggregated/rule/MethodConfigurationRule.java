@@ -39,10 +39,9 @@ public abstract class MethodConfigurationRule {
 	 * @param method The first method to check.
 	 * @param otherMethod The other method to check.
 	 *
-	 * @return An exception describing the rule violated by the two given
-	 *         methods or {@code null} if the methods don't violate this rule.
+	 * @throws ConstraintDeclarationException If this rule is violated by the two given methods.
 	 */
-	public abstract ConstraintDeclarationException apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod);
+	public abstract void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod);
 
 	/**
 	 * Whether {@code otherClazz} is a strict subtype of {@code clazz} or not.

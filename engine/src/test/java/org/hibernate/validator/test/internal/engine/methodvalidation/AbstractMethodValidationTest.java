@@ -39,6 +39,8 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.model.Custo
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithConstrainedVoidMethod;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithConstrainedVoidMethodImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.RepositoryBase;
 import org.hibernate.validator.testutil.TestForIssue;
 
@@ -565,7 +567,11 @@ public abstract class AbstractMethodValidationTest {
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000132.*")
-	public void voidMethodWithReturnValueConstraintCausesUnexpectedTypeException() {
+	public void voidMethodWithReturnValueConstraintCausesConstraintDeclarationException() {
+		CustomerRepositoryWithConstrainedVoidMethod customerRepository = getValidatingProxy(
+				new CustomerRepositoryWithConstrainedVoidMethodImpl(), validator
+		);
+
 		customerRepository.voidMethodWithIllegalReturnValueConstraint();
 	}
 

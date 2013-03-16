@@ -163,7 +163,7 @@ public class MethodDescriptorTest {
 		);
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	@TestForIssue(jiraKey = "HV-683")
 	public void testGetMethodDescriptorForIllegalyConfiguredMethodCausesConstraintDeclarationException() {
 		getMethodDescriptor( IllegalCustomerRepositoryExt.class, "zap", int.class );

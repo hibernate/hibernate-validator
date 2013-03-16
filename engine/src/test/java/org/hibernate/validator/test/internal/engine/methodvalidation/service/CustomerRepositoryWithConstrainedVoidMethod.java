@@ -14,26 +14,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.metadata.aggregated.rule;
+package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
-import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
+import javax.validation.constraints.Min;
 
 /**
- * Rule that ensures that parallel methods don't define any parameter
- * constraints.
- *
  * @author Gunnar Morling
  */
-public class ParallelMethodsMustNotDefineParameterConstraints extends MethodConfigurationRule {
+public interface CustomerRepositoryWithConstrainedVoidMethod {
 
-	@Override
-	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
-		if ( isDefinedOnParallelType( method, otherMethod ) &&
-				( method.hasParameterConstraints() || otherMethod.hasParameterConstraints() ) ) {
-			throw log.getParameterConstraintsDefinedInMethodsFromParallelTypesException(
-					method.getLocation().getMember(),
-					otherMethod.getLocation().getMember()
-			);
-		}
-	}
+	@Min(10)
+	void voidMethodWithIllegalReturnValueConstraint();
 }

@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated.rule;
 
-import javax.validation.ConstraintDeclarationException;
-
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 
 /**
@@ -29,16 +27,14 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 public class OverridingMethodMustNotAlterParameterConstraints extends MethodConfigurationRule {
 
 	@Override
-	public ConstraintDeclarationException apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
+	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
 		if ( isDefinedOnSubType( method, otherMethod ) &&
 				otherMethod.hasParameterConstraints() &&
 				!method.isEquallyParameterConstrained( otherMethod ) ) {
-			return log.getParameterConfigurationAlteredInSubTypeException(
+			throw log.getParameterConfigurationAlteredInSubTypeException(
 					method.getLocation().getMember(),
 					otherMethod.getLocation().getMember()
 			);
 		}
-
-		return null;
 	}
 }

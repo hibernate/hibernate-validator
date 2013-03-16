@@ -220,13 +220,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@Override
 	public ExecutableMetaData getMetaDataFor(ExecutableElement executable) {
-		ExecutableMetaData metaData = executableMetaDataMap.get( executable.getIdentifier() );
-
-		if ( metaData != null ) {
-			metaData.assertCorrectnessOfConfiguration();
-		}
-
-		return metaData;
+		return executableMetaDataMap.get( executable.getIdentifier() );
 	}
 
 	@Override

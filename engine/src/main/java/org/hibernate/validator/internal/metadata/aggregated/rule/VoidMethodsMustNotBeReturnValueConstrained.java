@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated.rule;
 
-import javax.validation.ConstraintDeclarationException;
-
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 
 /**
@@ -29,12 +27,10 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 public class VoidMethodsMustNotBeReturnValueConstrained extends MethodConfigurationRule {
 
 	@Override
-	public ConstraintDeclarationException apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
+	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
 		if ( method.getLocation().getExecutableElement().getReturnType() == void.class &&
 				( !method.getConstraints().isEmpty() || method.isCascading() ) ) {
-			return log.voidMethodsMustNotBeConstrained( method.getLocation().getMember() );
+			throw log.voidMethodsMustNotBeConstrained( method.getLocation().getMember() );
 		}
-
-		return null;
 	}
 }

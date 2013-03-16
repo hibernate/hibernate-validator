@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated.rule;
 
-import javax.validation.ConstraintDeclarationException;
-
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 
 /**
@@ -29,18 +27,16 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 public class ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue extends MethodConfigurationRule {
 
 	@Override
-	public ConstraintDeclarationException apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
+	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
 		boolean isCascaded = method.isCascading() || otherMethod.isCascading();
 		boolean hasGroupConversions = !method.getGroupConversions().isEmpty() || !otherMethod.getGroupConversions()
 				.isEmpty();
 
 		if ( isDefinedOnParallelType( method, otherMethod ) && isCascaded && hasGroupConversions ) {
-			return log.getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(
+			throw log.getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(
 					method.getLocation().getMember(),
 					otherMethod.getLocation().getMember()
 			);
 		}
-
-		return null;
 	}
 }

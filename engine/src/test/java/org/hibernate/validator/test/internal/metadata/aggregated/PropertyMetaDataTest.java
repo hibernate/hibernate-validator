@@ -16,10 +16,12 @@
 */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
+import static org.fest.assertions.Assertions.assertThat;
+
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
-import javax.validation.groups.ConvertGroup;
 import javax.validation.Valid;
+import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeMethod;
@@ -28,8 +30,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Gunnar Morling
@@ -45,7 +45,6 @@ public class PropertyMetaDataTest {
 
 	@Test
 	public void locallyDefinedGroupConversion() {
-
 		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( User1.class ).getMetaDataFor( "addresses" );
 
 		assertThat( property.convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
@@ -53,25 +52,14 @@ public class PropertyMetaDataTest {
 
 	@Test
 	public void groupConversionDefinedInHierarchy() {
-
 		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( User2.class ).getMetaDataFor( "addresses" );
 
 		assertThat( property.convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
 	}
 
-	@Test
-	public void groupConversionInHierarchyAreMerged() {
-
-		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" );
-
-		assertThat( property.convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
-		assertThat( property.convertGroup( Complete.class ) ).isEqualTo( FullPostal.class );
-	}
-
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
 	public void groupConversionInHierarchyWithSameFrom() {
-
-		beanMetaDataManager.getBeanMetaData( User4.class ).getMetaDataFor( "addresses" );
+		beanMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" );
 	}
 
 	public interface Complete extends Default {
@@ -107,17 +95,10 @@ public class PropertyMetaDataTest {
 
 		@Override
 		@Valid
-		@ConvertGroup(from = Complete.class, to = FullPostal.class)
-		public Set<Address> getAddresses() {
-			return super.getAddresses();
-		}
-	}
-
-	private static class User4 extends User1 {
-
-		@Override
-		@Valid
-		@ConvertGroup(from = Default.class, to = BasicPostal.class)
+		@ConvertGroup.List({
+				@ConvertGroup(from = Default.class, to = BasicPostal.class),
+				@ConvertGroup(from = Default.class, to = Complete.class)
+		})
 		public Set<Address> getAddresses() {
 			return super.getAddresses();
 		}

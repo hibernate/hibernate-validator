@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated.rule;
 
-import javax.validation.ConstraintDeclarationException;
-
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 
 /**
@@ -29,15 +27,13 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 public class ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine extends MethodConfigurationRule {
 
 	@Override
-	public ConstraintDeclarationException apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
+	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
 		if ( method.isCascading() && otherMethod.isCascading() &&
 				( isDefinedOnSubType( method, otherMethod ) || isDefinedOnSubType( otherMethod, method ) ) ) {
-			return log.methodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidation(
+			throw log.methodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidation(
 					method.getLocation().getMember(),
 					otherMethod.getLocation().getMember()
 			);
 		}
-
-		return null;
 	}
 }
