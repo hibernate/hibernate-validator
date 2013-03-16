@@ -199,7 +199,7 @@ public class ConstraintValidatorManager {
 	private void verifyResolveWasUnique(ConstraintDescriptorImpl<?> descriptor, Type valueClass, List<Type> assignableClasses) {
 		if ( assignableClasses.size() == 0 ) {
 			if ( descriptor.getConstraintType() == ConstraintType.CROSS_PARAMETER ) {
-				throw log.getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArray(
+				throw log.getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArrayException(
 						descriptor.getAnnotationType()
 								.getName()
 				);

@@ -30,7 +30,7 @@ public class ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine extends Me
 	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
 		if ( method.isCascading() && otherMethod.isCascading() &&
 				( isDefinedOnSubType( method, otherMethod ) || isDefinedOnSubType( otherMethod, method ) ) ) {
-			throw log.methodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidation(
+			throw log.getMethodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidationException(
 					method.getLocation().getMember(),
 					otherMethod.getLocation().getMember()
 			);

@@ -30,7 +30,7 @@ public class VoidMethodsMustNotBeReturnValueConstrained extends MethodConfigurat
 	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
 		if ( method.getLocation().getExecutableElement().getReturnType() == void.class &&
 				( !method.getConstraints().isEmpty() || method.isCascading() ) ) {
-			throw log.voidMethodsMustNotBeConstrained( method.getLocation().getMember() );
+			throw log.getVoidMethodsMustNotBeConstrainedException( method.getLocation().getMember() );
 		}
 	}
 }

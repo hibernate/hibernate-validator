@@ -279,7 +279,7 @@ public class ConstraintTree<A extends Annotation> {
 			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );
 		}
 		catch ( RuntimeException e ) {
-			throw log.getExceptionDuringIsValidCall( e );
+			throw log.getExceptionDuringIsValidCallException( e );
 		}
 		if ( !isValid ) {
 			//We do not add them these violations yet, since we don't know how they are

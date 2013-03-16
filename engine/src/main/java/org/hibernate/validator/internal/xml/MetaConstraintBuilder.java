@@ -64,7 +64,7 @@ public class MetaConstraintBuilder {
 			annotationClass = (Class<A>) ReflectionHelper.loadClass( constraint.getAnnotation(), defaultPackage );
 		}
 		catch ( ValidationException e ) {
-			throw log.unableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
+			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
 		}
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( annotationClass );
 
