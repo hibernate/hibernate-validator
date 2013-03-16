@@ -580,4 +580,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 160,
 			value = "Validator for cross-parameter constraint %s does not validate Object nor Object[].")
 	ConstraintDefinitionException getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArray(String constraint);
+
+	@Message(id = 161,
+			value = "Two methods defined in parallel types must not define group conversions for a cascaded method return value, if they are overridden by the same method, but methods %s and %s both define parameter constraints.")
+	ConstraintDeclarationException getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(Member method1, Member method2);
 }

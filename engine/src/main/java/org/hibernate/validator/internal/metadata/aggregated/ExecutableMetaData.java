@@ -28,6 +28,7 @@ import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
 import org.hibernate.validator.internal.metadata.aggregated.rule.OverridingMethodMustNotAlterParameterConstraints;
+import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue;
 import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineParameterConstraints;
 import org.hibernate.validator.internal.metadata.aggregated.rule.ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine;
 import org.hibernate.validator.internal.metadata.aggregated.rule.VoidMethodsMustNotBeReturnValueConstrained;
@@ -312,7 +313,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 						new OverridingMethodMustNotAlterParameterConstraints(),
 						new ParallelMethodsMustNotDefineParameterConstraints(),
 						new VoidMethodsMustNotBeReturnValueConstrained(),
-						new ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine()
+						new ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine(),
+						new ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue()
 				)
 		);
 
