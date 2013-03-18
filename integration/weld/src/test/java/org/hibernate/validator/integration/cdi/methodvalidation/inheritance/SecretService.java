@@ -14,31 +14,22 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi.methodvalidation.getter;
+package org.hibernate.validator.integration.cdi.methodvalidation.inheritance;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.executable.ExecutableType;
 import javax.validation.executable.ValidateOnExecution;
 
 /**
  * @author Hardy Ferentschik
  */
-@ValidateOnExecution
-public class DeliveryService {
+public class SecretService extends SecretServiceBase {
 
-	@ValidateOnExecution
-	public void findDelivery(@NotNull String id) {
-	}
+	// The @ValidateOnExecution annotations here are expected to be ignored
+	// since the methods override super-type methods
 
-	@ValidateOnExecution
-	@NotNull
-	public Delivery getDelivery() {
-		return null;
-	}
-
-	@NotNull
-	public Delivery getAnotherDelivery() {
-		return null;
+	@ValidateOnExecution(type = ExecutableType.NONE)
+	@Override
+	public void whisper(@NotNull String secret) {
 	}
 }
-
-

@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 import javax.validation.Payload;
@@ -180,13 +179,11 @@ public class ReflectionHelperTest {
 
 	@Test
 	public void testComputeAllImplementedMethods() throws Exception {
-		assertTrue( ReflectionHelper.computeAllImplementedMethods( null ).isEmpty() );
-		assertTrue( ReflectionHelper.computeAllImplementedMethods( Foo.class ).isEmpty() );
+		assertTrue( ReflectionHelper.computeAllOverridenAndImplementedMethods( null ).isEmpty() );
 
-		Set<Method> interfaceMethods = ReflectionHelper.computeAllImplementedMethods( Fubar.class );
-		assertEquals( interfaceMethods.size(), 2, "There should be two implemented methods. One from each interface." );
-		assertTrue( interfaceMethods.contains( Snafu.class.getMethod( "snafu" ) ) );
-		assertTrue( interfaceMethods.contains( Susfu.class.getMethod( "susfu" ) ) );
+		List<Method> methods = ReflectionHelper.computeAllOverridenAndImplementedMethods( Fubar.class );
+		assertTrue( methods.contains( Snafu.class.getMethod( "snafu" ) ) );
+		assertTrue( methods.contains( Susfu.class.getMethod( "susfu" ) ) );
 	}
 
 	@Test

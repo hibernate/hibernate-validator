@@ -32,7 +32,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -758,14 +757,13 @@ public final class ReflectionHelper {
 	 *
 	 * @param clazz The class for which to find the interface methods
 	 *
-	 * @return Set of all methods {@code clazz} implements. The empty list is returned if {@code clazz} does not
-	 *         implement any interfaces or {@code clazz} is {@code null}
+	 * @return returns set of all methods {@code clazz} implements. The empty list is returned if {@code clazz} is {@code null}
 	 */
-	public static Set<Method> computeAllImplementedMethods(Class<?> clazz) {
-		Set<Method> methods = newHashSet();
+	public static <T> List<Method> computeAllOverridenAndImplementedMethods(Class<T> clazz) {
+		List<Method> methods = newArrayList();
 
-		Set<Class<?>> interfaces = computeAllImplementedInterfaces( clazz );
-		for ( Class<?> interfaceClass : interfaces ) {
+		List<Class<? super T>> interfacesAndSuperTypes = computeClassHierarchy( clazz, true );
+		for ( Class<?> interfaceClass : interfacesAndSuperTypes ) {
 			Collections.addAll( methods, interfaceClass.getMethods() );
 		}
 
@@ -778,10 +776,10 @@ public final class ReflectionHelper {
 	 * @param clazz The class for which to find the interfaces
 	 *
 	 * @return Set of all interfaces {@code clazz} implements. The empty list is returned if {@code clazz} does not
-	 *         implement any interfaces or {@code clazz} is {@code null}
+	 *         implement any interfaces or {@code clazz} is {@code null}.
 	 */
 	public static Set<Class<?>> computeAllImplementedInterfaces(Class<?> clazz) {
-		Set<Class<?>> classes = new HashSet<Class<?>>();
+		Set<Class<?>> classes = newHashSet();
 		computeAllImplementedInterfaces( clazz, classes );
 		return classes;
 	}

@@ -22,6 +22,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Default;
@@ -202,12 +205,12 @@ public class ValidationExtension implements Extension {
 	private <T> void determineConstrainedMethod(AnnotatedType<T> type,
 												BeanDescriptor beanDescriptor,
 												Set<AnnotatedCallable<? super T>> callables) {
-		Set<Method> interfaceMethods = ReflectionHelper.computeAllImplementedMethods( type.getJavaClass() );
+		List<Method> overriddenAndImplementedMethods = ReflectionHelper.computeAllOverridenAndImplementedMethods( type.getJavaClass() );
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
 
 			// if the method implements an interface we need to use the configuration of the interface
-			method = replaceWithInterfaceMethod( method, interfaceMethods );
+			method = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );
 			boolean isGetter = ReflectionHelper.isGetterMethod( method );
 
 			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( method.getDeclaringClass() );
@@ -377,12 +380,16 @@ public class ValidationExtension implements Extension {
 		return executableTypes;
 	}
 
-	public Method replaceWithInterfaceMethod(Method method, Set<Method> interfaceMethods) {
-		for ( Method interfaceMethod : interfaceMethods ) {
+	public Method replaceWithOverriddenOrInterfaceMethod(Method method, List<Method> interfaceMethods) {
+		LinkedList<Method> list = new LinkedList<Method>( interfaceMethods );
+		Iterator<Method> iterator = list.descendingIterator();
+		while ( iterator.hasNext() ) {
+			Method interfaceMethod = iterator.next();
 			if ( ReflectionHelper.overrides( method, interfaceMethod ) ) {
 				return interfaceMethod;
 			}
 		}
+
 		return method;
 	}
 }

@@ -14,31 +14,12 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.cdi.methodvalidation.getter;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.executable.ValidateOnExecution;
+package org.hibernate.validator.integration.cdi.methodvalidation.inheritance;
 
 /**
  * @author Hardy Ferentschik
  */
-@ValidateOnExecution
-public class DeliveryService {
-
-	@ValidateOnExecution
-	public void findDelivery(@NotNull String id) {
-	}
-
-	@ValidateOnExecution
-	@NotNull
-	public Delivery getDelivery() {
-		return null;
-	}
-
-	@NotNull
-	public Delivery getAnotherDelivery() {
-		return null;
-	}
+public interface ShipmentServiceFirstInHierarchy extends ShipmentServiceSecondInHierarchy {
+	@Override
+	Shipment getShipment();
 }
-
-
