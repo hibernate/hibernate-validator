@@ -231,14 +231,6 @@ public class BeanDescriptorTest {
 		assertNotNull( methodDescriptor );
 	}
 
-	@Test
-	public void testGetConstraintsForMethodSucceedsAlsoIfTypeContainsAnotherIllegalMethod() throws Exception {
-		BeanDescriptor descriptor = getBeanDescriptor( IllegalCustomerRepositoryExt.class );
-		MethodDescriptor methodDescriptor = descriptor.getConstraintsForMethod( "foo" );
-
-		assertNotNull( methodDescriptor );
-	}
-
 	// A method descriptor can be retrieved by specifying an overridden method
 	// from a base type.
 	@Test
@@ -315,7 +307,7 @@ public class BeanDescriptorTest {
 		);
 	}
 
-	@Test(expectedExceptions = ConstraintDeclarationException.class)
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	@TestForIssue(jiraKey = "HV-683")
 	public void testGetConstrainedMethodsForTypeWithIllegalMethodCausesDeclarationException() {
 		getBeanDescriptor( IllegalCustomerRepositoryExt.class ).getConstrainedMethods( MethodType.NON_GETTER );

@@ -248,9 +248,11 @@ public abstract class ExecutableElement {
 	private static class MethodElement extends ExecutableElement {
 
 		private final Method method;
+		private final boolean isGetterMethod;
 
 		public MethodElement(Method method) {
 			this.method = method;
+			isGetterMethod = ReflectionHelper.isGetterMethod( method );
 		}
 
 		@Override
@@ -300,7 +302,7 @@ public abstract class ExecutableElement {
 
 		@Override
 		public boolean isGetterMethod() {
-			return ReflectionHelper.isGetterMethod( method );
+			return isGetterMethod;
 		}
 
 		@Override

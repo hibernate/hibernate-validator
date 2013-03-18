@@ -20,7 +20,6 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.CrossParameterDescriptor;
 import javax.validation.metadata.MethodDescriptor;
@@ -38,7 +37,6 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 	private final List<ParameterDescriptor> parameters;
 	private final CrossParameterDescriptor crossParameterDescriptor;
 	private final ReturnValueDescriptor returnValueDescriptor;
-	private final ConstraintDeclarationException constraintDeclarationException;
 	private final boolean isGetter;
 
 	public ExecutableDescriptorImpl(
@@ -49,8 +47,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 			List<ParameterDescriptor> parameters,
 			boolean defaultGroupSequenceRedefined,
 			boolean isGetter,
-			List<Class<?>> defaultGroupSequence,
-			ConstraintDeclarationException constraintDeclarationException) {
+			List<Class<?>> defaultGroupSequence) {
 		super(
 				returnType,
 				Collections.<ConstraintDescriptorImpl<?>>emptySet(),
@@ -61,7 +58,6 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		this.name = name;
 		this.parameters = Collections.unmodifiableList( parameters );
 		this.returnValueDescriptor = returnValueDescriptor;
-		this.constraintDeclarationException = constraintDeclarationException;
 		this.crossParameterDescriptor = new CrossParameterDescriptorImpl(
 				crossParameterConstraints,
 				defaultGroupSequenceRedefined,
@@ -118,12 +114,6 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		sb.append( "{name='" ).append( name ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();
-	}
-
-	public void assertCorrectnessOfConfiguration() throws ConstraintDeclarationException {
-		if ( constraintDeclarationException != null ) {
-			throw constraintDeclarationException;
-		}
 	}
 
 	public boolean isGetter() {

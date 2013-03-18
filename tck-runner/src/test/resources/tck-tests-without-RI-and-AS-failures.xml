@@ -18,7 +18,7 @@
         <packages>
             <package name="org.hibernate.beanvalidation.tck.tests.*"/>
         </packages>
-        
+
         <classes>
             <class name="org.hibernate.beanvalidation.tck.tests.integration.cdi.executable.ExecutableValidationTest">
                 <methods>
@@ -31,6 +31,11 @@
                     <exclude name="testValidationOfConstrainedMethodOnClassAnnotatedWithValidateOnExecutionContainingExecutableType"/>
                     <exclude name="testValidationOfConstrainedMethodOnTypeAnnotatedWithValidateOnExecutionContainingExecutableType"/>
                     <exclude name="testValidationOfConstrainedMethodOnInterfaceAnnotatedWithValidateOnExecutionContainingExecutableType"/>
+                    <exclude name="testConstructorValidationInvokesParameterAndReturnValueValidationUsingDefaultGroup"/>
+                    <exclude name="testMethodValidationInvokesParameterAndReturnValueValidationUsingDefaultGroup"/>
+                    <exclude name="testExecutableValidationUsesDefaultSettingSinceValidatedMethodImplementsAnInterfaceMethod"/>
+                    <exclude name="testExecutableValidationUsesSettingFromSuperTypeIfValidatedMethodImplementsAnInterfaceMethod"/>
+                    <exclude name="testExecutableValidationUsesSettingFromSuperTypeMethodIfValidatedMethodImplementsAnInterfaceMethod"/>
                 </methods>
             </class>
             <class name="org.hibernate.beanvalidation.tck.tests.integration.cdi.factory.ConstraintValidatorInjectionTest">
@@ -63,11 +68,24 @@
                     <exclude name="testValidationOfConstrainedGetterWithExecutableTypeALL"/>
                     <exclude name="testValidationOfConstrainedConstructorWithExecutableTypeALL"/>
                     <exclude name="testValidationOfConstrainedMethodWithExecutableTypesALLAndNONE"/>
+                    <exclude name="testValidationOfConstrainedConstructorWithExecutableTypeIMPLICIT"/>
+                    <exclude name="testValidationOfConstrainedGetterWithExecutableTypeIMPLICIT"/>
+                    <exclude name="testValidationOfConstrainedMethodWithExecutableTypeIMPLICIT"/>
                 </methods>
             </class>
             <class name="org.hibernate.beanvalidation.tck.tests.integration.cdi.executable.global.ExecutableValidationBasedOnGlobalConfigurationTest">
                 <methods>
                     <exclude name="testValidationOfConstrainedMethodOnTypeAnnotatedWithValidateOnExecutionContainingExecutableType"/>
+                </methods>
+            </class>
+            <class name="org.hibernate.beanvalidation.tck.tests.integration.cdi.executable.priority.ValidationInterceptorPriorityTest">
+                <methods>
+                    <exclude name="testValidationInterceptorHasPriority4800"/>
+                </methods>
+            </class>
+            <class name="org.hibernate.beanvalidation.tck.tests.integration.ee.cdi.ConstraintValidatorInjectionTest">
+                <methods>
+                    <exclude name="testJndiBoundValidatorFactoryIsCdiEnabled"/>
                 </methods>
             </class>
         </classes>

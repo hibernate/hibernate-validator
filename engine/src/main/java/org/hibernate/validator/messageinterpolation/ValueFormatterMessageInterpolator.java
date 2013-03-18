@@ -169,7 +169,7 @@ public class ValueFormatterMessageInterpolator implements MessageInterpolator {
 				interpolatedValue = String.format( locale, format, validatedValue );
 			}
 			catch ( IllegalFormatException e ) {
-				throw log.throwInvalidFormat( e.getMessage(), e );
+				throw log.getInvalidFormatException( e.getMessage(), e );
 			}
 		}
 		return interpolatedValue;

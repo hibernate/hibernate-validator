@@ -144,10 +144,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 	}
 
 	@Override
-	public void voidMethodWithIllegalReturnValueConstraint() {
-	}
-
-	@Override
 	public int getFoo(int i) {
 		return 0;
 	}

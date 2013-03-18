@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +26,12 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
+import org.hibernate.validator.internal.metadata.aggregated.rule.OverridingMethodMustNotAlterParameterConstraints;
+import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue;
+import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineParameterConstraints;
+import org.hibernate.validator.internal.metadata.aggregated.rule.ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine;
+import org.hibernate.validator.internal.metadata.aggregated.rule.VoidMethodsMustNotBeReturnValueConstrained;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
@@ -35,6 +40,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -65,24 +71,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 	private final Class<?>[] parameterTypes;
 	private final List<ParameterMetaData> parameterMetaDataList;
-
-	/**
-	 * <p>
-	 * A declaration exception in case this method violates the rules for
-	 * constraints in inheritance hierarchies, outlined in the Bean Validation
-	 * specification, section 4.5.5
-	 * ("Method constraints in inheritance hierarchies").
-	 * </p>
-	 * <p>
-	 * Such violations shall not hinder standard bean/property validation or
-	 * validation of other methods. Therefore this exception is created when
-	 * building this meta data object, but it will only be thrown by the
-	 * validation engine when actually a method validation is performed or meta
-	 * data for this method is requested.
-	 * </p>
-	 */
-	private final ConstraintDeclarationException constraintDeclarationException;
-
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
 	private final boolean isGetter;
 
@@ -101,7 +89,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
-			ConstraintDeclarationException constraintDeclarationException,
 			Map<Class<?>, Class<?>> returnValueGroupConversions,
 			boolean isCascading,
 			boolean isConstrained,
@@ -119,7 +106,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.parameterMetaDataList = Collections.unmodifiableList( parameterMetaData );
 		this.crossParameterConstraints = Collections.unmodifiableSet( crossParameterConstraints );
 		this.identifier = name + Arrays.toString( parameterTypes );
-		this.constraintDeclarationException = constraintDeclarationException;
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,
 				returnValueConstraints,
@@ -127,30 +113,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				returnValueGroupConversions
 		);
 		this.isGetter = isGetter;
-	}
-
-	/**
-	 * <p>
-	 * Checks the configuration of this method for correctness as per the rules
-	 * outlined in the Bean Validation specification, section 4.5.5
-	 * ("Method constraints in inheritance hierarchies").
-	 * </p>
-	 * <p>
-	 * In particular, overriding methods in sub-types may not add parameter
-	 * constraints and the return value of an overriding method may not be
-	 * marked as cascaded if the return value is marked as cascaded already on
-	 * the overridden method.
-	 * </p>
-	 *
-	 * @throws ConstraintDeclarationException In case any of the rules mandated by the specification is
-	 * violated.
-	 */
-	public void assertCorrectnessOfConfiguration()
-			throws ConstraintDeclarationException {
-
-		if ( constraintDeclarationException != null ) {
-			throw constraintDeclarationException;
-		}
 	}
 
 	/**
@@ -227,8 +189,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				parametersAsDescriptors( defaultGroupSequenceRedefined, defaultGroupSequence ),
 				defaultGroupSequenceRedefined,
 				isGetter,
-				defaultGroupSequence,
-				constraintDeclarationException
+				defaultGroupSequence
 		);
 	}
 
@@ -298,6 +259,19 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
 	 */
 	public static class Builder extends MetaDataBuilder {
+
+		/**
+		 * The rules applying for the definition of executable constraints.
+		 */
+		private static final Set<MethodConfigurationRule> rules = Collections.unmodifiableSet(
+				CollectionHelper.<MethodConfigurationRule>asSet(
+						new OverridingMethodMustNotAlterParameterConstraints(),
+						new ParallelMethodsMustNotDefineParameterConstraints(),
+						new VoidMethodsMustNotBeReturnValueConstrained(),
+						new ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine(),
+						new ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue()
+				)
+		);
 
 		/**
 		 * Either CONSTRUCTOR or METHOD.
@@ -384,12 +358,9 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		@Override
 		public ExecutableMetaData build() {
-			ExecutableElement executableElement = location.getExecutableElement();
+			assertCorrectnessOfConfiguration();
 
-			ConstraintDeclarationException constraintDeclarationException = checkParameterConstraints();
-			if ( constraintDeclarationException == null ) {
-				constraintDeclarationException = checkReturnValueConfiguration();
-			}
+			ExecutableElement executableElement = location.getExecutableElement();
 
 			return new ExecutableMetaData(
 					executableElement.getSimpleName(),
@@ -399,7 +370,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
-					constraintDeclarationException,
 					getGroupConversions(),
 					isCascading(),
 					isConstrained,
@@ -451,76 +421,27 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		}
 
 		/**
-		 * Checks that there are no invalid parameter constraints defined at
-		 * this builder's methods.
+		 * <p>
+		 * Checks the configuration of this method for correctness as per the
+		 * rules outlined in the Bean Validation specification, section 4.5.5
+		 * ("Method constraints in inheritance hierarchies").
+		 * </p>
+		 * <p>
+		 * In particular, overriding methods in sub-types may not add parameter
+		 * constraints and the return value of an overriding method may not be
+		 * marked as cascaded if the return value is marked as cascaded already
+		 * on the overridden method.
+		 * </p>
 		 *
-		 * @return A {@link ConstraintDeclarationException} describing the first
-		 *         illegal method parameter constraint found or {@code null}, if
-		 *         the methods of this builder have no such illegal constraints.
+		 * @throws ConstraintDeclarationException In case any of the rules mandated by the specification is
+		 * violated.
 		 */
-		private ConstraintDeclarationException checkParameterConstraints() {
+		private ConstraintDeclarationException assertCorrectnessOfConfiguration() {
 			for ( Entry<Class<?>, ConstrainedExecutable> entry : executablesByDeclaringType.entrySet() ) {
 				for ( Entry<Class<?>, ConstrainedExecutable> otherEntry : executablesByDeclaringType.entrySet() ) {
-					Class<?> beanClass = entry.getKey();
-					ConstrainedExecutable executableConfiguration = entry.getValue();
-					Member member = executableConfiguration.getLocation().getMember();
-
-					Class<?> otherBeanClass = otherEntry.getKey();
-					ConstrainedExecutable otherExecutableConfiguration = otherEntry.getValue();
-					Member otherMember = otherExecutableConfiguration.getLocation().getMember();
-
-					//overriding methods may only have the exact same constraints as the overridden method
-					if ( isStrictSubType( beanClass, otherBeanClass ) ) {
-						if ( otherExecutableConfiguration.hasParameterConstraints() &&
-								!executableConfiguration.isEquallyParameterConstrained( otherExecutableConfiguration ) ) {
-							return log.getParameterConfigurationAlteredInSubTypeException( member, otherMember );
-						}
+					for ( MethodConfigurationRule rule : rules ) {
+						rule.apply( entry.getValue(), otherEntry.getValue() );
 					}
-					//parallel methods may not define any parameter constraints
-					else if ( !otherBeanClass.isAssignableFrom( beanClass ) ) {
-						if ( executableConfiguration.hasParameterConstraints() || otherExecutableConfiguration.hasParameterConstraints() ) {
-							return log.getParameterConstraintsDefinedInMethodsFromParallelTypesException(
-									member,
-									otherMember
-							);
-						}
-					}
-				}
-			}
-
-			return null;
-		}
-
-		/**
-		 * Whether otherClazz is a strict subtype of clazz or not.
-		 *
-		 * @param clazz The superclass.
-		 * @param otherClazz The potential subclass to test.
-		 *
-		 * @return True if otherClazz is a strict subtype of clazz, false
-		 *         otherwise.
-		 */
-		private boolean isStrictSubType(Class<?> clazz, Class<?> otherClazz) {
-			return clazz.isAssignableFrom( otherClazz ) && !clazz.equals( otherClazz );
-		}
-
-		private ConstraintDeclarationException checkReturnValueConfiguration() {
-			ConstrainedExecutable methodWithCascadingReturnValue = null;
-
-			for ( ConstrainedExecutable executable : constrainedExecutables ) {
-				if ( executable.getLocation().getExecutableElement().getReturnType() == void.class &&
-						( !executable.getConstraints().isEmpty() || executable.isCascading() ) ) {
-					return log.voidMethodsMustNotBeConstrained( executable.getLocation().getMember() );
-				}
-
-				if ( executable.isCascading() ) {
-					if ( methodWithCascadingReturnValue != null ) {
-						return log.methodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidation(
-								methodWithCascadingReturnValue.getLocation().getMember(),
-								executable.getLocation().getMember()
-						);
-					}
-					methodWithCascadingReturnValue = executable;
 				}
 			}
 

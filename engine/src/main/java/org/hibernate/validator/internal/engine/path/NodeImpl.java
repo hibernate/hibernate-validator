@@ -232,7 +232,7 @@ public class NodeImpl
 		if ( nodeType.isAssignableFrom( this.getClass() ) ) {
 			return nodeType.cast( this );
 		}
-		throw log.unableToNarrowNodeType( this.getClass().getName(), nodeType.getName() );
+		throw log.getUnableToNarrowNodeTypeException( this.getClass().getName(), nodeType.getName() );
 	}
 
 	@Override

@@ -16,9 +16,7 @@
 */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,7 +27,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
@@ -88,20 +85,6 @@ public class IllegalMethodParameterConstraintsTest {
 	public void crossParameterConstraintStrengtheningInSubTypeCausesDeclarationException() {
 		getValidator().forExecutables().validateParameters(
 				new ZipImpl(), ZipImpl.class.getDeclaredMethods()[0], new Object[2]
-		);
-	}
-
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
-	public void standardBeanValidationCanBePerformedOnTypeWithIllegalMethodParameterConstraints() throws Exception {
-		QuxImpl qux = new QuxImpl();
-
-		//validating a property is fine
-		Set<ConstraintViolation<QuxImpl>> violations = getValidator().validate( qux );
-		assertCorrectConstraintViolationMessages( violations, "may not be null" );
-
-		//but method validation fails due to illegal parameter constraints being defined
-		getValidator().forExecutables().validateParameters(
-				qux, QuxImpl.class.getDeclaredMethod( "qux", String.class ), new Object[] { }
 		);
 	}
 

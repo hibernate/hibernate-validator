@@ -109,7 +109,6 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 			}
 
 			if ( addToSet ) {
-				constrainedMethod.assertCorrectnessOfConfiguration();
 				matchingMethodDescriptors.add( constrainedMethod );
 			}
 		}
@@ -121,12 +120,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
 		Contracts.assertNotNull( methodName, MESSAGES.methodNameMustNotBeNull() );
 
-		ExecutableDescriptorImpl methodDescriptor = constrainedMethods.get( methodName + Arrays.toString( parameterTypes ) );
-		if ( methodDescriptor != null ) {
-			methodDescriptor.assertCorrectnessOfConfiguration();
-		}
-
-		return methodDescriptor;
+		return constrainedMethods.get( methodName + Arrays.toString( parameterTypes ) );
 	}
 
 	@Override

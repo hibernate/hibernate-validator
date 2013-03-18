@@ -149,7 +149,7 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToFindProviderException(Class<?> providerClass);
 
 	@Message(id = 28, value = "Unexpected exception during isValid call.")
-	ValidationException getExceptionDuringIsValidCall(@Cause RuntimeException e);
+	ValidationException getExceptionDuringIsValidCallException(@Cause RuntimeException e);
 
 	@Message(id = 29, value = "Constraint factory returned null when trying to create instance of %s.")
 	ValidationException getConstraintFactoryMustNotReturnNullException(String validatorClassName);
@@ -220,7 +220,7 @@ public interface Log extends BasicLogger {
 	ValidationException getMissingFormatStringInTemplateException(String expression);
 
 	@Message(id = 51, value = "Invalid format: %s.")
-	ValidationException throwInvalidFormat(String message, @Cause IllegalFormatException e);
+	ValidationException getInvalidFormatException(String message, @Cause IllegalFormatException e);
 
 	@Message(id = 52,
 			value = "Default group sequence and default group sequence provider cannot be defined at the same time.")
@@ -427,10 +427,10 @@ public interface Log extends BasicLogger {
 	IllegalArgumentException getIllegalArgumentException(String message);
 
 	@Message(id = 117, value = "Invalid value for property %s: %s")
-	ValidationException getInvalidPropertyValue(String propertyName, String propertyValue, @Cause Exception e);
+	ValidationException getInvalidPropertyValueException(String propertyName, String propertyValue, @Cause Exception e);
 
 	@Message(id = 118, value = "Unable to cast %s to %s")
-	ClassCastException unableToNarrowNodeType(String actualDescriptorType, String expectedDescriptorType);
+	ClassCastException getUnableToNarrowNodeTypeException(String actualDescriptorType, String expectedDescriptorType);
 
 	@LogMessage(level = INFO)
 	@Message(id = 119, value = "Using %s as parameter name provider.")
@@ -454,10 +454,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 125, value = "Found group conversions for non-cascading element: %s.")
 	ConstraintDeclarationException getGroupConversionOnNonCascadingElementException(String location);
 
-	@Message(id = 126,
-			value = "No bean manager is available. In order to use InjectingConstraintValidatorFactory, the javax.validation.Validator must either be retrieved via dependency injection or a bean manager must be available via JNDI.")
-	IllegalStateException beanManagerIsNotAvailable();
-
 	@Message(id = 127, value = "Found group conversion using a group sequence as source: %s.")
 	ConstraintDeclarationException getGroupConversionForSequenceException(Class<?> from);
 
@@ -475,11 +471,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 131,
 			value = "A method return value must not be marked for cascaded validation more than once in a class hierarchy, but the following two methods are marked as such: %s, %s.")
-	ConstraintDeclarationException methodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidation(Member member1, Member member2);
+	ConstraintDeclarationException getMethodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidationException(Member member1, Member member2);
 
 	@Message(id = 132,
 			value = "Void methods must not be constrained or marked for cascaded validation, but method %s is.")
-	ConstraintDeclarationException voidMethodsMustNotBeConstrained(Member member);
+	ConstraintDeclarationException getVoidMethodsMustNotBeConstrainedException(Member member);
 
 	@Message(id = 133, value = "%1$s does not contain a constructor with the parameter types %2$s.")
 	ValidationException getBeanDoesNotContainConstructorException(String beanClassName, List<Class<?>> parameterTypes);
@@ -491,7 +487,7 @@ public interface Log extends BasicLogger {
 	ValidationException getBeanDoesNotContainMethodException(String beanClassName, String methodName, List<Class<?>> parameterTypes);
 
 	@Message(id = 136, value = "The specified constraint annotation class %1$s cannot be loaded.")
-	ValidationException unableToLoadConstraintAnnotationClassException(String constraintAnnotationClass, @Cause Exception e);
+	ValidationException getUnableToLoadConstraintAnnotationClassException(String constraintAnnotationClass, @Cause Exception e);
 
 	@Message(id = 137, value = "The method '%1$s' is defined twice in the mapping xml for bean %2$s.")
 	ValidationException getMethodIsDefinedTwiceInMappingXmlForBeanException(String name, String beanClassName);
@@ -579,5 +575,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 160,
 			value = "Validator for cross-parameter constraint %s does not validate Object nor Object[].")
-	ConstraintDefinitionException getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArray(String constraint);
+	ConstraintDefinitionException getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArrayException(String constraint);
+
+	@Message(id = 161,
+			value = "Two methods defined in parallel types must not define group conversions for a cascaded method return value, if they are overridden by the same method, but methods %s and %s both define parameter constraints.")
+	ConstraintDeclarationException getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(Member method1, Member method2);
 }

@@ -38,9 +38,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
@@ -133,20 +130,24 @@ public class ReflectionHelperTest {
 	@Test
 	public void testGetMessageParameter() {
 		NotNull testAnnotation = new NotNull() {
+			@Override
 			public String message() {
 				return "test";
 			}
 
+			@Override
 			public Class<?>[] groups() {
 				return new Class<?>[] { Default.class };
 			}
 
+			@Override
 			public Class<? extends Payload>[] payload() {
 				@SuppressWarnings("unchecked")
 				Class<? extends Payload>[] classes = new Class[] { };
 				return classes;
 			}
 
+			@Override
 			public Class<? extends Annotation> annotationType() {
 				return this.getClass();
 			}
@@ -174,22 +175,6 @@ public class ReflectionHelperTest {
 					e.getMessage().contains( "The specified annotation defines no parameter" ),
 					"Wrong exception message"
 			);
-		}
-	}
-
-	@Test
-	public void testPropertyExists() {
-		assertTrue( ReflectionHelper.propertyExists( Foo.class, "foo", FIELD ) );
-		assertFalse( ReflectionHelper.propertyExists( Foo.class, "foo", METHOD ) );
-		assertFalse( ReflectionHelper.propertyExists( Foo.class, "bar", FIELD ) );
-		assertTrue( ReflectionHelper.propertyExists( Foo.class, "bar", METHOD ) );
-
-		try {
-			assertTrue( ReflectionHelper.propertyExists( Foo.class, "bar", TYPE ) );
-			fail();
-		}
-		catch ( IllegalArgumentException e ) {
-			// success
 		}
 	}
 

@@ -79,9 +79,6 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 	@Min(10)
 	int overriddenMethodWithReturnValueConstraint();
 
-	@Min(10)
-	void voidMethodWithIllegalReturnValueConstraint();
-
 	int getFoo(int i);
 
 	int getFoo(@NotEmpty String s);

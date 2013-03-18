@@ -80,16 +80,27 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  */
 public final class ReflectionHelper {
 
+	private static final String PACKAGE_SEPARATOR = ".";
+	private static final String ARRAY_CLASS_NAME_PREFIX = "[L";
+	private static final String ARRAY_CLASS_NAME_SUFFIX = ";";
+
+	private static final String PROPERTY_ACCESSOR_PREFIX_GET = "get";
+	private static final String PROPERTY_ACCESSOR_PREFIX_IS = "is";
+	private static final String PROPERTY_ACCESSOR_PREFIX_HAS = "has";
+	private static final String[] PROPERTY_ACCESSOR_PREFIXES = {
+			PROPERTY_ACCESSOR_PREFIX_GET,
+			PROPERTY_ACCESSOR_PREFIX_IS,
+			PROPERTY_ACCESSOR_PREFIX_HAS
+	};
+
 	private static final Log log = LoggerFactory.make();
+
 	/**
 	 * Used for resolving type parameters. Thread-safe.
 	 */
 	private static final TypeResolver typeResolver = new TypeResolver();
-	private static final String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };
-	private static final String PACKAGE_SEPARATOR = ".";
+
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
-	private static final String ARRAY_CLASS_NAME_PREFIX = "[L";
-	private static final String ARRAY_CLASS_NAME_SUFFIX = ";";
 
 	static {
 		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
@@ -182,12 +193,26 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Process bean properties getter by applying the JavaBean naming conventions.
+	 * Returns the JavaBeans property name of the given member.
+	 * </p>
+	 * For fields, the field name will be returned. For getter methods, the
+	 * decapitalized property name will be returned, with the "get", "is" or "has"
+	 * prefix stripped off. Getter methods are methods
+	 * </p>
+	 * <ul>
+	 * <li>whose name start with "get" and who have a return type but no parameter
+	 * or</li>
+	 * <li>whose name starts with "is" and who have no parameter and return
+	 * {@code boolean} or</li>
+	 * <li>whose name starts with "has" and who have no parameter and return
+	 * {@code boolean} (HV-specific, not mandated by JavaBeans spec).</li>
+	 * </ul>
 	 *
-	 * @param member the member for which to get the property name.
+	 * @param member The member for which to get the property name.
 	 *
-	 * @return The bean method name with the "is" or "get" prefix stripped off, <code>null</code>
-	 *         the method name id not according to the JavaBeans standard.
+	 * @return The property name for the given member or {@code null} if the
+	 *         member is neither a field nor a getter method according to the
+	 *         JavaBeans standard.
 	 */
 	public static String getPropertyName(Member member) {
 		String name = null;
@@ -208,8 +233,15 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Checks whether the given method is a valid JavaBeans getter method,
-	 * meaning its name starts with "is" or "has" and it has no parameters.
+	 * Checks whether the given method is a valid JavaBeans getter method, which
+	 * is the case if
+	 * <ul>
+	 * <li>its name starts with "get" and it has a return type but no parameter or</li>
+	 * <li>its name starts with "is", it has no parameter and is returning
+	 * {@code boolean} or</li>
+	 * <li>its name starts with "has", it has no parameter and is returning
+	 * {@code boolean} (HV-specific, not mandated by JavaBeans spec).</li>
+	 * </ul>
 	 *
 	 * @param method The method of interest.
 	 *
@@ -217,27 +249,33 @@ public final class ReflectionHelper {
 	 *         {@code false} otherwise.
 	 */
 	public static boolean isGetterMethod(Method method) {
-		return getPropertyName( method ) != null && method.getParameterTypes().length == 0;
-	}
+		if ( method.getParameterTypes().length != 0 ) {
+			return false;
+		}
 
-	/**
-	 * Checks whether the property with the specified name and type exists on the given class.
-	 *
-	 * @param clazz The class to check for the property. Cannot be {@code null}.
-	 * @param property The property name without 'is', 'get' or 'has'. Cannot be {@code null} or empty.
-	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
-	 *
-	 * @return {@code true} is the property and can be access via the specified type, {@code false} otherwise.
-	 */
-	public static boolean propertyExists(Class<?> clazz, String property, ElementType elementType) {
-		return getMember( clazz, property, elementType ) != null;
+		String methodName = method.getName();
+
+		//<PropertyType> get<PropertyName>()
+		if ( methodName.startsWith( PROPERTY_ACCESSOR_PREFIX_GET ) && method.getReturnType() != void.class ) {
+			return true;
+		}
+		//boolean is<PropertyName>()
+		else if ( methodName.startsWith( PROPERTY_ACCESSOR_PREFIX_IS ) && method.getReturnType() == boolean.class ) {
+			return true;
+		}
+		//boolean has<PropertyName>()
+		else if ( methodName.startsWith( PROPERTY_ACCESSOR_PREFIX_HAS ) && method.getReturnType() == boolean.class ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
 	 * Returns the member with the given name and type.
 	 *
 	 * @param clazz The class from which to retrieve the member. Cannot be {@code null}.
-	 * @param property The property name without 'is', 'get' or 'has'. Cannot be {@code null} or empty.
+	 * @param property The property name without "is", "get" or "has". Cannot be {@code null} or empty.
 	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
 	 *
 	 * @return the member which matching the name and type or {@code null} if no such member exists.
