@@ -495,7 +495,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		for ( Cascadable cascadable : validatable.getCascadables() ) {
 			valueContext.appendNode( cascadable );
-			valueContext.setCurrentGroup( cascadable.convertGroup( originalGroup ) );
+			Class<?> group = cascadable.convertGroup( originalGroup );
+			valueContext.setCurrentGroup( group );
 
 			ElementType elementType = cascadable.getElementType();
 			if ( isCascadeRequired(
@@ -511,11 +512,21 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					Type type = value.getClass();
 					Iterator<?> iter = createIteratorForCascadedValue( type, value, valueContext );
 					boolean isIndexable = isIndexable( type );
+
+					// expand the group only if was created by group conversion;
+					// otherwise we're looping through the right validation order
+					// already and need only to pass the current element
+					ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder(
+							group,
+							group != originalGroup
+					);
+
 					validateCascadedConstraint(
 							validationContext,
 							iter,
 							isIndexable,
-							valueContext
+							valueContext,
+							validationOrder
 					);
 					if ( shouldFailFast( validationContext ) ) {
 						return;
@@ -585,7 +596,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return isIndexable;
 	}
 
-	private void validateCascadedConstraint(ValidationContext<?> context, Iterator<?> iter, boolean isIndexable, ValueContext<?, ?> valueContext) {
+	private void validateCascadedConstraint(ValidationContext<?> context, Iterator<?> iter, boolean isIndexable, ValueContext<?, ?> valueContext, ValidationOrder validationOrder) {
 		Object value;
 		Object mapKey;
 		int i = 0;
@@ -601,12 +612,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			if ( !context.isAlreadyValidated(
-					value, valueContext.getCurrentGroup(), valueContext.getPropertyPath()
+					value,
+					valueContext.getCurrentGroup(),
+					valueContext.getPropertyPath()
 			) ) {
-				ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder(
-						Arrays.<Class<?>>asList( valueContext.getCurrentGroup() )
-				);
-
 				ValueContext<?, Object> newValueContext;
 				if ( value != null ) {
 					newValueContext = ValueContext.getLocalExecutionContext(
