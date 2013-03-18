@@ -101,7 +101,6 @@ public final class ReflectionHelper {
 	private static final TypeResolver typeResolver = new TypeResolver();
 
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
-
 	static {
 		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
 
@@ -116,6 +115,23 @@ public final class ReflectionHelper {
 		temp.put( Void.TYPE, Void.TYPE );
 
 		PRIMITIVE_TO_WRAPPER_TYPES = Collections.unmodifiableMap( temp );
+	}
+
+	private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITVES_TYPES;
+	static {
+		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
+
+		temp.put( Boolean.class, boolean.class );
+		temp.put( Character.class, char.class );
+		temp.put( Double.class, double.class );
+		temp.put( Float.class, float.class );
+		temp.put( Long.class, long.class );
+		temp.put( Integer.class, int.class );
+		temp.put( Short.class, short.class );
+		temp.put( Byte.class, byte.class );
+		temp.put( Void.TYPE, Void.TYPE );
+
+		WRAPPER_TO_PRIMITVES_TYPES = Collections.unmodifiableMap( temp );
 	}
 
 	/**
@@ -668,11 +684,32 @@ public final class ReflectionHelper {
 	 * represent a primitive type.
 	 */
 	public static Class<?> boxedType(Class<?> primitiveType) {
-
 		Class<?> wrapperType = PRIMITIVE_TO_WRAPPER_TYPES.get( primitiveType );
 
 		if ( wrapperType == null ) {
 			throw log.getHasToBeAPrimitiveTypeException( primitiveType.getClass() );
+		}
+
+		return wrapperType;
+	}
+
+	/**
+	 * Returns the primitive type for a boxed type.
+	 *
+	 * @param type the boxed type
+	 *
+	 * @return the primitive type for a auto-boxed type. In case {@link Void} is
+	 *         passed (which is considered as primitive type by
+	 *         {@link Class#isPrimitive()}), {@link Void} will be returned.
+	 *
+	 * @throws IllegalArgumentException in case the parameter {@code primitiveType} does not
+	 * represent a primitive type.
+	 */
+	public static Class<?> unBoxedType(Class<?> type) {
+		Class<?> wrapperType = WRAPPER_TO_PRIMITVES_TYPES.get( type );
+
+		if ( wrapperType == null ) {
+			throw log.getHasToBeABoxedTypeException( type.getClass() );
 		}
 
 		return wrapperType;

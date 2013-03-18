@@ -580,4 +580,15 @@ public interface Log extends BasicLogger {
 	@Message(id = 161,
 			value = "Two methods defined in parallel types must not define group conversions for a cascaded method return value, if they are overridden by the same method, but methods %s and %s both define parameter constraints.")
 	ConstraintDeclarationException getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(Member method1, Member method2);
+
+	@Message(id = 162,
+			value = "The validated type %1$s does not specify the constructor/method: %2$s")
+	IllegalArgumentException getMethodOrConstructorNotDefinedByValidatedTypeException(String validatedTypeName, Member member);
+
+	@Message(id = 163,
+			value = "The actual parameter type '%1$s' is not assignable to the expected one '%2$s' for parameter %3$d of '%4$s'")
+	IllegalArgumentException getParameterTypesDoNotMatchException(String actualType, String expectedType, int index, Member member);
+
+	@Message(id = 164, value = "%s has to be a auto-boxed type.")
+	IllegalArgumentException getHasToBeABoxedTypeException(Class<?> clazz);
 }

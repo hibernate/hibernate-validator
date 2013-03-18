@@ -49,6 +49,7 @@ import org.hibernate.validator.internal.engine.resolver.SingleThreadCachedTraver
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -869,8 +870,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
 
 		if ( executableMetaData == null ) {
-			// nothing to validate
-			return;
+			// there is no executable metadata - specified object and method do not match
+			throw log.getMethodOrConstructorNotDefinedByValidatedTypeException(
+					beanMetaData.getBeanClass().getName(),
+					validationContext.getExecutable().getMember()
+			);
 		}
 
 		if ( beanMetaData.defaultGroupSequenceIsRedefined() ) {
@@ -977,13 +981,30 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// 2. validate parameter constraints
 			for ( int i = 0; i < parameterValues.length; i++ ) {
 				PathImpl originalPath = valueContext.getPropertyPath();
+
+				ParameterMetaData parameterMetaData = executableMetaData.getParameterMetaData( i );
 				Object value = parameterValues[i];
+
+				if ( value != null ) {
+					Class<?> valueType = value.getClass();
+					if ( parameterMetaData.getType() instanceof Class && ( (Class) parameterMetaData.getType() ).isPrimitive() ) {
+						valueType = ReflectionHelper.unBoxedType( valueType );
+					}
+					if ( !TypeHelper.isAssignable( parameterMetaData.getType(), valueType ) ) {
+						throw log.getParameterTypesDoNotMatchException(
+								valueType.getName(),
+								parameterMetaData.getType().toString(),
+								i,
+								validationContext.getExecutable().getMember()
+						);
+					}
+				}
 
 				valueContext.appendNode( executableMetaData.getParameterMetaData( i ) );
 				valueContext.setCurrentValidatedValue( value );
 
 				numberOfViolationsOfCurrentGroup += validateConstraintsForGroup(
-						validationContext, valueContext, executableMetaData.getParameterMetaData( i )
+						validationContext, valueContext, parameterMetaData
 				);
 				if ( shouldFailFast( validationContext ) ) {
 					return validationContext.getFailingConstraints().size() - numberOfViolationsBefore;
