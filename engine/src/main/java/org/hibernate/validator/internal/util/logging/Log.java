@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.IllegalFormatException;
@@ -595,4 +596,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 165, value = "Mixing IMPLICIT and other executable types is not allowed.")
 	IllegalArgumentException getMixingImplicitWithOtherExecutableTypesException();
+
+	@Message(id = 166,
+			value = "@ValidateOnExecution is not allowed on methods overriding a superclass method or implementing an interface. Check configuration for %1$s")
+	ValidationException getValidateOnExecutionOnOverriddenOrInterfaceMethodException(Method m);
 }
