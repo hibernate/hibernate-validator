@@ -46,6 +46,8 @@ import com.fasterxml.classmate.members.RawMethod;
 import com.fasterxml.classmate.members.ResolvedMethod;
 
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.classfilter.ClassFilter;
+import org.hibernate.validator.internal.util.classfilter.ClassFilters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.ConstructorInstance;
@@ -720,39 +722,58 @@ public final class ReflectionHelper {
 	 * Get all superclasses and optionally interfaces recursively. Classed are added by starting with the specified
 	 * class and its implemented interfaces. Then the super class of {@code clazz} is added and its interfaces and so on.
 	 *
-	 * @param clazz The class to start the search with.
-	 * @param includeInterfaces whether or not to include interfaces
+	 * @param clazz the class to start the search with
+	 * @param filters filters applying for the search
 	 *
-	 * @return List of all super classes and interfaces of {@code clazz}. The list contains the class itself! The empty
-	 *         list is returned if {@code clazz} is {@code null}.
+	 * @return List of super types of {@code clazz}. Will only contain those
+	 *         super types matching the given filters. The list contains the
+	 *         given class itself, if it is no proxy class. An empty list is
+	 *         returned if {@code clazz} is {@code null}.
 	 */
-	public static <T> List<Class<? super T>> computeClassHierarchy(Class<T> clazz, boolean includeInterfaces) {
+	public static <T> List<Class<? super T>> computeClassHierarchy(Class<T> clazz, ClassFilter... filters) {
 		List<Class<? super T>> classes = newArrayList();
-		computeClassHierarchy( clazz, classes, includeInterfaces );
+
+		List<ClassFilter> allFilters = newArrayList();
+		allFilters.addAll( Arrays.asList( filters ) );
+		allFilters.add( ClassFilters.excludingProxies() );
+
+		computeClassHierarchy( clazz, classes, allFilters );
 		return classes;
 	}
 
 	/**
 	 * Get all superclasses and interfaces recursively.
 	 *
-	 * @param clazz The class to start the search with
-	 * @param classes List of classes to which to add all found super classes and interfaces
-	 * @param includeInterfaces whether or not to include interfaces
+	 * @param clazz the class to start the search with
+	 * @param classes list of classes to which to add all found super types matching the given filters
+	 * @param filters filters applying for the search
 	 */
-	private static <T> void computeClassHierarchy(Class<? super T> clazz, List<Class<? super T>> classes, boolean includeInterfaces) {
+	private static <T> void computeClassHierarchy(Class<? super T> clazz, List<Class<? super T>> classes, Iterable<ClassFilter> filters) {
 		for ( Class<? super T> current = clazz; current != null; current = current.getSuperclass() ) {
 			if ( classes.contains( current ) ) {
 				return;
 			}
-			classes.add( current );
-			if ( includeInterfaces ) {
-				for ( Class<?> currentInterface : current.getInterfaces() ) {
-					@SuppressWarnings("unchecked") //safe since interfaces are super-types
-							Class<? super T> currentInterfaceCasted = (Class<? super T>) currentInterface;
-					computeClassHierarchy( currentInterfaceCasted, classes, includeInterfaces );
-				}
+
+			if ( acceptedByAllFilters( current, filters ) ) {
+				classes.add( current );
+			}
+
+			for ( Class<?> currentInterface : current.getInterfaces() ) {
+				@SuppressWarnings("unchecked") //safe since interfaces are super-types
+						Class<? super T> currentInterfaceCasted = (Class<? super T>) currentInterface;
+				computeClassHierarchy( currentInterfaceCasted, classes, filters );
 			}
 		}
+	}
+
+	private static boolean acceptedByAllFilters(Class<?> clazz, Iterable<ClassFilter> filters) {
+		for ( ClassFilter classFilter : filters ) {
+			if ( !classFilter.accepts( clazz ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -766,7 +787,7 @@ public final class ReflectionHelper {
 	public static <T> List<Method> computeAllMethods(Class<T> clazz) {
 		List<Method> methods = newArrayList();
 
-		List<Class<? super T>> hierarchyClasses = computeClassHierarchy( clazz, true );
+		List<Class<? super T>> hierarchyClasses = computeClassHierarchy( clazz );
 		for ( Class<?> hierarchyClass : hierarchyClasses ) {
 			Collections.addAll( methods, getMethods( hierarchyClass ) );
 		}

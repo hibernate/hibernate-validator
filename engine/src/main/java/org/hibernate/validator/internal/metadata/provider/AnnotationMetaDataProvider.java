@@ -108,7 +108,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
 		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
-		for ( Class<? super T> hierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
+		for ( Class<? super T> hierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass ) ) {
 			BeanConfiguration<? super T> configuration = getBeanConfiguration( hierarchyClass );
 			if ( configuration != null ) {
 				configurations.add( configuration );

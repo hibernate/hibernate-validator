@@ -51,7 +51,7 @@ public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvid
 	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
 		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
-		for ( Class<? super T> clazz : ReflectionHelper.computeClassHierarchy( beanClass, true ) ) {
+		for ( Class<? super T> clazz : ReflectionHelper.computeClassHierarchy( beanClass ) ) {
 			BeanConfiguration<? super T> configuration = getBeanConfiguration( clazz );
 			if ( configuration != null ) {
 				configurations.add( configuration );
