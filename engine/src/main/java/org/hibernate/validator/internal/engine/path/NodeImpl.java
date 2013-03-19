@@ -22,6 +22,13 @@ import java.util.Collections;
 import java.util.List;
 import javax.validation.ElementKind;
 import javax.validation.Path;
+import javax.validation.Path.BeanNode;
+import javax.validation.Path.ConstructorNode;
+import javax.validation.Path.CrossParameterNode;
+import javax.validation.Path.MethodNode;
+import javax.validation.Path.ParameterNode;
+import javax.validation.Path.PropertyNode;
+import javax.validation.Path.ReturnValueNode;
 
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -229,10 +236,17 @@ public class NodeImpl
 
 	@Override
 	public <T extends Path.Node> T as(Class<T> nodeType) {
-		if ( nodeType.isAssignableFrom( this.getClass() ) ) {
+		if ( ( kind == ElementKind.BEAN && nodeType == BeanNode.class ) ||
+				( kind == ElementKind.CONSTRUCTOR && nodeType == ConstructorNode.class ) ||
+				( kind == ElementKind.CROSS_PARAMETER && nodeType == CrossParameterNode.class ) ||
+				( kind == ElementKind.METHOD && nodeType == MethodNode.class ) ||
+				( kind == ElementKind.PARAMETER && nodeType == ParameterNode.class ) ||
+				( kind == ElementKind.PROPERTY && nodeType == PropertyNode.class ) ||
+				( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class ) ) {
 			return nodeType.cast( this );
 		}
-		throw log.getUnableToNarrowNodeTypeException( this.getClass().getName(), nodeType.getName() );
+
+		throw log.getUnableToNarrowNodeTypeException( this.getClass().getName(), kind, nodeType.getName() );
 	}
 
 	@Override
