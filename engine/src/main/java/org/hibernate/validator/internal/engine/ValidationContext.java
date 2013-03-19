@@ -332,7 +332,7 @@ public class ValidationContext<T> {
 		}
 	}
 
-	public boolean hasMetaConstraintBeProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
+	public boolean hasMetaConstraintBeenProcessed(Object bean, Path path, MetaConstraint<?> metaConstraint) {
 		// TODO switch to proper multi key map (HF)
 		IdentitySet processedConstraints = processedMetaConstraints.get( new BeanAndPath( bean, path ) );
 		return processedConstraints != null && processedConstraints.contains( metaConstraint );

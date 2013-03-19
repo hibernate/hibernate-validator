@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -44,7 +44,6 @@ import static org.testng.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class GroupValidationTest {
 	private Validator validator;
@@ -52,7 +51,6 @@ public class GroupValidationTest {
 	@BeforeMethod
 	public void setUp() {
 		validator = getValidator();
-
 	}
 
 	@Test
@@ -89,7 +87,7 @@ public class GroupValidationTest {
 
 		public class FailOnSecondValidationCallValidator
 				implements ConstraintValidator<FailOnSecondValidationCall, Object> {
-			private AtomicInteger invocationCount = new AtomicInteger( 0 );
+			private final AtomicInteger invocationCount = new AtomicInteger( 0 );
 
 			@Override
 			public void initialize(FailOnSecondValidationCall parameters) {

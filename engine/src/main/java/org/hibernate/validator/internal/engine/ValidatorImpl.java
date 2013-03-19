@@ -996,7 +996,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 				if ( value != null ) {
 					Class<?> valueType = value.getClass();
-					if ( parameterMetaData.getType() instanceof Class && ( (Class) parameterMetaData.getType() ).isPrimitive() ) {
+					if ( parameterMetaData.getType() instanceof Class && ( (Class<?>) parameterMetaData.getType() ).isPrimitive() ) {
 						valueType = ReflectionHelper.unBoxedType( valueType );
 					}
 					if ( !TypeHelper.isAssignable( parameterMetaData.getType(), valueType ) ) {
@@ -1278,7 +1278,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private boolean isValidationRequired(ValidationContext<?> validationContext,
 										 ValueContext<?, ?> valueContext,
 										 MetaConstraint<?> metaConstraint) {
-		if ( validationContext.hasMetaConstraintBeProcessed(
+		if ( validationContext.hasMetaConstraintBeenProcessed(
 				valueContext.getCurrentBean(),
 				valueContext.getPropertyPath(),
 				metaConstraint
