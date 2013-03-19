@@ -36,6 +36,11 @@
                     <exclude name="testExecutableValidationUsesDefaultSettingSinceValidatedMethodImplementsAnInterfaceMethod"/>
                     <exclude name="testExecutableValidationUsesSettingFromSuperTypeIfValidatedMethodImplementsAnInterfaceMethod"/>
                     <exclude name="testExecutableValidationUsesSettingFromSuperTypeMethodIfValidatedMethodImplementsAnInterfaceMethod"/>
+                    <exclude name="testCascadedReturnValueValidationOfConstrainedMethod"/>
+                    <exclude name="testExecutableValidationUsesDefaultSettingIfValidatedMethodOverridesASuperTypeMethod"/>
+                    <exclude name="testExecutableValidationUsesSettingFromHighestMethodInHierarchyIfValidatedMethodImplementsAnInterfaceMethod"/>
+                    <exclude name="testExecutableValidationUsesSettingFromSuperTypeIfValidatedMethodOverridesASuperTypeMethod"/>
+                    <exclude name="testExecutableValidationUsesSettingFromSuperTypeMethodIfValidatedMethodOverridesASuperTypeMethod"/>
                 </methods>
             </class>
             <class name="org.hibernate.beanvalidation.tck.tests.integration.cdi.factory.ConstraintValidatorInjectionTest">
