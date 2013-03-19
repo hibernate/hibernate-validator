@@ -23,7 +23,7 @@ import javax.validation.executable.ValidateOnExecution;
 /**
  * @author Hardy Ferentschik
  */
-public class SecretService extends SecretServiceBase {
+public class CIA extends SecretServiceBase {
 
 	// The @ValidateOnExecution annotations here are expected to be ignored
 	// since the methods override super-type methods

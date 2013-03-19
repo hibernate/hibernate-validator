@@ -822,6 +822,10 @@ public final class ReflectionHelper {
 		Contracts.assertValueNotNull( subTypeMethod, "subTypeMethod" );
 		Contracts.assertValueNotNull( superTypeMethod, "superTypeMethod" );
 
+		if ( subTypeMethod.equals( superTypeMethod) ) {
+			return false;
+		}
+
 		if ( !subTypeMethod.getName().equals( superTypeMethod.getName() ) ) {
 			return false;
 		}

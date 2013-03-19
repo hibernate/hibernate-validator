@@ -35,23 +35,23 @@ import static org.junit.Assert.fail;
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class ClassInheritanceMethodValidationTest {
+public class SuccessfulClassInheritanceMethodValidationTest {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
-				.addClass( SecretService.class )
+				.addClass( MI6.class )
 				.addClass( SecretServiceBase.class )
 				.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
 	@Inject
-	SecretService secretService;
+	MI6 mi6;
 
 	@Test
 	public void testOverriddenExecutionTypeIsConsidered() {
 		try {
-			secretService.whisper( null );
+			mi6.whisper( null );
 			fail( "Method invocation should have caused a ConstraintViolationException" );
 		}
 		catch ( ConstraintViolationException e ) {

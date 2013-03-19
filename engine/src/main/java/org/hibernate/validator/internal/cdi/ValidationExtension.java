@@ -380,13 +380,16 @@ public class ValidationExtension implements Extension {
 		return executableTypes;
 	}
 
-	public Method replaceWithOverriddenOrInterfaceMethod(Method method, List<Method> interfaceMethods) {
-		LinkedList<Method> list = new LinkedList<Method>( interfaceMethods );
+	public Method replaceWithOverriddenOrInterfaceMethod(Method method, List<Method> allMethodsOfType) {
+		LinkedList<Method> list = new LinkedList<Method>( allMethodsOfType );
 		Iterator<Method> iterator = list.descendingIterator();
 		while ( iterator.hasNext() ) {
-			Method interfaceMethod = iterator.next();
-			if ( ReflectionHelper.overrides( method, interfaceMethod ) ) {
-				return interfaceMethod;
+			Method overriddenOrInterfaceMethod = iterator.next();
+			if ( ReflectionHelper.overrides( method, overriddenOrInterfaceMethod ) ) {
+				if ( method.getAnnotation( ValidateOnExecution.class ) != null ) {
+					throw log.getValidateOnExecutionOnOverriddenOrInterfaceMethodException( method );
+				}
+				return overriddenOrInterfaceMethod;
 			}
 		}
 
