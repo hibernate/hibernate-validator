@@ -82,7 +82,10 @@ public class MetaConstraint<A extends Annotation> {
 		valueContext.setElementType( getElementType() );
 		valueContext.setTypeOfAnnotatedElement( typeOfAnnotatedElement() );
 
-		return constraintTree.validateConstraints( executionContext, valueContext );
+		boolean validationResult = constraintTree.validateConstraints( executionContext, valueContext );
+		executionContext.markConstraintProcessed( valueContext.getCurrentBean(), valueContext.getPropertyPath(), this );
+
+		return validationResult;
 	}
 
 	public ConstraintLocation getLocation() {

@@ -432,7 +432,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					break;
 				}
 			}
-			validationContext.markProcessed( valueContext );
+			validationContext.markCurrentBeanAsProcessed( valueContext );
 
 			// all constraints in the hierarchy has been validated, stop validation.
 			if ( defaultGroupSequenceIsRedefined ) {
@@ -452,7 +452,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// reset the path to the state before this call
 			valueContext.setPropertyPath( currentPath );
 		}
-		validationContext.markProcessed( valueContext );
+		validationContext.markCurrentBeanAsProcessed( valueContext );
 	}
 
 	private boolean validateConstraint(ValidationContext<?> validationContext,
@@ -611,7 +611,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				valueContext.setIndex( i );
 			}
 
-			if ( !context.isAlreadyValidated(
+			if ( !context.isBeanAlreadyValidated(
 					value,
 					valueContext.getCurrentGroup(),
 					valueContext.getPropertyPath()
@@ -1275,7 +1275,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return new SingleThreadCachedTraversableResolver( traversableResolver );
 	}
 
-	private boolean isValidationRequired(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext, MetaConstraint<?> metaConstraint) {
+	private boolean isValidationRequired(ValidationContext<?> validationContext,
+										 ValueContext<?, ?> valueContext,
+										 MetaConstraint<?> metaConstraint) {
+		if ( validationContext.hasMetaConstraintBeProcessed(
+				valueContext.getCurrentBean(),
+				valueContext.getPropertyPath(),
+				metaConstraint
+		) ) {
+			return false;
+		}
+
 		if ( !metaConstraint.getGroupList().contains( valueContext.getCurrentGroup() ) ) {
 			return false;
 		}
