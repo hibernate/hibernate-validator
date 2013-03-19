@@ -874,7 +874,6 @@ public final class ReflectionHelper {
 		return true;
 	}
 
-
 	private static void computeAllImplementedInterfaces(Class<?> clazz, Set<Class<?>> classes) {
 		if ( clazz == null ) {
 			return;
@@ -883,38 +882,6 @@ public final class ReflectionHelper {
 			classes.add( currentInterface );
 			computeAllImplementedInterfaces( currentInterface, classes );
 		}
-	}
-
-	/**
-	 * This methods inspects the type of the cascaded constraints and in case
-	 * of a list or array creates an iterator in order to validate each element. For maps an iterator over the values
-	 * is returned.
-	 *
-	 * @param type the type of the cascaded field or property.
-	 * @param value the actual value.
-	 *
-	 * @return An iterator over the value of a cascaded property.
-	 */
-	//TODO HV-571: Check whether we can unify this with ValidatorImpl#createIteratorForCascadedValue()
-	public static Iterator<?> createIteratorForCascadedValue(Type type, Object value) {
-		Iterator<?> iter;
-		if ( isIterable( type ) ) {
-			iter = ( (Iterable<?>) value ).iterator();
-		}
-		else if ( isMap( type ) ) {
-			Map<?, ?> map = (Map<?, ?>) value;
-			iter = map.values().iterator();
-		}
-		else if ( TypeHelper.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( (Object[]) value );
-			iter = arrayList.iterator();
-		}
-		else {
-			List<Object> list = newArrayList();
-			list.add( value );
-			iter = list.iterator();
-		}
-		return iter;
 	}
 
 	/**
