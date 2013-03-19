@@ -100,6 +100,7 @@ public final class ReflectionHelper {
 	private static final TypeResolver typeResolver = new TypeResolver();
 
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
+
 	static {
 		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
 
@@ -117,6 +118,7 @@ public final class ReflectionHelper {
 	}
 
 	private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITVES_TYPES;
+
 	static {
 		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
 
@@ -715,7 +717,8 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Get all superclasses and optionally interfaces recursively.
+	 * Get all superclasses and optionally interfaces recursively. Classed are added by starting with the specified
+	 * class and its implemented interfaces. Then the super class of {@code clazz} is added and its interfaces and so on.
 	 *
 	 * @param clazz The class to start the search with.
 	 * @param includeInterfaces whether or not to include interfaces
@@ -753,18 +756,19 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Get all interface method a class implements
+	 * Get a list of all methods a class declares, implements, overrides or inherits. Methods are added by adding
+	 * first all methods of the class itself and its implementing interfaces , then the super class and its interfaces, etc.
 	 *
-	 * @param clazz The class for which to find the interface methods
+	 * @param clazz The class for which to find all methods.
 	 *
-	 * @return returns set of all methods {@code clazz} implements. The empty list is returned if {@code clazz} is {@code null}
+	 * @return returns set of all methods of {@code clazz}. The empty list is returned if {@code clazz} is {@code null}
 	 */
-	public static <T> List<Method> computeAllOverridenAndImplementedMethods(Class<T> clazz) {
+	public static <T> List<Method> computeAllMethods(Class<T> clazz) {
 		List<Method> methods = newArrayList();
 
-		List<Class<? super T>> interfacesAndSuperTypes = computeClassHierarchy( clazz, true );
-		for ( Class<?> interfaceClass : interfacesAndSuperTypes ) {
-			Collections.addAll( methods, interfaceClass.getMethods() );
+		List<Class<? super T>> hierarchyClasses = computeClassHierarchy( clazz, true );
+		for ( Class<?> hierarchyClass : hierarchyClasses ) {
+			Collections.addAll( methods, getMethods( hierarchyClass ) );
 		}
 
 		return methods;

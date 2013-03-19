@@ -205,7 +205,7 @@ public class ValidationExtension implements Extension {
 	private <T> void determineConstrainedMethod(AnnotatedType<T> type,
 												BeanDescriptor beanDescriptor,
 												Set<AnnotatedCallable<? super T>> callables) {
-		List<Method> overriddenAndImplementedMethods = ReflectionHelper.computeAllOverridenAndImplementedMethods( type.getJavaClass() );
+		List<Method> overriddenAndImplementedMethods = ReflectionHelper.computeAllMethods( type.getJavaClass() );
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
 

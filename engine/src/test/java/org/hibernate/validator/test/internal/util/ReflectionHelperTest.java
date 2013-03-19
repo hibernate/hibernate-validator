@@ -179,9 +179,9 @@ public class ReflectionHelperTest {
 
 	@Test
 	public void testComputeAllImplementedMethods() throws Exception {
-		assertTrue( ReflectionHelper.computeAllOverridenAndImplementedMethods( null ).isEmpty() );
+		assertTrue( ReflectionHelper.computeAllMethods( null ).isEmpty() );
 
-		List<Method> methods = ReflectionHelper.computeAllOverridenAndImplementedMethods( Fubar.class );
+		List<Method> methods = ReflectionHelper.computeAllMethods( Fubar.class );
 		assertTrue( methods.contains( Snafu.class.getMethod( "snafu" ) ) );
 		assertTrue( methods.contains( Susfu.class.getMethod( "susfu" ) ) );
 	}
