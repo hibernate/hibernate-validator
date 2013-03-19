@@ -591,4 +591,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 164, value = "%s has to be a auto-boxed type.")
 	IllegalArgumentException getHasToBeABoxedTypeException(Class<?> clazz);
+
+	@Message(id = 165, value = "Mixing IMPLICIT and other executable types is not allowed.")
+	IllegalArgumentException getMixingImplicitWithOtherExecutableTypesException();
 }

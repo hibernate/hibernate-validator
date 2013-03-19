@@ -32,7 +32,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +100,7 @@ public final class ReflectionHelper {
 	private static final TypeResolver typeResolver = new TypeResolver();
 
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
+
 	static {
 		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
 
@@ -118,6 +118,7 @@ public final class ReflectionHelper {
 	}
 
 	private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITVES_TYPES;
+
 	static {
 		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
 
@@ -716,7 +717,8 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Get all superclasses and optionally interfaces recursively.
+	 * Get all superclasses and optionally interfaces recursively. Classed are added by starting with the specified
+	 * class and its implemented interfaces. Then the super class of {@code clazz} is added and its interfaces and so on.
 	 *
 	 * @param clazz The class to start the search with.
 	 * @param includeInterfaces whether or not to include interfaces
@@ -754,19 +756,19 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Get all interface method a class implements
+	 * Get a list of all methods a class declares, implements, overrides or inherits. Methods are added by adding
+	 * first all methods of the class itself and its implementing interfaces , then the super class and its interfaces, etc.
 	 *
-	 * @param clazz The class for which to find the interface methods
+	 * @param clazz The class for which to find all methods.
 	 *
-	 * @return Set of all methods {@code clazz} implements. The empty list is returned if {@code clazz} does not
-	 *         implement any interfaces or {@code clazz} is {@code null}
+	 * @return returns set of all methods of {@code clazz}. The empty list is returned if {@code clazz} is {@code null}
 	 */
-	public static Set<Method> computeAllImplementedMethods(Class<?> clazz) {
-		Set<Method> methods = newHashSet();
+	public static <T> List<Method> computeAllMethods(Class<T> clazz) {
+		List<Method> methods = newArrayList();
 
-		Set<Class<?>> interfaces = computeAllImplementedInterfaces( clazz );
-		for ( Class<?> interfaceClass : interfaces ) {
-			Collections.addAll( methods, interfaceClass.getMethods() );
+		List<Class<? super T>> hierarchyClasses = computeClassHierarchy( clazz, true );
+		for ( Class<?> hierarchyClass : hierarchyClasses ) {
+			Collections.addAll( methods, getMethods( hierarchyClass ) );
 		}
 
 		return methods;
@@ -778,10 +780,10 @@ public final class ReflectionHelper {
 	 * @param clazz The class for which to find the interfaces
 	 *
 	 * @return Set of all interfaces {@code clazz} implements. The empty list is returned if {@code clazz} does not
-	 *         implement any interfaces or {@code clazz} is {@code null}
+	 *         implement any interfaces or {@code clazz} is {@code null}.
 	 */
 	public static Set<Class<?>> computeAllImplementedInterfaces(Class<?> clazz) {
-		Set<Class<?>> classes = new HashSet<Class<?>>();
+		Set<Class<?>> classes = newHashSet();
 		computeAllImplementedInterfaces( clazz, classes );
 		return classes;
 	}

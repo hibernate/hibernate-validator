@@ -22,6 +22,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Default;
@@ -55,6 +58,8 @@ import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotat
 import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -65,8 +70,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  */
 public class ValidationExtension implements Extension {
+	private static final Log log = LoggerFactory.make();
 	private static final EnumSet<ExecutableType> ALL_EXECUTABLE_TYPES =
 			EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS, ExecutableType.GETTER_METHODS );
+	private static final EnumSet<ExecutableType> DEFAULT_EXECUTABLE_TYPES =
+			EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS );
 
 	private final Validator validator;
 	private final Set<ExecutableType> globalExecutableTypes;
@@ -166,9 +174,7 @@ public class ValidationExtension implements Extension {
 		AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
 		Class<?> clazz = type.getJavaClass();
 
-		EnumSet<ExecutableType> classLevelExecutableTypes = executableTypes(
-				clazz.getAnnotation( ValidateOnExecution.class )
-		);
+		EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( clazz );
 
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( clazz );
 		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables(
@@ -199,20 +205,17 @@ public class ValidationExtension implements Extension {
 	private <T> void determineConstrainedMethod(AnnotatedType<T> type,
 												BeanDescriptor beanDescriptor,
 												Set<AnnotatedCallable<? super T>> callables) {
-		Set<Method> interfaceMethods = ReflectionHelper.computeAllImplementedMethods( type.getJavaClass() );
+		List<Method> overriddenAndImplementedMethods = ReflectionHelper.computeAllMethods( type.getJavaClass() );
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
 
 			// if the method implements an interface we need to use the configuration of the interface
-			method = replaceWithInterfaceMethod( method, interfaceMethods );
-
-			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypes(
-					method.getDeclaringClass().getAnnotation( ValidateOnExecution.class )
-			);
-			EnumSet<ExecutableType> memberLevelExecutableType = executableTypes(
-					method.getAnnotation( ValidateOnExecution.class )
-			);
+			method = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );
 			boolean isGetter = ReflectionHelper.isGetterMethod( method );
+
+			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( method.getDeclaringClass() );
+			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnMethod( method, isGetter );
+
 			ExecutableType currentExecutableType = isGetter ? ExecutableType.GETTER_METHODS : ExecutableType.NON_GETTER_METHODS;
 
 			// validation is enabled per default, so explicit configuration can just veto whether
@@ -224,7 +227,6 @@ public class ValidationExtension implements Extension {
 			boolean needsValidation;
 			if ( isGetter ) {
 				needsValidation = isGetterConstrained( method, beanDescriptor );
-
 			}
 			else {
 				needsValidation = isNonGetterConstrained( method, beanDescriptor );
@@ -240,9 +242,7 @@ public class ValidationExtension implements Extension {
 		// no special inheritance rules to consider for constructors
 		for ( AnnotatedConstructor<T> annotatedConstructor : type.getConstructors() ) {
 			Constructor constructor = annotatedConstructor.getJavaMember();
-			EnumSet<ExecutableType> memberLevelExecutableType = executableTypes(
-					annotatedConstructor.getAnnotation( ValidateOnExecution.class )
-			);
+			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnConstructor( constructor );
 
 			if ( veto( classLevelExecutableTypes, memberLevelExecutableType, ExecutableType.CONSTRUCTORS ) ) {
 				continue;
@@ -308,7 +308,47 @@ public class ValidationExtension implements Extension {
 		return annotations;
 	}
 
-	private EnumSet<ExecutableType> executableTypes(ValidateOnExecution validateOnExecutionAnnotation) {
+	private EnumSet<ExecutableType> executableTypesDefinedOnType(Class<?> clazz) {
+		ValidateOnExecution validateOnExecutionAnnotation = clazz.getAnnotation( ValidateOnExecution.class );
+		EnumSet<ExecutableType> executableTypes = commonExecutableTypeChecks( validateOnExecutionAnnotation );
+
+		if ( executableTypes.contains( ExecutableType.IMPLICIT ) ) {
+			return DEFAULT_EXECUTABLE_TYPES;
+		}
+
+		return executableTypes;
+	}
+
+	private EnumSet<ExecutableType> executableTypesDefinedOnMethod(Method method, boolean isGetter) {
+		ValidateOnExecution validateOnExecutionAnnotation = method.getAnnotation( ValidateOnExecution.class );
+		EnumSet<ExecutableType> executableTypes = commonExecutableTypeChecks( validateOnExecutionAnnotation );
+
+		if ( executableTypes.contains( ExecutableType.IMPLICIT ) ) {
+			if ( isGetter ) {
+				executableTypes.add( ExecutableType.GETTER_METHODS );
+			}
+			else {
+				executableTypes.add( ExecutableType.NON_GETTER_METHODS );
+			}
+		}
+
+		return executableTypes;
+	}
+
+	private EnumSet<ExecutableType> executableTypesDefinedOnConstructor(Constructor constructor) {
+		ValidateOnExecution validateOnExecutionAnnotation = (ValidateOnExecution) constructor.getAnnotation(
+				ValidateOnExecution.class
+		);
+		EnumSet<ExecutableType> executableTypes = commonExecutableTypeChecks( validateOnExecutionAnnotation );
+
+		if ( executableTypes.contains( ExecutableType.IMPLICIT ) ) {
+			executableTypes.add( ExecutableType.CONSTRUCTORS );
+		}
+
+		return executableTypes;
+	}
+
+	private EnumSet<ExecutableType> commonExecutableTypeChecks(ValidateOnExecution validateOnExecutionAnnotation) {
 		if ( validateOnExecutionAnnotation == null ) {
 			return EnumSet.noneOf( ExecutableType.class );
 		}
@@ -321,23 +361,35 @@ public class ValidationExtension implements Extension {
 			Collections.addAll( executableTypes, validateOnExecutionAnnotation.type() );
 		}
 
-		if ( executableTypes.contains( ExecutableType.ALL ) ) {
-			return ALL_EXECUTABLE_TYPES;
+		// IMPLICIT cannot be mixed 10.1.2 of spec - Mixing IMPLICIT and other executable types is illegal
+		if ( executableTypes.contains( ExecutableType.IMPLICIT ) && executableTypes.size() > 1 ) {
+			throw log.getMixingImplicitWithOtherExecutableTypesException();
 		}
 
+		// NONE can be removed 10.1.2 of spec - A list containing NONE and other types of executables is equivalent to a
+		// list containing the types of executables without NONE.
 		if ( executableTypes.contains( ExecutableType.NONE ) && executableTypes.size() > 1 ) {
 			executableTypes.remove( ExecutableType.NONE );
+		}
+
+		// 10.1.2 od spec - A list containing ALL and other types of executables is equivalent to a list containing only ALL
+		if ( executableTypes.contains( ExecutableType.ALL ) ) {
+			executableTypes = ALL_EXECUTABLE_TYPES;
 		}
 
 		return executableTypes;
 	}
 
-	public Method replaceWithInterfaceMethod(Method method, Set<Method> interfaceMethods) {
-		for ( Method interfaceMethod : interfaceMethods ) {
+	public Method replaceWithOverriddenOrInterfaceMethod(Method method, List<Method> interfaceMethods) {
+		LinkedList<Method> list = new LinkedList<Method>( interfaceMethods );
+		Iterator<Method> iterator = list.descendingIterator();
+		while ( iterator.hasNext() ) {
+			Method interfaceMethod = iterator.next();
 			if ( ReflectionHelper.overrides( method, interfaceMethod ) ) {
 				return interfaceMethod;
 			}
 		}
+
 		return method;
 	}
 }
