@@ -34,7 +34,6 @@
         </module>
 
         <!-- Miscellaneous other checks.  -->
-        <module name="BooleanExpressionComplexity"/>
         <module name="UpperEll"/>
         <module name="PackageAnnotation"/>
         <module name="CovariantEquals"/>

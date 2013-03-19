@@ -29,6 +29,7 @@ import java.util.regex.PatternSyntaxException;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintTarget;
+import javax.validation.ElementKind;
 import javax.validation.GroupDefinitionException;
 import javax.validation.Path;
 import javax.validation.UnexpectedTypeException;
@@ -429,8 +430,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 117, value = "Invalid value for property %s: %s")
 	ValidationException getInvalidPropertyValueException(String propertyName, String propertyValue, @Cause Exception e);
 
-	@Message(id = 118, value = "Unable to cast %s to %s")
-	ClassCastException getUnableToNarrowNodeTypeException(String actualDescriptorType, String expectedDescriptorType);
+	@Message(id = 118, value = "Unable to cast %s (with element kind %s) to %s")
+	ClassCastException getUnableToNarrowNodeTypeException(String actualDescriptorType, ElementKind kind, String expectedDescriptorType);
 
 	@LogMessage(level = INFO)
 	@Message(id = 119, value = "Using %s as parameter name provider.")

@@ -46,6 +46,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.classfilter.ClassFilters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
@@ -169,7 +170,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.cascadedProperties = Collections.unmodifiableSet( cascadedProperties );
 		this.allMetaConstraints = Collections.unmodifiableSet( allMetaConstraints );
 
-		this.classHierarchyWithoutInterfaces = ReflectionHelper.computeClassHierarchy( beanClass, false );
+		this.classHierarchyWithoutInterfaces = ReflectionHelper.computeClassHierarchy(
+				beanClass,
+				ClassFilters.excludingInterfaces()
+		);
 
 		setDefaultGroupSequenceOrProvider( defaultGroupSequence, defaultGroupSequenceProvider );
 

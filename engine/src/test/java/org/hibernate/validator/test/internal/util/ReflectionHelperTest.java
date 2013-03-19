@@ -35,8 +35,10 @@ import javax.validation.groups.Default;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.classfilter.ClassFilters;
 import org.hibernate.validator.testutil.TestForIssue;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
@@ -194,6 +196,18 @@ public class ReflectionHelperTest {
 
 		method = Bar.class.getMethod( "getBar", String.class );
 		assertFalse( ReflectionHelper.isGetterMethod( method ) );
+	}
+
+	@Test
+	public void testComputeClassHierarchy() {
+		List<Class<? super Fubar>> fubarHierarchy = ReflectionHelper.computeClassHierarchy( Fubar.class );
+		assertThat( fubarHierarchy ).containsOnly( Fubar.class, Snafu.class, Susfu.class, Object.class );
+
+		List<Class<? super Fubar>> fubarHierarchyWithoutInterfaces = ReflectionHelper.computeClassHierarchy(
+				Fubar.class,
+				ClassFilters.excludingInterfaces()
+		);
+		assertThat( fubarHierarchyWithoutInterfaces ).containsOnly( Fubar.class, Object.class );
 	}
 
 	public class TestTypes {
