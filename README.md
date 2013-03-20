@@ -1,6 +1,6 @@
 # Hibernate Validator
 
-*Version: 5.0.0.CR3, 15.03.2013*
+*Version: 5.0.0.CR4, 20.03.2013*
 
 
 ## What is it?
@@ -35,7 +35,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>5.0.0.CR2</version>
+            <version>5.0.0.CR4</version>
         </dependency>
 
       You also need an API and implementation of the Unified Expression Language. This dependencies must be explicitly added in an SE environment.

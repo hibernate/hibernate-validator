@@ -1,6 +1,27 @@
 Hibernate Validator Changelog
 =============================
 
+5.0.0.CR4 (20.03.2013)
+----------------------
+
+** Bug
+    * [HV-678] - Constraint is validated several times if part of several groups
+    * [HV-766] - Method return values are allowed to be marked with @Valid in parallel methods
+    * [HV-767] - Group conversions not correctly applied for inherited group
+    * [HV-771] - @ValidateOnExecution not retrieved from overridden methods for sub-classes
+    * [HV-772] - @ValidateOnExecution not always retrieved from highest method in inheritance hierarchy
+    * [HV-773] - @ValidateOnExecution(type=IMPLICIT) on type-level causes getters to be validated
+    * [HV-774] - Consider return type when detecting getter methods
+    * [HV-775] - Node#as() doesn't throw ClassCastException if wrong type is passed
+    * [HV-776] - ValidationExtension should throw an exception in case of invalid @ValidateOnExecution configuration
+
+** Improvement
+    * [HV-672] - Throw meaningful exception in case object and method passed to validateParameters() don't match
+    * [HV-768] - Eagerly throw exceptions in case of illegal method constraints
+    * [HV-770] - Cascaded return value validation causes exception when used with Weld
+    * [HV-777] - Adapt to changed option name for excluding integration tests from TCK run
+
+
 5.0.0.CR3 (15.03.2013)
 ----------------------
 
