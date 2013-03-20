@@ -9,12 +9,6 @@
             </method-selector>
         </method-selectors>
 
-        <groups>
-            <run>
-                <exclude name="FAILING_IN_RI"/>
-            </run>
-        </groups>
-
         <packages>
             <package name="org.hibernate.beanvalidation.tck.tests.*"/>
         </packages>
