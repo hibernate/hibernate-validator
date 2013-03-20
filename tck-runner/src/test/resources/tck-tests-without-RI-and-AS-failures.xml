@@ -35,6 +35,7 @@
                     <exclude name="testExecutableValidationUsesSettingFromHighestMethodInHierarchyIfValidatedMethodImplementsAnInterfaceMethod"/>
                     <exclude name="testExecutableValidationUsesSettingFromSuperTypeIfValidatedMethodOverridesASuperTypeMethod"/>
                     <exclude name="testExecutableValidationUsesSettingFromSuperTypeMethodIfValidatedMethodOverridesASuperTypeMethod"/>
+                    <exclude name="testExecutableValidationUsesSettingFromSuperTypeForOverriddenMethodsAndLocalSettingForNonOverriddenMethod"/>
                 </methods>
             </class>
             <class name="org.hibernate.beanvalidation.tck.tests.integration.cdi.factory.ConstraintValidatorInjectionTest">
