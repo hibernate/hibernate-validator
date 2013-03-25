@@ -18,7 +18,7 @@ package org.hibernate.validator.internal.metadata.aggregated.rule;
 
 import javax.validation.ConstraintDeclarationException;
 
-import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData.Builder;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -34,7 +34,7 @@ public abstract class MethodConfigurationRule {
 
 	/**
 	 * Applies this rule. Invoked for each pair of methods collected by a given
-	 * {@link ExecutableMetaData.Builder}.
+	 * executable meta data {@link Builder}.
 	 *
 	 * @param method The first method to check.
 	 * @param otherMethod The other method to check.
