@@ -65,7 +65,7 @@ public class BeanConstraintLocation implements ConstraintLocation {
 	 * @param beanClass The class in which the constraint is defined on
 	 * @param member The member on which the constraint is defined on, {@code null} if it is a class constraint}
 	 */
-	public BeanConstraintLocation(Class<?> beanClass, Member member) {
+	private BeanConstraintLocation(Class<?> beanClass, Member member) {
 		this.member = member;
 
 		if ( this.member != null ) {

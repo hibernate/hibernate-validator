@@ -46,8 +46,8 @@ public class NodeImpl
 
 	private static final Log log = LoggerFactory.make();
 
-	public static final String INDEX_OPEN = "[";
-	public static final String INDEX_CLOSE = "]";
+	private static final String INDEX_OPEN = "[";
+	private static final String INDEX_CLOSE = "]";
 	private static final String RETURN_VALUE_NODE_NAME = "<return value>";
 	private static final String CROSS_PARAMETER_NODE_NAME = "<cross-parameter>";
 

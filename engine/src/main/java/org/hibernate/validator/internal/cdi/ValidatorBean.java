@@ -116,7 +116,7 @@ public class ValidatorBean implements Bean<Validator> {
 
 	@SuppressWarnings("unchecked")
 	private <T> T getReference(BeanManager beanManager, Class<T> clazz) {
-		Set<Bean<?>> beans = beanManager.getBeans( clazz, qualifiers.toArray( new Annotation[] { } ) );
+		Set<Bean<?>> beans = beanManager.getBeans( clazz, qualifiers.toArray( new Annotation[qualifiers.size()] ) );
 		for ( Bean<?> bean : beans ) {
 			for ( Annotation annotation : bean.getQualifiers() ) {
 				if ( annotation.annotationType().getName().equals( HibernateValidator.class.getName() ) ) {

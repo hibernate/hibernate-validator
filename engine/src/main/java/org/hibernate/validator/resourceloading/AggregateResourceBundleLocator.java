@@ -49,7 +49,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * first bundle containing the key.
 	 */
 	public AggregateResourceBundleLocator(List<String> bundleNames) {
-		this( bundleNames, (ResourceBundleLocator) null );
+		this( bundleNames, null );
 	}
 
 	/**

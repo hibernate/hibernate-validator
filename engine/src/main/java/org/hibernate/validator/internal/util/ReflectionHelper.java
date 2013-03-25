@@ -191,7 +191,7 @@ public final class ReflectionHelper {
 		return className.substring( 2, className.length() - 1 );
 	}
 
-	public static boolean isQualifiedClass(String clazz) {
+	private static boolean isQualifiedClass(String clazz) {
 		return clazz.contains( PACKAGE_SEPARATOR );
 	}
 
@@ -324,25 +324,6 @@ public final class ReflectionHelper {
 			}
 		}
 		return member;
-	}
-
-	/**
-	 * Returns the type of the field of return type of a method.
-	 *
-	 * @param member the member for which to get the type.
-	 *
-	 * @return Returns the type of the field of return type of a method.
-	 */
-	public static Class<?> getType(Member member) {
-		Class<?> type = null;
-		if ( member instanceof Field ) {
-			type = ( (Field) member ).getType();
-		}
-
-		if ( member instanceof Method ) {
-			type = ( (Method) member ).getReturnType();
-		}
-		return type;
 	}
 
 	/**
@@ -822,7 +803,7 @@ public final class ReflectionHelper {
 		Contracts.assertValueNotNull( subTypeMethod, "subTypeMethod" );
 		Contracts.assertValueNotNull( superTypeMethod, "superTypeMethod" );
 
-		if ( subTypeMethod.equals( superTypeMethod) ) {
+		if ( subTypeMethod.equals( superTypeMethod ) ) {
 			return false;
 		}
 

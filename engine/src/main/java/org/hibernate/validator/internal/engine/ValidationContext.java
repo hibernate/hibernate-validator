@@ -45,7 +45,6 @@ import org.hibernate.validator.internal.util.IdentitySet;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -240,9 +239,9 @@ public class ValidationContext<T> {
 		}
 	}
 
-	public List<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
-																   ConstraintValidatorContextImpl constraintValidatorContext) {
-		List<ConstraintViolation<T>> constraintViolations = newArrayList();
+	public Set<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
+																  ConstraintValidatorContextImpl constraintValidatorContext) {
+		Set<ConstraintViolation<T>> constraintViolations = newHashSet();
 		for ( MessageAndPath messageAndPath : constraintValidatorContext.getMessageAndPathList() ) {
 			ConstraintViolation<T> violation = createConstraintViolation(
 					localContext, messageAndPath, constraintValidatorContext.getConstraintDescriptor()

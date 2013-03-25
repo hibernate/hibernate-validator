@@ -102,10 +102,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		return elementType;
 	}
 
-	public Class<?> getRawType() {
-		return ReflectionHelper.getType( cascadingMember );
-	}
-
 	@Override
 	public Class<?> convertGroup(Class<?> from) {
 		return groupConversionHelper.convertGroup( from );

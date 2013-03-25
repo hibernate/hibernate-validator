@@ -144,10 +144,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		return identifier;
 	}
 
-	public boolean isGetter() {
-		return isGetter;
-	}
-
 	/**
 	 * Returns the cross-parameter constraints declared for the represented
 	 * method or constructor.
@@ -436,7 +432,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * @throws ConstraintDeclarationException In case any of the rules mandated by the specification is
 		 * violated.
 		 */
-		private ConstraintDeclarationException assertCorrectnessOfConfiguration() {
+		private void assertCorrectnessOfConfiguration() {
 			for ( Entry<Class<?>, ConstrainedExecutable> entry : executablesByDeclaringType.entrySet() ) {
 				for ( Entry<Class<?>, ConstrainedExecutable> otherEntry : executablesByDeclaringType.entrySet() ) {
 					for ( MethodConfigurationRule rule : rules ) {
@@ -444,8 +440,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					}
 				}
 			}
-
-			return null;
 		}
 	}
 }

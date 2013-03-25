@@ -81,7 +81,7 @@ public class ValueContext<T, V> {
 		return new ValueContext<T, V>( null, type, validatable, propertyPath );
 	}
 
-	protected ValueContext(T currentBean, Class<T> currentBeanType, Validatable validatable, PathImpl propertyPath) {
+	private ValueContext(T currentBean, Class<T> currentBeanType, Validatable validatable, PathImpl propertyPath) {
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
 		this.currentValidatable = validatable;

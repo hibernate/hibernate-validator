@@ -41,7 +41,7 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
 public class ReturnValueMetaData extends AbstractConstraintMetaData
 		implements Validatable, Cascadable {
 
-	public static final String RETURN_VALUE_NODE_NAME = null;
+	private static final String RETURN_VALUE_NODE_NAME = null;
 
 	private final List<Cascadable> cascadables;
 	private final GroupConversionHelper groupConversionHelper;

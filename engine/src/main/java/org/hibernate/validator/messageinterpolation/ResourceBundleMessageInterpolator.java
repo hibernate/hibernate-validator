@@ -44,7 +44,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	/**
 	 * The name of the default message bundle.
 	 */
-	public static final String DEFAULT_VALIDATION_MESSAGES = "org.hibernate.validator.ValidationMessages";
+	private static final String DEFAULT_VALIDATION_MESSAGES = "org.hibernate.validator.ValidationMessages";
 
 	/**
 	 * The name of the user-provided message bundle as defined in the specification.

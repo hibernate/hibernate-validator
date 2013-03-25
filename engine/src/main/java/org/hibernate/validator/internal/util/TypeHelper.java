@@ -200,7 +200,7 @@ public final class TypeHelper {
 		return null;
 	}
 
-	public static Type getArrayType(Type componentType) {
+	private static Type getArrayType(Type componentType) {
 		Contracts.assertNotNull( componentType, "componentType" );
 
 		if ( componentType instanceof Class<?> ) {
@@ -273,7 +273,7 @@ public final class TypeHelper {
 		return resolveTypeVariables( supertype, type );
 	}
 
-	public static Type[] getResolvedInterfaces(Type type) {
+	private static Type[] getResolvedInterfaces(Type type) {
 		Contracts.assertNotNull( type, "type" );
 
 		Class<?> rawType = getErasedReferenceType( type );

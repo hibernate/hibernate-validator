@@ -45,8 +45,7 @@ public final class PathImpl implements Path, Serializable {
 	private static final long serialVersionUID = 7564511574909882392L;
 	private static final Log log = LoggerFactory.make();
 
-	public static final String PROPERTY_PATH_SEPARATOR = ".";
-	public static final String RETURN_VALUE_NODE_NAME = null;
+	private static final String PROPERTY_PATH_SEPARATOR = ".";
 
 	/**
 	 * Regular expression used to split a string path into its elements.

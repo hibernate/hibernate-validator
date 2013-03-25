@@ -60,17 +60,17 @@ public class BeanMetaDataManager {
 	/**
 	 * The default initial capacity for this cache.
 	 */
-	static final int DEFAULT_INITIAL_CAPACITY = 16;
+	private static final int DEFAULT_INITIAL_CAPACITY = 16;
 
 	/**
 	 * The default load factor for this cache.
 	 */
-	static final float DEFAULT_LOAD_FACTOR = 0.75f;
+	private static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
 	/**
 	 * The default concurrency level for this cache.
 	 */
-	static final int DEFAULT_CONCURRENCY_LEVEL = 16;
+	private static final int DEFAULT_CONCURRENCY_LEVEL = 16;
 
 	/**
 	 * Additional metadata providers used for meta data retrieval if
