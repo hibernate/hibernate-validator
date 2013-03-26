@@ -35,7 +35,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.fasterxml.classmate.Filter;
 import com.fasterxml.classmate.MemberResolver;
@@ -46,8 +45,6 @@ import com.fasterxml.classmate.members.RawMethod;
 import com.fasterxml.classmate.members.ResolvedMethod;
 
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-import org.hibernate.validator.internal.util.classfilter.ClassFilter;
-import org.hibernate.validator.internal.util.classfilter.ClassFilters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.ConstructorInstance;
@@ -66,9 +63,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
@@ -700,97 +695,6 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Get all superclasses and optionally interfaces recursively. Classed are added by starting with the specified
-	 * class and its implemented interfaces. Then the super class of {@code clazz} is added and its interfaces and so on.
-	 *
-	 * @param clazz the class to start the search with
-	 * @param filters filters applying for the search
-	 *
-	 * @return List of super types of {@code clazz}. Will only contain those
-	 *         super types matching the given filters. The list contains the
-	 *         given class itself, if it is no proxy class. An empty list is
-	 *         returned if {@code clazz} is {@code null}.
-	 */
-	public static <T> List<Class<? super T>> computeClassHierarchy(Class<T> clazz, ClassFilter... filters) {
-		List<Class<? super T>> classes = newArrayList();
-
-		List<ClassFilter> allFilters = newArrayList();
-		allFilters.addAll( Arrays.asList( filters ) );
-		allFilters.add( ClassFilters.excludingProxies() );
-
-		computeClassHierarchy( clazz, classes, allFilters );
-		return classes;
-	}
-
-	/**
-	 * Get all superclasses and interfaces recursively.
-	 *
-	 * @param clazz the class to start the search with
-	 * @param classes list of classes to which to add all found super types matching the given filters
-	 * @param filters filters applying for the search
-	 */
-	private static <T> void computeClassHierarchy(Class<? super T> clazz, List<Class<? super T>> classes, Iterable<ClassFilter> filters) {
-		for ( Class<? super T> current = clazz; current != null; current = current.getSuperclass() ) {
-			if ( classes.contains( current ) ) {
-				return;
-			}
-
-			if ( acceptedByAllFilters( current, filters ) ) {
-				classes.add( current );
-			}
-
-			for ( Class<?> currentInterface : current.getInterfaces() ) {
-				@SuppressWarnings("unchecked") //safe since interfaces are super-types
-						Class<? super T> currentInterfaceCasted = (Class<? super T>) currentInterface;
-				computeClassHierarchy( currentInterfaceCasted, classes, filters );
-			}
-		}
-	}
-
-	private static boolean acceptedByAllFilters(Class<?> clazz, Iterable<ClassFilter> filters) {
-		for ( ClassFilter classFilter : filters ) {
-			if ( !classFilter.accepts( clazz ) ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Get a list of all methods a class declares, implements, overrides or inherits. Methods are added by adding
-	 * first all methods of the class itself and its implementing interfaces , then the super class and its interfaces, etc.
-	 *
-	 * @param clazz The class for which to find all methods.
-	 *
-	 * @return returns set of all methods of {@code clazz}. The empty list is returned if {@code clazz} is {@code null}
-	 */
-	public static <T> List<Method> computeAllMethods(Class<T> clazz) {
-		List<Method> methods = newArrayList();
-
-		List<Class<? super T>> hierarchyClasses = computeClassHierarchy( clazz );
-		for ( Class<?> hierarchyClass : hierarchyClasses ) {
-			Collections.addAll( methods, getMethods( hierarchyClass ) );
-		}
-
-		return methods;
-	}
-
-	/**
-	 * Get all interfaces a class directly implements.
-	 *
-	 * @param clazz The class for which to find the interfaces
-	 *
-	 * @return Set of all interfaces {@code clazz} implements. The empty list is returned if {@code clazz} does not
-	 *         implement any interfaces or {@code clazz} is {@code null}.
-	 */
-	public static Set<Class<?>> computeAllImplementedInterfaces(Class<?> clazz) {
-		Set<Class<?>> classes = newHashSet();
-		computeAllImplementedInterfaces( clazz, classes );
-		return classes;
-	}
-
-	/**
 	 * Checks, whether {@code subTypeMethod} overrides {@code superTypeMethod}.
 	 *
 	 * @param subTypeMethod The sub type method (cannot be {@code null}).
@@ -857,16 +761,6 @@ public final class ReflectionHelper {
 		}
 
 		return true;
-	}
-
-	private static void computeAllImplementedInterfaces(Class<?> clazz, Set<Class<?>> classes) {
-		if ( clazz == null ) {
-			return;
-		}
-		for ( Class<?> currentInterface : clazz.getInterfaces() ) {
-			classes.add( currentInterface );
-			computeAllImplementedInterfaces( currentInterface, classes );
-		}
 	}
 
 	/**

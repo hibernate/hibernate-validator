@@ -14,27 +14,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.util.classfilter;
-
-import org.hibernate.validator.internal.util.ReflectionHelper;
+package org.hibernate.validator.internal.util.classhierarchy;
 
 /**
  * Provides filters to be used when invoking
- * {@link ReflectionHelper#computeClassHierarchy(Class, ClassFilter...)}.
+ * {@link ClassHierarchy#filter(Filter...)}.
  *
  * @author Gunnar Morling
  */
-public class ClassFilters {
+public class Filters {
 
-	private static final ClassFilter PROXY_FILTER = new WeldProxyFilter();
-	private static final ClassFilter INTERFACES_FILTER = new InterfacesFilter();
+	private static final Filter PROXY_FILTER = new WeldProxyFilter();
+	private static final Filter INTERFACES_FILTER = new InterfacesFilter();
 
 	/**
 	 * Returns a filter which exclude interfaces.
 	 *
 	 * @return a filter which exclude interfaces
 	 */
-	public static ClassFilter excludingInterfaces() {
+	public static Filter excludingInterfaces() {
 		return INTERFACES_FILTER;
 	}
 
@@ -43,11 +41,11 @@ public class ClassFilters {
 	 *
 	 * @return a filter which exclude proxy objects
 	 */
-	public static ClassFilter excludingProxies() {
+	public static Filter excludingProxies() {
 		return PROXY_FILTER;
 	}
 
-	private static class InterfacesFilter implements ClassFilter {
+	private static class InterfacesFilter implements Filter {
 
 		@Override
 		public boolean accepts(Class<?> clazz) {
@@ -55,7 +53,7 @@ public class ClassFilters {
 		}
 	}
 
-	private static class WeldProxyFilter implements ClassFilter {
+	private static class WeldProxyFilter implements Filter {
 
 		private static final String WELD_PROXY_INTERFACE_NAME = "org.jboss.weld.bean.proxy.ProxyObject";
 
