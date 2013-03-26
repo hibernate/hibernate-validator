@@ -99,6 +99,7 @@ public class XmlMappingParser {
 		try {
 			JAXBContext jc = JAXBContext.newInstance( ConstraintMappingsType.class );
 
+			Set<String> alreadyProcessedConstraintDefinitions = newHashSet();
 			for ( InputStream in : mappingStreams ) {
 				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", in );
 				String schemaResourceName = getSchemaResourceName( schemaVersion );
@@ -110,7 +111,11 @@ public class XmlMappingParser {
 				ConstraintMappingsType mapping = getValidationConfig( in, unmarshaller );
 				String defaultPackage = mapping.getDefaultPackage();
 
-				parseConstraintDefinitions( mapping.getConstraintDefinition(), defaultPackage );
+				parseConstraintDefinitions(
+						mapping.getConstraintDefinition(),
+						defaultPackage,
+						alreadyProcessedConstraintDefinitions
+				);
 
 				for ( BeanType bean : mapping.getBean() ) {
 					Class<?> beanClass = ReflectionHelper.loadClass( bean.getClazz(), defaultPackage );
@@ -203,9 +208,17 @@ public class XmlMappingParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void parseConstraintDefinitions(List<ConstraintDefinitionType> constraintDefinitionList, String defaultPackage) {
+	private void parseConstraintDefinitions(List<ConstraintDefinitionType> constraintDefinitionList,
+											String defaultPackage,
+											Set<String> alreadyProcessedConstraintDefinitions) {
 		for ( ConstraintDefinitionType constraintDefinition : constraintDefinitionList ) {
 			String annotationClassName = constraintDefinition.getAnnotation();
+			if ( alreadyProcessedConstraintDefinitions.contains( annotationClassName ) ) {
+				throw log.getOverridingConstraintDefinitionsInMultipleMappingFilesException( annotationClassName );
+			}
+			else {
+				alreadyProcessedConstraintDefinitions.add( annotationClassName );
+			}
 
 			Class<?> clazz = ReflectionHelper.loadClass( annotationClassName, defaultPackage );
 			if ( !clazz.isAnnotation() ) {
@@ -265,7 +278,7 @@ public class XmlMappingParser {
 			for ( ConstrainedElement constrainedElement : newConstrainedElements ) {
 				if ( existingConstrainedElements.contains( constrainedElement ) ) {
 					ConstraintLocation location = constrainedElement.getLocation();
-					throw log.getConstrainedElementConfiguredMultipleTimesException(location.getMember().toString() );
+					throw log.getConstrainedElementConfiguredMultipleTimesException( location.getMember().toString() );
 				}
 				else {
 					existingConstrainedElements.add( constrainedElement );

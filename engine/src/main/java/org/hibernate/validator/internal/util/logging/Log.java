@@ -600,4 +600,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 166,
 			value = "@ValidateOnExecution is not allowed on methods overriding a superclass method or implementing an interface. Check configuration for %1$s")
 	ValidationException getValidateOnExecutionOnOverriddenOrInterfaceMethodException(Method m);
+
+	@Message(id = 167,
+			value = "A given constraint definition can only be overridden in one mapping files. %1$s is overridden in multiple files")
+	ValidationException getOverridingConstraintDefinitionsInMultipleMappingFilesException(String constraintClass);
 }
