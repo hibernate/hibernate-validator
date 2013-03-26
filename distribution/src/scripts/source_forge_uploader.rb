@@ -4,7 +4,7 @@ class SourceForgeUploader
     @artifacts = upload_artifacts
     @user = sourceforge_user
     @version = release_version
-    @base_dir = "/home/frs/project/hibernate/OldFiles/test"
+    @base_dir = "/home/frs/project/hibernate/hibernate-validator"
     @release_dir = @base_dir + "/" + @version
 
     puts " SourceFroge upload to " + @release_dir
