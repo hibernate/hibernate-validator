@@ -602,6 +602,6 @@ public interface Log extends BasicLogger {
 	ValidationException getValidateOnExecutionOnOverriddenOrInterfaceMethodException(Method m);
 
 	@Message(id = 167,
-			value = "A given constraint definition can only be overridden in one mapping files. %1$s is overridden in multiple files")
+			value = "A given constraint definition can only be overridden in one mapping file. %1$s is overridden in multiple files")
 	ValidationException getOverridingConstraintDefinitionsInMultipleMappingFilesException(String constraintClass);
 }
