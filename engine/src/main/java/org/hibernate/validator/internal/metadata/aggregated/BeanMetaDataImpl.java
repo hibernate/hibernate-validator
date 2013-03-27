@@ -45,8 +45,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
-import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.classfilter.ClassFilters;
+import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
@@ -55,7 +55,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.partition;
-import static org.hibernate.validator.internal.util.ReflectionHelper.computeAllImplementedInterfaces;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
@@ -170,14 +169,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		this.cascadedProperties = Collections.unmodifiableSet( cascadedProperties );
 		this.allMetaConstraints = Collections.unmodifiableSet( allMetaConstraints );
 
-		this.classHierarchyWithoutInterfaces = ReflectionHelper.computeClassHierarchy(
+		this.classHierarchyWithoutInterfaces = ClassHierarchyHelper.getHierarchy(
 				beanClass,
-				ClassFilters.excludingInterfaces()
+				Filters.excludeInterfaces()
 		);
 
 		setDefaultGroupSequenceOrProvider( defaultGroupSequence, defaultGroupSequenceProvider );
 
-		this.directMetaConstraints = buildDirectConstraintSets();
+		this.directMetaConstraints = getDirectConstraints();
 
 		this.executableMetaDataMap = Collections.unmodifiableMap( byIdentifier( executableMetaDataSet ) );
 
@@ -339,11 +338,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return classLevelConstraints != null ? classLevelConstraints : Collections.<MetaConstraint<?>>emptySet();
 	}
 
-	private Set<MetaConstraint<?>> buildDirectConstraintSets() {
+	private Set<MetaConstraint<?>> getDirectConstraints() {
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
-		Set<Class<?>> classAndInterfaces = computeAllImplementedInterfaces( beanClass );
+		Set<Class<?>> classAndInterfaces = newHashSet();
 		classAndInterfaces.add( beanClass );
+		classAndInterfaces.addAll( ClassHierarchyHelper.getDirectlyImplementedInterfaces( beanClass ) );
 
 		for ( Class<?> clazz : classAndInterfaces ) {
 			for ( MetaConstraint<?> metaConstraint : allMetaConstraints ) {

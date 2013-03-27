@@ -58,6 +58,7 @@ import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotat
 import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -205,7 +206,7 @@ public class ValidationExtension implements Extension {
 	private <T> void determineConstrainedMethod(AnnotatedType<T> type,
 												BeanDescriptor beanDescriptor,
 												Set<AnnotatedCallable<? super T>> callables) {
-		List<Method> overriddenAndImplementedMethods = ReflectionHelper.computeAllMethods( type.getJavaClass() );
+		List<Method> overriddenAndImplementedMethods = ClassHierarchyHelper.getAllMethods( type.getJavaClass() );
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
 
@@ -241,7 +242,7 @@ public class ValidationExtension implements Extension {
 	private <T> void determineConstrainedConstructors(AnnotatedType<T> type, BeanDescriptor beanDescriptor, EnumSet<ExecutableType> classLevelExecutableTypes, Set<AnnotatedCallable<? super T>> callables) {
 		// no special inheritance rules to consider for constructors
 		for ( AnnotatedConstructor<T> annotatedConstructor : type.getConstructors() ) {
-			Constructor constructor = annotatedConstructor.getJavaMember();
+			Constructor<?> constructor = annotatedConstructor.getJavaMember();
 			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnConstructor( constructor );
 
 			if ( veto( classLevelExecutableTypes, memberLevelExecutableType, ExecutableType.CONSTRUCTORS ) ) {
@@ -335,8 +336,8 @@ public class ValidationExtension implements Extension {
 		return executableTypes;
 	}
 
-	private EnumSet<ExecutableType> executableTypesDefinedOnConstructor(Constructor constructor) {
-		ValidateOnExecution validateOnExecutionAnnotation = (ValidateOnExecution) constructor.getAnnotation(
+	private EnumSet<ExecutableType> executableTypesDefinedOnConstructor(Constructor<?> constructor) {
+		ValidateOnExecution validateOnExecutionAnnotation = constructor.getAnnotation(
 				ValidateOnExecution.class
 		);
 		EnumSet<ExecutableType> executableTypes = commonExecutableTypeChecks( validateOnExecutionAnnotation );

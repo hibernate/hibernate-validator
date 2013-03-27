@@ -35,10 +35,8 @@ import javax.validation.groups.Default;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.classfilter.ClassFilters;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
@@ -180,15 +178,6 @@ public class ReflectionHelperTest {
 	}
 
 	@Test
-	public void testComputeAllImplementedMethods() throws Exception {
-		assertTrue( ReflectionHelper.computeAllMethods( null ).isEmpty() );
-
-		List<Method> methods = ReflectionHelper.computeAllMethods( Fubar.class );
-		assertTrue( methods.contains( Snafu.class.getMethod( "snafu" ) ) );
-		assertTrue( methods.contains( Susfu.class.getMethod( "susfu" ) ) );
-	}
-
-	@Test
 	@TestForIssue(jiraKey = "HV-622")
 	public void testIsGetterMethod() throws Exception {
 		Method method = Bar.class.getMethod( "getBar" );
@@ -198,58 +187,21 @@ public class ReflectionHelperTest {
 		assertFalse( ReflectionHelper.isGetterMethod( method ) );
 	}
 
-	@Test
-	public void testComputeClassHierarchy() {
-		List<Class<? super Fubar>> fubarHierarchy = ReflectionHelper.computeClassHierarchy( Fubar.class );
-		assertThat( fubarHierarchy ).containsOnly( Fubar.class, Snafu.class, Susfu.class, Object.class );
-
-		List<Class<? super Fubar>> fubarHierarchyWithoutInterfaces = ReflectionHelper.computeClassHierarchy(
-				Fubar.class,
-				ClassFilters.excludingInterfaces()
-		);
-		assertThat( fubarHierarchyWithoutInterfaces ).containsOnly( Fubar.class, Object.class );
-	}
-
-	public class TestTypes {
+	@SuppressWarnings("unused")
+	private static class TestTypes {
 		public List<String> stringList;
 		public Map<String, Object> objectMap;
 		public String[] stringArray;
 	}
 
-	public class Foo {
-		String foo;
-
-		public String getBar() {
-			return "bar";
-		}
-	}
-
-	public class Bar {
+	@SuppressWarnings("unused")
+	private static class Bar {
 		public String getBar() {
 			return null;
 		}
 
 		public String getBar(String param) {
 			return null;
-		}
-	}
-
-	public interface Snafu {
-		void snafu();
-	}
-
-	public interface Susfu {
-		void susfu();
-	}
-
-	public class Fubar implements Snafu, Susfu {
-
-		@Override
-		public void snafu() {
-		}
-
-		@Override
-		public void susfu() {
 		}
 	}
 }
