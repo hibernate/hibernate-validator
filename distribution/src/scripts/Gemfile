@@ -1,0 +1,5 @@
+source "http://rubygems.org"
+
+gem "choice"
+gem "net-sftp"
+gem "nokogiri"
