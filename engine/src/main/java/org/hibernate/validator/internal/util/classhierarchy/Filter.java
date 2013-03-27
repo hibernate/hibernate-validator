@@ -14,27 +14,25 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.util.classfilter;
-
-import org.hibernate.validator.internal.util.ReflectionHelper;
+package org.hibernate.validator.internal.util.classhierarchy;
 
 /**
  * A filter to be used when invoking
- * {@link ReflectionHelper#computeClassHierarchy(Class, ClassFilter...)}.
- * 
+ * {@link ClassHierarchyHelper#getHierarchy(Class, Filter...)}.
+ *
  * @author Gunnar Morling
  */
-public interface ClassFilter {
+public interface Filter {
 
 	/**
 	 * Whether the given class is accepted by this filter or not.
-	 * 
-	 * @param clazz
-	 *            the class of interest
+	 *
+	 * @param clazz the class of interest
+	 *
 	 * @return {@code true} if this filter accepts the given class (meaning it
 	 *         will be contained in the result of
-	 *         {@link ReflectionHelper#computeClassHierarchy(Class, ClassFilter...)}
-	 *         , {@code false} otherwise.
+	 *         {@link ClassHierarchyHelper#getHierarchy(Class, Filter...)},
+	 *         {@code false} otherwise.
 	 */
 	boolean accepts(Class<?> clazz);
 }

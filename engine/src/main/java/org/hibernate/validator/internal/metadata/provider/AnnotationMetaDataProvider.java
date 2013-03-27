@@ -56,6 +56,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
@@ -108,7 +109,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
 		List<BeanConfiguration<? super T>> configurations = newArrayList();
 
-		for ( Class<? super T> hierarchyClass : ReflectionHelper.computeClassHierarchy( beanClass ) ) {
+		for ( Class<? super T> hierarchyClass : ClassHierarchyHelper.getHierarchy( beanClass ) ) {
 			BeanConfiguration<? super T> configuration = getBeanConfiguration( hierarchyClass );
 			if ( configuration != null ) {
 				configurations.add( configuration );
