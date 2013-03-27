@@ -324,9 +324,16 @@ public class ConstraintHelper {
 	 * @param definitionClasses The validators to register
 	 * @param keepDefaultClasses Whether any default validators should be kept or not
 	 */
-	public <A extends Annotation> void putValidatorClasses(Class<A> annotationType, List<Class<? extends ConstraintValidator<A, ?>>> definitionClasses, boolean keepDefaultClasses) {
+	public <A extends Annotation> void putValidatorClasses(Class<A> annotationType,
+														   List<Class<? extends ConstraintValidator<A, ?>>> definitionClasses,
+														   boolean keepDefaultClasses) {
 		if ( keepDefaultClasses ) {
-			definitionClasses.addAll( getDefaultValidatorClasses( annotationType ) );
+			List<Class<? extends ConstraintValidator<A, ?>>> defaultValidators = getDefaultValidatorClasses(
+					annotationType
+			);
+			for ( Class<? extends ConstraintValidator<A, ?>> defaultValidator : defaultValidators ) {
+				definitionClasses.add( 0, defaultValidator );
+			}
 		}
 
 		validatorClasses.put( annotationType, definitionClasses );
