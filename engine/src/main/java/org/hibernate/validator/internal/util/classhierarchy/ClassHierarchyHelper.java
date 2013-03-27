@@ -83,8 +83,9 @@ public class ClassHierarchyHelper {
 			}
 
 			for ( Class<?> currentInterface : current.getInterfaces() ) {
-				@SuppressWarnings("unchecked") //safe since interfaces are super-types
-						Class<? super T> currentInterfaceCasted = (Class<? super T>) currentInterface;
+				//safe since interfaces are super-types
+				@SuppressWarnings("unchecked")
+				Class<? super T> currentInterfaceCasted = (Class<? super T>) currentInterface;
 				getHierarchy( currentInterfaceCasted, classes, filters );
 			}
 		}
