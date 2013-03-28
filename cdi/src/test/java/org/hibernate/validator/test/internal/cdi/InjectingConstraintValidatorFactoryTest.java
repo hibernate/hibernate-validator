@@ -24,8 +24,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Min;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.hibernate.validator.internal.cdi.InjectingConstraintValidatorFactory;
 
@@ -33,6 +33,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -44,7 +45,7 @@ public class InjectingConstraintValidatorFactoryTest {
 	private InjectionTarget<MyValidator> injectionTargetMock;
 	private CreationalContext<MyValidator> creationalContextMock;
 
-	@BeforeMethod
+	@Before
 	@SuppressWarnings("unchecked")
 	public void setUp() {
 		beanManagerMock = createMock( BeanManager.class );
@@ -54,9 +55,15 @@ public class InjectingConstraintValidatorFactoryTest {
 		creationalContextMock = createMock( CreationalContext.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullBeanManager() {
-		new InjectingConstraintValidatorFactory( null );
+		try {
+			new InjectingConstraintValidatorFactory( null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			// success
+		}
 	}
 
 	@Test

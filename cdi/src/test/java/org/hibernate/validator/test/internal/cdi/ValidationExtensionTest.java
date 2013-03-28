@@ -29,8 +29,8 @@ import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.cdi.ValidationExtension;
@@ -42,11 +42,11 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
  */
-@Test(singleThreaded = true) // needs to run single threaded, because the mocks are shared across test methods
 public class ValidationExtensionTest {
 	private ValidationExtension extension;
 	private AfterBeanDiscovery afterBeanDiscoveryMock;
@@ -56,7 +56,7 @@ public class ValidationExtensionTest {
 	private BeanManager beanManagerMock;
 
 	@SuppressWarnings("unchecked")
-	@BeforeMethod
+	@Before
 	public void setUp() {
 		extension = new ValidationExtension();
 		afterBeanDiscoveryMock = createMock( AfterBeanDiscovery.class );
@@ -66,19 +66,37 @@ public class ValidationExtensionTest {
 		validatorBeanMock = createMock( Bean.class );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullAfterBeanDiscovery() {
-		extension.afterBeanDiscovery( afterBeanDiscoveryMock, null );
+		try {
+			extension.afterBeanDiscovery( afterBeanDiscoveryMock, null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			// success
+		}
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullBeanManager() {
-		extension.afterBeanDiscovery( null, beanManagerMock );
+		try {
+			extension.afterBeanDiscovery( null, beanManagerMock );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			// success
+		}
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testNullParameters() {
-		extension.afterBeanDiscovery( null, null );
+		try {
+			extension.afterBeanDiscovery( null, null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			// success
+		}
 	}
 
 	@Test
@@ -163,8 +181,15 @@ public class ValidationExtensionTest {
 		verify( processBeanMock, validatorFactoryBeanMock, validatorBeanMock, afterBeanDiscoveryMock, beanManagerMock );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
+	@Test
 	public void testProcessAnnotatedTypeNullParameter() {
-		extension.processAnnotatedType( null );
+		try {
+			extension.processAnnotatedType( null );
+			fail();
+		}
+		catch ( IllegalArgumentException e ) {
+			// success
+		}
 	}
 }
+
