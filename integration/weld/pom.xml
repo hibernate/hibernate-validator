@@ -44,7 +44,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
+            <artifactId>hibernate-validator-cdi</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
