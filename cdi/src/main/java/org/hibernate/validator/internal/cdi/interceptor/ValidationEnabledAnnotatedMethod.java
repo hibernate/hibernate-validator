@@ -16,23 +16,21 @@
 */
 package org.hibernate.validator.internal.cdi.interceptor;
 
-import java.lang.reflect.Constructor;
-import javax.enterprise.inject.spi.AnnotatedConstructor;
+import java.lang.reflect.Method;
+import javax.enterprise.inject.spi.AnnotatedMethod;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ValidationEnabledAnnotatedConstructor<T> extends ValidationEnabledAnnotatedCallable<T>
-		implements AnnotatedConstructor<T> {
-	public ValidationEnabledAnnotatedConstructor(AnnotatedConstructor<T> constructor) {
-		super( constructor );
+public class ValidationEnabledAnnotatedMethod<T> extends ValidationEnabledAnnotatedCallable<T>
+		implements AnnotatedMethod<T> {
+
+	public ValidationEnabledAnnotatedMethod(AnnotatedMethod<T> method) {
+		super( method );
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Constructor<T> getJavaMember() {
-		return (Constructor<T>) getWrappedCallable().getJavaMember();
+	public Method getJavaMember() {
+		return (Method) getWrappedCallable().getJavaMember();
 	}
 }
-
-

@@ -168,5 +168,3 @@ public class ValidationExtensionTest {
 		extension.processAnnotatedType( null );
 	}
 }
-
-

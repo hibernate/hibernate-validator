@@ -206,4 +206,3 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 		return destructibleInstance.getInstance();
 	}
 }
-

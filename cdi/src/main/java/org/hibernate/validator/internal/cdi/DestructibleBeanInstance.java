@@ -57,5 +57,3 @@ public class DestructibleBeanInstance<T> {
 		return instance;
 	}
 }
-
-

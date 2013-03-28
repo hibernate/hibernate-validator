@@ -76,6 +76,7 @@
 
     <modules>
         <module>engine</module>
+        <module>cdi</module>
         <module>tck-runner</module>
         <module>integration/as</module>
         <module>integration/weld</module>
@@ -101,6 +102,11 @@
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-validator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator-cdi</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

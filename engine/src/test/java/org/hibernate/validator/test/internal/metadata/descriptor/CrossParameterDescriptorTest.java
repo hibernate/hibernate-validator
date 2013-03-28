@@ -17,7 +17,7 @@
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import java.util.Set;
-import javax.enterprise.inject.Default;
+import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.CrossParameterDescriptor;
 import javax.validation.metadata.Scope;

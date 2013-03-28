@@ -68,6 +68,7 @@ public class IntegrationTestUtil {
 				// from a remote repo
 				.goOffline()
 				.artifact( "org.hibernate:hibernate-validator:" + VALIDATOR_VERSION )
+				.artifact( "org.hibernate:hibernate-validator-cdi:" + VALIDATOR_VERSION )
 				.resolveAs( JavaArchive.class );
 
 		// remove the service file for Hibernate Validator to avoid bootstrapping Hibernate Validator
