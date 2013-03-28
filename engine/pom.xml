@@ -15,7 +15,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -86,21 +88,6 @@
             <artifactId>jsoup</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-	    <groupId>javax.annotation</groupId>
-	    <artifactId>javax.annotation-api</artifactId>
-	    <optional>true</optional>
-	</dependency>
-	<dependency>
-	    <groupId>org.jboss.spec.javax.interceptor</groupId>
-	    <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
-	    <optional>true</optional>
-	</dependency>
-	<dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <optional>true</optional>
-        </dependency>
 
         <!--
         Test dependencies
@@ -153,23 +140,6 @@
                 </includes>
             </testResource>
         </testResources>
-        <pluginManagement>
-            <plugins>
-                <!-- Creates a report by running "mvn clirr:clirr" -->
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>clirr-maven-plugin</artifactId>
-                    <configuration>
-                        <comparisonVersion>4.3.0.Final</comparisonVersion>
-                        <excludes>
-                            <exclude>org/hibernate/validator/internal/**</exclude>
-                        </excludes>
-                        <logResults>true</logResults>
-                        <minSeverity>info</minSeverity>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -222,7 +192,7 @@
                                 <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                                 <manifestEntries>
                                     <Specification-Title>Bean Validation</Specification-Title>
-                                    <Specification-Version>1.0</Specification-Version>
+                                    <Specification-Version>1.1</Specification-Version>
                                 </manifestEntries>
                             </archive>
                         </configuration>
