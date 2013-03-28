@@ -56,8 +56,8 @@
       that a given string shall either be upper case or lower case. We'll
       apply it later on to the <property>licensePlate</property> field of the
       <classname>Car</classname> class from <xref
-      linkend="validator-gettingstarted" /> to ensure, that the field is
-      always an upper-case string.</para>
+      linkend="validator-gettingstarted"/> to ensure, that the field is always
+      an upper-case string.</para>
 
       <para>First we need a way to express the two case modes. We might use
       <classname>String</classname> constants, but a better way to go is to
@@ -126,7 +126,7 @@ public @interface CheckCase {
         <listitem>
           <para>an attribute <property>groups</property> that allows the
           specification of validation groups, to which this constraint belongs
-          (see <xref linkend="validator-usingvalidator-validationgroups" />).
+          (see <xref linkend="validator-usingvalidator-validationgroups"/>).
           This must default to an empty array of type
           <classname>Class&lt;?&gt;</classname>.</para>
         </listitem>
@@ -283,7 +283,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       <section>
         <title>The ConstraintValidatorContext</title>
 
-        <para><xref linkend="example-constraint-validator" /> relies on the
+        <para><xref linkend="example-constraint-validator"/> relies on the
         default error message generation by just returning
         <constant>true</constant> or <constant>false</constant> from the
         <methodname>isValid</methodname> call. Using the passed
@@ -334,7 +334,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
 }</programlisting>
         </example>
 
-        <para><xref linkend="example-constraint-validator-context" os="" />
+        <para><xref linkend="example-constraint-validator-context" os=""/>
         shows how you can disable the default error message generation and add
         a custom error message using a specified message template. In this
         example the use of the
@@ -351,7 +351,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
         constraint violations. This is important for the case where you
         validate multiple properties of the class or even traverse the object
         graph. A custom property path creation could look like <xref
-        linkend="example-custom-error" />.</para>
+        linkend="example-custom-error"/>.</para>
 
         <example id="example-custom-error">
           <title>Adding new <classname>ConstraintViolation</classname> with
@@ -381,7 +381,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       in case a <classname>@CheckCase</classname> constraint is violated. To
       do so, we add the following to our custom
       <filename>ValidationMessages.properties</filename> (see also <xref
-      linkend="section-message-interpolation" />)</para>
+      linkend="section-message-interpolation"/>)</para>
 
       <example>
         <title>Defining a custom error message for the
@@ -401,7 +401,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
 
       <para>Now that our first custom constraint is completed, we can use it
       in the <classname>Car</classname> class from the <xref
-      linkend="validator-gettingstarted" /> chapter to specify that the
+      linkend="validator-gettingstarted"/> chapter to specify that the
       <property>licensePlate</property> field shall only contain upper-case
       strings:</para>
 
@@ -505,7 +505,7 @@ public class CarTest {
 
     <para>Looking at the <property>licensePlate</property> field of the
     <classname>Car</classname> class in <xref
-    linkend="example-car-with-checkcase" />, we see three constraint
+    linkend="example-car-with-checkcase"/>, we see three constraint
     annotations already. In complexer scenarios, where even more constraints
     could be applied to one element, this might become a bit confusing easily.
     Furthermore, if we had a <property>licensePlate</property> field in
