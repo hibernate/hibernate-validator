@@ -513,11 +513,6 @@
                     <version>${org.codehaus.mojo.chronos.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>clirr-maven-plugin</artifactId>
-                    <version>2.4</version>
-                </plugin>
-                <plugin>
                     <groupId>org.codehaus.gmaven</groupId>
                     <artifactId>gmaven-plugin</artifactId>
                     <version>1.4</version>
