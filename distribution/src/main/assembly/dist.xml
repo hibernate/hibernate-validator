@@ -30,13 +30,9 @@
         <dependencySet>
             <outputDirectory>dist</outputDirectory>
             <includes>
-                <include>org.hibernate:hibernate-validator-annotation-processor</include>
-            </includes>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>dist</outputDirectory>
-            <includes>
                 <include>org.hibernate:hibernate-validator</include>
+                <include>org.hibernate:hibernate-validator-cdi</include>
+                <include>org.hibernate:hibernate-validator-annotation-processor</include>
             </includes>
         </dependencySet>
 

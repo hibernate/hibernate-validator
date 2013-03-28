@@ -43,6 +43,10 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator-cdi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator-annotation-processor</artifactId>
         </dependency>
 
@@ -76,14 +80,14 @@
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
         </dependency>
-	<dependency>
-	    <groupId>org.jboss.spec.javax.interceptor</groupId>
-	    <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
-	</dependency>
-	<dependency>
-	    <groupId>javax.annotation</groupId>
-	    <artifactId>javax.annotation-api</artifactId>
-	</dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.interceptor</groupId>
+            <artifactId>jboss-interceptors-api_1.2_spec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
