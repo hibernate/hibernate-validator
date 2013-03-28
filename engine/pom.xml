@@ -207,7 +207,7 @@
                                 <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                                 <manifestEntries>
                                     <Specification-Title>Bean Validation</Specification-Title>
-                                    <Specification-Version>1.0</Specification-Version>
+                                    <Specification-Version>1.1</Specification-Version>
                                 </manifestEntries>
                             </archive>
                         </configuration>
