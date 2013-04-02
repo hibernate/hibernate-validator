@@ -443,7 +443,7 @@
                         <javadocDirectory>${project.basedir}/../src/main/javadoc</javadocDirectory>
                         <stylesheetfile>stylesheet.css</stylesheetfile>
                         <bottom>
-                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat Middleware, LLC.</a>  All Rights Reserved]]></bottom>
+                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="http://redhat.com">Red Hat, Inc.</a> All Rights Reserved]]></bottom>
                     </configuration>
                 </plugin>
                 <plugin>
