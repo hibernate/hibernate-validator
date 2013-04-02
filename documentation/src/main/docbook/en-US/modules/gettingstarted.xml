@@ -73,26 +73,25 @@
       <varname>log4j</varname> and <varname>slf4j</varname>.</para>
     </tip>
 
-    <bridgehead>Unified EL</bridgehead>
+    <section id="validator-gettingstarted-uel">
+      <title>Unified EL</title>
 
-    <para>For the evaluation of dynamic expressions in constraint violation
-    messages, Hibernate Validator requires an implementation of the Unified
-    Expression Language (<ulink url="jcp.org/en/jsr/detail?id=341">JSR
-    341</ulink>). When your application runs on a Java EE container such as
-    JBoss AS, an EL implementation is already provided by the
-    container.</para>
+      <para>Hibernate Validator requires an implementation of the Unified
+      Expression Language (<ulink url="jcp.org/en/jsr/detail?id=341">JSR
+      341</ulink>) for evaluating dynamic expressions in constraint violation
+      messages (see <xref linkend="section-message-interpolation"/>). When
+      your application runs in a Java EE container such as JBoss AS, an EL
+      implementation is already provided by the container. In a Java SE
+      environment, however, you have to add an implementation as dependency to
+      your POM file. For instance you can add the following two dependencies
+      to use the JSR 341 <ulink url="http://uel.java.net/">reference
+      implementation</ulink>:</para>
 
-    <para>If your application runs in a Java SE environment where no such
-    implementation is provided, you have to add one as dependency to your POM
-    file. For instance add the following two dependencies to use the JSR 341
-    <ulink url="http://uel.java.net/">reference implementation</ulink> (set
-    the version value to the version you want to use):</para>
+      <example>
+        <title>Maven dependencies for Unified EL reference
+        implementation</title>
 
-    <example>
-      <title>Maven dependencies for Unified EL reference
-      implementation</title>
-
-      <programlisting>&lt;dependency&gt;
+        <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;javax.el&lt;/groupId&gt;
     &lt;artifactId&gt;javax.el-api&lt;/artifactId&gt;
     &lt;version&gt;2.2.4&lt;/version&gt;
@@ -102,31 +101,35 @@
     &lt;artifactId&gt;javax.el&lt;/artifactId&gt;
     &lt;version&gt;2.2.4&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
-    </example>
+      </example>
+    </section>
 
-    <bridgehead>CDI</bridgehead>
+    <section id="validator-gettingstarted-cdi">
+      <title>CDI</title>
 
-    <para>Bean Validation defines integration points with CDI (Contexts and
-    Dependency Injection for Java<superscript>TM</superscript> EE, <ulink
-    url="http://jcp.org/en/jsr/detail?id=346">JSR 346</ulink>). If your
-    application runs in an environment which does not provide this integration
-    out of the box, you may use the Hibernate Validator CDI portable extension
-    by adding the following Maven dependency to your POM:</para>
+      <para>Bean Validation defines integration points with CDI (Contexts and
+      Dependency Injection for Java<superscript>TM</superscript> EE, <ulink
+      url="http://jcp.org/en/jsr/detail?id=346">JSR 346</ulink>). If your
+      application runs in an environment which does not provide this
+      integration out of the box, you may use the Hibernate Validator CDI
+      portable extension by adding the following Maven dependency to your
+      POM:</para>
 
-    <example>
-      <title>Hibernate Validator CDI portable extension Maven
-      dependency</title>
+      <example>
+        <title>Hibernate Validator CDI portable extension Maven
+        dependency</title>
 
-      <programlisting>&lt;dependency&gt;
+        <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator-cdi&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
-    </example>
+      </example>
 
-    <para>Note that adding this dependency is usually not required for
-    applications running on a Java EE application server. You can learn more
-    about the integration of Bean Validation and CDI in section TODO.</para>
+      <para>Note that adding this dependency is usually not required for
+      applications running on a Java EE application server. You can learn more
+      about the integration of Bean Validation and CDI in section TODO.</para>
+    </section>
   </section>
 
   <section id="validator-gettingstarted-createmodel">
