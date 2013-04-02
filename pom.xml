@@ -20,7 +20,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
-    <version>5.0.0.CR5</version>
+    <version>5.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Validator Aggregator</name>
