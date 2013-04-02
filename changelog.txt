@@ -1,6 +1,20 @@
 Hibernate Validator Changelog
 =============================
 
+5.0.0.CR5 (02.04.2013)
+----------------------
+
+** Bug
+    * [HV-778] - Provide a way to deactivate cdi extension
+    * [HV-782] - Multiple constraint-mappings files for one constraint to not work
+
+** Improvement
+    * [HV-648] - Script documentation and distribution upload
+    * [HV-724] - Remove JavaDoc warnings
+    * [HV-783] - Extract hierarchy related functionality from ReflectionHelper
+    * [HV-786] - Update dependencies to Weld and BV TCK
+
+
 5.0.0.CR4 (20.03.2013)
 ----------------------
 
