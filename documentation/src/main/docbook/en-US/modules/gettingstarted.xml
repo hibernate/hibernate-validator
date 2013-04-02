@@ -40,29 +40,6 @@
       <para>An Internet connection (Maven has to download all required
       libraries)</para>
     </listitem>
-
-    <listitem>
-      <para>A properly configured remote repository. Add the following to your
-      <filename>settings.xml</filename>: <example id="example-jboss-maven-url">
-          <title>Configuring the JBoss Maven repository</title>
-
-          <programlisting>&lt;repositories&gt;
-    &lt;repository&gt;
-        &lt;id&gt;jboss-public-repository-group&lt;/id&gt;
-        &lt;url&gt;https://repository.jboss.org/nexus/content/groups/public-jboss&lt;/url&gt;
-        &lt;releases&gt;
-          &lt;enabled&gt;true&lt;/enabled&gt;
-        &lt;/releases&gt;
-        &lt;snapshots&gt;
-          &lt;enabled&gt;true&lt;/enabled&gt;
-        &lt;/snapshots&gt;
-     &lt;/repository&gt;
-&lt;/repositories&gt;        </programlisting>
-        </example>More information about <filename>settings.xml</filename> can
-      be found in the <ulink
-      url="http://maven.apache.org/ref/2.0.8/maven-settings/settings.html">Maven
-      Local Settings Model</ulink>.</para>
-    </listitem>
   </itemizedlist>
 
   <section id="validator-gettingstarted-createproject">
