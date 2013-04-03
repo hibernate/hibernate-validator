@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2011-11-14 10:37+0000\n"
+"POT-Creation-Date: 2013-04-03 09:59+0000\n"
 "PO-Revision-Date: 2010-08-22 23:44+0830\n"
 "Last-Translator: Strong Liu <stliu@hibernate.org>\n"
 "Language-Team: none\n"
@@ -28,14 +28,14 @@ msgstr "<filename>validation.xml</filename>"
 
 #. Tag: para
 #: xmlconfiguration.xml:29
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
 "The key to enable XML configuration for Hibernate Validator is the file "
-"<filename>validation.xml</filename>. If this file exists in the classpath "
-"its configuration will be applied when the <classname>ValidationFactory</"
-"classname> gets created. <xref linkend=\"image-validation-configuration\"/> "
-"shows a model view of the xsd <filename>valiation.xml</filename> has to "
-"adhere to."
+"<filename>META-INF/validation.xml</filename>. If this file exists on the "
+"classpath its configuration will be applied when the "
+"<classname>ValidationFactory</classname> gets created. <xref linkend=\"image-"
+"validation-configuration\"/> shows a model view of the XML schema to which "
+"<filename>validation.xml</filename> has to adhere."
 msgstr ""
 "我们可以使用<filename>validation.xml</filename>来对Hibernate Validator进行配"
 "置. <classname>ValidationFactory</classname>在初始化的时候会在类路径下寻找此"
@@ -67,11 +67,12 @@ msgstr "<title>validation.xml</title>"
 #: xmlconfiguration.xml:57
 #, fuzzy, no-c-format
 msgid ""
-"&lt;validation-config xmlns=\"http://jboss.org/xml/ns/javax/validation/"
-"configuration\"\n"
-" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-" xsi:schemaLocation=\"http://jboss.org/xml/ns/javax/validation/configuration"
-"\"&gt;\n"
+"&lt;validation-config\n"
+"    xmlns=\"http://jboss.org/xml/ns/javax/validation/configuration\"\n"
+"    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+"    xsi:schemaLocation=\"http://jboss.org/xml/ns/javax/validation/"
+"configuration\"&gt;\n"
+"\n"
 "    &lt;default-provider&gt;org.hibernate.validator.HibernateValidator&lt;/"
 "default-provider&gt;\n"
 "    &lt;message-interpolator&gt;org.hibernate.validator.messageinterpolation."
@@ -80,8 +81,8 @@ msgid ""
 "DefaultTraversableResolver&lt;/traversable-resolver&gt;\n"
 "    &lt;constraint-validator-factory&gt;org.hibernate.validator.engine."
 "ConstraintValidatorFactoryImpl&lt;/constraint-validator-factory&gt;\n"
-"    &lt;constraint-mapping&gt;/constraints-car.xml&lt;/constraint-"
-"mapping&gt;\n"
+"    &lt;constraint-mapping&gt;META-INF/validation/constraints-car.xml&lt;/"
+"constraint-mapping&gt;\n"
 "    &lt;property name=\"prop1\"&gt;value1&lt;/property&gt;\n"
 "    &lt;property name=\"prop2\"&gt;value2&lt;/property&gt;\n"
 "&lt;/validation-config&gt;"
@@ -107,34 +108,26 @@ msgstr ""
 
 #. Tag: para
 #: xmlconfiguration.xml:61
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
-"There can only be one <filename>validation.xml</filename> in the classpath. "
-"If more than one is found an exception is thrown."
+"There must only be one file named <filename>META-INF/validation.xml</"
+"filename> on the classpath. If more than one is found an exception is thrown."
 msgstr ""
 "类路径下面只能有一个<filename>validation.xml</filename>, 如果超过一个的话,会"
 "抛出异常."
 
 #. Tag: para
-#: xmlconfiguration.xml:65
-#, no-c-format
+#: xmlconfiguration.xml:66
+#, fuzzy, no-c-format
 msgid ""
-"All settings shown in the <filename>validation.xml</filename> are optional "
-"and in the case of <xref linkend=\"example-validation-xml\"/> show the "
-"defaults used within Hibernate Validator. The node <property>default-"
-"provider</property> allows to choose the Bean Validation provider. This is "
-"useful if there is more than one provider in the classpath. "
-"<property>message-interpolator</property>, <property>traversable-resolver</"
-"property> and <property>constraint-validator-factory</property> allow to "
-"customize the <classname>javax.validation.MessageInterpolator</classname>, "
+"The node <property>default-provider</property> allows to choose the Bean "
+"Validation provider. This is useful if there is more than one provider on "
+"the classpath. <property>message-interpolator</property>, "
+"<property>traversable-resolver</property> and <property>constraint-validator-"
+"factory</property> allow to customize the used implementations for "
+"<classname>javax.validation.MessageInterpolator</classname>, "
 "<classname>javax.validation.TraversableResolver</classname> resp. "
-"<classname>javax.validation.ConstraintValidatorFactory</classname>. The same "
-"configuration options are also available programmatically through the "
-"<classname>javax.validation.Configuration</classname>. In fact XML "
-"configuration will be overridden by values explicitly specified via the API. "
-"It is even possible to ignore the XML configuration completely via "
-"<methodname> Configuration.ignoreXmlConfiguration()</methodname>. See also "
-"<xref linkend=\"validator-bootstrapping\"/>."
+"<classname>javax.validation.ConstraintValidatorFactory</classname>."
 msgstr ""
 "<filename>validation.xml</filename>中所有的配置信息都是可选的, <xref linkend="
 "\"example-validation-xml\"/>中就是列出了Hibernate Validator中的默认值. 如果类"
@@ -152,19 +145,35 @@ msgstr ""
 "bootstrapping\"/>."
 
 #. Tag: para
-#: xmlconfiguration.xml:83
+#: xmlconfiguration.xml:76
 #, no-c-format
 msgid ""
-"Via the <property>constraint-mapping</property> you can list an arbitrary "
-"number of additional XML files containing the actual constraint "
-"configuration. See <xref linkend=\"section-mapping-constraints\"/>."
+"All these settings are optional. <xref linkend=\"example-validation-xml\"/> "
+"shows the defaults used within Hibernate Validator. The same configuration "
+"options are also available programmatically through <classname>javax."
+"validation.Configuration</classname>. In fact XML configuration will be "
+"overridden by values explicitly specified via the API. It is even possible "
+"to ignore the XML configuration completely via <methodname>Configuration."
+"ignoreXmlConfiguration()</methodname>. See also <xref linkend=\"validator-"
+"bootstrapping\"/>."
+msgstr ""
+
+#. Tag: para
+#: xmlconfiguration.xml:86
+#, fuzzy, no-c-format
+msgid ""
+"Via the <property>constraint-mapping</property> element you can list an "
+"arbitrary number of additional XML files containing the actual constraint "
+"configuration. Mapping file names must be specified using their fully-"
+"qualified name on the classpath. Details on writing mapping files can be "
+"found in the next section."
 msgstr ""
 "你可以增加若干个<property>constraint-mapping</property>节点,在每个里面列出一"
 "个额外的xml文件用来定义约束规则, 具体请参考<xref linkend=\"section-mapping-"
 "constraints\"/>."
 
 #. Tag: para
-#: xmlconfiguration.xml:87
+#: xmlconfiguration.xml:92
 #, fuzzy, no-c-format
 msgid ""
 "Last but not least, you can specify provider specific properties via the "
@@ -174,18 +183,18 @@ msgstr ""
 "属的属性. Hibernate Validator当前并没有使用任何特定的属性."
 
 #. Tag: title
-#: xmlconfiguration.xml:92
+#: xmlconfiguration.xml:97
 #, no-c-format
 msgid "Mapping constraints"
 msgstr "映射约束"
 
 #. Tag: para
-#: xmlconfiguration.xml:94
-#, no-c-format
+#: xmlconfiguration.xml:99
+#, fuzzy, no-c-format
 msgid ""
-"Expressing constraints in XML is possible via files adhering to the xsd seen "
-"in <xref linkend=\"image-mapping-configuration\"/>. Note that these mapping "
-"files are only processed if listed via <property>constraint-mapping</"
+"Expressing constraints in XML is possible via files adhering to the schema "
+"seen in <xref linkend=\"image-mapping-configuration\"/>. Note that these "
+"mapping files are only processed if listed via <property>constraint-mapping</"
 "property> in your <filename>validation.xml</filename>."
 msgstr ""
 "我们也可以通过xml来定义约束条件, 只需要这个xml符合<xref linkend=\"image-"
@@ -194,37 +203,38 @@ msgstr ""
 "property>节点中才能得到处理."
 
 #. Tag: title
-#: xmlconfiguration.xml:101
+#: xmlconfiguration.xml:106
 #, no-c-format
 msgid "validation-mapping-1.0.xsd"
 msgstr "validation-mapping-1.0.xsd"
 
 #. Tag: para
-#: xmlconfiguration.xml:116
-#, no-c-format
+#: xmlconfiguration.xml:121
+#, fuzzy, no-c-format
 msgid ""
-"shows how our classes Car and RentalCar from <xref linkend=\"example-car\"/> "
-"resp. <xref linkend=\"example-rental-car\"/> could be mapped in XML."
+"shows how our classes <classname>Car</classname> and <classname>RentalCar</"
+"classname> from <xref linkend=\"example-car\"/> resp. <xref linkend="
+"\"example-rental-car\"/> could be mapped in XML."
 msgstr ""
 "显示了如何通过xml定义的方式来给<xref linkend=\"example-car\"/>中的类Car 以及"
 "<xref linkend=\"example-rental-car\"/> 中的RentalCar定义约束条件."
 
 #. Tag: title
-#: xmlconfiguration.xml:121
+#: xmlconfiguration.xml:127
 #, no-c-format
 msgid "constraints-car.xml"
 msgstr "constraints-car.xml"
 
 #. Tag: programlisting
-#: xmlconfiguration.xml:123
+#: xmlconfiguration.xml:129
 #, fuzzy, no-c-format
 msgid ""
-"&lt;constraint-mappings xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"
-"\"\n"
-"                     xsi:schemaLocation=\"http://jboss.org/xml/ns/javax/"
-"validation/mapping validation-mapping-1.0.xsd\"\n"
-"                     xmlns=\"http://jboss.org/xml/ns/javax/validation/mapping"
-"\"&gt;\n"
+"&lt;constraint-mappings\n"
+"    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+"    xsi:schemaLocation=\"http://jboss.org/xml/ns/javax/validation/mapping "
+"validation-mapping-1.0.xsd\"\n"
+"    xmlns=\"http://jboss.org/xml/ns/javax/validation/mapping\"&gt;\n"
+"\n"
 "    &lt;default-package&gt;org.hibernate.validator.quickstart&lt;/default-"
 "package&gt;\n"
 "    &lt;bean class=\"Car\" ignore-annotations=\"true\"&gt;\n"
@@ -329,22 +339,22 @@ msgstr ""
 "&lt;/constraint-mappings&gt;"
 
 #. Tag: para
-#: xmlconfiguration.xml:126
-#, no-c-format
+#: xmlconfiguration.xml:132
+#, fuzzy, no-c-format
 msgid ""
 "The XML configuration is closely mirroring the programmatic API. For this "
 "reason it should suffice to just add some comments. <property>default-"
-"package</property> is used for all fields where a classname is expected. If "
+"package</property> is used for all fields where a class name is expected. If "
 "the specified class is not fully qualified the configured default package "
 "will be used. Every mapping file can then have several <property>bean</"
 "property> nodes, each describing the constraints on the entity with the "
 "specified class name.<warning> <para>A given entity can only be configured "
 "once across all configuration files. If the same class is configured more "
-"than once an exception is thrown.</para> </warning>Settings <property>ignore-"
-"annotations</property> to true means that constraint annotations placed on "
-"the configured bean are ignored. The default for this value is "
-"<constant>true</constant>. ignore-annotations is also available for the "
-"nodes <property>class</property>, <property>fields</property> and "
+"than once an exception is thrown.</para> </warning>Setting <property>ignore-"
+"annotations</property> to <constant>true</constant> means that constraint "
+"annotations placed on the configured bean are ignored. The default for this "
+"value is <constant>true</constant>. ignore-annotations is also available for "
+"the nodes <property>class</property>, <property>fields</property> and "
 "<property>getter</property>. If not explicitly specified on these levels the "
 "configured <property>bean</property> value applies. Otherwise do the nodes "
 "<property>class</property>, <property>fields</property> and "
@@ -352,10 +362,10 @@ msgid ""
 "placed (see <xref linkend=\"validator-usingvalidator-annotate\"/>). The "
 "<property>constraint</property> node is then used to add a constraint on the "
 "corresponding level. Each constraint definition must define the class via "
-"the annotation attribute. The constraint attributes required by the Bean "
-"Validation specification (<property>message</property>, <property>groups</"
-"property> and <property>payload</property>) have dedicated nodes. All other "
-"constraint specific attributes are configured using the the "
+"the <property>annotation</property> attribute. The constraint attributes "
+"required by the Bean Validation specification (<property>message</property>, "
+"<property>groups</property> and <property>payload</property>) have dedicated "
+"nodes. All other constraint specific attributes are configured using the "
 "<property>element</property> node."
 msgstr ""
 "这个xml的定义基本上和通过编程方式差不多, 所以只需要简单的解释. 其中"
@@ -378,7 +388,7 @@ msgstr ""
 "<property>element</property>节点来定义."
 
 #. Tag: para
-#: xmlconfiguration.xml:154
+#: xmlconfiguration.xml:161
 #, no-c-format
 msgid ""
 "The class node also allows to reconfigure the default group sequence (see "
@@ -390,8 +400,8 @@ msgstr ""
 "group-class\"/>) ."
 
 #. Tag: para
-#: xmlconfiguration.xml:158
-#, no-c-format
+#: xmlconfiguration.xml:165
+#, fuzzy, no-c-format
 msgid ""
 "Last but not least, the list of <classname>ConstraintValidator</classname>s "
 "associated to a given constraint can be altered via the <property>constraint-"
@@ -401,9 +411,9 @@ msgid ""
 "<classname>ConstraintValidator</classname> implementations associated to the "
 "constraint. If <property>include-existing-validator</property> is set to "
 "<constant>false</constant>, validators defined on the constraint annotation "
-"are ignored. If set to <constant>true</constant>, the list of "
-"ConstraintValidators described in XML are concatenated to the list of "
-"validators described on the annotation."
+"are ignored. If set to <constant>true</constant>, the list of constraint "
+"validators described in XML is concatenated to the list of validators "
+"specified on the annotation."
 msgstr ""
 "最后, 你还可以通过<property>constraint-definition</property>节点来对一个指定"
 "的约束条件上绑定的校验器(<classname>ConstraintValidator</classname>)进行修"

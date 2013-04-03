@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter03;
+package org.hibernate.validator.referenceguide.chapter04;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;

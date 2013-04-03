@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter03.constraintcomposition;
+package org.hibernate.validator.referenceguide.chapter04.constraintvalidatorcontext;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -13,11 +13,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({ METHOD, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = { })
+@Constraint(validatedBy = CheckCaseValidator.class)
 @Documented
 public @interface CheckCase {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter03.constraintcomposition.CheckCase.message}";
+	String message() default "{org.hibernate.validator.referenceguide.chapter03.constraintvalidatorcontext.CheckCase.message}";
 
 	Class<?>[] groups() default { };
 

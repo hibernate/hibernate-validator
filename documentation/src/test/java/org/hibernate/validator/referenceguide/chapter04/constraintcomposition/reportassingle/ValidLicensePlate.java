@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter03.constraintcomposition.reportassingle;
+package org.hibernate.validator.referenceguide.chapter04.constraintcomposition.reportassingle;
 
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;

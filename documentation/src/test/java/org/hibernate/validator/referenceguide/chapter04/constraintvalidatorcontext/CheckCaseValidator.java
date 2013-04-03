@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter03;
+package org.hibernate.validator.referenceguide.chapter04.constraintvalidatorcontext;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -18,11 +18,22 @@ public class CheckCaseValidator implements ConstraintValidator<CheckCase, String
 			return true;
 		}
 
+		boolean isValid;
 		if ( caseMode == CaseMode.UPPER ) {
-			return object.equals( object.toUpperCase() );
+			isValid = object.equals( object.toUpperCase() );
 		}
 		else {
-			return object.equals( object.toLowerCase() );
+			isValid = object.equals( object.toLowerCase() );
 		}
+
+		if ( !isValid ) {
+			constraintContext.disableDefaultConstraintViolation();
+			constraintContext.buildConstraintViolationWithTemplate(
+					"{org.hibernate.validator.referenceguide.chapter03.constraintvalidatorcontext.CheckCase.message}"
+			)
+					.addConstraintViolation();
+		}
+
+		return isValid;
 	}
 }

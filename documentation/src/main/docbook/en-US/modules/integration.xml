@@ -21,7 +21,7 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="validator-integration">
-  <title>Integration with other frameworks</title>
+  <title>Integrating with other frameworks</title>
 
   <para>Hibernate Validator is intended to be used to implement multi-layered
   data validation, where constraints are expressed in a single place (the
