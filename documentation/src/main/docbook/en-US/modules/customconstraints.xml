@@ -382,7 +382,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
 
         <para>In case you are implementing a
         <classname>ConstraintValidator</classname> for a class-level
-        constraint it is also possible to adjust set the property path for the
+        constraint it is also possible to adjust the property path for the
         created constraint violations. This is important for the case where
         you validate multiple properties of the class or even traverse the
         object graph and want the constraint violation to point to one of the
