@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter03.constraintcomposition;
+package org.hibernate.validator.referenceguide.chapter04.constraintcomposition;
 
 public class Car {
 

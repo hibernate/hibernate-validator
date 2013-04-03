@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter03.custompath;
+package org.hibernate.validator.referenceguide.chapter04.custompath;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter03.custompath;
+package org.hibernate.validator.referenceguide.chapter04.custompath;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

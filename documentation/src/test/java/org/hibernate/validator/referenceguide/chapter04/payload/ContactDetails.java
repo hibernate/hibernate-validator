@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter03.payload;
+package org.hibernate.validator.referenceguide.chapter04.payload;
 
 import javax.validation.constraints.NotNull;
 

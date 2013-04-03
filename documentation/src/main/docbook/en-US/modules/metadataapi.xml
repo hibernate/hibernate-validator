@@ -21,7 +21,7 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="validator-metadata-api">
-  <title>Metadata API</title>
+  <title>Accessing Metadata</title>
 
   <para>The Bean Validation specification provides not only a validation
   engine, but also a metadata repository for all defined constraints. The
@@ -53,7 +53,7 @@
     <code>beanDescriptor.getConstraintsForProperty</code> or
     <code>beanDescriptor.getConstrainedProperties</code> to get a single resp.
     set of <classname>PropertyDescriptor</classname>s (see <xref
-    linkend="section-property-descriptor" />). </para>
+    linkend="section-property-descriptor"/>).</para>
   </section>
 
   <section id="section-property-descriptor">
@@ -86,7 +86,7 @@
     search to constraints described on fields or on getters or a given set of
     groups. Given an <classname>ElementDescriptor</classname> instance you
     just call <code>findConstraints</code> to retrieve a
-    <classname>ConstraintFinder</classname> instance. </para>
+    <classname>ConstraintFinder</classname> instance.</para>
 
     <example id="example-constraint-finder">
       <title>Usage of ConstraintFinder</title>
@@ -101,7 +101,7 @@ Set&lt;ConstraintDescriptor&lt;?&gt;&gt; constraints = propertyDescriptor.findCo
                                            .getConstraintDescriptors();</programlisting>
     </example>
 
-    <para><xref linkend="example-constraint-finder" /> shows an example on how
+    <para><xref linkend="example-constraint-finder"/> shows an example on how
     to use the <classname>ConstraintFinder</classname> API. Interesting are
     especially the restrictions <code>unorderedAndMatchingGroups</code> and
     <code>lookingAt(<ulink
@@ -127,6 +127,6 @@ Set&lt;ConstraintDescriptor&lt;?&gt;&gt; constraints = propertyDescriptor.findCo
     constraint annotation and its parameters, as well as the groups the
     constraint is supposed to be applied on. It also also you to access the
     pass-through constraint payload (see <xref
-    linkend="example-defining-custom-constraint" />).</para>
+    linkend="example-defining-custom-constraint"/>).</para>
   </section>
 </chapter>

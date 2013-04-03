@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	~ JBoss, Home of Professional Open Source
+	~ Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+	~ by the @authors tag. See the copyright.txt in the distribution for a
+	~ full listing of individual contributors.
+	~
+	~ Licensed under the Apache License, Version 2.0 (the "License");
+	~ you may not use this file except in compliance with the License.
+	~ You may obtain a copy of the License at
+	~ http://www.apache.org/licenses/LICENSE-2.0
+	~ Unless required by applicable law or agreed to in writing, software
+	~ distributed under the License is distributed on an "AS IS" BASIS,
+	~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	~ See the License for the specific language governing permissions and
+	~ limitations under the License.
+-->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
+%BOOK_ENTITIES;
+]>
+<chapter id="validator-groups">
+  <title>Grouping constraints</title>
+
+  <para>Each of the validate methods in <xref
+  linkend="validator-usingvalidator-validate"/> takes also a var-arg argument
+  <parameter>groups</parameter>. So far we have been ignoring this paramter,
+  but it is time to have a closer look.</para>
+
+  <section>
+    <title>Requesting groups</title>
+
+    <para>Groups allow you to restrict the set of constraints applied during
+    validation. A possible use-case for groups are UI wizards where in each
+    step only a specified subset of constraints get validated. The groups
+    targeted are passed as var-arg parameters to the appropriate validate
+    method. Let's have a look at an extended <classname>Car</classname> with
+    <classname>Driver</classname> example. First we have the class
+    <classname>Person</classname> (<xref linkend="example-person"/>) which has
+    a <classname>@NotNull </classname>constraint on <property>name</property>.
+    Since no group is specified for this annotation the default group
+    <classname>javax.validation.groups.Default</classname> is assumed.</para>
+
+    <note>
+      <para>When more than one group is requested, the order in which the
+      groups are evaluated is not deterministic. If no group is specified the
+      default group <classname>javax.validation.groups.Default</classname> is
+      assumed.</para>
+    </note>
+
+    <example id="example-person">
+      <title>Person</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+
+import javax.validation.constraints.NotNull;
+
+public class Person {
+	@NotNull
+	private String name;
+
+	public Person(String name) {
+		this.name = name;
+	}
+
+	// getters and setters ...
+}</programlisting>
+    </example>
+
+    <para>Next we have the class <classname>Driver</classname> (<xref
+    linkend="example-driver"/>) extending <classname>Person</classname>. Here
+    we are adding the properties <property>age</property> and
+    <property>hasDrivingLicense</property>. In order to drive you must be at
+    least 18 (<classname>@Min(18)</classname>) and you must have a driving
+    license (<classname>@AssertTrue</classname>). Both constraints defined on
+    these properties belong to the group <classname>DriverChecks</classname>.
+    As you can see in <xref linkend="example-group-interfaces"/> the group
+    <classname>DriverChecks</classname> is just a simple tagging interface.
+    Using interfaces makes the usage of groups type safe and allows for easy
+    refactoring. It also means that groups can inherit from each other via
+    class inheritance.</para>
+
+    <example id="example-driver">
+      <title>Driver</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
+
+public class Driver extends Person {
+	@Min(
+			value = 18,
+			message = "You have to be 18 to drive a car",
+			groups = DriverChecks.class
+	)
+	public int age;
+
+	@AssertTrue(
+			message = "You first have to pass the driving test",
+			groups = DriverChecks.class
+	)
+	public boolean hasDrivingLicense;
+
+	public Driver(String name) {
+		super( name );
+	}
+
+	public void passedDrivingTest(boolean b) {
+		hasDrivingLicense = b;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+}
+
+
+</programlisting>
+    </example>
+
+    <example id="example-group-interfaces">
+      <title>Group interfaces</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+
+public interface DriverChecks {
+}</programlisting>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+
+public interface CarChecks {
+}</programlisting>
+    </example>
+
+    <para>Last but not least we add the property
+    <property>passedVehicleInspection</property> to the
+    <classname>Car</classname> class (<xref linkend="example-car"/>)
+    indicating whether a car passed the road worthy tests.</para>
+
+    <example id="example-car">
+      <title>Car</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+
+import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+public class Car {
+	@NotNull
+	private String manufacturer;
+
+	@NotNull
+	@Size(min = 2, max = 14)
+	private String licensePlate;
+
+	@Min(2)
+	private int seatCount;
+
+	@AssertTrue(
+			message = "The car has to pass the vehicle inspection first",
+			groups = CarChecks.class
+	)
+	private boolean passedVehicleInspection;
+
+	@Valid
+	private Driver driver;
+
+	public Car(String manufacturer, String licencePlate, int seatCount) {
+		this.manufacturer = manufacturer;
+		this.licensePlate = licencePlate;
+		this.seatCount = seatCount;
+	}
+
+	public boolean isPassedVehicleInspection() {
+		return passedVehicleInspection;
+	}
+
+	public void setPassedVehicleInspection(boolean passedVehicleInspection) {
+		this.passedVehicleInspection = passedVehicleInspection;
+	}
+
+	public Driver getDriver() {
+		return driver;
+	}
+
+	public void setDriver(Driver driver) {
+		this.driver = driver;
+	}
+
+	// getters and setters ...
+}
+
+
+</programlisting>
+    </example>
+
+    <para>Overall three different groups are used in our example.
+    <property>Person.name</property>, <property>Car.manufacturer</property>,
+    <property>Car.licensePlate</property> and
+    <property>Car.seatCount</property> all belong to the
+    <classname>Default</classname> group. <property>Driver.age</property> and
+    <property>Driver.hasDrivingLicense</property> belong to
+    <classname>DriverChecks</classname> and last but not least
+    <property>Car.passedVehicleInspection</property> belongs to the group
+    <classname>CarChecks</classname>. <xref linkend="example-drive-away"/>
+    shows how passing different group combinations to the
+    <methodname>Validator.validate</methodname> method result in different
+    validation results.</para>
+
+    <example id="example-drive-away">
+      <title>Drive away</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.groups.Default;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static junit.framework.Assert.assertEquals;
+
+public class GroupTest {
+
+	private static Validator validator;
+
+	@BeforeClass
+	public static void setUp() {
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		validator = factory.getValidator();
+	}
+
+	@Test
+	public void driveAway() {
+		// create a car and check that everything is ok with it.
+		Car car = new Car( "Morris", "DD-AB-123", 2 );
+		Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validate( car );
+		assertEquals( 0, constraintViolations.size() );
+
+		// but has it passed the vehicle inspection?
+		constraintViolations = validator.validate( car, CarChecks.class );
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals(
+				"The car has to pass the vehicle inspection first",
+				constraintViolations.iterator().next().getMessage()
+		);
+
+		// let's go to the vehicle inspection
+		car.setPassedVehicleInspection( true );
+		assertEquals( 0, validator.validate( car ).size() );
+
+		// now let's add a driver. He is 18, but has not passed the driving test yet
+		Driver john = new Driver( "John Doe" );
+		john.setAge( 18 );
+		car.setDriver( john );
+		constraintViolations = validator.validate( car, DriverChecks.class );
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals(
+				"You first have to pass the driving test",
+				constraintViolations.iterator().next().getMessage()
+		);
+
+		// ok, John passes the test
+		john.passedDrivingTest( true );
+		assertEquals( 0, validator.validate( car, DriverChecks.class ).size() );
+
+		// just checking that everything is in order now
+		assertEquals(
+				0, validator.validate(
+				car,
+				Default.class,
+				CarChecks.class,
+				DriverChecks.class
+		).size()
+		);
+	}
+}
+
+</programlisting>
+    </example>
+
+    <para>In <xref linkend="example-drive-away"/> we first create a car and
+    validate it using no explicit group. There are no validation errors, even
+    though the property <property>passedVehicleInspection</property> is per
+    default <constant>false</constant>. However, the constraint defined on
+    this property does not belong to the default group. Next we just validate
+    the <classname>CarChecks</classname> group which will fail until we make
+    sure that the car passes the vehicle inspection. When we then add a driver
+    to the car and validate against <classname>DriverChecks</classname> we get
+    again a constraint violation due to the fact that the driver has not yet
+    passed the driving test. Only after setting
+    <property>passedDrivingTest</property> to true the validation against
+    <classname>DriverChecks</classname> will pass. Last but not least, we show
+    that all constraints are passing by validating against all defined
+    groups.</para>
+  </section>
+
+  <section>
+    <title>Defining group sequences</title>
+
+    <para>By default, constraints are evaluated in no particular order,
+    regardless of which groups they belong to. In some situations, however, it
+    is useful to control the order constraints are evaluated. In our example
+    from <xref linkend="validator-usingvalidator-validationgroups"/> we could
+    for example require that first all default car constraints are passing
+    before we check the road worthiness of the car. Finally before we drive
+    away we check the actual driver constraints. In order to implement such an
+    order one would define a new interface and annotate it with
+    <classname>@GroupSequence</classname> defining the order in which the
+    groups have to be validated.</para>
+
+    <note>
+      <para>If at least one constraint fails in a sequenced group none of the
+      constraints of the following groups in the sequence get
+      validated.</para>
+    </note>
+
+    <example id="example-orderedChecks">
+      <title>Interface with @GroupSequence</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+
+import javax.validation.GroupSequence;
+import javax.validation.groups.Default;
+
+@GroupSequence({ Default.class, CarChecks.class, DriverChecks.class })
+public interface OrderedChecks {
+}</programlisting>
+    </example>
+
+    <para><warning>
+        <para>Groups defining a sequence and groups composing a sequence must
+        not be involved in a cyclic dependency either directly or indirectly,
+        either through cascaded sequence definition or group inheritance. If a
+        group containing such a circularity is evaluated, a
+        <classname>GroupDefinitionException</classname> is raised.</para>
+      </warning>The usage of the new sequence could then look like in <xref
+    linkend="example-group-sequence"/>.</para>
+
+    <example id="example-group-sequence">
+      <title>Usage of a group sequence</title>
+
+      <programlisting language="JAVA" role="JAVA">	@Test
+	public void testOrderedChecks() {
+		Car car = new Car( "Morris", "DD-AB-123", 2 );
+		car.setPassedVehicleInspection( true );
+
+		Driver john = new Driver( "John Doe" );
+		john.setAge( 18 );
+		john.passedDrivingTest( true );
+		car.setDriver( john );
+
+		assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );
+	}</programlisting>
+    </example>
+  </section>
+
+  <section id="section-default-group-class">
+    <title>Redefining the default group sequence</title>
+
+    <section>
+      <title>@GroupSequence</title>
+
+      <para>The <classname>@GroupSequence</classname> annotation also fulfills
+      a second purpose. It allows you to redefine what the
+      <constant>Default</constant> group means for a given class. To redefine
+      <classname>Default</classname> for a given class, add a
+      <classname>@GroupSequence</classname> annotation to the class. The
+      defined groups in the annotation express the sequence of groups that
+      substitute <classname>Default</classname> for this class. <xref
+      linkend="example-rental-car"/> introduces a new class
+      <classname>RentalCar</classname> with a redefined default group. With
+      this definition you can evaluate the constraints belonging to
+      <classname>RentalChecks</classname>, <classname>CarChecks</classname>
+      and <classname>RentalCar</classname> by just requesting the
+      <classname>Default</classname> group as seen in <xref
+      linkend="example-testCarIsRented"/>.</para>
+
+      <example id="example-rental-car">
+        <title>RentalCar with @GroupSequence</title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+
+import javax.validation.GroupSequence;
+import javax.validation.constraints.AssertFalse;
+
+@GroupSequence({ RentalChecks.class, CarChecks.class, RentalCar.class })
+public class RentalCar extends Car {
+	@AssertFalse(message = "The car is currently rented out", groups = RentalChecks.class)
+	private boolean rented;
+
+	public RentalCar(String manufacturer, String licencePlate, int seatCount) {
+		super( manufacturer, licencePlate, seatCount );
+	}
+
+	public boolean isRented() {
+		return rented;
+	}
+
+	public void setRented(boolean rented) {
+		this.rented = rented;
+	}
+}</programlisting>
+      </example>
+
+      <example id="example-testCarIsRented">
+        <title>RentalCar with redefined default group</title>
+
+        <programlisting language="JAVA" role="JAVA">	/**
+	 * Validating the default group leads to validation on the default group sequence of {@code RentalCar}.
+	 */
+	@Test
+	public void carIsRented() {
+		RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
+		rentalCar.setPassedVehicleInspection( true );
+		rentalCar.setRented( true );
+
+		Set&lt;ConstraintViolation&lt;RentalCar&gt;&gt; constraintViolations = validator.validate( rentalCar );
+
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals(
+				"Wrong message",
+				"The car is currently rented out",
+				constraintViolations.iterator().next().getMessage()
+		);
+
+		rentalCar.setRented( false );
+		constraintViolations = validator.validate( rentalCar );
+
+		assertEquals( 0, constraintViolations.size() );
+	}</programlisting>
+      </example>
+
+      <note>
+        <para>Due to the fact that there cannot be a cyclic dependency in the
+        group and group sequence definitions one cannot just add
+        <classname>Default</classname> to the sequence redefining
+        <classname>Default</classname> for a class. Instead the class itself
+        has to be added!</para>
+      </note>
+
+      <note>
+        <para>The <classname>Default</classname> group sequence overriding is
+        local to the class it is defined on and is not propagated to the
+        associated objects. This means in particular that adding
+        <classname>DriverChecks</classname> to the default group sequence of
+        <classname>RentalCar</classname> would not have any effects. Only the
+        group <classname>Default</classname> will be propagated to the driver
+        association when validation a rental car instance.</para>
+      </note>
+    </section>
+
+    <section>
+      <title>@GroupSequenceProvider</title>
+
+      <para>The <classname>@javax.validation.GroupSequence</classname>
+      annotation is a standardized Bean Validation annotation. As seen in the
+      previous section it allows you to statically redefine the default group
+      sequence for a class. Hibernate Validator also offers a custom, non
+      standardized annotation -
+      <classname>org.hibernate.validator.group.GroupSequenceProvider
+      </classname>- which allows for dynamic redefinition of the default group
+      sequence. Using the rental car scenario again, one could dynamically add
+      the <classname>CarChecks</classname> as seen in <xref
+      linkend="example-rental-car-group-sequence-provider"/> and <xref
+      linkend="example-group-sequence-provider-implementation"/>.</para>
+
+      <example id="example-rental-car-group-sequence-provider">
+        <title>RentalCar with @GroupSequenceProvider</title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupsequenceprovider;
+
+import javax.validation.constraints.AssertFalse;
+
+import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.referenceguide.chapter03.groups.Car;
+import org.hibernate.validator.referenceguide.chapter03.groups.RentalChecks;
+
+@GroupSequenceProvider(RentalCarGroupSequenceProvider.class)
+public class RentalCar extends Car {
+	@AssertFalse(message = "The car is currently rented out", groups = RentalChecks.class)
+	private boolean rented;
+
+	public RentalCar(String manufacturer, String licencePlate, int seatCount) {
+		super( manufacturer, licencePlate, seatCount );
+	}
+
+	public boolean isRented() {
+		return rented;
+	}
+
+	public void setRented(boolean rented) {
+		this.rented = rented;
+	}
+}</programlisting>
+      </example>
+
+      <example id="example-group-sequence-provider-implementation" label="">
+        <title>DefaultGroupSequenceProvider implementation</title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupsequenceprovider;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.validator.referenceguide.chapter03.groups.CarChecks;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+
+public class RentalCarGroupSequenceProvider implements DefaultGroupSequenceProvider&lt;RentalCar&gt; {
+	public List&lt;Class&lt;?&gt;&gt; getValidationGroups(RentalCar car) {
+		List&lt;Class&lt;?&gt;&gt; defaultGroupSequence = new ArrayList&lt;Class&lt;?&gt;&gt;();
+		defaultGroupSequence.add( RentalCar.class );
+
+		if ( car != null &amp;&amp; !car.isRented() ) {
+			defaultGroupSequence.add( CarChecks.class );
+		}
+
+		return defaultGroupSequence;
+	}
+}</programlisting>
+      </example>
+    </section>
+  </section>
+
+  <section>
+    <title>Group conversion</title>
+
+    <para>TODO</para>
+  </section>
+</chapter>
