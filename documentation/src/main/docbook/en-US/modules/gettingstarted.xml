@@ -59,19 +59,22 @@
     <para>This transitively pulls in the dependency to the Bean Validation API
     (<literal>javax.validation:validation-api:&bvVersion;</literal>).</para>
 
-    <tip>
+    <section id="validator-gettingstarted-logging">
+      <title>Logging</title>
+
       <para>For the purposes of logging, Hibernate Validator uses the JBoss
       Logging API. This is an abstraction layer which supports several known
       logging solutions (e.g. log4j or the logging framework provided by the
-      JDK) as implementation. Just add your preferred logging library to the
-      classpath and all log requests from Hibernate Validator will
-      automatically be delegated to that logging provider.</para>
+      JDK) as implementation. Just add your preferred logging library as
+      dependency to your project and all log requests from Hibernate Validator
+      will automatically be delegated to that logging provider.</para>
 
-      <para>Alternatively, you can explicitely specify a provider using the
-      system property <varname>org.jboss.logging.provider</varname>. Supported
-      values currently are <varname>jboss</varname>, <varname>jdk</varname>,
+      <para>If there are several logging implementations part of the
+      classpath, you can explicitely specify a provider using the system
+      property <varname>org.jboss.logging.provider</varname>. Supported values
+      currently are <varname>jboss</varname>, <varname>jdk</varname>,
       <varname>log4j</varname> and <varname>slf4j</varname>.</para>
-    </tip>
+    </section>
 
     <section id="validator-gettingstarted-uel">
       <title>Unified EL</title>
