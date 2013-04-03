@@ -163,22 +163,36 @@ public class ContactDetails {
         </listitem>
       </itemizedlist>
 
-      <para>Besides those three mandatory attributes
-      (<property>message</property>, <property>groups</property> and
-      <property>payload</property>) we add another one allowing for the
-      required case mode to be specified. The name <property>value</property>
-      is a special one, which can be omitted upon using the annotation, if it
-      is the only attribute specified, as e.g. in
-      <code>@CheckCase(CaseMode.UPPER)</code>.</para>
+      <para>Besides these three mandatory attributes we add another one,
+      <property>value</property>, allowing for the required case mode to be
+      specified. The name <property>value</property> is a special one, which
+      can be omitted when using the annotation, if it is the only attribute
+      specified, as e.g. in <code>@CheckCase(CaseMode.UPPER)</code>.</para>
 
-      <para>In addition we annotate the annotation type with a couple of
-      so-called meta annotations:</para>
+      <para>In addition we annotate the annotation type with a couple of meta
+      annotations:</para>
 
       <itemizedlist>
         <listitem>
-          <para><code>@Target({ METHOD, FIELD, ANNOTATION_TYPE })</code>:
-          Says, that methods, fields and annotation declarations may be
-          annotated with @CheckCase (but not type declarations e.g.)</para>
+          <para><code>@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE
+          })</code>: Defines the supported target element types for the
+          constraint. <classname>@CheckCase</classname> may be used on fields
+          (element type <classname>FIELD</classname>), JavaBeans properties as
+          well as method return values (<classname>METHOD</classname>) and
+          method/constructor parameters (<classname>PARAMETER</classname>). By
+          adding the element type <classname>ANNOTATION_TYPE</classname>, we
+          allow for the creation composed constraints (see <xref
+          linkend="section-constraint-composition"/>) based on
+          <classname>@CheckCase</classname>. </para>
+
+          <para>Would we create a class-level constraint (see <xref
+          linkend="validator-usingvalidator-classlevel"/>), the element type
+          <classname>TYPE</classname> had to be used. Constraints targetting
+          the return value of a constructor need to support the element type
+          <classname>CONSTRUCTOR</classname>. Cross-parameter constraints (see
+          TODO) which are used to validate all the parameters of a method or
+          constructor together, must support <classname>METHOD</classname> or
+          <classname>CONSTRUCTOR</classname>, respectively.</para>
         </listitem>
 
         <listitem>
@@ -189,37 +203,37 @@ public class ContactDetails {
 
         <listitem>
           <para><code>@Constraint(validatedBy =
-          CheckCaseValidator.class)</code>: Specifies the validator to be used
-          to validate elements annotated with @CheckCase</para>
+          CheckCaseValidator.class)</code>: Marks the annotation type as
+          constraint annotation and specifies the validator to be used to
+          validate elements annotated with <classname>@CheckCase</classname>.
+          If a constraint may be used on several data types, several
+          validators may be specified, one for each data type.</para>
         </listitem>
 
         <listitem>
           <para><code>@Documented</code>: Says, that the use of
-          <code>@CheckCase</code> will be contained in the JavaDoc of elements
-          annotated with it</para>
+          <classname>@CheckCase</classname> will be contained in the JavaDoc
+          of elements annotated with it</para>
         </listitem>
       </itemizedlist>
 
-      <tip>
-        <para>Hibernate Validator provides support for the validation of
-        method parameters using constraint annotations (see <xref
-        linkend="validator-customoptions-methodvalidation" />).</para>
-
-        <para>In order to use a custom constraint for parameter validation the
-        <classname>ElementType.PARAMETER</classname> must be specified within
-        the <classname>@Target</classname> annotation. This is already the
-        case for all constraints defined by the Bean Validation API and also
-        the custom constraints provided by Hibernate Validator.</para>
-      </tip>
+      <para>Finally, there is an inner annotation type named
+      <classname>List</classname>. This annotation allows to specify several
+      <classname>@CheckCase</classname> annotations on the same element, e.g.
+      with different validation groups and messages. Note that while also
+      another name could be used, we follow the Bean Validation, which
+      recommends to use the name <classname>List</classname> and make the
+      annotation an inner annotation of the corresponding constraint
+      type.</para>
     </section>
 
     <section id="validator-customconstraints-validator">
       <title id="section-constraint-validator">The constraint
       validator</title>
 
-      <para>Next, we need to implement a constraint validator, that's able to
-      validate elements with a <classname>@CheckCase</classname> annotation.
-      To do so, we implement the interface
+      <para>Next, we need to implement a constraint validator, which is able
+      to validate elements with a <classname>@CheckCase</classname>
+      annotation. To do so, we implement the interface
       <classname>ConstraintValidator</classname> as shown below:</para>
 
       <example id="example-constraint-validator">
@@ -346,12 +360,13 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
           </tip></para>
 
         <para>In case you are implementing a
-        <classname>ConstraintValidator</classname> a class level constraint it
-        is also possible to adjust set the property path for the created
-        constraint violations. This is important for the case where you
-        validate multiple properties of the class or even traverse the object
-        graph. A custom property path creation could look like <xref
-        linkend="example-custom-error"/>.</para>
+        <classname>ConstraintValidator</classname> for a class-level
+        constraint it is also possible to adjust set the property path for the
+        created constraint violations. This is important for the case where
+        you validate multiple properties of the class or even traverse the
+        object graph and want the constraint violation to point to one of the
+        involved properties only. A custom property path creation could look
+        like <xref linkend="example-custom-error"/>.</para>
 
         <example id="example-custom-error">
           <title>Adding new <classname>ConstraintViolation</classname> with
