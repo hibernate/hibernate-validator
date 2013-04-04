@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2011-11-14 10:37+0000\n"
+"POT-Creation-Date: 2013-04-03 09:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
@@ -29,7 +29,7 @@ msgstr ""
 #. Tag: para
 #: furtherreading.xml:28
 #, no-c-format
-msgid "A great source for examples is the Bean Validation TCK which is available for anonymous access on <ulink url=\"https://github.com/beanvalidation/beanvalidation-tck\">GitHub</ulink>. In particular the TCK's <ulink url=\"https://github.com/beanvalidation/beanvalidation-tck/tree/master/src/main/java/org/hibernate/jsr303/tck/tests\">tests</ulink> might be of interest. <ulink url=\"http://jcp.org/en/jsr/detail?id=303\">The JSR 303</ulink> specification itself is also a great way to deepen your understanding of Bean Validation resp. Hibernate Validator."
+msgid "A great source for examples is the Bean Validation TCK which is available for anonymous access on <ulink url=\"https://github.com/beanvalidation/beanvalidation-tck\">GitHub</ulink>. In particular the TCK's <ulink url=\"https://github.com/beanvalidation/beanvalidation-tck/tree/master/src/main/java/org/hibernate/beanvalidation/tck/tests\">tests</ulink> might be of interest. <ulink url=\"http://jcp.org/en/jsr/detail?id=303\">The JSR 303</ulink> specification itself is also a great way to deepen your understanding of Bean Validation resp. Hibernate Validator."
 msgstr ""
 
 #. Tag: para

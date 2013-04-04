@@ -21,7 +21,7 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="validator-xmlconfiguration">
-  <title>XML configuration</title>
+  <title>Using XML configuration</title>
 
   <section>
     <title><filename>validation.xml</filename></title>
