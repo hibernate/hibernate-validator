@@ -26,6 +26,7 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
+import javax.enterprise.inject.spi.PassivationCapable;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.BootstrapConfiguration;
 import javax.validation.Configuration;
@@ -43,7 +44,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 /**
  * @author Hardy Ferentschik
  */
-public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
+public class ValidatorFactoryBean implements Bean<ValidatorFactory>, PassivationCapable {
 	private final BeanManager beanManager;
 	private final Set<Annotation> qualifiers;
 	private final Set<DestructibleBeanInstance<?>> destructibleResources;
@@ -205,4 +206,9 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory> {
 		destructibleResources.add( destructibleInstance );
 		return destructibleInstance.getInstance();
 	}
+
+    @Override
+    public String getId() {
+        return ValidatorFactoryBean.class.getName();
+    }
 }

@@ -27,6 +27,7 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
+import javax.enterprise.inject.spi.PassivationCapable;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -39,7 +40,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 /**
  * @author Hardy Ferentschik
  */
-public class ValidatorBean implements Bean<Validator> {
+public class ValidatorBean implements Bean<Validator>, PassivationCapable {
 	private final BeanManager beanManager;
 	private final Set<Annotation> qualifiers;
 
@@ -127,4 +128,9 @@ public class ValidatorBean implements Bean<Validator> {
 		}
 		return null;
 	}
+
+    @Override
+    public String getId() {
+        return ValidatorBean.class.getName();
+    }
 }
