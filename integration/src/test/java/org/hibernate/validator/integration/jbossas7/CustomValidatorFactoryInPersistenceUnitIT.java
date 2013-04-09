@@ -37,7 +37,7 @@ import org.junit.runner.RunWith;
 
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the integration of Hibernate Validator in JBoss AS 7
@@ -89,7 +89,7 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 		// under javax.persistence.validation.factory. This works for the JBoss AS purposes, but not generically
 		Object obj = properties.get( "javax.persistence.validation.factory" );
 		assertTrue( "There should be an object under this property", obj != null );
-		ValidatorFactory factory = ( ValidatorFactory ) obj;
+		ValidatorFactory factory = (ValidatorFactory) obj;
 //		assertTrue(
 //				"The Custom Validator implementation should be used",
 //				factory instanceof MyValidationProvider.DummyValidatorFactory

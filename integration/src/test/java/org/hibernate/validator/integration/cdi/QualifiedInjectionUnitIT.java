@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.integration.cdi;
 
+import java.io.Serializable;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -30,8 +32,9 @@ import org.junit.runner.RunWith;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
+import org.hibernate.validator.testutil.TestForIssue;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Hardy Ferentschik
@@ -47,6 +50,9 @@ public class QualifiedInjectionUnitIT {
 	@Inject
 	@HibernateValidator
 	private Validator validator;
+
+	@Inject
+	TestEntity testEntity;
 
 	@Deployment
 	public static WebArchive createTestArchive() throws Exception {
@@ -64,5 +70,35 @@ public class QualifiedInjectionUnitIT {
 	public void testQualifiedValidatorFactoryAndValidatorInjectable() {
 		assertNotNull( "The validator factory should have been injected", validatorFactory );
 		assertNotNull( "The validator should have been injected", validator );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-787")
+	public void testInjectionIntoBeanWithPassivatingScope() throws Exception {
+		assertNotNull( testEntity );
+		assertNotNull( testEntity.getValidatorFactory() );
+		assertNotNull( testEntity.getValidator() );
+	}
+
+	@SessionScoped
+	@SuppressWarnings("serial")
+	public static class TestEntity implements Serializable {
+
+		@Inject
+		@HibernateValidator
+		private ValidatorFactory validatorFactory;
+
+		@Inject
+		@HibernateValidator
+		private Validator validator;
+
+
+		public ValidatorFactory getValidatorFactory() {
+			return validatorFactory;
+		}
+
+		public Validator getValidator() {
+			return validator;
+		}
 	}
 }

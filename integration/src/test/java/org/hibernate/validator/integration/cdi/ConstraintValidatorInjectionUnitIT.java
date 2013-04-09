@@ -35,7 +35,7 @@ import org.hibernate.validator.integration.cdi.service.PingService;
 import org.hibernate.validator.integration.cdi.service.PingServiceImpl;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Hardy Ferentschik
