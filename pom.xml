@@ -212,7 +212,7 @@
             <dependency>
                 <groupId>javax.enterprise</groupId>
                 <artifactId>cdi-api</artifactId>
-                <version>1.1-20130305</version>
+                <version>1.1-20130403</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.jboss.spec.javax.interceptor</groupId>
@@ -227,7 +227,7 @@
             <dependency>
                 <groupId>org.jboss.weld</groupId>
                 <artifactId>weld-core</artifactId>
-                <version>2.0.0.Beta8</version>
+                <version>2.0.0.CR2</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.as</groupId>
