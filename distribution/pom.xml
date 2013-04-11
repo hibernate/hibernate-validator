@@ -14,7 +14,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -104,7 +106,9 @@
                     </sourcepath>
                     <links>
                         <link>http://docs.oracle.com/javase/6/docs/api</link>
+                        <link>http://docs.oracle.com/javaee/6/api</link>
                         <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api</link>
+                        <link>http://docs.jboss.org/cdi/api/1.1-PFD</link>
                     </links>
                     <packagesheader>Hibernate Validator Packages</packagesheader>
                     <doctitle>Hibernate Validator ${project.version}</doctitle>
@@ -114,6 +118,10 @@
                         <group>
                             <title>Validator Packages</title>
                             <packages>org.hibernate.validator*</packages>
+                        </group>
+                        <group>
+                            <title>Validator Portable Extension Packages</title>
+                            <packages>org.hibernate.validator.cdi:org.hibernate.validator.internal.cdi*</packages>
                         </group>
                         <group>
                             <title>Annotation Processor Packages</title>
