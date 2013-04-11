@@ -1,6 +1,21 @@
 Hibernate Validator Changelog
 =============================
 
+5.0.0.Final (11.04.2013)
+------------------------
+
+** Bug
+    * [HV-787] - javax.enterprise.inject.spi.Bean implementations should also implement PassivationCapable
+    * [HV-788] - Upgrade BV API and TCK to final versions
+
+** Improvement
+    * [HV-752] - Check transitive dependencies from CDI API
+    * [HV-785] - Improve structure of JavaDoc
+
+** Task
+    * [HV-781] - Align with latest Weld release
+
+
 5.0.0.CR5 (02.04.2013)
 ----------------------
 

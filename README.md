@@ -1,13 +1,13 @@
 # Hibernate Validator
 
-*Version: 5.0.0.CR5, 02.04.2013*
+*Version: 5.0.0.Final, 11.04.2013*
 
 
 ## What is it?
 
 This is the reference implementation of [JSR-349 - Bean Validation 1.1](http://www.beanvalidation.org/).
-Bean Validation defines a metadata model and API for JavaBean validation. 
-The default metadata source is annotations, with the ability to override and extend 
+Bean Validation defines a metadata model and API for JavaBean as well as method validation.
+The default metadata source are annotations, with the ability to override and extend
 the meta-data through the use of XML validation descriptors.
 
 ## Documentation
@@ -35,7 +35,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>5.0.0.CR5</version>
+            <version>5.0.0.Final</version>
         </dependency>
 
       You also need an API and implementation of the Unified Expression Language. This dependencies must be explicitly added in an SE environment.
@@ -52,6 +52,16 @@ Logging will delegate any log requests to that provider.
            <version>2.2.4</version>
         </dependency>
 
+* Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
+in an environment which does not provide this integration out of the box, you may use the Hibernate Validator CDI portable
+extension by adding the following dependency:
+
+        <dependency>
+           <groupId>org.hibernate</groupId>
+           <artifactId>hibernate-validator-cdi</artifactId>
+           <version>5.0.0-SNAPSHOT</version>
+        </dependency>
+
 * _hibernate-validator-annotation-processor-&lt;version&gt;.jar_ is an optional jar which can be integrated with your build
 environment respectively IDE to verify that constraint annotations are correctly used. Refer to the [online
 documentation](http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html/validator-annotation-processor.html) for more information.
@@ -64,7 +74,7 @@ the Apache Software License 2.0. Refer to license.txt for more information.
 ## Build from Source
 
 You can build Hibernate Validator from source by cloning the git repository git://github.com/hibernate/hibernate-validator.git.
-You will also need a JDK 6 or 7 and a Maven 3. With these prerequisites in place you can compile the source via
+You will also need a JDK 6 or 7 and Maven 3. With these prerequisites in place you can compile the source via
 
     mvn clean install -s settings-example.xml
 
