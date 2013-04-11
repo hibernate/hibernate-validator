@@ -46,6 +46,10 @@
                 <include>javax.el:*</include>
                 <include>org.glassfish.web:*</include>
             </includes>
+            <excludes>
+                <!-- unwanted transitive dependency from javax.enterprise:cdi-api -->
+                <exclude>javax.el:el-api</exclude>
+            </excludes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>dist/lib/optional</outputDirectory>
