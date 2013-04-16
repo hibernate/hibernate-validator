@@ -314,11 +314,11 @@ public class GroupTest {
     <para>By default, constraints are evaluated in no particular order,
     regardless of which groups they belong to. In some situations, however, it
     is useful to control the order constraints are evaluated. In our example
-    from <xref linkend="validator-usingvalidator-validationgroups"/> we could
-    for example require that first all default car constraints are passing
-    before we check the road worthiness of the car. Finally before we drive
-    away we check the actual driver constraints. In order to implement such an
-    order one would define a new interface and annotate it with
+    from <xref linkend="example-drive-away"/> we could for example require
+    that first all default car constraints are passing before we check the
+    road worthiness of the car. Finally before we drive away we check the
+    actual driver constraints. In order to implement such an order one would
+    define a new interface and annotate it with
     <classname>@GroupSequence</classname> defining the order in which the
     groups have to be validated.</para>
 
@@ -538,6 +538,211 @@ public class RentalCarGroupSequenceProvider implements DefaultGroupSequenceProvi
   <section>
     <title>Group conversion</title>
 
-    <para>TODO</para>
+    <para>What if you wanted to validate the car related checks together with
+    the driver checks. Of course you could pass the required groups to the
+    validate call explicitly, but what if you wanted to make these validations
+    occur as part of the <classname>Default</classname> group validation. Here
+    <classname>@ConvertGroup</classname> comes into play which allows you
+    during cascaded validtion to use a different group than the originally
+    requested one. Let's have a look at <xref
+    linkend="example-group-conversion-dedault-to-driver-checks"/>. Here
+    <code>@GroupSequence({ CarChecks.class, Car.class })</code> is used to
+    combine the car related constraints under the Default group (see <xref
+    linkend="section-default-group-class"/>). There is also a
+    <code>@ConvertGroup(from = Default.class, to = DriverChecks.class)</code>
+    which ensures the <classname>Default</classname> group gets converted to
+    the <classname>DriverChecks</classname> group during cascaded validation
+    of the <property>driver</property> association.</para>
+
+    <example id="example-group-conversion-dedault-to-driver-checks">
+      <title>@ConvertGroup usage</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupconversion;
+
+import javax.validation.GroupSequence;
+import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.groups.ConvertGroup;
+import javax.validation.groups.Default;
+
+@GroupSequence({ CarChecks.class, Car.class })
+public class Car {
+	@NotNull
+	private String manufacturer;
+
+	@NotNull
+	@Size(min = 2, max = 14)
+	private String licensePlate;
+
+	@Min(2)
+	private int seatCount;
+
+	@AssertTrue(
+			message = "The car has to pass the vehicle inspection first",
+			groups = CarChecks.class
+	)
+	private boolean passedVehicleInspection;
+
+	@Valid
+	@ConvertGroup(from = Default.class, to = DriverChecks.class)
+	private Driver driver;
+
+	public Car(String manufacturer, String licencePlate, int seatCount) {
+		this.manufacturer = manufacturer;
+		this.licensePlate = licencePlate;
+		this.seatCount = seatCount;
+	}
+
+	public boolean isPassedVehicleInspection() {
+		return passedVehicleInspection;
+	}
+
+	public void setPassedVehicleInspection(boolean passedVehicleInspection) {
+		this.passedVehicleInspection = passedVehicleInspection;
+	}
+
+	public Driver getDriver() {
+		return driver;
+	}
+
+	public void setDriver(Driver driver) {
+		this.driver = driver;
+	}
+
+	// getters and setters ...
+}</programlisting>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupconversion;
+
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
+
+public class Driver extends Person {
+	@Min(
+			value = 18,
+			message = "You have to be 18 to drive a car",
+			groups = DriverChecks.class
+	)
+	public int age;
+
+	@AssertTrue(
+			message = "You first have to pass the driving test",
+			groups = DriverChecks.class
+	)
+	public boolean hasDrivingLicense;
+
+	public Driver(String name) {
+		super( name );
+	}
+
+	public void passedDrivingTest(boolean b) {
+		hasDrivingLicense = b;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+}</programlisting>
+    </example>
+
+    <para>As a result the
+    <methodname>validateDriverChecksTogetherWithCarChecks</methodname> test in
+    <xref linkend="example-group-conversion-test"/> will pass even though the
+    constraint on <property>hasDrivingLicense</property> belongs to the
+    <classname>DriverChecks</classname> group and only the
+    <classname>Default</classname> group is requested in the
+    <methodname>validate</methodname> call.</para>
+
+    <example id="example-group-conversion-test">
+      <title>Test case for @ConvertGroup</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupconversion;
+
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static junit.framework.Assert.assertEquals;
+
+public class GroupConversionTest {
+
+	private static Validator validator;
+
+	@BeforeClass
+	public static void setUp() {
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		validator = factory.getValidator();
+	}
+
+	@Test
+	public void validateDriverChecksTogetherWithCarChecks() {
+		// create a car and validate. The Driver is still null and does not get validated
+		Car car = new Car( "VW", "USD-123", 4 );
+		car.setPassedVehicleInspection( true );
+		Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validate( car );
+		assertEquals( 0, constraintViolations.size() );
+
+		// create a driver who has not passed the driving test
+		Driver john = new Driver( "John Doe" );
+		john.setAge( 18 );
+
+		// now let's add a driver to the car
+		car.setDriver( john );
+		constraintViolations = validator.validate( car );
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals(
+				"The driver constraint should also be validated as part of the default group",
+				constraintViolations.iterator().next().getMessage(),
+				"You first have to pass the driving test"
+		);
+	}
+}</programlisting>
+    </example>
+
+    <para>Group conversions can be used everywhere @Valid can be used, namely
+    associations, method and constructor parameters and return values. In
+    order to specify multiple conversions
+    <classname>@ConvertGroup.List</classname> can be used. </para>
+
+    <para>However, there are several restrictionsas well : <itemizedlist>
+        <listitem>
+          <para><classname>@ConvertGroup</classname> must be used in
+          combination with <classname>@Valid</classname>. If used without a
+          <classname>ConstraintDeclarationException</classname> is
+          thrown.</para>
+        </listitem>
+
+        <listitem>
+          <para>It is not legal to have multiple conversion rules on the same
+          element with the same <parameter>from</parameter> value. In this
+          case, a <classname>ConstraintDeclarationException</classname> is
+          raised.</para>
+        </listitem>
+
+        <listitem>
+          <para>The <parameter>from</parameter> attribute cannot refer to a
+          group sequence. A
+          <classname>ConstraintDeclarationException</classname> is raised in
+          this situation. </para>
+        </listitem>
+      </itemizedlist><note>
+        <para>Rules are not executed recursively. The first matching
+        conversion rule is used and subsequent rules are ignored. For example
+        if a set of <classname>@ConvertGroup</classname> declarations chains
+        group A to B and B to C, the group A will be converted to B and not to
+        C. </para>
+      </note></para>
   </section>
 </chapter>
