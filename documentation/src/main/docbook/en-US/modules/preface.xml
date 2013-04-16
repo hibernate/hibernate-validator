@@ -34,15 +34,15 @@
   <mediaobject>
     <imageobject role="fo">
       <imagedata align="center" contentdepth="" contentwidth="150mm"
-                 fileref="application-layers.png" scalefit="" />
+                 fileref="application-layers.png" scalefit=""/>
     </imageobject>
 
     <imageobject role="html">
-      <imagedata depth="" fileref="application-layers.png" scalefit="1" />
+      <imagedata depth="" fileref="application-layers.png" scalefit="1"/>
     </imageobject>
   </mediaobject>
 
-  <para>JSR 303 - Bean Validation - defines a metadata model and API for
+  <para>JSR 349 - Bean Validation 1.1 - defines a metadata model and API for
   entity validation. The default metadata source is annotations, with the
   ability to override and extend the meta-data through the use of XML. The API
   is not tied to a specific application tier or programming model. It is
@@ -53,11 +53,11 @@
   <para><mediaobject>
       <imageobject role="fo">
         <imagedata align="center" contentdepth="" contentwidth="150mm"
-                   fileref="application-layers2.png" scalefit="" />
+                   fileref="application-layers2.png" scalefit=""/>
       </imageobject>
 
       <imageobject role="html">
-        <imagedata depth="" fileref="application-layers2.png" scalefit="1" />
+        <imagedata depth="" fileref="application-layers2.png" scalefit="1"/>
       </imageobject>
     </mediaobject></para>
 
