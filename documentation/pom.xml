@@ -149,12 +149,16 @@
                     <options>
                         <xincludeSupported>true</xincludeSupported>
                         <xmlTransformerType>saxon</xmlTransformerType>
-                        <!-- needed for uri-resolvers; can be ommitted if using 'current' uri scheme -->
-                        <!--     could also locate the docbook dependency and inspect its version... -->
                         <docbookVersion>1.72.0</docbookVersion>
                         <localeSeparator>-</localeSeparator>
                         <injectionDateFormat>yyyy-MM-dd</injectionDateFormat>
                     </options>
+                    <injections>
+                        <injection>
+                            <name>bvVersion</name>
+                            <value>${bv.api.version}</value>
+                        </injection>
+                    </injections>
                     <profiling>
                         <enabled>true</enabled>
                     </profiling>
