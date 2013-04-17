@@ -54,8 +54,6 @@
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
 
-import javax.validation.constraints.NotNull;
-
 public class Person {
 	@NotNull
 	private String name;
@@ -85,9 +83,6 @@ public class Person {
       <title>Driver</title>
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
-
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Min;
 
 public class Driver extends Person {
 	@Min(
@@ -148,12 +143,6 @@ public interface CarChecks {
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
 
-import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 public class Car {
 	@NotNull
 	private String manufacturer;
@@ -197,10 +186,7 @@ public class Car {
 	}
 
 	// getters and setters ...
-}
-
-
-</programlisting>
+}</programlisting>
     </example>
 
     <para>Overall three different groups are used in our example.
@@ -220,18 +206,6 @@ public class Car {
       <title>Drive away</title>
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
-
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.groups.Default;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static junit.framework.Assert.assertEquals;
 
 public class GroupTest {
 
@@ -287,9 +261,7 @@ public class GroupTest {
 		).size()
 		);
 	}
-}
-
-</programlisting>
+}</programlisting>
     </example>
 
     <para>In <xref linkend="example-drive-away"/> we first create a car and
@@ -333,9 +305,6 @@ public class GroupTest {
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
 
-import javax.validation.GroupSequence;
-import javax.validation.groups.Default;
-
 @GroupSequence({ Default.class, CarChecks.class, DriverChecks.class })
 public interface OrderedChecks {
 }</programlisting>
@@ -353,18 +322,18 @@ public interface OrderedChecks {
     <example id="example-group-sequence">
       <title>Usage of a group sequence</title>
 
-      <programlisting language="JAVA" role="JAVA">	@Test
-	public void testOrderedChecks() {
-		Car car = new Car( "Morris", "DD-AB-123", 2 );
-		car.setPassedVehicleInspection( true );
+      <programlisting language="JAVA" role="JAVA">@Test
+public void testOrderedChecks() {
+	Car car = new Car( "Morris", "DD-AB-123", 2 );
+	car.setPassedVehicleInspection( true );
 
-		Driver john = new Driver( "John Doe" );
-		john.setAge( 18 );
-		john.passedDrivingTest( true );
-		car.setDriver( john );
+	Driver john = new Driver( "John Doe" );
+	john.setAge( 18 );
+	john.passedDrivingTest( true );
+	car.setDriver( john );
 
-		assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );
-	}</programlisting>
+	assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );
+}</programlisting>
     </example>
   </section>
 
@@ -394,9 +363,6 @@ public interface OrderedChecks {
 
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
 
-import javax.validation.GroupSequence;
-import javax.validation.constraints.AssertFalse;
-
 @GroupSequence({ RentalChecks.class, CarChecks.class, RentalCar.class })
 public class RentalCar extends Car {
 	@AssertFalse(message = "The car is currently rented out", groups = RentalChecks.class)
@@ -419,29 +385,29 @@ public class RentalCar extends Car {
       <example id="example-testCarIsRented">
         <title>RentalCar with redefined default group</title>
 
-        <programlisting language="JAVA" role="JAVA">	/**
-	 * Validating the default group leads to validation on the default group sequence of {@code RentalCar}.
-	 */
-	@Test
-	public void carIsRented() {
-		RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
-		rentalCar.setPassedVehicleInspection( true );
-		rentalCar.setRented( true );
+        <programlisting language="JAVA" role="JAVA">/**
+ * Validating the default group leads to validation on the default group sequence of {@code RentalCar}.
+ */
+@Test
+public void carIsRented() {
+	RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
+	rentalCar.setPassedVehicleInspection( true );
+	rentalCar.setRented( true );
 
-		Set&lt;ConstraintViolation&lt;RentalCar&gt;&gt; constraintViolations = validator.validate( rentalCar );
+	Set&lt;ConstraintViolation&lt;RentalCar&gt;&gt; constraintViolations = validator.validate( rentalCar );
 
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals(
-				"Wrong message",
-				"The car is currently rented out",
-				constraintViolations.iterator().next().getMessage()
-		);
+	assertEquals( 1, constraintViolations.size() );
+	assertEquals(
+			"Wrong message",
+			"The car is currently rented out",
+			constraintViolations.iterator().next().getMessage()
+	);
 
-		rentalCar.setRented( false );
-		constraintViolations = validator.validate( rentalCar );
+	rentalCar.setRented( false );
+	constraintViolations = validator.validate( rentalCar );
 
-		assertEquals( 0, constraintViolations.size() );
-	}</programlisting>
+	assertEquals( 0, constraintViolations.size() );
+}</programlisting>
       </example>
 
       <note>
@@ -483,12 +449,6 @@ public class RentalCar extends Car {
 
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupsequenceprovider;
 
-import javax.validation.constraints.AssertFalse;
-
-import org.hibernate.validator.group.GroupSequenceProvider;
-import org.hibernate.validator.referenceguide.chapter03.groups.Car;
-import org.hibernate.validator.referenceguide.chapter03.groups.RentalChecks;
-
 @GroupSequenceProvider(RentalCarGroupSequenceProvider.class)
 public class RentalCar extends Car {
 	@AssertFalse(message = "The car is currently rented out", groups = RentalChecks.class)
@@ -512,12 +472,6 @@ public class RentalCar extends Car {
         <title>DefaultGroupSequenceProvider implementation</title>
 
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupsequenceprovider;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hibernate.validator.referenceguide.chapter03.groups.CarChecks;
-import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 public class RentalCarGroupSequenceProvider implements DefaultGroupSequenceProvider&lt;RentalCar&gt; {
 	public List&lt;Class&lt;?&gt;&gt; getValidationGroups(RentalCar car) {
@@ -543,11 +497,14 @@ public class RentalCarGroupSequenceProvider implements DefaultGroupSequenceProvi
     validate call explicitly, but what if you wanted to make these validations
     occur as part of the <classname>Default</classname> group validation. Here
     <classname>@ConvertGroup</classname> comes into play which allows you
-    during cascaded validtion to use a different group than the originally
-    requested one. Let's have a look at <xref
+    during cascaded validation to use a different group than the originally
+    requested one.</para>
+
+    <para>Let's have a look at <xref
     linkend="example-group-conversion-dedault-to-driver-checks"/>. Here
     <code>@GroupSequence({ CarChecks.class, Car.class })</code> is used to
-    combine the car related constraints under the Default group (see <xref
+    combine the car related constraints under the
+    <classname>Default</classname> group (see <xref
     linkend="section-default-group-class"/>). There is also a
     <code>@ConvertGroup(from = Default.class, to = DriverChecks.class)</code>
     which ensures the <classname>Default</classname> group gets converted to
@@ -558,15 +515,6 @@ public class RentalCarGroupSequenceProvider implements DefaultGroupSequenceProvi
       <title>@ConvertGroup usage</title>
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupconversion;
-
-import javax.validation.GroupSequence;
-import javax.validation.Valid;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.groups.ConvertGroup;
-import javax.validation.groups.Default;
 
 @GroupSequence({ CarChecks.class, Car.class })
 public class Car {
@@ -617,9 +565,6 @@ public class Car {
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupconversion;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Min;
-
 public class Driver extends Person {
 	@Min(
 			value = 18,
@@ -665,17 +610,6 @@ public class Driver extends Person {
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupconversion;
 
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static junit.framework.Assert.assertEquals;
-
 public class GroupConversionTest {
 
 	private static Validator validator;
@@ -711,10 +645,10 @@ public class GroupConversionTest {
 }</programlisting>
     </example>
 
-    <para>Group conversions can be used everywhere @Valid can be used, namely
-    associations, method and constructor parameters and return values. In
-    order to specify multiple conversions
-    <classname>@ConvertGroup.List</classname> can be used. </para>
+    <para>Group conversions can be used everywhere
+    <classname>@Valid</classname> can be used, namely associations, method and
+    constructor parameters and return values. In order to specify multiple
+    conversions <classname>@ConvertGroup.List</classname> can be used.</para>
 
     <para>However, there are several restrictionsas well : <itemizedlist>
         <listitem>
@@ -735,14 +669,14 @@ public class GroupConversionTest {
           <para>The <parameter>from</parameter> attribute cannot refer to a
           group sequence. A
           <classname>ConstraintDeclarationException</classname> is raised in
-          this situation. </para>
+          this situation.</para>
         </listitem>
       </itemizedlist><note>
         <para>Rules are not executed recursively. The first matching
         conversion rule is used and subsequent rules are ignored. For example
         if a set of <classname>@ConvertGroup</classname> declarations chains
         group A to B and B to C, the group A will be converted to B and not to
-        C. </para>
+        C.</para>
       </note></para>
   </section>
 </chapter>
