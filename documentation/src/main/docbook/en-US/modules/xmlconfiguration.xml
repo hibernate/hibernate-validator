@@ -31,10 +31,7 @@
   constraint declarations and closely matches the constraint declaration
   approach via annotations. Let's have a look at these two document
   types.<note>
-      <para>There are actually two versions for each descriptor type, one for
-      Bean Validation 1.0 and one for Bean Validation 1.1. Both versions are
-      supported, but we recommend the use of the latter together with
-      Hibernate Validator 5.x. The xsd files are available via <ulink
+      <para>The xsd files are available via <ulink
       url="http://www.jboss.org/xml/ns/javax/validation/configuration/">http://www.jboss.org/xml/ns/javax/validation/configuration</ulink>
       and <ulink
       url="http://www.jboss.org/xml/ns/javax/validation/mapping">http://www.jboss.org/xml/ns/javax/validation/mapping</ulink>.</para>
@@ -250,7 +247,7 @@
     several <property>bean</property> nodes, each describing the constraints
     on the entity with the specified class name.<warning>
         <para>A given entity can only be configured once across all
-        configuration files. The same applies for constraint defintions for a
+        configuration files. The same applies for constraint definitions for a
         given constraint annotation. It can only occur in one mapping file. If
         these rules are violated a <classname>ValidationException</classname>
         is thrown.</para>
