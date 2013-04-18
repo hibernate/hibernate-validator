@@ -1,5 +1,5 @@
 <!ENTITY version "WORKING">
-<!ENTITY bvVersion "1.1.0.Final">
+<!ENTITY bvVersion "[Version of Bean Validation spec]">
 <!ENTITY today "TODAY">
 <!ENTITY copyrightYear "2009 - 2013">
 <!ENTITY copyrightHolder "Red Hat, Inc. &amp; Gunnar Morling">

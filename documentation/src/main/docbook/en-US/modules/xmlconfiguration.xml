@@ -21,10 +21,25 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="validator-xmlconfiguration">
-  <title>Using XML configuration</title>
+  <title>Configuring via XML</title>
+
+  <para>So far we have used the default configuration source for Bean
+  Validation, namely annotations. However, there also exist two kinds of XML
+  descriptors allowing configuration via XML. The first descriptor describes
+  general Bean Validation behaviour and is provided as
+  <filename>META-INF/validation.xml</filename>. The second one describes
+  constraint declarations and closely matches the constraint declaration
+  approach via annotations. Let's have a look at these two document
+  types.<note>
+      <para>The xsd files are available via <ulink
+      url="http://www.jboss.org/xml/ns/javax/validation/configuration/">http://www.jboss.org/xml/ns/javax/validation/configuration</ulink>
+      and <ulink
+      url="http://www.jboss.org/xml/ns/javax/validation/mapping">http://www.jboss.org/xml/ns/javax/validation/mapping</ulink>.</para>
+    </note></para>
 
   <section>
-    <title><filename>validation.xml</filename></title>
+    <title>Configuring ValidationFactory in
+    <filename>validation.xml</filename></title>
 
     <para>The key to enable XML configuration for Hibernate Validator is the
     file <filename>META-INF/validation.xml</filename>. If this file exists on
@@ -33,39 +48,71 @@
     linkend="image-validation-configuration"/> shows a model view of the XML
     schema to which <filename>validation.xml</filename> has to adhere.<example
         id="image-validation-configuration">
-        <title>validation-configuration-1.0.xsd</title>
+        <title>validation-configuration-1.1.xsd</title>
 
         <mediaobject>
           <imageobject role="fo">
             <imagedata align="center"
-                       fileref="validation-configuration-1.0.png" scalefit="1"/>
+                       fileref="validation-configuration-1.1.png" format="PNG"
+                       width="80%"/>
           </imageobject>
 
           <imageobject role="html">
-            <imagedata depth="" fileref="validation-configuration-1.0.png"
-                       scalefit="1"/>
+            <imagedata depth="" fileref="validation-configuration-1.1.png"
+                       format="PNG" scalefit="1"/>
           </imageobject>
         </mediaobject>
       </example></para>
 
     <para><xref linkend="example-validation-xml"/> shows the several
-    configuration options of <filename>validation.xml</filename>.</para>
+    configuration options of <filename>validation.xml</filename> using the
+    Hibernate Validator built-in defaults. All settings are optional and the
+    same configuration options are also available programmatically through
+    <classname>javax.validation.Configuration</classname>. In fact the XML
+    configuration will be overridden by values explicitly specified via the
+    programmatic API. It is even possible to ignore the XML configuration
+    completely via
+    <methodname>Configuration.ignoreXmlConfiguration()</methodname>. See also
+    <xref linkend="validator-bootstrapping"/>.</para>
 
     <example id="example-validation-xml">
-      <title>validation.xml</title>
+      <title>validation.xml with Hibernate Validator defaults</title>
 
       <programlisting language="XML" role="XML">&lt;validation-config
     xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration"&gt;
 
-    &lt;default-provider&gt;org.hibernate.validator.HibernateValidator&lt;/default-provider&gt;
-    &lt;message-interpolator&gt;org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator&lt;/message-interpolator&gt;
-    &lt;traversable-resolver&gt;org.hibernate.validator.engine.resolver.DefaultTraversableResolver&lt;/traversable-resolver&gt;
-    &lt;constraint-validator-factory&gt;org.hibernate.validator.engine.ConstraintValidatorFactoryImpl&lt;/constraint-validator-factory&gt;
+    &lt;default-provider&gt;
+        org.hibernate.validator.HibernateValidator
+    &lt;/default-provider&gt;
+
+    &lt;message-interpolator&gt;
+        org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator
+    &lt;/message-interpolator&gt;
+
+    &lt;traversable-resolver&gt;
+        org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver
+    &lt;/traversable-resolver&gt;
+
+    &lt;constraint-validator-factory&gt;
+        org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl
+    &lt;/constraint-validator-factory&gt;
+
+    &lt;parameter-name-provider&gt;
+        org.hibernate.validator.internal.engine.DefaultParameterNameProvider
+    &lt;/parameter-name-provider&gt;
+
+    &lt;executable-validation enabled="true"&gt;
+        &lt;default-validated-executable-types&gt;
+            &lt;executable-type&gt;CONSTRUCTORS&lt;/executable-type&gt;
+            &lt;executable-type&gt;NON_GETTER_METHODS&lt;/executable-type&gt;
+        &lt;/default-validated-executable-types&gt;
+    &lt;/executable-validation&gt;
+
     &lt;constraint-mapping&gt;META-INF/validation/constraints-car.xml&lt;/constraint-mapping&gt;
-    &lt;property name="prop1"&gt;value1&lt;/property&gt;
-    &lt;property name="prop2"&gt;value2&lt;/property&gt;
+
+    &lt;property name="hibernate.validator.fail_fast"&gt;false&lt;/property&gt;
 &lt;/validation-config&gt;</programlisting>
     </example>
 
@@ -78,22 +125,24 @@
     <para>The node <property>default-provider</property> allows to choose the
     Bean Validation provider. This is useful if there is more than one
     provider on the classpath. <property>message-interpolator</property>,
-    <property>traversable-resolver</property> and
-    <property>constraint-validator-factory</property> allow to customize the
-    used implementations for
-    <classname>javax.validation.MessageInterpolator</classname>,
-    <classname>javax.validation.TraversableResolver</classname> resp.
-    <classname>javax.validation.ConstraintValidatorFactory</classname>.</para>
+    <property>traversable-resolver</property>,
+    <property>constraint-validator-factory</property> and
+    <property>parameter-name-provider</property> allow to customize the used
+    implementations for the interfaces
+    <classname>MessageInterpolator</classname>,
+    <classname>TraversableResolver</classname>,
+    <classname>ConstraintValidatorFactory</classname> and
+    <classname>ParameterNameProvider</classname> defined in the
+    <classname>javax.validation</classname> package. See <xref
+    linkend="validator-bootstrapping"/> for more information about these
+    interfaces.</para>
 
-    <para>All these settings are optional. <xref
-    linkend="example-validation-xml"/> shows the defaults used within
-    Hibernate Validator. The same configuration options are also available
-    programmatically through
-    <classname>javax.validation.Configuration</classname>. In fact XML
-    configuration will be overridden by values explicitly specified via the
-    API. It is even possible to ignore the XML configuration completely via
-    <methodname>Configuration.ignoreXmlConfiguration()</methodname>. See also
-    <xref linkend="validator-bootstrapping"/>.</para>
+    <para><property>executable-validation</property> and its subnodes define
+    defaults for method validation. The Bean Validation specification defines
+    constructor and non getter methods as defaults. The
+    <property>enabled</property> attribute acts as global switch to turn
+    method validation on and off (see also TODO - reference to method
+    validation).</para>
 
     <para>Via the <property>constraint-mapping</property> element you can list
     an arbitrary number of additional XML files containing the actual
@@ -102,29 +151,33 @@
     can be found in the next section.</para>
 
     <para>Last but not least, you can specify provider specific properties via
-    the <property>property</property> nodes.</para>
+    the <property>property</property> nodes. In the example we are using the
+    Hibernate Validator specific
+    <property>hibernate.validator.fail_fast</property> property (see <xref
+    linkend="failfast"/>).</para>
   </section>
 
   <section>
-    <title id="section-mapping-constraints">Mapping constraints</title>
+    <title id="section-mapping-constraints">Mapping constraints via
+    <property>constraint-mappings</property></title>
 
     <para>Expressing constraints in XML is possible via files adhering to the
     schema seen in <xref linkend="image-mapping-configuration"/>. Note that
     these mapping files are only processed if listed via
-    <property>constraint-mapping</property> in your
+    <property>constraint-mapping</property> in
     <filename>validation.xml</filename>.</para>
 
     <example id="image-mapping-configuration">
-      <title>validation-mapping-1.0.xsd</title>
+      <title>validation-mapping-1.1.xsd</title>
 
       <mediaobject>
         <imageobject role="fo">
-          <imagedata align="center" contentdepth="240mm"
-                     fileref="validation-mapping-1.0.png" scalefit=""/>
+          <imagedata align="center" contentdepth="200mm"
+                     fileref="validation-mapping-1.1.png" format="PNG"/>
         </imageobject>
 
         <imageobject role="html">
-          <imagedata depth="" fileref="validation-mapping-1.0.png"
+          <imagedata fileref="validation-mapping-1.1.png" format="PNG"
                      scalefit="1"/>
         </imageobject>
       </mediaobject>
@@ -133,15 +186,16 @@
     <para><xref linkend="example-constraints-car"/> shows how our classes
     <classname>Car</classname> and <classname>RentalCar</classname> from <xref
     linkend="example-car"/> resp. <xref linkend="example-rental-car"/> could
-    be mapped in XML.</para>
+    be mapped in XML. Example x shows how method validation from example y can
+    be expressed in xml. (TODO create example)</para>
 
     <example id="example-constraints-car">
-      <title>constraints-car.xml</title>
+      <title>constraints.xml</title>
 
       <programlisting language="XML" role="XML">&lt;constraint-mappings
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd"
-    xmlns="http://jboss.org/xml/ns/javax/validation/mapping"&gt;
+    xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.1.xsd"
+    xmlns="http://jboss.org/xml/ns/javax/validation/mapping" version="1.1"&gt;
 
     &lt;default-package&gt;org.hibernate.validator.quickstart&lt;/default-package&gt;
     &lt;bean class="Car" ignore-annotations="true"&gt;
@@ -193,8 +247,10 @@
     several <property>bean</property> nodes, each describing the constraints
     on the entity with the specified class name.<warning>
         <para>A given entity can only be configured once across all
-        configuration files. If the same class is configured more than once an
-        exception is thrown.</para>
+        configuration files. The same applies for constraint definitions for a
+        given constraint annotation. It can only occur in one mapping file. If
+        these rules are violated a <classname>ValidationException</classname>
+        is thrown.</para>
       </warning>Setting <property>ignore-annotations</property> to
     <constant>true</constant> means that constraint annotations placed on the
     configured bean are ignored. The default for this value is

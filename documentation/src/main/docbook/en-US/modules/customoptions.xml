@@ -163,7 +163,7 @@
     </note>
   </section>
 
-  <section>
+  <section id="section-fail-fast">
     <title>Fail fast mode</title>
 
     <para>First off, the fail fast mode. Hibernate Validator allows to return
