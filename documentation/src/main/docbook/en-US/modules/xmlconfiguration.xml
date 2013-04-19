@@ -65,9 +65,9 @@
       </example></para>
 
     <para><xref linkend="example-validation-xml"/> shows the several
-    configuration options of <filename>validation.xml</filename> using the
-    Hibernate Validator built-in defaults. All settings are optional and the
-    same configuration options are also available programmatically through
+    configuration options of <filename>validation.xml</filename>. All settings
+    are optional and the same configuration options are also available
+    programmatically through
     <classname>javax.validation.Configuration</classname>. In fact the XML
     configuration will be overridden by values explicitly specified via the
     programmatic API. It is even possible to ignore the XML configuration
@@ -76,37 +76,27 @@
     <xref linkend="validator-bootstrapping"/>.</para>
 
     <example id="example-validation-xml">
-      <title>validation.xml with Hibernate Validator defaults</title>
+      <title>validation.xml</title>
 
       <programlisting language="XML" role="XML">&lt;validation-config
     xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration"&gt;
 
-    &lt;default-provider&gt;
-        org.hibernate.validator.HibernateValidator
-    &lt;/default-provider&gt;
+    &lt;default-provider&gt;com.acme.ValidationProvider&lt;/default-provider&gt;
 
-    &lt;message-interpolator&gt;
-        org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator
-    &lt;/message-interpolator&gt;
-
-    &lt;traversable-resolver&gt;
-        org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver
-    &lt;/traversable-resolver&gt;
-
+    &lt;message-interpolator&gt;com.acme.MessageInterpolator&lt;/message-interpolator&gt;
+    &lt;traversable-resolver&gt;com.acme.TraversableResolver&lt;/traversable-resolver&gt;
     &lt;constraint-validator-factory&gt;
-        org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl
+        com.acme.ConstraintValidatorFactory
     &lt;/constraint-validator-factory&gt;
-
-    &lt;parameter-name-provider&gt;
-        org.hibernate.validator.internal.engine.DefaultParameterNameProvider
-    &lt;/parameter-name-provider&gt;
+    &lt;parameter-name-provider&gt;com.acme.ParameterNameProvider&lt;/parameter-name-provider&gt;
 
     &lt;executable-validation enabled="true"&gt;
         &lt;default-validated-executable-types&gt;
             &lt;executable-type&gt;CONSTRUCTORS&lt;/executable-type&gt;
             &lt;executable-type&gt;NON_GETTER_METHODS&lt;/executable-type&gt;
+            &lt;executable-type&gt;GETTER_METHODS&lt;/executable-type&gt;
         &lt;/default-validated-executable-types&gt;
     &lt;/executable-validation&gt;
 
