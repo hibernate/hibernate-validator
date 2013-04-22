@@ -37,7 +37,7 @@
       url="http://www.jboss.org/xml/ns/javax/validation/mapping">http://www.jboss.org/xml/ns/javax/validation/mapping</ulink>.</para>
     </note></para>
 
-  <section>
+  <section id="section-configuration-validation-xml">
     <title>Configuring ValidationFactory in
     <filename>validation.xml</filename></title>
 
