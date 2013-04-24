@@ -20,7 +20,7 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter id="validator-usingvalidator">
+<chapter id="chapter-bean-constraints">
   <title>Declaring and validating bean constraints</title>
 
   <para>In this chapter we will see in more detail how to use Hibernate
@@ -30,7 +30,7 @@
   Let's start with how to add constraints to an entity.</para>
 
   <section id="validator-usingvalidator-annotate">
-    <title>Defining constraints</title>
+    <title>Defining bean constraints</title>
 
     <para>Constraints in Bean Validation are expressed via Java annotations.
     In this section we show how to enhance an object model with these
@@ -290,7 +290,7 @@ public class RentalCar extends Car {
       <classname>@NotNull</classname> constraint from the super-class.</para>
     </section>
 
-    <section>
+    <section id="section-object-graph-validation">
       <title>Object graphs</title>
 
       <para>The Bean Validation API does not only allow to validate single
@@ -407,7 +407,7 @@ public class Car {
       </example>
 
       <para>If a <classname>Car</classname> instance is validated, a
-      <classname>ConstraintValidation</classname> will be created, if any of
+      <classname>ConstraintViolation</classname> will be created, if any of
       the <classname>Person</classname> objects contained in the
       <property>passengers</property> list has a <code>null</code> name.<note>
           <para><classname>null</classname> values are getting ignored when
@@ -417,7 +417,7 @@ public class Car {
   </section>
 
   <section id="validator-usingvalidator-validate">
-    <title>Validating constraints</title>
+    <title>Validating bean constraints</title>
 
     <para>The <classname>Validator</classname> interface is the main entry
     point to Bean Validation. In <xref linkend="section-validator-instance"/>
@@ -546,12 +546,12 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
       </section>
     </section>
 
-    <section>
+    <section id="section-constraint-violation-methods">
       <title><classname>ConstraintViolation</classname> methods</title>
 
       <para>Now it is time to have a closer look at what a
-      <classname>ConstraintViolation</classname>. Using the different methods
-      of <classname>ConstraintViolation</classname> a lot of useful
+      <classname>ConstraintViolation</classname> is. Using the different
+      methods of <classname>ConstraintViolation</classname> a lot of useful
       information about the cause of the validation failure can be determined.
       <xref linkend="table-constraint-violation"/> gives an overview of these
       methods:</para>
