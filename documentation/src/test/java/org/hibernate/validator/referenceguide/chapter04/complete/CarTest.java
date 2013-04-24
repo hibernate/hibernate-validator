@@ -15,7 +15,7 @@ public class CarTest {
 	private static Validator validator;
 
 	@BeforeClass
-	public static void setUp() {
+	public static void setUpValidator() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
 	}

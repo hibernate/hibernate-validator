@@ -519,7 +519,7 @@ public class CarTest {
     </section>
   </section>
 
-  <section>
+  <section id="section-cross-parameter-constraints">
     <title>Cross-parameter constraints</title>
 
     <para>Bean Validation distinguishes between two different kinds of
@@ -571,10 +571,12 @@ public @interface ConsistentDateParameters {
     <classname>@Constraint</classname>. This meta annotation also specifies
     the corresponding validator, which is shown in <xref
     linkend="example-cross-parameter-validator"/>. Note that besides the
-    element types METHOD and CONSTRUCTOR also ANNOTATION_TYPE is specified as
-    target of the annotation, in order to enable the creation of composed
-    constraints based on <classname>@ConsistentDateParameters</classname> (see
-    <xref linkend="validator-customconstraints-compound"/>).</para>
+    element types <classname>METHOD</classname> and
+    <classname>CONSTRUCTOR</classname> also
+    <classname>ANNOTATION_TYPE</classname> is specified as target of the
+    annotation, in order to enable the creation of composed constraints based
+    on <classname>@ConsistentDateParameters</classname> (see <xref
+    linkend="validator-customconstraints-compound"/>).</para>
 
     <para><note>
         <para>Cross-parameter constraints are specified directly on the

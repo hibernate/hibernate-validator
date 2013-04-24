@@ -20,7 +20,7 @@ public class ConsistentDateParametersTest {
 	private static ExecutableValidator executableValidator;
 
 	@BeforeClass
-	public static void setUp() {
+	public static void setUpValidator() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		executableValidator = factory.getValidator().forExecutables();
 	}
@@ -40,7 +40,6 @@ public class ConsistentDateParametersTest {
 				method,
 				parameterValues
 		);
-
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals(
