@@ -20,384 +20,467 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter id="validator-bootstrapping">
+<chapter id="chapter-bootstrapping">
   <title>Bootstrapping</title>
 
-  <para>We already seen in <xref linkend="section-validator-instance"/> the
-  easiest way to create a <classname>Validator</classname> instance -
-  <methodname>Validation.buildDefaultValidatorFactory</methodname>. In this
-  chapter we have a look at the other methods in
-  <classname>javax.validation.Validation</classname> and how they allow to
-  configure several aspects of Bean Validation at bootstrapping time.</para>
+  <para>In <xref linkend="section-obtaining-validator"/> you already saw one
+  way for creating a <classname>Validator</classname> instance — via
+  <methodname>Validation#buildDefaultValidatorFactory()</methodname>. In this
+  chapter you will learn how to use the other methods in
+  <classname>javax.validation.Validation</classname> in order to bootstrap
+  specifically configured validators.</para>
 
-  <para>The different bootstrapping options allow, amongst other things, to
-  bootstrap any Bean Validation implementation on the classpath. Generally, an
-  available provider is discovered by the <ulink
-  url="http://docs.oracle.com/javase/6/docs/technotes/guides/jar/jar.html#Service%20Provider">Java
-  Service Provider</ulink> mechanism. A Bean Validation implementation
-  includes the file
-  <filename>javax.validation.spi.ValidationProvider</filename> in
-  <filename>META-INF/services</filename>. This file contains the fully
-  qualified classname of the <classname>ValidationProvider</classname> of the
-  implementation. In the case of Hibernate Validator this is
-  <classname>org.hibernate.validator.HibernateValidator</classname>.</para>
+  <section>
+    <title>Retrieving <classname>ValidatorFactory</classname> and
+    <classname>Validator</classname></title>
 
-  <note>
-    <para>If there are more than one Bean Validation implementation providers
-    in the classpath and
-    <methodname>Validation.buildDefaultValidatorFactory()</methodname> is
-    used, there is no guarantee which provider will be chosen. To enforce the
-    provider <methodname>Validation.byProvider()</methodname> should be
-    used.</para>
-  </note>
+    <para>You obtain a <classname>Validator</classname> by retrieving a
+    <classname>ValidatorFactory</classname> via one of the static methods on
+    <classname>javax.validation.Validation</classname> and calling
+    <classname>getValidator()</classname> on the factory instance.</para>
 
-  <section id="section-validator-instance">
-    <title><classname>Configuration</classname> and
-    <classname>ValidatorFactory</classname></title>
-
-    <para>There are three different methods in the Validation class to create
-    a Validator instance. The easiest in shown in <xref
-    linkend="example-build-default-validator-factory"/>.</para>
+    <para><xref linkend="example-build-default-validator-factory"/> shows how
+    to obtain a validator from the default validator factory:</para>
 
     <example id="example-build-default-validator-factory">
-      <title>Validation.buildDefaultValidatorFactory()</title>
+      <title>Bootstrapping default <classname>ValidatorFactory</classname> and
+      <classname>Validator</classname></title>
 
       <programlisting language="JAVA" role="JAVA">ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 Validator validator = factory.getValidator();</programlisting>
     </example>
 
-    <para>You can also use the method
-    <methodname>Validation.byDefaultProvider()</methodname> which will allow
-    you to configure several aspects of the created Validator instance:</para>
-
-    <example>
-      <title>Validation.byDefaultProvider()</title>
-
-      <programlisting language="JAVA" role="JAVA">Configuration&lt;?&gt; config = Validation.byDefaultProvider().configure();
-config.messageInterpolator(new MyMessageInterpolator())
-    .traversableResolver( new MyTraversableResolver())
-    .constraintValidatorFactory(new MyConstraintValidatorFactory());
-
-ValidatorFactory factory = config.buildValidatorFactory();
-Validator validator = factory.getValidator();
-</programlisting>
-    </example>
-
-    <para>We will learn more about <classname>MessageInterpolator</classname>,
-    <classname>TraversableResolver</classname> and
-    <classname>ConstraintValidatorFactory</classname> in the following
-    sections.</para>
-
-    <para>Last but not least you can ask for a Configuration object of a
-    specific Bean Validation provider. This is useful if you have more than
-    one Bean Validation provider in your classpath. In this situation you can
-    make an explicit choice about which implementation to use. In the case of
-    Hibernate Validator the <classname>Validator</classname> creation looks
-    like:</para>
-
-    <example>
-      <title>Validation.byProvider( HibernateValidator.class )</title>
-
-      <programlisting language="JAVA" role="JAVA">HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
-config.messageInterpolator(new MyMessageInterpolator())
-    .traversableResolver( new MyTraversableResolver())
-    .constraintValidatorFactory(new MyConstraintValidatorFactory());
-
-ValidatorFactory factory = config.buildValidatorFactory();
-Validator validator = factory.getValidator();</programlisting>
-    </example>
-
-    <para><tip>
-        <para>The generated <classname>Validator</classname> instance is
-        thread safe and can be cached.</para>
-      </tip></para>
-  </section>
-
-  <section id="section-validation-provider-resolver">
-    <title><classname>ValidationProviderResolver</classname></title>
-
-    <para>In the case that the Java Service Provider mechanism does not work
-    in your environment or you have a special classloader setup, you are able
-    to provide a custom <classname>ValidationProviderResolver</classname>. An
-    example in an OSGi environment you could plug your custom provider
-    resolver like seen in <xref linkend="example-provider-resolver"/>.</para>
-
-    <example id="example-provider-resolver">
-      <title>Providing a custom ValidationProviderResolver</title>
-
-      <programlisting language="JAVA" role="JAVA">Configuration&lt;?&gt; config = Validation.byDefaultProvider()
-    .providerResolver( new OSGiServiceDiscoverer() )
-    .configure();
-
-ValidatorFactory factory = config.buildValidatorFactory();
-Validator validator = factory.getValidator();
-</programlisting>
-    </example>
-
-    <para>Your <classname>OSGiServiceDiscoverer</classname> must in this case
-    implement the interface
-    <classname>ValidationProviderResolver</classname>:</para>
-
-    <example>
-      <title>ValidationProviderResolver interface</title>
-
-      <programlisting language="JAVA" role="JAVA">public interface ValidationProviderResolver {
-    /**
-     * Returns a list of ValidationProviders available in the runtime environment.
-     *
-     * @return list of validation providers.  
-     */
-    List&lt;ValidationProvider&lt;?&gt;&gt; getValidationProviders();
-}
-</programlisting>
-    </example>
-  </section>
-
-  <section id="section-message-interpolator">
-    <title><classname>MessageInterpolator</classname></title>
-
-    <para><xref linkend="section-message-interpolation"/> already discussed
-    the default message interpolation algorithm. If you have special
-    requirements for your message interpolation you can provide a custom
-    interpolator using
-    <methodname>Configuration.messageInterpolator()</methodname>. This message
-    interpolator will be shared by all validators generated by the
-    <classname>ValidatorFactory</classname> created from this
-    <classname>Configuration</classname>. <xref
-    linkend="example-message-interpolator"/> shows an interpolator (available
-    in Hibernate Validator) which can interpolate the value being validated in
-    the constraint message. To refer to this value in the constraint message
-    you can use: <itemizedlist>
-        <listitem>
-          <para>${validatedValue}: this will call <methodname>String.valueOf
-          </methodname>on the validated value.</para>
-        </listitem>
-
-        <listitem>
-          <para>${validatedValue:&lt;format&gt;}: provide your own format
-          string which will be passed to <code>String.format</code> together
-          with the validated value. Refer to the javadoc of
-          <code>String.format</code> for more information about the format
-          options.</para>
-        </listitem>
-      </itemizedlist></para>
-
-    <example id="example-message-interpolator">
-      <title>Providing a custom MessageInterpolator</title>
-
-      <programlisting language="JAVA" role="JAVA">Configuration&lt;?&gt; configuration = Validation.byDefaultProvider().configure();
-ValidatorFactory factory = configuration
-    .messageInterpolator(new ValueFormatterMessageInterpolator(configuration.getDefaultMessageInterpolator()))
-    .buildValidatorFactory();
-
-Validator validator = factory.getValidator();
-</programlisting>
-    </example>
-
     <tip>
-      <para>It is recommended that <classname>MessageInterpolator</classname>
-      implementations delegate final interpolation to the Bean Validation
-      default <classname>MessageInterpolator</classname> to ensure standard
-      Bean Validation interpolation rules are followed. The default
-      implementation is accessible through
-      <methodname>Configuration.getDefaultMessageInterpolator()</methodname>.</para>
+      <para>The generated <classname>ValidatorFactory</classname> and
+      <classname>Validator</classname> instances are thread-safe and can be
+      cached. As Hibernate Validator uses the factory as context for caching
+      constraint metadata it is recommended to work with one factory instance
+      within an application.</para>
     </tip>
 
-    <section id="section-resource-bundle-locator">
-      <title>ResourceBundleLocator</title>
+    <para>Bean Validation supports working with several providers such as
+    Hibernate Validator within one application. If more than one provider is
+    present on the classpath, it is not guaranteed which one is chosen when
+    creating a factory via
+    <methodname>buildDefaultValidatorFactory()</methodname>.</para>
 
-      <para>A common use case is the ability to specify your own resource
-      bundles for message interpolation. The default
-      <classname>MessageInterpolator</classname> implementation in Hibernate
-      Validator is called
-      <classname>ResourceBundleMessageInterpolator</classname> and per default
-      loads resource bundles via
-      <methodname>ResourceBundle.getBundle</methodname>. However,
-      <classname>ResourceBundleMessageInterpolator</classname> also allows you
-      to specify a custom implementation of
-      <classname>ResourceBundleLocator</classname> allowing you to provide
-      your own resource bundles. <xref
-      linkend="example-resource-bundle-locator"/> shows an example. In the
-      example<methodname>
-      HibernateValidatorConfiguration.getDefaultResourceBundleLocator</methodname>
-      is used to retrieve the default
-      <classname>ResourceBundleLocator</classname> which then can be passed to
-      the custom implementation in order implement delegation.</para>
+    <para>In this case you can explicitly specify the provider to use via
+    <methodname>Validation#byProvider()</methodname>, passing the provider's
+    <classname>ValidationProvider</classname> class as shown in <xref
+    linkend="example-using-specific-provider"/>.</para>
 
-      <example id="example-resource-bundle-locator">
-        <title>Providing a custom ResourceBundleLocator</title>
+    <example id="example-using-specific-provider">
+      <title>Bootstrapping <classname>ValidatorFactory</classname> and
+      <classname>Validator</classname> using a specific provider</title>
 
-        <programlisting language="JAVA" role="JAVA">HibernateValidatorConfiguration configure = Validation.byProvider(HibernateValidator.class).configure();
+      <programlisting language="JAVA" role="JAVA">ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.buildValidatorFactory();
+Validator validator = validatorFactory.getValidator();</programlisting>
+    </example>
 
-ResourceBundleLocator defaultResourceBundleLocator = configure.getDefaultResourceBundleLocator(); 
-ResourceBundleLocator myResourceBundleLocator = new MyCustomResourceBundleLocator(defaultResourceBundleLocator);
+    <para>Note that the configuration object returned by
+    <methodname>configure()</methodname> allows to specifically customize the
+    factory before calling <methodname>buildValidatorFactory()</methodname>.
+    The available options are discussed later in this chapter.</para>
 
-configure.messageInterpolator(new ResourceBundleMessageInterpolator(myResourceBundleLocator));
-</programlisting>
+    <para>Similarly you can retrieve the default validator factory for
+    configuration which is demonstrated in <xref
+    linkend="example-configuring-default-provider"/>.</para>
+
+    <example id="example-configuring-default-provider">
+      <title>Retrieving the default <classname>ValidatorFactory</classname>
+      for configuration</title>
+
+      <programlisting language="JAVA" role="JAVA">ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+		.configure()
+		.buildValidatorFactory();
+Validator validator = validatorFactory.getValidator();</programlisting>
+    </example>
+
+    <note>
+      <para>If a <classname>ValidatorFactory</classname> instance is no longer
+      in use, it should be disposed by calling
+      <methodname>ValidatorFactory#close()</methodname>. This will free any
+      resources possibly allocated by the factory.</para>
+    </note>
+
+    <section>
+      <title><classname>ValidationProviderResolver</classname></title>
+
+      <para>By default, available Bean Validation providers are discovered
+      using the <ulink
+      url="http://docs.oracle.com/javase/6/docs/technotes/guides/jar/jar.html#Service%20Provider">Java
+      Service Provider</ulink> mechanism.</para>
+
+      <para>For that purpose, each provider includes the file
+      <filename>META-INF/services/javax.validation.spi.ValidationProvider</filename>,
+      containing the fully qualified classname of its
+      <classname>ValidationProvider</classname> implementation. In the case of
+      Hibernate Validator this is
+      <classname>org.hibernate.validator.HibernateValidator</classname>.</para>
+
+      <para>Depending on your environment and its classloading specifics,
+      provider discovery via the Java's service loader mechanism might not
+      work. In this case you can plug in a custom
+      <classname>ValidationProviderResolver</classname> implementation which
+      performs the provider retrieval. An example is OSGi, where you could
+      implement a provider resolver which uses OSGi services for provider
+      discovery.</para>
+
+      <para>To use a custom provider resolver pass it via
+      <methodname>providerResolver()</methodname> as shown shown in <xref
+      linkend="example-using-custom-validation-provider-resolver"/>.</para>
+
+      <example id="example-using-custom-validation-provider-resolver">
+        <title>Using a custom
+        <classname>ValidationProviderResolver</classname></title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter08;
+
+public class OsgiServiceDiscoverer implements ValidationProviderResolver {
+
+	@Override
+	public List&lt;ValidationProvider&lt;?&gt;&gt; getValidationProviders() {
+		//...
+	}
+}</programlisting>
+
+        <programlisting language="JAVA" role="JAVA">ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+		.providerResolver( new OsgiServiceDiscoverer() )
+		.configure()
+		.buildValidatorFactory();
+Validator validator = validatorFactory.getValidator();</programlisting>
       </example>
-
-      <para>Hibernate Validator provides the following implementation of
-      <classname>ResourceBundleLocator</classname> -
-      <classname>PlatformResourceBundleLocator</classname> (the default) and
-      <classname>AggregateResourceBundleLocator</classname>. The latter can be
-      used to specify a list of resource bundle names which will get loaded
-      and merged into a single resource bundle. Refer to the JavaDoc
-      documentation for more information.</para>
     </section>
   </section>
 
   <section>
-    <title><classname>TraversableResolver</classname></title>
+    <title>Configuring a <classname>ValidatorFactory</classname></title>
 
-    <para>The usage of the <classname>TraversableResolver</classname> has so
-    far not been discussed. The idea is that in some cases, the state of a
-    property should not be accessed. The most obvious example for that is a
-    lazy loaded property or association of a Java Persistence provider.
-    Validating this lazy property or association would mean that its state
-    would have to be accessed triggering a load from the database. Bean
-    Validation controls which property can and cannot be accessed via the
-    <classname>TraversableResolver</classname> interface (see <xref
-    linkend="example-traversable-resolver"/>). In the example
-    HibernateValidatorConfiguration.</para>
+    <para>By default validator factories retrieved from
+    <classname>Validation</classname> and any validators they create are
+    configured as per the XML descriptor
+    <filename>META-INF/validation.xml</filename> (see <xref
+    linkend="chapter-xml-configuration"/>), if present.</para>
 
-    <example id="example-traversable-resolver">
-      <title>TraversableResolver interface</title>
+    <para>If you want to disable the XML based configuration, you can do so by
+    invoking
+    <methodname>Configuration#ignoreXmlConfiguration()</methodname>.</para>
 
-      <programlisting language="JAVA" role="JAVA">/**
- * Contract determining if a property can be accessed by the Bean Validation provider
- * This contract is called for each property that is being either validated or cascaded.
- *
- * A traversable resolver implementation must be thread-safe.
- *
- */
-public interface TraversableResolver {
-    /**
-     * Determine if the Bean Validation provider is allowed to reach the property state
-     *
-     * @param traversableObject object hosting &lt;code&gt;traversableProperty&lt;/code&gt; or null  
-     *                          if validateValue is called
-     * @param traversableProperty the traversable property.
-     * @param rootBeanType type of the root object passed to the Validator.
-     * @param pathToTraversableObject path from the root object to
-     *        &lt;code&gt;traversableObject&lt;/code&gt;
-     *        (using the path specification defined by Bean Validator).
-     * @param elementType either &lt;code&gt;FIELD&lt;/code&gt; or &lt;code&gt;METHOD&lt;/code&gt;.
-     *
-     * @return &lt;code&gt;true&lt;/code&gt; if the Bean Validation provider is allowed to
-     *         reach the property state, &lt;code&gt;false&lt;/code&gt; otherwise.
-     */
-     boolean isReachable(Object traversableObject,
-                         Path.Node traversableProperty,
-                         Class&lt;?&gt; rootBeanType,
-                         Path pathToTraversableObject,
-                         ElementType elementType);
+    <para>The different values of the XML configuration can be accessed via
+    <methodname>Configuration#getBootstrapConfiguration()</methodname>. This
+    can for instance be helpful if you want to integrate Bean Validation into
+    a managed environment and want to create managed instances of the objects
+    configured via XML.</para>
 
-    /**
-     * Determine if the Bean Validation provider is allowed to cascade validation on
-     * the bean instance returned by the property value
-     * marked as &lt;code&gt;@Valid&lt;/code&gt;.
-     * Note that this method is called only if isReachable returns true for the same set of
-     * arguments and if the property is marked as &lt;code&gt;@Valid&lt;/code&gt;
-     *
-     * @param traversableObject object hosting &lt;code&gt;traversableProperty&lt;/code&gt; or null
-     *                          if validateValue is called
-     * @param traversableProperty the traversable property.
-     * @param rootBeanType type of the root object passed to the Validator.
-     * @param pathToTraversableObject path from the root object to
-     *        &lt;code&gt;traversableObject&lt;/code&gt;
-     *        (using the path specification defined by Bean Validator).
-     * @param elementType either &lt;code&gt;FIELD&lt;/code&gt; or &lt;code&gt;METHOD&lt;/code&gt;.
-     *
-     * @return &lt;code&gt;true&lt;/code&gt; if the Bean Validation provider is allowed to
-     *         cascade validation, &lt;code&gt;false&lt;/code&gt; otherwise.
-     */
-     boolean isCascadable(Object traversableObject,
-                          Path.Node traversableProperty,
-                          Class&lt;?&gt; rootBeanType,
-                          Path pathToTraversableObject,
-                          ElementType elementType);
-}
-</programlisting>
-    </example>
+    <para>Using the fluent configuration API, you can override one or more of
+    the settings when bootstrapping the factory. The following sections show
+    how to make use of the different options. Note that the
+    <classname>Configuration</classname> class exposes the default
+    implementations of the different extension points which can be useful if
+    you want to use these as delegates for your custom implementations.</para>
 
-    <para>Hibernate Validator provides two
-    <classname>TraversableResolver</classname>s out of the box which will be
-    enabled automatically depending on your environment. The first is the
-    <classname>DefaultTraversableResolver</classname> which will always return
-    true for <methodname>isReachable()</methodname> and
-    <methodname>isTraversable()</methodname>. The second is the
-    <classname>JPATraversableResolver</classname> which gets enabled when
-    Hibernate Validator gets used in combination with JPA 2. In case you have
-    to provide your own resolver you can do so again using the
-    <classname>Configuration</classname> object as seen in <xref
-    linkend="example-traversable-resolver-config"/>.</para>
+    <section>
+      <title><classname>MessageInterpolator</classname></title>
 
-    <example id="example-traversable-resolver-config">
-      <title>Providing a custom TraversableResolver</title>
+      <para>Message interpolators are used by the validation engine to create
+      user readable error messages from constraint message descriptors.</para>
 
-      <programlisting language="JAVA" role="JAVA">Configuration&lt;?&gt; configuration = Validation.byDefaultProvider().configure();
-ValidatorFactory factory = configuration
-    .traversableResolver(new MyTraversableResolver())
-    .buildValidatorFactory();
+      <para>In case the default message interpolation algorithm described in
+      <xref linkend="chapter-message-interpolation"/> is not sufficient for
+      your needs, you can pass in your own implementation of the
+      <classname>MessageInterpolator</classname> interface via
+      <classname>Configuration#messageInterpolator()</classname> as shown in
+      <xref linkend="example-using-custom-message-interpolator"/>.</para>
 
-Validator validator = factory.getValidator();
-</programlisting>
-    </example>
+      <example id="example-using-custom-message-interpolator">
+        <title>Using a custom
+        <classname>MessageInterpolator</classname></title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter08;
+
+public class MyMessageInterpolator implements MessageInterpolator {
+
+	@Override
+	public String interpolate(String messageTemplate, Context context) {
+		//...
+	}
+
+	@Override
+	public String interpolate(String messageTemplate, Context context, Locale locale) {
+		//...
+	}
+}</programlisting>
+
+        <programlisting language="JAVA" role="JAVA">ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+		.configure()
+		.messageInterpolator( new MyMessageInterpolator() )
+		.buildValidatorFactory();
+Validator validator = validatorFactory.getValidator();</programlisting>
+      </example>
+    </section>
+
+    <section>
+      <title><classname>TraversableResolver</classname></title>
+
+      <para>In some cases the validation engine should not access the state of
+      a bean property. The most obvious example for that is a lazily loaded
+      property or association of a JPA entity. Validating this lazy property
+      or association would mean that its state would have to be accessed,
+      triggering a load from the database.</para>
+
+      <para>Which properties can be accessed and which ones not is controlled
+      by querying the <classname>TraversableResolver</classname> interface.
+      <xref linkend="example-using-custom-traversable-resolver"/> shows how to
+      use a custom traversable resolver implementation.</para>
+
+      <example id="example-using-custom-traversable-resolver">
+        <title>Using a custom
+        <classname>TraversableResolver</classname></title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter08;
+
+public class MyTraversableResolver implements TraversableResolver {
+
+	@Override
+	public boolean isReachable(
+			Object traversableObject,
+			Node traversableProperty,
+			Class&lt;?&gt; rootBeanType,
+			Path pathToTraversableObject,
+			ElementType elementType) {
+		//...
+	}
+
+	@Override
+	public boolean isCascadable(
+			Object traversableObject,
+			Node traversableProperty,
+			Class&lt;?&gt; rootBeanType,
+			Path pathToTraversableObject,
+			ElementType elementType) {
+		//...
+	}
+}</programlisting>
+
+        <programlisting language="JAVA" role="JAVA">ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+		.configure()
+		.traversableResolver( new MyTraversableResolver() )
+		.buildValidatorFactory();
+Validator validator = validatorFactory.getValidator();</programlisting>
+      </example>
+
+      <para>Hibernate Validator provides two
+      <classname>TraversableResolver</classname>s out of the box which will be
+      enabled automatically depending on your environment. The first is
+      <classname>DefaultTraversableResolver</classname> which will always
+      return <literal>true</literal> for
+      <methodname>isReachable()</methodname> and
+      <methodname>isTraversable()</methodname>. The second is
+      <classname>JPATraversableResolver</classname> which gets enabled when
+      Hibernate Validator is used in combination with JPA 2.</para>
+    </section>
+
+    <section>
+      <title><classname>ConstraintValidatorFactory</classname></title>
+
+      <para><classname>ConstraintValidatorFactory</classname> is the extension
+      point for customizing how constraint validators are instantiated and
+      released.</para>
+
+      <para>The default <classname>ConstraintValidatorFactory</classname>
+      provided by Hibernate Validator requires a public no-arg constructor to
+      instantiate <classname>ConstraintValidator</classname> instances (see
+      <xref linkend="section-constraint-validator"/>). Using a custom
+      <classname>ConstraintValidatorFactory</classname> offers for example the
+      possibility to use dependency injection in constraint validator
+      implementations.</para>
+
+      <para>To configure a custom constraint validator factory call
+      <methodname>Configuration#constraintValidatorFactory()</methodname> (see
+      <xref
+      linkend="example-using-custom-constraint-validator-factory"/>.</para>
+
+      <example id="example-using-custom-constraint-validator-factory">
+        <title>Using a custom
+        <classname>ConstraintValidatorFactory</classname></title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter08;
+
+public class MyConstraintValidatorFactory implements ConstraintValidatorFactory {
+
+	@Override
+	public &lt;T extends ConstraintValidator&lt;?, ?&gt;&gt; T getInstance(Class&lt;T&gt; key) {
+		//...
+	}
+
+	@Override
+	public void releaseInstance(ConstraintValidator&lt;?, ?&gt; instance) {
+		//...
+	}
+}</programlisting>
+
+        <programlisting language="JAVA" role="JAVA">ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+		.configure()
+		.constraintValidatorFactory( new MyConstraintValidatorFactory() )
+		.buildValidatorFactory();
+Validator validator = validatorFactory.getValidator();</programlisting>
+      </example>
+
+      <warning>
+        <para>Any constraint implementations relying on
+        <classname>ConstraintValidatorFactory</classname> behaviors specific
+        to an implementation (dependency injection, no no-arg constructor and
+        so on) are not considered portable.</para>
+      </warning>
+
+      <note>
+        <para><classname>ConstraintValidatorFactory</classname>
+        implementations should not cache validator instances as the state of
+        each instance can be altered in the
+        <methodname>initialize()</methodname> method.</para>
+      </note>
+    </section>
+
+    <section>
+      <title><classname>ParameterNameProvider</classname></title>
+
+      <para>In case a method or constructor parameter constraint is violated,
+      the <classname>ParameterNameProvider</classname> interface is used to
+      retrieve the parameter's name and make it available to the user via the
+      constraint violation's property path.</para>
+
+      <para>The default implementation returns parameter names in the form
+      <literal>arg0</literal>, <literal>arg1</literal> etc., while custom
+      implementations could e.g. be based on parameter annotations, debug
+      symbols or a feature for retrieving parameter names at runtime possibly
+      provided by future Java versions.</para>
+
+      <para>Custom <classname>ParameterNameProvider</classname>
+      implementations are used as demonstrated in <xref
+      linkend="example-using-custom-parameter-name-provider"/>.</para>
+
+      <example id="example-using-custom-parameter-name-provider">
+        <title>Using a custom
+        <classname>ParameterNameProvider</classname></title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter08;
+
+public class MyParameterNameProvider implements ParameterNameProvider {
+
+	@Override
+	public List&lt;String&gt; getParameterNames(Constructor&lt;?&gt; constructor) {
+		//...
+	}
+
+	@Override
+	public List&lt;String&gt; getParameterNames(Method method) {
+		//...
+	}
+}</programlisting>
+
+        <programlisting language="JAVA" role="JAVA">ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+		.configure()
+		.parameterNameProvider( new MyParameterNameProvider() )
+		.buildValidatorFactory();
+Validator validator = validatorFactory.getValidator();</programlisting>
+      </example>
+    </section>
+
+    <section>
+      <title>Adding mapping streams</title>
+
+      <para>As discussed earlier you can configure the constraints applying
+      for your Java beans using XML based constraint mappings.</para>
+
+      <para>Besides the mapping files specified in
+      <filename>META-INF/validation.xml</filename> you can add further
+      mappings via <methodname>Configuration#addMapping()</methodname> (see
+      <xref linkend="example-adding-mapping-streams"/>). Note that the passed
+      input stream(s) must adhere to the XML schema for constraint mappings
+      presented in <xref linkend="section-mapping-xml-constraints"/>.</para>
+
+      <example id="example-adding-mapping-streams">
+        <title>Adding constraint mapping streams</title>
+
+        <programlisting language="JAVA" role="JAVA">InputStream constraintMapping1 = ...;
+InputStream constraintMapping2 = ...;
+ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+		.configure()
+		.addMapping( constraintMapping1 )
+		.addMapping( constraintMapping2 )
+		.buildValidatorFactory();
+Validator validator = validatorFactory.getValidator();</programlisting>
+      </example>
+
+      <para>You should close any passed input stream after the validator
+      factory has been created.</para>
+    </section>
+
+    <section id="section-provider-specific-settings">
+      <title>Provider-specific settings</title>
+
+      <para>Via the configuration object returned by
+      <methodname>Validation#byProvider()</methodname> provider specific
+      options can be configured.</para>
+
+      <para>In case of Hibernate Validator this allows you to enable the fail
+      fast mode and pass one or more programmatic constraint mappings as
+      demonstrated in <xref
+      linkend="example-hibernate-validator-specific-options"/>.</para>
+
+      <example id="example-hibernate-validator-specific-options">
+        <title>Setting Hibernate Validator specific options</title>
+
+        <programlisting language="JAVA" role="JAVA">ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.failFast( true )
+		.addMapping( (ConstraintMapping) null )
+		.buildValidatorFactory();
+Validator validator = validatorFactory.getValidator();</programlisting>
+      </example>
+
+      <para>Alternatively, provider-specific options can be passed via
+      <methodname>Configuration#addProperty()</methodname>. Hibernate
+      Validator supports enabling the fail fast mode that way, too:</para>
+
+      <example id="example-hibernate-validator-specific-option-via-addproperty">
+        <title>Enabling a Hibernate Validator specific option via
+        <methodname>addProperty()</methodname></title>
+
+        <programlisting language="JAVA" role="JAVA">ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.addProperty( "hibernate.validator.fail_fast", "true" )
+		.buildValidatorFactory();
+Validator validator = validatorFactory.getValidator();</programlisting>
+      </example>
+
+      <para>Refer to <xref linkend="section-fail-fast"/> and <xref
+      linkend="section-programmatic-api"/> to learn more about the fail fast
+      mode and the constraint declaration API.</para>
+    </section>
   </section>
 
   <section>
-    <title><classname>ConstraintValidatorFactory</classname></title>
+    <title>Configuring a <classname>Validator</classname></title>
 
-    <para>Last but not least, there is one more configuration option to
-    discuss, the <classname>ConstraintValidatorFactory</classname>. The
-    default <classname>ConstraintValidatorFactory</classname> provided by
-    Hibernate Validator requires a public no-arg constructor to instantiate
-    <classname>ConstraintValidator</classname> instances (see <xref
-    linkend="section-constraint-validator"/>). Using a custom
-    <classname>ConstraintValidatorFactory</classname> offers for example the
-    possibility to use dependency injection in constraint implementations. The
-    configuration of the custom factory is once more via the
-    <classname>Configuration</classname> (<xref
-    linkend="example-constraint-validator-factory"/>).</para>
+    <para>When working with a configured validator factory it can occasionally
+    be required to apply a different configuration to a single
+    <classname>Validator</classname> instance. <xref
+    linkend="example-using-context"/> shows how this can be achieved by
+    calling <methodname>ValidatorFactory#usingContext()</methodname>.</para>
 
-    <example id="example-constraint-validator-factory">
-      <title>Providing a custom ConstraintValidatorFactory</title>
+    <example id="example-using-context">
+      <title>Configuring a <classname>Validator</classname> via
+      <methodname>usingContext()</methodname></title>
 
-      <programlisting language="JAVA" role="JAVA">Configuration&lt;?&gt; configuration = Validation.byDefaultProvider().configure();
-ValidatorFactory factory = configuration
-    .constraintValidatorFactory(new IOCConstraintValidatorFactory())
-    .buildValidatorFactory();
+      <programlisting language="JAVA" role="JAVA">ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
 
-Validator validator = factory.getValidator();
-</programlisting>
+Validator validator = validatorFactory.usingContext()
+		.messageInterpolator( new MyMessageInterpolator() )
+		.traversableResolver( new MyTraversableResolver() )
+		.getValidator();</programlisting>
     </example>
-
-    <para>The interface you have to implement is:</para>
-
-    <example>
-      <title>ConstraintValidatorFactory interface</title>
-
-      <programlisting language="JAVA" role="JAVA">public interface ConstraintValidatorFactory {
-    /**
-     * @param key The class of the constraint validator to instantiate.
-     *
-     * @return A constraint validator instance of the specified class.
-     */
-     &lt;T extends ConstraintValidator&lt;?,?&gt;&gt; T getInstance(Class&lt;T&gt; key);
-}
-</programlisting>
-    </example>
-
-    <warning>
-      <para>Any constraint implementation relying on
-      <classname>ConstraintValidatorFactory</classname> behaviors specific to
-      an implementation (dependency injection, no no-arg constructor and so
-      on) are not considered portable.</para>
-    </warning>
-
-    <note>
-      <para>ConstraintValidatorFactory should not cache instances as the state
-      of each instance can be altered in the initialize method.</para>
-    </note>
   </section>
 </chapter>
