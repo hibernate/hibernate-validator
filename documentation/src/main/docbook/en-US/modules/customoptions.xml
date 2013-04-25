@@ -403,4 +403,20 @@ public @interface PatternOrSize {
       case validation of the constraint composition fails.</para>
     </tip>
   </section>
+
+  <section>
+    <title><classname>ResourceBundleLocator</classname></title>
+
+    <para>As described in <xref linkend="section-message-interpolator"/>, Bean
+    Validation allows to plug in custom message interpolator
+    implementations.</para>
+
+    <para>With <classname>ResourceBundleLocator</classname>, Hibernate
+    Validator provides an additional SPI which allows to retrieve error
+    messages from other resource bundles than
+    <filename>ValidationMessages</filename>, while still using the actual
+    interpolation algorithm as defined by the specification. Refer to <xref
+    linkend="section-resource-bundle-locator"/> to learn how to configure a
+    custom resource bundle locator.</para>
+  </section>
 </chapter>
