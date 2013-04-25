@@ -20,7 +20,7 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter id="validator-groups">
+<chapter id="chapter-groups">
   <title>Grouping constraints</title>
 
   <para>Each of the validate methods in <xref
