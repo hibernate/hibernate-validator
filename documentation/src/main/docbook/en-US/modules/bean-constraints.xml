@@ -21,7 +21,7 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="validator-usingvalidator">
-  <title>Declaring and validating constraints</title>
+  <title>Declaring and validating bean constraints</title>
 
   <para>In this chapter we will see in more detail how to use Hibernate
   Validator to validate constraints for a given entity model. We will also
@@ -48,11 +48,6 @@
 
         <listitem>
           <para>class constraints</para>
-        </listitem>
-
-        <listitem>
-          <para>method constraints (parameter, cross-parameter and return
-          value constraints)</para>
         </listitem>
       </itemizedlist></para>
 
@@ -238,31 +233,6 @@ public class Car {
     //getters and setters ...
 }</programlisting>
       </example>
-    </section>
-
-    <section>
-      <title id="validator-usingvalidator-classlevel">Method
-      constraints</title>
-
-      <para>TODO - intro</para>
-
-      <section>
-        <title>Parameter constraints</title>
-
-        <para/>
-      </section>
-
-      <section>
-        <title>Cross-parameter constraints</title>
-
-        <para/>
-      </section>
-
-      <section>
-        <title>Return value constraints</title>
-
-        <para/>
-      </section>
     </section>
 
     <section>
@@ -671,55 +641,6 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
           </tbody>
         </tgroup>
       </table>
-    </section>
-
-    <section id="section-message-interpolation">
-      <title>Message interpolation</title>
-
-      <para>As we will see in <xref linkend="validator-customconstraints"/>
-      each constraint definition must define a default message descriptor.
-      This message can be overridden at declaration time using the
-      <methodname>message</methodname> attribute of the constraint. You can
-      see this in <xref linkend="example-driver"/>. This message descriptors
-      get interpolated when a constraint validation fails using the configured
-      <classname>MessageInterpolator</classname>. The interpolator will try to
-      resolve any message parameters, meaning string literals enclosed in
-      braces. In order to resolve these parameters Hibernate Validator's
-      default <classname>MessageInterpolator</classname> first recursively
-      resolves parameters against a custom
-      <classname>ResourceBundle</classname> called
-      <filename>ValidationMessages.properties</filename> at the root of the
-      classpath (It is up to you to create this file). If no further
-      replacements are possible against the custom bundle the default
-      <classname>ResourceBundle</classname> under
-      <filename>/org/hibernate/validator/ValidationMessages.properties</filename>
-      gets evaluated. If a replacement occurs against the default bundle the
-      algorithm looks again at the custom bundle (and so on). Once no further
-      replacements against these two resource bundles are possible remaining
-      parameters are getting resolved against the attributes of the constraint
-      to be validated.</para>
-
-      <para>Since the braces { and } have special meaning in the messages they
-      need to be escaped if they are used literally. The following The
-      following rules apply:<itemizedlist>
-          <listitem>
-            <para>\{ is considered as the literal {</para>
-          </listitem>
-
-          <listitem>
-            <para>\} is considered as the literal }</para>
-          </listitem>
-
-          <listitem>
-            <para>\\ is considered as the literal \</para>
-          </listitem>
-        </itemizedlist></para>
-
-      <para>If the default message interpolator does not fit your requirements
-      it is possible to plug a custom
-      <classname>MessageInterpolator</classname> when the
-      <classname>ValidatorFactory</classname> gets created. This can be seen
-      in <xref linkend="validator-bootstrapping"/>.</para>
     </section>
   </section>
 
