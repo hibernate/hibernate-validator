@@ -23,14 +23,17 @@
 <chapter id="chapter-bean-constraints">
   <title>Declaring and validating bean constraints</title>
 
-  <para>In this chapter we will see in more detail how to use Hibernate
-  Validator to validate constraints for a given entity model. We will also
-  learn which default constraints the Bean Validation specification provides
-  and which additional constraints are only provided by Hibernate Validator.
-  Let's start with how to add constraints to an entity.</para>
+  <para>Read this chapter in order to learn how to declare bean constraints
+  (see <xref linkend="section-declaring-bean-constraints"/>) and validate the
+  same (see <xref linkend="section-validating-bean-constraints"/>). <xref
+  linkend="section-builtin-constraints"/> provides an overview of all built-in
+  constraints coming with Hibernate Validator.</para>
 
-  <section id="validator-usingvalidator-annotate">
-    <title>Defining bean constraints</title>
+  <para>If you are interested in applying constraints to method parameters and
+  return values, refer to <xref linkend="chapter-method-constraints"/>.</para>
+
+  <section id="section-declaring-bean-constraints">
+    <title>Declaring bean constraints</title>
 
     <para>Constraints in Bean Validation are expressed via Java annotations.
     In this section we show how to enhance an object model with these
@@ -68,41 +71,35 @@
       example:</para>
 
       <example id="example-field-level">
-        <title>Field level constraint</title>
+        <title>Field-level constraints</title>
 
-        <programlisting language="JAVA" role="JAVA">package com.mycompany;
-
-import javax.validation.constraints.NotNull;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter02.fieldlevel;
 
 public class Car {
 
-    @NotNull
-    private String manufacturer;
+	@NotNull
+	private String manufacturer;
 
-    @AssertTrue
-    private boolean isRegistered;
+	@AssertTrue
+	private boolean isRegistered;
 
-    public Car(String manufacturer, boolean isRegistered) {
-        super();
-        this.manufacturer = manufacturer;
-        this.isRegistered = isRegistered;
-    }
+	public Car(String manufacturer, boolean isRegistered) {
+		this.manufacturer = manufacturer;
+		this.isRegistered = isRegistered;
+	}
+
+	//getters and setters...
 }</programlisting>
       </example>
 
-      <para>When using field level constraints field access strategy is used
-      to access the value to be validated. This means the bean validation
-      provider directly accesses the instance variable and does not invoke the
-      property accessor method also if such a method exists.</para>
+      <para>When using field-level constraints field access strategy is used
+      to access the value to be validated. This means the validation engine
+      directly accesses the instance variable and does not invoke the property
+      accessor method also if such a method exists.</para>
 
-      <note>
-        <para>The access type (private, protected or public) does not
-        matter.</para>
-      </note>
-
-      <note>
-        <para>Static fields and properties cannot be validated.</para>
-      </note>
+      <para>Constraints can be applied to fields of any access type (public,
+      private etc.). Constraints on static fields are not supported,
+      though.</para>
 
       <tip>
         <para>When validating byte code enhanced objects property level
@@ -121,56 +118,54 @@ public class Car {
       same entity as in <xref linkend="example-field-level"/>, however,
       property level constraints are used.<note>
           <para>The property's getter method has to be annotated, not its
-          setter.</para>
+          setter. That way also read-only properties can be constrained which
+          have no setter method.</para>
         </note></para>
 
       <example id="example-property-level">
-        <title>Property level constraint</title>
+        <title>Property-level constraints</title>
 
-        <programlisting language="JAVA" role="JAVA">package com.mycompany;
-
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter02.propertylevel;
 
 public class Car {
 
-    private String manufacturer;
+	private String manufacturer;
 
-    private boolean isRegistered;
-      
-    public Car(String manufacturer, boolean isRegistered) {
-        super();
-        this.manufacturer = manufacturer;
-        this.isRegistered = isRegistered;
-    }
+	private boolean isRegistered;
 
-    @NotNull
-    public String getManufacturer() {
-        return manufacturer;
-    }
+	public Car(String manufacturer, boolean isRegistered) {
+		this.manufacturer = manufacturer;
+		this.isRegistered = isRegistered;
+	}
 
-    public void setManufacturer(String manufacturer) {
-        this.manufacturer = manufacturer;
-    }
+	@NotNull
+	public String getManufacturer() {
+		return manufacturer;
+	}
 
-    @AssertTrue
-    public boolean isRegistered() {
-        return isRegistered;
-    }
+	public void setManufacturer(String manufacturer) {
+		this.manufacturer = manufacturer;
+	}
 
-    public void setRegistered(boolean isRegistered) {
-        this.isRegistered = isRegistered;
-    }
+	@AssertTrue
+	public boolean isRegistered() {
+		return isRegistered;
+	}
+
+	public void setRegistered(boolean isRegistered) {
+		this.isRegistered = isRegistered;
+	}
 }</programlisting>
       </example>
 
       <para>When using property level constraints property access strategy is
-      used to access the value to be validated. This means the bean validation
-      provider accesses the state via the property accessor method. One
-      advantage of annotating properties instead of fields is that the
-      constraints become part of the constrained type's API that way and users
-      are aware of the existing constraints without having to examine the
-      type's implementation.</para>
+      used to access the value to be validated, i.e. the validation engine
+      accesses the state via the property accessor method.</para>
+
+      <para>One advantage of annotating properties instead of fields is that
+      the constraints become part of the type's API that way. Thus users are
+      aware of the existing constraints without having to examine the type's
+      implementation.</para>
 
       <tip>
         <para>It is recommended to stick either to field
@@ -185,52 +180,37 @@ public class Car {
       <title id="validator-usingvalidator-classlevel">Class-level
       constraints</title>
 
-      <para>Last but not least, a constraint can also be placed on class
-      level. When a constraint annotation is placed on this level the class
-      instance itself passed to the
-      <classname>ConstraintValidator</classname>. Class level constraints are
-      useful if it is necessary to inspect more than a single property of the
-      class to validate it or if a correlation between different state
-      variables has to be evaluated. In <xref linkend="example-class-level"/>
-      we add the property <property>passengers</property> to the class
-      <classname>Car</classname>. We also add the constraint
-      <classname>PassengerCount</classname> on the class level. We will later
-      see how we can actually create this custom constraint (see <xref
-      linkend="validator-customconstraints"/>). For now it is enough to know
-      that <classname>PassengerCount</classname> will ensure that there cannot
-      be more passengers in a car than there are seats.</para>
+      <para>Last but not least, a constraint can also be placed on the class
+      level. In this case not a single property is subject of the validation
+      but the complete object. Class-level constraints are useful if the
+      validation depends on a correlation between several properties of an
+      object.</para>
+
+      <para>The <classname>Car</classname> class in <xref
+      linkend="example-class-level"/> has the two attributes
+      <varname>seatCount</varname> and <varname>passengers</varname> and it
+      should be ensured that the list of passengers has not more entries than
+      seats are available. For that purpose the
+      @<classname>PassengerCount</classname> constraint is added on the class
+      level. The validator of that constraint has access to the complete
+      <classname>Car</classname> object, allowing to compare the numbers of
+      seats and passengers. Refer to <xref
+      linkend="validator-customconstraints"/> to learn in detail how this
+      custom constraint is implemented.</para>
 
       <example id="example-class-level">
-        <title>Class level constraint</title>
+        <title>Class-level constraint</title>
 
-        <programlisting language="JAVA" role="JAVA">package com.mycompany;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter02.classlevel;
 
 @PassengerCount
 public class Car {
 
-    @NotNull
-    private String manufacturer;
+	private int seatCount;
 
-    @NotNull
-    @Size(min = 2, max = 14)
-    private String licensePlate;
+	private List&lt;Person&gt; passengers;
 
-    @Min(2)
-    private int seatCount;
-    
-    private List&lt;Person&gt; passengers;
-    
-    public Car(String manufacturer, String licencePlate, int seatCount) {
-        this.manufacturer = manufacturer;
-        this.licensePlate = licencePlate;
-        this.seatCount = seatCount;
-    }
-
-    //getters and setters ...
+	//...
 }</programlisting>
       </example>
     </section>
@@ -238,115 +218,94 @@ public class Car {
     <section>
       <title>Constraint inheritance</title>
 
-      <para>When validating an object that implements an interface or extends
-      another class, all constraint annotations on the implemented interface
-      and parent class apply in the same manner as the constraints specified
-      on the validated object itself. To make things clearer let's have a look
-      at the following example:</para>
+      <para>When a class implements an interface or extends another class, all
+      constraint annotations declared on the supertype apply in the same
+      manner as the constraints specified on the class itself. To make things
+      clearer let's have a look at the following example:</para>
 
       <example>
-        <title>Constraint inheritance using RentalCar</title>
+        <title>Constraint inheritance</title>
 
-        <programlisting language="JAVA" role="JAVA">package com.mycompany;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter02.inheritance;
 
-import javax.validation.constraints.NotNull;
+public class Car {
+
+	private String manufacturer;
+
+	@NotNull
+	public String getManufacturer() {
+		return manufacturer;
+	}
+
+	//...
+}</programlisting>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter02.inheritance;
 
 public class RentalCar extends Car {
 
-    private String rentalStation;
-    
-    public RentalCar(String manufacturer, String rentalStation) {
-        super(manufacturer);
-        this.rentalStation = rentalStation;
-    }
-    
-    @NotNull
-    public String getRentalStation() {
-        return rentalStation;
-    }
+	private String rentalStation;
 
-    public void setRentalStation(String rentalStation) {
-        this.rentalStation = rentalStation;
-    }
+	@NotNull
+	public String getRentalStation() {
+		return rentalStation;
+	}
+
+	//...
 }</programlisting>
       </example>
 
-      <para>Our well-known class <classname>Car</classname> is now extended by
-      <classname>RentalCar</classname> with the additional property
+      <para>Here the class <classname>RentalCar</classname> is a subclass of
+      <classname>Car</classname> and adds the property
       <property>rentalStation</property>. If an instance of
       <classname>RentalCar</classname> is validated, not only the
       <classname>@NotNull</classname> constraint on
-      <property>rentalStation</property> is validated, but also the constraint
+      <property>rentalStation</property> is evaluated, but also the constraint
       on <property>manufacturer</property> from the parent class.</para>
 
-      <para>The same would hold true, if <classname>Car</classname> were an
-      interface implemented by <classname>RentalCar</classname>.</para>
+      <para>The same would be true, if <classname>Car</classname> was not a
+      superclass but an interface implemented by
+      <classname>RentalCar</classname>.</para>
 
       <para>Constraint annotations are aggregated if methods are overridden.
-      If <classname>RentalCar</classname> would override the
+      So if <classname>RentalCar</classname> overrode the
       <methodname>getManufacturer()</methodname> method from
-      <classname>Car</classname> any constraints annotated at the overriding
+      <classname>Car</classname>, any constraints annotated at the overriding
       method would be evaluated in addition to the
-      <classname>@NotNull</classname> constraint from the super-class.</para>
+      <classname>@NotNull</classname> constraint from the superclass.</para>
     </section>
 
     <section id="section-object-graph-validation">
       <title>Object graphs</title>
 
       <para>The Bean Validation API does not only allow to validate single
-      class instances but also complete object graphs. To do so, just annotate
-      a field or property representing a reference to another object with
-      <classname>@Valid</classname>. If the parent object is validated, all
-      referenced objects annotated with <classname>@Valid</classname> will be
-      validated as well (as will be their children etc.). See <xref
-      linkend="example-car-with-driver"/>.</para>
+      class instances but also complete object graphs (cascaded validation).
+      To do so, just annotate a field or property representing a reference to
+      another object with <classname>@Valid</classname> as demonstrated in
+      <xref linkend="example-cascaded-validation"/>.</para>
 
-      <example>
-        <title>Class Person</title>
+      <example id="example-cascaded-validation">
+        <title>Cascaded validation</title>
 
-        <programlisting language="JAVA" role="JAVA">package com.mycompany;
-
-import javax.validation.constraints.NotNull;
-
-public class Person {
-
-    @NotNull
-    private String name;
-    
-    public Person(String name) {
-        super();
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-}</programlisting>
-      </example>
-
-      <example id="example-car-with-driver">
-        <title>Adding a driver to the car</title>
-
-        <programlisting language="JAVA" role="JAVA">package com.mycompany;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter02.objectgraph;
 
 public class Car {
 
-    @NotNull
-    @Valid
-    private Person driver;
-    
-    public Car(Person driver) {
-        this.driver = driver;
-    }
+	@NotNull
+	@Valid
+	private Person driver;
 
-    //getters and setters ...
+	//...
+}</programlisting>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter02.objectgraph;
+
+public class Person {
+
+	@NotNull
+	private String name;
+
+	//...
 }</programlisting>
       </example>
 
@@ -357,6 +316,16 @@ public class Car {
       <classname>Car</classname> will fail if the <property>name</property>
       field of the referenced <classname>Person</classname> instance is
       <code>null</code>.</para>
+
+      <para>The validation of object graphs is done recursively, i.e. if a
+      reference marked for cacaded validation points to an object which itself
+      has properties annotated with <classname>@Valid</classname>, these
+      references will be followed up by the validation engine as well. It is
+      ensured that no infinite loops occur during cascaded validation, if for
+      instance two objects hold references to each other.</para>
+
+      <para>Note that <literal>null</literal> values are getting ignored
+      during cascaded validation.</para>
 
       <para>Object graph validation also works for collection-typed fields.
       That means any attributes that</para>
@@ -381,42 +350,31 @@ public class Car {
       cause each contained element to be validated, when the parent object is
       validated.</para>
 
-      <example>
-        <title>Car with a list of passengers</title>
+      <example id="example-cascaded-validation-list">
+        <title>Cascaded validation of a collection</title>
 
-        <programlisting language="JAVA" role="JAVA">package com.mycompany;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter02.objectgraph.list;
 
 public class Car {
 
-    @NotNull
-    @Valid
-    private List&lt;Person&gt; passengers = new ArrayList&lt;Person&gt;();
+	@NotNull
+	@Valid
+	private List&lt;Person&gt; passengers = new ArrayList&lt;Person&gt;();
 
-    public Car(List&lt;Person&gt; passengers) {
-        this.passengers = passengers;
-    }
-
-    //getters and setters ...
+	//...
 }</programlisting>
       </example>
 
-      <para>If a <classname>Car</classname> instance is validated, a
+      <para>So when validating an instance of the <classname>Car</classname>
+      class shown in <xref linkend="example-cascaded-validation-list"/>, a
       <classname>ConstraintViolation</classname> will be created, if any of
       the <classname>Person</classname> objects contained in the
-      <property>passengers</property> list has a <code>null</code> name.<note>
-          <para><classname>null</classname> values are getting ignored when
-          validating object graphs.</para>
-        </note></para>
+      <property>passengers</property> list has a <code>null</code>
+      name.</para>
     </section>
   </section>
 
-  <section id="validator-usingvalidator-validate">
+  <section id="section-validating-bean-constraints">
     <title>Validating bean constraints</title>
 
     <para>The <classname>Validator</classname> interface is the main entry
@@ -432,9 +390,8 @@ public class Car {
       hold of a <classname>Validator</classname> instance. The road to this
       instance leads via the <classname>Validation</classname> class and a
       <classname>ValidatorFactory</classname>. The easiest way is to use the
-      static
-      <methodname>Validation.buildDefaultValidatorFactory()</methodname>
-      method:</para>
+      static method
+      <methodname>Validation#buildDefaultValidatorFactory()</methodname>:</para>
 
       <example>
         <title>Validation.buildDefaultValidatorFactory()</title>
@@ -453,7 +410,7 @@ Validator validator = factory.getValidator();</programlisting>
       <title>Validator methods</title>
 
       <para>The <classname>Validator</classname> interface contains three
-      methods that can be used to either validate entire entities or just a
+      methods that can be used to either validate entire entities or just
       single properties of the entity.</para>
 
       <para>All three methods return a
@@ -466,76 +423,78 @@ Validator validator = factory.getValidator();</programlisting>
       used to specify, which validation groups shall be considered when
       performing the validation. If the parameter is not specified the default
       validation group
-      (<classname>javax.validation.groups.Default</classname>) will be used.
-      We will go into more detail on the topic of validation groups in <xref
-      linkend="validator-usingvalidator-validationgroups"/></para>
+      (<classname>javax.validation.groups.Default</classname>) is used. The
+      topic of validation groups is discussed in detail in <xref
+      linkend="chapter-groups"/>.</para>
 
       <section>
-        <title><methodname>validate</methodname></title>
+        <title><methodname>validate()</methodname></title>
 
         <para>Use the <methodname>validate()</methodname> method to perform
-        validation of all constraints of a given entity instance (see <xref
-        linkend="example-validator-validate"/> ).</para>
+        validation of all constraints of a given bean. <xref
+        linkend="example-validator-validate"/> shows the validation of an
+        instance of the <classname>Car</classname> class from <xref
+        linkend="example-property-level"/> which fails to satisfy the
+        <classname>@NotNull</classname> constraint on the
+        <varname>manufacturer</varname> property. The validation call
+        therefore returns one <classname>ConstraintViolation</classname>
+        object.</para>
 
         <example id="example-validator-validate">
-          <title>Usage of
-          <methodname>Validator.validate()</methodname></title>
+          <title>Using of
+          <methodname>Validator#validate()</methodname></title>
 
-          <programlisting language="JAVA" role="JAVA">ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-Validator validator = factory.getValidator();
+          <programlisting language="JAVA" role="JAVA">Car car = new Car( null, true );
 
-Car car = new Car(null);
+Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validate( car );
 
-Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validate(car);
-
-assertEquals(1, constraintViolations.size());
-assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
+assertEquals( 1, constraintViolations.size() );
+assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );</programlisting>
         </example>
       </section>
 
       <section>
-        <title><methodname>validateProperty</methodname></title>
+        <title><methodname>validateProperty()</methodname></title>
 
-        <para>With help of the <methodname>validateProperty()</methodname> a
-        single named property of a given object can be validated. The property
+        <para>With help of the <methodname>validateProperty()</methodname> you
+        can validate a single named property of a given object. The property
         name is the JavaBeans property name.</para>
 
         <example>
-          <title>Usage of
-          <methodname>Validator.validateProperty()</methodname></title>
+          <title>Using
+          <methodname>Validator#validateProperty()</methodname></title>
 
-          <programlisting language="JAVA" role="JAVA">Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+          <programlisting language="JAVA" role="JAVA">Car car = new Car( null, true );
 
-Car car = new Car(null);
+Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validateProperty(
+		car,
+		"manufacturer"
+);
 
-Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validateProperty(car, "manufacturer");
-
-assertEquals(1, constraintViolations.size());
-assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
+assertEquals( 1, constraintViolations.size() );
+assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );</programlisting>
         </example>
-
-        <para><methodname>Validator.validateProperty</methodname> is for
-        example used in the integration of Bean Validation into JSF 2 (see
-        <xref linkend="section-presentation-layer"/>).</para>
       </section>
 
       <section>
-        <title><methodname>validateValue</methodname></title>
+        <title><methodname>validateValue()</methodname></title>
 
-        <para>Using the <methodname>validateValue() </methodname>method you
-        can check, whether a single property of a given class can be validated
+        <para>By using the <methodname>validateValue() </methodname>method you
+        can check whether a single property of a given class can be validated
         successfully, if the property had the specified value:</para>
 
         <example>
-          <title>Usage of
-          <methodname>Validator.validateValue()</methodname></title>
+          <title>Using
+          <methodname>Validator#validateValue()</methodname></title>
 
-          <programlisting language="JAVA" role="JAVA">Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+          <programlisting language="JAVA" role="JAVA">Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validateValue(
+		Car.class,
+		"manufacturer",
+		null
+);
 
-Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator.validateValue(Car.class, "manufacturer", null);
-
-assertEquals(1, constraintViolations.size());
-assertEquals("may not be null", constraintViolations.iterator().next().getMessage());</programlisting>
+assertEquals( 1, constraintViolations.size() );
+assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );</programlisting>
         </example>
 
         <note>
@@ -543,6 +502,12 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
           <methodname>validateProperty()</methodname> or
           <methodname>validateValue()</methodname>.</para>
         </note>
+
+        <para><methodname>Validator#validateProperty()</methodname> is for
+        example used in the integration of Bean Validation into JSF 2 (see
+        <xref linkend="section-presentation-layer"/>) to perform a validation
+        of the values entered into a form before they are propagated to the
+        model.</para>
       </section>
     </section>
 
@@ -554,7 +519,8 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
       methods of <classname>ConstraintViolation</classname> a lot of useful
       information about the cause of the validation failure can be determined.
       <xref linkend="table-constraint-violation"/> gives an overview of these
-      methods:</para>
+      methods. The values in the "Example" column refer to <xref
+      linkend="example-validator-validate"/>.</para>
 
       <table id="table-constraint-violation">
         <title>The various <classname>ConstraintViolation</classname>
@@ -567,8 +533,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
               <entry>Usage</entry>
 
-              <entry>Example (referring to <xref
-              linkend="example-validator-validate"/>)</entry>
+              <entry>Example</entry>
             </row>
           </thead>
 
@@ -576,67 +541,69 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
             <row>
               <entry><methodname>getMessage()</methodname></entry>
 
-              <entry>The interpolated error message.</entry>
+              <entry>The interpolated error message</entry>
 
-              <entry>may not be null</entry>
+              <entry>"may not be null"</entry>
             </row>
 
             <row>
               <entry><methodname>getMessageTemplate()</methodname></entry>
 
-              <entry>The non-interpolated error message.</entry>
+              <entry>The non-interpolated error message</entry>
 
-              <entry>{javax.validation.constraints.NotNull.message}</entry>
+              <entry>"{... NotNull.message}"</entry>
             </row>
 
             <row>
               <entry><methodname>getRootBean()</methodname></entry>
 
-              <entry>The root bean being validated.</entry>
+              <entry>The root bean being validated</entry>
 
-              <entry>car</entry>
+              <entry><varname>car</varname></entry>
             </row>
 
             <row>
               <entry><methodname>getRootBeanClass()</methodname></entry>
 
-              <entry>The class of the root bean being validated.</entry>
+              <entry>The class of the root bean being validated</entry>
 
-              <entry>Car.class</entry>
+              <entry><classname>Car.class</classname></entry>
             </row>
 
             <row>
               <entry><methodname>getLeafBean()</methodname></entry>
 
               <entry>If a bean constraint, the bean instance the constraint is
-              applied on. If a property constraint, the bean instance hosting
-              the property the constraint is applied on.</entry>
+              applied on; If a property constraint, the bean instance hosting
+              the property the constraint is applied on</entry>
 
-              <entry>car</entry>
+              <entry><varname>car</varname></entry>
             </row>
 
             <row>
               <entry><methodname>getPropertyPath()</methodname></entry>
 
-              <entry>The property path to the value from root bean.</entry>
+              <entry>The property path to the validated value from root
+              bean</entry>
 
-              <entry/>
+              <entry>contains one node with kind
+              <classname>PROPERTY</classname> and name "manufacturer"</entry>
             </row>
 
             <row>
               <entry><methodname>getInvalidValue()</methodname></entry>
 
-              <entry>The value failing to pass the constraint.</entry>
+              <entry>The value failing to pass the constraint</entry>
 
-              <entry>passengers</entry>
+              <entry><literal>null</literal></entry>
             </row>
 
             <row>
               <entry><methodname>getConstraintDescriptor()</methodname></entry>
 
-              <entry>Constraint metadata reported to fail.</entry>
+              <entry>Constraint metadata reported to fail</entry>
 
-              <entry/>
+              <entry>descriptor for <classname>@NotNull</classname></entry>
             </row>
           </tbody>
         </tgroup>
@@ -644,7 +611,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
     </section>
   </section>
 
-  <section id="validator-defineconstraints-builtin">
+  <section id="section-builtin-constraints">
     <title>Built-in constraints</title>
 
     <para>Hibernate Validator comprises a basic set of commonly used
@@ -668,22 +635,23 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
       <note>
         <para>Hibernate Validator allows some constraints to be applied to
         more data types than required by the Bean Validation specification
-        (e.g. @Max can be applied to <classname>Strings</classname>). Relying
-        on this feature can impact portability of your application between
-        Bean Validation providers.</para>
+        (e.g. <classname>@Max</classname> can be applied to
+        <classname>Strings</classname>). Relying on this feature can impact
+        portability of your application between Bean Validation
+        providers.</para>
       </note>
 
       <table id="table-spec-constraints">
         <title>Bean Validation constraints</title>
 
         <tgroup cols="4">
-          <colspec align="left"/>
+          <colspec align="left" colwidth="1*"/>
 
-          <colspec align="left"/>
+          <colspec align="left" colwidth="2*"/>
 
-          <colspec align="left"/>
+          <colspec align="left" colwidth="2*"/>
 
-          <colspec align="left"/>
+          <colspec align="left" colwidth="1*"/>
 
           <thead>
             <row>
@@ -699,90 +667,97 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
           <tbody valign="top">
             <row>
-              <entry>@AssertFalse</entry>
+              <entry><classname>@AssertFalse</classname></entry>
 
               <entry><classname>Boolean</classname>,
               <classname>boolean</classname></entry>
 
               <entry>Checks that the annotated element is
-              <constant>false</constant>.</entry>
+              <constant>false</constant></entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@AssertTrue</entry>
+              <entry><classname>@AssertTrue</classname></entry>
 
               <entry><classname>Boolean</classname>,
               <classname>boolean</classname></entry>
 
               <entry>Checks that the annotated element is
-              <constant>true</constant>.</entry>
+              <constant>true</constant></entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@DecimalMax</entry>
+              <entry><classname>@DecimalMax(value=,</classname>
+              <classname>inclusive=)</classname></entry>
 
               <entry><classname>BigDecimal</classname>,
               <classname>BigInteger</classname>,
-              <classname>String</classname>, <classname>byte</classname>,
-              <classname>short</classname>, <classname>int</classname>,
-              <classname>long</classname> and the respective wrappers of the
-              primitive types. Additionally supported by HV: any sub-type of
-              <classname>Number</classname> and
-              <classname>CharSequence</classname>.</entry>
+              <classname>CharSequence</classname>,
+              <classname>byte</classname>, <classname>short</classname>,
+              <classname>int</classname>, <classname>long</classname> and the
+              respective wrappers of the primitive types; Additionally
+              supported by HV: any sub-type of
+              <classname>Number</classname></entry>
 
-              <entry>The annotated element must be a number whose value must
-              be lower or equal to the specified maximum. The parameter value
-              is the string representation of the max value according to the
+              <entry>Checks whether the annotated value is less than the
+              specified maximum, when <parameter>inclusive=false</parameter>.
+              Otherwise whether the value is less than or equal to the
+              specified maximum. The parameter <parameter>value</parameter> is
+              the string representation of the max value according to the
               <classname>BigDecimal</classname> string representation.</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@DecimalMin</entry>
+              <entry><classname>@DecimalMin(value=,</classname>
+              <classname>inclusive=)</classname></entry>
 
               <entry><classname>BigDecimal</classname>,
               <classname>BigInteger</classname>,
-              <classname>String</classname>, <classname>byte</classname>,
-              <classname>short</classname>, <classname>int</classname>,
-              <classname>long</classname> and the respective wrappers of the
-              primitive types. Additionally supported by HV: any sub-type of
-              <classname>Number </classname>and
-              <classname>CharSequence</classname>.</entry>
+              <classname>CharSequence</classname>,
+              <classname>byte</classname>, <classname>short</classname>,
+              <classname>int</classname>, <classname>long</classname> and the
+              respective wrappers of the primitive types; Additionally
+              supported by HV: any sub-type of
+              <classname>Number</classname></entry>
 
-              <entry>The annotated element must be a number whose value must
-              be higher or equal to the specified minimum. The parameter value
-              is the string representation of the min value according to the
+              <entry>Checks whether the annotated value is larger than the
+              specified minimum, when <parameter>inclusive=false</parameter>.
+              Otherwise whether the value is larger than or equal to the
+              specified minimum. The parameter <parameter>value</parameter> is
+              the string representation of the min value according to the
               <classname>BigDecimal</classname> string representation.</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@Digits(integer=, fraction=)</entry>
+              <entry><classname>@Digits(integer=,</classname>
+              <classname>fraction=)</classname></entry>
 
               <entry><classname>BigDecimal</classname>,
               <classname>BigInteger</classname>,
-              <classname>String</classname>, <classname>byte</classname>,
-              <classname>short</classname>, <classname>int</classname>,
-              <classname>long</classname> and the respective wrappers of the
-              primitive types. Additionally supported by HV: any sub-type of
-              <classname>Number</classname> and
-              <classname>CharSequence</classname>.</entry>
+              <classname>CharSequence</classname>,
+              <classname>byte</classname>, <classname>short</classname>,
+              <classname>int</classname>, <classname>long</classname> and the
+              respective wrappers of the primitive types; Additionally
+              supported by HV: any sub-type of
+              <classname>Number</classname></entry>
 
               <entry>Checks whether the annoted value is a number having up to
               <literal>integer</literal> digits and
-              <literal>fraction</literal> fractional digits.</entry>
+              <literal>fraction</literal> fractional digits</entry>
 
-              <entry>Define column precision and scale.</entry>
+              <entry>Defines column precision and scale</entry>
             </row>
 
             <row>
-              <entry>@Future</entry>
+              <entry><classname>@Future</classname></entry>
 
               <entry><classname>java.util.Date</classname>,
               <classname>java.util.Calendar</classname>; Additionally
@@ -790,74 +765,74 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               url="http://joda-time.sourceforge.net/">Joda Time</ulink>
               date/time API is on the class path: any implementations of
               <classname>ReadablePartial</classname> and
-              <classname>ReadableInstant</classname>.</entry>
+              <classname>ReadableInstant</classname></entry>
 
               <entry>Checks whether the annotated date is in the
-              future.</entry>
+              future</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@Max</entry>
+              <entry><classname>@Max(value=)</classname></entry>
 
               <entry><classname>BigDecimal</classname>,
               <classname>BigInteger</classname>, <classname>byte</classname>,
               <classname>short</classname>, <classname>int</classname>,
               <classname>long</classname> and the respective wrappers of the
-              primitive types. Additionally supported by HV: any sub-type
-              of<classname>CharSequence</classname> (the numeric value
+              primitive types; Additionally supported by HV: any sub-type of
+              <classname>CharSequence</classname> (the numeric value
               represented by the character sequence is evaluated), any
-              sub-type of <classname>Number</classname>.</entry>
+              sub-type of <classname>Number</classname></entry>
 
               <entry>Checks whether the annotated value is less than or equal
-              to the specified maximum.</entry>
+              to the specified maximum</entry>
 
-              <entry>Add a check constraint on the column.</entry>
+              <entry>Adds a check constraint on the column</entry>
             </row>
 
             <row>
-              <entry>@Min</entry>
+              <entry><classname>@Min(value=)</classname></entry>
 
               <entry><classname>BigDecimal</classname>,
               <classname>BigInteger</classname>, <classname>byte</classname>,
               <classname>short</classname>, <classname>int</classname>,
               <classname>long</classname> and the respective wrappers of the
-              primitive types. Additionally supported by HV: any sub-type of
+              primitive types; Additionally supported by HV: any sub-type of
               <classname>CharSequence</classname> (the numeric value
               represented by the char sequence is evaluated), any sub-type of
-              <classname>Number</classname>.</entry>
+              <classname>Number</classname></entry>
 
               <entry>Checks whether the annotated value is higher than or
-              equal to the specified minimum.</entry>
+              equal to the specified minimum</entry>
 
-              <entry>Add a check constraint on the column.</entry>
+              <entry>Adds a check constraint on the column</entry>
             </row>
 
             <row>
-              <entry>@NotNull</entry>
+              <entry><classname>@NotNull</classname></entry>
 
               <entry>Any type</entry>
 
               <entry>Checks that the annotated value is not
               <constant>null.</constant></entry>
 
-              <entry>Column(s) are not null.</entry>
+              <entry>Column(s) are not nullable</entry>
             </row>
 
             <row>
-              <entry>@Null</entry>
+              <entry><classname>@Null</classname></entry>
 
               <entry>Any type</entry>
 
               <entry>Checks that the annotated value is
-              <constant>null.</constant></entry>
+              <constant>null</constant></entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@Past</entry>
+              <entry><classname>@Past</classname></entry>
 
               <entry><classname>java.util.Date</classname>,
               <classname>java.util.Calendar</classname>; Additionally
@@ -865,42 +840,42 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               url="http://joda-time.sourceforge.net/">Joda Time</ulink>
               date/time API is on the class path: any implementations of
               <classname>ReadablePartial</classname> and
-              <classname>ReadableInstant</classname>.</entry>
+              <classname>ReadableInstant</classname></entry>
 
-              <entry>Checks whether the annotated date is in the past.</entry>
+              <entry>Checks whether the annotated date is in the past</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@Pattern(regex=, flag=)</entry>
+              <entry><classname>@Pattern(regex=,</classname>
+              <classname>flag=)</classname></entry>
 
-              <entry><classname>String</classname>. Additionally supported by
-              HV: any sub-type of <classname>CharSequence</classname>.</entry>
+              <entry><classname>CharSequence</classname></entry>
 
               <entry>Checks if the annotated string matches the regular
               expression <parameter>regex</parameter> considering the given
-              flag <parameter>match</parameter>.</entry>
+              flag <parameter>match</parameter></entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@Size(min=, max=)</entry>
+              <entry><classname>@Size(min=, max=)</classname></entry>
 
-              <entry><classname>String</classname>,
+              <entry><classname>CharSequence</classname>,
               <classname>Collection</classname>, <classname>Map</classname>
-              and <classname>arrays</classname>. Additionally supported by HV:
-              any sub-type of <classname>CharSequence</classname>.</entry>
+              and <classname>arrays</classname></entry>
 
               <entry>Checks if the annotated element's size is between min and
-              max (inclusive).</entry>
+              max (inclusive)</entry>
 
-              <entry>Column length will be set to max.</entry>
+              <entry>Column length will be set to
+              <parameter>max</parameter></entry>
             </row>
 
             <row>
-              <entry>@Valid</entry>
+              <entry><classname>@Valid</classname></entry>
 
               <entry>Any non-primitive type</entry>
 
@@ -909,7 +884,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               validated recursively. If the object is a map, the value
               elements are validated recursively.</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
           </tbody>
         </tgroup>
@@ -917,10 +892,10 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
       <note>
         <para>On top of the parameters indicated in <xref
-        linkend="table-spec-constraints"/> each constraint supports the
-        parameters <parameter>message</parameter>,
-        <parameter>groups</parameter> and <parameter>payload</parameter>. This
-        is a requirement of the Bean Validation specification.</para>
+        linkend="table-spec-constraints"/> each constraint has the parameters
+        <parameter>message</parameter>, <parameter>groups</parameter> and
+        <parameter>payload</parameter>. This is a requirement of the Bean
+        Validation specification.</para>
       </note>
     </section>
 
@@ -931,7 +906,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
       Hibernate Validator provides several useful custom constraints which are
       listed in <xref linkend="table-custom-constraints"/>. With one exception
       also these constraints apply to the field/property level, only
-      @ScriptAssert is a class-level constraint.</para>
+      <classname>@ScriptAssert</classname> is a class-level constraint.</para>
 
       <table id="table-custom-constraints">
         <title>Custom constraints</title>
@@ -959,7 +934,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
           <tbody valign="top">
             <row>
-              <entry>@CreditCardNumber</entry>
+              <entry><classname>@CreditCardNumber</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
 
@@ -969,11 +944,11 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               url="http://www.merriampark.com/anatomycc.htm">Anatomy of Credit
               Card Numbers</ulink>.</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@Email</entry>
+              <entry><classname>@Email</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
 
@@ -983,24 +958,28 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               allow to specify an additional regular expression (including
               regular expression flags) which the email must match.</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@Length(min=, max=)</entry>
+              <entry><classname>@Length(min=, max=)</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
 
               <entry>Validates that the annotated character sequence is
               between <parameter>min</parameter> and
-              <parameter>max</parameter> included.</entry>
+              <parameter>max</parameter> included</entry>
 
-              <entry>Column length will be set to max.</entry>
+              <entry>Column length will be set to
+              <parameter>max</parameter></entry>
             </row>
 
             <row>
-              <entry>@ModCheck(modType=, multiplier=, startIndex=, endIndex=,
-              checkDigitPosition=, ignoreNonDigitCharacters=)</entry>
+              <entry><classname>@ModCheck(modType=,</classname>
+              <classname>multiplier=, startIndex=,</classname>
+              <classname>endIndex=,</classname>
+              <classname>checkDigitPosition=,</classname>
+              <classname>ignoreNonDigitCharacters=)</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
 
@@ -1020,11 +999,11 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               <constant>ignoreNonDigitCharacters</constant> allows to ignore
               non digit characters.</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@NotBlank</entry>
+              <entry><classname>@NotBlank</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
 
@@ -1033,24 +1012,24 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               @NotEmpty is that this constraint can only be applied on strings
               and that trailing whitespaces are ignored.</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@NotEmpty</entry>
+              <entry><classname>@NotEmpty</classname></entry>
 
               <entry><classname>CharSequence</classname>,
               <classname>Collection</classname>, <classname>Map</classname>
               and arrays</entry>
 
               <entry>Checks whether the annotated element is not
-              <constant>null</constant> nor empty.</entry>
+              <constant>null</constant> nor empty</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@Range(min=, max=)</entry>
+              <entry><classname>@Range(min=, max=)</classname></entry>
 
               <entry><classname>BigDecimal</classname>,
               <classname>BigInteger</classname>,
@@ -1060,13 +1039,14 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               respective wrappers of the primitive types</entry>
 
               <entry>Checks whether the annotated value lies between
-              (inclusive) the specified minimum and maximum.</entry>
+              (inclusive) the specified minimum and maximum</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@SafeHtml(whitelistType=, additionalTags=)</entry>
+              <entry><classname>@SafeHtml(whitelistType=,</classname>
+              <classname>additionalTags=)</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
 
@@ -1079,11 +1059,12 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               specify additional html tags for the whitelist with the
               <parameter>additionalTags</parameter> attribute.</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@ScriptAssert(lang=, script=, alias=)</entry>
+              <entry><classname>@ScriptAssert(lang=,</classname>
+              <classname>script=, alias=)</classname></entry>
 
               <entry>Any type</entry>
 
@@ -1096,11 +1077,13 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               any scripting or expression language, for which a JSR 223
               compatible engine can be found in the class path.</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
 
             <row>
-              <entry>@URL(protocol=, host=, port=, regexp=, flags=)</entry>
+              <entry><classname>@URL(protocol=,</classname>
+              <classname>host=, port=</classname>
+              <classname>regexp=, flags=)</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
 
@@ -1114,7 +1097,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
               regular expression (including regular expression flags) which
               the URL must match.</entry>
 
-              <entry>none</entry>
+              <entry>None</entry>
             </row>
           </tbody>
         </tgroup>
@@ -1159,7 +1142,7 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
             <tbody valign="top">
               <row>
-                <entry>@CNPJ</entry>
+                <entry><classname>@CNPJ</classname></entry>
 
                 <entry><classname>CharSequence</classname></entry>
 
@@ -1169,36 +1152,36 @@ assertEquals("may not be null", constraintViolations.iterator().next().getMessag
 
                 <entry>Brazil</entry>
 
-                <entry>none</entry>
+                <entry>None</entry>
               </row>
 
               <row>
-                <entry>@CPF</entry>
+                <entry><classname>@CPF</classname></entry>
 
                 <entry><classname>CharSequence</classname></entry>
 
                 <entry>Checks that the annotated character sequence represents
                 a Brazilian individual taxpayer registry number (Cadastro de
-                Pessoa Fídsica).</entry>
+                Pessoa Fídsica)</entry>
 
                 <entry>Brazil</entry>
 
-                <entry>none</entry>
+                <entry>None</entry>
               </row>
 
               <row>
-                <entry>@TituloEleitoral</entry>
+                <entry><classname>@TituloEleitoral</classname></entry>
 
                 <entry><classname>CharSequence</classname></entry>
 
                 <entry>Checks that the annotated character sequence represents
                 a Brazilian voter ID card number (<ulink
                 url="http://ghiorzi.org/cgcancpf.htm">Título
-                Eleitoral</ulink>).</entry>
+                Eleitoral</ulink>)</entry>
 
                 <entry>Brazil</entry>
 
-                <entry>none</entry>
+                <entry>None</entry>
               </row>
             </tbody>
           </tgroup>
