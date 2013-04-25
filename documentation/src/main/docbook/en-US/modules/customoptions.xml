@@ -221,8 +221,8 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
     </example>
   </section>
 
-  <section id="programmaticapi">
-    <title>Programmatic constraint definition</title>
+  <section id="section-programmatic-api">
+    <title>Programmatic constraint declaration</title>
 
     <para>Another addition to the Bean Validation specification is the ability
     to configure constraints via a fluent API. This API can be used

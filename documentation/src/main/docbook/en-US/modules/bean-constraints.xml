@@ -401,7 +401,7 @@ Validator validator = factory.getValidator();</programlisting>
       </example>
 
       <para>For other ways of obtaining a Validator instance see <xref
-      linkend="validator-bootstrapping"/>. For now we just want to see how we
+      linkend="chapter-bootstrapping"/>. For now we just want to see how we
       can use the <classname>Validator</classname> instance to validate entity
       instances.</para>
     </section>
@@ -1081,9 +1081,9 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
             </row>
 
             <row>
-              <entry><classname>@URL(protocol=,</classname>
-              <classname>host=, port=</classname>
-              <classname>regexp=, flags=)</classname></entry>
+              <entry><classname>@URL(protocol=,</classname> <classname>host=,
+              port=</classname> <classname>regexp=,
+              flags=)</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
 

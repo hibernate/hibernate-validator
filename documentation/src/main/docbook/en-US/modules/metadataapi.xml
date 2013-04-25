@@ -293,11 +293,11 @@ assertEquals( 1, driverDescriptor.getGroupConversions().size() );</programlistin
     <para>Using <methodname>getConstrainedDescriptors()</methodname>, you can
     retrieve a set of <classname>ConstraintDescriptor</classname>s providing
     more information on the individual constraints of a given property. The
-    method <methodname>isCascaded()</methodname> returns true, if the property
-    is marked for cascaded validation (either using the
-    <classname>@Valid</classname> annotation or via XML), false otherwise. Any
-    configured group conversions are returned by
-    <methodname>getGroupConversions()</methodname>. See <xref
+    method <methodname>isCascaded()</methodname> returns
+    <literal>true</literal>, if the property is marked for cascaded validation
+    (either using the <classname>@Valid</classname> annotation or via XML),
+    <literal>false</literal> otherwise. Any configured group conversions are
+    returned by <methodname>getGroupConversions()</methodname>. See <xref
     linkend="section-group-conversion-descriptor"/> for more details on
     <classname>GroupConversionDescriptor</classname>.</para>
   </section>

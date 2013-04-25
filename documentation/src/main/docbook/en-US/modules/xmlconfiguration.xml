@@ -20,7 +20,7 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter id="validator-xmlconfiguration">
+<chapter id="chapter-xml-configuration">
   <title>Configuring via XML</title>
 
   <para>So far we have used the default configuration source for Bean
@@ -147,7 +147,7 @@
     linkend="failfast"/>).</para>
   </section>
 
-  <section>
+  <section id="section-mapping-xml-constraints">
     <title id="section-mapping-constraints">Mapping constraints via
     <property>constraint-mappings</property></title>
 
