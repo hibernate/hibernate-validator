@@ -46,15 +46,17 @@
     <title>Project set up</title>
 
     <para>In order to use Hibernate Validator within a Maven project, simply
-    add the following dependency to your <filename>pom.xml</filename>:<example>
-        <title>Hibernate Validator Maven dependency</title>
+    add the following dependency to your <filename>pom.xml</filename>:</para>
 
-        <programlisting>&lt;dependency&gt;
+    <example>
+      <title>Hibernate Validator Maven dependency</title>
+
+      <programlisting language="XML" role="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
-      </example></para>
+    </example>
 
     <para>This transitively pulls in the dependency to the Bean Validation API
     (<literal>javax.validation:validation-api:&bvVersion;</literal>).</para>
@@ -94,7 +96,7 @@
         <title>Maven dependencies for Unified EL reference
         implementation</title>
 
-        <programlisting>&lt;dependency&gt;
+        <programlisting language="XML" role="XML">&lt;dependency&gt;
     &lt;groupId&gt;javax.el&lt;/groupId&gt;
     &lt;artifactId&gt;javax.el-api&lt;/artifactId&gt;
     &lt;version&gt;2.2.4&lt;/version&gt;
@@ -122,7 +124,7 @@
         <title>Hibernate Validator CDI portable extension Maven
         dependency</title>
 
-        <programlisting>&lt;dependency&gt;
+        <programlisting language="XML" role="XML">&lt;dependency&gt;
     &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator-cdi&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;

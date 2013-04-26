@@ -66,18 +66,18 @@
   <toc/>
 
   <xi:include href="modules/preface.xml"/>
-  <xi:include href="modules/gettingstarted.xml"/>
+  <xi:include href="modules/getting-started.xml"/>
   <xi:include href="modules/bean-constraints.xml"/>
   <xi:include href="modules/method-constraints.xml"/>
   <xi:include href="modules/message-interpolation.xml"/>
   <xi:include href="modules/groups.xml"/>
-  <xi:include href="modules/customconstraints.xml"/>
-  <xi:include href="modules/xmlconfiguration.xml"/>
+  <xi:include href="modules/custom-constraints.xml"/>
+  <xi:include href="modules/xml-configuration.xml"/>
   <xi:include href="modules/bootstrapping.xml"/>
-  <xi:include href="modules/metadataapi.xml"/>
+  <xi:include href="modules/metadata-api.xml"/>
   <xi:include href="modules/integration.xml"/>
-  <xi:include href="modules/customoptions.xml"/>
-  <xi:include href="modules/annotationprocessor.xml"/>
-  <xi:include href="modules/furtherreading.xml"/>
+  <xi:include href="modules/custom-options.xml"/>
+  <xi:include href="modules/annotation-processor.xml"/>
+  <xi:include href="modules/further-reading.xml"/>
 
 </book>
