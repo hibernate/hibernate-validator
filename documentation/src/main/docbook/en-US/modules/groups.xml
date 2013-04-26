@@ -280,7 +280,7 @@ public class GroupTest {
     groups.</para>
   </section>
 
-  <section>
+  <section id="section-defining-group-sequences">
     <title>Defining group sequences</title>
 
     <para>By default, constraints are evaluated in no particular order,
