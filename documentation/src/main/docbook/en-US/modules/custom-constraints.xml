@@ -123,20 +123,18 @@ public @interface CheckCase {
         <listitem>
           <para>an attribute <property>groups</property> that allows the
           specification of validation groups, to which this constraint belongs
-          (see <xref linkend="validator-usingvalidator-validationgroups"/>).
-          This must default to an empty array of type
-          <classname>Class&lt;?&gt;</classname>.</para>
+          (see <xref linkend="chapter-groups"/>). This must default to an
+          empty array of type <classname>Class&lt;?&gt;</classname>.</para>
         </listitem>
 
         <listitem>
           <para>an attribute <classname>payload</classname> that can be used
           by clients of the Bean Validation API to assign custom payload
           objects to a constraint. This attribute is not used by the API
-          itself. <tip>
-              <para>An example for a custom payload could be the definition of
-              a severity.</para>
+          itself. An example for a custom payload could be the definition of a
+          severity:</para>
 
-              <programlisting language="JAVA" role="JAVA">public class Severity {
+          <programlisting language="JAVA" role="JAVA">public class Severity {
 	public interface Info extends Payload {
 	}
 
@@ -155,12 +153,11 @@ public class ContactDetails {
 	// ...
 }</programlisting>
 
-              <para>Now a client can after the validation of a
-              <classname>ContactDetails</classname> instance access the
-              severity of a constraint using
-              <methodname>ConstraintViolation.getConstraintDescriptor().getPayload()</methodname>
-              and adjust its behaviour depending on the severity.</para>
-            </tip></para>
+          <para>Now a client can after the validation of a
+          <classname>ContactDetails</classname> instance access the severity
+          of a constraint using
+          <methodname>ConstraintViolation.getConstraintDescriptor().getPayload()</methodname>
+          and adjust its behaviour depending on the severity.</para>
         </listitem>
       </itemizedlist>
 
