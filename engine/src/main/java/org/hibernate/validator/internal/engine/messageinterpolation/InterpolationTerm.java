@@ -16,10 +16,15 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation;
 
+import java.lang.reflect.Constructor;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
+
+import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Represents a single EL or parameter expression extracted from a message.
@@ -28,6 +33,13 @@ import javax.validation.MessageInterpolator;
  * @author Gunnar Morling
  */
 public abstract class InterpolationTerm {
+
+	private static final Log log = LoggerFactory.make();
+
+	/**
+	 * FQN of class ElInterpolationTerm
+	 */
+	private static final String EL_INTERPOLATION_TERM_CLASS_NAME = "org.hibernate.validator.internal.engine.messageinterpolation.ElInterpolationTerm";
 
 	/**
 	 * Meta character to designate an EL expression.
@@ -65,10 +77,41 @@ public abstract class InterpolationTerm {
 	 */
 	public static InterpolationTerm getInstance(String expression, Locale locale) {
 		if ( expression.startsWith( EL_DESIGNATION_CHARACTER ) ) {
-			return new ElInterpolationTerm( expression, locale );
+			return newElInterpolationTerm( expression, locale );
 		}
 		else {
 			return new ParameterInterpolationTerm( expression, locale );
+		}
+	}
+
+    /**
+     * Returns a new instance of {@link ElInterpolationTerm} representing the given expression. Class loading and instantiation
+     * are done reflectively. This allows to work with non EL interpolation terms without having the EL API on the class path as
+     * it is made sure that the {@code ElInterpolationTerm} class is not loaded in that case.
+     *
+     * @param expression the expression for which to create an interpolation term
+     * @param locale the locale of the term
+     *
+     * @return an interpolation term representing the given expression
+     */
+	private static InterpolationTerm newElInterpolationTerm(String expression, Locale locale) {
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends InterpolationTerm> elInterpolationTermClass = (Class<? extends InterpolationTerm>) ReflectionHelper
+					.loadClass(
+							EL_INTERPOLATION_TERM_CLASS_NAME,
+							InterpolationTerm.class
+					);
+			Constructor<? extends InterpolationTerm> constructor = ReflectionHelper.getConstructor(
+					elInterpolationTermClass,
+					String.class,
+					Locale.class
+			);
+
+			return ReflectionHelper.newConstructorInstance( constructor, expression, locale );
+		}
+		catch ( NoClassDefFoundError ncdfe ) {
+			throw log.getNoElApiPresentException( expression, ncdfe );
 		}
 	}
 

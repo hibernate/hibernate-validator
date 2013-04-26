@@ -604,4 +604,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 167,
 			value = "A given constraint definition can only be overridden in one mapping file. %1$s is overridden in multiple files")
 	ValidationException getOverridingConstraintDefinitionsInMultipleMappingFilesException(String constraintClass);
+
+	@Message(id = 168, value = "Interpolation of expression \"%s\" failed since the Unified EL API could not be found on the classpath.")
+	ValidationException getNoElApiPresentException(String expression, @Cause NoClassDefFoundError ncdfe);
 }
