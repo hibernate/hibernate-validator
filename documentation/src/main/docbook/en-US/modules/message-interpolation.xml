@@ -315,7 +315,7 @@ assertEquals( "Price must not be higher than $100000", message );</programlistin
     </section>
   </section>
 
-  <section>
+  <section id="section-custom-message-interpolation">
     <title>Custom message interpolation</title>
 
     <para>If the default message interpolation algorithm does not fit your
