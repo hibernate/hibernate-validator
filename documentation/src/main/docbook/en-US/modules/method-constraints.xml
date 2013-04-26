@@ -625,8 +625,9 @@ executableValidator = factory.getValidator().forExecutables();</programlisting>
       <para>In the example the executable validator is retrieved from the
       default validator factory, but if required you could also bootstrap a
       specifically configured factory as described in <xref
-      linkend="validator-bootstrapping"/>, for instance in order to use a
-      specific parameter name provider (see TODO).</para>
+      linkend="chapter-bootstrapping"/>, for instance in order to use a
+      specific parameter name provider (see <xref
+      linkend="section-parameter-name-provider"/>).</para>
     </section>
 
     <section id="section-executable-validator-methods">
@@ -834,8 +835,8 @@ assertEquals( ValidRacingCar.class, constraintType );          </programlisting>
       <para>In addition to the methods introduced in <xref
       linkend="section-constraint-violation-methods"/>,
       <classname>ConstraintViolation</classname> provides two more methods
-      specific to the validation of executable parameters and return values.
-      </para>
+      specific to the validation of executable parameters and return
+      values.</para>
 
       <para><methodname>ConstraintViolation#getExecutableParameters()</methodname>
       returns the validated parameter array in case of method or constructor

@@ -23,10 +23,10 @@
 <chapter id="chapter-groups">
   <title>Grouping constraints</title>
 
-  <para>Each of the validate methods in <xref
-  linkend="validator-usingvalidator-validate"/> takes also a var-arg argument
-  <parameter>groups</parameter>. So far we have been ignoring this paramter,
-  but it is time to have a closer look.</para>
+  <para>All validation methods on <classname>Validator</classname> and
+  <classname>ExecutableValidator</classname> discussed in earlier chapters
+  also take a var-arg argument <parameter>groups</parameter>. So far we have
+  been ignoring this parameter, but it is time to have a closer look.</para>
 
   <section>
     <title>Requesting groups</title>

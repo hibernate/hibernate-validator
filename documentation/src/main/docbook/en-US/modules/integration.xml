@@ -41,8 +41,8 @@
       <para>The Java Service Provider mechanism used by Bean Validation to
       automatically discover validation providers doesn't work in an OSGi
       environment. To solve this, you have to provide a custom
-      <classname>ValidationProviderResolver</classname>. See <xref
-      linkend="section-validation-provider-resolver"/></para>
+      <classname>ValidationProviderResolver</classname> (see <xref
+      linkend="section-validation-provider-resolver"/>). </para>
     </tip>
 
     <itemizedlist>
@@ -297,7 +297,7 @@
     </tip>
   </section>
 
-  <section>
+  <section id="section-integration-with-cdi">
     <title>CDI</title>
 
     <para>TODO</para>

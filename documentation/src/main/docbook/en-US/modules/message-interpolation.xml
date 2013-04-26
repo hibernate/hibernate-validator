@@ -330,26 +330,14 @@ assertEquals( "Price must not be higher than $100000", message );</programlistin
     <methodname>Configuration#getDefaultMessageInterpolator()</methodname>.</para>
 
     <para>In order to use a custom message interpolator it must be registered
-    with the validation runtime. To do so, you have the following
-    options:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Configure it in the Bean Validation XML descriptor
-        <filename>META-INF/validation.xml</filename> (see <xref
-        linkend="section-configuration-validation-xml"/>)</para>
-      </listitem>
-
-      <listitem>
-        <para>Specify it when the <classname>ValidatorFactory</classname> gets
-        created (see <xref linkend="validator-bootstrapping"/>)</para>
-      </listitem>
-
-      <listitem>
-        <para>Specify it when creating a Validator by invoking
-        <methodname>ValidatorFactory.usingContext().messageInterpolator(messageInterpolator).getValidator()</methodname></para>
-      </listitem>
-    </itemizedlist>
+    with the validation runtime. You can do this by either configuring it in
+    the Bean Validation XML descriptor
+    <filename>META-INF/validation.xml</filename> (see <xref
+    linkend="section-configuration-validation-xml"/>) or passing it when
+    bootstrapping a <classname>ValidatorFactory</classname> or
+    <classname>Validator</classname> (see <xref
+    linkend="section-validator-factory-message-interpolator"/> and <xref
+    linkend="section-configuring-validator"/>, respectively).</para>
 
     <section id="section-resource-bundle-locator">
       <title><classname>ResourceBundleLocator</classname></title>

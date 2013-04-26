@@ -73,7 +73,7 @@
     programmatic API. It is even possible to ignore the XML configuration
     completely via
     <methodname>Configuration.ignoreXmlConfiguration()</methodname>. See also
-    <xref linkend="validator-bootstrapping"/>.</para>
+    <xref linkend="section-configuring-validator-factory"/>.</para>
 
     <example id="example-validation-xml">
       <title>validation.xml</title>
@@ -123,16 +123,16 @@
     <classname>TraversableResolver</classname>,
     <classname>ConstraintValidatorFactory</classname> and
     <classname>ParameterNameProvider</classname> defined in the
-    <classname>javax.validation</classname> package. See <xref
-    linkend="validator-bootstrapping"/> for more information about these
-    interfaces.</para>
+    <classname>javax.validation</classname> package. See the sub-sections of
+    <xref linkend="section-configuring-validator-factory"/> for more
+    information about these interfaces.</para>
 
     <para><property>executable-validation</property> and its subnodes define
     defaults for method validation. The Bean Validation specification defines
     constructor and non getter methods as defaults. The
     <property>enabled</property> attribute acts as global switch to turn
-    method validation on and off (see also TODO - reference to method
-    validation).</para>
+    method validation on and off (see also <xref
+    linkend="chapter-method-constraints"/>).</para>
 
     <para>Via the <property>constraint-mapping</property> element you can list
     an arbitrary number of additional XML files containing the actual
@@ -144,7 +144,7 @@
     the <property>property</property> nodes. In the example we are using the
     Hibernate Validator specific
     <property>hibernate.validator.fail_fast</property> property (see <xref
-    linkend="failfast"/>).</para>
+    linkend="section-fail-fast"/>).</para>
   </section>
 
   <section id="section-mapping-xml-constraints">
@@ -250,7 +250,7 @@
     the configured <property>bean</property> value applies. Otherwise do the
     nodes <property>class</property>, <property>fields</property> and
     <property>getter</property> determine on which level the constraints are
-    placed (see <xref linkend="validator-usingvalidator-annotate"/>). The
+    placed (see <xref linkend="section-declaring-bean-constraints"/>). The
     <property>constraint</property> node is then used to add a constraint on
     the corresponding level. Each constraint definition must define the class
     via the <property>annotation</property> attribute. The constraint

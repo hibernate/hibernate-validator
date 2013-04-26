@@ -377,11 +377,11 @@ public class Car {
   <section id="section-validating-bean-constraints">
     <title>Validating bean constraints</title>
 
-    <para>The <classname>Validator</classname> interface is the main entry
-    point to Bean Validation. In <xref linkend="section-validator-instance"/>
-    we will first show how to obtain an <classname>Validator</classname>
-    instance. Afterwards we will learn how to use the different methods of the
-    <classname>Validator</classname> interface.</para>
+    <para>The <classname>Validator</classname> interface is the most important
+    object in Bean Validation. The next section shows how to obtain an
+    <classname>Validator</classname> instance. Afterwards you'll learn how to
+    use the different methods of the <classname>Validator</classname>
+    interface.</para>
 
     <section id="section-obtaining-validator">
       <title>Obtaining a <classname>Validator</classname> instance</title>
@@ -441,8 +441,7 @@ Validator validator = factory.getValidator();</programlisting>
         object.</para>
 
         <example id="example-validator-validate">
-          <title>Using
-          <methodname>Validator#validate()</methodname></title>
+          <title>Using <methodname>Validator#validate()</methodname></title>
 
           <programlisting language="JAVA" role="JAVA">Car car = new Car( null, true );
 

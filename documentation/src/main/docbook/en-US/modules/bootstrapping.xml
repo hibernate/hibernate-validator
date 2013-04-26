@@ -105,7 +105,7 @@ Validator validator = validatorFactory.getValidator();</programlisting>
       resources possibly allocated by the factory.</para>
     </note>
 
-    <section>
+    <section id="section-validation-provider-resolver">
       <title><classname>ValidationProviderResolver</classname></title>
 
       <para>By default, available Bean Validation providers are discovered
@@ -155,7 +155,7 @@ Validator validator = validatorFactory.getValidator();</programlisting>
     </section>
   </section>
 
-  <section>
+  <section id="section-configuring-validator-factory">
     <title>Configuring a <classname>ValidatorFactory</classname></title>
 
     <para>By default validator factories retrieved from
@@ -181,7 +181,7 @@ Validator validator = validatorFactory.getValidator();</programlisting>
     implementations of the different extension points which can be useful if
     you want to use these as delegates for your custom implementations.</para>
 
-    <section>
+    <section id="section-validator-factory-message-interpolator">
       <title><classname>MessageInterpolator</classname></title>
 
       <para>Message interpolators are used by the validation engine to create
@@ -343,7 +343,7 @@ Validator validator = validatorFactory.getValidator();</programlisting>
       </note>
     </section>
 
-    <section>
+    <section id="section-parameter-name-provider">
       <title><classname>ParameterNameProvider</classname></title>
 
       <para>In case a method or constructor parameter constraint is violated,
@@ -462,7 +462,7 @@ Validator validator = validatorFactory.getValidator();</programlisting>
     </section>
   </section>
 
-  <section>
+  <section id="section-configuring-validator">
     <title>Configuring a <classname>Validator</classname></title>
 
     <para>When working with a configured validator factory it can occasionally
