@@ -67,7 +67,7 @@
         <title>Enum <classname>CaseMode</classname> to express upper vs. lower
         case</title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06;
 
 public enum CaseMode {
 	UPPER,
@@ -83,7 +83,7 @@ public enum CaseMode {
         <title>Defining the <classname>CheckCase</classname> constraint
         annotation</title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06;
 
 @Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
 @Retention(RUNTIME)
@@ -91,7 +91,7 @@ public enum CaseMode {
 @Documented
 public @interface CheckCase {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter04.CheckCase.message}";
+	String message() default "{org.hibernate.validator.referenceguide.chapter06.CheckCase.message}";
 
 	Class&lt;?&gt;[] groups() default { };
 
@@ -238,7 +238,7 @@ public class ContactDetails {
         <title>Implementing a constraint validator for the constraint
         <classname>CheckCase</classname></title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06;
 
 public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, String&gt; {
 
@@ -310,7 +310,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
           <title>Use of ConstraintValidatorContext to define custom error
           messages</title>
 
-          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04.constraintvalidatorcontext;
+          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.constraintvalidatorcontext;
 
 public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, String&gt; {
 
@@ -338,7 +338,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
 		if ( !isValid ) {
 			constraintContext.disableDefaultConstraintViolation();
 			constraintContext.buildConstraintViolationWithTemplate(
-					"{org.hibernate.validator.referenceguide.chapter04.constraintvalidatorcontext.CheckCase.message}"
+					"{org.hibernate.validator.referenceguide.chapter06.constraintvalidatorcontext.CheckCase.message}"
 			)
 					.addConstraintViolation();
 		}
@@ -376,7 +376,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
           <title>Adding new <classname>ConstraintViolation</classname> with
           custom property path</title>
 
-          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04.custompath;
+          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.custompath;
 
 public class ValidPassengerCountValidator
 		implements ConstraintValidator&lt;ValidPassengerCount, Car&gt; {
@@ -420,7 +420,7 @@ public class ValidPassengerCountValidator
         <title>Defining a custom error message for the
         <classname>CheckCase</classname> constraint</title>
 
-        <programlisting>org.hibernate.validator.referenceguide.chapter04.CheckCase.message=Case mode must be {value}.</programlisting>
+        <programlisting>org.hibernate.validator.referenceguide.chapter06.CheckCase.message=Case mode must be {value}.</programlisting>
       </example>
 
       <para>If a validation error occurs, the validation runtime will use the
@@ -442,7 +442,7 @@ public class ValidPassengerCountValidator
         <title>Applying the <classname>CheckCase</classname>
         constraint</title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06;
 
 public class Car {
 
@@ -475,7 +475,7 @@ public class Car {
         <title>Testcase demonstrating the <classname>CheckCase</classname>
         validation</title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06;
 
 public class CarTest {
 
@@ -544,7 +544,7 @@ public class CarTest {
     <example>
       <title>Cross-parameter constraint</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04.crossparameter;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.crossparameter;
 
 @Constraint(validatedBy = ConsistentDateParameterValidator.class)
 @Target({ METHOD, CONSTRUCTOR, ANNOTATION_TYPE })
@@ -552,7 +552,7 @@ public class CarTest {
 @Documented
 public @interface ConsistentDateParameters {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter04." +
+	String message() default "{org.hibernate.validator.referenceguide.chapter06." +
 			"crossparameter.ConsistentDateParameters.message}";
 
 	Class&lt;?&gt;[] groups() default { };
@@ -587,7 +587,7 @@ public @interface ConsistentDateParameters {
     <example id="example-cross-parameter-validator">
       <title>Generic and cross-parameter constraint</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04.crossparameter;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.crossparameter;
 
 @SupportedValidationTarget(ValidationTarget.PARAMETERS)
 public class ConsistentDateParameterValidator implements
@@ -649,7 +649,7 @@ public class ConsistentDateParameterValidator implements
     <example id="example-dual-cross-parameter-constraint">
       <title>Generic and cross-parameter constraint</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04.crossparameter;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.crossparameter;
 
 @Constraint(validatedBy = {
 		ScriptAssertObjectValidator.class,
@@ -660,7 +660,7 @@ public class ConsistentDateParameterValidator implements
 @Documented
 public @interface ScriptAssert {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter04." +
+	String message() default "{org.hibernate.validator.referenceguide.chapter06." +
 			"crossparameter.ScriptAssert.message}";
 
 	Class&lt;?&gt;[] groups() default { };
@@ -722,7 +722,7 @@ public Car buildCar(int seatCount, List&lt;Passenger&gt; passengers) {
       <title>Creating a composing constraint
       <classname>ValidLicensePlate</classname></title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04.constraintcomposition;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.constraintcomposition;
 
 @NotNull
 @Size(min = 2, max = 14)
@@ -733,7 +733,7 @@ public Car buildCar(int seatCount, List&lt;Passenger&gt; passengers) {
 @Documented
 public @interface ValidLicensePlate {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter04.constraintcomposition.ValidLicensePlate.message}";
+	String message() default "{org.hibernate.validator.referenceguide.chapter06.constraintcomposition.ValidLicensePlate.message}";
 
 	Class&lt;?&gt;[] groups() default { };
 
@@ -758,7 +758,7 @@ public @interface ValidLicensePlate {
       <title>Application of composing constraint
       <classname>ValidLicensePlate</classname></title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter04.constraintcomposition;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.constraintcomposition;
 
 public class Car {
 
@@ -785,7 +785,7 @@ public class Car {
 @ReportAsSingleViolation
 public @interface ValidLicensePlate {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter04.constraintcomposition.ValidLicensePlate.message}";
+	String message() default "{org.hibernate.validator.referenceguide.chapter06.constraintcomposition.ValidLicensePlate.message}";
 
 	Class&lt;?&gt;[] groups() default { };
 

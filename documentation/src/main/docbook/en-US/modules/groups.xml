@@ -52,7 +52,7 @@
     <example id="example-person">
       <title>Person</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups;
 
 public class Person {
 	@NotNull
@@ -82,7 +82,7 @@ public class Person {
     <example id="example-driver">
       <title>Driver</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups;
 
 public class Driver extends Person {
 	@Min(
@@ -122,12 +122,12 @@ public class Driver extends Person {
     <example id="example-group-interfaces">
       <title>Group interfaces</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups;
 
 public interface DriverChecks {
 }</programlisting>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups;
 
 public interface CarChecks {
 }</programlisting>
@@ -141,7 +141,7 @@ public interface CarChecks {
     <example id="example-car">
       <title>Car</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups;
 
 public class Car {
 	@NotNull
@@ -205,7 +205,7 @@ public class Car {
     <example id="example-drive-away">
       <title>Drive away</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups;
 
 public class GroupTest {
 
@@ -303,7 +303,7 @@ public class GroupTest {
     <example id="example-orderedChecks">
       <title>Interface with @GroupSequence</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups;
 
 @GroupSequence({ Default.class, CarChecks.class, DriverChecks.class })
 public interface OrderedChecks {
@@ -361,7 +361,7 @@ public void testOrderedChecks() {
       <example id="example-rental-car">
         <title>RentalCar with @GroupSequence</title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups;
 
 @GroupSequence({ RentalChecks.class, CarChecks.class, RentalCar.class })
 public class RentalCar extends Car {
@@ -447,7 +447,7 @@ public void carIsRented() {
       <example id="example-rental-car-group-sequence-provider">
         <title>RentalCar with @GroupSequenceProvider</title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupsequenceprovider;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups.groupsequenceprovider;
 
 @GroupSequenceProvider(RentalCarGroupSequenceProvider.class)
 public class RentalCar extends Car {
@@ -471,7 +471,7 @@ public class RentalCar extends Car {
       <example id="example-group-sequence-provider-implementation" label="">
         <title>DefaultGroupSequenceProvider implementation</title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupsequenceprovider;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups.groupsequenceprovider;
 
 public class RentalCarGroupSequenceProvider implements DefaultGroupSequenceProvider&lt;RentalCar&gt; {
 	public List&lt;Class&lt;?&gt;&gt; getValidationGroups(RentalCar car) {
@@ -514,7 +514,7 @@ public class RentalCarGroupSequenceProvider implements DefaultGroupSequenceProvi
     <example id="example-group-conversion-dedault-to-driver-checks">
       <title>@ConvertGroup usage</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupconversion;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups.groupconversion;
 
 @GroupSequence({ CarChecks.class, Car.class })
 public class Car {
@@ -563,7 +563,7 @@ public class Car {
 	// getters and setters ...
 }</programlisting>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupconversion;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups.groupconversion;
 
 public class Driver extends Person {
 	@Min(
@@ -608,7 +608,7 @@ public class Driver extends Person {
     <example id="example-group-conversion-test">
       <title>Test case for @ConvertGroup</title>
 
-      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.groups.groupconversion;
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groups.groupconversion;
 
 public class GroupConversionTest {
 
