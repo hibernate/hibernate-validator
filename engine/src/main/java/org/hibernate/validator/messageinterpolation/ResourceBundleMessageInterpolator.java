@@ -224,7 +224,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 
 		while ( matcher.find() ) {
 			String match = matcher.group( 1 );
-			InterpolationTerm expression = new InterpolationTerm( match, locale );
+			InterpolationTerm expression = InterpolationTerm.getInstance( match, locale );
 			if ( expression.needsEvaluation() ) {
 				String resolvedExpression = expression.interpolate( context );
 				resolvedExpression = Matcher.quoteReplacement( resolvedExpression );

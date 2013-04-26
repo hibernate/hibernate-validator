@@ -62,11 +62,6 @@
             <artifactId>javax.el-api</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.glassfish.web</groupId>
-            <artifactId>javax.el</artifactId>
-            <scope>runtime</scope>
-        </dependency>
 
         <!--
         Optional dependencies
@@ -90,6 +85,11 @@
         <!--
         Test dependencies
         -->
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>javax.el</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
