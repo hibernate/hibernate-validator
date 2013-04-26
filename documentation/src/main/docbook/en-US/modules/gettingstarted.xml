@@ -83,12 +83,14 @@
       Expression Language (<ulink url="jcp.org/en/jsr/detail?id=341">JSR
       341</ulink>) for evaluating dynamic expressions in constraint violation
       messages (see <xref linkend="section-message-interpolation"/>). When
-      your application runs in a Java EE container such as JBoss AS, an EL
-      implementation is already provided by the container. In a Java SE
-      environment, however, you have to add an implementation as dependency to
-      your POM file. For instance you can add the following two dependencies
-      to use the JSR 341 <ulink url="http://uel.java.net/">reference
-      implementation</ulink>:</para>
+      your application runs in a Servlet container or a Java EE container such
+      as WildFly, an EL implementation is already provided by the
+      container.</para>
+
+      <para>In a Java SE environment, however, you have to add an
+      implementation as dependency to your POM file. For instance you can add
+      the following two dependencies to use the JSR 341 <ulink
+      url="http://uel.java.net/">reference implementation</ulink>:</para>
 
       <example>
         <title>Maven dependencies for Unified EL reference

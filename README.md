@@ -40,8 +40,8 @@ Logging will delegate any log requests to that provider.
 
       If you want to use the Unified Expression Language (EL) in your constraint violation messages or work with the `@DecimalMax`/`@DecimalMin`
       constraints, you also need to make the EL API and an implementation part of your class path. While these dependencies are typically provided
-      by the container in a Java EE environment, you have to explicitly add them in an SE environment. E.g. add the following two dependencies to
-      use the EL reference implementation:
+      in Java EE environments and Servlet containers, you have to explicitly add them in an SE environment. E.g. add the following two dependencies
+      to use the EL reference implementation:
 
         <dependency>
            <groupId>javax.el</groupId>
