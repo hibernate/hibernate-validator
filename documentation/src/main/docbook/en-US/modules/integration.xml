@@ -266,7 +266,7 @@
     <example id="example-jsf2">
       <title>Usage of Bean Validation within JSF2</title>
 
-      <programlisting>&lt;h:form&gt;
+      <programlisting language="XML" role="XML">&lt;h:form&gt;
   <emphasis role="bold">&lt;f:validateBean&gt;</emphasis>
     &lt;h:inputText value=”#{model.property}” /&gt;
     &lt;h:selectOneRadio value=”#{model.radioProperty}” &gt; ... &lt;/h:selectOneRadio&gt;
@@ -295,5 +295,11 @@
 
       <programlisting>javax.faces.validator.BeanValidator.MESSAGE={0}</programlisting>
     </tip>
+  </section>
+
+  <section>
+    <title>CDI</title>
+
+    <para>TODO</para>
   </section>
 </chapter>

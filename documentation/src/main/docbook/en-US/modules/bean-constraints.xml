@@ -394,7 +394,7 @@ public class Car {
       <methodname>Validation#buildDefaultValidatorFactory()</methodname>:</para>
 
       <example>
-        <title>Validation.buildDefaultValidatorFactory()</title>
+        <title>Validation#buildDefaultValidatorFactory()</title>
 
         <programlisting language="JAVA" role="JAVA">ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 Validator validator = factory.getValidator();</programlisting>
@@ -441,7 +441,7 @@ Validator validator = factory.getValidator();</programlisting>
         object.</para>
 
         <example id="example-validator-validate">
-          <title>Using of
+          <title>Using
           <methodname>Validator#validate()</methodname></title>
 
           <programlisting language="JAVA" role="JAVA">Car car = new Car( null, true );

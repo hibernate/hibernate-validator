@@ -136,7 +136,7 @@ public @interface CheckCase {
               <para>An example for a custom payload could be the definition of
               a severity.</para>
 
-              <programlisting>public class Severity {
+              <programlisting language="JAVA" role="JAVA">public class Severity {
 	public interface Info extends Payload {
 	}
 

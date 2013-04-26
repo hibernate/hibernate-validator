@@ -37,7 +37,7 @@
   <example id="metadata-example-car">
     <title>Example classes</title>
 
-    <programlisting>package org.hibernate.validator.referenceguide.chapter07;
+    <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter07;
 
 public class Person {
 
@@ -50,7 +50,7 @@ public class Person {
 	//getters and setters ...
 }</programlisting>
 
-    <programlisting>public interface Vehicle {
+    <programlisting language="JAVA" role="JAVA">public interface Vehicle {
 
 	public interface Basic {
 	}
@@ -59,7 +59,7 @@ public class Person {
 	String getManufacturer();
 }</programlisting>
 
-    <programlisting>@ValidCar
+    <programlisting language="JAVA" role="JAVA">@ValidCar
 public class Car implements Vehicle {
 
 	public interface SeverityInfo extends Payload {
@@ -152,7 +152,7 @@ public class Car implements Vehicle {
     <example id="metadata-example-using-beandescriptor">
       <title>Using <classname>BeanDescriptor</classname></title>
 
-      <programlisting>Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+      <programlisting language="JAVA" role="JAVA">Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 BeanDescriptor carDescriptor = validator.getConstraintsForClass( Car.class );
 
@@ -269,7 +269,7 @@ assertNotNull(
     <example id="metadata-example-using-propertydescriptor">
       <title>Using <classname>PropertyDescriptor</classname></title>
 
-      <programlisting>PropertyDescriptor licensePlateDescriptor = carDescriptor.getConstraintsForProperty(
+      <programlisting language="JAVA" role="JAVA">PropertyDescriptor licensePlateDescriptor = carDescriptor.getConstraintsForProperty(
 		"licensePlate"
 );
 
@@ -318,7 +318,7 @@ assertEquals( 1, driverDescriptor.getGroupConversions().size() );</programlistin
       <title>Using <classname>MethodDescriptor</classname> and
       <classname>ConstructorDescriptor</classname></title>
 
-      <programlisting>//driveAway(int) has a constrained parameter and an unconstrained return value
+      <programlisting language="JAVA" role="JAVA">//driveAway(int) has a constrained parameter and an unconstrained return value
 MethodDescriptor driveAwayDescriptor = carDescriptor.getConstraintsForMethod(
 		"driveAway",
 		int.class
@@ -479,7 +479,7 @@ assertEquals(
     <example id="metadata-example-using-elementdescriptor">
       <title>Using <classname>ElementDescriptor</classname> methods</title>
 
-      <programlisting>PropertyDescriptor manufacturerDescriptor = carDescriptor.getConstraintsForProperty(
+      <programlisting language="JAVA" role="JAVA">PropertyDescriptor manufacturerDescriptor = carDescriptor.getConstraintsForProperty(
 		"manufacturer"
 );
 
@@ -507,7 +507,7 @@ assertEquals( Object[].class, loadCrossParameterDescriptor.getElementClass() );<
     <example id="example-constraint-finder">
       <title>Usage of ConstraintFinder</title>
 
-      <programlisting>PropertyDescriptor manufacturerDescriptor = carDescriptor.getConstraintsForProperty(
+      <programlisting language="JAVA" role="JAVA">PropertyDescriptor manufacturerDescriptor = carDescriptor.getConstraintsForProperty(
 		"manufacturer"
 );
 
@@ -603,7 +603,7 @@ assertEquals(
     <example id="metadata-example-using-groupconversiondescriptor">
       <title>Using <classname>GroupConversionDescriptor</classname></title>
 
-      <programlisting>PropertyDescriptor driverDescriptor = carDescriptor.getConstraintsForProperty( "driver" );
+      <programlisting language="JAVA" role="JAVA">PropertyDescriptor driverDescriptor = carDescriptor.getConstraintsForProperty( "driver" );
 
 Set&lt;GroupConversionDescriptor&gt; groupConversions = driverDescriptor.getGroupConversions();
 assertEquals( 1, groupConversions.size() );
@@ -634,7 +634,7 @@ assertEquals( Person.Basic.class, groupConversionDescriptor.getTo() );</programl
     <example id="metadata-example-using-constraintdescriptor">
       <title>Using <classname>ConstraintDescriptor</classname></title>
 
-      <programlisting>//descriptor for the @LuggageCountMatchesPassengerCount constraint on the
+      <programlisting language="JAVA" role="JAVA">//descriptor for the @LuggageCountMatchesPassengerCount constraint on the
 //load(List&lt;Person&gt;, List&lt;PieceOfLuggage&gt;) method
 ConstraintDescriptor&lt;?&gt; constraintDescriptor = carDescriptor.getConstraintsForMethod(
 		"load",

@@ -179,7 +179,7 @@
     <example floatstyle="" id="example-fail-fast-property">
       <title>Enabling <option>failFast</option> via a property</title>
 
-      <programlisting language="" role="">HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
+      <programlisting language="JAVA" role="JAVA">HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
 ValidatorFactory factory = configuration.addProperty( "hibernate.validator.fail_fast", "true" ).buildValidatorFactory();
 Validator validator = factory.getValidator();
 
@@ -191,7 +191,7 @@ Validator validator = factory.getValidator();
       <title>Enabling <option>failFast</option> at the
       <classname>Configuration</classname> level</title>
 
-      <programlisting lang="">HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
+      <programlisting language="JAVA" role="JAVA">HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
 ValidatorFactory factory = configuration.failFast( true ).buildValidatorFactory();
 Validator validator = factory.getValidator();
 
@@ -203,7 +203,7 @@ Validator validator = factory.getValidator();
       <title>Enabling <option>failFast</option> at the
       <classname>ValidatorFactory</classname> level</title>
 
-      <programlisting language="" role="">HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
+      <programlisting language="JAVA" role="JAVA">HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
 ValidatorFactory factory = configuration.buildValidatorFactory();
 
 Validator validator = factory.getValidator();
@@ -237,10 +237,10 @@ validator = factory.unwrap( HibernateValidatorFactory.class )
     constraints can be defined in a fluent manner as shown in <xref lang=""
     linkend="example-constraint-mapping"/>.</para>
 
-    <para><example id="example-constraint-mapping">
-        <title>Programmatic constraint definition</title>
+    <example id="example-constraint-mapping">
+      <title>Programmatic constraint definition</title>
 
-        <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
+      <programlisting language="JAVA" role="JAVA">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .property( "manufacturer", FIELD )
         .constraint( new NotNullDef() )
@@ -252,7 +252,7 @@ mapping.type( Car.class )
 .type( RentalCar.class )
     .property( "rentalStation", METHOD )
         .constraint( new NotNullDef() );      </programlisting>
-      </example></para>
+    </example>
 
     <para>As you can see constraints can be configured on multiple classes and
     properties using method chaining. The constraint definition classes
@@ -267,15 +267,15 @@ mapping.type( Car.class )
     <classname>GenericConstraintDef</classname> as seen in <xref
     linkend="example-generic-constraint-mapping"/>.</para>
 
-    <para><example id="example-generic-constraint-mapping">
-        <title>Programmatic constraint definition using
-        <methodname>createGeneric()</methodname></title>
+    <example id="example-generic-constraint-mapping">
+      <title>Programmatic constraint definition using
+      <methodname>createGeneric()</methodname></title>
 
-        <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
+      <programlisting language="JAVA" role="JAVA">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .property( "licensePlate", FIELD )
         .constraint( new GenericConstraintDef&lt;CheckCase.class&gt;( CheckCase.class ).param( "value", CaseMode.UPPER ) );   </programlisting>
-      </example></para>
+    </example>
 
     <para>Not only standard class- and property-level constraints but also
     method constraints can be configured using the API. As shown in <xref
@@ -287,7 +287,7 @@ mapping.type( Car.class )
     <example id="example-method-constraint-mapping">
       <title>Programmatic definition of method constraints</title>
 
-      <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
+      <programlisting language="JAVA" role="JAVA">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .method( "drive", String.class, Integer.class )
         .parameter( 0 )
@@ -307,10 +307,10 @@ mapping.type( Car.class )
     them with <classname>@Valid</classname>). An example can be found in <xref
     lang="" linkend="example-cascading-constraints"/>.</para>
 
-    <para><example id="example-cascading-constraints">
-        <title>Marking constraints for cascaded validation</title>
+    <example id="example-cascading-constraints">
+      <title>Marking constraints for cascaded validation</title>
 
-        <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
+      <programlisting language="JAVA" role="JAVA">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .property( "manufacturer", FIELD )
         .valid()
@@ -326,20 +326,22 @@ mapping.type( Car.class )
 .type( RentalCar.class )
     .property( "rentalStation", METHOD )
         .valid();</programlisting>
-      </example></para>
+    </example>
 
     <para>Last but not least you can configure the default group sequence or
     the default group sequence provider of a type as shown in <xref lang=""
-    linkend="example-sequences"/>.<example id="example-sequences">
-        <title>Configuration of default group sequence and default group
-        sequence provider</title>
+    linkend="example-sequences"/>.</para>
 
-        <programlisting language="" role="">ConstraintMapping mapping = new ConstraintMapping();
+    <example id="example-sequences">
+      <title>Configuration of default group sequence and default group
+      sequence provider</title>
+
+      <programlisting language="JAVA" role="JAVA">ConstraintMapping mapping = new ConstraintMapping();
 mapping.type( Car.class )
     .defaultGroupSequence( Car.class, CarChecks.class )
 .type( RentalCar.class )
     .defaultGroupSequenceProvider( RentalCarGroupSequenceProvider.class ); </programlisting>
-      </example></para>
+    </example>
 
     <para>Once a <classname>ConstraintMapping</classname> is set up it has to
     be passed to the configuration. Since the programmatic API is not part of
@@ -347,17 +349,17 @@ mapping.type( Car.class )
     <classname>HibernateValidatorConfiguration</classname> instance as shown
     in <xref linkend="example-hibernate-specific-config"/>.</para>
 
-    <para><example id="example-hibernate-specific-config">
-        <title>Creating a Hibernate Validator specific configuration</title>
+    <example id="example-hibernate-specific-config">
+      <title>Creating a Hibernate Validator specific configuration</title>
 
-        <programlisting lang="" language="" role="">ConstraintMapping mapping = new ConstraintMapping();
+      <programlisting lang="JAVA" language="" role="JAVA">ConstraintMapping mapping = new ConstraintMapping();
 // configure mapping instance
 
 HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
 config.addMapping( mapping );
 ValidatorFactory factory = config.buildValidatorFactory();
 Validator validator = factory.getValidator();</programlisting>
-      </example></para>
+    </example>
   </section>
 
   <section>

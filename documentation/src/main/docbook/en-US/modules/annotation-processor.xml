@@ -29,11 +29,11 @@
   <itemizedlist>
     <listitem>
       <para>specifying constraint annotations at unsupported data types (e.g.
-      by annotating a String with @Past)</para>
+      by annotating a String with <classname>@Past</classname>)</para>
     </listitem>
 
     <listitem>
-      <para>annotating the setter of a JavaBean property (instead of the
+      <para>annotating the setter of a JavaBeans property (instead of the
       getter method)</para>
     </listitem>
 
@@ -62,8 +62,8 @@
 
     <para>The Hibernate Validator Annotation Processor is based on the
     "Pluggable Annotation Processing API" as defined by <ulink
-    url="http://jcp.org/en/jsr/detail?id=269">JSR 269</ulink> which is
-    part of the Java Platform since Java 6.</para>
+    url="http://jcp.org/en/jsr/detail?id=269">JSR 269</ulink> which is part of
+    the Java Platform since Java 6.</para>
   </section>
 
   <section id="validator-annotationprocessor-features">
@@ -112,7 +112,7 @@
     <para>The behavior of the Hibernate Validator Annotation Processor can be
     controlled using the <ulink
     url="http://java.sun.com/javase/6/docs/technotes/tools/windows/javac.html#options">processor
-    options</ulink> listed in table<xref
+    options</ulink> listed in table <xref
     linkend="table_processor_options"/>:</para>
 
     <table id="table_processor_options">
@@ -206,7 +206,7 @@
         <example>
           <title>Using the annotation processor with Ant</title>
 
-          <programlisting>&lt;javac srcdir="src/main"
+          <programlisting language="XML" role="XML">&lt;javac srcdir="src/main"
        destdir="build/classes"
        classpath="/path/to/validation-api-&bvVersion;.jar"&gt;
        &lt;compilerarg value="-processorpath" /&gt;
@@ -226,12 +226,11 @@
         <example>
           <title>Adding the HV Annotation Processor as dependency</title>
 
-          <programlisting>...
+          <programlisting language="XML" role="XML">...
 &lt;dependency&gt;
     &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
     &lt;artifactId&gt;hibernate-validator-annotation-processor&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
-    &lt;scope&gt;compile&lt;/scope&gt;
 &lt;/dependency&gt;
 ...        </programlisting>
         </example>
@@ -252,7 +251,7 @@
         <example>
           <title>Adding the Maven Annotation Plugin repository</title>
 
-          <programlisting>...
+          <programlisting language="XML" role="XML">...
 &lt;pluginRepositories&gt;
     &lt;pluginRepository&gt;
         &lt;id&gt;maven-annotation-plugin-repo&lt;/id&gt;
@@ -271,7 +270,7 @@
         <example>
           <title>Configuring the Maven Annotation Plugin</title>
 
-          <programlisting>...
+          <programlisting language="XML" role="XML">...
 &lt;plugin&gt;
     &lt;artifactId&gt;maven-compiler-plugin&lt;/artifactId&gt;
     &lt;configuration&gt;
@@ -298,7 +297,6 @@
             &lt;groupId&gt;org.hibernate&lt;/groupId&gt;
             &lt;artifactId&gt;hibernate-validator-annotation-processor&lt;/artifactId&gt;
             &lt;version&gt;&version;&lt;/version&gt;
-            &lt;scope&gt;compile&lt;/scope&gt;
         &lt;/dependency&gt;
     &lt;/dependencies&gt;
 &lt;/plugin&gt;
