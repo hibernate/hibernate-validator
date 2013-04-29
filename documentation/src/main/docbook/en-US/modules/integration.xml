@@ -42,7 +42,7 @@
       automatically discover validation providers doesn't work in an OSGi
       environment. To solve this, you have to provide a custom
       <classname>ValidationProviderResolver</classname> (see <xref
-      linkend="section-validation-provider-resolver"/>). </para>
+      linkend="section-validation-provider-resolver"/>).</para>
     </tip>
 
     <itemizedlist>
@@ -208,20 +208,24 @@
 
         <programlisting language="XML" role="XML">&lt;hibernate-configuration&gt;
     &lt;session-factory&gt;
-       ...
-       &lt;property name="javax.persistence.validation.group.pre-persist"&gt;javax.validation.groups.Default&lt;/property&gt;
-       &lt;property name="javax.persistence.validation.group.pre-update"&gt;javax.validation.groups.Default&lt;/property&gt;
-       &lt;property name="javax.persistence.validation.group.pre-remove"&gt;&lt;/property&gt;
-       ...
-       &lt;event type="pre-update"&gt;
-         &lt;listener class="org.hibernate.cfg.beanvalidation.BeanValidationEventListener"/&gt;
-       &lt;/event&gt;
-       &lt;event type="pre-insert"&gt;
-         &lt;listener class="org.hibernate.cfg.beanvalidation.BeanValidationEventListener"/&gt;
-       &lt;/event&gt;
-       &lt;event type="pre-delete"&gt;
-         &lt;listener class="org.hibernate.cfg.beanvalidation.BeanValidationEventListener"/&gt;
-       &lt;/event&gt;
+        ...
+        &lt;property name="javax.persistence.validation.group.pre-persist"&gt;
+            javax.validation.groups.Default
+        &lt;/property&gt;
+        &lt;property name="javax.persistence.validation.group.pre-update"&gt;
+            javax.validation.groups.Default
+        &lt;/property&gt;
+        &lt;property name="javax.persistence.validation.group.pre-remove"&gt;&lt;/property&gt;
+        ...
+        &lt;event type="pre-update"&gt;
+            &lt;listener class="org.hibernate.cfg.beanvalidation.BeanValidationEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="pre-insert"&gt;
+            &lt;listener class="org.hibernate.cfg.beanvalidation.BeanValidationEventListener"/&gt;
+        &lt;/event&gt;
+        &lt;event type="pre-delete"&gt;
+            &lt;listener class="org.hibernate.cfg.beanvalidation.BeanValidationEventListener"/&gt;
+        &lt;/event&gt;
     &lt;/session-factory&gt;
 &lt;/hibernate-configuration&gt;</programlisting>
       </example>
@@ -300,6 +304,361 @@
   <section id="section-integration-with-cdi">
     <title>CDI</title>
 
-    <para>TODO</para>
+    <para>As of version 1.1, Bean Validation is integrated with CDI (Contexts
+    and Dependency Injection for Java<superscript>TM</superscript> EE).</para>
+
+    <para>This integration provides CDI managed beans for
+    <classname>Validator</classname> and
+    <classname>ValidatorFactory</classname> and enables dependency injection
+    in constraint validators as well as custom message interpolators,
+    traversable resolvers, constraint validator factories and parameter name
+    providers.</para>
+
+    <para>Furthermore, parameter and return value constraints on the methods
+    and constructors of CDI managed beans will automatically be validated upon
+    invocation.</para>
+
+    <para>When your application runs on a Jave EE container, this integration
+    is enabled by default. When working with CDI in a Servlet container or in
+    a pure Java SE environment, you can use the CDI portable extension
+    provided by Hibernate Validator. To do so, add the portable extension to
+    your class path as described in <xref
+    linkend="section-getting-started-cdi"/>.</para>
+
+    <section>
+      <title>Dependency injection</title>
+
+      <para>CDI's dependency injection mechanism makes it very easy to
+      retrieve <classname>ValidatorFactory</classname> and
+      <classname>Validator</classname> instances and use them in your managed
+      beans. Just annotate instance fields of your bean with
+      <classname>@javax.inject.Inject</classname> as shown in <xref
+      linkend="example-dependency-injection"/>.</para>
+
+      <example id="example-dependency-injection">
+        <title>Retrieving validator factory and validator via
+        <classname>@Inject</classname></title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.validator;
+
+@ApplicationScoped
+public class RentalStation {
+
+	@Inject
+	private ValidatorFactory validatorFactory;
+
+	@Inject
+	private Validator validator;
+
+	//...
+}</programlisting>
+      </example>
+
+      <para>The injected beans are the default validator factory and validator
+      instances. In order to configure them - e.g. to use a custom message
+      interpolator - you can use the Bean Validation XML descriptors as
+      discussed in <xref linkend="chapter-xml-configuration"/>.</para>
+
+      <para>If you are working with several Bean Validation providers you can
+      make sure that factory and validator from Hibernate Validator are
+      injected by annotating the injection points with the
+      <classname>@HibernateValidator</classname> qualifier which is
+      demonstrated in <xref
+      linkend="example-dependency-injection-using-hv"/>.</para>
+
+      <example id="example-dependency-injection-using-hv">
+        <title>Using the @HibernateValidator qualifier annotation</title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.validator.qualifier;
+
+@ApplicationScoped
+public class RentalStation {
+
+	@Inject
+	@HibernateValidator
+	private ValidatorFactory validatorFactory;
+
+	@Inject
+	@HibernateValidator
+	private Validator validator;
+
+	//...
+}</programlisting>
+      </example>
+
+      <tip>
+        <para>The fully-qualified name of the qualifier annotation is
+        <classname>org.hibernate.validator.cdi.HibernateValidator</classname>.
+        Be sure to not import
+        <classname>org.hibernate.validator.HibernateValidator</classname>
+        instead which is the <classname>ValidationProvider</classname>
+        implementation used for selecting Hibernate Validator when working
+        with the bootstrapping API (see <xref
+        linkend="section-retrieving-validator-factory-validator"/>).</para>
+      </tip>
+
+      <para>Via <classname>@Inject</classname> you also can inject
+      dependencies into constraint validators and other Bean Validation
+      objects such as <classname>MessageInterpolator</classname>
+      implementations etc.</para>
+
+      <para><xref linkend="example-constraint-validator-injected-bean"/>
+      demonstrates how an injected CDI bean is used in a
+      <classname>ConstraintValidator</classname> implementation to determine
+      whether the given constraint is valid or not. As the example shows, you
+      also can work with the <classname>@PostConstruct</classname> and
+      <classname>@PreDestroy</classname> callbacks to implement any required
+      construction and destruction logic. </para>
+
+      <example id="example-constraint-validator-injected-bean">
+        <title>Constraint validator with injected bean</title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.injection;
+
+public class ValidLicensePlateValidator
+		implements ConstraintValidator&lt;ValidLicensePlate, String&gt; {
+
+	@Inject
+	private VehicleRegistry vehicleRegistry;
+
+	@PostConstruct
+	public void postConstruct() {
+		//do initialization logic...
+	}
+
+	@PreDestroy
+	public void preDestroy() {
+		//do destruction logic...
+	}
+
+	@Override
+	public void initialize(ValidLicensePlate constraintAnnotation) {
+	}
+
+	@Override
+	public boolean isValid(String licensePlate, ConstraintValidatorContext constraintContext) {
+		return vehicleRegistry.isValidLicensePlate( licensePlate );
+	}
+}</programlisting>
+      </example>
+    </section>
+
+    <section>
+      <title>Method validation</title>
+
+      <para>The method interception facilities of CDI allow for a very tight
+      integration with Bean Validation's method validation functionality. Just
+      put constraint annotations to the parameters and return values of the
+      executables of your CDI beans and they will be validated automatically
+      before (parameter constraints) and after (return value constraints) a
+      method or constructor is invoked.</para>
+
+      <para>Note that no explicit interceptor binding is required, instead the
+      required method validation interceptor will automatically be registered
+      for all managed beans with constrained methods and constructors.</para>
+
+      <para>You can see an example in <xref
+      linkend="example-cdi-method-validation"/>.</para>
+
+      <example id="example-cdi-method-validation">
+        <title>CDI managed beans with method-level constraints</title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.methodvalidation;
+
+@ApplicationScoped
+public class RentalStation {
+
+	@Valid
+	public RentalStation() {
+		//...
+	}
+
+	@NotNull
+	@Valid
+	public Car rentCar(
+			@NotNull Customer customer,
+			@NotNull @Future Date startDate,
+			@Min(1) int durationInDays) {
+		//...
+	}
+
+	@NotNull
+	List&lt;Car&gt; getAvailableCars() {
+		//...
+	}
+}</programlisting>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.methodvalidation;
+
+@RequestScoped
+public class RentCarRequest {
+
+	@Inject
+	private RentalStation rentalStation;
+
+	public void rentCar(String customerId, Date startDate, int duration) {
+		//causes ConstraintViolationException
+		rentalStation.rentCar( null, null, -1 );
+	}
+}</programlisting>
+      </example>
+
+      <para>Here the <classname>RentalStation</classname> bean hosts several
+      method constraints. When invoking one of the
+      <classname>RentalStation</classname> methods from another bean such as
+      <classname>RentCarRequest</classname>, the constraints of the invoked
+      method are automatically validated. If any illegal parameter values are
+      passed as in the example, a
+      <classname>ConstraintViolationException</classname> will be thrown by
+      the method interceptor, providing detailed information on the violated
+      constraints. The same is the case if the method's return value violates
+      any return value constraints.</para>
+
+      <para>Similarly, constructor constraints are validated automatically
+      upon invocation. In the example the <classname>RentalStation</classname>
+      object returned by the constructor will be validated since the
+      constructor return value is marked with
+      <classname>@Valid</classname>.</para>
+
+      <section>
+        <title>Validated executable types</title>
+
+        <para>Bean Validation allows for a fine-grained control of the
+        executable types which are automatically validated. By default,
+        constraints on constructors and non-getter methods are validated.
+        Therefore the <classname>@NotNull</classname> constraint on the method
+        <classname>RentalStation#getAvailableCars()</classname> in <xref
+        linkend="example-cdi-method-validation"/> gets not validated when the
+        method is invoked.</para>
+
+        <para>You have the following options to configure which types of
+        executables are validated upon invocation:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Configure the executable types globally via the XML
+            descriptor <filename>META-INF/validation.xml</filename>; see <xref
+            linkend="section-configuration-validation-xml"/> for an
+            example</para>
+          </listitem>
+
+          <listitem>
+            <para>Use the <classname>@ValidateOnExecution</classname>
+            annotation on the executable or type level</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>If several sources of configuration are specified for a given
+        executable, <classname>@ValidateOnExecution</classname> on the
+        executable level takes precedence over
+        <classname>@ValidateOnExecution</classname> on the type level and
+        <classname>@ValidateOnExecution</classname> generally takes precedence
+        over the globally configured types in
+        <filename><filename>META-INF/validation.xml</filename></filename>.</para>
+
+        <para><xref linkend="example-using-validateonexecution"/> shows how to
+        use the <classname>@ValidateOnExecution</classname> annotation:</para>
+
+        <example id="example-using-validateonexecution">
+          <title>Using <classname>@ValidateOnExecution</classname></title>
+
+          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.methodvalidation.configuration;
+
+@ApplicationScoped
+@ValidateOnExecution(type = ExecutableType.ALL)
+public class RentalStation {
+
+	@Valid
+	public RentalStation() {
+		//...
+	}
+
+	@NotNull
+	@Valid
+	@ValidateOnExecution(type = ExecutableType.NONE)
+	public Car rentCar(
+			@NotNull Customer customer,
+			@NotNull @Future Date startDate,
+			@Min(1) int durationInDays) {
+		//...
+	}
+
+	@NotNull
+	public List&lt;Car&gt; getAvailableCars() {
+		//...
+	}
+}</programlisting>
+        </example>
+
+        <para>Here the method <methodname>rentCar()</methodname> won't be
+        validated upon invocation because it is annotated with
+        <classname>@ValidateOnExecution(type =
+        ExecutableType.NONE)</classname>. In contrast, the constructor and the
+        method <methodname>getAvailableCars()</methodname> will be validated
+        due to <classname>@ValidateOnExecution(type =
+        ExecutableType.ALL)</classname> being given on the type level.
+        <classname>ExecutableType.ALL</classname> is a more compact form for
+        explicitly specifying all the types
+        <classname>CONSTRUCTORS</classname>,
+        <classname>GETTER_METHODS</classname> and
+        <classname>NON_GETTER_METHODS</classname>.</para>
+
+        <tip>
+          <para>Executable validation can be turned off globally by specifying
+          <literal>&lt;executable-validation enabled="false"/&gt;</literal> in
+          <filename>META-INF/validation.xml</filename>. In this case, any
+          <classname>@ValidateOnExecution</classname> annotations are
+          ignored.</para>
+        </tip>
+
+        <para>Note that when a method overrides or implements a super-type
+        method the configuration will be taken from that overridden or
+        implemented method (as given via
+        <classname>@ValidateOnExecution</classname> on the method itself or on
+        the super-type). This protects a client of the super-type method from
+        an unexpected alteration of the configuration, e.g. disabling
+        validation of an overridden executable in a sub-type.</para>
+
+        <para>In case a CDI managed bean overrides or implements a super-type
+        method and this super-type method hosts any constraints, it can happen
+        that the validation interceptor is not properly registered with the
+        bean, resulting in the bean's methods not being validated upon
+        invocation. In this case you can specify the executable type IMPLICIT
+        on the sub-class as shown in <xref
+        linkend="example-using-executabletype-implicit"/>, which makes sure
+        that all required metadata is discovered an the validation interceptor
+        kicks in when the methods on
+        <classname>ExpressRentalStation</classname> are invoked.</para>
+
+        <example id="example-using-executabletype-implicit">
+          <title>Using <classname>ExecutableType.IMPLICIT</classname></title>
+
+          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.methodvalidation.implicit;
+
+@ValidateOnExecution(type = ExecutableType.ALL)
+public interface RentalStation {
+
+	@NotNull
+	@Valid
+	Car rentCar(
+			@NotNull Customer customer,
+			@NotNull @Future Date startDate,
+			@Min(1) int durationInDays);
+}</programlisting>
+
+          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.methodvalidation.implicit;
+
+@ApplicationScoped
+@ValidateOnExecution(type = ExecutableType.IMPLICIT)
+public class ExpressRentalStation implements RentalStation {
+
+	@Override
+	public Car rentCar(Customer customer, Date startDate, @Min(1) int durationInDays) {
+		//...
+	}
+}</programlisting>
+        </example>
+      </section>
+    </section>
   </section>
 </chapter>
