@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2012-05-09 09:42+0000\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
 "PO-Revision-Date: 2010-08-23 21:26+0830\n"
 "Last-Translator: Strong Liu <stliu@hibernate.org>\n"
 "Language-Team: none\n"
@@ -22,14 +22,14 @@ msgstr "Bootstrapping"
 
 #. Tag: para
 #: bootstrapping.xml:26
-#, no-c-format
+#, fuzzy, no-c-format
 msgid ""
-"We already seen in <xref linkend=\"section-validator-instance\"/> the "
-"easiest way to create a <classname>Validator</classname> instance - "
-"<methodname>Validation.buildDefaultValidatorFactory</methodname>. In this "
-"chapter we have a look at the other methods in <classname>javax.validation."
-"Validation</classname> and how they allow to configure several aspects of "
-"Bean Validation at bootstrapping time."
+"In <xref linkend=\"section-obtaining-validator\"/> you already saw one way "
+"for creating a <classname>Validator</classname> instance — via "
+"<methodname>Validation#buildDefaultValidatorFactory()</methodname>. In this "
+"chapter you will learn how to use the other methods in <classname>javax."
+"validation.Validation</classname> in order to bootstrap specifically "
+"configured validators."
 msgstr ""
 "在<xref linkend=\"section-validator-instance\"/>中我们说道过, 最简单的创建一"
 "个<classname>Validator</classname>实例的方法是通过<methodname>Validation."
@@ -37,20 +37,178 @@ msgstr ""
 "<classname>javax.validation.Validation</classname>中的其他方法, 以及如何通过"
 "这些方法在Bean Validation初始化的时候对其进行配置的."
 
-#. Tag: para
-#: bootstrapping.xml:33
+#. Tag: title
+#: bootstrapping.xml:34
 #, fuzzy, no-c-format
 msgid ""
-"The different bootstrapping options allow, amongst other things, to "
-"bootstrap any Bean Validation implementation on the classpath. Generally, an "
-"available provider is discovered by the <ulink url=\"http://docs.oracle.com/"
-"javase/6/docs/technotes/guides/jar/jar.html#Service%20Provider\">Java "
-"Service Provider</ulink> mechanism. A Bean Validation implementation "
-"includes the file <filename>javax.validation.spi.ValidationProvider</"
-"filename> in <filename>META-INF/services</filename>. This file contains the "
-"fully qualified classname of the <classname>ValidationProvider</classname> "
-"of the implementation. In the case of Hibernate Validator this is "
-"<classname>org.hibernate.validator.HibernateValidator</classname>."
+"Retrieving <classname>ValidatorFactory</classname> and <classname>Validator</"
+"classname>"
+msgstr ""
+"<classname>Configuration</classname> 和 <classname>ValidatorFactory</"
+"classname>"
+
+#. Tag: para
+#: bootstrapping.xml:37
+#, no-c-format
+msgid ""
+"You obtain a <classname>Validator</classname> by retrieving a "
+"<classname>ValidatorFactory</classname> via one of the static methods on "
+"<classname>javax.validation.Validation</classname> and calling "
+"<classname>getValidator()</classname> on the factory instance."
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:42
+#, no-c-format
+msgid "shows how to obtain a validator from the default validator factory:"
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:46
+#, fuzzy, no-c-format
+msgid ""
+"Bootstrapping default <classname>ValidatorFactory</classname> and "
+"<classname>Validator</classname>"
+msgstr ""
+"<classname>Configuration</classname> 和 <classname>ValidatorFactory</"
+"classname>"
+
+#. Tag: programlisting
+#: bootstrapping.xml:49
+#, no-c-format
+msgid ""
+"ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+"Validator validator = factory.getValidator();"
+msgstr ""
+"ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+"Validator validator = factory.getValidator();"
+
+#. Tag: para
+#: bootstrapping.xml:53
+#, no-c-format
+msgid ""
+"The generated <classname>ValidatorFactory</classname> and "
+"<classname>Validator</classname> instances are thread-safe and can be "
+"cached. As Hibernate Validator uses the factory as context for caching "
+"constraint metadata it is recommended to work with one factory instance "
+"within an application."
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:60
+#, no-c-format
+msgid ""
+"Bean Validation supports working with several providers such as Hibernate "
+"Validator within one application. If more than one provider is present on "
+"the classpath, it is not guaranteed which one is chosen when creating a "
+"factory via <methodname>buildDefaultValidatorFactory()</methodname>."
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:66
+#, no-c-format
+msgid ""
+"In this case you can explicitly specify the provider to use via "
+"<methodname>Validation#byProvider()</methodname>, passing the provider's "
+"<classname>ValidationProvider</classname> class as shown in <xref linkend="
+"\"example-using-specific-provider\"/>."
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:72
+#, fuzzy, no-c-format
+msgid ""
+"Bootstrapping <classname>ValidatorFactory</classname> and "
+"<classname>Validator</classname> using a specific provider"
+msgstr ""
+"<classname>Configuration</classname> 和 <classname>ValidatorFactory</"
+"classname>"
+
+#. Tag: programlisting
+#: bootstrapping.xml:75
+#, fuzzy, no-c-format
+msgid ""
+"ValidatorFactory validatorFactory = Validation.byProvider"
+"( HibernateValidator.class )\n"
+"                .configure()\n"
+"                .buildValidatorFactory();\n"
+"Validator validator = validatorFactory.getValidator();"
+msgstr ""
+"ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+"Validator validator = factory.getValidator();"
+
+#. Tag: para
+#: bootstrapping.xml:78
+#, no-c-format
+msgid ""
+"Note that the configuration object returned by <methodname>configure()</"
+"methodname> allows to specifically customize the factory before calling "
+"<methodname>buildValidatorFactory()</methodname>. The available options are "
+"discussed later in this chapter."
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:83
+#, no-c-format
+msgid ""
+"Similarly you can retrieve the default validator factory for configuration "
+"which is demonstrated in <xref linkend=\"example-configuring-default-provider"
+"\"/>."
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:88
+#, no-c-format
+msgid ""
+"Retrieving the default <classname>ValidatorFactory</classname> for "
+"configuration"
+msgstr ""
+
+#. Tag: programlisting
+#: bootstrapping.xml:91
+#, fuzzy, no-c-format
+msgid ""
+"ValidatorFactory validatorFactory = Validation.byDefaultProvider()\n"
+"                .configure()\n"
+"                .buildValidatorFactory();\n"
+"Validator validator = validatorFactory.getValidator();"
+msgstr ""
+"ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+"Validator validator = factory.getValidator();"
+
+#. Tag: para
+#: bootstrapping.xml:95
+#, no-c-format
+msgid ""
+"If a <classname>ValidatorFactory</classname> instance is no longer in use, "
+"it should be disposed by calling <methodname>ValidatorFactory#close()</"
+"methodname>. This will free any resources possibly allocated by the factory."
+msgstr ""
+
+#. Tag: classname
+#: bootstrapping.xml:102
+#, no-c-format
+msgid "ValidationProviderResolver"
+msgstr "ValidationProviderResolver"
+
+#. Tag: para
+#: bootstrapping.xml:104
+#, no-c-format
+msgid ""
+"By default, available Bean Validation providers are discovered using the "
+"<ulink url=\"http://docs.oracle.com/javase/6/docs/technotes/guides/jar/jar."
+"html#Service%20Provider\">Java Service Provider</ulink> mechanism."
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:109
+#, fuzzy, no-c-format
+msgid ""
+"For that purpose, each provider includes the file <filename>META-INF/"
+"services/javax.validation.spi.ValidationProvider</filename>, containing the "
+"fully qualified classname of its <classname>ValidationProvider</classname> "
+"implementation. In the case of Hibernate Validator this is <classname>org."
+"hibernate.validator.HibernateValidator</classname>."
 msgstr ""
 "The different bootstrapping options allow, amongst other things, to "
 "bootstrap any Bean Validation implementation on the classpath. 通常, 一个服务"
@@ -64,304 +222,177 @@ msgstr ""
 "HibernateValidator</classname>."
 
 #. Tag: para
-#: bootstrapping.xml:46
+#: bootstrapping.xml:116
 #, no-c-format
 msgid ""
-"If there are more than one Bean Validation implementation providers in the "
-"classpath and <methodname>Validation.buildDefaultValidatorFactory()</"
-"methodname> is used, there is no guarantee which provider will be chosen. To "
-"enforce the provider <methodname>Validation.byProvider()</methodname> should "
-"be used."
+"Depending on your environment and its classloading specifics, provider "
+"discovery via the Java's service loader mechanism might not work. In this "
+"case you can plug in a custom <classname>ValidationProviderResolver</"
+"classname> implementation which performs the provider retrieval. An example "
+"is OSGi, where you could implement a provider resolver which uses OSGi "
+"services for provider discovery."
 msgstr ""
-"如果当前类路径下存在多个Bean Validation的实现, 那么<methodname>Validation."
-"buildDefaultValidatorFactory()</methodname>并不能保证具体那个实现会被使用. 如"
-"果想指定某一个的话, 请使用<methodname>Validation.byProvider()</methodname>."
+
+#. Tag: para
+#: bootstrapping.xml:124
+#, no-c-format
+msgid ""
+"To use a custom provider resolver pass it via <methodname>providerResolver()"
+"</methodname> as shown shown in <xref linkend=\"example-using-custom-"
+"validation-provider-resolver\"/>."
+msgstr ""
 
 #. Tag: title
-#: bootstrapping.xml:55
+#: bootstrapping.xml:129
+#, fuzzy, no-c-format
+msgid "Using a custom <classname>ValidationProviderResolver</classname>"
+msgstr "使用自定义的ValidationProviderResolver"
+
+#. Tag: programlisting
+#: bootstrapping.xml:132
 #, no-c-format
 msgid ""
-"<classname>Configuration</classname> and <classname>ValidatorFactory</"
-"classname>"
+"package org.hibernate.validator.referenceguide.chapter08;\n"
+"\n"
+"public class OsgiServiceDiscoverer implements ValidationProviderResolver {\n"
+"\n"
+"        @Override\n"
+"        public List&lt;ValidationProvider&lt;?&gt;&gt; getValidationProviders"
+"() {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: bootstrapping.xml:134
+#, fuzzy, no-c-format
+msgid ""
+"ValidatorFactory validatorFactory = Validation.byDefaultProvider()\n"
+"                .providerResolver( new OsgiServiceDiscoverer() )\n"
+"                .configure()\n"
+"                .buildValidatorFactory();\n"
+"Validator validator = validatorFactory.getValidator();"
+msgstr ""
+"Configuration&lt;?&gt; config = Validation.byDefaultProvider()\n"
+"    .providerResolver( new OSGiServiceDiscoverer() )\n"
+"    .configure();\n"
+"\n"
+"ValidatorFactory factory = config.buildValidatorFactory();\n"
+"Validator validator = factory.getValidator();"
+
+#. Tag: title
+#: bootstrapping.xml:140
+#, fuzzy, no-c-format
+msgid "Configuring a <classname>ValidatorFactory</classname>"
 msgstr ""
 "<classname>Configuration</classname> 和 <classname>ValidatorFactory</"
 "classname>"
 
 #. Tag: para
-#: bootstrapping.xml:58
+#: bootstrapping.xml:142
 #, no-c-format
 msgid ""
-"There are three different methods in the Validation class to create a "
-"Validator instance. The easiest in shown in <xref linkend=\"example-build-"
-"default-validator-factory\"/>."
+"By default validator factories retrieved from <classname>Validation</"
+"classname> and any validators they create are configured as per the XML "
+"descriptor <filename>META-INF/validation.xml</filename> (see <xref linkend="
+"\"chapter-xml-configuration\"/>), if present."
 msgstr ""
-"Validation类提供了三种方法来创建一个Validator的实例, <xref linkend=\"example-"
-"build-default-validator-factory\"/>中显示的是最简单的方法."
-
-#. Tag: title
-#: bootstrapping.xml:63
-#, no-c-format
-msgid "Validation.buildDefaultValidatorFactory()"
-msgstr "Validation.buildDefaultValidatorFactory()"
-
-#. Tag: programlisting
-#: bootstrapping.xml:65
-#, no-c-format
-msgid ""
-"ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
-"Validator validator = factory.getValidator();"
-msgstr ""
-"ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
-"Validator validator = factory.getValidator();"
 
 #. Tag: para
-#: bootstrapping.xml:68
+#: bootstrapping.xml:148
 #, no-c-format
 msgid ""
-"You can also use the method <methodname>Validation.byDefaultProvider()</"
-"methodname> which will allow you to configure several aspects of the created "
-"Validator instance:"
+"If you want to disable the XML based configuration, you can do so by "
+"invoking <methodname>Configuration#ignoreXmlConfiguration()</methodname>."
 msgstr ""
-"你也可以通过<methodname>Validation.byDefaultProvider()</methodname>现获取一个"
-"Configuration对象, 这样可以对要创建的Validator进行配置."
-
-#. Tag: title
-#: bootstrapping.xml:73
-#, no-c-format
-msgid "Validation.byDefaultProvider()"
-msgstr "Validation.byDefaultProvider()"
-
-#. Tag: programlisting
-#: bootstrapping.xml:75
-#, no-c-format
-msgid ""
-"Configuration&lt;?&gt; config = Validation.byDefaultProvider().configure();\n"
-"config.messageInterpolator(new MyMessageInterpolator())\n"
-"    .traversableResolver( new MyTraversableResolver())\n"
-"    .constraintValidatorFactory(new MyConstraintValidatorFactory());\n"
-"\n"
-"ValidatorFactory factory = config.buildValidatorFactory();\n"
-"Validator validator = factory.getValidator();"
-msgstr ""
-"Configuration&lt;?&gt; config = Validation.byDefaultProvider().configure();\n"
-"config.messageInterpolator(new MyMessageInterpolator())\n"
-"    .traversableResolver( new MyTraversableResolver())\n"
-"    .constraintValidatorFactory(new MyConstraintValidatorFactory());\n"
-"\n"
-"ValidatorFactory factory = config.buildValidatorFactory();\n"
-"Validator validator = factory.getValidator();"
 
 #. Tag: para
-#: bootstrapping.xml:78
+#: bootstrapping.xml:152
 #, no-c-format
 msgid ""
-"We will learn more about <classname>MessageInterpolator</classname>, "
-"<classname>TraversableResolver</classname> and "
-"<classname>ConstraintValidatorFactory</classname> in the following sections."
+"The different values of the XML configuration can be accessed via "
+"<methodname>Configuration#getBootstrapConfiguration()</methodname>. This can "
+"for instance be helpful if you want to integrate Bean Validation into a "
+"managed environment and want to create managed instances of the objects "
+"configured via XML."
 msgstr ""
-"<classname>MessageInterpolator</classname>, <classname>TraversableResolver</"
-"classname> 和 <classname>ConstraintValidatorFactory</classname>会在后面详细介"
-"绍."
 
 #. Tag: para
-#: bootstrapping.xml:83
+#: bootstrapping.xml:158
 #, no-c-format
 msgid ""
-"Last but not least you can ask for a Configuration object of a specific Bean "
-"Validation provider. This is useful if you have more than one Bean "
-"Validation provider in your classpath. In this situation you can make an "
-"explicit choice about which implementation to use. In the case of Hibernate "
-"Validator the <classname>Validator</classname> creation looks like:"
+"Using the fluent configuration API, you can override one or more of the "
+"settings when bootstrapping the factory. The following sections show how to "
+"make use of the different options. Note that the <classname>Configuration</"
+"classname> class exposes the default implementations of the different "
+"extension points which can be useful if you want to use these as delegates "
+"for your custom implementations."
 msgstr ""
-"最后, 你可以指定使用哪个Bean Validation的实现. 如果类路径下存在多个Bean "
-"Validation的实现的话,这样就很有必要了. 例如, 如果你想使用Hibernate Validator"
-"来作为内部实现来创建<classname>Validator</classname>的话:"
-
-#. Tag: title
-#: bootstrapping.xml:91
-#, no-c-format
-msgid "Validation.byProvider( HibernateValidator.class )"
-msgstr "Validation.byProvider( HibernateValidator.class )"
-
-#. Tag: programlisting
-#: bootstrapping.xml:93
-#, no-c-format
-msgid ""
-"HibernateValidatorConfiguration config = Validation.byProvider"
-"( HibernateValidator.class ).configure();\n"
-"config.messageInterpolator(new MyMessageInterpolator())\n"
-"    .traversableResolver( new MyTraversableResolver())\n"
-"    .constraintValidatorFactory(new MyConstraintValidatorFactory());\n"
-"\n"
-"ValidatorFactory factory = config.buildValidatorFactory();\n"
-"Validator validator = factory.getValidator();"
-msgstr ""
-"HibernateValidatorConfiguration config = Validation.byProvider"
-"( HibernateValidator.class ).configure();\n"
-"config.messageInterpolator(new MyMessageInterpolator())\n"
-"    .traversableResolver( new MyTraversableResolver())\n"
-"    .constraintValidatorFactory(new MyConstraintValidatorFactory());\n"
-"\n"
-"ValidatorFactory factory = config.buildValidatorFactory();\n"
-"Validator validator = factory.getValidator();"
-
-#. Tag: para
-#: bootstrapping.xml:97
-#, no-c-format
-msgid ""
-"The generated <classname>Validator</classname> instance is thread safe and "
-"can be cached."
-msgstr ""
-"创建出来的<classname>Validator</classname>实例是线程安全的, 所以你可以把它缓"
-"存起来."
 
 #. Tag: classname
-#: bootstrapping.xml:103
-#, no-c-format
-msgid "ValidationProviderResolver"
-msgstr "ValidationProviderResolver"
-
-#. Tag: para
-#: bootstrapping.xml:105
-#, no-c-format
-msgid ""
-"In the case that the Java Service Provider mechanism does not work in your "
-"environment or you have a special classloader setup, you are able to provide "
-"a custom <classname>ValidationProviderResolver</classname>. An example in an "
-"OSGi environment you could plug your custom provider resolver like seen in "
-"<xref linkend=\"example-provider-resolver\"/>."
-msgstr ""
-"如果 Java Service Provider机制在你的环境中不能够正常工作, 或者你有特别的"
-"classloader设置的话, 你也可以提供一个自定义的"
-"<classname>ValidationProviderResolver</classname>.<xref linkend=\"example-"
-"provider-resolver\"/>显示了如何在OSGi环境中插入自定义的provider resolver."
-
-#. Tag: title
-#: bootstrapping.xml:112
-#, no-c-format
-msgid "Providing a custom ValidationProviderResolver"
-msgstr "使用自定义的ValidationProviderResolver"
-
-#. Tag: programlisting
-#: bootstrapping.xml:114
-#, no-c-format
-msgid ""
-"Configuration&lt;?&gt; config = Validation.byDefaultProvider()\n"
-"    .providerResolver( new OSGiServiceDiscoverer() )\n"
-"    .configure();\n"
-"\n"
-"ValidatorFactory factory = config.buildValidatorFactory();\n"
-"Validator validator = factory.getValidator();"
-msgstr ""
-"Configuration&lt;?&gt; config = Validation.byDefaultProvider()\n"
-"    .providerResolver( new OSGiServiceDiscoverer() )\n"
-"    .configure();\n"
-"\n"
-"ValidatorFactory factory = config.buildValidatorFactory();\n"
-"Validator validator = factory.getValidator();"
-
-#. Tag: para
-#: bootstrapping.xml:117
-#, no-c-format
-msgid ""
-"Your <classname>OSGiServiceDiscoverer</classname> must in this case "
-"implement the interface <classname>ValidationProviderResolver</classname>:"
-msgstr ""
-"在这种情况下, 你的<classname>OSGiServiceDiscoverer</classname>类需要实现"
-"<classname>ValidationProviderResolver</classname>接口:"
-
-#. Tag: title
-#: bootstrapping.xml:122
-#, no-c-format
-msgid "ValidationProviderResolver interface"
-msgstr "ValidationProviderResolver接口"
-
-#. Tag: programlisting
-#: bootstrapping.xml:124
-#, no-c-format
-msgid ""
-"public interface ValidationProviderResolver {\n"
-"    /**\n"
-"     * Returns a list of ValidationProviders available in the runtime "
-"environment.\n"
-"     *\n"
-"     * @return list of validation providers.  \n"
-"     */\n"
-"    List&lt;ValidationProvider&lt;?&gt;&gt; getValidationProviders();\n"
-"}"
-msgstr ""
-"public interface ValidationProviderResolver {\n"
-"    /**\n"
-"     * Returns a list of ValidationProviders available in the runtime "
-"environment.\n"
-"     *\n"
-"     * @return list of validation providers.  \n"
-"     */\n"
-"    List&lt;ValidationProvider&lt;?&gt;&gt; getValidationProviders();\n"
-"}"
-
-#. Tag: classname
-#: bootstrapping.xml:129
+#: bootstrapping.xml:166
 #, no-c-format
 msgid "MessageInterpolator"
 msgstr "MessageInterpolator"
 
 #. Tag: para
-#: bootstrapping.xml:131
-#, fuzzy, no-c-format
-msgid ""
-"already discussed the default message interpolation algorithm. If you have "
-"special requirements for your message interpolation you can provide a custom "
-"interpolator using <methodname>Configuration.messageInterpolator()</"
-"methodname>. This message interpolator will be shared by all validators "
-"generated by the <classname>ValidatorFactory</classname> created from this "
-"<classname>Configuration</classname>. <xref linkend=\"example-message-"
-"interpolator\"/> shows an interpolator (available in Hibernate Validator) "
-"which can interpolate the value being validated in the constraint message. "
-"To refer to this value in the constraint message you can use:"
-msgstr ""
-"已经讨轮过默认的错误消息解析机制. 如果这个默认的实现不能满足你的需求的话, 你"
-"还可以通过<methodname>Configuration.messageInterpolator()</methodname>方法来"
-"提供你自定义的消息解析器. 这样, 所有通过<classname>Configuration</classname>"
-"创建出来的<classname>ValidatorFactory</classname>生成的校验器都会使用此消息解"
-"析器(请参考 <xref linkend=\"example-message-interpolator\"/>)."
-
-#. Tag: para
-#: bootstrapping.xml:144
+#: bootstrapping.xml:168
 #, no-c-format
 msgid ""
-"${validatedValue}: this will call <methodname>String.valueOf </methodname>on "
-"the validated value."
+"Message interpolators are used by the validation engine to create user "
+"readable error messages from constraint message descriptors."
 msgstr ""
 
 #. Tag: para
-#: bootstrapping.xml:149
+#: bootstrapping.xml:171
 #, no-c-format
 msgid ""
-"${validatedValue:&lt;format&gt;}: provide your own format string which will "
-"be passed to <code>String.format</code> together with the validated value. "
-"Refer to the javadoc of <code>String.format</code> for more information "
-"about the format options."
+"In case the default message interpolation algorithm described in <xref "
+"linkend=\"chapter-message-interpolation\"/> is not sufficient for your "
+"needs, you can pass in your own implementation of the "
+"<classname>MessageInterpolator</classname> interface via "
+"<classname>Configuration#messageInterpolator()</classname> as shown in <xref "
+"linkend=\"example-using-custom-message-interpolator\"/>."
 msgstr ""
 
 #. Tag: title
-#: bootstrapping.xml:158
-#, no-c-format
-msgid "Providing a custom MessageInterpolator"
+#: bootstrapping.xml:179
+#, fuzzy, no-c-format
+msgid "Using a custom <classname>MessageInterpolator</classname>"
 msgstr "自定义的MessageInterpolator"
 
 #. Tag: programlisting
-#: bootstrapping.xml:160
+#: bootstrapping.xml:182
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter08;\n"
+"\n"
+"public class MyMessageInterpolator implements MessageInterpolator {\n"
+"\n"
+"        @Override\n"
+"        public String interpolate(String messageTemplate, Context context) "
+"{\n"
+"                //...\n"
+"        }\n"
+"\n"
+"        @Override\n"
+"        public String interpolate(String messageTemplate, Context context, "
+"Locale locale) {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: bootstrapping.xml:184
 #, fuzzy, no-c-format
 msgid ""
-"Configuration&lt;?&gt; configuration = Validation.byDefaultProvider()."
-"configure();\n"
-"ValidatorFactory factory = configuration\n"
-"    .messageInterpolator(new ValueFormatterMessageInterpolator(configuration."
-"getDefaultMessageInterpolator()))\n"
-"    .buildValidatorFactory();\n"
-"\n"
-"Validator validator = factory.getValidator();"
+"ValidatorFactory validatorFactory = Validation.byDefaultProvider()\n"
+"                .configure()\n"
+"                .messageInterpolator( new MyMessageInterpolator() )\n"
+"                .buildValidatorFactory();\n"
+"Validator validator = validatorFactory.getValidator();"
 msgstr ""
 "Configuration&lt;?&gt; configuration = Validation.byDefaultProvider()."
 "configure();\n"
@@ -372,299 +403,98 @@ msgstr ""
 "\n"
 "Validator validator = factory.getValidator();"
 
-#. Tag: para
-#: bootstrapping.xml:164
-#, no-c-format
-msgid ""
-"It is recommended that <classname>MessageInterpolator</classname> "
-"implementations delegate final interpolation to the Bean Validation default "
-"<classname>MessageInterpolator</classname> to ensure standard Bean "
-"Validation interpolation rules are followed. The default implementation is "
-"accessible through <methodname>Configuration.getDefaultMessageInterpolator()"
-"</methodname>."
-msgstr ""
-"It is recommended that <classname>MessageInterpolator</classname> "
-"implementations delegate final interpolation to the Bean Validation default "
-"<classname>MessageInterpolator</classname> to ensure standard Bean "
-"Validation interpolation rules are followed. The default implementation is "
-"accessible through <methodname>Configuration.getDefaultMessageInterpolator()"
-"</methodname>."
-
-#. Tag: title
-#: bootstrapping.xml:173
-#, no-c-format
-msgid "ResourceBundleLocator"
-msgstr "ResourceBundleLocator"
-
-#. Tag: para
-#: bootstrapping.xml:175
-#, no-c-format
-msgid ""
-"A common use case is the ability to specify your own resource bundles for "
-"message interpolation. The default <classname>MessageInterpolator</"
-"classname> implementation in Hibernate Validator is called "
-"<classname>ResourceBundleMessageInterpolator</classname> and per default "
-"loads resource bundles via <methodname>ResourceBundle.getBundle</"
-"methodname>. However, <classname>ResourceBundleMessageInterpolator</"
-"classname> also allows you to specify a custom implementation of "
-"<classname>ResourceBundleLocator</classname> allowing you to provide your "
-"own resource bundles. <xref linkend=\"example-resource-bundle-locator\"/> "
-"shows an example. In the example<methodname> HibernateValidatorConfiguration."
-"getDefaultResourceBundleLocator</methodname> is used to retrieve the default "
-"<classname>ResourceBundleLocator</classname> which then can be passed to the "
-"custom implementation in order implement delegation."
-msgstr ""
-"一个普遍的需求是你可能需要为错误消息解析指定你自己的resource bundles. "
-"<classname>ResourceBundleMessageInterpolator</classname>是Hibernate Validator"
-"中默认的<classname>MessageInterpolator</classname>的实现, 它默认情况下是通过"
-"<methodname>ResourceBundle.getBundle</methodname>来获取resource bundle的. 不"
-"过, <classname>ResourceBundleMessageInterpolator</classname>也支持你指定一个"
-"自定义的<classname>ResourceBundleLocator</classname>实现来提供你自己的"
-"resource bundle. <xref linkend=\"example-resource-bundle-locator\"/>提供了一"
-"个示例. 在这个例子中, 先通过<methodname> HibernateValidatorConfiguration."
-"getDefaultResourceBundleLocator</methodname>获取默认的"
-"<classname>ResourceBundleLocator</classname>实现, 然后再用你自定义的实现把默"
-"认的包装起来, 代理模式."
-
-#. Tag: title
-#: bootstrapping.xml:194
-#, no-c-format
-msgid "Providing a custom ResourceBundleLocator"
-msgstr "自定义的ResourceBundleLocator"
-
-#. Tag: programlisting
-#: bootstrapping.xml:196
-#, no-c-format
-msgid ""
-"HibernateValidatorConfiguration configure = Validation.byProvider"
-"(HibernateValidator.class).configure();\n"
-"\n"
-"ResourceBundleLocator defaultResourceBundleLocator = configure."
-"getDefaultResourceBundleLocator(); \n"
-"ResourceBundleLocator myResourceBundleLocator = new "
-"MyCustomResourceBundleLocator(defaultResourceBundleLocator);\n"
-"\n"
-"configure.messageInterpolator(new ResourceBundleMessageInterpolator"
-"(myResourceBundleLocator));"
-msgstr ""
-"HibernateValidatorConfiguration configure = Validation.byProvider"
-"(HibernateValidator.class).configure();\n"
-"\n"
-"ResourceBundleLocator defaultResourceBundleLocator = configure."
-"getDefaultResourceBundleLocator(); \n"
-"ResourceBundleLocator myResourceBundleLocator = new "
-"MyCustomResourceBundleLocator(defaultResourceBundleLocator);\n"
-"\n"
-"configure.messageInterpolator(new ResourceBundleMessageInterpolator"
-"(myResourceBundleLocator));"
-
-#. Tag: para
-#: bootstrapping.xml:199
-#, no-c-format
-msgid ""
-"Hibernate Validator provides the following implementation of "
-"<classname>ResourceBundleLocator</classname> - "
-"<classname>PlatformResourceBundleLocator</classname> (the default) and "
-"<classname>AggregateResourceBundleLocator</classname>. The latter can be "
-"used to specify a list of resource bundle names which will get loaded and "
-"merged into a single resource bundle. Refer to the JavaDoc documentation for "
-"more information."
-msgstr ""
-"Hibernate Validator提供了两个<classname>ResourceBundleLocator</classname>的实"
-"现 - <classname>PlatformResourceBundleLocator</classname> (默认) 和 "
-"<classname>AggregateResourceBundleLocator</classname>. 后者可以定义一系列的"
-"resource bundle, 然后它会读取这些文件, 并且把它们组合成一个. 更多信息请参考此"
-"类的javadoc 文档."
-
 #. Tag: classname
-#: bootstrapping.xml:210
+#: bootstrapping.xml:189
 #, no-c-format
 msgid "TraversableResolver"
 msgstr "TraversableResolver"
 
 #. Tag: para
-#: bootstrapping.xml:212
+#: bootstrapping.xml:191
 #, no-c-format
 msgid ""
-"The usage of the <classname>TraversableResolver</classname> has so far not "
-"been discussed. The idea is that in some cases, the state of a property "
-"should not be accessed. The most obvious example for that is a lazy loaded "
-"property or association of a Java Persistence provider. Validating this lazy "
-"property or association would mean that its state would have to be accessed "
-"triggering a load from the database. Bean Validation controls which property "
-"can and cannot be accessed via the <classname>TraversableResolver</"
-"classname> interface (see <xref linkend=\"example-traversable-resolver\"/>). "
-"In the example HibernateValidatorConfiguration."
+"In some cases the validation engine should not access the state of a bean "
+"property. The most obvious example for that is a lazily loaded property or "
+"association of a JPA entity. Validating this lazy property or association "
+"would mean that its state would have to be accessed, triggering a load from "
+"the database."
 msgstr ""
-"到目前位置我们还没有讨论过<classname>TraversableResolver</classname>接口, 它"
-"的设计目的是在某些情况下, 我们可能不应该去获取一个属性的状态. 最典型的情况就"
-"是一个延迟加载的属性或者与JPA中涉及到关联关系的时候. 当验证这两种情况的属性的"
-"时候, 很可能会触发一次对数据库的查询.Bean Validation正是通过"
-"<classname>TraversableResolver</classname>接口来控制能否访问某一个属性的 "
-"(<xref linkend=\"example-traversable-resolver\"/>)."
-
-#. Tag: title
-#: bootstrapping.xml:224
-#, no-c-format
-msgid "TraversableResolver interface"
-msgstr "TraversableResolver接口"
-
-#. Tag: programlisting
-#: bootstrapping.xml:226
-#, no-c-format
-msgid ""
-"/**\n"
-" * Contract determining if a property can be accessed by the Bean Validation "
-"provider\n"
-" * This contract is called for each property that is being either validated "
-"or cascaded.\n"
-" *\n"
-" * A traversable resolver implementation must be thread-safe.\n"
-" *\n"
-" */\n"
-"public interface TraversableResolver {\n"
-"    /**\n"
-"     * Determine if the Bean Validation provider is allowed to reach the "
-"property state\n"
-"     *\n"
-"     * @param traversableObject object hosting &lt;code&gt;"
-"traversableProperty&lt;/code&gt; or null  \n"
-"     *                          if validateValue is called\n"
-"     * @param traversableProperty the traversable property.\n"
-"     * @param rootBeanType type of the root object passed to the Validator.\n"
-"     * @param pathToTraversableObject path from the root object to\n"
-"     *        &lt;code&gt;traversableObject&lt;/code&gt;\n"
-"     *        (using the path specification defined by Bean Validator).\n"
-"     * @param elementType either &lt;code&gt;FIELD&lt;/code&gt; or &lt;"
-"code&gt;METHOD&lt;/code&gt;.\n"
-"     *\n"
-"     * @return &lt;code&gt;true&lt;/code&gt; if the Bean Validation provider "
-"is allowed to\n"
-"     *         reach the property state, &lt;code&gt;false&lt;/code&gt; "
-"otherwise.\n"
-"     */\n"
-"     boolean isReachable(Object traversableObject,\n"
-"                         Path.Node traversableProperty,\n"
-"                         Class&lt;?&gt; rootBeanType,\n"
-"                         Path pathToTraversableObject,\n"
-"                         ElementType elementType);\n"
-"\n"
-"    /**\n"
-"     * Determine if the Bean Validation provider is allowed to cascade "
-"validation on\n"
-"     * the bean instance returned by the property value\n"
-"     * marked as &lt;code&gt;@Valid&lt;/code&gt;.\n"
-"     * Note that this method is called only if isReachable returns true for "
-"the same set of\n"
-"     * arguments and if the property is marked as &lt;code&gt;@Valid&lt;/"
-"code&gt;\n"
-"     *\n"
-"     * @param traversableObject object hosting &lt;code&gt;"
-"traversableProperty&lt;/code&gt; or null\n"
-"     *                          if validateValue is called\n"
-"     * @param traversableProperty the traversable property.\n"
-"     * @param rootBeanType type of the root object passed to the Validator.\n"
-"     * @param pathToTraversableObject path from the root object to\n"
-"     *        &lt;code&gt;traversableObject&lt;/code&gt;\n"
-"     *        (using the path specification defined by Bean Validator).\n"
-"     * @param elementType either &lt;code&gt;FIELD&lt;/code&gt; or &lt;"
-"code&gt;METHOD&lt;/code&gt;.\n"
-"     *\n"
-"     * @return &lt;code&gt;true&lt;/code&gt; if the Bean Validation provider "
-"is allowed to\n"
-"     *         cascade validation, &lt;code&gt;false&lt;/code&gt; "
-"otherwise.\n"
-"     */\n"
-"     boolean isCascadable(Object traversableObject,\n"
-"                          Path.Node traversableProperty,\n"
-"                          Class&lt;?&gt; rootBeanType,\n"
-"                          Path pathToTraversableObject,\n"
-"                          ElementType elementType);\n"
-"}"
-msgstr ""
-"/**\n"
-" * Contract determining if a property can be accessed by the Bean Validation "
-"provider\n"
-" * This contract is called for each property that is being either validated "
-"or cascaded.\n"
-" *\n"
-" * A traversable resolver implementation must be thread-safe.\n"
-" *\n"
-" */\n"
-"public interface TraversableResolver {\n"
-"    /**\n"
-"     * Determine if the Bean Validation provider is allowed to reach the "
-"property state\n"
-"     *\n"
-"     * @param traversableObject object hosting &lt;code&gt;"
-"traversableProperty&lt;/code&gt; or null  \n"
-"     *                          if validateValue is called\n"
-"     * @param traversableProperty the traversable property.\n"
-"     * @param rootBeanType type of the root object passed to the Validator.\n"
-"     * @param pathToTraversableObject path from the root object to\n"
-"     *        &lt;code&gt;traversableObject&lt;/code&gt;\n"
-"     *        (using the path specification defined by Bean Validator).\n"
-"     * @param elementType either &lt;code&gt;FIELD&lt;/code&gt; or &lt;"
-"code&gt;METHOD&lt;/code&gt;.\n"
-"     *\n"
-"     * @return &lt;code&gt;true&lt;/code&gt; if the Bean Validation provider "
-"is allowed to\n"
-"     *         reach the property state, &lt;code&gt;false&lt;/code&gt; "
-"otherwise.\n"
-"     */\n"
-"     boolean isReachable(Object traversableObject,\n"
-"                         Path.Node traversableProperty,\n"
-"                         Class&lt;?&gt; rootBeanType,\n"
-"                         Path pathToTraversableObject,\n"
-"                         ElementType elementType);\n"
-"\n"
-"    /**\n"
-"     * Determine if the Bean Validation provider is allowed to cascade "
-"validation on\n"
-"     * the bean instance returned by the property value\n"
-"     * marked as &lt;code&gt;@Valid&lt;/code&gt;.\n"
-"     * Note that this method is called only if isReachable returns true for "
-"the same set of\n"
-"     * arguments and if the property is marked as &lt;code&gt;@Valid&lt;/"
-"code&gt;\n"
-"     *\n"
-"     * @param traversableObject object hosting &lt;code&gt;"
-"traversableProperty&lt;/code&gt; or null\n"
-"     *                          if validateValue is called\n"
-"     * @param traversableProperty the traversable property.\n"
-"     * @param rootBeanType type of the root object passed to the Validator.\n"
-"     * @param pathToTraversableObject path from the root object to\n"
-"     *        &lt;code&gt;traversableObject&lt;/code&gt;\n"
-"     *        (using the path specification defined by Bean Validator).\n"
-"     * @param elementType either &lt;code&gt;FIELD&lt;/code&gt; or &lt;"
-"code&gt;METHOD&lt;/code&gt;.\n"
-"     *\n"
-"     * @return &lt;code&gt;true&lt;/code&gt; if the Bean Validation provider "
-"is allowed to\n"
-"     *         cascade validation, &lt;code&gt;false&lt;/code&gt; "
-"otherwise.\n"
-"     */\n"
-"     boolean isCascadable(Object traversableObject,\n"
-"                          Path.Node traversableProperty,\n"
-"                          Class&lt;?&gt; rootBeanType,\n"
-"                          Path pathToTraversableObject,\n"
-"                          ElementType elementType);\n"
-"}"
 
 #. Tag: para
-#: bootstrapping.xml:229
+#: bootstrapping.xml:197
+#, no-c-format
+msgid ""
+"Which properties can be accessed and which ones not is controlled by "
+"querying the <classname>TraversableResolver</classname> interface. <xref "
+"linkend=\"example-using-custom-traversable-resolver\"/> shows how to use a "
+"custom traversable resolver implementation."
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:203
+#, fuzzy, no-c-format
+msgid "Using a custom <classname>TraversableResolver</classname>"
+msgstr "自定义的TraversableResolver"
+
+#. Tag: programlisting
+#: bootstrapping.xml:206
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter08;\n"
+"\n"
+"public class MyTraversableResolver implements TraversableResolver {\n"
+"\n"
+"        @Override\n"
+"        public boolean isReachable(\n"
+"                        Object traversableObject,\n"
+"                        Node traversableProperty,\n"
+"                        Class&lt;?&gt; rootBeanType,\n"
+"                        Path pathToTraversableObject,\n"
+"                        ElementType elementType) {\n"
+"                //...\n"
+"        }\n"
+"\n"
+"        @Override\n"
+"        public boolean isCascadable(\n"
+"                        Object traversableObject,\n"
+"                        Node traversableProperty,\n"
+"                        Class&lt;?&gt; rootBeanType,\n"
+"                        Path pathToTraversableObject,\n"
+"                        ElementType elementType) {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: bootstrapping.xml:208
+#, fuzzy, no-c-format
+msgid ""
+"ValidatorFactory validatorFactory = Validation.byDefaultProvider()\n"
+"                .configure()\n"
+"                .traversableResolver( new MyTraversableResolver() )\n"
+"                .buildValidatorFactory();\n"
+"Validator validator = validatorFactory.getValidator();"
+msgstr ""
+"Configuration&lt;?&gt; configuration = Validation.byDefaultProvider()."
+"configure();\n"
+"ValidatorFactory factory = configuration\n"
+"    .traversableResolver(new MyTraversableResolver())\n"
+"    .buildValidatorFactory();\n"
+"\n"
+"Validator validator = factory.getValidator();"
+
+#. Tag: para
+#: bootstrapping.xml:211
 #, fuzzy, no-c-format
 msgid ""
 "Hibernate Validator provides two <classname>TraversableResolver</classname>s "
 "out of the box which will be enabled automatically depending on your "
-"environment. The first is the <classname>DefaultTraversableResolver</"
-"classname> which will always return true for <methodname>isReachable()</"
-"methodname> and <methodname>isTraversable()</methodname>. The second is the "
+"environment. The first is <classname>DefaultTraversableResolver</classname> "
+"which will always return <literal>true</literal> for <methodname>isReachable"
+"()</methodname> and <methodname>isTraversable()</methodname>. The second is "
 "<classname>JPATraversableResolver</classname> which gets enabled when "
-"Hibernate Validator gets used in combination with JPA 2. In case you have to "
-"provide your own resolver you can do so again using the "
-"<classname>Configuration</classname> object as seen in <xref linkend="
-"\"example-traversable-resolver-config\"/>."
+"Hibernate Validator is used in combination with JPA 2."
 msgstr ""
 "Hibernate Validator包含了两个<classname>TraversableResolver</classname>接口的"
 "实现, 并且会根据你的环境来决定自动判断使用哪个实现. 首先是"
@@ -675,53 +505,31 @@ msgstr ""
 "供自己的实现, 可以参照<xref linkend=\"example-traversable-resolver-config\"/"
 ">."
 
-#. Tag: title
-#: bootstrapping.xml:242
-#, no-c-format
-msgid "Providing a custom TraversableResolver"
-msgstr "自定义的TraversableResolver"
-
-#. Tag: programlisting
-#: bootstrapping.xml:244
-#, no-c-format
-msgid ""
-"Configuration&lt;?&gt; configuration = Validation.byDefaultProvider()."
-"configure();\n"
-"ValidatorFactory factory = configuration\n"
-"    .traversableResolver(new MyTraversableResolver())\n"
-"    .buildValidatorFactory();\n"
-"\n"
-"Validator validator = factory.getValidator();"
-msgstr ""
-"Configuration&lt;?&gt; configuration = Validation.byDefaultProvider()."
-"configure();\n"
-"ValidatorFactory factory = configuration\n"
-"    .traversableResolver(new MyTraversableResolver())\n"
-"    .buildValidatorFactory();\n"
-"\n"
-"Validator validator = factory.getValidator();"
-
 #. Tag: classname
-#: bootstrapping.xml:249
+#: bootstrapping.xml:223
 #, no-c-format
 msgid "ConstraintValidatorFactory"
 msgstr "ConstraintValidatorFactory"
 
 #. Tag: para
-#: bootstrapping.xml:251
+#: bootstrapping.xml:225
 #, no-c-format
 msgid ""
-"Last but not least, there is one more configuration option to discuss, the "
-"<classname>ConstraintValidatorFactory</classname>. The default "
-"<classname>ConstraintValidatorFactory</classname> provided by Hibernate "
-"Validator requires a public no-arg constructor to instantiate "
+"<classname>ConstraintValidatorFactory</classname> is the extension point for "
+"customizing how constraint validators are instantiated and released."
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:229
+#, fuzzy, no-c-format
+msgid ""
+"The default <classname>ConstraintValidatorFactory</classname> provided by "
+"Hibernate Validator requires a public no-arg constructor to instantiate "
 "<classname>ConstraintValidator</classname> instances (see <xref linkend="
 "\"section-constraint-validator\"/>). Using a custom "
 "<classname>ConstraintValidatorFactory</classname> offers for example the "
-"possibility to use dependency injection in constraint implementations. The "
-"configuration of the custom factory is once more via the "
-"<classname>Configuration</classname> (<xref linkend=\"example-constraint-"
-"validator-factory\"/>)."
+"possibility to use dependency injection in constraint validator "
+"implementations."
 msgstr ""
 "最后, 还有个配置项得提一下, 那就是<classname>ConstraintValidatorFactory</"
 "classname>类. Hibernate Validator中默认的"
@@ -733,73 +541,68 @@ msgstr ""
 "<classname>ConstraintValidatorFactory</classname>的方法还是老样子(<xref "
 "linkend=\"example-constraint-validator-factory\"/>)."
 
-#. Tag: title
-#: bootstrapping.xml:264
+#. Tag: para
+#: bootstrapping.xml:237
 #, no-c-format
-msgid "Providing a custom ConstraintValidatorFactory"
+msgid ""
+"To configure a custom constraint validator factory call "
+"<methodname>Configuration#constraintValidatorFactory()</methodname> (see "
+"<xref linkend=\"example-using-custom-constraint-validator-factory\"/>."
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:243
+#, fuzzy, no-c-format
+msgid "Using a custom <classname>ConstraintValidatorFactory</classname>"
 msgstr "自定义的ConstraintValidatorFactory"
 
 #. Tag: programlisting
-#: bootstrapping.xml:266
+#: bootstrapping.xml:246
 #, no-c-format
 msgid ""
-"Configuration&lt;?&gt; configuration = Validation.byDefaultProvider()."
-"configure();\n"
-"ValidatorFactory factory = configuration\n"
-"    .constraintValidatorFactory(new IOCConstraintValidatorFactory())\n"
-"    .buildValidatorFactory();\n"
+"package org.hibernate.validator.referenceguide.chapter08;\n"
 "\n"
-"Validator validator = factory.getValidator();"
+"public class MyConstraintValidatorFactory implements "
+"ConstraintValidatorFactory {\n"
+"\n"
+"        @Override\n"
+"        public &lt;T extends ConstraintValidator&lt;?, ?&gt;&gt; T "
+"getInstance(Class&lt;T&gt; key) {\n"
+"                //...\n"
+"        }\n"
+"\n"
+"        @Override\n"
+"        public void releaseInstance(ConstraintValidator&lt;?, ?&gt; "
+"instance) {\n"
+"                //...\n"
+"        }\n"
+"}"
 msgstr ""
-"Configuration&lt;?&gt; configuration = Validation.byDefaultProvider()."
-"configure();\n"
-"ValidatorFactory factory = configuration\n"
-"    .constraintValidatorFactory(new IOCConstraintValidatorFactory())\n"
-"    .buildValidatorFactory();\n"
-"\n"
-"Validator validator = factory.getValidator();"
-
-#. Tag: para
-#: bootstrapping.xml:269
-#, no-c-format
-msgid "The interface you have to implement is:"
-msgstr "你需要实现此接口:"
-
-#. Tag: title
-#: bootstrapping.xml:272
-#, no-c-format
-msgid "ConstraintValidatorFactory interface"
-msgstr "ConstraintValidatorFactory接口"
 
 #. Tag: programlisting
-#: bootstrapping.xml:274
-#, no-c-format
+#: bootstrapping.xml:248
+#, fuzzy, no-c-format
 msgid ""
-"public interface ConstraintValidatorFactory {\n"
-"    /**\n"
-"     * @param key The class of the constraint validator to instantiate.\n"
-"     *\n"
-"     * @return A constraint validator instance of the specified class.\n"
-"     */\n"
-"     &lt;T extends ConstraintValidator&lt;?,?&gt;&gt; T getInstance(Class&lt;"
-"T&gt; key);\n"
-"}"
+"ValidatorFactory validatorFactory = Validation.byDefaultProvider()\n"
+"                .configure()\n"
+"                .constraintValidatorFactory( new MyConstraintValidatorFactory"
+"() )\n"
+"                .buildValidatorFactory();\n"
+"Validator validator = validatorFactory.getValidator();"
 msgstr ""
-"public interface ConstraintValidatorFactory {\n"
-"    /**\n"
-"     * @param key The class of the constraint validator to instantiate.\n"
-"     *\n"
-"     * @return A constraint validator instance of the specified class.\n"
-"     */\n"
-"     &lt;T extends ConstraintValidator&lt;?,?&gt;&gt; T getInstance(Class&lt;"
-"T&gt; key);\n"
-"}"
+"Configuration&lt;?&gt; configuration = Validation.byDefaultProvider()."
+"configure();\n"
+"ValidatorFactory factory = configuration\n"
+"    .constraintValidatorFactory(new IOCConstraintValidatorFactory())\n"
+"    .buildValidatorFactory();\n"
+"\n"
+"Validator validator = factory.getValidator();"
 
 #. Tag: para
-#: bootstrapping.xml:278
-#, no-c-format
+#: bootstrapping.xml:252
+#, fuzzy, no-c-format
 msgid ""
-"Any constraint implementation relying on "
+"Any constraint implementations relying on "
 "<classname>ConstraintValidatorFactory</classname> behaviors specific to an "
 "implementation (dependency injection, no no-arg constructor and so on) are "
 "not considered portable."
@@ -809,11 +612,714 @@ msgstr ""
 "可移植."
 
 #. Tag: para
-#: bootstrapping.xml:285
-#, no-c-format
+#: bootstrapping.xml:259
+#, fuzzy, no-c-format
 msgid ""
-"ConstraintValidatorFactory should not cache instances as the state of each "
-"instance can be altered in the initialize method."
+"<classname>ConstraintValidatorFactory</classname> implementations should not "
+"cache validator instances as the state of each instance can be altered in "
+"the <methodname>initialize()</methodname> method."
 msgstr ""
 "ConstraintValidatorFactory不应该缓存其创建的实例, 因为每个实例都可能在其的初"
 "始化方法中被修改."
+
+#. Tag: classname
+#: bootstrapping.xml:267
+#, no-c-format
+msgid "ParameterNameProvider"
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:269
+#, no-c-format
+msgid ""
+"In case a method or constructor parameter constraint is violated, the "
+"<classname>ParameterNameProvider</classname> interface is used to retrieve "
+"the parameter's name and make it available to the user via the constraint "
+"violation's property path."
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:274
+#, no-c-format
+msgid ""
+"The default implementation returns parameter names in the form "
+"<literal>arg0</literal>, <literal>arg1</literal> etc., while custom "
+"implementations could e.g. be based on parameter annotations, debug symbols "
+"or a feature for retrieving parameter names at runtime possibly provided by "
+"future Java versions."
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:280
+#, no-c-format
+msgid ""
+"Custom <classname>ParameterNameProvider</classname> implementations are used "
+"as demonstrated in <xref linkend=\"example-using-custom-parameter-name-"
+"provider\"/>."
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:285
+#, no-c-format
+msgid "Using a custom <classname>ParameterNameProvider</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: bootstrapping.xml:288
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter08;\n"
+"\n"
+"public class MyParameterNameProvider implements ParameterNameProvider {\n"
+"\n"
+"        @Override\n"
+"        public List&lt;String&gt; getParameterNames(Constructor&lt;?&gt; "
+"constructor) {\n"
+"                //...\n"
+"        }\n"
+"\n"
+"        @Override\n"
+"        public List&lt;String&gt; getParameterNames(Method method) {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: bootstrapping.xml:290
+#, fuzzy, no-c-format
+msgid ""
+"ValidatorFactory validatorFactory = Validation.byDefaultProvider()\n"
+"                .configure()\n"
+"                .parameterNameProvider( new MyParameterNameProvider() )\n"
+"                .buildValidatorFactory();\n"
+"Validator validator = validatorFactory.getValidator();"
+msgstr ""
+"Configuration&lt;?&gt; configuration = Validation.byDefaultProvider()."
+"configure();\n"
+"ValidatorFactory factory = configuration\n"
+"    .traversableResolver(new MyTraversableResolver())\n"
+"    .buildValidatorFactory();\n"
+"\n"
+"Validator validator = factory.getValidator();"
+
+#. Tag: title
+#: bootstrapping.xml:295
+#, no-c-format
+msgid "Adding mapping streams"
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:297
+#, no-c-format
+msgid ""
+"As discussed earlier you can configure the constraints applying for your "
+"Java beans using XML based constraint mappings."
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:300
+#, no-c-format
+msgid ""
+"Besides the mapping files specified in <filename>META-INF/validation.xml</"
+"filename> you can add further mappings via "
+"<methodname>Configuration#addMapping()</methodname> (see <xref linkend="
+"\"example-adding-mapping-streams\"/>). Note that the passed input stream(s) "
+"must adhere to the XML schema for constraint mappings presented in <xref "
+"linkend=\"section-mapping-xml-constraints\"/>."
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:308
+#, no-c-format
+msgid "Adding constraint mapping streams"
+msgstr ""
+
+#. Tag: programlisting
+#: bootstrapping.xml:310
+#, no-c-format
+msgid ""
+"InputStream constraintMapping1 = ...;\n"
+"InputStream constraintMapping2 = ...;\n"
+"ValidatorFactory validatorFactory = Validation.byDefaultProvider()\n"
+"                .configure()\n"
+"                .addMapping( constraintMapping1 )\n"
+"                .addMapping( constraintMapping2 )\n"
+"                .buildValidatorFactory();\n"
+"Validator validator = validatorFactory.getValidator();"
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:313
+#, no-c-format
+msgid ""
+"You should close any passed input stream after the validator factory has "
+"been created."
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:318
+#, no-c-format
+msgid "Provider-specific settings"
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:320
+#, no-c-format
+msgid ""
+"Via the configuration object returned by <methodname>Validation#byProvider()"
+"</methodname> provider specific options can be configured."
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:324
+#, no-c-format
+msgid ""
+"In case of Hibernate Validator this allows you to enable the fail fast mode "
+"and pass one or more programmatic constraint mappings as demonstrated in "
+"<xref linkend=\"example-hibernate-validator-specific-options\"/>."
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:330
+#, no-c-format
+msgid "Setting Hibernate Validator specific options"
+msgstr ""
+
+#. Tag: programlisting
+#: bootstrapping.xml:332
+#, no-c-format
+msgid ""
+"ValidatorFactory validatorFactory = Validation.byProvider"
+"( HibernateValidator.class )\n"
+"                .configure()\n"
+"                .failFast( true )\n"
+"                .addMapping( (ConstraintMapping) null )\n"
+"                .buildValidatorFactory();\n"
+"Validator validator = validatorFactory.getValidator();"
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:335
+#, no-c-format
+msgid ""
+"Alternatively, provider-specific options can be passed via "
+"<methodname>Configuration#addProperty()</methodname>. Hibernate Validator "
+"supports enabling the fail fast mode that way, too:"
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:340
+#, no-c-format
+msgid ""
+"Enabling a Hibernate Validator specific option via <methodname>addProperty()"
+"</methodname>"
+msgstr ""
+
+#. Tag: programlisting
+#: bootstrapping.xml:343
+#, no-c-format
+msgid ""
+"ValidatorFactory validatorFactory = Validation.byProvider"
+"( HibernateValidator.class )\n"
+"                .configure()\n"
+"                .addProperty( \"hibernate.validator.fail_fast\", \"true\" )\n"
+"                .buildValidatorFactory();\n"
+"Validator validator = validatorFactory.getValidator();"
+msgstr ""
+
+#. Tag: para
+#: bootstrapping.xml:346
+#, no-c-format
+msgid ""
+"Refer to <xref linkend=\"section-fail-fast\"/> and <xref linkend=\"section-"
+"programmatic-api\"/> to learn more about the fail fast mode and the "
+"constraint declaration API."
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:353
+#, fuzzy, no-c-format
+msgid "Configuring a <classname>Validator</classname>"
+msgstr ""
+"<classname>Configuration</classname> 和 <classname>ValidatorFactory</"
+"classname>"
+
+#. Tag: para
+#: bootstrapping.xml:355
+#, no-c-format
+msgid ""
+"When working with a configured validator factory it can occasionally be "
+"required to apply a different configuration to a single "
+"<classname>Validator</classname> instance. <xref linkend=\"example-using-"
+"context\"/> shows how this can be achieved by calling "
+"<methodname>ValidatorFactory#usingContext()</methodname>."
+msgstr ""
+
+#. Tag: title
+#: bootstrapping.xml:362
+#, no-c-format
+msgid ""
+"Configuring a <classname>Validator</classname> via <methodname>usingContext()"
+"</methodname>"
+msgstr ""
+
+#. Tag: programlisting
+#: bootstrapping.xml:365
+#, no-c-format
+msgid ""
+"ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory"
+"();\n"
+"\n"
+"Validator validator = validatorFactory.usingContext()\n"
+"                .messageInterpolator( new MyMessageInterpolator() )\n"
+"                .traversableResolver( new MyTraversableResolver() )\n"
+"                .getValidator();"
+msgstr ""
+
+#~ msgid ""
+#~ "If there are more than one Bean Validation implementation providers in "
+#~ "the classpath and <methodname>Validation.buildDefaultValidatorFactory()</"
+#~ "methodname> is used, there is no guarantee which provider will be chosen. "
+#~ "To enforce the provider <methodname>Validation.byProvider()</methodname> "
+#~ "should be used."
+#~ msgstr ""
+#~ "如果当前类路径下存在多个Bean Validation的实现, 那么<methodname>Validation."
+#~ "buildDefaultValidatorFactory()</methodname>并不能保证具体那个实现会被使"
+#~ "用. 如果想指定某一个的话, 请使用<methodname>Validation.byProvider()</"
+#~ "methodname>."
+
+#~ msgid ""
+#~ "There are three different methods in the Validation class to create a "
+#~ "Validator instance. The easiest in shown in <xref linkend=\"example-build-"
+#~ "default-validator-factory\"/>."
+#~ msgstr ""
+#~ "Validation类提供了三种方法来创建一个Validator的实例, <xref linkend="
+#~ "\"example-build-default-validator-factory\"/>中显示的是最简单的方法."
+
+#~ msgid "Validation.buildDefaultValidatorFactory()"
+#~ msgstr "Validation.buildDefaultValidatorFactory()"
+
+#~ msgid ""
+#~ "You can also use the method <methodname>Validation.byDefaultProvider()</"
+#~ "methodname> which will allow you to configure several aspects of the "
+#~ "created Validator instance:"
+#~ msgstr ""
+#~ "你也可以通过<methodname>Validation.byDefaultProvider()</methodname>现获取"
+#~ "一个Configuration对象, 这样可以对要创建的Validator进行配置."
+
+#~ msgid "Validation.byDefaultProvider()"
+#~ msgstr "Validation.byDefaultProvider()"
+
+#~ msgid ""
+#~ "Configuration&lt;?&gt; config = Validation.byDefaultProvider().configure"
+#~ "();\n"
+#~ "config.messageInterpolator(new MyMessageInterpolator())\n"
+#~ "    .traversableResolver( new MyTraversableResolver())\n"
+#~ "    .constraintValidatorFactory(new MyConstraintValidatorFactory());\n"
+#~ "\n"
+#~ "ValidatorFactory factory = config.buildValidatorFactory();\n"
+#~ "Validator validator = factory.getValidator();"
+#~ msgstr ""
+#~ "Configuration&lt;?&gt; config = Validation.byDefaultProvider().configure"
+#~ "();\n"
+#~ "config.messageInterpolator(new MyMessageInterpolator())\n"
+#~ "    .traversableResolver( new MyTraversableResolver())\n"
+#~ "    .constraintValidatorFactory(new MyConstraintValidatorFactory());\n"
+#~ "\n"
+#~ "ValidatorFactory factory = config.buildValidatorFactory();\n"
+#~ "Validator validator = factory.getValidator();"
+
+#~ msgid ""
+#~ "We will learn more about <classname>MessageInterpolator</classname>, "
+#~ "<classname>TraversableResolver</classname> and "
+#~ "<classname>ConstraintValidatorFactory</classname> in the following "
+#~ "sections."
+#~ msgstr ""
+#~ "<classname>MessageInterpolator</classname>, "
+#~ "<classname>TraversableResolver</classname> 和 "
+#~ "<classname>ConstraintValidatorFactory</classname>会在后面详细介绍."
+
+#~ msgid ""
+#~ "Last but not least you can ask for a Configuration object of a specific "
+#~ "Bean Validation provider. This is useful if you have more than one Bean "
+#~ "Validation provider in your classpath. In this situation you can make an "
+#~ "explicit choice about which implementation to use. In the case of "
+#~ "Hibernate Validator the <classname>Validator</classname> creation looks "
+#~ "like:"
+#~ msgstr ""
+#~ "最后, 你可以指定使用哪个Bean Validation的实现. 如果类路径下存在多个Bean "
+#~ "Validation的实现的话,这样就很有必要了. 例如, 如果你想使用Hibernate "
+#~ "Validator来作为内部实现来创建<classname>Validator</classname>的话:"
+
+#~ msgid "Validation.byProvider( HibernateValidator.class )"
+#~ msgstr "Validation.byProvider( HibernateValidator.class )"
+
+#~ msgid ""
+#~ "HibernateValidatorConfiguration config = Validation.byProvider"
+#~ "( HibernateValidator.class ).configure();\n"
+#~ "config.messageInterpolator(new MyMessageInterpolator())\n"
+#~ "    .traversableResolver( new MyTraversableResolver())\n"
+#~ "    .constraintValidatorFactory(new MyConstraintValidatorFactory());\n"
+#~ "\n"
+#~ "ValidatorFactory factory = config.buildValidatorFactory();\n"
+#~ "Validator validator = factory.getValidator();"
+#~ msgstr ""
+#~ "HibernateValidatorConfiguration config = Validation.byProvider"
+#~ "( HibernateValidator.class ).configure();\n"
+#~ "config.messageInterpolator(new MyMessageInterpolator())\n"
+#~ "    .traversableResolver( new MyTraversableResolver())\n"
+#~ "    .constraintValidatorFactory(new MyConstraintValidatorFactory());\n"
+#~ "\n"
+#~ "ValidatorFactory factory = config.buildValidatorFactory();\n"
+#~ "Validator validator = factory.getValidator();"
+
+#~ msgid ""
+#~ "The generated <classname>Validator</classname> instance is thread safe "
+#~ "and can be cached."
+#~ msgstr ""
+#~ "创建出来的<classname>Validator</classname>实例是线程安全的, 所以你可以把它"
+#~ "缓存起来."
+
+#~ msgid ""
+#~ "In the case that the Java Service Provider mechanism does not work in "
+#~ "your environment or you have a special classloader setup, you are able to "
+#~ "provide a custom <classname>ValidationProviderResolver</classname>. An "
+#~ "example in an OSGi environment you could plug your custom provider "
+#~ "resolver like seen in <xref linkend=\"example-provider-resolver\"/>."
+#~ msgstr ""
+#~ "如果 Java Service Provider机制在你的环境中不能够正常工作, 或者你有特别的"
+#~ "classloader设置的话, 你也可以提供一个自定义的"
+#~ "<classname>ValidationProviderResolver</classname>.<xref linkend=\"example-"
+#~ "provider-resolver\"/>显示了如何在OSGi环境中插入自定义的provider resolver."
+
+#~ msgid ""
+#~ "Your <classname>OSGiServiceDiscoverer</classname> must in this case "
+#~ "implement the interface <classname>ValidationProviderResolver</classname>:"
+#~ msgstr ""
+#~ "在这种情况下, 你的<classname>OSGiServiceDiscoverer</classname>类需要实现"
+#~ "<classname>ValidationProviderResolver</classname>接口:"
+
+#~ msgid "ValidationProviderResolver interface"
+#~ msgstr "ValidationProviderResolver接口"
+
+#~ msgid ""
+#~ "public interface ValidationProviderResolver {\n"
+#~ "    /**\n"
+#~ "     * Returns a list of ValidationProviders available in the runtime "
+#~ "environment.\n"
+#~ "     *\n"
+#~ "     * @return list of validation providers.  \n"
+#~ "     */\n"
+#~ "    List&lt;ValidationProvider&lt;?&gt;&gt; getValidationProviders();\n"
+#~ "}"
+#~ msgstr ""
+#~ "public interface ValidationProviderResolver {\n"
+#~ "    /**\n"
+#~ "     * Returns a list of ValidationProviders available in the runtime "
+#~ "environment.\n"
+#~ "     *\n"
+#~ "     * @return list of validation providers.  \n"
+#~ "     */\n"
+#~ "    List&lt;ValidationProvider&lt;?&gt;&gt; getValidationProviders();\n"
+#~ "}"
+
+#, fuzzy
+#~ msgid ""
+#~ "already discussed the default message interpolation algorithm. If you "
+#~ "have special requirements for your message interpolation you can provide "
+#~ "a custom interpolator using <methodname>Configuration.messageInterpolator"
+#~ "()</methodname>. This message interpolator will be shared by all "
+#~ "validators generated by the <classname>ValidatorFactory</classname> "
+#~ "created from this <classname>Configuration</classname>. <xref linkend="
+#~ "\"example-message-interpolator\"/> shows an interpolator (available in "
+#~ "Hibernate Validator) which can interpolate the value being validated in "
+#~ "the constraint message. To refer to this value in the constraint message "
+#~ "you can use:"
+#~ msgstr ""
+#~ "已经讨轮过默认的错误消息解析机制. 如果这个默认的实现不能满足你的需求的话, "
+#~ "你还可以通过<methodname>Configuration.messageInterpolator()</methodname>方"
+#~ "法来提供你自定义的消息解析器. 这样, 所有通过<classname>Configuration</"
+#~ "classname>创建出来的<classname>ValidatorFactory</classname>生成的校验器都"
+#~ "会使用此消息解析器(请参考 <xref linkend=\"example-message-interpolator\"/"
+#~ ">)."
+
+#~ msgid ""
+#~ "It is recommended that <classname>MessageInterpolator</classname> "
+#~ "implementations delegate final interpolation to the Bean Validation "
+#~ "default <classname>MessageInterpolator</classname> to ensure standard "
+#~ "Bean Validation interpolation rules are followed. The default "
+#~ "implementation is accessible through <methodname>Configuration."
+#~ "getDefaultMessageInterpolator()</methodname>."
+#~ msgstr ""
+#~ "It is recommended that <classname>MessageInterpolator</classname> "
+#~ "implementations delegate final interpolation to the Bean Validation "
+#~ "default <classname>MessageInterpolator</classname> to ensure standard "
+#~ "Bean Validation interpolation rules are followed. The default "
+#~ "implementation is accessible through <methodname>Configuration."
+#~ "getDefaultMessageInterpolator()</methodname>."
+
+#~ msgid "ResourceBundleLocator"
+#~ msgstr "ResourceBundleLocator"
+
+#~ msgid ""
+#~ "A common use case is the ability to specify your own resource bundles for "
+#~ "message interpolation. The default <classname>MessageInterpolator</"
+#~ "classname> implementation in Hibernate Validator is called "
+#~ "<classname>ResourceBundleMessageInterpolator</classname> and per default "
+#~ "loads resource bundles via <methodname>ResourceBundle.getBundle</"
+#~ "methodname>. However, <classname>ResourceBundleMessageInterpolator</"
+#~ "classname> also allows you to specify a custom implementation of "
+#~ "<classname>ResourceBundleLocator</classname> allowing you to provide your "
+#~ "own resource bundles. <xref linkend=\"example-resource-bundle-locator\"/> "
+#~ "shows an example. In the example<methodname> "
+#~ "HibernateValidatorConfiguration.getDefaultResourceBundleLocator</"
+#~ "methodname> is used to retrieve the default "
+#~ "<classname>ResourceBundleLocator</classname> which then can be passed to "
+#~ "the custom implementation in order implement delegation."
+#~ msgstr ""
+#~ "一个普遍的需求是你可能需要为错误消息解析指定你自己的resource bundles. "
+#~ "<classname>ResourceBundleMessageInterpolator</classname>是Hibernate "
+#~ "Validator中默认的<classname>MessageInterpolator</classname>的实现, 它默认"
+#~ "情况下是通过<methodname>ResourceBundle.getBundle</methodname>来获取"
+#~ "resource bundle的. 不过, <classname>ResourceBundleMessageInterpolator</"
+#~ "classname>也支持你指定一个自定义的<classname>ResourceBundleLocator</"
+#~ "classname>实现来提供你自己的resource bundle. <xref linkend=\"example-"
+#~ "resource-bundle-locator\"/>提供了一个示例. 在这个例子中, 先通过"
+#~ "<methodname> HibernateValidatorConfiguration."
+#~ "getDefaultResourceBundleLocator</methodname>获取默认的"
+#~ "<classname>ResourceBundleLocator</classname>实现, 然后再用你自定义的实现把"
+#~ "默认的包装起来, 代理模式."
+
+#~ msgid "Providing a custom ResourceBundleLocator"
+#~ msgstr "自定义的ResourceBundleLocator"
+
+#~ msgid ""
+#~ "HibernateValidatorConfiguration configure = Validation.byProvider"
+#~ "(HibernateValidator.class).configure();\n"
+#~ "\n"
+#~ "ResourceBundleLocator defaultResourceBundleLocator = configure."
+#~ "getDefaultResourceBundleLocator(); \n"
+#~ "ResourceBundleLocator myResourceBundleLocator = new "
+#~ "MyCustomResourceBundleLocator(defaultResourceBundleLocator);\n"
+#~ "\n"
+#~ "configure.messageInterpolator(new ResourceBundleMessageInterpolator"
+#~ "(myResourceBundleLocator));"
+#~ msgstr ""
+#~ "HibernateValidatorConfiguration configure = Validation.byProvider"
+#~ "(HibernateValidator.class).configure();\n"
+#~ "\n"
+#~ "ResourceBundleLocator defaultResourceBundleLocator = configure."
+#~ "getDefaultResourceBundleLocator(); \n"
+#~ "ResourceBundleLocator myResourceBundleLocator = new "
+#~ "MyCustomResourceBundleLocator(defaultResourceBundleLocator);\n"
+#~ "\n"
+#~ "configure.messageInterpolator(new ResourceBundleMessageInterpolator"
+#~ "(myResourceBundleLocator));"
+
+#~ msgid ""
+#~ "Hibernate Validator provides the following implementation of "
+#~ "<classname>ResourceBundleLocator</classname> - "
+#~ "<classname>PlatformResourceBundleLocator</classname> (the default) and "
+#~ "<classname>AggregateResourceBundleLocator</classname>. The latter can be "
+#~ "used to specify a list of resource bundle names which will get loaded and "
+#~ "merged into a single resource bundle. Refer to the JavaDoc documentation "
+#~ "for more information."
+#~ msgstr ""
+#~ "Hibernate Validator提供了两个<classname>ResourceBundleLocator</classname>"
+#~ "的实现 - <classname>PlatformResourceBundleLocator</classname> (默认) 和 "
+#~ "<classname>AggregateResourceBundleLocator</classname>. 后者可以定义一系列"
+#~ "的resource bundle, 然后它会读取这些文件, 并且把它们组合成一个. 更多信息请"
+#~ "参考此类的javadoc 文档."
+
+#~ msgid ""
+#~ "The usage of the <classname>TraversableResolver</classname> has so far "
+#~ "not been discussed. The idea is that in some cases, the state of a "
+#~ "property should not be accessed. The most obvious example for that is a "
+#~ "lazy loaded property or association of a Java Persistence provider. "
+#~ "Validating this lazy property or association would mean that its state "
+#~ "would have to be accessed triggering a load from the database. Bean "
+#~ "Validation controls which property can and cannot be accessed via the "
+#~ "<classname>TraversableResolver</classname> interface (see <xref linkend="
+#~ "\"example-traversable-resolver\"/>). In the example "
+#~ "HibernateValidatorConfiguration."
+#~ msgstr ""
+#~ "到目前位置我们还没有讨论过<classname>TraversableResolver</classname>接口, "
+#~ "它的设计目的是在某些情况下, 我们可能不应该去获取一个属性的状态. 最典型的情"
+#~ "况就是一个延迟加载的属性或者与JPA中涉及到关联关系的时候. 当验证这两种情况"
+#~ "的属性的时候, 很可能会触发一次对数据库的查询.Bean Validation正是通过"
+#~ "<classname>TraversableResolver</classname>接口来控制能否访问某一个属性的 "
+#~ "(<xref linkend=\"example-traversable-resolver\"/>)."
+
+#~ msgid "TraversableResolver interface"
+#~ msgstr "TraversableResolver接口"
+
+#~ msgid ""
+#~ "/**\n"
+#~ " * Contract determining if a property can be accessed by the Bean "
+#~ "Validation provider\n"
+#~ " * This contract is called for each property that is being either "
+#~ "validated or cascaded.\n"
+#~ " *\n"
+#~ " * A traversable resolver implementation must be thread-safe.\n"
+#~ " *\n"
+#~ " */\n"
+#~ "public interface TraversableResolver {\n"
+#~ "    /**\n"
+#~ "     * Determine if the Bean Validation provider is allowed to reach the "
+#~ "property state\n"
+#~ "     *\n"
+#~ "     * @param traversableObject object hosting &lt;code&gt;"
+#~ "traversableProperty&lt;/code&gt; or null  \n"
+#~ "     *                          if validateValue is called\n"
+#~ "     * @param traversableProperty the traversable property.\n"
+#~ "     * @param rootBeanType type of the root object passed to the "
+#~ "Validator.\n"
+#~ "     * @param pathToTraversableObject path from the root object to\n"
+#~ "     *        &lt;code&gt;traversableObject&lt;/code&gt;\n"
+#~ "     *        (using the path specification defined by Bean Validator).\n"
+#~ "     * @param elementType either &lt;code&gt;FIELD&lt;/code&gt; or &lt;"
+#~ "code&gt;METHOD&lt;/code&gt;.\n"
+#~ "     *\n"
+#~ "     * @return &lt;code&gt;true&lt;/code&gt; if the Bean Validation "
+#~ "provider is allowed to\n"
+#~ "     *         reach the property state, &lt;code&gt;false&lt;/code&gt; "
+#~ "otherwise.\n"
+#~ "     */\n"
+#~ "     boolean isReachable(Object traversableObject,\n"
+#~ "                         Path.Node traversableProperty,\n"
+#~ "                         Class&lt;?&gt; rootBeanType,\n"
+#~ "                         Path pathToTraversableObject,\n"
+#~ "                         ElementType elementType);\n"
+#~ "\n"
+#~ "    /**\n"
+#~ "     * Determine if the Bean Validation provider is allowed to cascade "
+#~ "validation on\n"
+#~ "     * the bean instance returned by the property value\n"
+#~ "     * marked as &lt;code&gt;@Valid&lt;/code&gt;.\n"
+#~ "     * Note that this method is called only if isReachable returns true "
+#~ "for the same set of\n"
+#~ "     * arguments and if the property is marked as &lt;code&gt;@Valid&lt;/"
+#~ "code&gt;\n"
+#~ "     *\n"
+#~ "     * @param traversableObject object hosting &lt;code&gt;"
+#~ "traversableProperty&lt;/code&gt; or null\n"
+#~ "     *                          if validateValue is called\n"
+#~ "     * @param traversableProperty the traversable property.\n"
+#~ "     * @param rootBeanType type of the root object passed to the "
+#~ "Validator.\n"
+#~ "     * @param pathToTraversableObject path from the root object to\n"
+#~ "     *        &lt;code&gt;traversableObject&lt;/code&gt;\n"
+#~ "     *        (using the path specification defined by Bean Validator).\n"
+#~ "     * @param elementType either &lt;code&gt;FIELD&lt;/code&gt; or &lt;"
+#~ "code&gt;METHOD&lt;/code&gt;.\n"
+#~ "     *\n"
+#~ "     * @return &lt;code&gt;true&lt;/code&gt; if the Bean Validation "
+#~ "provider is allowed to\n"
+#~ "     *         cascade validation, &lt;code&gt;false&lt;/code&gt; "
+#~ "otherwise.\n"
+#~ "     */\n"
+#~ "     boolean isCascadable(Object traversableObject,\n"
+#~ "                          Path.Node traversableProperty,\n"
+#~ "                          Class&lt;?&gt; rootBeanType,\n"
+#~ "                          Path pathToTraversableObject,\n"
+#~ "                          ElementType elementType);\n"
+#~ "}"
+#~ msgstr ""
+#~ "/**\n"
+#~ " * Contract determining if a property can be accessed by the Bean "
+#~ "Validation provider\n"
+#~ " * This contract is called for each property that is being either "
+#~ "validated or cascaded.\n"
+#~ " *\n"
+#~ " * A traversable resolver implementation must be thread-safe.\n"
+#~ " *\n"
+#~ " */\n"
+#~ "public interface TraversableResolver {\n"
+#~ "    /**\n"
+#~ "     * Determine if the Bean Validation provider is allowed to reach the "
+#~ "property state\n"
+#~ "     *\n"
+#~ "     * @param traversableObject object hosting &lt;code&gt;"
+#~ "traversableProperty&lt;/code&gt; or null  \n"
+#~ "     *                          if validateValue is called\n"
+#~ "     * @param traversableProperty the traversable property.\n"
+#~ "     * @param rootBeanType type of the root object passed to the "
+#~ "Validator.\n"
+#~ "     * @param pathToTraversableObject path from the root object to\n"
+#~ "     *        &lt;code&gt;traversableObject&lt;/code&gt;\n"
+#~ "     *        (using the path specification defined by Bean Validator).\n"
+#~ "     * @param elementType either &lt;code&gt;FIELD&lt;/code&gt; or &lt;"
+#~ "code&gt;METHOD&lt;/code&gt;.\n"
+#~ "     *\n"
+#~ "     * @return &lt;code&gt;true&lt;/code&gt; if the Bean Validation "
+#~ "provider is allowed to\n"
+#~ "     *         reach the property state, &lt;code&gt;false&lt;/code&gt; "
+#~ "otherwise.\n"
+#~ "     */\n"
+#~ "     boolean isReachable(Object traversableObject,\n"
+#~ "                         Path.Node traversableProperty,\n"
+#~ "                         Class&lt;?&gt; rootBeanType,\n"
+#~ "                         Path pathToTraversableObject,\n"
+#~ "                         ElementType elementType);\n"
+#~ "\n"
+#~ "    /**\n"
+#~ "     * Determine if the Bean Validation provider is allowed to cascade "
+#~ "validation on\n"
+#~ "     * the bean instance returned by the property value\n"
+#~ "     * marked as &lt;code&gt;@Valid&lt;/code&gt;.\n"
+#~ "     * Note that this method is called only if isReachable returns true "
+#~ "for the same set of\n"
+#~ "     * arguments and if the property is marked as &lt;code&gt;@Valid&lt;/"
+#~ "code&gt;\n"
+#~ "     *\n"
+#~ "     * @param traversableObject object hosting &lt;code&gt;"
+#~ "traversableProperty&lt;/code&gt; or null\n"
+#~ "     *                          if validateValue is called\n"
+#~ "     * @param traversableProperty the traversable property.\n"
+#~ "     * @param rootBeanType type of the root object passed to the "
+#~ "Validator.\n"
+#~ "     * @param pathToTraversableObject path from the root object to\n"
+#~ "     *        &lt;code&gt;traversableObject&lt;/code&gt;\n"
+#~ "     *        (using the path specification defined by Bean Validator).\n"
+#~ "     * @param elementType either &lt;code&gt;FIELD&lt;/code&gt; or &lt;"
+#~ "code&gt;METHOD&lt;/code&gt;.\n"
+#~ "     *\n"
+#~ "     * @return &lt;code&gt;true&lt;/code&gt; if the Bean Validation "
+#~ "provider is allowed to\n"
+#~ "     *         cascade validation, &lt;code&gt;false&lt;/code&gt; "
+#~ "otherwise.\n"
+#~ "     */\n"
+#~ "     boolean isCascadable(Object traversableObject,\n"
+#~ "                          Path.Node traversableProperty,\n"
+#~ "                          Class&lt;?&gt; rootBeanType,\n"
+#~ "                          Path pathToTraversableObject,\n"
+#~ "                          ElementType elementType);\n"
+#~ "}"
+
+#~ msgid "The interface you have to implement is:"
+#~ msgstr "你需要实现此接口:"
+
+#~ msgid "ConstraintValidatorFactory interface"
+#~ msgstr "ConstraintValidatorFactory接口"
+
+#~ msgid ""
+#~ "public interface ConstraintValidatorFactory {\n"
+#~ "    /**\n"
+#~ "     * @param key The class of the constraint validator to instantiate.\n"
+#~ "     *\n"
+#~ "     * @return A constraint validator instance of the specified class.\n"
+#~ "     */\n"
+#~ "     &lt;T extends ConstraintValidator&lt;?,?&gt;&gt; T getInstance"
+#~ "(Class&lt;T&gt; key);\n"
+#~ "}"
+#~ msgstr ""
+#~ "public interface ConstraintValidatorFactory {\n"
+#~ "    /**\n"
+#~ "     * @param key The class of the constraint validator to instantiate.\n"
+#~ "     *\n"
+#~ "     * @return A constraint validator instance of the specified class.\n"
+#~ "     */\n"
+#~ "     &lt;T extends ConstraintValidator&lt;?,?&gt;&gt; T getInstance"
+#~ "(Class&lt;T&gt; key);\n"
+#~ "}"

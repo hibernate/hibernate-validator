@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2011-02-11 14:56+0000\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
 "PO-Revision-Date: 2010-08-14 14:38+0830\n"
 "Last-Translator: Strong Liu <stliu@hibernate.org>\n"
 "Language-Team: none\n"
@@ -21,43 +21,43 @@ msgid "Hibernate Validator"
 msgstr "Hibernate Validator"
 
 #. Tag: subtitle
-#: master.xml:26
-#, no-c-format
-msgid "JSR 303 Reference Implementation"
+#: master.xml:27
+#, fuzzy, no-c-format
+msgid "JSR 349 Reference Implementation"
 msgstr "JSR 303 的参考实现"
 
 #. Tag: subtitle
-#: master.xml:27
+#: master.xml:29
 #, no-c-format
 msgid "Reference Guide"
 msgstr "使用指南"
 
 #. Tag: releaseinfo
-#: master.xml:28
+#: master.xml:31
 #, no-c-format
 msgid "&version;"
 msgstr ""
 
 #. Tag: holder
-#: master.xml:33
+#: master.xml:40
 #, no-c-format
 msgid "&copyrightHolder;"
 msgstr "&copyrightHolder;"
 
 #. Tag: author
-#: master.xml:36
+#: master.xml:44
 #, no-c-format
 msgid "<firstname>Hardy</firstname> <surname>Ferentschik</surname>"
 msgstr "<firstname>Hardy</firstname> <surname>Ferentschik</surname>"
 
 #. Tag: author
-#: master.xml:40
+#: master.xml:50
 #, no-c-format
 msgid "<firstname>Gunnar</firstname> <surname>Morling</surname>"
 msgstr "<firstname>Gunnar</firstname> <surname>Morling</surname>"
 
 #. Tag: othercredit
-#: master.xml:44
+#: master.xml:56
 #, fuzzy, no-c-format
 msgid ""
 "<firstname>Shaozhuang</firstname> <surname>Liu</surname> "

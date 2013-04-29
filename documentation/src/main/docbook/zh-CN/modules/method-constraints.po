@@ -1,0 +1,1334 @@
+# Language zh-CN translations for PACKAGE package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
+"PO-Revision-Date: 2013-04-29 13:14+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh-CN\n"
+
+#. Tag: title
+#: method-constraints.xml:24
+#, no-c-format
+msgid "Declaring and validating method constraints"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:26
+#, no-c-format
+msgid ""
+"As of Bean Validation 1.1, constraints can not only be applied to Java beans "
+"and their properties, but also to the parameters and return values of the "
+"methods and constructors of any Java type. That way Bean Validation "
+"constraints can be used to specify"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:33
+#, no-c-format
+msgid ""
+"the preconditions that must be satisfied by the caller before a method or "
+"constructor may be invoked (by applying constraints to the parameters of an "
+"executable)"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:39
+#, no-c-format
+msgid ""
+"the postconditions that are guaranteed to the caller after a method or "
+"constructor invocation returns (by applying constraints to the return value "
+"of an executable)"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:46
+#, no-c-format
+msgid ""
+"For the purpose of this reference guide, the term <emphasis>method "
+"constraint</emphasis> refers to both, method and constructor constraints, if "
+"not stated otherwise. Ocassionally, the term <emphasis>executable</emphasis> "
+"is used when referering to methods and constructors."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:53
+#, no-c-format
+msgid ""
+"This approach has several advantages over traditional ways of checking the "
+"correctness of parameters and return values:"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:58
+#, no-c-format
+msgid ""
+"the checks don't have to be performed manually (e.g. by throwing "
+"<classname>IllegalArgumentExceptions</classname> or similar), resulting in "
+"less code to write and maintain"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:64
+#, no-c-format
+msgid ""
+"an executable's pre- and postconditions don't have to be expressed again in "
+"its documentation, since the constraint annotations will automatically be "
+"included in the generated JavaDoc. This avoids redundancies and reduces the "
+"chance of inconsistencies between implementation and documentation"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:73
+#, no-c-format
+msgid ""
+"In order to make annotations show up in the JavaDoc of annoted elements, the "
+"annotation types themselves must be annotated with the meta annotation "
+"<classname>@Documented</classname>. This is the case for all built-in "
+"constraints and is considered a best practice for any custom constraints."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:80
+#, no-c-format
+msgid ""
+"In the remainder of this chapter you will learn how to declare parameter and "
+"return value constraints and how to validate the same using the "
+"<classname>ExecutableValidator</classname> API."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:85
+#, no-c-format
+msgid "Declaring method constraints"
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:88
+#, no-c-format
+msgid "Parameter constraints"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:90
+#, no-c-format
+msgid ""
+"You specify the preconditions of a method or constructor by adding "
+"constraint annotations to its parameters as demonstrated in <xref linkend="
+"\"example-declaring-parameter-constraints\"/>."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:95
+#, no-c-format
+msgid "Declaring method and constructor parameter constraints"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:97
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.parameter;\n"
+"\n"
+"public class RentalStation {\n"
+"\n"
+"        public RentalStation(@NotNull String name) {\n"
+"                //...\n"
+"        }\n"
+"\n"
+"        public void rentCar(\n"
+"                        @NotNull Customer customer,\n"
+"                        @NotNull @Future Date startDate,\n"
+"                        @Min(1) int durationInDays) {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:100
+#, no-c-format
+msgid "The following preconditions are declared here:"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:104
+#, no-c-format
+msgid ""
+"The name passed to the <classname>RentalCar</classname> constructor must not "
+"be <literal>null</literal>"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:109
+#, no-c-format
+msgid ""
+"When invoking the <methodname>rentCar()</methodname> method, the given "
+"customer must not be <literal>null</literal>, the rental's start date must "
+"not be <literal>null</literal> and must be in the future and the rental "
+"duration must be at least one day"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:116
+#, no-c-format
+msgid ""
+"Note that declaring method or constructor constraints itself does not "
+"automatically cause their validation upon invocation of the executable. "
+"Instead, the ExecutableValidator API (see <xref linkend=\"section-validating-"
+"executable-constraints\"/>) must be used to perform the validation, which is "
+"often done using a method interception facility such as AOP, proxy objects "
+"etc."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:123
+#, no-c-format
+msgid ""
+"Constraints may only be applied to instance methods, i.e. declaring "
+"constraints on static methods is not supported. Depending on the "
+"interception facility you use for triggering method validation, additional "
+"restrictions may apply, e.g. with respect to the visibility of methods "
+"supported as target of interception. Refer to the documentation of the "
+"interception technology to find out whether any such limitations exist."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:132
+#, no-c-format
+msgid "Cross-parameter constraints"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:134
+#, no-c-format
+msgid ""
+"Sometimes validation does not only depend on a single parameter but on "
+"several or even all parameters of a method or constructor. This kind of "
+"requirement can be fulfilled with help of a cross-parameter constraint."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:139
+#, no-c-format
+msgid ""
+"Cross-parameter constraints can be considered as the method validation "
+"equivalent to class-level constraints. Both can be used to implement "
+"validation requirements which are based on several elements. While class-"
+"level constraints apply to several properties of a bean, cross-parameter "
+"constraints apply to several parameters of an executable."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:146
+#, no-c-format
+msgid ""
+"In contrast to single-parameter constraints, cross-parameter constraints are "
+"declared on the method or constructor as you can see in <xref linkend="
+"\"example-using-cross-parameter-constraint\"/>. Here the cross-parameter "
+"constraint <classname>@LuggageCountMatchesPassengerCount</classname> "
+"declared on the <methodname>load()</methodname> method is used to ensure "
+"that no passenger has more than two pieces of luggage."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:155
+#, no-c-format
+msgid "Declaring a cross-parameter constraint"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:157
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.crossparameter;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        @LuggageCountMatchesPassengerCount(piecesOfLuggagePerPassenger = 2)\n"
+"        public void load(List&lt;Person&gt; passengers, List&lt;"
+"PieceOfLuggage&gt; luggage) {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:160
+#, no-c-format
+msgid ""
+"As you will learn in the next section, return value constraints are also "
+"declared on the method level. In order to distinguish cross-parameter "
+"constraints from return value constraints, a constraint's target is "
+"configured at its validator implementation(s). You can find out about the "
+"details in <xref linkend=\"section-cross-parameter-constraints\"/> which "
+"shows how to implement your own cross-parameter constraints."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:168
+#, no-c-format
+msgid ""
+"In some cases a constraint can be applied to an executable's parameters (i."
+"e. it is a cross-parameter constraint), but also to the return value. One "
+"example for this are custom constraints which allow to specify validation "
+"rules using expression or script languages."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:174
+#, no-c-format
+msgid ""
+"Such constraints must define a member <methodname>validationAppliesTo()</"
+"methodname> which can be used at declaration time to specify the constraint "
+"target. As shown in <xref linkend=\"example-specifying-constraint-target\"/> "
+"you apply the constraint to an executable's parameters by specifying "
+"<literal>validationAppliesTo = ConstraintTarget.PARAMETERS</literal>, while "
+"<classname>ConstraintTarget.RETURN_VALUE</classname> is used to apply the "
+"constraint to the executable return value."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:184
+#, no-c-format
+msgid "Specifying a constraint's target"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:186
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.crossparameter."
+"constrainttarget;\n"
+"\n"
+"public class Garage {\n"
+"\n"
+"        @ELAssert(expression = \"...\", validationAppliesTo = "
+"ConstraintTarget.PARAMETERS)\n"
+"        public Car buildCar(List&lt;Part&gt; parts) {\n"
+"                //...\n"
+"        }\n"
+"\n"
+"        @ELAssert(expression = \"...\", validationAppliesTo = "
+"ConstraintTarget.RETURN_VALUE)\n"
+"        public Car paintCar(int color) {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:189
+#, no-c-format
+msgid ""
+"Although such a constraint is applicable to the parameters and return value "
+"of an executable, the target can often be inferred automatically. This is "
+"the case, if the constraint is declared on"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:196
+#, no-c-format
+msgid ""
+"a void method with parameters (the constraint applies to the parameters)"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:201
+#, no-c-format
+msgid ""
+"an executable with return value but no parameters (the constraint applies to "
+"the return value)"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:206
+#, no-c-format
+msgid ""
+"neither a method nor a constructor, but a field, parameter etc. (the "
+"constraint applies to the annotated element)"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:211
+#, no-c-format
+msgid ""
+"In these situations you don't have to specify the constraint target. It is "
+"still recommended to do so if it increases readability of the source code. "
+"If the constraint target is not specified in situations where it can't be "
+"determined automatically, a <classname>ConstraintDeclarationException</"
+"classname> is raised."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:221
+#, no-c-format
+msgid "Return value constraints"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:223
+#, no-c-format
+msgid ""
+"The postconditions of a method or constructor are declared by adding "
+"constraint annotations to the executable as shown in <xref linkend=\"example-"
+"declaring-return-value-constraints\"/>."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:228
+#, no-c-format
+msgid "Declaring method and constructor return value constraints"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:231
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.returnvalue;\n"
+"\n"
+"public class RentalStation {\n"
+"\n"
+"        @ValidRentalStation\n"
+"        public RentalStation() {\n"
+"                //...\n"
+"        }\n"
+"\n"
+"        @NotNull\n"
+"        @Size(min = 1)\n"
+"        public List&lt;Customer&gt; getCustomers() {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:234
+#, no-c-format
+msgid ""
+"The following constraints apply to the executables of "
+"<classname>RentalStation</classname>:"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:239
+#, no-c-format
+msgid ""
+"Any newly created <classname>RentalStation</classname> object must satisfy "
+"the <classname>@ValidRentalStation</classname> constraint"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:245
+#, no-c-format
+msgid ""
+"The customer list returned by <methodname>getCustomers()</methodname> must "
+"not be <literal>null</literal> and must contain at least on element"
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:253
+#, no-c-format
+msgid "Cascaded validation"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:256
+#, no-c-format
+msgid ""
+"Similar to the cascaded validation of JavaBeans properties (see <xref "
+"linkend=\"section-object-graph-validation\"/>), the <classname>@Valid</"
+"classname> annotation can be used to mark executable parameters and return "
+"values for cascaded validation. When validating a parameter or return value "
+"annotated with <classname>@Valid</classname>, the constraints declared on "
+"the parameter or return value object are validated as well."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:264
+#, no-c-format
+msgid ""
+"In <xref linkend=\"example-cascaded-executable-validation\"/>, the "
+"<varname>car</varname> parameter of the method <methodname>Garage#checkCar()"
+"</methodname> as well as the return value of the <classname>Garage</"
+"classname> constructor are marked for cascaded validation."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:271
+#, no-c-format
+msgid "Marking executable parameters and return values for cascaded validation"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:274
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.cascaded;\n"
+"\n"
+"public class Garage {\n"
+"\n"
+"        @NotNull\n"
+"        private final String name;\n"
+"\n"
+"        @Valid\n"
+"        public Garage(String name) {\n"
+"                this.name = name;\n"
+"        }\n"
+"\n"
+"        public boolean checkCar(@Valid @NotNull Car car) {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:276
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.cascaded;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        @NotNull\n"
+"        private final String manufacturer;\n"
+"\n"
+"        @NotNull\n"
+"        @Size(min = 2, max = 14)\n"
+"        private final String licensePlate;\n"
+"\n"
+"        public Car(String manufacturer, String licencePlate) {\n"
+"                this.manufacturer = manufacturer;\n"
+"                this.licensePlate = licencePlate;\n"
+"        }\n"
+"\n"
+"        //getters and setters ...\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:279
+#, no-c-format
+msgid ""
+"When validating the arguments of the <methodname>checkCar()</methodname> "
+"method, the constraints on the properties of the passed <classname>Car</"
+"classname> object are evaluated as well. Similarly, the <classname>@NotNull</"
+"classname> constraint on the <varname>name</varname> field of "
+"<classname>Garage</classname> is checked when validating the return value of "
+"the <classname>Garage</classname> constructor."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:287
+#, no-c-format
+msgid ""
+"Generally, the cascaded validation works for executables in exactly the same "
+"way as it does for JavaBeans properties."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:290
+#, no-c-format
+msgid ""
+"In particular, <literal>null</literal> values are ignored during cascaded "
+"validation (naturally this can't happen during constructor return value "
+"validation) and cascaded validation is performed recursively, i.e. if a "
+"parameter or return value object which is marked for cascaded validation "
+"itself has properties marked with <classname>@Valid</classname>, the "
+"constraints declared on the referenced elements will be validated as well."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:298
+#, no-c-format
+msgid ""
+"Cascaded validation can not only be applied to simple object references but "
+"also to collection-typed parameters and return values. This means when "
+"putting the <classname>@Valid</classname> annotation to a parameter or "
+"return value which"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:305
+#, no-c-format
+msgid "is an array"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:309
+#, no-c-format
+msgid "implements <classname>java.lang.Iterable</classname>"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:313
+#, no-c-format
+msgid "implements <classname>java.util.Map</classname>"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:317
+#, no-c-format
+msgid ""
+"then each contained element gets checked, when the parameter or return value "
+"is validated. So when validating the arguments of the <methodname>checkCars()"
+"</methodname> method in <xref linkend=\"example-cascaded-executable-"
+"validation-listtyped\"/>, each element instance of the passed list will be "
+"validated and a <classname>ConstraintViolation</classname> created when any "
+"of the contained <classname>Car</classname> objects is invalid."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:326
+#, no-c-format
+msgid "List-typed method parameter marked for cascaded validation"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:329
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.cascaded."
+"collection;\n"
+"\n"
+"public class Garage {\n"
+"\n"
+"        public boolean checkCars(@Valid @NotNull List&lt;Car&gt; cars) {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:334
+#, no-c-format
+msgid "Method constraints in inheritance hierarchies"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:337
+#, no-c-format
+msgid ""
+"When declaring method constraints in inheritance hierarchies, it's important "
+"to be aware of the following rules:"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:342
+#, no-c-format
+msgid ""
+"The preconditions to be satisified by the caller of a method may not be "
+"strengthened in subtypes"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:347
+#, no-c-format
+msgid ""
+"The postconditions guaranteed to the caller of a method may not be weakened "
+"in subtypes"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:352
+#, no-c-format
+msgid ""
+"These rules are motivated by the concept of <emphasis>behavioral subtyping</"
+"emphasis> which requires that wherever a type <classname>T</classname> is "
+"used, also a subtype <classname>S</classname> of <classname>T</classname> "
+"may be used without altering the program's behavior."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:358
+#, no-c-format
+msgid ""
+"As an example, consider a class invoking a method on an object with the "
+"static type <classname>T</classname>. If the runtime type of that object was "
+"<classname>S</classname> and <classname>S</classname> imposed additional "
+"preconditions, the client class might fail to satisfy these preconditions as "
+"is not aware of them. The rules of behavioral subtyping are also known as "
+"the <ulink url=\"http://en.wikipedia.org/wiki/Liskov_substitution_principle"
+"\">Liskov substitution principle</ulink>."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:367
+#, no-c-format
+msgid ""
+"The Bean Validation specification implements the first rule by disallowing "
+"parameter constraints on methods which override or implement a method "
+"declared in a supertype (superclass or interface). <xref linkend=\"example-"
+"illegal-parameter-constraints\"/> shows a violation of this rule."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:374
+#, no-c-format
+msgid "Illegal method parameter constraint in subtype"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:376
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.inheritance."
+"parameter;\n"
+"\n"
+"public interface Vehicle {\n"
+"\n"
+"    void drive(@Max(75) int speedInMph);\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:378
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.inheritance."
+"parameter;\n"
+"\n"
+"import javax.validation.constraints.Max;\n"
+"\n"
+"public class Car implements Vehicle {\n"
+"\n"
+"        @Override\n"
+"        public void drive(@Max(55) int speedInMph) {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:381
+#, no-c-format
+msgid ""
+"The <classname>@Max</classname> constraint on <methodname>Car#drive()</"
+"methodname> is illegal since this method implements the interface method "
+"<methodname>Vehicle#drive()</methodname>. Note that parameter constraints on "
+"overriding methods are also disallowed, if the supertype method itself "
+"doesn't declare any parameter constraints."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:388
+#, no-c-format
+msgid ""
+"Furthermore, if a method overrides or implements a method declared in "
+"several parallel supertypes (e.g. two interfaces not extending each other or "
+"a class and an interface not implemented by that class), no parameter "
+"constraints may be specified for the method in any of the involved types. "
+"The types in <xref linkend=\"example-illegal-parameter-constraints-parallel-"
+"types\"/> demonstrate a violation of that rule. The method "
+"<methodname>RacingCar#drive()</methodname> overrides "
+"<methodname>Vehicle#drive()</methodname> as well as <methodname>Car#drive()</"
+"methodname>. Therefore the constraint on <methodname>Vehicle#drive()</"
+"methodname> is illegal."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:401
+#, no-c-format
+msgid "Illegal method parameter constraint in parallel types of a hierarchy"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:404
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.inheritance."
+"parallel;\n"
+"\n"
+"public interface Vehicle {\n"
+"\n"
+"        void drive(@Max(75) int speedInMph);\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:406
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.inheritance."
+"parallel;\n"
+"\n"
+"public interface Car {\n"
+"\n"
+"        public void drive(int speedInMph);\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:408
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.inheritance."
+"parallel;\n"
+"\n"
+"public class RacingCar implements Car, Vehicle {\n"
+"\n"
+"        @Override\n"
+"        public void drive(int speedInMph) {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:411
+#, no-c-format
+msgid ""
+"The previously described restrictions only apply to parameter constraints. "
+"In contrast, return value constraints may be added in methods overriding or "
+"implementing any supertype methods."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:415
+#, no-c-format
+msgid ""
+"In this case, all the method's return value constraints apply for the "
+"subtype method, i.e. the constraints declared on the subtype method itself "
+"as well as any return value constraints on overridden/implemented supertype "
+"methods. This is legal as putting additional return value constraints in "
+"place may never represent a weakening of the postconditions guaranteed to "
+"the caller of a method."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:422
+#, no-c-format
+msgid ""
+"So when validating the return value of the method "
+"<methodname>Car#getPassengers()</methodname> shown in <xref linkend="
+"\"example-return-value-constraints-in-hierarchy\"/>, the <classname>@Size</"
+"classname> constraint on the method itself as well as the "
+"<classname>@NotNull</classname> constraint on the implemented interface "
+"method <methodname>Vehicle#getPassengers()</methodname> apply."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:431
+#, no-c-format
+msgid "Return value constraints on supertype and subtype method"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:434
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.inheritance."
+"returnvalue;\n"
+"\n"
+"public interface Vehicle {\n"
+"\n"
+"        @NotNull\n"
+"        List&lt;Person&gt; getPassengers();\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:436
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.inheritance."
+"returnvalue;\n"
+"\n"
+"public class Car implements Vehicle {\n"
+"\n"
+"        @Override\n"
+"        @Size(min = 1)\n"
+"        public List&lt;Person&gt; getPassengers() {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:439
+#, no-c-format
+msgid ""
+"If the validation engine detects a violation of any of the aforementioned "
+"rules, a <classname>ConstraintDeclarationException</classname> will be "
+"raised."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:445
+#, no-c-format
+msgid ""
+"The rules described in this section only apply to methods but not "
+"constructors. By definition, constructors never override supertype "
+"constructors. Therefore, when validating the parameters or the return value "
+"of a constructor invocation only the constraints declared on the constructor "
+"itself apply, but never any constraints declared on supertype constructors."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:456
+#, no-c-format
+msgid "Validating method constraints"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:458
+#, no-c-format
+msgid ""
+"The validation of method constraints is done using the "
+"<classname>ExecutableValidator</classname> interface."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:461
+#, no-c-format
+msgid ""
+"In <xref linkend=\"section-obtaining-executable-validator\"/> you'll learn "
+"how to obtain an <classname>ExecutableValidator</classname> instance "
+"while<xref linkend=\"section-executable-validator-methods\"/> shows how to "
+"use the different methods offered by this interface."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:466
+#, no-c-format
+msgid ""
+"Instead of calling the ExecutableValidator methods directly from within "
+"application code, they are usually invoked via a method interception "
+"technology such as AOP, proxy objects, etc. This causes executable "
+"constraints to be validated automatically and transparently upon method or "
+"constructor invocation. Typically a <classname>ConstraintViolationException</"
+"classname> is raised by the integration layer in case any of the constraints "
+"is violated."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:475
+#, no-c-format
+msgid "Obtaining an <classname>ExecutableValidator</classname> instance"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:478
+#, no-c-format
+msgid ""
+"You can retrieve an <classname>ExecutableValidator</classname> instance via "
+"<classname>Validator#forExecutables()</classname> as shown in <xref linkend="
+"\"example-obtaining-executable-validator\"/>."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:483
+#, no-c-format
+msgid "Obtaining an ExecutableValidator"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:485
+#, no-c-format
+msgid ""
+"ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+"executableValidator = factory.getValidator().forExecutables();"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:488
+#, no-c-format
+msgid ""
+"In the example the executable validator is retrieved from the default "
+"validator factory, but if required you could also bootstrap a specifically "
+"configured factory as described in <xref linkend=\"chapter-bootstrapping\"/"
+">, for instance in order to use a specific parameter name provider (see "
+"<xref linkend=\"section-parameter-name-provider\"/>)."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:497
+#, no-c-format
+msgid "<classname>ExecutableValidator</classname> methods"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:499
+#, no-c-format
+msgid ""
+"The <classname>ExecutableValidator</classname> interface offers altogether "
+"four methods:"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:504
+#, no-c-format
+msgid ""
+"<methodname>validateParameters()</methodname> and "
+"<methodname>validateReturnValue()</methodname> for method validation"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:510
+#, no-c-format
+msgid ""
+"<methodname>validateConstructorParameters()</methodname> and "
+"<methodname>validateConstructorReturnValue()</methodname> for constructor "
+"validation"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:516
+#, no-c-format
+msgid ""
+"Just as the methods on <classname>Validator</classname>, all these methods "
+"return a <classname>Set&lt;ConstraintViolation&gt;</classname> which "
+"contains a <classname>ConstraintViolation</classname> instance for each "
+"violated constraint and which is empty if the validation succeeds. Also all "
+"the methods have a var-args <varname>groups</varname> parameter by which you "
+"can pass the validation groups to be considered for validation."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:524
+#, no-c-format
+msgid ""
+"The examples in the following sections are based on the methods on "
+"constructors of the <classname>Car</classname> class shown in <xref linkend="
+"\"example-executable-validator-class-car\"/>."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:529
+#, no-c-format
+msgid ""
+"Class <classname>Car</classname> with constrained methods and constructors"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:532
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter03.validation;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        public Car(@NotNull String manufacturer) {\n"
+"                //...\n"
+"        }\n"
+"\n"
+"        @ValidRacingCar\n"
+"        public Car(String manufacturer, String team) {\n"
+"                //...\n"
+"        }\n"
+"\n"
+"        public void drive(@Max(75) int speedInMph) {\n"
+"                //...\n"
+"        }\n"
+"\n"
+"        @Size(min = 1)\n"
+"        public List&lt;Passenger&gt; getPassengers() {\n"
+"                //...\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: methodname
+#: method-constraints.xml:536
+#, no-c-format
+msgid "validateParameters()"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:538
+#, no-c-format
+msgid ""
+"The method <methodname>validateParameters()</methodname> is used to validate "
+"the arguments of a method invocation. <xref linkend=\"example-executable-"
+"validator-validate-parameters\"/> shows an example. The validation results "
+"in a violation of the <classname>@Max</classname> constraint on the "
+"parameter of the <methodname>drive()</methodname> method."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:546
+#, no-c-format
+msgid "Using <methodname>ExecutableValidator#validateParameters()</methodname>"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:549
+#, no-c-format
+msgid ""
+"Car object = new Car( \"Morris\" );\n"
+"Method method = Car.class.getMethod( \"drive\", int.class );\n"
+"Object[] parameterValues = { 80 };\n"
+"Set&lt;ConstraintViolation&lt;Car&gt;&gt; violations = executableValidator."
+"validateParameters(\n"
+"                object,\n"
+"                method,\n"
+"                parameterValues\n"
+");\n"
+"\n"
+"assertEquals( 1, violations.size() );\n"
+"Class&lt;? extends Annotation&gt; constraintType = violations.iterator()\n"
+"                .next()\n"
+"                .getConstraintDescriptor()\n"
+"                .getAnnotation()\n"
+"                .annotationType();\n"
+"assertEquals( Max.class, constraintType );"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:552
+#, no-c-format
+msgid ""
+"Note that <methodname>validateParameters()</methodname> validates all the "
+"parameter constraints of a method, i.e. constraints on individual parameters "
+"as well as cross-parameter constraints."
+msgstr ""
+
+#. Tag: methodname
+#: method-constraints.xml:559
+#, no-c-format
+msgid "validateReturnValue()"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:561
+#, no-c-format
+msgid ""
+"Using <methodname>validateReturnValue()</methodname> the return value of a "
+"method can can be validated. The validation in <xref linkend=\"example-"
+"executable-validator-validate-return-value\"/> yields one constraint "
+"violation since the <methodname>getPassengers()</methodname> method is "
+"expect to return at least one <classname>Passenger</classname> object."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:569
+#, no-c-format
+msgid ""
+"Using <methodname>ExecutableValidator#validateReturnValue()</methodname>"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:572
+#, no-c-format
+msgid ""
+"Car object = new Car( \"Morris\" );\n"
+"Method method = Car.class.getMethod( \"getPassengers\" );\n"
+"Object returnValue = Collections.&lt;Passenger&gt;emptyList();\n"
+"Set&lt;ConstraintViolation&lt;Car&gt;&gt; violations = executableValidator."
+"validateReturnValue(\n"
+"                object,\n"
+"                method,\n"
+"                returnValue\n"
+");\n"
+"\n"
+"assertEquals( 1, violations.size() );\n"
+"Class&lt;? extends Annotation&gt; constraintType = violations.iterator()\n"
+"                .next()\n"
+"                .getConstraintDescriptor()\n"
+"                .getAnnotation()\n"
+"                .annotationType();\n"
+"assertEquals( Size.class, constraintType );"
+msgstr ""
+
+#. Tag: methodname
+#: method-constraints.xml:577
+#, no-c-format
+msgid "validateConstructorParameters()"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:579
+#, no-c-format
+msgid ""
+"The arguments of constructor invocations can be validated with "
+"<methodname>validateConstructorParameters()</methodname> as shown in method "
+"<xref linkend=\"example-executable-validator-validate-constructor-parameters"
+"\"/>. Due to the <classname>@NotNull</classname> constraint on the "
+"<varname>manufacturer</varname> parameter, the validation call returns one "
+"constraint violation."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:588
+#, no-c-format
+msgid ""
+"Using <methodname>ExecutableValidator#validateConstructorParameters()</"
+"methodname>"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:591
+#, no-c-format
+msgid ""
+"Constructor&lt;Car&gt; constructor = Car.class.getConstructor( String."
+"class );\n"
+"Object[] parameterValues = { null };\n"
+"Set&lt;ConstraintViolation&lt;Car&gt;&gt; violations = executableValidator."
+"validateConstructorParameters(\n"
+"                constructor,\n"
+"                parameterValues\n"
+");\n"
+"\n"
+"assertEquals( 1, violations.size() );\n"
+"Class&lt;? extends Annotation&gt; constraintType = violations.iterator()\n"
+"                .next()\n"
+"                .getConstraintDescriptor()\n"
+"                .getAnnotation()\n"
+"                .annotationType();\n"
+"assertEquals( NotNull.class, constraintType );"
+msgstr ""
+
+#. Tag: methodname
+#: method-constraints.xml:596
+#, no-c-format
+msgid "validateConstructorReturnValue()"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:598
+#, no-c-format
+msgid ""
+"Finally, by using <methodname>validateConstructorReturnValue()</methodname> "
+"you can valide a constructor's return value. In <xref linkend=\"example-"
+"executable-validator-validate-constructor-return-value\"/>, "
+"<methodname>validateConstructorReturnValue()</methodname> returns one "
+"constraint violation, since the <classname>Car</classname> object returned "
+"by the constructor doesn't satisfy the <classname>@ValidRacingCar</"
+"classname> constraint (not shown)."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:608
+#, no-c-format
+msgid ""
+"Using <methodname>ExecutableValidator#validateConstructorReturnValue()</"
+"methodname>"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:611
+#, no-c-format
+msgid ""
+"//constructor for creating racing cars\n"
+"Constructor&lt;Car&gt; constructor = Car.class.getConstructor( String.class, "
+"String.class );\n"
+"Car createdObject = new Car( \"Morris\", null );\n"
+"Set&lt;ConstraintViolation&lt;Car&gt;&gt; violations = executableValidator."
+"validateConstructorReturnValue(\n"
+"                constructor,\n"
+"                createdObject\n"
+");\n"
+"\n"
+"assertEquals( 1, violations.size() );\n"
+"Class&lt;? extends Annotation&gt; constraintType = violations.iterator()\n"
+"                .next()\n"
+"                .getConstraintDescriptor()\n"
+"                .getAnnotation()\n"
+"                .annotationType();\n"
+"assertEquals( ValidRacingCar.class, constraintType );"
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:617
+#, no-c-format
+msgid ""
+"<classname>ConstraintViolation</classname> methods for method validation"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:620
+#, no-c-format
+msgid ""
+"In addition to the methods introduced in <xref linkend=\"section-constraint-"
+"violation-methods\"/>, <classname>ConstraintViolation</classname> provides "
+"two more methods specific to the validation of executable parameters and "
+"return values."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:626
+#, no-c-format
+msgid ""
+"<methodname>ConstraintViolation#getExecutableParameters()</methodname> "
+"returns the validated parameter array in case of method or constructor "
+"parameter validation, while "
+"<methodname>ConstraintViolation#getExecutableReturnValue()</methodname> "
+"provides access to the validated object in case of return value validation."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:633
+#, no-c-format
+msgid ""
+"All the other <classname>ConstraintViolation</classname> methods generally "
+"work for method validation in the same way as for validation of beans. Refer "
+"to the <ulink url=\"http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/"
+"api/index.html?javax/validation/metadata/BeanDescriptor.html\">JavaDoc</"
+"ulink> to learn more about the behavior of the individual methods and their "
+"return values during bean and method validation."
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:640
+#, no-c-format
+msgid ""
+"Note that <methodname>getPropertyPath()</methodname> can be very useful in "
+"order to obtain detailed information about the validated parameter or return "
+"value, e.g. for logging purposes. In particular, you can retrieve name and "
+"argument types of the concerned method as well as the index of the concerned "
+"parameter from the path nodes. How this can be done is shown in <xref "
+"linkend=\"example-executable-validation-property-path\"/>."
+msgstr ""
+
+#. Tag: title
+#: method-constraints.xml:649
+#, no-c-format
+msgid "Retrieving method and parameter information"
+msgstr ""
+
+#. Tag: programlisting
+#: method-constraints.xml:651
+#, no-c-format
+msgid ""
+"Car object = new Car( \"Morris\" );\n"
+"Method method = Car.class.getMethod( \"drive\", int.class );\n"
+"Object[] parameterValues = { 80 };\n"
+"Set&lt;ConstraintViolation&lt;Car&gt;&gt; violations = executableValidator."
+"validateParameters(\n"
+"                object,\n"
+"                method,\n"
+"                parameterValues\n"
+");\n"
+"\n"
+"assertEquals( 1, violations.size() );\n"
+"Iterator&lt;Node&gt; propertyPath = violations.iterator()\n"
+"                .next()\n"
+"                .getPropertyPath()\n"
+"                .iterator();\n"
+"\n"
+"MethodNode methodNode = propertyPath.next().as( MethodNode.class );\n"
+"assertEquals( \"drive\", methodNode.getName() );\n"
+"assertEquals( Arrays.&lt;Class&lt;?&gt;&gt;asList( int.class ), methodNode."
+"getParameterTypes() );\n"
+"\n"
+"ParameterNode parameterNode = propertyPath.next().as( ParameterNode."
+"class );\n"
+"assertEquals( \"arg0\", parameterNode.getName() );\n"
+"assertEquals( 0, parameterNode.getParameterIndex() );"
+msgstr ""
+
+#. Tag: para
+#: method-constraints.xml:654
+#, no-c-format
+msgid ""
+"The parameter name is determined using the current "
+"<classname>ParameterNameProvider</classname> (see TODO) and defaults to "
+"<literal>arg0</literal>, <literal>arg1</literal> etc."
+msgstr ""

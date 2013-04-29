@@ -1,0 +1,61 @@
+# Language zh-CN translations for PACKAGE package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
+"PO-Revision-Date: 2013-04-29 13:14+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh-CN\n"
+
+#. Tag: title
+#: further-reading.xml:24
+#, no-c-format
+msgid "Further reading"
+msgstr ""
+
+#. Tag: para
+#: further-reading.xml:26
+#, no-c-format
+msgid "Last but not least, a few pointers to further information."
+msgstr ""
+
+#. Tag: para
+#: further-reading.xml:28
+#, no-c-format
+msgid ""
+"A great source for examples is the Bean Validation TCK which is available "
+"for anonymous access on <ulink url=\"https://github.com/beanvalidation/"
+"beanvalidation-tck\">GitHub</ulink>. In particular the TCK's <ulink url="
+"\"https://github.com/beanvalidation/beanvalidation-tck/tree/1.1.0.Final/tests"
+"\">tests</ulink> might be of interest. <ulink url=\"http://beanvalidation."
+"org/1.1/spec/1.1.0.cr3\">The JSR 349</ulink> specification itself is also a "
+"great way to deepen your understanding of Bean Validation resp. Hibernate "
+"Validator."
+msgstr ""
+
+#. Tag: para
+#: further-reading.xml:38
+#, no-c-format
+msgid ""
+"If you have any further questions to Hibernate Validator or want to share "
+"some of your use cases have a look at the <ulink url=\"http://community."
+"jboss.org/en/hibernate/validator\">Hibernate Validator Wiki</ulink> and the "
+"<ulink url=\"https://forum.hibernate.org/viewforum.php?f=9\">Hibernate "
+"Validator Forum</ulink>."
+msgstr ""
+
+#. Tag: para
+#: further-reading.xml:45
+#, no-c-format
+msgid ""
+"In case you would like to report a bug use <ulink url=\"http://opensource."
+"atlassian.com/projects/hibernate/browse/HV\">Hibernate's Jira</ulink> "
+"instance. Feedback is always welcome!"
+msgstr ""

@@ -1,0 +1,713 @@
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: metadata-api.xml:24
+#, no-c-format
+msgid "Metadata API"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:26
+#, no-c-format
+msgid "The Bean Validation specification provides not only a validation engine, but also an API for retrieving constraint metadata in a uniform way, no matter whether the constraints are declared using annotations or via XML mappings. We'll have a closer look at this API and its possibilities in the following sections. All the introduced API types can be found in the <package>javax.validation.metadata</package> package."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:33
+#, no-c-format
+msgid "The examples presented in this chapter are based on the classes and constraint declarations shown in <xref linkend=\"metadata-example-car\"/>."
+msgstr ""
+
+#. Tag: title
+#: metadata-api.xml:38
+#, no-c-format
+msgid "Example classes"
+msgstr ""
+
+#. Tag: programlisting
+#: metadata-api.xml:40
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter07;\n"
+      "\n"
+      "public class Person {\n"
+      "\n"
+      "        public interface Basic {\n"
+      "        }\n"
+      "\n"
+      "        @NotNull\n"
+      "        private String name;\n"
+      "\n"
+      "        //getters and setters ...\n"
+      "}"
+msgstr ""
+
+#. Tag: programlisting
+#: metadata-api.xml:42
+#, no-c-format
+msgid ""
+      "public interface Vehicle {\n"
+      "\n"
+      "        public interface Basic {\n"
+      "        }\n"
+      "\n"
+      "        @NotNull(groups = Vehicle.Basic.class)\n"
+      "        String getManufacturer();\n"
+      "}"
+msgstr ""
+
+#. Tag: programlisting
+#: metadata-api.xml:44
+#, no-c-format
+msgid ""
+      "@ValidCar\n"
+      "public class Car implements Vehicle {\n"
+      "\n"
+      "        public interface SeverityInfo extends Payload {\n"
+      "        }\n"
+      "\n"
+      "        private String manufacturer;\n"
+      "\n"
+      "        @NotNull\n"
+      "        @Size(min = 2, max = 14)\n"
+      "        private String licensePlate;\n"
+      "\n"
+      "        private Person driver;\n"
+      "\n"
+      "        private String modelName;\n"
+      "\n"
+      "        public Car() {\n"
+      "        }\n"
+      "\n"
+      "        public Car(\n"
+      "                        @NotNull String manufacturer,\n"
+      "                        String licencePlate,\n"
+      "                        Person driver,\n"
+      "                        String modelName) {\n"
+      "\n"
+      "                this.manufacturer = manufacturer;\n"
+      "                this.licensePlate = licencePlate;\n"
+      "                this.driver = driver;\n"
+      "                this.modelName = modelName;\n"
+      "        }\n"
+      "\n"
+      "        public void driveAway(@Max(75) int speed) {\n"
+      "                //...\n"
+      "        }\n"
+      "\n"
+      "        @LuggageCountMatchesPassengerCount(\n"
+      "                        piecesOfLuggagePerPassenger = 2,\n"
+      "                        validationAppliesTo = ConstraintTarget.PARAMETERS,\n"
+      "                        payload = SeverityInfo.class,\n"
+      "                        message = \"There must not be more than {piecesOfLuggagePerPassenger} pieces of \" +\n"
+      "                                        \"luggage per passenger.\"\n"
+      "        )\n"
+      "        public void load(List&lt;Person&gt; passengers, List&lt;PieceOfLuggage&gt; luggage) {\n"
+      "                //...\n"
+      "        }\n"
+      "\n"
+      "        @Override\n"
+      "        @Size(min = 3)\n"
+      "        public String getManufacturer() {\n"
+      "                return manufacturer;\n"
+      "        }\n"
+      "\n"
+      "        public void setManufacturer(String manufacturer) {\n"
+      "                this.manufacturer = manufacturer;\n"
+      "        }\n"
+      "\n"
+      "        @Valid\n"
+      "        @ConvertGroup(from = Default.class, to = Person.Basic.class)\n"
+      "        public Person getDriver() {\n"
+      "                return driver;\n"
+      "        }\n"
+      "\n"
+      "        //further getters and setters...\n"
+      "}"
+msgstr ""
+
+#. Tag: classname
+#: metadata-api.xml:49
+#, no-c-format
+msgid "BeanDescriptor"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:51
+#, no-c-format
+msgid "The entry point into the metadata API is the method <code>Validator.getConstraintsForClass()</code>, which returns an instance of the <ulink url=\"http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/BeanDescriptor.html\"><classname>BeanDescriptor</classname></ulink> interface. Using this descriptor, you can obtain metadata for constraints declared directly on the bean itself (class- or property-level), but also retrieve metadata descriptors representing single properties, methods and constructors."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:60
+#, no-c-format
+msgid "demonstrates how to retrieve a <classname>BeanDescriptor</classname> for the <classname>Car</classname> class and how to use this descriptor in form of assertions."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:66
+#, no-c-format
+msgid "If a constraint declaration hosted by the requested class is invalid, a <classname>ValidationException</classname> is thrown."
+msgstr ""
+
+#. Tag: title
+#: metadata-api.xml:72
+#, no-c-format
+msgid "Using <classname>BeanDescriptor</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: metadata-api.xml:74
+#, no-c-format
+msgid ""
+      "Validator validator = Validation.buildDefaultValidatorFactory().getValidator();\n"
+      "\n"
+      "BeanDescriptor carDescriptor = validator.getConstraintsForClass( Car.class );\n"
+      "\n"
+      "assertTrue( carDescriptor.isBeanConstrained() );\n"
+      "\n"
+      "//one class-level constraint\n"
+      "assertEquals( 1, carDescriptor.getConstraintDescriptors().size() );\n"
+      "\n"
+      "//manufacturer, licensePlate, driver\n"
+      "assertEquals( 3, carDescriptor.getConstrainedProperties().size() );\n"
+      "\n"
+      "//property has constraint\n"
+      "assertNotNull( carDescriptor.getConstraintsForProperty( \"licensePlate\" ) );\n"
+      "\n"
+      "//property is marked with @Valid\n"
+      "assertNotNull( carDescriptor.getConstraintsForProperty( \"driver\" ) );\n"
+      "\n"
+      "//constraints from getter method in interface and implementation class are returned\n"
+      "assertEquals(\n"
+      "                2,\n"
+      "                carDescriptor.getConstraintsForProperty( \"manufacturer\" )\n"
+      "                                .getConstraintDescriptors()\n"
+      "                                .size()\n"
+      ");\n"
+      "\n"
+      "//property is not constrained\n"
+      "assertNull( carDescriptor.getConstraintsForProperty( \"modelName\" ) );\n"
+      "\n"
+      "//driveAway(int), load(List&lt;Person&gt;, List&lt;PieceOfLuggage&gt;)\n"
+      "assertEquals( 2, carDescriptor.getConstrainedMethods( MethodType.NON_GETTER ).size() );\n"
+      "\n"
+      "//driveAway(int), getManufacturer(), getDriver(), load(List&lt;Person&gt;, List&lt;PieceOfLuggage&gt;)\n"
+      "assertEquals(\n"
+      "                4,\n"
+      "                carDescriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER )\n"
+      "                                .size()\n"
+      ");\n"
+      "\n"
+      "//driveAway(int)\n"
+      "assertNotNull( carDescriptor.getConstraintsForMethod( \"driveAway\", int.class ) );\n"
+      "\n"
+      "//getManufacturer()\n"
+      "assertNotNull( carDescriptor.getConstraintsForMethod( \"getManufacturer\" ) );\n"
+      "\n"
+      "//setManufacturer() is not constrained\n"
+      "assertNull( carDescriptor.getConstraintsForMethod( \"setManufacturer\", String.class ) );\n"
+      "\n"
+      "//Car(String, String, Person, String)\n"
+      "assertEquals( 1, carDescriptor.getConstrainedConstructors().size() );\n"
+      "\n"
+      "//Car(String, String, Person, String)\n"
+      "assertNotNull(\n"
+      "                carDescriptor.getConstraintsForConstructor(\n"
+      "                                String.class,\n"
+      "                                String.class,\n"
+      "                                Person.class,\n"
+      "                                String.class\n"
+      "                )\n"
+      ");"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:77
+#, no-c-format
+msgid "You can determine whether the specified class hosts any class- or property-level constraints via <code>isBeanConstrained()</code>. Method or constructor constraints are not considered by <methodname>isBeanConstrained()</methodname>."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:82
+#, no-c-format
+msgid "The method <code>getConstraintDescriptors()</code> is common to all descriptors derived from <classname>ElementDescriptor</classname> (see <xref linkend=\"validator-metadata-api-elementdescriptor\"/>) and returns a set of descriptors representing the constraints directly declared on the given element. In case of <classname>BeanDescriptor</classname>, the bean's class-level constraints are returned. More details on <classname>ConstraintDescriptor</classname> can be found in <xref linkend=\"section-constraint-descriptor\"/>."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:91
+#, no-c-format
+msgid "Via <methodname>getConstraintsForProperty()</methodname>, <methodname>getConstraintsForMethod()</methodname> and <methodname>getConstraintsForConstructor()</methodname> you can obtain a descriptor representing one given property or executable element, identified by its name and, in case of methods and constructors, parameter types. The different descriptor types returned by these methods are described in the following sections."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:99
+#, no-c-format
+msgid "Note that these methods consider constraints declared at super-types according to the rules for constraint inheritance as described in TODO. An example is the descriptor for the <varname>manufacturer</varname> property, which provides access to all constraints defined on <methodname>Vehicle#getManufacturer()</methodname> and the implementing method <methodname>Car#getManufacturer()</methodname>. <literal>null</literal> is returned in case the specified element does not exist or is not constrained."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:108
+#, no-c-format
+msgid "The methods <methodname>getConstrainedProperties()</methodname>, <methodname>getConstrainedMethods()</methodname> and <methodname>getConstrainedConstructors()</methodname> return (potentially empty) sets with all constrained properties, methods and constructors, respectively. An element is considered constrained, if it has at least one constraint or is marked for cascaded validation. When invoking <methodname>getConstrainedMethods()</methodname>, you can specify the type of the methods to be returned (getters, non-getters or both)."
+msgstr ""
+
+#. Tag: classname
+#: metadata-api.xml:119
+#, no-c-format
+msgid "PropertyDescriptor"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:121
+#, no-c-format
+msgid "The interface <ulink url=\"http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/PropertyDescriptor.html\"><classname>PropertyDescriptor</classname></ulink> represents one given property of a class. It is transparent whether constraints are declared on a field or a property getter, provided the JavaBeans naming conventions are respected. <xref linkend=\"metadata-example-using-propertydescriptor\"/> shows how to use the <classname>PropertyDescriptor</classname> interface."
+msgstr ""
+
+#. Tag: title
+#: metadata-api.xml:130
+#, no-c-format
+msgid "Using <classname>PropertyDescriptor</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: metadata-api.xml:132
+#, no-c-format
+msgid ""
+      "PropertyDescriptor licensePlateDescriptor = carDescriptor.getConstraintsForProperty(\n"
+      "                \"licensePlate\"\n"
+      ");\n"
+      "\n"
+      "//\"licensePlate\" has two constraints, is not marked with @Valid and defines no group conversions\n"
+      "assertEquals( \"licensePlate\", licensePlateDescriptor.getPropertyName() );\n"
+      "assertEquals( 2, licensePlateDescriptor.getConstraintDescriptors().size() );\n"
+      "assertTrue( licensePlateDescriptor.hasConstraints() );\n"
+      "assertFalse( licensePlateDescriptor.isCascaded() );\n"
+      "assertTrue( licensePlateDescriptor.getGroupConversions().isEmpty() );\n"
+      "\n"
+      "PropertyDescriptor driverDescriptor = carDescriptor.getConstraintsForProperty( \"driver\" );\n"
+      "\n"
+      "//\"driver\" has no constraints, is marked with @Valid and defines one group conversion\n"
+      "assertEquals( \"driver\", driverDescriptor.getPropertyName() );\n"
+      "assertTrue( driverDescriptor.getConstraintDescriptors().isEmpty() );\n"
+      "assertFalse( driverDescriptor.hasConstraints() );\n"
+      "assertTrue( driverDescriptor.isCascaded() );\n"
+      "assertEquals( 1, driverDescriptor.getGroupConversions().size() );"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:135
+#, no-c-format
+msgid "Using <methodname>getConstrainedDescriptors()</methodname>, you can retrieve a set of <classname>ConstraintDescriptor</classname>s providing more information on the individual constraints of a given property. The method <methodname>isCascaded()</methodname> returns <literal>true</literal>, if the property is marked for cascaded validation (either using the <classname>@Valid</classname> annotation or via XML), <literal>false</literal> otherwise. Any configured group conversions are returned by <methodname>getGroupConversions()</methodname>. See <xref linkend=\"section-group-conversion-descriptor\"/> for more details on <classname>GroupConversionDescriptor</classname>."
+msgstr ""
+
+#. Tag: title
+#: metadata-api.xml:148
+#, no-c-format
+msgid "MethodDescriptor and ConstructorDescriptor"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:150
+#, no-c-format
+msgid "Constrained methods and constructors (together referred to as \"executables\" in the following) are represented by the interfaces <ulink url=\"http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/MethodDescriptor.html\"><classname>MethodDescriptor</classname></ulink> and <ulink url=\"http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ConstructorDescriptor.html\"><classname>ConstructorDescriptor</classname></ulink>, respectively. <xref linkend=\"metadata-example-using-methodandconstructordescriptor\"/> demonstrates how to work with these descriptors."
+msgstr ""
+
+#. Tag: title
+#: metadata-api.xml:160
+#, no-c-format
+msgid "Using <classname>MethodDescriptor</classname> and <classname>ConstructorDescriptor</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: metadata-api.xml:163
+#, no-c-format
+msgid ""
+      "//driveAway(int) has a constrained parameter and an unconstrained return value\n"
+      "MethodDescriptor driveAwayDescriptor = carDescriptor.getConstraintsForMethod(\n"
+      "                \"driveAway\",\n"
+      "                int.class\n"
+      ");\n"
+      "assertEquals( \"driveAway\", driveAwayDescriptor.getName() );\n"
+      "assertTrue( driveAwayDescriptor.hasConstrainedParameters() );\n"
+      "assertFalse( driveAwayDescriptor.hasConstrainedReturnValue() );\n"
+      "\n"
+      "//always returns an empty set; constraints are retrievable by navigating to\n"
+      "//one of the sub-descriptors, e.g. for the return value\n"
+      "assertTrue( driveAwayDescriptor.getConstraintDescriptors().isEmpty() );\n"
+      "\n"
+      "ParameterDescriptor speedDescriptor = driveAwayDescriptor.getParameterDescriptors()\n"
+      "                .get( 0 );\n"
+      "\n"
+      "//The \"speed\" parameter is located at index 0, has one constraint and is not cascaded\n"
+      "//nor does it define group conversions\n"
+      "assertEquals( \"arg0\", speedDescriptor.getName() );\n"
+      "assertEquals( 0, speedDescriptor.getIndex() );\n"
+      "assertEquals( 1, speedDescriptor.getConstraintDescriptors().size() );\n"
+      "assertFalse( speedDescriptor.isCascaded() );\n"
+      "assert speedDescriptor.getGroupConversions().isEmpty();\n"
+      "\n"
+      "//getDriver() has no constrained parameters but its return value is marked for cascaded\n"
+      "//validation and declares one group conversion\n"
+      "MethodDescriptor getDriverDescriptor = carDescriptor.getConstraintsForMethod(\n"
+      "                \"getDriver\"\n"
+      ");\n"
+      "assertFalse( getDriverDescriptor.hasConstrainedParameters() );\n"
+      "assertTrue( getDriverDescriptor.hasConstrainedReturnValue() );\n"
+      "\n"
+      "ReturnValueDescriptor returnValueDescriptor = getDriverDescriptor.getReturnValueDescriptor();\n"
+      "assertTrue( returnValueDescriptor.getConstraintDescriptors().isEmpty() );\n"
+      "assertTrue( returnValueDescriptor.isCascaded() );\n"
+      "assertEquals( 1, returnValueDescriptor.getGroupConversions().size() );\n"
+      "\n"
+      "//load(List&lt;Person&gt;, List&lt;PieceOfLuggage&gt;) has one cross-parameter constraint\n"
+      "MethodDescriptor loadDescriptor = carDescriptor.getConstraintsForMethod(\n"
+      "                \"load\",\n"
+      "                List.class,\n"
+      "                List.class\n"
+      ");\n"
+      "assertTrue( loadDescriptor.hasConstrainedParameters() );\n"
+      "assertFalse( loadDescriptor.hasConstrainedReturnValue() );\n"
+      "assertEquals(\n"
+      "                1,\n"
+      "                loadDescriptor.getCrossParameterDescriptor().getConstraintDescriptors().size()\n"
+      ");\n"
+      "\n"
+      "//Car(String, String, Person, String) has one constrained parameter\n"
+      "ConstructorDescriptor constructorDescriptor = carDescriptor.getConstraintsForConstructor(\n"
+      "                String.class,\n"
+      "                String.class,\n"
+      "                Person.class,\n"
+      "                String.class\n"
+      ");\n"
+      "\n"
+      "assertEquals( \"Car\", constructorDescriptor.getName() );\n"
+      "assertFalse( constructorDescriptor.hasConstrainedReturnValue() );\n"
+      "assertTrue( constructorDescriptor.hasConstrainedParameters() );\n"
+      "assertEquals(\n"
+      "                1,\n"
+      "                constructorDescriptor.getParameterDescriptors()\n"
+      "                                .get( 0 )\n"
+      "                                .getConstraintDescriptors()\n"
+      "                                .size()\n"
+      ");"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:166
+#, no-c-format
+msgid "<methodname>getName()</methodname> returns the name of the given method or constructor. The methods <methodname>hasConstrainedParameters()</methodname> and <methodname>hasConstrainedReturnValue()</methodname> can be used to perform a quick check whether an executable element has any parameter constraints (either constraints on single parameters or cross-parameter constraints) or return value constraints."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:174
+#, no-c-format
+msgid "Note that any constraints are not directly exposed on <classname>MethodDescriptor</classname> and <classname>ConstructorDescriptor</classname>, but rather on dedicated descriptors representing an executable's parameters, its return value and its cross-parameter constraints. To get hold of one of these descriptors, invoke <methodname>getParameterDescriptors()</methodname>, <methodname>getReturnValueDescriptor()</methodname> or <methodname>getCrossParameterDescriptor()</methodname>, respectively."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:184
+#, no-c-format
+msgid "These descriptors provide access to the element's constraints (<methodname>getConstraintDescriptors()</methodname>) and, in case of parameters and return value, to its configuration for cascaded validation (<methodname>isValid()</methodname> and <methodname>getGroupConversions()</methodname>). For parameters, you also can retrieve the index and the name, as returned by the currently used parameter name provider (see TODO) via <methodname>getName()</methodname> and <methodname>getIndex()</methodname>."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:194
+#, no-c-format
+msgid "Getter methods following the JavaBeans naming conventions are considered as bean properties but also as constrained methods."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:197
+#, no-c-format
+msgid "That means you can retrieve the related metadata either by obtaining a <classname>PropertyDescriptor</classname> (e.g. <methodname>BeanDescriptor.getConstraintsForProperty(\"foo\")</methodname>) or by examining the return value descriptor of the getter's <classname>MethodDescriptor</classname> (e.g. <methodname>BeanDescriptor.getConstraintsForMethod(\"getFoo\").getReturnValueDescriptor()</methodname>)."
+msgstr ""
+
+#. Tag: classname
+#: metadata-api.xml:207
+#, no-c-format
+msgid "ElementDescriptor"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:209
+#, no-c-format
+msgid "The <ulink url=\"http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ElementDescriptor.html\"><classname>ElementDiscriptor</classname></ulink> interface is the common base class for the individual descriptor types such as <classname>BeanDescriptor</classname>, <classname>PropertyDescriptor</classname> etc. Besides <methodname>getConstraintDescriptors()</methodname> it provides some more methods common to all descriptors."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:217
+#, no-c-format
+msgid "<code>hasConstraints()</code> allows for a quick check whether an element has any direct constraints (e.g. class-level constraints in case of <classname>BeanDescriptor</classname>). <methodname>getElementClass()</methodname> returns the Java type of the element represented by a given descriptor. More specifically, the method returns"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:226
+#, no-c-format
+msgid "the object type when invoked on <classname>BeanDescriptor</classname>,"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:231
+#, no-c-format
+msgid "the type of a property or parameter when invoked on <classname>PropertyDescriptor</classname> or <classname>ParameterDescriptor</classname> respectively,"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:237
+#, no-c-format
+msgid "<classname>Object[].class</classname> when invoked on <classname>CrossParameterDescriptor</classname>,"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:242
+#, no-c-format
+msgid "the return type when invoked on <classname>ConstructorDescriptor</classname>, <classname>MethodDescriptor</classname> or <classname>ReturnValueDescriptor</classname>. <classname>void.class</classname> will be returned for methods which don't have a return value."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:251
+#, no-c-format
+msgid "shows how these methods are used."
+msgstr ""
+
+#. Tag: title
+#: metadata-api.xml:255
+#, no-c-format
+msgid "Using <classname>ElementDescriptor</classname> methods"
+msgstr ""
+
+#. Tag: programlisting
+#: metadata-api.xml:257
+#, no-c-format
+msgid ""
+      "PropertyDescriptor manufacturerDescriptor = carDescriptor.getConstraintsForProperty(\n"
+      "                \"manufacturer\"\n"
+      ");\n"
+      "\n"
+      "assertTrue( manufacturerDescriptor.hasConstraints() );\n"
+      "assertEquals( String.class, manufacturerDescriptor.getElementClass() );\n"
+      "\n"
+      "CrossParameterDescriptor loadCrossParameterDescriptor = carDescriptor.getConstraintsForMethod(\n"
+      "                \"load\",\n"
+      "                List.class,\n"
+      "                List.class\n"
+      ").getCrossParameterDescriptor();\n"
+      "\n"
+      "assertTrue( loadCrossParameterDescriptor.hasConstraints() );\n"
+      "assertEquals( Object[].class, loadCrossParameterDescriptor.getElementClass() );"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:260
+#, no-c-format
+msgid "Finally, <classname>ElementDescriptor</classname> offers access to the <classname>ConstraintFinder</classname> API which allows you to query for constraint metadata in a fine grained way. <xref linkend=\"example-constraint-finder\"/> shows how to retrieve a <classname>ConstraintFinder</classname> instance via <methodname>findConstraints()</methodname> and use the API to query for constraint metadata."
+msgstr ""
+
+#. Tag: title
+#: metadata-api.xml:269
+#, no-c-format
+msgid "Usage of ConstraintFinder"
+msgstr ""
+
+#. Tag: programlisting
+#: metadata-api.xml:271
+#, no-c-format
+msgid ""
+      "PropertyDescriptor manufacturerDescriptor = carDescriptor.getConstraintsForProperty(\n"
+      "                \"manufacturer\"\n"
+      ");\n"
+      "\n"
+      "//\"manufacturer\" constraints are declared on the getter, not the field\n"
+      "assertTrue(\n"
+      "                manufacturerDescriptor.findConstraints()\n"
+      "                                .declaredOn( ElementType.FIELD )\n"
+      "                                .getConstraintDescriptors()\n"
+      "                                .isEmpty()\n"
+      ");\n"
+      "\n"
+      "//@NotNull on Vehicle#getManufacturer() is part of another group\n"
+      "assertEquals(\n"
+      "                1,\n"
+      "                manufacturerDescriptor.findConstraints()\n"
+      "                                .unorderedAndMatchingGroups( Default.class )\n"
+      "                                .getConstraintDescriptors()\n"
+      "                                .size()\n"
+      ");\n"
+      "\n"
+      "//@Size on Car#getManufacturer()\n"
+      "assertEquals(\n"
+      "                1,\n"
+      "                manufacturerDescriptor.findConstraints()\n"
+      "                                .lookingAt( Scope.LOCAL_ELEMENT )\n"
+      "                                .getConstraintDescriptors()\n"
+      "                                .size()\n"
+      ");\n"
+      "\n"
+      "//@Size on Car#getManufacturer() and @NotNull on Vehicle#getManufacturer()\n"
+      "assertEquals(\n"
+      "                2,\n"
+      "                manufacturerDescriptor.findConstraints()\n"
+      "                                .lookingAt( Scope.HIERARCHY )\n"
+      "                                .getConstraintDescriptors()\n"
+      "                                .size()\n"
+      ");\n"
+      "\n"
+      "//Combining several filter options\n"
+      "assertEquals(\n"
+      "                1,\n"
+      "                manufacturerDescriptor.findConstraints()\n"
+      "                                .declaredOn( ElementType.METHOD )\n"
+      "                                .lookingAt( Scope.HIERARCHY )\n"
+      "                                .unorderedAndMatchingGroups( Vehicle.Basic.class )\n"
+      "                                .getConstraintDescriptors()\n"
+      "                                .size()\n"
+      ");"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:274
+#, no-c-format
+msgid "Via <methodname>declaredOn()</methodname>, the API allows to return only <classname>ConstraintDescriptor</classname>s declared on certain element types. This is useful to search for property constraints declared on either fields or getter methods."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:279
+#, no-c-format
+msgid "<methodname>unorderedAndMatchingGroups()</methodname> restricts the resulting constraints to those matching the given validation group(s)."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:283
+#, no-c-format
+msgid "<methodname>lookingAt()</methodname> allows to distinguish between constraints directly specified on the element (<constant>Scope.LOCAL_ELEMENT</constant>) or constraints belonging to the element but hosted anywhere in the class hierarchy (<constant>Scope.HIERARCHY</constant>)."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:289
+#, no-c-format
+msgid "The different options also can be combined as shown in the last example."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:293
+#, no-c-format
+msgid "Order is not respected by <methodname>unorderedAndMatchingGroups()</methodname>, but group inheritance and inheritance via sequence are."
+msgstr ""
+
+#. Tag: classname
+#: metadata-api.xml:300
+#, no-c-format
+msgid "GroupConversionDescriptor"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:302
+#, no-c-format
+msgid "All those descriptor types that represent elements which can be subject of cascaded validation (i.e., <classname>PropertyDescriptor</classname>, <classname>ParameterDescriptor</classname> and <classname>ReturnValueDescriptor</classname>) provide access to the element's group conversions via <methodname>getGroupConversions()</methodname>. The returned set contains a <ulink url=\"http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/GroupConversionDescriptor.html\"><classname>GroupConversionDescriptor</classname></ulink> for each configured conversion, allowing to retrieve source and target groups of the conversion. <xref linkend=\"metadata-example-using-groupconversiondescriptor\"/> shows an example."
+msgstr ""
+
+#. Tag: title
+#: metadata-api.xml:317
+#, no-c-format
+msgid "Using <classname>GroupConversionDescriptor</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: metadata-api.xml:319
+#, no-c-format
+msgid ""
+      "PropertyDescriptor driverDescriptor = carDescriptor.getConstraintsForProperty( \"driver\" );\n"
+      "\n"
+      "Set&lt;GroupConversionDescriptor&gt; groupConversions = driverDescriptor.getGroupConversions();\n"
+      "assertEquals( 1, groupConversions.size() );\n"
+      "\n"
+      "GroupConversionDescriptor groupConversionDescriptor = groupConversions.iterator()\n"
+      "                .next();\n"
+      "assertEquals( Default.class, groupConversionDescriptor.getFrom() );\n"
+      "assertEquals( Person.Basic.class, groupConversionDescriptor.getTo() );"
+msgstr ""
+
+#. Tag: classname
+#: metadata-api.xml:324
+#, no-c-format
+msgid "ConstraintDescriptor"
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:326
+#, no-c-format
+msgid "Last but not least, the <ulink url=\"http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ConstraintDescriptor.html\"><classname>ConstraintDescriptor</classname></ulink> interface describes a single constraint together with its composing constraints. Via an instance of this interface you get access to the constraint annotation and its parameters."
+msgstr ""
+
+#. Tag: para
+#: metadata-api.xml:332
+#, no-c-format
+msgid "shows how to retrieve default constraint attributes (such as message template, groups etc.) as well as custom constraint attributes (<varname>piecesOfLuggagePerPassenger</varname>) and other metadata such as the constraint's annotation type and its validators from a <classname>ConstraintDescriptor</classname>."
+msgstr ""
+
+#. Tag: title
+#: metadata-api.xml:340
+#, no-c-format
+msgid "Using <classname>ConstraintDescriptor</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: metadata-api.xml:342
+#, no-c-format
+msgid ""
+      "//descriptor for the @LuggageCountMatchesPassengerCount constraint on the\n"
+      "//load(List&lt;Person&gt;, List&lt;PieceOfLuggage&gt;) method\n"
+      "ConstraintDescriptor&lt;?&gt; constraintDescriptor = carDescriptor.getConstraintsForMethod(\n"
+      "                \"load\",\n"
+      "                List.class,\n"
+      "                List.class\n"
+      ").getCrossParameterDescriptor().getConstraintDescriptors().iterator().next();\n"
+      "\n"
+      "//constraint type\n"
+      "assertEquals(\n"
+      "                LuggageCountMatchesPassengerCount.class,\n"
+      "                constraintDescriptor.getAnnotation().annotationType()\n"
+      ");\n"
+      "\n"
+      "//standard constraint attributes\n"
+      "assertEquals( SeverityInfo.class, constraintDescriptor.getPayload().iterator().next() );\n"
+      "assertEquals(\n"
+      "                ConstraintTarget.PARAMETERS,\n"
+      "                constraintDescriptor.getValidationAppliesTo()\n"
+      ");\n"
+      "assertEquals( Default.class, constraintDescriptor.getGroups().iterator().next() );\n"
+      "assertEquals(\n"
+      "                \"There must not be more than {piecesOfLuggagePerPassenger} pieces of luggage per passenger.\",\n"
+      "                constraintDescriptor.getMessageTemplate()\n"
+      ");\n"
+      "\n"
+      "//custom constraint attribute\n"
+      "assertEquals(\n"
+      "                2,\n"
+      "                constraintDescriptor.getAttributes().get( \"piecesOfLuggagePerPassenger\" )\n"
+      ");\n"
+      "\n"
+      "//no composing constraints\n"
+      "assertTrue( constraintDescriptor.getComposingConstraints().isEmpty() );\n"
+      "\n"
+      "//validator class\n"
+      "assertEquals(\n"
+      "                Arrays.&lt;Class&lt;?&gt;&gt;asList( LuggageCountMatchesPassengerCount.Validator.class ),\n"
+      "                constraintDescriptor.getConstraintValidatorClasses()\n"
+      ");"
+msgstr ""

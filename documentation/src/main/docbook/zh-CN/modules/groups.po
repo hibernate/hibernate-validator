@@ -5,57 +5,55 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2013-04-03 09:59+0000\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
 "PO-Revision-Date: 2013-04-03 09:59+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
+"Language: zh-CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh-CN\n"
 
 #. Tag: title
 #: groups.xml:24
 #, no-c-format
-msgid "Declaring and validating constraints"
+msgid "Grouping constraints"
 msgstr ""
 
 #. Tag: para
 #: groups.xml:26
 #, no-c-format
 msgid ""
-"In this chapter we will see in more detail how to use Hibernate Validator to "
-"validate constraints for a given entity model. We will also learn which "
-"default constraints the Bean Validation specification provides and which "
-"additional constraints are only provided by Hibernate Validator. Let's start "
-"with how to add constraints to an entity."
+"All validation methods on <classname>Validator</classname> and "
+"<classname>ExecutableValidator</classname> discussed in earlier chapters "
+"also take a var-arg argument <parameter>groups</parameter>. So far we have "
+"been ignoring this parameter, but it is time to have a closer look."
 msgstr ""
 
 #. Tag: title
-#: groups.xml:33
+#: groups.xml:32
 #, no-c-format
-msgid "Validating groups"
+msgid "Requesting groups"
 msgstr ""
 
 #. Tag: para
-#: groups.xml:35
+#: groups.xml:34
 #, no-c-format
 msgid ""
 "Groups allow you to restrict the set of constraints applied during "
-"validation. This makes for example wizard like validation possible where in "
-"each step only a specified subset of constraints get validated. The groups "
-"targeted are passed as var-args parameters to <methodname>validate</"
-"methodname>, <methodname>validateProperty</methodname> and "
-"<methodname>validateValue</methodname>. Let's have a look at an extended "
-"<classname>Car</classname> with <classname>Driver</classname> example. First "
-"we have the class <classname>Person</classname> (<xref linkend=\"example-"
-"person\"/>) which has a <classname>@NotNull </classname>constraint on "
-"<property>name</property>. Since no group is specified for this annotation "
-"its default group is <classname>javax.validation.groups.Default</classname>."
+"validation. A possible use-case for groups are UI wizards where in each step "
+"only a specified subset of constraints get validated. The groups targeted "
+"are passed as var-arg parameters to the appropriate validate method. Let's "
+"have a look at an extended <classname>Car</classname> with "
+"<classname>Driver</classname> example. First we have the class "
+"<classname>Person</classname> (<xref linkend=\"example-person\"/>) which has "
+"a <classname>@NotNull </classname>constraint on <property>name</property>. "
+"Since no group is specified for this annotation the default group "
+"<classname>javax.validation.groups.Default</classname> is assumed."
 msgstr ""
 
 #. Tag: para
-#: groups.xml:50
+#: groups.xml:46
 #, no-c-format
 msgid ""
 "When more than one group is requested, the order in which the groups are "
@@ -64,28 +62,31 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: groups.xml:57
+#: groups.xml:53
 #, no-c-format
 msgid "Person"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:59
+#: groups.xml:55
 #, no-c-format
 msgid ""
-"public class Person {\n"
-"    @NotNull\n"
-"    private String name;\n"
+"package org.hibernate.validator.referenceguide.chapter05.groups;\n"
 "\n"
-"    public Person(String name) {\n"
-"        this.name = name;\n"
-"    }\n"
-"    // getters and setters ...\n"
+"public class Person {\n"
+"        @NotNull\n"
+"        private String name;\n"
+"\n"
+"        public Person(String name) {\n"
+"                this.name = name;\n"
+"        }\n"
+"\n"
+"        // getters and setters ...\n"
 "}"
 msgstr ""
 
 #. Tag: para
-#: groups.xml:62
+#: groups.xml:58
 #, no-c-format
 msgid ""
 "Next we have the class <classname>Driver</classname> (<xref linkend="
@@ -103,61 +104,78 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: groups.xml:76
+#: groups.xml:72
 #, no-c-format
 msgid "Driver"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:78
+#: groups.xml:74
 #, no-c-format
 msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups;\n"
+"\n"
 "public class Driver extends Person {\n"
-"    @Min(value = 18, message = \"You have to be 18 to drive a car\", groups "
-"= DriverChecks.class)\n"
-"    public int age;\n"
+"        @Min(\n"
+"                        value = 18,\n"
+"                        message = \"You have to be 18 to drive a car\",\n"
+"                        groups = DriverChecks.class\n"
+"        )\n"
+"        public int age;\n"
 "\n"
-"    @AssertTrue(message = \"You first have to pass the driving test\", "
-"groups = DriverChecks.class)\n"
-"    public boolean hasDrivingLicense;\n"
+"        @AssertTrue(\n"
+"                        message = \"You first have to pass the driving test"
+"\",\n"
+"                        groups = DriverChecks.class\n"
+"        )\n"
+"        public boolean hasDrivingLicense;\n"
 "\n"
-"    public Driver(String name) {\n"
-"        super( name );\n"
-"    }\n"
+"        public Driver(String name) {\n"
+"                super( name );\n"
+"        }\n"
 "\n"
-"    public void passedDrivingTest(boolean b) {\n"
-"        hasDrivingLicense = b;\n"
-"    }\n"
+"        public void passedDrivingTest(boolean b) {\n"
+"                hasDrivingLicense = b;\n"
+"        }\n"
 "\n"
-"    public int getAge() {\n"
-"        return age;\n"
-"    }\n"
+"        public int getAge() {\n"
+"                return age;\n"
+"        }\n"
 "\n"
-"    public void setAge(int age) {\n"
-"        this.age = age;\n"
-"    }\n"
+"        public void setAge(int age) {\n"
+"                this.age = age;\n"
+"        }\n"
 "}"
 msgstr ""
 
 #. Tag: title
-#: groups.xml:82
+#: groups.xml:78
 #, no-c-format
 msgid "Group interfaces"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:84
+#: groups.xml:80
 #, no-c-format
 msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups;\n"
+"\n"
 "public interface DriverChecks {\n"
-"}\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: groups.xml:82
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups;\n"
 "\n"
 "public interface CarChecks {\n"
 "}"
 msgstr ""
 
 #. Tag: para
-#: groups.xml:87
+#: groups.xml:85
 #, no-c-format
 msgid ""
 "Last but not least we add the property <property>passedVehicleInspection</"
@@ -166,43 +184,68 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: groups.xml:93
+#: groups.xml:91
 #, no-c-format
 msgid "<title>Car</title>"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:95
+#: groups.xml:93
 #, no-c-format
 msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups;\n"
+"\n"
 "public class Car {\n"
-"    @NotNull\n"
-"    private String manufacturer;\n"
+"        @NotNull\n"
+"        private String manufacturer;\n"
 "\n"
-"    @NotNull\n"
-"    @Size(min = 2, max = 14)\n"
-"    private String licensePlate;\n"
+"        @NotNull\n"
+"        @Size(min = 2, max = 14)\n"
+"        private String licensePlate;\n"
 "\n"
-"    @Min(2)\n"
-"    private int seatCount;\n"
+"        @Min(2)\n"
+"        private int seatCount;\n"
 "\n"
-"    @AssertTrue(message = \"The car has to pass the vehicle inspection first"
-"\", groups = CarChecks.class)\n"
-"    private boolean passedVehicleInspection;\n"
+"        @AssertTrue(\n"
+"                        message = \"The car has to pass the vehicle "
+"inspection first\",\n"
+"                        groups = CarChecks.class\n"
+"        )\n"
+"        private boolean passedVehicleInspection;\n"
 "\n"
-"    @Valid\n"
-"    private Driver driver;\n"
+"        @Valid\n"
+"        private Driver driver;\n"
 "\n"
-"    public Car(String manufacturer, String licencePlate, int seatCount) {\n"
-"        this.manufacturer = manufacturer;\n"
-"        this.licensePlate = licencePlate;\n"
-"        this.seatCount = seatCount;\n"
-"    }\n"
+"        public Car(String manufacturer, String licencePlate, int seatCount) "
+"{\n"
+"                this.manufacturer = manufacturer;\n"
+"                this.licensePlate = licencePlate;\n"
+"                this.seatCount = seatCount;\n"
+"        }\n"
+"\n"
+"        public boolean isPassedVehicleInspection() {\n"
+"                return passedVehicleInspection;\n"
+"        }\n"
+"\n"
+"        public void setPassedVehicleInspection(boolean "
+"passedVehicleInspection) {\n"
+"                this.passedVehicleInspection = passedVehicleInspection;\n"
+"        }\n"
+"\n"
+"        public Driver getDriver() {\n"
+"                return driver;\n"
+"        }\n"
+"\n"
+"        public void setDriver(Driver driver) {\n"
+"                this.driver = driver;\n"
+"        }\n"
+"\n"
+"        // getters and setters ...\n"
 "}"
 msgstr ""
 
 #. Tag: para
-#: groups.xml:98
+#: groups.xml:96
 #, no-c-format
 msgid ""
 "Overall three different groups are used in our example. <property>Person."
@@ -218,115 +261,126 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: groups.xml:112
+#: groups.xml:110
 #, no-c-format
 msgid "Drive away"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:114
+#: groups.xml:112
 #, no-c-format
 msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups;\n"
+"\n"
 "public class GroupTest {\n"
 "\n"
-"    private static Validator validator;\n"
+"        private static Validator validator;\n"
 "\n"
-"    @BeforeClass\n"
-"    public static void setUp() {\n"
-"        ValidatorFactory factory = Validation.buildDefaultValidatorFactory"
-"();\n"
-"        validator = factory.getValidator();\n"
-"    }\n"
+"        @BeforeClass\n"
+"        public static void setUp() {\n"
+"                ValidatorFactory factory = Validation."
+"buildDefaultValidatorFactory();\n"
+"                validator = factory.getValidator();\n"
+"        }\n"
 "\n"
-"    @Test\n"
-"    public void driveAway() {\n"
-"        // create a car and check that everything is ok with it.\n"
-"        Car car = new Car( \"Morris\", \"DD-AB-123\", 2 );\n"
-"        Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = "
-"validator.validate( car );\n"
-"        assertEquals( 0, constraintViolations.size() );\n"
+"        @Test\n"
+"        public void driveAway() {\n"
+"                // create a car and check that everything is ok with it.\n"
+"                Car car = new Car( \"Morris\", \"DD-AB-123\", 2 );\n"
+"                Set&lt;ConstraintViolation&lt;Car&gt;&gt; "
+"constraintViolations = validator.validate( car );\n"
+"                assertEquals( 0, constraintViolations.size() );\n"
 "\n"
-"        // but has it passed the vehicle inspection?\n"
-"        constraintViolations = validator.validate( car, CarChecks.class );\n"
-"        assertEquals( 1, constraintViolations.size() );\n"
-"        assertEquals(\"The car has to pass the vehicle inspection first\", "
-"constraintViolations.iterator().next().getMessage());\n"
-"\n"
-"        // let's go to the vehicle inspection\n"
-"        car.setPassedVehicleInspection( true );\n"
-"        assertEquals( 0, validator.validate( car ).size() );\n"
-"\n"
-"        // now let's add a driver. He is 18, but has not passed the driving "
-"test yet\n"
-"        Driver john = new Driver( \"John Doe\" );\n"
-"        john.setAge( 18 );\n"
-"        car.setDriver( john );\n"
-"        constraintViolations = validator.validate( car, DriverChecks."
+"                // but has it passed the vehicle inspection?\n"
+"                constraintViolations = validator.validate( car, CarChecks."
 "class );\n"
-"        assertEquals( 1, constraintViolations.size() );\n"
-"        assertEquals( \"You first have to pass the driving test\", "
-"constraintViolations.iterator().next().getMessage() );\n"
+"                assertEquals( 1, constraintViolations.size() );\n"
+"                assertEquals(\n"
+"                                \"The car has to pass the vehicle inspection "
+"first\",\n"
+"                                constraintViolations.iterator().next()."
+"getMessage()\n"
+"                );\n"
 "\n"
-"        // ok, John passes the test\n"
-"        john.passedDrivingTest( true );\n"
-"        assertEquals( 0, validator.validate( car, DriverChecks.class ).size"
-"() );\n"
+"                // let's go to the vehicle inspection\n"
+"                car.setPassedVehicleInspection( true );\n"
+"                assertEquals( 0, validator.validate( car ).size() );\n"
 "\n"
-"        // just checking that everything is in order now\n"
-"        assertEquals( 0, validator.validate( car, Default.class, CarChecks."
-"class, DriverChecks.class ).size() );\n"
-"    }\n"
+"                // now let's add a driver. He is 18, but has not passed the "
+"driving test yet\n"
+"                Driver john = new Driver( \"John Doe\" );\n"
+"                john.setAge( 18 );\n"
+"                car.setDriver( john );\n"
+"                constraintViolations = validator.validate( car, DriverChecks."
+"class );\n"
+"                assertEquals( 1, constraintViolations.size() );\n"
+"                assertEquals(\n"
+"                                \"You first have to pass the driving test"
+"\",\n"
+"                                constraintViolations.iterator().next()."
+"getMessage()\n"
+"                );\n"
+"\n"
+"                // ok, John passes the test\n"
+"                john.passedDrivingTest( true );\n"
+"                assertEquals( 0, validator.validate( car, DriverChecks."
+"class ).size() );\n"
+"\n"
+"                // just checking that everything is in order now\n"
+"                assertEquals(\n"
+"                                0, validator.validate(\n"
+"                                car,\n"
+"                                Default.class,\n"
+"                                CarChecks.class,\n"
+"                                DriverChecks.class\n"
+"                ).size()\n"
+"                );\n"
+"        }\n"
 "}"
 msgstr ""
 
 #. Tag: para
-#: groups.xml:117
+#: groups.xml:115
 #, no-c-format
 msgid ""
-"First we create a car and validate it using no explicit group. There are no "
-"validation errors, even though the property "
-"<property>passedVehicleInspection</property> is per default <constant>false</"
-"constant>. However, the constraint defined on this property does not belong "
-"to the default group. Next we just validate the <classname>CarChecks</"
-"classname> group which will fail until we make sure that the car passes the "
-"vehicle inspection. When we then add a driver to the car and validate "
-"against <classname>DriverChecks</classname> we get again a constraint "
-"violation due to the fact that the driver has not yet passed the driving "
-"test. Only after setting <property>passedDrivingTest</property> to true the "
-"validation against <classname>DriverChecks</classname> will pass."
-msgstr ""
-
-#. Tag: para
-#: groups.xml:130
-#, no-c-format
-msgid ""
+"In <xref linkend=\"example-drive-away\"/> we first create a car and validate "
+"it using no explicit group. There are no validation errors, even though the "
+"property <property>passedVehicleInspection</property> is per default "
+"<constant>false</constant>. However, the constraint defined on this property "
+"does not belong to the default group. Next we just validate the "
+"<classname>CarChecks</classname> group which will fail until we make sure "
+"that the car passes the vehicle inspection. When we then add a driver to the "
+"car and validate against <classname>DriverChecks</classname> we get again a "
+"constraint violation due to the fact that the driver has not yet passed the "
+"driving test. Only after setting <property>passedDrivingTest</property> to "
+"true the validation against <classname>DriverChecks</classname> will pass. "
 "Last but not least, we show that all constraints are passing by validating "
 "against all defined groups."
 msgstr ""
 
 #. Tag: title
-#: groups.xml:134
+#: groups.xml:132
 #, no-c-format
-msgid "Group sequences"
+msgid "Defining group sequences"
 msgstr ""
 
 #. Tag: para
-#: groups.xml:136
+#: groups.xml:134
 #, no-c-format
 msgid ""
 "By default, constraints are evaluated in no particular order, regardless of "
 "which groups they belong to. In some situations, however, it is useful to "
 "control the order constraints are evaluated. In our example from <xref "
-"linkend=\"validator-usingvalidator-validationgroups\"/> we could for example "
-"require that first all default car constraints are passing before we check "
-"the road worthiness of the car. Finally before we drive away we check the "
-"actual driver constraints. In order to implement such an order one would "
-"define a new interface and annotate it with <classname>@GroupSequence</"
-"classname> defining the order in which the groups have to be validated."
+"linkend=\"example-drive-away\"/> we could for example require that first all "
+"default car constraints are passing before we check the road worthiness of "
+"the car. Finally before we drive away we check the actual driver "
+"constraints. In order to implement such an order one would define a new "
+"interface and annotate it with <classname>@GroupSequence</classname> "
+"defining the order in which the groups have to be validated."
 msgstr ""
 
 #. Tag: para
-#: groups.xml:148
+#: groups.xml:146
 #, no-c-format
 msgid ""
 "If at least one constraint fails in a sequenced group none of the "
@@ -334,22 +388,24 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: groups.xml:154
+#: groups.xml:152
 #, no-c-format
 msgid "Interface with @GroupSequence"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:156
+#: groups.xml:154
 #, no-c-format
 msgid ""
-"@GroupSequence({Default.class, CarChecks.class, DriverChecks.class})\n"
+"package org.hibernate.validator.referenceguide.chapter05.groups;\n"
+"\n"
+"@GroupSequence({ Default.class, CarChecks.class, DriverChecks.class })\n"
 "public interface OrderedChecks {\n"
 "}"
 msgstr ""
 
 #. Tag: para
-#: groups.xml:160
+#: groups.xml:158
 #, no-c-format
 msgid ""
 "Groups defining a sequence and groups composing a sequence must not be "
@@ -360,7 +416,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: groups.xml:164
+#: groups.xml:162
 #, no-c-format
 msgid ""
 "The usage of the new sequence could then look like in <xref linkend="
@@ -368,44 +424,44 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: groups.xml:169
+#: groups.xml:167
 #, no-c-format
 msgid "Usage of a group sequence"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:171
+#: groups.xml:169
 #, no-c-format
 msgid ""
 "@Test\n"
 "public void testOrderedChecks() {\n"
-"    Car car = new Car( \"Morris\", \"DD-AB-123\", 2 );\n"
-"    car.setPassedVehicleInspection( true );\n"
+"        Car car = new Car( \"Morris\", \"DD-AB-123\", 2 );\n"
+"        car.setPassedVehicleInspection( true );\n"
 "\n"
-"    Driver john = new Driver( \"John Doe\" );\n"
-"    john.setAge( 18 );\n"
-"    john.passedDrivingTest( true );\n"
-"    car.setDriver( john );\n"
+"        Driver john = new Driver( \"John Doe\" );\n"
+"        john.setAge( 18 );\n"
+"        john.passedDrivingTest( true );\n"
+"        car.setDriver( john );\n"
 "\n"
-"    assertEquals( 0, validator.validate( car, OrderedChecks.class ).size"
+"        assertEquals( 0, validator.validate( car, OrderedChecks.class ).size"
 "() );\n"
 "}"
 msgstr ""
 
 #. Tag: title
-#: groups.xml:176
+#: groups.xml:174
 #, no-c-format
-msgid "Redefining the default group sequence of a class"
+msgid "Redefining the default group sequence"
 msgstr ""
 
 #. Tag: title
-#: groups.xml:179
+#: groups.xml:177
 #, no-c-format
 msgid "@GroupSequence"
 msgstr ""
 
 #. Tag: para
-#: groups.xml:181
+#: groups.xml:179
 #, no-c-format
 msgid ""
 "The <classname>@GroupSequence</classname> annotation also fulfills a second "
@@ -423,44 +479,46 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: groups.xml:197
+#: groups.xml:195
 #, no-c-format
 msgid "RentalCar with @GroupSequence"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:199
+#: groups.xml:197
 #, no-c-format
 msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups;\n"
+"\n"
 "@GroupSequence({ RentalChecks.class, CarChecks.class, RentalCar.class })\n"
 "public class RentalCar extends Car {\n"
-"    @AssertFalse(message = \"The car is currently rented out\", groups = "
+"        @AssertFalse(message = \"The car is currently rented out\", groups = "
 "RentalChecks.class)\n"
-"    private boolean rented;\n"
+"        private boolean rented;\n"
 "\n"
-"    public RentalCar(String manufacturer, String licencePlate, int "
+"        public RentalCar(String manufacturer, String licencePlate, int "
 "seatCount) {\n"
-"        super( manufacturer, licencePlate, seatCount );\n"
-"    }\n"
+"                super( manufacturer, licencePlate, seatCount );\n"
+"        }\n"
 "\n"
-"    public boolean isRented() {\n"
-"        return rented;\n"
-"    }\n"
+"        public boolean isRented() {\n"
+"                return rented;\n"
+"        }\n"
 "\n"
-"    public void setRented(boolean rented) {\n"
-"        this.rented = rented;\n"
-"    }\n"
+"        public void setRented(boolean rented) {\n"
+"                this.rented = rented;\n"
+"        }\n"
 "}"
 msgstr ""
 
 #. Tag: title
-#: groups.xml:203
+#: groups.xml:201
 #, no-c-format
 msgid "RentalCar with redefined default group"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:205
+#: groups.xml:203
 #, no-c-format
 msgid ""
 "/**\n"
@@ -469,29 +527,30 @@ msgid ""
 " */\n"
 "@Test\n"
 "public void carIsRented() {\n"
-"  RentalCar rentalCar = new RentalCar( \"Morris\", \"DD-AB-123\", 2 );\n"
-"  rentalCar.setPassedVehicleInspection( true );\n"
-"  rentalCar.setRented( true );\n"
+"        RentalCar rentalCar = new RentalCar( \"Morris\", \"DD-AB-123\", "
+"2 );\n"
+"        rentalCar.setPassedVehicleInspection( true );\n"
+"        rentalCar.setRented( true );\n"
 "\n"
-"  Set&lt;ConstraintViolation&lt;RentalCar&gt;&gt; constraintViolations = "
-"validator.validate( rentalCar );\n"
+"        Set&lt;ConstraintViolation&lt;RentalCar&gt;&gt; constraintViolations "
+"= validator.validate( rentalCar );\n"
 "\n"
-"  assertEquals( 1, constraintViolations.size() );\n"
-"  assertEquals(\n"
-"    \"Wrong message\",\n"
-"    \"The car is currently rented out\",\n"
-"    constraintViolations.iterator().next().getMessage()\n"
-"  );\n"
+"        assertEquals( 1, constraintViolations.size() );\n"
+"        assertEquals(\n"
+"                        \"Wrong message\",\n"
+"                        \"The car is currently rented out\",\n"
+"                        constraintViolations.iterator().next().getMessage()\n"
+"        );\n"
 "\n"
-"  rentalCar.setRented( false );\n"
-"  constraintViolations = validator.validate( rentalCar );\n"
+"        rentalCar.setRented( false );\n"
+"        constraintViolations = validator.validate( rentalCar );\n"
 "\n"
-"  assertEquals( 0, constraintViolations.size() );\n"
+"        assertEquals( 0, constraintViolations.size() );\n"
 "}"
 msgstr ""
 
 #. Tag: para
-#: groups.xml:209
+#: groups.xml:207
 #, no-c-format
 msgid ""
 "Due to the fact that there cannot be a cyclic dependency in the group and "
@@ -501,7 +560,7 @@ msgid ""
 msgstr ""
 
 #. Tag: para
-#: groups.xml:217
+#: groups.xml:215
 #, no-c-format
 msgid ""
 "The <classname>Default</classname> group sequence overriding is local to the "
@@ -513,13 +572,13 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: groups.xml:228
+#: groups.xml:226
 #, no-c-format
 msgid "@GroupSequenceProvider"
 msgstr ""
 
 #. Tag: para
-#: groups.xml:230
+#: groups.xml:228
 #, no-c-format
 msgid ""
 "The <classname>@javax.validation.GroupSequence</classname> annotation is a "
@@ -535,58 +594,321 @@ msgid ""
 msgstr ""
 
 #. Tag: title
-#: groups.xml:243
+#: groups.xml:241
 #, no-c-format
 msgid "RentalCar with @GroupSequenceProvider"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:245
+#: groups.xml:243
 #, no-c-format
 msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups."
+"groupsequenceprovider;\n"
+"\n"
 "@GroupSequenceProvider(RentalCarGroupSequenceProvider.class)\n"
 "public class RentalCar extends Car {\n"
-"    @AssertFalse(message = \"The car is currently rented out\", groups = "
+"        @AssertFalse(message = \"The car is currently rented out\", groups = "
 "RentalChecks.class)\n"
-"    private boolean rented;\n"
+"        private boolean rented;\n"
 "\n"
-"    public RentalCar(String manufacturer, String licencePlate, int "
+"        public RentalCar(String manufacturer, String licencePlate, int "
 "seatCount) {\n"
-"        super( manufacturer, licencePlate, seatCount );\n"
-"    }\n"
+"                super( manufacturer, licencePlate, seatCount );\n"
+"        }\n"
 "\n"
-"    public boolean isRented() {\n"
-"        return rented;\n"
-"    }\n"
+"        public boolean isRented() {\n"
+"                return rented;\n"
+"        }\n"
 "\n"
-"    public void setRented(boolean rented) {\n"
-"        this.rented = rented;\n"
-"    }\n"
+"        public void setRented(boolean rented) {\n"
+"                this.rented = rented;\n"
+"        }\n"
 "}"
 msgstr ""
 
 #. Tag: title
-#: groups.xml:249
+#: groups.xml:247
 #, no-c-format
 msgid "DefaultGroupSequenceProvider implementation"
 msgstr ""
 
 #. Tag: programlisting
-#: groups.xml:251
+#: groups.xml:249
 #, no-c-format
 msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups."
+"groupsequenceprovider;\n"
+"\n"
 "public class RentalCarGroupSequenceProvider implements "
 "DefaultGroupSequenceProvider&lt;RentalCar&gt; {\n"
-"    public List&lt;Class&lt;?&gt;&gt; getValidationGroups(RentalCar car) {\n"
-"        List&lt;Class&lt;?&gt;&gt; defaultGroupSequence = new ArrayList&lt;"
-"Class&lt;?&gt;&gt;();\n"
-"        defaultGroupSequence.add( RentalCar.class );\n"
+"        public List&lt;Class&lt;?&gt;&gt; getValidationGroups(RentalCar car) "
+"{\n"
+"                List&lt;Class&lt;?&gt;&gt; defaultGroupSequence = new "
+"ArrayList&lt;Class&lt;?&gt;&gt;();\n"
+"                defaultGroupSequence.add( RentalCar.class );\n"
 "\n"
-"        if ( car != null &amp;&amp; !car.isRented() ) {\n"
-"            defaultGroupSequence.add( CarChecks.class );\n"
+"                if ( car != null &amp;&amp; !car.isRented() ) {\n"
+"                        defaultGroupSequence.add( CarChecks.class );\n"
+"                }\n"
+"\n"
+"                return defaultGroupSequence;\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: groups.xml:255
+#, no-c-format
+msgid "Group conversion"
+msgstr ""
+
+#. Tag: para
+#: groups.xml:257
+#, no-c-format
+msgid ""
+"What if you wanted to validate the car related checks together with the "
+"driver checks. Of course you could pass the required groups to the validate "
+"call explicitly, but what if you wanted to make these validations occur as "
+"part of the <classname>Default</classname> group validation. Here "
+"<classname>@ConvertGroup</classname> comes into play which allows you during "
+"cascaded validation to use a different group than the originally requested "
+"one."
+msgstr ""
+
+#. Tag: para
+#: groups.xml:265
+#, no-c-format
+msgid ""
+"Let's have a look at <xref linkend=\"example-group-conversion-dedault-to-"
+"driver-checks\"/>. Here <code>@GroupSequence({ CarChecks.class, Car.class })"
+"</code> is used to combine the car related constraints under the "
+"<classname>Default</classname> group (see <xref linkend=\"section-default-"
+"group-class\"/>). There is also a <code>@ConvertGroup(from = Default.class, "
+"to = DriverChecks.class)</code> which ensures the <classname>Default</"
+"classname> group gets converted to the <classname>DriverChecks</classname> "
+"group during cascaded validation of the <property>driver</property> "
+"association."
+msgstr ""
+
+#. Tag: title
+#: groups.xml:277
+#, no-c-format
+msgid "@ConvertGroup usage"
+msgstr ""
+
+#. Tag: programlisting
+#: groups.xml:279
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups."
+"groupconversion;\n"
+"\n"
+"@GroupSequence({ CarChecks.class, Car.class })\n"
+"public class Car {\n"
+"        @NotNull\n"
+"        private String manufacturer;\n"
+"\n"
+"        @NotNull\n"
+"        @Size(min = 2, max = 14)\n"
+"        private String licensePlate;\n"
+"\n"
+"        @Min(2)\n"
+"        private int seatCount;\n"
+"\n"
+"        @AssertTrue(\n"
+"                        message = \"The car has to pass the vehicle "
+"inspection first\",\n"
+"                        groups = CarChecks.class\n"
+"        )\n"
+"        private boolean passedVehicleInspection;\n"
+"\n"
+"        @Valid\n"
+"        @ConvertGroup(from = Default.class, to = DriverChecks.class)\n"
+"        private Driver driver;\n"
+"\n"
+"        public Car(String manufacturer, String licencePlate, int seatCount) "
+"{\n"
+"                this.manufacturer = manufacturer;\n"
+"                this.licensePlate = licencePlate;\n"
+"                this.seatCount = seatCount;\n"
 "        }\n"
 "\n"
-"        return defaultGroupSequence;\n"
-"    }\n"
+"        public boolean isPassedVehicleInspection() {\n"
+"                return passedVehicleInspection;\n"
+"        }\n"
+"\n"
+"        public void setPassedVehicleInspection(boolean "
+"passedVehicleInspection) {\n"
+"                this.passedVehicleInspection = passedVehicleInspection;\n"
+"        }\n"
+"\n"
+"        public Driver getDriver() {\n"
+"                return driver;\n"
+"        }\n"
+"\n"
+"        public void setDriver(Driver driver) {\n"
+"                this.driver = driver;\n"
+"        }\n"
+"\n"
+"        // getters and setters ...\n"
 "}"
+msgstr ""
+
+#. Tag: programlisting
+#: groups.xml:281
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups."
+"groupconversion;\n"
+"\n"
+"public class Driver extends Person {\n"
+"        @Min(\n"
+"                        value = 18,\n"
+"                        message = \"You have to be 18 to drive a car\",\n"
+"                        groups = DriverChecks.class\n"
+"        )\n"
+"        public int age;\n"
+"\n"
+"        @AssertTrue(\n"
+"                        message = \"You first have to pass the driving test"
+"\",\n"
+"                        groups = DriverChecks.class\n"
+"        )\n"
+"        public boolean hasDrivingLicense;\n"
+"\n"
+"        public Driver(String name) {\n"
+"                super( name );\n"
+"        }\n"
+"\n"
+"        public void passedDrivingTest(boolean b) {\n"
+"                hasDrivingLicense = b;\n"
+"        }\n"
+"\n"
+"        public int getAge() {\n"
+"                return age;\n"
+"        }\n"
+"\n"
+"        public void setAge(int age) {\n"
+"                this.age = age;\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: groups.xml:284
+#, no-c-format
+msgid ""
+"As a result the <methodname>validateDriverChecksTogetherWithCarChecks</"
+"methodname> test in <xref linkend=\"example-group-conversion-test\"/> will "
+"pass even though the constraint on <property>hasDrivingLicense</property> "
+"belongs to the <classname>DriverChecks</classname> group and only the "
+"<classname>Default</classname> group is requested in the "
+"<methodname>validate</methodname> call."
+msgstr ""
+
+#. Tag: title
+#: groups.xml:293
+#, no-c-format
+msgid "Test case for @ConvertGroup"
+msgstr ""
+
+#. Tag: programlisting
+#: groups.xml:295
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter05.groups."
+"groupconversion;\n"
+"\n"
+"public class GroupConversionTest {\n"
+"\n"
+"        private static Validator validator;\n"
+"\n"
+"        @BeforeClass\n"
+"        public static void setUp() {\n"
+"                ValidatorFactory factory = Validation."
+"buildDefaultValidatorFactory();\n"
+"                validator = factory.getValidator();\n"
+"        }\n"
+"\n"
+"        @Test\n"
+"        public void validateDriverChecksTogetherWithCarChecks() {\n"
+"                // create a car and validate. The Driver is still null and "
+"does not get validated\n"
+"                Car car = new Car( \"VW\", \"USD-123\", 4 );\n"
+"                car.setPassedVehicleInspection( true );\n"
+"                Set&lt;ConstraintViolation&lt;Car&gt;&gt; "
+"constraintViolations = validator.validate( car );\n"
+"                assertEquals( 0, constraintViolations.size() );\n"
+"\n"
+"                // create a driver who has not passed the driving test\n"
+"                Driver john = new Driver( \"John Doe\" );\n"
+"                john.setAge( 18 );\n"
+"\n"
+"                // now let's add a driver to the car\n"
+"                car.setDriver( john );\n"
+"                constraintViolations = validator.validate( car );\n"
+"                assertEquals( 1, constraintViolations.size() );\n"
+"                assertEquals(\n"
+"                                \"The driver constraint should also be "
+"validated as part of the default group\",\n"
+"                                constraintViolations.iterator().next()."
+"getMessage(),\n"
+"                                \"You first have to pass the driving test\"\n"
+"                );\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: groups.xml:298
+#, no-c-format
+msgid ""
+"Group conversions can be used everywhere <classname>@Valid</classname> can "
+"be used, namely associations, method and constructor parameters and return "
+"values. In order to specify multiple conversions <classname>@ConvertGroup."
+"List</classname> can be used."
+msgstr ""
+
+#. Tag: para
+#: groups.xml:303
+#, no-c-format
+msgid "However, there are several restrictionsas well :"
+msgstr ""
+
+#. Tag: para
+#: groups.xml:305
+#, no-c-format
+msgid ""
+"<classname>@ConvertGroup</classname> must be used in combination with "
+"<classname>@Valid</classname>. If used without a "
+"<classname>ConstraintDeclarationException</classname> is thrown."
+msgstr ""
+
+#. Tag: para
+#: groups.xml:312
+#, no-c-format
+msgid ""
+"It is not legal to have multiple conversion rules on the same element with "
+"the same <parameter>from</parameter> value. In this case, a "
+"<classname>ConstraintDeclarationException</classname> is raised."
+msgstr ""
+
+#. Tag: para
+#: groups.xml:319
+#, no-c-format
+msgid ""
+"The <parameter>from</parameter> attribute cannot refer to a group sequence. "
+"A <classname>ConstraintDeclarationException</classname> is raised in this "
+"situation."
+msgstr ""
+
+#. Tag: para
+#: groups.xml:325
+#, no-c-format
+msgid ""
+"Rules are not executed recursively. The first matching conversion rule is "
+"used and subsequent rules are ignored. For example if a set of "
+"<classname>@ConvertGroup</classname> declarations chains group A to B and B "
+"to C, the group A will be converted to B and not to C."
 msgstr ""

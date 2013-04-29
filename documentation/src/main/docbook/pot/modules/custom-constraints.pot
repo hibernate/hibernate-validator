@@ -1,0 +1,858 @@
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: custom-constraints.xml:24
+#, no-c-format
+msgid "Creating custom constraints"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:26
+#, no-c-format
+msgid "Though the Bean Validation API defines a whole set of standard constraint annotations one can easily think of situations in which these standard annotations won't suffice. For these cases you are able to create custom constraints tailored to your specific validation requirements in a simple manner."
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:33
+#, no-c-format
+msgid "Creating a simple constraint"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:35
+#, no-c-format
+msgid "To create a custom constraint, the following three steps are required:"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:40
+#, no-c-format
+msgid "Create a constraint annotation"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:44
+#, no-c-format
+msgid "Implement a validator"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:48
+#, no-c-format
+msgid "Define a default error message"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:53
+#, no-c-format
+msgid "The constraint annotation"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:55
+#, no-c-format
+msgid "Let's write a constraint annotation, that can be used to express that a given string shall either be upper case or lower case. We'll apply it later on to the <property>licensePlate</property> field of the <classname>Car</classname> class from <xref linkend=\"validator-gettingstarted\"/> to ensure, that the field is always an upper-case string."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:62
+#, no-c-format
+msgid "First we need a way to express the two case modes. We might use <classname>String</classname> constants, but a better way to go is to use a Java 5 enum for that purpose:"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:67
+#, no-c-format
+msgid "Enum <classname>CaseMode</classname> to express upper vs. lower case"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:70
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06;\n"
+      "\n"
+      "public enum CaseMode {\n"
+      "        UPPER,\n"
+      "        LOWER;\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:73
+#, no-c-format
+msgid "Now we can define the actual constraint annotation. If you've never designed an annotation before, this may look a bit scary, but actually it's not that hard:"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:78
+#, no-c-format
+msgid "Defining the <classname>CheckCase</classname> constraint annotation"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:81
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06;\n"
+      "\n"
+      "@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })\n"
+      "@Retention(RUNTIME)\n"
+      "@Constraint(validatedBy = CheckCaseValidator.class)\n"
+      "@Documented\n"
+      "public @interface CheckCase {\n"
+      "\n"
+      "        String message() default \"{org.hibernate.validator.referenceguide.chapter06.CheckCase.message}\";\n"
+      "\n"
+      "        Class&lt;?&gt;[] groups() default { };\n"
+      "\n"
+      "        Class&lt;? extends Payload&gt;[] payload() default { };\n"
+      "\n"
+      "        CaseMode value();\n"
+      "\n"
+      "        @Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })\n"
+      "        @Retention(RUNTIME)\n"
+      "        @Documented\n"
+      "        @interface List {\n"
+      "                CheckCase[] value();\n"
+      "        }\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:84
+#, no-c-format
+msgid "An annotation type is defined using the <code>@interface</code> keyword. All attributes of an annotation type are declared in a method-like manner. The specification of the Bean Validation API demands, that any constraint annotation defines"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:91
+#, no-c-format
+msgid "an attribute <property>message</property> that returns the default key for creating error messages in case the constraint is violated"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:97
+#, no-c-format
+msgid "an attribute <property>groups</property> that allows the specification of validation groups, to which this constraint belongs (see <xref linkend=\"chapter-groups\"/>). This must default to an empty array of type <classname>Class&lt;?&gt;</classname>."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:104
+#, no-c-format
+msgid "an attribute <classname>payload</classname> that can be used by clients of the Bean Validation API to assign custom payload objects to a constraint. This attribute is not used by the API itself. An example for a custom payload could be the definition of a severity:"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:110
+#, no-c-format
+msgid ""
+      "public class Severity {\n"
+      "        public interface Info extends Payload {\n"
+      "        }\n"
+      "\n"
+      "        public interface Error extends Payload {\n"
+      "        }\n"
+      "}\n"
+      "\n"
+      "public class ContactDetails {\n"
+      "        @NotNull(message = \"Name is mandatory\", payload = Severity.Error.class)\n"
+      "        private String name;\n"
+      "\n"
+      "        @NotNull(message = \"Phone number not specified, but not mandatory\",\n"
+      "                        payload = Severity.Info.class)\n"
+      "        private String phoneNumber;\n"
+      "\n"
+      "        // ...\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:112
+#, no-c-format
+msgid "Now a client can after the validation of a <classname>ContactDetails</classname> instance access the severity of a constraint using <methodname>ConstraintViolation.getConstraintDescriptor().getPayload()</methodname> and adjust its behaviour depending on the severity."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:120
+#, no-c-format
+msgid "Besides these three mandatory attributes we add another one, <property>value</property>, allowing for the required case mode to be specified. The name <property>value</property> is a special one, which can be omitted when using the annotation, if it is the only attribute specified, as e.g. in <code>@CheckCase(CaseMode.UPPER)</code>."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:126
+#, no-c-format
+msgid "In addition we annotate the annotation type with a couple of meta annotations:"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:131
+#, no-c-format
+msgid "<code>@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })</code>: Defines the supported target element types for the constraint. <classname>@CheckCase</classname> may be used on fields (element type <classname>FIELD</classname>), JavaBeans properties as well as method return values (<classname>METHOD</classname>) and method/constructor parameters (<classname>PARAMETER</classname>). By adding the element type <classname>ANNOTATION_TYPE</classname>, we allow for the creation composed constraints (see <xref linkend=\"section-constraint-composition\"/>) based on <classname>@CheckCase</classname>."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:142
+#, no-c-format
+msgid "Would we create a class-level constraint (see <xref linkend=\"validator-usingvalidator-classlevel\"/>), the element type <classname>TYPE</classname> had to be used. Constraints targetting the return value of a constructor need to support the element type <classname>CONSTRUCTOR</classname>. Cross-parameter constraints (see TODO) which are used to validate all the parameters of a method or constructor together, must support <classname>METHOD</classname> or <classname>CONSTRUCTOR</classname>, respectively."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:153
+#, no-c-format
+msgid "<code>@Retention(RUNTIME)</code>: Specifies, that annotations of this type will be available at runtime by the means of reflection"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:159
+#, no-c-format
+msgid "<code>@Constraint(validatedBy = CheckCaseValidator.class)</code>: Marks the annotation type as constraint annotation and specifies the validator to be used to validate elements annotated with <classname>@CheckCase</classname>. If a constraint may be used on several data types, several validators may be specified, one for each data type."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:168
+#, no-c-format
+msgid "<code>@Documented</code>: Says, that the use of <classname>@CheckCase</classname> will be contained in the JavaDoc of elements annotated with it"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:174
+#, no-c-format
+msgid "Finally, there is an inner annotation type named <classname>List</classname>. This annotation allows to specify several <classname>@CheckCase</classname> annotations on the same element, e.g. with different validation groups and messages. Note that while also another name could be used, we follow the Bean Validation, which recommends to use the name <classname>List</classname> and make the annotation an inner annotation of the corresponding constraint type."
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:185
+#, no-c-format
+msgid "The constraint validator"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:188
+#, no-c-format
+msgid "Next, we need to implement a constraint validator, which is able to validate elements with a <classname>@CheckCase</classname> annotation. To do so, we implement the interface <classname>ConstraintValidator</classname> as shown below:"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:194
+#, no-c-format
+msgid "Implementing a constraint validator for the constraint <classname>CheckCase</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:197
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06;\n"
+      "\n"
+      "public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, String&gt; {\n"
+      "\n"
+      "        private CaseMode caseMode;\n"
+      "\n"
+      "        @Override\n"
+      "        public void initialize(CheckCase constraintAnnotation) {\n"
+      "                this.caseMode = constraintAnnotation.value();\n"
+      "        }\n"
+      "\n"
+      "        @Override\n"
+      "        public boolean isValid(String object, ConstraintValidatorContext constraintContext) {\n"
+      "                if ( object == null ) {\n"
+      "                        return true;\n"
+      "                }\n"
+      "\n"
+      "                if ( caseMode == CaseMode.UPPER ) {\n"
+      "                        return object.equals( object.toUpperCase() );\n"
+      "                }\n"
+      "                else {\n"
+      "                        return object.equals( object.toLowerCase() );\n"
+      "                }\n"
+      "        }\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:200
+#, no-c-format
+msgid "The <classname>ConstraintValidator</classname> interface defines two type parameters, which we set in our implementation. The first one specifies the annotation type to be validated (in our example <classname>CheckCase</classname>), the second one the type of elements, which the validator can handle (here <classname>String</classname>)."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:207
+#, no-c-format
+msgid "In case a constraint annotation is allowed at elements of different types, a <classname>ConstraintValidator</classname> for each allowed type has to be implemented and registered at the constraint annotation as shown above."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:212
+#, no-c-format
+msgid "The implementation of the validator is straightforward. The <methodname>initialize()</methodname> method gives us access to the attribute values of the annotation to be validated. In the example we store the <classname>CaseMode</classname> in a field of the validator for further usage."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:218
+#, no-c-format
+msgid "In the <methodname>isValid()</methodname> method we implement the logic, that determines, whether a <classname>String</classname> is valid according to a given <classname>@CheckCase</classname> annotation or not. This decision depends on the case mode retrieved in <classname>initialize()</classname>. As the Bean Validation specification recommends, we consider <code>null</code> values as being valid. If <code>null</code> is not a valid value for an element, it should be annotated with <code>@NotNull</code> explicitly."
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:228
+#, no-c-format
+msgid "The ConstraintValidatorContext"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:230
+#, no-c-format
+msgid "relies on the default error message generation by just returning <constant>true</constant> or <constant>false</constant> from the <methodname>isValid</methodname> call. Using the passed <classname>ConstraintValidatorContext</classname> object it is possible to either add additional error messages or completely disable the default error message generation and solely define custom error messages. The <classname>ConstraintValidatorContext</classname> API is modeled as fluent interface and is best demonstrated with an example:"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:242
+#, no-c-format
+msgid "Use of ConstraintValidatorContext to define custom error messages"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:245
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06.constraintvalidatorcontext;\n"
+      "\n"
+      "public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, String&gt; {\n"
+      "\n"
+      "        private CaseMode caseMode;\n"
+      "\n"
+      "        @Override\n"
+      "        public void initialize(CheckCase constraintAnnotation) {\n"
+      "                this.caseMode = constraintAnnotation.value();\n"
+      "        }\n"
+      "\n"
+      "        @Override\n"
+      "        public boolean isValid(String object, ConstraintValidatorContext constraintContext) {\n"
+      "                if ( object == null ) {\n"
+      "                        return true;\n"
+      "                }\n"
+      "\n"
+      "                boolean isValid;\n"
+      "                if ( caseMode == CaseMode.UPPER ) {\n"
+      "                        isValid = object.equals( object.toUpperCase() );\n"
+      "                }\n"
+      "                else {\n"
+      "                        isValid = object.equals( object.toLowerCase() );\n"
+      "                }\n"
+      "\n"
+      "                if ( !isValid ) {\n"
+      "                        constraintContext.disableDefaultConstraintViolation();\n"
+      "                        constraintContext.buildConstraintViolationWithTemplate(\n"
+      "                                        \"{org.hibernate.validator.referenceguide.chapter06.constraintvalidatorcontext.CheckCase.message}\"\n"
+      "                        )\n"
+      "                                        .addConstraintViolation();\n"
+      "                }\n"
+      "\n"
+      "                return isValid;\n"
+      "        }\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:248
+#, no-c-format
+msgid "shows how you can disable the default error message generation and add a custom error message using a specified message template. In this example the use of the <classname>ConstraintValidatorContext</classname> results in the same error message as the default error message generation."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:254
+#, no-c-format
+msgid "It is important to add each configured constraint violation by calling <methodname>addConstraintViolation()</methodname>. Only after that the new constraint violation will be created."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:259
+#, no-c-format
+msgid "In case you are implementing a <classname>ConstraintValidator</classname> for a class-level constraint it is also possible to adjust the property path for the created constraint violations. This is important for the case where you validate multiple properties of the class or even traverse the object graph and want the constraint violation to point to one of the involved properties only. As an example, <xref linkend=\"example-custom-error\"/> shows the validator of a custom class-level constraint <classname>@ValidPassengerCount</classname> which makes sure that a car has not more passengers than seats. If this constraint is violated, this violation is reported at the <property>passengers</property> property."
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:273
+#, no-c-format
+msgid "Adding new <classname>ConstraintViolation</classname> with custom property path"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:276
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06.custompath;\n"
+      "\n"
+      "public class ValidPassengerCountValidator\n"
+      "                implements ConstraintValidator&lt;ValidPassengerCount, Car&gt; {\n"
+      "\n"
+      "        @Override\n"
+      "        public void initialize(ValidPassengerCount constraintAnnotation) {\n"
+      "        }\n"
+      "\n"
+      "        @Override\n"
+      "        public boolean isValid(Car car, ConstraintValidatorContext constraintValidatorContext) {\n"
+      "                if ( car == null ) {\n"
+      "                        return true;\n"
+      "                }\n"
+      "\n"
+      "                boolean isValid = car.getPassengers().size() &lt;= car.getSeatCount();\n"
+      "\n"
+      "                if ( !isValid ) {\n"
+      "                        constraintValidatorContext.disableDefaultConstraintViolation();\n"
+      "                        constraintValidatorContext\n"
+      "                                        .buildConstraintViolationWithTemplate( \"{my.custom.template}\" )\n"
+      "                                        .addPropertyNode( \"passengers\" ).addConstraintViolation();\n"
+      "                }\n"
+      "\n"
+      "                return isValid;\n"
+      "        }\n"
+      "}"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:282
+#, no-c-format
+msgid "The error message"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:284
+#, no-c-format
+msgid "Finally we need to specify the error message, that shall be used, in case a <classname>@CheckCase</classname> constraint is violated. To do so, we add the following to our custom <filename>ValidationMessages.properties</filename> (see also <xref linkend=\"section-message-interpolation\"/>)"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:291
+#, no-c-format
+msgid "Defining a custom error message for the <classname>CheckCase</classname> constraint"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:294
+#, no-c-format
+msgid "org.hibernate.validator.referenceguide.chapter06.CheckCase.message=Case mode must be {value}."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:297
+#, no-c-format
+msgid "If a validation error occurs, the validation runtime will use the default value, that we specified for the message attribute of the <classname>@CheckCase</classname> annotation to look up the error message in this file."
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:304
+#, no-c-format
+msgid "Using the constraint"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:306
+#, no-c-format
+msgid "Now that our first custom constraint is completed, we can use it in the <classname>Car</classname> class from the <xref linkend=\"validator-gettingstarted\"/> chapter to specify that the <property>licensePlate</property> field shall only contain upper-case strings:"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:313
+#, no-c-format
+msgid "Applying the <classname>CheckCase</classname> constraint"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:316
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06;\n"
+      "\n"
+      "public class Car {\n"
+      "\n"
+      "        @NotNull\n"
+      "        private final String manufacturer;\n"
+      "\n"
+      "        @NotNull\n"
+      "        @Size(min = 2, max = 14)\n"
+      "        @CheckCase(CaseMode.UPPER)\n"
+      "        private final String licensePlate;\n"
+      "\n"
+      "        @Min(2)\n"
+      "        private final int seatCount;\n"
+      "\n"
+      "        public Car ( String manufacturer, String licencePlate, int seatCount ) {\n"
+      "                this.manufacturer = manufacturer;\n"
+      "                this.licensePlate = licencePlate;\n"
+      "                this.seatCount = seatCount;\n"
+      "        }\n"
+      "\n"
+      "        //getters and setters ...\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:319
+#, no-c-format
+msgid "Finally let's demonstrate in a little test that the <classname>@CheckCase</classname> constraint is properly validated:"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:324
+#, no-c-format
+msgid "Testcase demonstrating the <classname>CheckCase</classname> validation"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:327
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06;\n"
+      "\n"
+      "public class CarTest {\n"
+      "\n"
+      "        private static Validator validator;\n"
+      "\n"
+      "        @BeforeClass\n"
+      "        public static void setUp() {\n"
+      "                ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+      "                validator = factory.getValidator();\n"
+      "        }\n"
+      "\n"
+      "        @Test\n"
+      "        public void testLicensePlateNotUpperCase() {\n"
+      "\n"
+      "                Car car = new Car( \"Morris\", \"dd-ab-123\", 4 );\n"
+      "\n"
+      "                Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+      "                                validator.validate( car );\n"
+      "                assertEquals( 1, constraintViolations.size() );\n"
+      "                assertEquals(\n"
+      "                                \"Case mode must be UPPER.\",\n"
+      "                                constraintViolations.iterator().next().getMessage()\n"
+      "                );\n"
+      "        }\n"
+      "\n"
+      "        @Test\n"
+      "        public void carIsValid() {\n"
+      "\n"
+      "                Car car = new Car( \"Morris\", \"DD-AB-123\", 4 );\n"
+      "\n"
+      "                Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+      "                                validator.validate( car );\n"
+      "\n"
+      "                assertEquals( 0, constraintViolations.size() );\n"
+      "        }\n"
+      "}"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:333
+#, no-c-format
+msgid "Cross-parameter constraints"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:335
+#, no-c-format
+msgid "Bean Validation distinguishes between two different kinds of constraints."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:338
+#, no-c-format
+msgid "Generic constraints (which have been discussed so far) apply to the annotated element, e.g. a type, field, method parameter or return value etc. Cross-parameter constraints, in contrast, apply to the array of parameters of a method or constructor and can be used to express validation logic which depends on several parameter values."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:344
+#, no-c-format
+msgid "In order to define a cross-parameter constraint, its validator class must be annotated with <classname>@SupportedValidationTarget(ValidationTarget.PARAMETERS)</classname>. The type parameter <varname>T</varname> from the <classname>ConstraintValidator</classname> interface must resolve to either <classname>Object</classname> or <classname>Object[]</classname> in order to receive the array of method/constructor arguments in the <methodname>isValid()</methodname> method."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:353
+#, no-c-format
+msgid "The following example shows the definition of a cross-parameter constraint which can be used to check that two <classname>Date</classname> parameters of a method are in the correct order:"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:358
+#, no-c-format
+msgid "Cross-parameter constraint"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:360
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06.crossparameter;\n"
+      "\n"
+      "@Constraint(validatedBy = ConsistentDateParameterValidator.class)\n"
+      "@Target({ METHOD, CONSTRUCTOR, ANNOTATION_TYPE })\n"
+      "@Retention(RUNTIME)\n"
+      "@Documented\n"
+      "public @interface ConsistentDateParameters {\n"
+      "\n"
+      "        String message() default \"{org.hibernate.validator.referenceguide.chapter06.\" +\n"
+      "                        \"crossparameter.ConsistentDateParameters.message}\";\n"
+      "\n"
+      "        Class&lt;?&gt;[] groups() default { };\n"
+      "\n"
+      "        Class&lt;? extends Payload&gt;[] payload() default { };\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:363
+#, no-c-format
+msgid "The definition of a cross-parameter constraint isn't any different from defining a generic constraint, i.e. it must specify the members <methodname>message()</methodname>, <methodname>groups()</methodname> and <methodname>payload()</methodname> and be annotated with <classname>@Constraint</classname>. This meta annotation also specifies the corresponding validator, which is shown in <xref linkend=\"example-cross-parameter-validator\"/>. Note that besides the element types <classname>METHOD</classname> and <classname>CONSTRUCTOR</classname> also <classname>ANNOTATION_TYPE</classname> is specified as target of the annotation, in order to enable the creation of composed constraints based on <classname>@ConsistentDateParameters</classname> (see <xref linkend=\"validator-customconstraints-compound\"/>)."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:378
+#, no-c-format
+msgid "Cross-parameter constraints are specified directly on the declaration of a method or constructor, which is also the case for return value constraints. In order to improve code readability, it is therefore recommended to chose constraint names — such as <classname>@ConsistentDateParameters</classname> — which make the constraint target aparent."
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:387 custom-constraints.xml:419
+#, no-c-format
+msgid "Generic and cross-parameter constraint"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:389
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06.crossparameter;\n"
+      "\n"
+      "@SupportedValidationTarget(ValidationTarget.PARAMETERS)\n"
+      "public class ConsistentDateParameterValidator implements\n"
+      "                ConstraintValidator&lt;ConsistentDateParameters, Object[]&gt; {\n"
+      "\n"
+      "        @Override\n"
+      "        public void initialize(ConsistentDateParameters constraintAnnotation) {\n"
+      "        }\n"
+      "\n"
+      "        @Override\n"
+      "        public boolean isValid(Object[] value, ConstraintValidatorContext context) {\n"
+      "                if ( value.length != 2 ) {\n"
+      "                        throw new IllegalArgumentException( \"Illegal method signature\" );\n"
+      "                }\n"
+      "\n"
+      "                //leave null-checking to @NotNull on individual parameters\n"
+      "                if ( value[0] == null || value[1] == null ) {\n"
+      "                        return true;\n"
+      "                }\n"
+      "\n"
+      "                if ( !( value[0] instanceof Date ) || !( value[1] instanceof Date ) ) {\n"
+      "                        throw new IllegalArgumentException(\n"
+      "                                        \"Illegal method signature, expected two \" +\n"
+      "                                                        \"parameters of type Date.\"\n"
+      "                        );\n"
+      "                }\n"
+      "\n"
+      "                return ( (Date) value[0] ).before( (Date) value[1] );\n"
+      "        }\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:392
+#, no-c-format
+msgid "As discussed above, the validation target <varname>PARAMETERS</varname> must be configured for a cross-parameter validator by using the <classname>@SupportedValidationTarget</classname> annotation. Since a cross-parameter constraint could be applied to any method or constructor, it is considered a best practice to check for the expected number and types of parameters in the validator implementation. As with generic constraints, <literal>null</literal> parameters should be considered valid and <classname>@NotNull</classname> on the individual parameters should be used to make sure that parameters are not <literal>null</literal>."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:403
+#, no-c-format
+msgid "In rare situations a constraint is both, generic and cross-parameter. This is the case if a constraint has a validator class which is annotated with <classname>@SupportedValidationTarget({ValidationTarget.PARAMETERS, ValidationTarget.ANNOTATED_ELEMENT})</classname> or if it has a generic and a cross-parameter validator class."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:410
+#, no-c-format
+msgid "When declaring such a constraint on a method which has parameters and also a return value, the intended constraint target can't be determined. Constraints which are generic and cross-parameter at the same time, must therefore define a member <methodname>validationAppliesTo()</methodname> which allows the constraint user to specify the constraint's target as shown in <xref linkend=\"example-dual-cross-parameter-constraint\"/>."
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:421
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06.crossparameter;\n"
+      "\n"
+      "@Constraint(validatedBy = {\n"
+      "                ScriptAssertObjectValidator.class,\n"
+      "                ScriptAssertParametersValidator.class\n"
+      "})\n"
+      "@Target({ TYPE, FIELD, PARAMETER, METHOD, CONSTRUCTOR, ANNOTATION_TYPE })\n"
+      "@Retention(RUNTIME)\n"
+      "@Documented\n"
+      "public @interface ScriptAssert {\n"
+      "\n"
+      "        String message() default \"{org.hibernate.validator.referenceguide.chapter06.\" +\n"
+      "                        \"crossparameter.ScriptAssert.message}\";\n"
+      "\n"
+      "        Class&lt;?&gt;[] groups() default { };\n"
+      "\n"
+      "        Class&lt;? extends Payload&gt;[] payload() default { };\n"
+      "\n"
+      "        String script();\n"
+      "\n"
+      "        ConstraintTarget validationAppliesTo() default ConstraintTarget.IMPLICIT;\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:424
+#, no-c-format
+msgid "The <classname>@ScriptAssert</classname> constraint has two validators (not shown), a generic and a cross-parameter one and thus defines the member <methodname>validationAppliesTo()</methodname>. The default value <varname>IMPLICIT</varname> allows to derive the target automatically in situations where this is possible (e.g. if the constraint is declared on a field or on a method which has parameters but no return value)."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:432
+#, no-c-format
+msgid "If the target can not be determined implicitly, it must be set by the user to either <varname>PARAMETERS</varname> or <varname>RETURN_VALUE</varname> as shown in <xref linkend=\"example-dual-cross-parameter-constraint-usage\"/>."
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:438
+#, no-c-format
+msgid "Specifying the target for a generic and cross-parameter constraint"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:441
+#, no-c-format
+msgid ""
+      "@ScriptAssert(script = \"arg1.size() &lt;= arg0\", validationAppliesTo = ConstraintTarget.PARAMETERS)\n"
+      "public Car buildCar(int seatCount, List&lt;Passenger&gt; passengers) {\n"
+      "        //...\n"
+      "}"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:446
+#, no-c-format
+msgid "Constraint composition"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:448
+#, no-c-format
+msgid "In the following, we'll discuss how to create higher level constraints by composing several basic constraints."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:451
+#, no-c-format
+msgid "Looking at the <property>licensePlate</property> field of the <classname>Car</classname> class in <xref linkend=\"example-car-with-checkcase\"/>, we see three constraint annotations already. In complexer scenarios, where even more constraints could be applied to one element, this might become a bit confusing easily. Furthermore, if we had a <property>licensePlate</property> field in another class, we would have to copy all constraint declarations to the other class as well, violating the DRY principle."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:460
+#, no-c-format
+msgid "This problem can be tackled using composed constraints. In the following we create a new constraint annotation <classname>@ValidLicensePlate</classname>, that comprises the constraints <classname>@NotNull</classname>, <classname>@Size</classname> and <classname>@CheckCase</classname>:"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:467
+#, no-c-format
+msgid "Creating a composing constraint <classname>ValidLicensePlate</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:470
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06.constraintcomposition;\n"
+      "\n"
+      "@NotNull\n"
+      "@Size(min = 2, max = 14)\n"
+      "@CheckCase(CaseMode.UPPER)\n"
+      "@Target({ METHOD, FIELD, ANNOTATION_TYPE })\n"
+      "@Retention(RUNTIME)\n"
+      "@Constraint(validatedBy = { })\n"
+      "@Documented\n"
+      "public @interface ValidLicensePlate {\n"
+      "\n"
+      "        String message() default \"{org.hibernate.validator.referenceguide.chapter06.constraintcomposition.ValidLicensePlate.message}\";\n"
+      "\n"
+      "        Class&lt;?&gt;[] groups() default { };\n"
+      "\n"
+      "        Class&lt;? extends Payload&gt;[] payload() default { };\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:473
+#, no-c-format
+msgid "To do so, we just have to annotate the constraint declaration with its comprising constraints (btw. that's exactly why we allowed annotation types as target for the <classname>@CheckCase</classname> annotation). As no additional validation is required for the <classname>@ValidLicensePlate</classname> annotation itself, we don't declare a validator within the <classname>@Constraint </classname>meta annotation."
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:481
+#, no-c-format
+msgid "Using the new composed constraint at the <property>licensePlate</property> field is fully equivalent to the previous version, where we declared the three constraints directly at the field itself:"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:487
+#, no-c-format
+msgid "Application of composing constraint <classname>ValidLicensePlate</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:490
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter06.constraintcomposition;\n"
+      "\n"
+      "public class Car {\n"
+      "\n"
+      "        @ValidLicensePlate\n"
+      "        private String licensePlate;\n"
+      "\n"
+      "        //...\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: custom-constraints.xml:493
+#, no-c-format
+msgid "The set of <classname>ConstraintViolations</classname> retrieved when validating a <classname>Car</classname> instance will contain an entry for each violated composing constraint of the <classname>@ValidLicensePlate</classname> constraint. If you rather prefer a single <classname>ConstraintViolation</classname> in case any of the composing constraints is violated, the <classname>@ReportAsSingleViolation</classname> meta constraint can be used as follows:"
+msgstr ""
+
+#. Tag: title
+#: custom-constraints.xml:503
+#, no-c-format
+msgid "Usage of <classname>@ReportAsSingleViolation</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-constraints.xml:505
+#, no-c-format
+msgid ""
+      "//...\n"
+      "@ReportAsSingleViolation\n"
+      "public @interface ValidLicensePlate {\n"
+      "\n"
+      "        String message() default \"{org.hibernate.validator.referenceguide.chapter06.constraintcomposition.ValidLicensePlate.message}\";\n"
+      "\n"
+      "        Class&lt;?&gt;[] groups() default { };\n"
+      "\n"
+      "        Class&lt;? extends Payload&gt;[] payload() default { };\n"
+      "}"
+msgstr ""

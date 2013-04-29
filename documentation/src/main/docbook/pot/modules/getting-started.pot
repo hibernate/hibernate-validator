@@ -1,0 +1,397 @@
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Tag: title
+#: getting-started.xml:24
+#, no-c-format
+msgid "Getting started"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:26
+#, no-c-format
+msgid "This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Bean Validation. For the following quickstart you need:"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:32
+#, no-c-format
+msgid "A JDK &gt;= 6"
+msgstr ""
+
+#. Tag: ulink
+#: getting-started.xml:36
+#, no-c-format
+msgid "Apache Maven"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:40
+#, no-c-format
+msgid "An Internet connection (Maven has to download all required libraries)"
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:46
+#, no-c-format
+msgid "Project set up"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:48
+#, no-c-format
+msgid "In order to use Hibernate Validator within a Maven project, simply add the following dependency to your <filename>pom.xml</filename>:"
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:52
+#, no-c-format
+msgid "Hibernate Validator Maven dependency"
+msgstr ""
+
+#. Tag: programlisting
+#: getting-started.xml:54
+#, no-c-format
+msgid ""
+      "&lt;dependency&gt;\n"
+      "    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;\n"
+      "    &lt;artifactId&gt;hibernate-validator&lt;/artifactId&gt;\n"
+      "    &lt;version&gt;&version;&lt;/version&gt;\n"
+      "&lt;/dependency&gt;"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:57
+#, no-c-format
+msgid "This transitively pulls in the dependency to the Bean Validation API (<literal>javax.validation:validation-api:&bvVersion;</literal>)."
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:61
+#, no-c-format
+msgid "Logging"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:63
+#, no-c-format
+msgid "For the purposes of logging, Hibernate Validator uses the JBoss Logging API. This is an abstraction layer which supports several known logging solutions (e.g. log4j or the logging framework provided by the JDK) as implementation. Just add your preferred logging library as dependency to your project and all log requests from Hibernate Validator will automatically be delegated to that logging provider."
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:70
+#, no-c-format
+msgid "If there are several logging implementations part of the classpath, you can explicitely specify a provider using the system property <varname>org.jboss.logging.provider</varname>. Supported values currently are <varname>jboss</varname>, <varname>jdk</varname>, <varname>log4j</varname> and <varname>slf4j</varname>."
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:78
+#, no-c-format
+msgid "Unified EL"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:80
+#, no-c-format
+msgid "Hibernate Validator requires an implementation of the Unified Expression Language (<ulink url=\"jcp.org/en/jsr/detail?id=341\">JSR 341</ulink>) for evaluating dynamic expressions in constraint violation messages (see <xref linkend=\"section-message-interpolation\"/>). When your application runs in a Java EE container such as JBoss AS, an EL implementation is already provided by the container. In a Java SE environment, however, you have to add an implementation as dependency to your POM file. For instance you can add the following two dependencies to use the JSR 341 <ulink url=\"http://uel.java.net/\">reference implementation</ulink>:"
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:92
+#, no-c-format
+msgid "Maven dependencies for Unified EL reference implementation"
+msgstr ""
+
+#. Tag: programlisting
+#: getting-started.xml:95
+#, no-c-format
+msgid ""
+      "&lt;dependency&gt;\n"
+      "    &lt;groupId&gt;javax.el&lt;/groupId&gt;\n"
+      "    &lt;artifactId&gt;javax.el-api&lt;/artifactId&gt;\n"
+      "    &lt;version&gt;2.2.4&lt;/version&gt;\n"
+      "&lt;/dependency&gt;\n"
+      "&lt;dependency&gt;\n"
+      "    &lt;groupId&gt;org.glassfish.web&lt;/groupId&gt;\n"
+      "    &lt;artifactId&gt;javax.el&lt;/artifactId&gt;\n"
+      "    &lt;version&gt;2.2.4&lt;/version&gt;\n"
+      "&lt;/dependency&gt;"
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:100
+#, no-c-format
+msgid "<title>CDI</title>"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:102
+#, no-c-format
+msgid "Bean Validation defines integration points with CDI (Contexts and Dependency Injection for Java<superscript>TM</superscript> EE, <ulink url=\"http://jcp.org/en/jsr/detail?id=346\">JSR 346</ulink>). If your application runs in an environment which does not provide this integration out of the box, you may use the Hibernate Validator CDI portable extension by adding the following Maven dependency to your POM:"
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:111
+#, no-c-format
+msgid "Hibernate Validator CDI portable extension Maven dependency"
+msgstr ""
+
+#. Tag: programlisting
+#: getting-started.xml:114
+#, no-c-format
+msgid ""
+      "&lt;dependency&gt;\n"
+      "    &lt;groupId&gt;org.hibernate&lt;/groupId&gt;\n"
+      "    &lt;artifactId&gt;hibernate-validator-cdi&lt;/artifactId&gt;\n"
+      "    &lt;version&gt;&version;&lt;/version&gt;\n"
+      "&lt;/dependency&gt;"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:117
+#, no-c-format
+msgid "Note that adding this dependency is usually not required for applications running on a Java EE application server. You can learn more about the integration of Bean Validation and CDI in <xref linkend=\"section-integration-with-cdi\"/>."
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:125
+#, no-c-format
+msgid "Applying constraints"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:127
+#, no-c-format
+msgid "Lets dive directly into an example to see how to apply constraints."
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:131
+#, no-c-format
+msgid "Class Car annotated with constraints"
+msgstr ""
+
+#. Tag: programlisting
+#: getting-started.xml:133
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter01;\n"
+      "\n"
+      "import javax.validation.constraints.Min;\n"
+      "import javax.validation.constraints.NotNull;\n"
+      "import javax.validation.constraints.Size;\n"
+      "\n"
+      "public class Car {\n"
+      "\n"
+      "        @NotNull\n"
+      "        private String manufacturer;\n"
+      "\n"
+      "        @NotNull\n"
+      "        @Size(min = 2, max = 14)\n"
+      "        private String licensePlate;\n"
+      "\n"
+      "        @Min(2)\n"
+      "        private int seatCount;\n"
+      "\n"
+      "        public Car(String manufacturer, String licencePlate, int seatCount) {\n"
+      "                this.manufacturer = manufacturer;\n"
+      "                this.licensePlate = licencePlate;\n"
+      "                this.seatCount = seatCount;\n"
+      "        }\n"
+      "\n"
+      "        //getters and setters ...\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:136
+#, no-c-format
+msgid "The <classname>@NotNull</classname>, <classname>@Size</classname> and <classname>@Min</classname> annotations are used to declare the constraints which should be applied to the fields of a <classname>Car</classname> instance:"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:143
+#, no-c-format
+msgid "<property>manufacturer</property> must never be <literal>null</literal>"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:148
+#, no-c-format
+msgid "<property>licensePlate</property> must never be <literal>null</literal> and must be between 2 and 14 characters long"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:154
+#, no-c-format
+msgid "<property>seatCount</property> must be at least 2"
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:160
+#, no-c-format
+msgid "Validating constraints"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:162
+#, no-c-format
+msgid "To perform a validation of these constraints, you use a <classname>Validator</classname> instance. Let's have a look at a unit test for <classname>Car</classname>:"
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:167
+#, no-c-format
+msgid "Class CarTest showing validation examples"
+msgstr ""
+
+#. Tag: programlisting
+#: getting-started.xml:169
+#, no-c-format
+msgid ""
+      "package org.hibernate.validator.referenceguide.chapter01;\n"
+      "\n"
+      "import java.util.Set;\n"
+      "import javax.validation.ConstraintViolation;\n"
+      "import javax.validation.Validation;\n"
+      "import javax.validation.Validator;\n"
+      "import javax.validation.ValidatorFactory;\n"
+      "\n"
+      "import org.junit.BeforeClass;\n"
+      "import org.junit.Test;\n"
+      "\n"
+      "import static org.junit.Assert.assertEquals;\n"
+      "\n"
+      "public class CarTest {\n"
+      "\n"
+      "        private static Validator validator;\n"
+      "\n"
+      "        @BeforeClass\n"
+      "        public static void setUp() {\n"
+      "                ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+      "                validator = factory.getValidator();\n"
+      "        }\n"
+      "\n"
+      "        @Test\n"
+      "        public void manufacturerIsNull() {\n"
+      "                Car car = new Car( null, \"DD-AB-123\", 4 );\n"
+      "\n"
+      "                Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+      "                                validator.validate( car );\n"
+      "\n"
+      "                assertEquals( 1, constraintViolations.size() );\n"
+      "                assertEquals( \"may not be null\", constraintViolations.iterator().next().getMessage() );\n"
+      "        }\n"
+      "\n"
+      "        @Test\n"
+      "        public void licensePlateTooShort() {\n"
+      "                Car car = new Car( \"Morris\", \"D\", 4 );\n"
+      "\n"
+      "                Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+      "                                validator.validate( car );\n"
+      "\n"
+      "                assertEquals( 1, constraintViolations.size() );\n"
+      "                assertEquals(\n"
+      "                                \"size must be between 2 and 14\",\n"
+      "                                constraintViolations.iterator().next().getMessage()\n"
+      "                );\n"
+      "        }\n"
+      "\n"
+      "        @Test\n"
+      "        public void seatCountTooLow() {\n"
+      "                Car car = new Car( \"Morris\", \"DD-AB-123\", 1 );\n"
+      "\n"
+      "                Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+      "                                validator.validate( car );\n"
+      "\n"
+      "                assertEquals( 1, constraintViolations.size() );\n"
+      "                assertEquals(\n"
+      "                                \"must be greater than or equal to 2\",\n"
+      "                                constraintViolations.iterator().next().getMessage()\n"
+      "                );\n"
+      "        }\n"
+      "\n"
+      "        @Test\n"
+      "        public void carIsValid() {\n"
+      "                Car car = new Car( \"Morris\", \"DD-AB-123\", 2 );\n"
+      "\n"
+      "                Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =\n"
+      "                                validator.validate( car );\n"
+      "\n"
+      "                assertEquals( 0, constraintViolations.size() );\n"
+      "        }\n"
+      "}"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:172
+#, no-c-format
+msgid "In the <methodname>setUp()</methodname> method a <classname>Validator</classname> object is retrieved from the <classname>ValidatorFactory</classname>. A <classname>Validator</classname> instance is thread-safe and may be reused multiple times. It thus can safely be stored in a static field and be used in the test methods to validate the different <classname>Car</classname> instances."
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:180
+#, no-c-format
+msgid "The <methodname>validate()</methodname> method returns a set of <classname>ConstraintViolation</classname> instances, which you can iterate ovr in order to see which validation errors occurred. The first three test methods show some expected constraint violations:"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:187
+#, no-c-format
+msgid "The <classname>@NotNull</classname> constraint on manufacturer is violated in <methodname>manufacturerIsNull()</methodname>"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:192
+#, no-c-format
+msgid "The <classname>@Size</classname> constraint on licensePlate is violated in <methodname>licensePlateTooShort()</methodname>"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:197
+#, no-c-format
+msgid "The <classname>@Min</classname> constraint on seatCount is violated in <methodname>seatCountTooLow()</methodname>"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:202
+#, no-c-format
+msgid "If the object validates successfully, <methodname>validate()</methodname> returns an empty set as you can see in <methodname>carIsValid()</methodname>."
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:206
+#, no-c-format
+msgid "Note that only use classes from the package <package>javax.validation</package> from the Bean Validation API are used. No classes from Hibernate Validator are directly referenced, resulting in portable code."
+msgstr ""
+
+#. Tag: title
+#: getting-started.xml:213
+#, no-c-format
+msgid "Where to go next?"
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:215
+#, no-c-format
+msgid "That concludes the 5 minute tour through the world of Hibernate Validator and Bean Validaiton. Continue exploring the code examples or look at further examples referenced in <xref linkend=\"validator-further-reading\"/>."
+msgstr ""
+
+#. Tag: para
+#: getting-started.xml:220
+#, no-c-format
+msgid "To learn more about the validation of beans and properties, just continue reading <xref linkend=\"chapter-bean-constraints\"/>. If you are interested in using Bean Validation for the validation of method pre- and postcondition refer to <xref linkend=\"chapter-method-constraints\"/>. In case your application has specific validation requirements have a look at <xref linkend=\"validator-customconstraints\"/>."
+msgstr ""

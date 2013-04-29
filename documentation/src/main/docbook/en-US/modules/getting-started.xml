@@ -61,23 +61,6 @@
     <para>This transitively pulls in the dependency to the Bean Validation API
     (<literal>javax.validation:validation-api:&bvVersion;</literal>).</para>
 
-    <section id="validator-gettingstarted-logging">
-      <title>Logging</title>
-
-      <para>For the purposes of logging, Hibernate Validator uses the JBoss
-      Logging API. This is an abstraction layer which supports several known
-      logging solutions (e.g. log4j or the logging framework provided by the
-      JDK) as implementation. Just add your preferred logging library as
-      dependency to your project and all log requests from Hibernate Validator
-      will automatically be delegated to that logging provider.</para>
-
-      <para>If there are several logging implementations part of the
-      classpath, you can explicitely specify a provider using the system
-      property <varname>org.jboss.logging.provider</varname>. Supported values
-      currently are <varname>jboss</varname>, <varname>jdk</varname>,
-      <varname>log4j</varname> and <varname>slf4j</varname>.</para>
-    </section>
-
     <section id="validator-gettingstarted-uel">
       <title>Unified EL</title>
 
@@ -316,10 +299,10 @@ public class CarTest {
     <methodname>validate()</methodname> returns an empty set as you can see in
     <methodname>carIsValid()</methodname>.</para>
 
-    <para>Note that only use classes from the package
-    <package>javax.validation</package> from the Bean Validation API are used.
-    No classes from Hibernate Validator are directly referenced, resulting in
-    portable code.</para>
+    <para>Note that only classes from the package
+    <package>javax.validation</package> are used. These are provided from the
+    Bean Validation API. No classes from Hibernate Validator are directly
+    referenced, resulting in portable code.</para>
   </section>
 
   <section id="validator-gettingstarted-whatsnext">
