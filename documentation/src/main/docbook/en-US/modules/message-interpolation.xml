@@ -21,7 +21,7 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="chapter-message-interpolation">
-  <title>Message interpolation</title>
+  <title>Interpolating constraint error messages</title>
 
   <para>Message interpolation is the process of creating error messages for
   violated Bean Validation constraints. In this chapter you will learn how
@@ -54,7 +54,7 @@ public class Car {
     </example>
 
     <para>If a constraint is violated, its descriptor will be interpolated by
-    the runtime using the currently configured
+    the validation engine using the currently configured
     <classname>MessageInterpolator</classname>. The interpolated error message
     can then be retrieved from the resulting constraint violation by calling
     <methodname>ConstraintViolation#getMessage()</methodname>.</para>
@@ -72,12 +72,12 @@ public class Car {
         resource bundle <filename>ValidationMessages</filename>. If this
         bundle contains an entry for a given message parameter, that parameter
         will be replaced in the message with the corresponding value from the
-        bundle. This step will be executed recursively if the replaced value
-        again contains message parameters. The resource bundle is expected to
-        be provided by the application developer, e.g. by adding a file named
-        <filename>ValidationMessages.properties</filename> to the classpath.
-        You can also create localized error messages by providing locale
-        specific variations of this bundle, such as
+        bundle. This step will be executed recursively in case the replaced
+        value again contains message parameters. The resource bundle is
+        expected to be provided by the application developer, e.g. by adding a
+        file named <filename>ValidationMessages.properties</filename> to the
+        classpath. You can also create localized error messages by providing
+        locale specific variations of this bundle, such as
         <filename>ValidationMessages_en_US.properties</filename>. By default,
         the JVM's default locale
         (<methodname>Locale#getDefault()</methodname>) will be used when
@@ -150,7 +150,7 @@ public class Car {
     <section id="section-interpolation-with-message-expressions">
       <title>Interpolation with message expressions</title>
 
-      <para>Since Bean Validation 1.1 / Hibernate Validator 5 it is possible
+      <para>As of Hibernate Validator 5 (Bean Validation 1.1) it is possible
       to use the Unified Expression Language (as defined by <ulink
       url="http://jcp.org/en/jsr/detail?id=341">JSR 341</ulink>) in constraint
       violation messages. This allows to define error messages based on
@@ -325,15 +325,14 @@ assertEquals( "Price must not be higher than $100000", message );</programlistin
     <para>Custom interpolators must implement the interface
     <classname>javax.validation.MessageInterpolator</classname>. Note that
     implementations must be thread-safe. It is recommended that custom message
-    interpolators delegate final implementation to the runtime's default
-    interpolator, which can be obtained via
+    interpolators delegate final implementation to the default interpolator,
+    which can be obtained via
     <methodname>Configuration#getDefaultMessageInterpolator()</methodname>.</para>
 
     <para>In order to use a custom message interpolator it must be registered
-    with the validation runtime. You can do this by either configuring it in
-    the Bean Validation XML descriptor
+    either by configuring it in the Bean Validation XML descriptor
     <filename>META-INF/validation.xml</filename> (see <xref
-    linkend="section-configuration-validation-xml"/>) or passing it when
+    linkend="section-configuration-validation-xml"/>) or by passing it when
     bootstrapping a <classname>ValidatorFactory</classname> or
     <classname>Validator</classname> (see <xref
     linkend="section-validator-factory-message-interpolator"/> and <xref
@@ -342,8 +341,8 @@ assertEquals( "Price must not be higher than $100000", message );</programlistin
     <section id="section-resource-bundle-locator">
       <title><classname>ResourceBundleLocator</classname></title>
 
-      <para>It is a common case that you want to use the message interpolation
-      algorithm as defined by the Bean Validation specification but retrieve
+      <para>In some use cases you want to use the message interpolation
+      algorithm as defined by the Bean Validation specification, but retrieve
       error messages from other resource bundles than
       <filename>ValidationMessages</filename>. In this situation Hibernate
       Validator's <classname>ResourceBundleLocator</classname> SPI can

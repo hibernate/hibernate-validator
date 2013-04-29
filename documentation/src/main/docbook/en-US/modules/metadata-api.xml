@@ -21,7 +21,7 @@
 %BOOK_ENTITIES;
 ]>
 <chapter id="validator-metadata-api">
-  <title>Metadata API</title>
+  <title>Using constraint metadata</title>
 
   <para>The Bean Validation specification provides not only a validation
   engine, but also an API for retrieving constraint metadata in a uniform way,
