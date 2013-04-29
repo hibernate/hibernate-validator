@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2013-04-03 09:59+0000\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
@@ -21,43 +21,43 @@ msgid "Hibernate Validator"
 msgstr ""
 
 #. Tag: subtitle
-#: master.xml:26
+#: master.xml:27
 #, no-c-format
-msgid "JSR 303 Reference Implementation"
+msgid "JSR 349 Reference Implementation"
 msgstr ""
 
 #. Tag: subtitle
-#: master.xml:27
+#: master.xml:29
 #, no-c-format
 msgid "Reference Guide"
 msgstr ""
 
 #. Tag: releaseinfo
-#: master.xml:28
+#: master.xml:31
 #, no-c-format
 msgid "&version;"
 msgstr ""
 
 #. Tag: holder
-#: master.xml:33
+#: master.xml:40
 #, no-c-format
 msgid "&copyrightHolder;"
 msgstr ""
 
 #. Tag: author
-#: master.xml:36
+#: master.xml:44
 #, no-c-format
 msgid "<firstname>Hardy</firstname> <surname>Ferentschik</surname>"
 msgstr ""
 
 #. Tag: author
-#: master.xml:40
+#: master.xml:50
 #, no-c-format
 msgid "<firstname>Gunnar</firstname> <surname>Morling</surname>"
 msgstr ""
 
 #. Tag: othercredit
-#: master.xml:44
+#: master.xml:56
 #, no-c-format
 msgid "<firstname>Shaozhuang</firstname> <surname>Liu</surname> <email>stliu@hibernate.org</email>"
 msgstr ""

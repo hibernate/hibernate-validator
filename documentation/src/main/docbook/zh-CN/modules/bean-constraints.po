@@ -1,0 +1,1658 @@
+# Language zh-CN translations for PACKAGE package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
+"PO-Revision-Date: 2013-04-29 13:14+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh-CN\n"
+
+#. Tag: title
+#: bean-constraints.xml:24
+#, no-c-format
+msgid "Declaring and validating bean constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:26
+#, no-c-format
+msgid ""
+"Read this chapter in order to learn how to declare bean constraints (see "
+"<xref linkend=\"section-declaring-bean-constraints\"/>) and validate the "
+"same (see <xref linkend=\"section-validating-bean-constraints\"/>). <xref "
+"linkend=\"section-builtin-constraints\"/> provides an overview of all built-"
+"in constraints coming with Hibernate Validator."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:32
+#, no-c-format
+msgid ""
+"If you are interested in applying constraints to method parameters and "
+"return values, refer to <xref linkend=\"chapter-method-constraints\"/>."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:36
+#, no-c-format
+msgid "Declaring bean constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:38
+#, no-c-format
+msgid ""
+"Constraints in Bean Validation are expressed via Java annotations. In this "
+"section we show how to enhance an object model with these annotations. We "
+"have to differentiate between several types of constraint annotations:"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:45
+#, no-c-format
+msgid "field constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:49
+#, no-c-format
+msgid "property constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:53
+#, no-c-format
+msgid "class constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:58
+#, no-c-format
+msgid ""
+"Not all constraints can be placed on all of these levels. In fact, none of "
+"the default constraints defined by Bean Validation can be placed at class "
+"level. The <classname>java.lang.annotation.Target</classname> annotation in "
+"the constraint annotation itself determines on which elements a constraint "
+"can be placed. See <xref linkend=\"validator-customconstraints\"/> for more "
+"information."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:67 bean-constraints.xml:74
+#, no-c-format
+msgid "Field-level constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:69
+#, no-c-format
+msgid ""
+"Constraints can be expressed by annotating a field of a class. <xref linkend="
+"\"example-field-level\"/> shows a field level configuration example:"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:76
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter02.fieldlevel;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        @NotNull\n"
+"        private String manufacturer;\n"
+"\n"
+"        @AssertTrue\n"
+"        private boolean isRegistered;\n"
+"\n"
+"        public Car(String manufacturer, boolean isRegistered) {\n"
+"                this.manufacturer = manufacturer;\n"
+"                this.isRegistered = isRegistered;\n"
+"        }\n"
+"\n"
+"        //getters and setters...\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:79
+#, no-c-format
+msgid ""
+"When using field-level constraints field access strategy is used to access "
+"the value to be validated. This means the validation engine directly "
+"accesses the instance variable and does not invoke the property accessor "
+"method also if such a method exists."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:84
+#, no-c-format
+msgid ""
+"Constraints can be applied to fields of any access type (public, private "
+"etc.). Constraints on static fields are not supported, though."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:89
+#, no-c-format
+msgid ""
+"When validating byte code enhanced objects property level constraints should "
+"be used, because the byte code enhancing library won't be able to determine "
+"a field access via reflection."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:96 bean-constraints.xml:110
+#, no-c-format
+msgid "Property-level constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:98
+#, no-c-format
+msgid ""
+"If your model class adheres to the <ulink type=\"\" url=\"http://java.sun."
+"com/javase/technologies/desktop/javabeans/index.jsp\">JavaBeans</ulink> "
+"standard, it is also possible to annotate the properties of a bean class "
+"instead of its fields. <xref linkend=\"example-property-level\"/> uses the "
+"same entity as in <xref linkend=\"example-field-level\"/>, however, property "
+"level constraints are used."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:104
+#, no-c-format
+msgid ""
+"The property's getter method has to be annotated, not its setter. That way "
+"also read-only properties can be constrained which have no setter method."
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:112
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter02.propertylevel;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        private String manufacturer;\n"
+"\n"
+"        private boolean isRegistered;\n"
+"\n"
+"        public Car(String manufacturer, boolean isRegistered) {\n"
+"                this.manufacturer = manufacturer;\n"
+"                this.isRegistered = isRegistered;\n"
+"        }\n"
+"\n"
+"        @NotNull\n"
+"        public String getManufacturer() {\n"
+"                return manufacturer;\n"
+"        }\n"
+"\n"
+"        public void setManufacturer(String manufacturer) {\n"
+"                this.manufacturer = manufacturer;\n"
+"        }\n"
+"\n"
+"        @AssertTrue\n"
+"        public boolean isRegistered() {\n"
+"                return isRegistered;\n"
+"        }\n"
+"\n"
+"        public void setRegistered(boolean isRegistered) {\n"
+"                this.isRegistered = isRegistered;\n"
+"        }\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:115
+#, no-c-format
+msgid ""
+"When using property level constraints property access strategy is used to "
+"access the value to be validated, i.e. the validation engine accesses the "
+"state via the property accessor method."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:119
+#, no-c-format
+msgid ""
+"One advantage of annotating properties instead of fields is that the "
+"constraints become part of the type's API that way. Thus users are aware of "
+"the existing constraints without having to examine the type's implementation."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:125
+#, no-c-format
+msgid ""
+"It is recommended to stick either to field <emphasis>or</emphasis> property "
+"annotations within one class. It is not recommended to annotate a field "
+"<emphasis>and</emphasis> the accompanying getter method as this would cause "
+"the field to be validated twice."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:134
+#, no-c-format
+msgid "Class-level constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:137
+#, no-c-format
+msgid ""
+"Last but not least, a constraint can also be placed on the class level. In "
+"this case not a single property is subject of the validation but the "
+"complete object. Class-level constraints are useful if the validation "
+"depends on a correlation between several properties of an object."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:143
+#, no-c-format
+msgid ""
+"The <classname>Car</classname> class in <xref linkend=\"example-class-level"
+"\"/> has the two attributes <varname>seatCount</varname> and "
+"<varname>passengers</varname> and it should be ensured that the list of "
+"passengers has not more entries than seats are available. For that purpose "
+"the @<classname>PassengerCount</classname> constraint is added on the class "
+"level. The validator of that constraint has access to the complete "
+"<classname>Car</classname> object, allowing to compare the numbers of seats "
+"and passengers. Refer to <xref linkend=\"validator-customconstraints\"/> to "
+"learn in detail how this custom constraint is implemented."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:156
+#, no-c-format
+msgid "Class-level constraint"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:158
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter02.classlevel;\n"
+"\n"
+"@PassengerCount\n"
+"public class Car {\n"
+"\n"
+"        private int seatCount;\n"
+"\n"
+"        private List&lt;Person&gt; passengers;\n"
+"\n"
+"        //...\n"
+"}"
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:163 bean-constraints.xml:171
+#, no-c-format
+msgid "Constraint inheritance"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:165
+#, no-c-format
+msgid ""
+"When a class implements an interface or extends another class, all "
+"constraint annotations declared on the supertype apply in the same manner as "
+"the constraints specified on the class itself. To make things clearer let's "
+"have a look at the following example:"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:173
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter02.inheritance;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        private String manufacturer;\n"
+"\n"
+"        @NotNull\n"
+"        public String getManufacturer() {\n"
+"                return manufacturer;\n"
+"        }\n"
+"\n"
+"        //...\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:175
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter02.inheritance;\n"
+"\n"
+"public class RentalCar extends Car {\n"
+"\n"
+"        private String rentalStation;\n"
+"\n"
+"        @NotNull\n"
+"        public String getRentalStation() {\n"
+"                return rentalStation;\n"
+"        }\n"
+"\n"
+"        //...\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:178
+#, no-c-format
+msgid ""
+"Here the class <classname>RentalCar</classname> is a subclass of "
+"<classname>Car</classname> and adds the property <property>rentalStation</"
+"property>. If an instance of <classname>RentalCar</classname> is validated, "
+"not only the <classname>@NotNull</classname> constraint on "
+"<property>rentalStation</property> is evaluated, but also the constraint on "
+"<property>manufacturer</property> from the parent class."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:186
+#, no-c-format
+msgid ""
+"The same would be true, if <classname>Car</classname> was not a superclass "
+"but an interface implemented by <classname>RentalCar</classname>."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:190
+#, no-c-format
+msgid ""
+"Constraint annotations are aggregated if methods are overridden. So if "
+"<classname>RentalCar</classname> overrode the <methodname>getManufacturer()</"
+"methodname> method from <classname>Car</classname>, any constraints "
+"annotated at the overriding method would be evaluated in addition to the "
+"<classname>@NotNull</classname> constraint from the superclass."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:199
+#, no-c-format
+msgid "Object graphs"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:201
+#, no-c-format
+msgid ""
+"The Bean Validation API does not only allow to validate single class "
+"instances but also complete object graphs (cascaded validation). To do so, "
+"just annotate a field or property representing a reference to another object "
+"with <classname>@Valid</classname> as demonstrated in <xref linkend="
+"\"example-cascaded-validation\"/>."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:208
+#, no-c-format
+msgid "Cascaded validation"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:210
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter02.objectgraph;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        @NotNull\n"
+"        @Valid\n"
+"        private Person driver;\n"
+"\n"
+"        //...\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:212
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter02.objectgraph;\n"
+"\n"
+"public class Person {\n"
+"\n"
+"        @NotNull\n"
+"        private String name;\n"
+"\n"
+"        //...\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:215
+#, no-c-format
+msgid ""
+"If an instance of <classname>Car</classname> is validated, the referenced "
+"<classname>Person</classname> object will be validated as well, as the "
+"<property>driver</property> field is annotated with <classname>@Valid</"
+"classname>. Therefore the validation of a <classname>Car</classname> will "
+"fail if the <property>name</property> field of the referenced "
+"<classname>Person</classname> instance is <code>null</code>."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:223
+#, no-c-format
+msgid ""
+"The validation of object graphs is done recursively, i.e. if a reference "
+"marked for cacaded validation points to an object which itself has "
+"properties annotated with <classname>@Valid</classname>, these references "
+"will be followed up by the validation engine as well. It is ensured that no "
+"infinite loops occur during cascaded validation, if for instance two objects "
+"hold references to each other."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:230
+#, no-c-format
+msgid ""
+"Note that <literal>null</literal> values are getting ignored during cascaded "
+"validation."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:233
+#, no-c-format
+msgid ""
+"Object graph validation also works for collection-typed fields. That means "
+"any attributes that"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:238
+#, no-c-format
+msgid "are arrays"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:242
+#, no-c-format
+msgid ""
+"implement <classname>java.lang.Iterable</classname> (especially "
+"<classname>Collection</classname>, <classname>List</classname> and "
+"<classname>Set</classname>)"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:248
+#, no-c-format
+msgid "implement <classname>java.util.Map</classname>"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:252
+#, no-c-format
+msgid ""
+"can be annotated with <classname>@Valid</classname>, which will cause each "
+"contained element to be validated, when the parent object is validated."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:257
+#, no-c-format
+msgid "Cascaded validation of a collection"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:259
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter02.objectgraph.list;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        @NotNull\n"
+"        @Valid\n"
+"        private List&lt;Person&gt; passengers = new ArrayList&lt;Person&gt;"
+"();\n"
+"\n"
+"        //...\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:262
+#, no-c-format
+msgid ""
+"So when validating an instance of the <classname>Car</classname> class shown "
+"in <xref linkend=\"example-cascaded-validation-list\"/>, a "
+"<classname>ConstraintViolation</classname> will be created, if any of the "
+"<classname>Person</classname> objects contained in the <property>passengers</"
+"property> list has a <code>null</code> name."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:272
+#, no-c-format
+msgid "Validating bean constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:274
+#, no-c-format
+msgid ""
+"The <classname>Validator</classname> interface is the most important object "
+"in Bean Validation. The next section shows how to obtain an "
+"<classname>Validator</classname> instance. Afterwards you'll learn how to "
+"use the different methods of the <classname>Validator</classname> interface."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:281
+#, no-c-format
+msgid "Obtaining a <classname>Validator</classname> instance"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:283
+#, no-c-format
+msgid ""
+"The first step towards validating an entity instance is to get hold of a "
+"<classname>Validator</classname> instance. The road to this instance leads "
+"via the <classname>Validation</classname> class and a "
+"<classname>ValidatorFactory</classname>. The easiest way is to use the "
+"static method <methodname>Validation#buildDefaultValidatorFactory()</"
+"methodname>:"
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:291
+#, no-c-format
+msgid "Validation#buildDefaultValidatorFactory()"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:293
+#, no-c-format
+msgid ""
+"ValidatorFactory factory = Validation.buildDefaultValidatorFactory();\n"
+"Validator validator = factory.getValidator();"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:296
+#, no-c-format
+msgid ""
+"For other ways of obtaining a Validator instance see <xref linkend=\"chapter-"
+"bootstrapping\"/>. For now we just want to see how we can use the "
+"<classname>Validator</classname> instance to validate entity instances."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:303
+#, no-c-format
+msgid "Validator methods"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:305
+#, no-c-format
+msgid ""
+"The <classname>Validator</classname> interface contains three methods that "
+"can be used to either validate entire entities or just single properties of "
+"the entity."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:309
+#, no-c-format
+msgid ""
+"All three methods return a <classname>Set&lt;ConstraintViolation&gt;</"
+"classname>. The set is empty, if the validation succeeds. Otherwise a "
+"<classname>ConstraintViolation</classname> instance is added for each "
+"violated constraint."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:315
+#, no-c-format
+msgid ""
+"All the validation methods have a var-args parameter which can be used to "
+"specify, which validation groups shall be considered when performing the "
+"validation. If the parameter is not specified the default validation group "
+"(<classname>javax.validation.groups.Default</classname>) is used. The topic "
+"of validation groups is discussed in detail in <xref linkend=\"chapter-groups"
+"\"/>."
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:324
+#, no-c-format
+msgid "validate()"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:326
+#, no-c-format
+msgid ""
+"Use the <methodname>validate()</methodname> method to perform validation of "
+"all constraints of a given bean. <xref linkend=\"example-validator-validate"
+"\"/> shows the validation of an instance of the <classname>Car</classname> "
+"class from <xref linkend=\"example-property-level\"/> which fails to satisfy "
+"the <classname>@NotNull</classname> constraint on the <varname>manufacturer</"
+"varname> property. The validation call therefore returns one "
+"<classname>ConstraintViolation</classname> object."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:337
+#, no-c-format
+msgid "Using <methodname>Validator#validate()</methodname>"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:339
+#, no-c-format
+msgid ""
+"Car car = new Car( null, true );\n"
+"\n"
+"Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator."
+"validate( car );\n"
+"\n"
+"assertEquals( 1, constraintViolations.size() );\n"
+"assertEquals( \"may not be null\", constraintViolations.iterator().next()."
+"getMessage() );"
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:344
+#, no-c-format
+msgid "validateProperty()"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:346
+#, no-c-format
+msgid ""
+"With help of the <methodname>validateProperty()</methodname> you can "
+"validate a single named property of a given object. The property name is the "
+"JavaBeans property name."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:351
+#, no-c-format
+msgid "Using <methodname>Validator#validateProperty()</methodname>"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:354
+#, no-c-format
+msgid ""
+"Car car = new Car( null, true );\n"
+"\n"
+"Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator."
+"validateProperty(\n"
+"                car,\n"
+"                \"manufacturer\"\n"
+");\n"
+"\n"
+"assertEquals( 1, constraintViolations.size() );\n"
+"assertEquals( \"may not be null\", constraintViolations.iterator().next()."
+"getMessage() );"
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:359
+#, no-c-format
+msgid "validateValue()"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:361
+#, no-c-format
+msgid ""
+"By using the <methodname>validateValue() </methodname>method you can check "
+"whether a single property of a given class can be validated successfully, if "
+"the property had the specified value:"
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:366
+#, no-c-format
+msgid "Using <methodname>Validator#validateValue()</methodname>"
+msgstr ""
+
+#. Tag: programlisting
+#: bean-constraints.xml:369
+#, no-c-format
+msgid ""
+"Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator."
+"validateValue(\n"
+"                Car.class,\n"
+"                \"manufacturer\",\n"
+"                null\n"
+");\n"
+"\n"
+"assertEquals( 1, constraintViolations.size() );\n"
+"assertEquals( \"may not be null\", constraintViolations.iterator().next()."
+"getMessage() );"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:373
+#, no-c-format
+msgid ""
+"<classname>@Valid</classname> is not honored by <methodname>validateProperty"
+"()</methodname> or <methodname>validateValue()</methodname>."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:378
+#, no-c-format
+msgid ""
+"<methodname>Validator#validateProperty()</methodname> is for example used in "
+"the integration of Bean Validation into JSF 2 (see <xref linkend=\"section-"
+"presentation-layer\"/>) to perform a validation of the values entered into a "
+"form before they are propagated to the model."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:387
+#, no-c-format
+msgid "<classname>ConstraintViolation</classname> methods"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:389
+#, no-c-format
+msgid ""
+"Now it is time to have a closer look at what a "
+"<classname>ConstraintViolation</classname> is. Using the different methods "
+"of <classname>ConstraintViolation</classname> a lot of useful information "
+"about the cause of the validation failure can be determined. <xref linkend="
+"\"table-constraint-violation\"/> gives an overview of these methods. The "
+"values in the \"Example\" column refer to <xref linkend=\"example-validator-"
+"validate\"/>."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:398
+#, no-c-format
+msgid "The various <classname>ConstraintViolation</classname> methods"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:404
+#, no-c-format
+msgid "Method"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:406
+#, no-c-format
+msgid "Usage"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:408
+#, no-c-format
+msgid "Example"
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:414
+#, no-c-format
+msgid "getMessage()"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:416
+#, no-c-format
+msgid "The interpolated error message"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:418
+#, no-c-format
+msgid "\"may not be null\""
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:422
+#, no-c-format
+msgid "getMessageTemplate()"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:424
+#, no-c-format
+msgid "The non-interpolated error message"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:426
+#, no-c-format
+msgid "\"{... NotNull.message}\""
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:430
+#, no-c-format
+msgid "getRootBean()"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:432
+#, no-c-format
+msgid "The root bean being validated"
+msgstr ""
+
+#. Tag: varname
+#: bean-constraints.xml:434 bean-constraints.xml:452
+#, no-c-format
+msgid "<varname>car</varname>"
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:438
+#, no-c-format
+msgid "getRootBeanClass()"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:440
+#, no-c-format
+msgid "The class of the root bean being validated"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:442
+#, no-c-format
+msgid "Car.class"
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:446
+#, no-c-format
+msgid "getLeafBean()"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:448
+#, no-c-format
+msgid ""
+"If a bean constraint, the bean instance the constraint is applied on; If a "
+"property constraint, the bean instance hosting the property the constraint "
+"is applied on"
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:456
+#, no-c-format
+msgid "getPropertyPath()"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:458
+#, no-c-format
+msgid "The property path to the validated value from root bean"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:461
+#, no-c-format
+msgid ""
+"contains one node with kind <classname>PROPERTY</classname> and name "
+"\"manufacturer\""
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:466
+#, no-c-format
+msgid "getInvalidValue()"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:468
+#, no-c-format
+msgid "The value failing to pass the constraint"
+msgstr ""
+
+#. Tag: literal
+#: bean-constraints.xml:470
+#, no-c-format
+msgid "null"
+msgstr ""
+
+#. Tag: methodname
+#: bean-constraints.xml:474
+#, no-c-format
+msgid "getConstraintDescriptor()"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:476
+#, no-c-format
+msgid "Constraint metadata reported to fail"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:478
+#, no-c-format
+msgid "descriptor for <classname>@NotNull</classname>"
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:487
+#, no-c-format
+msgid "Built-in constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:489
+#, no-c-format
+msgid ""
+"Hibernate Validator comprises a basic set of commonly used constraints. "
+"These are foremost the constraints defined by the Bean Validation "
+"specification (see <xref linkend=\"table-spec-constraints\"/>). "
+"Additionally, Hibernate Validator provides useful custom constraints (see "
+"<xref linkend=\"table-custom-constraints\"/> and <xref linkend=\"table-"
+"custom-country-constraints\"/>)."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:497 bean-constraints.xml:517
+#, no-c-format
+msgid "Bean Validation constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:499
+#, no-c-format
+msgid ""
+"shows purpose and supported data types of all constraints specified in the "
+"Bean Validation API. All these constraints apply to the field/property "
+"level, there are no class-level constraints defined in the Bean Validation "
+"specification. If you are using the Hibernate object-relational mapper, some "
+"of the constraints are taken into account when creating the DDL for your "
+"model (see column \"Hibernate metadata impact\")."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:508
+#, no-c-format
+msgid ""
+"Hibernate Validator allows some constraints to be applied to more data types "
+"than required by the Bean Validation specification (e.g. <classname>@Max</"
+"classname> can be applied to <classname>Strings</classname>). Relying on "
+"this feature can impact portability of your application between Bean "
+"Validation providers."
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:530 bean-constraints.xml:797 bean-constraints.xml:1003
+#, no-c-format
+msgid "Annotation"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:532 bean-constraints.xml:799 bean-constraints.xml:1005
+#, no-c-format
+msgid "Supported data types"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:534 bean-constraints.xml:801 bean-constraints.xml:1007
+#, no-c-format
+msgid "<entry>Use</entry>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:536 bean-constraints.xml:803 bean-constraints.xml:1011
+#, no-c-format
+msgid "Hibernate metadata impact"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:542
+#, no-c-format
+msgid "@AssertFalse"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:544 bean-constraints.xml:556
+#, no-c-format
+msgid "<classname>Boolean</classname>, <classname>boolean</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:547
+#, no-c-format
+msgid "Checks that the annotated element is <constant>false</constant>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:550 bean-constraints.xml:562 bean-constraints.xml:585
+#: bean-constraints.xml:608 bean-constraints.xml:645 bean-constraints.xml:703
+#: bean-constraints.xml:719 bean-constraints.xml:732 bean-constraints.xml:759
+#: bean-constraints.xml:819 bean-constraints.xml:833 bean-constraints.xml:874
+#: bean-constraints.xml:887 bean-constraints.xml:900 bean-constraints.xml:916
+#: bean-constraints.xml:934 bean-constraints.xml:952 bean-constraints.xml:972
+#: bean-constraints.xml:1027 bean-constraints.xml:1041
+#: bean-constraints.xml:1056
+#, no-c-format
+msgid "None"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:554
+#, no-c-format
+msgid "@AssertTrue"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:559
+#, no-c-format
+msgid "Checks that the annotated element is <constant>true</constant>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:566
+#, no-c-format
+msgid ""
+"<classname>@DecimalMax(value=,</classname> <classname>inclusive=)</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:569 bean-constraints.xml:592 bean-constraints.xml:615
+#, no-c-format
+msgid ""
+"<classname>BigDecimal</classname>, <classname>BigInteger</classname>, "
+"<classname>CharSequence</classname>, <classname>byte</classname>, "
+"<classname>short</classname>, <classname>int</classname>, <classname>long</"
+"classname> and the respective wrappers of the primitive types; Additionally "
+"supported by HV: any sub-type of <classname>Number</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:578
+#, no-c-format
+msgid ""
+"Checks whether the annotated value is less than the specified maximum, when "
+"<parameter>inclusive=false</parameter>. Otherwise whether the value is less "
+"than or equal to the specified maximum. The parameter <parameter>value</"
+"parameter> is the string representation of the max value according to the "
+"<classname>BigDecimal</classname> string representation."
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:589
+#, no-c-format
+msgid ""
+"<classname>@DecimalMin(value=,</classname> <classname>inclusive=)</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:601
+#, no-c-format
+msgid ""
+"Checks whether the annotated value is larger than the specified minimum, "
+"when <parameter>inclusive=false</parameter>. Otherwise whether the value is "
+"larger than or equal to the specified minimum. The parameter "
+"<parameter>value</parameter> is the string representation of the min value "
+"according to the <classname>BigDecimal</classname> string representation."
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:612
+#, no-c-format
+msgid ""
+"<classname>@Digits(integer=,</classname> <classname>fraction=)</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:624
+#, no-c-format
+msgid ""
+"Checks whether the annoted value is a number having up to <literal>integer</"
+"literal> digits and <literal>fraction</literal> fractional digits"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:628
+#, no-c-format
+msgid "Defines column precision and scale"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:632
+#, no-c-format
+msgid "@Future"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:634 bean-constraints.xml:709
+#, no-c-format
+msgid ""
+"<classname>java.util.Date</classname>, <classname>java.util.Calendar</"
+"classname>; Additionally supported by HV, if the <ulink url=\"http://joda-"
+"time.sourceforge.net/\">Joda Time</ulink> date/time API is on the class "
+"path: any implementations of <classname>ReadablePartial</classname> and "
+"<classname>ReadableInstant</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:642
+#, no-c-format
+msgid "Checks whether the annotated date is in the future"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:649
+#, no-c-format
+msgid "@Max(value=)"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:651
+#, no-c-format
+msgid ""
+"<classname>BigDecimal</classname>, <classname>BigInteger</classname>, "
+"<classname>byte</classname>, <classname>short</classname>, <classname>int</"
+"classname>, <classname>long</classname> and the respective wrappers of the "
+"primitive types; Additionally supported by HV: any sub-type of "
+"<classname>CharSequence</classname> (the numeric value represented by the "
+"character sequence is evaluated), any sub-type of <classname>Number</"
+"classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:660
+#, no-c-format
+msgid ""
+"Checks whether the annotated value is less than or equal to the specified "
+"maximum"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:663 bean-constraints.xml:681
+#, no-c-format
+msgid "Adds a check constraint on the column"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:667
+#, no-c-format
+msgid "@Min(value=)"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:669
+#, no-c-format
+msgid ""
+"<classname>BigDecimal</classname>, <classname>BigInteger</classname>, "
+"<classname>byte</classname>, <classname>short</classname>, <classname>int</"
+"classname>, <classname>long</classname> and the respective wrappers of the "
+"primitive types; Additionally supported by HV: any sub-type of "
+"<classname>CharSequence</classname> (the numeric value represented by the "
+"char sequence is evaluated), any sub-type of <classname>Number</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:678
+#, no-c-format
+msgid ""
+"Checks whether the annotated value is higher than or equal to the specified "
+"minimum"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:685
+#, no-c-format
+msgid "@NotNull"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:687 bean-constraints.xml:698 bean-constraints.xml:941
+#, no-c-format
+msgid "Any type"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:689
+#, no-c-format
+msgid "Checks that the annotated value is not <constant>null.</constant>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:692
+#, no-c-format
+msgid "Column(s) are not nullable"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:696
+#, no-c-format
+msgid "@Null"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:700
+#, no-c-format
+msgid "Checks that the annotated value is <constant>null</constant>"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:707
+#, no-c-format
+msgid "@Past"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:717
+#, no-c-format
+msgid "Checks whether the annotated date is in the past"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:723
+#, no-c-format
+msgid "<classname>@Pattern(regex=,</classname> <classname>flag=)</classname>"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:726 bean-constraints.xml:811 bean-constraints.xml:825
+#: bean-constraints.xml:839 bean-constraints.xml:856 bean-constraints.xml:880
+#: bean-constraints.xml:923 bean-constraints.xml:960 bean-constraints.xml:1019
+#: bean-constraints.xml:1033 bean-constraints.xml:1047
+#, no-c-format
+msgid "CharSequence"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:728
+#, no-c-format
+msgid ""
+"Checks if the annotated string matches the regular expression "
+"<parameter>regex</parameter> considering the given flag <parameter>match</"
+"parameter>"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:736
+#, no-c-format
+msgid "@Size(min=, max=)"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:738
+#, no-c-format
+msgid ""
+"<classname>CharSequence</classname>, <classname>Collection</classname>, "
+"<classname>Map</classname> and <classname>arrays</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:742
+#, no-c-format
+msgid ""
+"Checks if the annotated element's size is between min and max (inclusive)"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:745 bean-constraints.xml:845
+#, no-c-format
+msgid "Column length will be set to <parameter>max</parameter>"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:750
+#, no-c-format
+msgid "@Valid"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:752
+#, no-c-format
+msgid "Any non-primitive type"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:754
+#, no-c-format
+msgid ""
+"Performs validation recursively on the associated object. If the object is a "
+"collection or an array, the elements are validated recursively. If the "
+"object is a map, the value elements are validated recursively."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:766
+#, no-c-format
+msgid ""
+"On top of the parameters indicated in <xref linkend=\"table-spec-constraints"
+"\"/> each constraint has the parameters <parameter>message</parameter>, "
+"<parameter>groups</parameter> and <parameter>payload</parameter>. This is a "
+"requirement of the Bean Validation specification."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:775
+#, no-c-format
+msgid "Additional constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:777
+#, no-c-format
+msgid ""
+"In addition to the constraints defined by the Bean Validation API Hibernate "
+"Validator provides several useful custom constraints which are listed in "
+"<xref linkend=\"table-custom-constraints\"/>. With one exception also these "
+"constraints apply to the field/property level, only "
+"<classname>@ScriptAssert</classname> is a class-level constraint."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:784
+#, no-c-format
+msgid "Custom constraints"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:809
+#, no-c-format
+msgid "@CreditCardNumber"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:813
+#, no-c-format
+msgid ""
+"Checks that the annotated character sequence passes the Luhn checksum test. "
+"Note, this validation aims to check for user mistakes, not credit card "
+"validity! See also <ulink url=\"http://www.merriampark.com/anatomycc.htm"
+"\">Anatomy of Credit Card Numbers</ulink>."
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:823
+#, no-c-format
+msgid "@Email"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:827
+#, no-c-format
+msgid ""
+"Checks whether the specified character sequence is a valid email address. "
+"The optional parameters <parameter>regexp</parameter> and <parameter>flags</"
+"parameter> allow to specify an additional regular expression (including "
+"regular expression flags) which the email must match."
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:837
+#, no-c-format
+msgid "@Length(min=, max=)"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:841
+#, no-c-format
+msgid ""
+"Validates that the annotated character sequence is between <parameter>min</"
+"parameter> and <parameter>max</parameter> included"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:850
+#, no-c-format
+msgid ""
+"<classname>@ModCheck(modType=,</classname> <classname>multiplier=, "
+"startIndex=,</classname> <classname>endIndex=,</classname> "
+"<classname>checkDigitPosition=,</classname> "
+"<classname>ignoreNonDigitCharacters=)</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:858
+#, no-c-format
+msgid ""
+"Checks that the digits within the annotated character sequence pass the mod "
+"10 or mod 11 checksum algorithm. <constant>modType</constant> is used to "
+"select the modulo type and the <constant>multiplier</constant> determines "
+"the algorithm specific multiplier (see also <ulink url=\"http://en.wikipedia."
+"org/wiki/Luhn_algorithm\">Luhn algorithm</ulink>). <constant>startIndex</"
+"constant> and <constant>endIndex</constant> allow to only run the modulo "
+"algorithm on the specified sub-string. <constant>checkDigitPosition</"
+"constant> allows to use an arbitrary digit within the character sequence to "
+"be the check digit. If not specified it is assumed that the check digit is "
+"part of the specified range. Last but not least, "
+"<constant>ignoreNonDigitCharacters</constant> allows to ignore non digit "
+"characters."
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:878
+#, no-c-format
+msgid "@NotBlank"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:882
+#, no-c-format
+msgid ""
+"Checks that the annotated character sequence is not null and the trimmed "
+"length is greater than 0. The difference to @NotEmpty is that this "
+"constraint can only be applied on strings and that trailing whitespaces are "
+"ignored."
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:891
+#, no-c-format
+msgid "@NotEmpty"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:893
+#, no-c-format
+msgid ""
+"<classname>CharSequence</classname>, <classname>Collection</classname>, "
+"<classname>Map</classname> and arrays"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:897
+#, no-c-format
+msgid ""
+"Checks whether the annotated element is not <constant>null</constant> nor "
+"empty"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:904
+#, no-c-format
+msgid "@Range(min=, max=)"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:906
+#, no-c-format
+msgid ""
+"<classname>BigDecimal</classname>, <classname>BigInteger</classname>, "
+"<classname>CharSequence</classname>, <classname>byte</classname>, "
+"<classname>short</classname>, <classname>int</classname>, <classname>long</"
+"classname> and the respective wrappers of the primitive types"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:913
+#, no-c-format
+msgid ""
+"Checks whether the annotated value lies between (inclusive) the specified "
+"minimum and maximum"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:920
+#, no-c-format
+msgid ""
+"<classname>@SafeHtml(whitelistType=,</classname> <classname>additionalTags=)"
+"</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:925
+#, no-c-format
+msgid ""
+"Checks whether the annotated value contains potentially malicious fragments "
+"such as <code>&lt;script/&gt;</code>. In order to use this constraint, the "
+"<ulink url=\"http://jsoup.org/\">jsoup</ulink> library must be part of the "
+"class path. With the <parameter>whitelistType</parameter> attribute "
+"predefined whitelist types can be chosen. You can also specify additional "
+"html tags for the whitelist with the <parameter>additionalTags</parameter> "
+"attribute."
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:938
+#, no-c-format
+msgid ""
+"<classname>@ScriptAssert(lang=,</classname> <classname>script=, alias=)</"
+"classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:943
+#, no-c-format
+msgid ""
+"Checks whether the given script can successfully be evaluated against the "
+"annotated element. In order to use this constraint, an implementation of the "
+"Java Scripting API as defined by JSR 223 (\"Scripting for the "
+"Java<superscript>TM</superscript> Platform\") must part of the class path. "
+"The expressions to be evaluated can be written in any scripting or "
+"expression language, for which a JSR 223 compatible engine can be found in "
+"the class path."
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:956
+#, no-c-format
+msgid ""
+"<classname>@URL(protocol=,</classname> <classname>host=, port=</classname> "
+"<classname>regexp=, flags=)</classname>"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:962
+#, no-c-format
+msgid ""
+"Checks if the annotated character sequence is a valid URL according to "
+"RFC2396. If any of the optional parameters <parameter>protocol</parameter>, "
+"<parameter>host</parameter> or <parameter>port</parameter> are specified, "
+"the corresponding URL fragments must match the specified values. The "
+"optional parameters <parameter>regexp</parameter> and <parameter>flags</"
+"parameter> allow to specify an additional regular expression (including "
+"regular expression flags) which the URL must match."
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:979
+#, no-c-format
+msgid "Country specific constraints"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:981
+#, no-c-format
+msgid ""
+"Hibernate Validator offers also some country specific constraints, e.g. for "
+"the validation of social security numbers."
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:983
+#, no-c-format
+msgid ""
+"If you have to implement a country specific constraint, consider making it a "
+"contribution to Hibernate Validator!"
+msgstr ""
+
+#. Tag: title
+#: bean-constraints.xml:988
+#, no-c-format
+msgid "Custom country specific constraints"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:1009
+#, no-c-format
+msgid "Country"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:1017
+#, no-c-format
+msgid "@CNPJ"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:1021
+#, no-c-format
+msgid ""
+"Checks that the annotated character sequence represents a Brazilian "
+"corporate tax payer registry number (Cadastro de Pessoa Juríeddica)"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:1025 bean-constraints.xml:1039
+#: bean-constraints.xml:1054
+#, no-c-format
+msgid "Brazil"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:1031
+#, no-c-format
+msgid "@CPF"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:1035
+#, no-c-format
+msgid ""
+"Checks that the annotated character sequence represents a Brazilian "
+"individual taxpayer registry number (Cadastro de Pessoa Fídsica)"
+msgstr ""
+
+#. Tag: classname
+#: bean-constraints.xml:1045
+#, no-c-format
+msgid "@TituloEleitoral"
+msgstr ""
+
+#. Tag: entry
+#: bean-constraints.xml:1049
+#, no-c-format
+msgid ""
+"Checks that the annotated character sequence represents a Brazilian voter ID "
+"card number (<ulink url=\"http://ghiorzi.org/cgcancpf.htm\">Título "
+"Eleitoral</ulink>)"
+msgstr ""
+
+#. Tag: para
+#: bean-constraints.xml:1063
+#, no-c-format
+msgid ""
+"In some cases neither the Bean Validation constraints nor the custom "
+"constraints provided by Hibernate Validator will fulfill your requirements. "
+"In this case you can easily write your own constraint. We will discuss this "
+"in <xref linkend=\"validator-customconstraints\"/>."
+msgstr ""

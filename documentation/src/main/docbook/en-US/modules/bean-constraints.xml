@@ -23,9 +23,9 @@
 <chapter id="chapter-bean-constraints">
   <title>Declaring and validating bean constraints</title>
 
-  <para>Read this chapter in order to learn how to declare bean constraints
-  (see <xref linkend="section-declaring-bean-constraints"/>) and validate the
-  same (see <xref linkend="section-validating-bean-constraints"/>). <xref
+  <para>In this chapter you will learn how to declare (see <xref
+  linkend="section-declaring-bean-constraints"/>) and validate (see <xref
+  linkend="section-validating-bean-constraints"/>) bean constraints. <xref
   linkend="section-builtin-constraints"/> provides an overview of all built-in
   constraints coming with Hibernate Validator.</para>
 
@@ -95,7 +95,7 @@ public class Car {
       <para>When using field-level constraints field access strategy is used
       to access the value to be validated. This means the validation engine
       directly accesses the instance variable and does not invoke the property
-      accessor method also if such a method exists.</para>
+      accessor method even if such an accessor exists.</para>
 
       <para>Constraints can be applied to fields of any access type (public,
       private etc.). Constraints on static fields are not supported,
@@ -116,11 +116,7 @@ public class Car {
       standard, it is also possible to annotate the properties of a bean class
       instead of its fields. <xref linkend="example-property-level"/> uses the
       same entity as in <xref linkend="example-field-level"/>, however,
-      property level constraints are used.<note>
-          <para>The property's getter method has to be annotated, not its
-          setter. That way also read-only properties can be constrained which
-          have no setter method.</para>
-        </note></para>
+      property level constraints are used.</para>
 
       <example id="example-property-level">
         <title>Property-level constraints</title>
@@ -158,14 +154,15 @@ public class Car {
 }</programlisting>
       </example>
 
+      <note>
+        <para>The property's getter method has to be annotated, not its
+        setter. That way also read-only properties can be constrained which
+        have no setter method.</para>
+      </note>
+
       <para>When using property level constraints property access strategy is
       used to access the value to be validated, i.e. the validation engine
       accesses the state via the property accessor method.</para>
-
-      <para>One advantage of annotating properties instead of fields is that
-      the constraints become part of the type's API that way. Thus users are
-      aware of the existing constraints without having to examine the type's
-      implementation.</para>
 
       <tip>
         <para>It is recommended to stick either to field
@@ -317,12 +314,13 @@ public class Person {
       field of the referenced <classname>Person</classname> instance is
       <code>null</code>.</para>
 
-      <para>The validation of object graphs is done recursively, i.e. if a
-      reference marked for cacaded validation points to an object which itself
-      has properties annotated with <classname>@Valid</classname>, these
-      references will be followed up by the validation engine as well. It is
-      ensured that no infinite loops occur during cascaded validation, if for
-      instance two objects hold references to each other.</para>
+      <para>The validation of object graphs is recursive, i.e. if a reference
+      marked for cascaded validation points to an object which itself has
+      properties annotated with <classname>@Valid</classname>, these
+      references will be followed up by the validation engine as well. The
+      validation engine will ensure that no infinite loops occur during
+      cascaded validation, for example if two objects hold references to each
+      other.</para>
 
       <para>Note that <literal>null</literal> values are getting ignored
       during cascaded validation.</para>
@@ -391,7 +389,7 @@ public class Car {
       instance leads via the <classname>Validation</classname> class and a
       <classname>ValidatorFactory</classname>. The easiest way is to use the
       static method
-      <methodname>Validation#buildDefaultValidatorFactory()</methodname>:</para>
+      <methodname>Validation.buildDefaultValidatorFactory()</methodname>:</para>
 
       <example>
         <title>Validation#buildDefaultValidatorFactory()</title>
@@ -428,7 +426,7 @@ Validator validator = factory.getValidator();</programlisting>
       linkend="chapter-groups"/>.</para>
 
       <section>
-        <title><methodname>validate()</methodname></title>
+        <title><methodname>Validator.validate()</methodname></title>
 
         <para>Use the <methodname>validate()</methodname> method to perform
         validation of all constraints of a given bean. <xref
@@ -453,7 +451,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
       </section>
 
       <section>
-        <title><methodname>validateProperty()</methodname></title>
+        <title><methodname>Validator.validateProperty()</methodname></title>
 
         <para>With help of the <methodname>validateProperty()</methodname> you
         can validate a single named property of a given object. The property
@@ -476,7 +474,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
       </section>
 
       <section>
-        <title><methodname>validateValue()</methodname></title>
+        <title><methodname>Validator.validateValue()</methodname></title>
 
         <para>By using the <methodname>validateValue() </methodname>method you
         can check whether a single property of a given class can be validated

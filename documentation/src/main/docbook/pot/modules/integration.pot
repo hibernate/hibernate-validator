@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: http://bugs.kde.org\n"
-"POT-Creation-Date: 2013-04-03 09:59+0000\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <kde-i18n-doc@kde.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 #. Tag: title
 #: integration.xml:24
 #, no-c-format
-msgid "Integration with other frameworks"
+msgid "Integrating with other frameworks"
 msgstr ""
 
 #. Tag: para
@@ -41,7 +41,7 @@ msgstr ""
 #. Tag: para
 #: integration.xml:41
 #, no-c-format
-msgid "The Java Service Provider mechanism used by Bean Validation to automatically discover validation providers doesn't work in an OSGi environment. To solve this, you have to provide a custom <classname>ValidationProviderResolver</classname>. See <xref linkend=\"section-validation-provider-resolver\"/>"
+msgid "The Java Service Provider mechanism used by Bean Validation to automatically discover validation providers doesn't work in an OSGi environment. To solve this, you have to provide a custom <classname>ValidationProviderResolver</classname> (see <xref linkend=\"section-validation-provider-resolver\"/>)."
 msgstr ""
 
 #. Tag: title
@@ -331,5 +331,17 @@ msgstr ""
 #: integration.xml:272
 #, no-c-format
 msgid "javax.faces.validator.BeanValidator.MESSAGE={0}"
+msgstr ""
+
+#. Tag: title
+#: integration.xml:277
+#, no-c-format
+msgid "<title>CDI</title>"
+msgstr ""
+
+#. Tag: para
+#: integration.xml:279
+#, no-c-format
+msgid "TODO"
 msgstr ""
 

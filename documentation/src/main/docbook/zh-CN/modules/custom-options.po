@@ -1,0 +1,619 @@
+# Language zh-CN translations for PACKAGE package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
+"PO-Revision-Date: 2013-04-29 13:14+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh-CN\n"
+
+#. Tag: title
+#: custom-options.xml:24
+#, no-c-format
+msgid "Hibernate Validator Specifics"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:26
+#, no-c-format
+msgid ""
+"In this chapter you will learn how to make use of several features provided "
+"by Hibernate Validator in addition to the functionality defined by the Bean "
+"Validation specification. This includes the fail fast mode, the API for "
+"programmatic constraint configuration and the boolean composition of "
+"constraints."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:33
+#, no-c-format
+msgid ""
+"Using the features described in the following sections may result in "
+"application code which is not portable between Bean Validation providers."
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:39
+#, no-c-format
+msgid "Public API"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:41
+#, no-c-format
+msgid ""
+"Let's start, however, with a look at the public API of Hibernate Validator. "
+"<xref linkend=\"validator-public-api\"/> lists all packages belonging to "
+"this API and describes their purpose. Note that when a package is part of "
+"the public this is not necessarily true for its sub-packages."
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:48
+#, no-c-format
+msgid "Hibernate Validator public API"
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:53
+#, no-c-format
+msgid "Packages"
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:55
+#, no-c-format
+msgid "Description"
+msgstr ""
+
+#. Tag: package
+#: custom-options.xml:61
+#, no-c-format
+msgid "org.hibernate.validator"
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:63
+#, no-c-format
+msgid ""
+"Classes used by the Bean Validation bootstrap mechanism (eg. validation "
+"provider, configuration class); For more details see <xref linkend=\"chapter-"
+"bootstrapping\"/>."
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:69
+#, no-c-format
+msgid ""
+"<package>org.hibernate.validator.cfg</package>, <package>org.hibernate."
+"validator.cfg.context</package>, <package>org.hibernate.validator.cfg.defs</"
+"package>"
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:73
+#, no-c-format
+msgid ""
+"Hibernate Validator's fluent API for constraint declaration; In <package>org."
+"hibernate.validator.cfg</package> you will find the "
+"<classname>ConstraintMapping</classname> interface and in <package>org."
+"hibernate.validator.cfg.defs</package> all constraint definitions. Refer to "
+"<xref linkend=\"section-programmatic-api\"/> for the details."
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:82
+#, no-c-format
+msgid ""
+"<package>org.hibernate.validator.constraints</package>, <package>org."
+"hibernate.validator.constraints.br</package>"
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:85
+#, no-c-format
+msgid ""
+"Some useful custom constraints provided by Hibernate Validator in addition "
+"to the built-in constraints defined by the Bean Validation specification; "
+"The constraints are described in detail in <xref linkend=\"validator-"
+"defineconstraints-hv-constraints\"/>."
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:93
+#, no-c-format
+msgid ""
+"<package>org.hibernate.validator.group</package>, <package>org.hibernate."
+"validator.spi.group</package>"
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:96
+#, no-c-format
+msgid ""
+"The group sequence provider feature which allows you to define dynamic "
+"default group sequences in function of the validated object state; The "
+"specifics can be found in <xref linkend=\"section-default-group-class\"/>."
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:103
+#, no-c-format
+msgid ""
+"<package>org.hibernate.validator.messageinterpolation</package>, "
+"<package>org.hibernate.validator.resourceloading</package>, <package>org."
+"hibernate.validator.spi.resourceloading</package>"
+msgstr ""
+
+#. Tag: entry
+#: custom-options.xml:107
+#, no-c-format
+msgid ""
+"Classes related to constraint message interpolation; The first package "
+"contains Hibernate Validator's default message interpolator, "
+"<classname>ResourceBundleMessageInterpolator</classname>. The latter two "
+"packages provide the<classname> ResourceBundleLocator</classname> SPI for "
+"the loading of resource bundles (see <xref linkend=\"section-resource-bundle-"
+"locator\"/>) and its default implementation."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:121
+#, no-c-format
+msgid ""
+"The public packages of Hibernate Validator fall into two categories: while "
+"the actual API parts are intended to be <emphasis>invoked</emphasis> or "
+"<emphasis>used</emphasis> by clients (e.g. the API for programmatic "
+"constraint declaration or the custom constraints), the SPI (service provider "
+"interface) packages contain interfaces which are intended to be "
+"<emphasis>implemented</emphasis> by clients (e.g. "
+"<classname>ResourceBundleLocator</classname>)."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:130
+#, no-c-format
+msgid ""
+"Any packages not listed in that table are internal packages of Hibernate "
+"Validator and are not intended to be accessed by clients. The contents of "
+"these internal packages can change from release to release without notice, "
+"thus possibly breaking any client code relying on it."
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:138
+#, no-c-format
+msgid "Fail fast mode"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:140
+#, no-c-format
+msgid ""
+"Using the fail fast mode, Hibernate Validator allows to return from the "
+"current validation as soon as the first constraint violation occurs. This "
+"can be useful for the validation of large object graphs where you are only "
+"interested in a quick check whether there is any constraint violation at all."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:146
+#, no-c-format
+msgid "shows how to bootstrap and use a fail fast enabled validator."
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:150
+#, no-c-format
+msgid "Using the fail fast validation mode"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-options.xml:152
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter11.failfast;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        @NotNull\n"
+"        private String manufacturer;\n"
+"\n"
+"        @AssertTrue\n"
+"        private boolean isRegistered;\n"
+"\n"
+"        public Car(String manufacturer, boolean isRegistered) {\n"
+"                this.manufacturer = manufacturer;\n"
+"                this.isRegistered = isRegistered;\n"
+"        }\n"
+"\n"
+"        //getters and setters...\n"
+"}"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-options.xml:154
+#, no-c-format
+msgid ""
+"Validator validator = Validation.byProvider( HibernateValidator.class )\n"
+"                .configure()\n"
+"                .failFast( true )\n"
+"                .buildValidatorFactory()\n"
+"                .getValidator();\n"
+"\n"
+"Car car = new Car( null, false );\n"
+"\n"
+"Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations = validator."
+"validate( car );\n"
+"\n"
+"assertEquals( 1, constraintViolations.size() );"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:157
+#, no-c-format
+msgid ""
+"Here the validated object actually fails to satisfy both the constraints "
+"declared on the <classname>Car</classname> class, yet the validation call "
+"yields only one <classname>ConstraintViolation</classname> since the fail "
+"fast mode is enabled."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:163
+#, no-c-format
+msgid ""
+"There is no guarantee in which order the constraints are evaluated, i.e. it "
+"is not deterministic whether the returned violation originates from the "
+"<classname>@NotNull</classname> or the <classname>@AssertTrue</classname> "
+"constraint. If required, a deterministic evaluation order can be enforced "
+"using group sequences as described in <xref linkend=\"section-defining-group-"
+"sequences\"/>."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:171
+#, no-c-format
+msgid ""
+"Refer to <xref linkend=\"section-provider-specific-settings\"/> to learn "
+"about the different ways of enabling the fail fast mode when bootstrapping a "
+"validator."
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:177 custom-options.xml:203
+#, no-c-format
+msgid "Programmatic constraint declaration"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:179
+#, no-c-format
+msgid ""
+"As per the Bean Validation specification, you can declare constraints using "
+"Java annotations and XML based constraint mappings."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:183
+#, no-c-format
+msgid ""
+"In addition, Hibernate Validator provides a fluent API which allows for the "
+"programmatic configuration of constraints. Use cases include the dynamic "
+"addition of constraints at runtime depending on some application state or "
+"tests where you need entities with different constraints in different "
+"scenarios but don't want to implement actual Java classes for each test case."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:190
+#, no-c-format
+msgid ""
+"By default, constraints added via the fluent API are additive to constraints "
+"configured via the standard configuration capabilities. But it is also "
+"possible to ignore annotation and XML configured constraints where required."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:195
+#, no-c-format
+msgid ""
+"The API is centered around the <classname>ConstraintMapping</classname> "
+"interface. You obtain a new mapping via "
+"<classname>HibernateValidatorConfiguration#createConstraintMapping()</"
+"classname> which you then can configure in a fluent manner as shown in <xref "
+"lang=\"\" linkend=\"example-constraint-mapping\"/>."
+msgstr ""
+
+#. Tag: programlisting
+#: custom-options.xml:205
+#, no-c-format
+msgid ""
+"HibernateValidatorConfiguration configuration = Validation\n"
+"                .byProvider( HibernateValidator.class )\n"
+"                .configure();\n"
+"\n"
+"ConstraintMapping constraintMapping = configuration.createConstraintMapping"
+"();\n"
+"\n"
+"constraintMapping\n"
+"        .type( Car.class )\n"
+"                .property( \"manufacturer\", FIELD )\n"
+"                        .constraint( new NotNullDef() )\n"
+"                .property( \"licensePlate\", FIELD )\n"
+"                        .ignoreAnnotations()\n"
+"                        .constraint( new NotNullDef() )\n"
+"                        .constraint( new SizeDef().min( 2 ).max( 14 ) )\n"
+"        .type( RentalCar.class )\n"
+"                .property( \"rentalStation\", METHOD )\n"
+"                                .constraint( new NotNullDef() );\n"
+"\n"
+"Validator validator = configuration.addMapping( constraintMapping )\n"
+"                .buildValidatorFactory()\n"
+"                .getValidator();"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:208
+#, no-c-format
+msgid ""
+"Constraints can be configured on multiple classes and properties using "
+"method chaining. The constraint definition classes <classname>NotNullDef</"
+"classname> and <classname>SizeDef</classname> are helper classes which allow "
+"to configure constraint parameters in a type-safe fashion. Definition "
+"classes exist for all built-in constraints in the <classname>org.hibernate."
+"validator.cfg.defs</classname> package. By calling "
+"<methodname>ignoreAnnotations()</methodname> any constraints configured via "
+"annotations or XML are ignored for the given element."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:218
+#, no-c-format
+msgid ""
+"Having configured the mapping, you must add it back to the configuration "
+"object from which you then can obtain a validator factory."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:222
+#, no-c-format
+msgid ""
+"For custom constraints you can either create your own definition classes "
+"extending <classname>ConstraintDef</classname> or you can use "
+"<classname>GenericConstraintDef</classname> as seen in <xref linkend="
+"\"example-generic-constraint-mapping\"/>."
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:228
+#, no-c-format
+msgid "Programmatic declaration of a custom constraint"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-options.xml:230
+#, no-c-format
+msgid ""
+"ConstraintMapping constraintMapping = configuration.createConstraintMapping"
+"();\n"
+"\n"
+"constraintMapping\n"
+"        .type( Car.class )\n"
+"                .property( \"licensePlate\", FIELD )\n"
+"                        .constraint( new GenericConstraintDef&lt;"
+"CheckCase&gt;( CheckCase.class )\n"
+"                                .param( \"value\", CaseMode.UPPER )\n"
+"                        );"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:233
+#, no-c-format
+msgid ""
+"By invoking <methodname>valid()</methodname> a member is marked for "
+"cascasded validation which is equivalent to annotating it with "
+"<classname>@Valid</classname>. An example can be seen in <xref lang=\"\" "
+"linkend=\"example-cascading-constraints\"/>."
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:239
+#, no-c-format
+msgid "Marking a property for cascaded validation"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-options.xml:241
+#, no-c-format
+msgid ""
+"ConstraintMapping constraintMapping = configuration.createConstraintMapping"
+"();\n"
+"\n"
+"constraintMapping\n"
+"        .type( Car.class )\n"
+"                .property( \"driver\", FIELD )\n"
+"                        .constraint( new NotNullDef() )\n"
+"                        .valid()\n"
+"        .type( Person.class )\n"
+"                .property( \"name\", FIELD )\n"
+"                        .constraint( new NotNullDef() );"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:244
+#, no-c-format
+msgid ""
+"Not only bean constraints but also method constraints can be configured "
+"using the fluent API. As shown in <xref lang=\"\" linkend=\"example-method-"
+"constraint-mapping\"/> methods are identified by their name and parameter "
+"types. Having selected a method, you can marke its parameters and/or return "
+"value for cascaded validation and add constraints."
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:252
+#, no-c-format
+msgid "Programmatic declaration of method constraints"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-options.xml:254
+#, no-c-format
+msgid ""
+"ConstraintMapping constraintMapping = configuration.createConstraintMapping"
+"();\n"
+"\n"
+"constraintMapping\n"
+"        .type( Car.class )\n"
+"                .method( \"drive\", int.class )\n"
+"                        .parameter( 0 )\n"
+"                                .constraint( new MaxDef().value ( 75 ) )\n"
+"                .method( \"getDriver\" )\n"
+"                        .returnValue()\n"
+"                                .constraint( new NotNullDef() )\n"
+"                                .valid();"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:257
+#, no-c-format
+msgid ""
+"Last but not least you can configure the default group sequence or the "
+"default group sequence provider of a type as shown in the following example."
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:262
+#, no-c-format
+msgid ""
+"Configuration of default group sequence and default group sequence provider"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-options.xml:265
+#, no-c-format
+msgid ""
+"ConstraintMapping constraintMapping = configuration.createConstraintMapping"
+"();\n"
+"\n"
+"constraintMapping\n"
+"        .type( Car.class )\n"
+"                .defaultGroupSequence( Car.class, CarChecks.class )\n"
+"        .type( RentalCar.class )\n"
+"                .defaultGroupSequenceProviderClass"
+"( RentalCarGroupSequenceProvider.class );"
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:270
+#, no-c-format
+msgid "Boolean composition of constraints"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:272
+#, no-c-format
+msgid ""
+"Bean Validation specificies that the constraints of a composed constraint "
+"(see <xref linkend=\"section-constraint-composition\"/>) are all combined "
+"via a logical <emphasis>AND</emphasis>. This means all of the composing "
+"constraints need to return <constant>true</constant> in order for an overall "
+"successful validation."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:278
+#, no-c-format
+msgid ""
+"Hibernate Validator offers an extension to this and allows you to compose "
+"constraints via a logical <emphasis>OR</emphasis> or <emphasis>NOT</"
+"emphasis>. To do so you have to use the <classname>ConstraintComposition</"
+"classname> annotation and the enum <classname>CompositionType</classname> "
+"with its values <emphasis>AND</emphasis>, <emphasis>OR</emphasis> and "
+"<emphasis>ALL_FALSE</emphasis>."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:286
+#, no-c-format
+msgid ""
+"shows how to build a composed constraint <classname>@PatternOrSize</"
+"classname> where only one of the composing constraints needs to be valid in "
+"order to pass the validation. Either the validated string is all lower-cased "
+"or it is between two and three characters long."
+msgstr ""
+
+#. Tag: title
+#: custom-options.xml:293
+#, no-c-format
+msgid "OR composition of constraints"
+msgstr ""
+
+#. Tag: programlisting
+#: custom-options.xml:295
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter11."
+"booleancomposition;\n"
+"\n"
+"@ConstraintComposition(OR)\n"
+"@Pattern(regexp = \"[a-z]\")\n"
+"@Size(min = 2, max = 3)\n"
+"@ReportAsSingleViolation\n"
+"@Target({ METHOD, FIELD })\n"
+"@Retention(RUNTIME)\n"
+"@Constraint(validatedBy = { })\n"
+"public @interface PatternOrSize {\n"
+"        String message() default \"{org.hibernate.validator.referenceguide."
+"chapter11.\" +\n"
+"                        \"booleancomposition.PatternOrSize.message}\";\n"
+"\n"
+"        Class&lt;?&gt;[] groups() default { };\n"
+"\n"
+"        Class&lt;? extends Payload&gt;[] payload() default { };\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:299
+#, no-c-format
+msgid ""
+"Using <emphasis>ALL_FALSE</emphasis> as composition type implicitly enforces "
+"that only a single violation will get reported in case validation of the "
+"constraint composition fails."
+msgstr ""
+
+#. Tag: classname
+#: custom-options.xml:306
+#, no-c-format
+msgid "ResourceBundleLocator"
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:308
+#, no-c-format
+msgid ""
+"As described in <xref linkend=\"section-custom-message-interpolation\"/>, "
+"Bean Validation allows to plug in custom message interpolator "
+"implementations."
+msgstr ""
+
+#. Tag: para
+#: custom-options.xml:312
+#, no-c-format
+msgid ""
+"With <classname>ResourceBundleLocator</classname>, Hibernate Validator "
+"provides an additional SPI which allows to retrieve error messages from "
+"other resource bundles than <filename>ValidationMessages</filename> while "
+"still using the actual interpolation algorithm as defined by the "
+"specification. Refer to <xref linkend=\"section-resource-bundle-locator\"/> "
+"to learn how to make use of that SPI."
+msgstr ""

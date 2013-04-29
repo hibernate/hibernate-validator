@@ -1,0 +1,583 @@
+# Language zh-CN translations for PACKAGE package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
+"PO-Revision-Date: 2013-04-29 13:14+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh-CN\n"
+
+#. Tag: title
+#: message-interpolation.xml:24
+#, no-c-format
+msgid "Message interpolation"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:26
+#, no-c-format
+msgid ""
+"Message interpolation is the process of creating error messages for violated "
+"Bean Validation constraints. In this chapter you will learn how such "
+"messages are defined and resolved and how you can plug in custom message "
+"interpolators in case the default algorithm is not sufficient for your "
+"requirements."
+msgstr ""
+
+#. Tag: title
+#: message-interpolation.xml:33
+#, no-c-format
+msgid "Default message interpolation"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:35
+#, no-c-format
+msgid ""
+"Constraint violation messages are retrieved from so called message "
+"descriptors. Each constraint defines its default message descriptor using "
+"the <methodname>message</methodname> attribute. At declaration time, the "
+"default descriptor can be overridden with a specific value as shown in <xref "
+"linkend=\"example-overriding-message\"/>."
+msgstr ""
+
+#. Tag: title
+#: message-interpolation.xml:42
+#, no-c-format
+msgid ""
+"Specifying a message descriptor using the <methodname>message</methodname> "
+"attribute"
+msgstr ""
+
+#. Tag: programlisting
+#: message-interpolation.xml:45
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter04;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        @NotNull(message = \"The manufacturer name must not be null\")\n"
+"        private String manufacturer;\n"
+"\n"
+"        //constructor, getters and setters ...\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:48
+#, no-c-format
+msgid ""
+"If a constraint is violated, its descriptor will be interpolated by the "
+"runtime using the currently configured <classname>MessageInterpolator</"
+"classname>. The interpolated error message can then be retrieved from the "
+"resulting constraint violation by calling "
+"<methodname>ConstraintViolation#getMessage()</methodname>."
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:54
+#, no-c-format
+msgid ""
+"Message descriptors can contain <emphasis>message parameters</emphasis> as "
+"well as <emphasis>message expressions</emphasis> which will be resolved "
+"during interpolation. Message parameters are string literals enclosed in "
+"<literal>{}</literal>, while message expressions are string literals "
+"enclosed in <literal>${}</literal>. The following algorithm is applied "
+"during method interpolation:"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:63
+#, no-c-format
+msgid ""
+"Resolve any message parameters by using them as key for the resource bundle "
+"<filename>ValidationMessages</filename>. If this bundle contains an entry "
+"for a given message parameter, that parameter will be replaced in the "
+"message with the corresponding value from the bundle. This step will be "
+"executed recursively if the replaced value again contains message "
+"parameters. The resource bundle is expected to be provided by the "
+"application developer, e.g. by adding a file named "
+"<filename>ValidationMessages.properties</filename> to the classpath. You can "
+"also create localized error messages by providing locale specific variations "
+"of this bundle, such as <filename>ValidationMessages_en_US.properties</"
+"filename>. By default, the JVM's default locale "
+"(<methodname>Locale#getDefault()</methodname>) will be used when looking up "
+"messages in the bundle."
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:80
+#, no-c-format
+msgid ""
+"Resolve any message parameters by using them as key for a resource bundle "
+"containing the standard error messages for the built-in constraints as "
+"defined in Appendix B of the Bean Validation specification. In the case of "
+"Hibernate Validator, this bundle is named <classname>org.hibernate.validator."
+"ValidationMessages</classname>. If this step triggers a replacement, step 1 "
+"is executed again, otherwise step 3 is applied."
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:91
+#, no-c-format
+msgid ""
+"Resolve any message parameters by replacing them with the value of the "
+"constraint annotation member of the same name. This allows to refer to "
+"attribute values of the constraint (e.g. <methodname>Size#min()</"
+"methodname>) in the error message (e.g. \"must be at least ${min}\")."
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:99
+#, no-c-format
+msgid ""
+"Resolve any message expressions by evaluating them as expressions of the "
+"Unified Expression Language. See <xref linkend=\"section-interpolation-with-"
+"message-expressions\"/> to learn more about the usage of Unified EL in error "
+"messages."
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:107
+#, no-c-format
+msgid ""
+"You can find the formal definition of the interpolation algorithm in section "
+"<ulink url=\"http://beanvalidation.org/1.1/spec/#default-resolution-algorithm"
+"\">5.3.1.1</ulink> of the Bean Validation specification."
+msgstr ""
+
+#. Tag: title
+#: message-interpolation.xml:114
+#, no-c-format
+msgid "Special characters"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:116
+#, no-c-format
+msgid ""
+"Since the characters <literal>{</literal>, <literal>}</literal> and <literal>"
+"$</literal> have a special meaning in message descriptors they need to be "
+"escaped if you want to use them literally. The following rules apply:"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:121
+#, no-c-format
+msgid ""
+"<literal><literal>\\{</literal></literal> is considered as the literal "
+"<literal>{</literal>"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:126
+#, no-c-format
+msgid ""
+"<literal>\\}</literal> is considered as the literal <literal>}</literal>"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:131
+#, no-c-format
+msgid ""
+"<literal>\\$</literal> is considered as the literal <literal>$</literal>"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:136
+#, no-c-format
+msgid ""
+"<literal>\\\\</literal> is considered as the literal <literal>\\</literal>"
+msgstr ""
+
+#. Tag: title
+#: message-interpolation.xml:143
+#, no-c-format
+msgid "Interpolation with message expressions"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:145
+#, no-c-format
+msgid ""
+"Since Bean Validation 1.1 / Hibernate Validator 5 it is possible to use the "
+"Unified Expression Language (as defined by <ulink url=\"http://jcp.org/en/"
+"jsr/detail?id=341\">JSR 341</ulink>) in constraint violation messages. This "
+"allows to define error messages based on conditional logic and also enables "
+"advanced formatting options. The validation engine makes the following "
+"objects available in the EL context:"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:155
+#, no-c-format
+msgid "the attribute values of the constraint mapped to the attribute names"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:160
+#, no-c-format
+msgid ""
+"the currently validated value (property, bean, method parameter etc.) under "
+"the name <varname>validatedValue</varname>"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:166
+#, no-c-format
+msgid ""
+"a bean mapped to the name <varname>formatter</varname> exposing the var-arg "
+"method <methodname>format(String format, Object... args)</methodname> which "
+"behaves like <methodname>java.util.Formatter.format(String format, Object... "
+"args)</methodname>."
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:174
+#, no-c-format
+msgid ""
+"The following section provides several examples for using EL expressions in "
+"error messages."
+msgstr ""
+
+#. Tag: title
+#: message-interpolation.xml:179
+#, no-c-format
+msgid "Examples"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:181
+#, no-c-format
+msgid ""
+"shows how to make use of the different options for specifying message "
+"descriptors."
+msgstr ""
+
+#. Tag: title
+#: message-interpolation.xml:185
+#, no-c-format
+msgid "Specifying message descriptors"
+msgstr ""
+
+#. Tag: programlisting
+#: message-interpolation.xml:187
+#, no-c-format
+msgid ""
+"package org.hibernate.validator.referenceguide.chapter04.complete;\n"
+"\n"
+"public class Car {\n"
+"\n"
+"        @NotNull\n"
+"        private String manufacturer;\n"
+"\n"
+"        @Size(\n"
+"                        min = 2,\n"
+"                        max = 14,\n"
+"                        message = \"The license plate must be between {min} "
+"and {max} characters long\"\n"
+"        )\n"
+"        private String licensePlate;\n"
+"\n"
+"        @Min(\n"
+"                        value = 2,\n"
+"                        message = \"There must be at least {value} seat"
+"${value &gt; 1 ? 's' : ''}\"\n"
+"        )\n"
+"        private int seatCount;\n"
+"\n"
+"        @DecimalMax(\n"
+"                        value = \"350\",\n"
+"                        message = \"The top speed ${formatter.format"
+"('%1$.2f', validatedValue)} is higher \" +\n"
+"                                        \"than {value}\"\n"
+"        )\n"
+"        private double topSpeed;\n"
+"\n"
+"        @DecimalMax(value = \"100000\", message = \"Price must not be higher "
+"than ${value}\")\n"
+"        private BigDecimal price;\n"
+"\n"
+"        public Car(\n"
+"                        String manufacturer,\n"
+"                        String licensePlate,\n"
+"                        int seatCount,\n"
+"                        double topSpeed,\n"
+"                        BigDecimal price) {\n"
+"                this.manufacturer = manufacturer;\n"
+"                this.licensePlate = licensePlate;\n"
+"                this.seatCount = seatCount;\n"
+"                this.topSpeed = topSpeed;\n"
+"                this.price = price;\n"
+"        }\n"
+"\n"
+"        //getters and setters ...\n"
+"}"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:190
+#, no-c-format
+msgid ""
+"Validating an invalid <classname>Car</classname> instance yields constraint "
+"violations with the messages shown by the assertions in <xref linkend="
+"\"example-expected-error-messages\"/>:"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:196
+#, no-c-format
+msgid ""
+"the <classname>@NotNull</classname> constraint on the <varname>manufacturer</"
+"varname> field causes the error message \"may not be null\", as this is the "
+"default message defined by the Bean Validation specification and no specific "
+"descriptor is given in the <methodname>message</methodname> attribute"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:204
+#, no-c-format
+msgid ""
+"the <classname>@Size</classname> constraint on the <varname>licensePlate</"
+"varname> field shows the interpolation of message parameters (<literal>{min}"
+"</literal>, <literal>{max}</literal>)"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:211
+#, no-c-format
+msgid ""
+"the <classname>@Min</classname> constraint on <varname>seatCount</varname> "
+"demonstrates how use an EL expression with a ternery expression to "
+"dynamically chose singular or plural form, depending on an attribute of the "
+"constraint (\"There must be at least 1 seat\" vs. \"There must be at least 2 "
+"seats\")"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:219
+#, no-c-format
+msgid ""
+"the message for the <classname>@DecimalMax</classname> constraint on "
+"<varname>topSpeed</varname> shows how to refer to the validated object in "
+"the error message and format it using the <varname>formatter</varname> object"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:226
+#, no-c-format
+msgid ""
+"finally, the <classname>@DecimalMax</classname> constraint on "
+"<varname>price</varname> shows that parameter interpolation has precedence "
+"over expression evaluation, causing the <literal>$</literal> sign to show up "
+"in front of the maximum price"
+msgstr ""
+
+#. Tag: title
+#: message-interpolation.xml:235
+#, no-c-format
+msgid "Expected error messages"
+msgstr ""
+
+#. Tag: programlisting
+#: message-interpolation.xml:237
+#, no-c-format
+msgid ""
+"Car car = new Car( null, \"A\", 1, 400.123456, BigDecimal.valueOf"
+"( 200000 ) );\n"
+"\n"
+"String message = validator.validateProperty( car, \"manufacturer\" )\n"
+"                .iterator()\n"
+"                .next()\n"
+"                .getMessage();\n"
+"assertEquals( \"may not be null\", message );\n"
+"\n"
+"message = validator.validateProperty( car, \"licensePlate\" )\n"
+"                .iterator()\n"
+"                .next()\n"
+"                .getMessage();\n"
+"assertEquals(\n"
+"                \"The license plate must be between 2 and 14 characters long"
+"\",\n"
+"                message\n"
+");\n"
+"\n"
+"message = validator.validateProperty( car, \"seatCount\" ).iterator().next()."
+"getMessage();\n"
+"assertEquals( \"There must be at least 2 seats\", message );\n"
+"\n"
+"message = validator.validateProperty( car, \"topSpeed\" ).iterator().next()."
+"getMessage();\n"
+"assertEquals( \"The top speed 400.12 is higher than 350\", message );\n"
+"\n"
+"message = validator.validateProperty( car, \"price\" ).iterator().next()."
+"getMessage();\n"
+"assertEquals( \"Price must not be higher than $100000\", message );"
+msgstr ""
+
+#. Tag: title
+#: message-interpolation.xml:243
+#, no-c-format
+msgid "Custom message interpolation"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:245
+#, no-c-format
+msgid ""
+"If the default message interpolation algorithm does not fit your "
+"requirements it is also possible to plug in a custom "
+"<classname>MessageInterpolator</classname> implementation."
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:249
+#, no-c-format
+msgid ""
+"Custom interpolators must implement the interface <classname>javax."
+"validation.MessageInterpolator</classname>. Note that implementations must "
+"be thread-safe. It is recommended that custom message interpolators delegate "
+"final implementation to the runtime's default interpolator, which can be "
+"obtained via <methodname>Configuration#getDefaultMessageInterpolator()</"
+"methodname>."
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:256
+#, no-c-format
+msgid ""
+"In order to use a custom message interpolator it must be registered with the "
+"validation runtime. You can do this by either configuring it in the Bean "
+"Validation XML descriptor <filename>META-INF/validation.xml</filename> (see "
+"<xref linkend=\"section-configuration-validation-xml\"/>) or passing it when "
+"bootstrapping a <classname>ValidatorFactory</classname> or "
+"<classname>Validator</classname> (see <xref linkend=\"section-validator-"
+"factory-message-interpolator\"/> and <xref linkend=\"section-configuring-"
+"validator\"/>, respectively)."
+msgstr ""
+
+#. Tag: classname
+#: message-interpolation.xml:267
+#, no-c-format
+msgid "ResourceBundleLocator"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:269
+#, no-c-format
+msgid ""
+"It is a common case that you want to use the message interpolation algorithm "
+"as defined by the Bean Validation specification but retrieve error messages "
+"from other resource bundles than <filename>ValidationMessages</filename>. In "
+"this situation Hibernate Validator's <classname>ResourceBundleLocator</"
+"classname> SPI can help."
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:276
+#, no-c-format
+msgid ""
+"The default message interpolator in Hibernate Validator, "
+"<classname>ResourceBundleMessageInterpolator</classname>, delegates "
+"retrieval of resource bundles to that SPI. Using an alternative bundle only "
+"requires passing an instance of <classname>PlatformResourceBundleLocator</"
+"classname> with the bundle name when bootstrapping the "
+"<classname>ValidatorFactory</classname> as shown in <xref linkend=\"example-"
+"using-specific-resource-bundle-locator\"/>."
+msgstr ""
+
+#. Tag: title
+#: message-interpolation.xml:286
+#, no-c-format
+msgid "Using a specific resource bundle"
+msgstr ""
+
+#. Tag: programlisting
+#: message-interpolation.xml:288
+#, no-c-format
+msgid ""
+"Validator validator = Validation.byDefaultProvider()\n"
+"                .configure()\n"
+"                .messageInterpolator(\n"
+"                                new ResourceBundleMessageInterpolator(\n"
+"                                                new "
+"PlatformResourceBundleLocator( \"MyMessages\" )\n"
+"                                )\n"
+"                )\n"
+"                .buildValidatorFactory()\n"
+"                .getValidator();"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:291
+#, no-c-format
+msgid ""
+"Of course you also could implement a completely different "
+"<classname>ResourceBundleLocator</classname>, which for instance returns "
+"bundles backed by records in a database. In this case you can obtain the "
+"default locator via "
+"<classname>HibernateValidatorConfiguration#getDefaultResourceBundleLocator()"
+"</classname>, which you e.g. could use as fallback for your custom locator."
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:298
+#, no-c-format
+msgid ""
+"Besides <classname>PlatformResourceBundleLocator</classname>, Hibernate "
+"Validator provides another resource bundle locator implementation out of the "
+"box, namely <classname>AggregateResourceBundleLocator</classname>, which "
+"allows to retrieve error messages from more than one resource bundle. You "
+"could for instance use this implementation in a multi-module application "
+"where you want to have one message bundle per module. <xref linkend="
+"\"example-using-aggregate-resource-bundle-locator\"/> shows how to use "
+"<classname>AggregateResourceBundleLocator</classname>."
+msgstr ""
+
+#. Tag: title
+#: message-interpolation.xml:309
+#, no-c-format
+msgid "Using <classname>AggregateResourceBundleLocator</classname>"
+msgstr ""
+
+#. Tag: programlisting
+#: message-interpolation.xml:312
+#, no-c-format
+msgid ""
+"Validator validator = Validation.byDefaultProvider()\n"
+"                .configure()\n"
+"                .messageInterpolator(\n"
+"                                new ResourceBundleMessageInterpolator(\n"
+"                                                new "
+"AggregateResourceBundleLocator(\n"
+"                                                                Arrays.asList"
+"(\n"
+"                                                                                \"MyMessages"
+"\",\n"
+"                                                                                \"MyOtherMessages"
+"\"\n"
+"                                                                )\n"
+"                                                )\n"
+"                                )\n"
+"                )\n"
+"                .buildValidatorFactory()\n"
+"                .getValidator();"
+msgstr ""
+
+#. Tag: para
+#: message-interpolation.xml:315
+#, no-c-format
+msgid ""
+"Note that the bundles are processed in the order as passed to the "
+"constructor. That means if several bundles contain an entry for a given "
+"message key, the value will be taken from the first bundle in the list "
+"containing the key."
+msgstr ""

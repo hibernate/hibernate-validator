@@ -1,0 +1,344 @@
+# Language zh-CN translations for PACKAGE package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2013-04-29 13:14+0000\n"
+"PO-Revision-Date: 2013-04-29 13:14+0000\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh-CN\n"
+
+#. Tag: title
+#: xml-configuration.xml:24
+#, no-c-format
+msgid "Configuring via XML"
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:26
+#, no-c-format
+msgid ""
+"So far we have used the default configuration source for Bean Validation, "
+"namely annotations. However, there also exist two kinds of XML descriptors "
+"allowing configuration via XML. The first descriptor describes general Bean "
+"Validation behaviour and is provided as <filename>META-INF/validation.xml</"
+"filename>. The second one describes constraint declarations and closely "
+"matches the constraint declaration approach via annotations. Let's have a "
+"look at these two document types."
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:34
+#, no-c-format
+msgid ""
+"The xsd files are available via <ulink url=\"http://www.jboss.org/xml/ns/"
+"javax/validation/configuration/\">http://www.jboss.org/xml/ns/javax/"
+"validation/configuration</ulink> and <ulink url=\"http://www.jboss.org/xml/"
+"ns/javax/validation/mapping\">http://www.jboss.org/xml/ns/javax/validation/"
+"mapping</ulink>."
+msgstr ""
+
+#. Tag: title
+#: xml-configuration.xml:41
+#, no-c-format
+msgid "Configuring ValidationFactory in <filename>validation.xml</filename>"
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:44
+#, no-c-format
+msgid ""
+"The key to enable XML configuration for Hibernate Validator is the file "
+"<filename>META-INF/validation.xml</filename>. If this file exists on the "
+"classpath its configuration will be applied when the "
+"<classname>ValidationFactory</classname> gets created. <xref linkend=\"image-"
+"validation-configuration\"/> shows a model view of the XML schema to which "
+"<filename>validation.xml</filename> has to adhere."
+msgstr ""
+
+#. Tag: title
+#: xml-configuration.xml:51
+#, no-c-format
+msgid "validation-configuration-1.1.xsd"
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:67
+#, no-c-format
+msgid ""
+"shows the several configuration options of <filename>validation.xml</"
+"filename>. All settings are optional and the same configuration options are "
+"also available programmatically through <classname>javax.validation."
+"Configuration</classname>. In fact the XML configuration will be overridden "
+"by values explicitly specified via the programmatic API. It is even possible "
+"to ignore the XML configuration completely via <methodname>Configuration."
+"ignoreXmlConfiguration()</methodname>. See also <xref linkend=\"section-"
+"configuring-validator-factory\"/>."
+msgstr ""
+
+#. Tag: title
+#: xml-configuration.xml:79
+#, no-c-format
+msgid "validation.xml"
+msgstr ""
+
+#. Tag: programlisting
+#: xml-configuration.xml:81
+#, no-c-format
+msgid ""
+"&lt;validation-config\n"
+"    xmlns=\"http://jboss.org/xml/ns/javax/validation/configuration\"\n"
+"    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+"    xsi:schemaLocation=\"http://jboss.org/xml/ns/javax/validation/"
+"configuration\"&gt;\n"
+"\n"
+"    &lt;default-provider&gt;com.acme.ValidationProvider&lt;/default-"
+"provider&gt;\n"
+"\n"
+"    &lt;message-interpolator&gt;com.acme.MessageInterpolator&lt;/message-"
+"interpolator&gt;\n"
+"    &lt;traversable-resolver&gt;com.acme.TraversableResolver&lt;/traversable-"
+"resolver&gt;\n"
+"    &lt;constraint-validator-factory&gt;\n"
+"        com.acme.ConstraintValidatorFactory\n"
+"    &lt;/constraint-validator-factory&gt;\n"
+"    &lt;parameter-name-provider&gt;com.acme.ParameterNameProvider&lt;/"
+"parameter-name-provider&gt;\n"
+"\n"
+"    &lt;executable-validation enabled=\"true\"&gt;\n"
+"        &lt;default-validated-executable-types&gt;\n"
+"            &lt;executable-type&gt;CONSTRUCTORS&lt;/executable-type&gt;\n"
+"            &lt;executable-type&gt;NON_GETTER_METHODS&lt;/executable-"
+"type&gt;\n"
+"            &lt;executable-type&gt;GETTER_METHODS&lt;/executable-type&gt;\n"
+"        &lt;/default-validated-executable-types&gt;\n"
+"    &lt;/executable-validation&gt;\n"
+"\n"
+"    &lt;constraint-mapping&gt;META-INF/validation/constraints-car.xml&lt;/"
+"constraint-mapping&gt;\n"
+"\n"
+"    &lt;property name=\"hibernate.validator.fail_fast\"&gt;false&lt;/"
+"property&gt;\n"
+"&lt;/validation-config&gt;"
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:85
+#, no-c-format
+msgid ""
+"There must only be one file named <filename>META-INF/validation.xml</"
+"filename> on the classpath. If more than one is found an exception is thrown."
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:90
+#, no-c-format
+msgid ""
+"The node <property>default-provider</property> allows to choose the Bean "
+"Validation provider. This is useful if there is more than one provider on "
+"the classpath. <property>message-interpolator</property>, "
+"<property>traversable-resolver</property>, <property>constraint-validator-"
+"factory</property> and <property>parameter-name-provider</property> allow to "
+"customize the used implementations for the interfaces "
+"<classname>MessageInterpolator</classname>, <classname>TraversableResolver</"
+"classname>, <classname>ConstraintValidatorFactory</classname> and "
+"<classname>ParameterNameProvider</classname> defined in the <classname>javax."
+"validation</classname> package. See the sub-sections of <xref linkend="
+"\"section-configuring-validator-factory\"/> for more information about these "
+"interfaces."
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:105
+#, no-c-format
+msgid ""
+"<property>executable-validation</property> and its subnodes define defaults "
+"for method validation. The Bean Validation specification defines constructor "
+"and non getter methods as defaults. The <property>enabled</property> "
+"attribute acts as global switch to turn method validation on and off (see "
+"also <xref linkend=\"chapter-method-constraints\"/>)."
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:112
+#, no-c-format
+msgid ""
+"Via the <property>constraint-mapping</property> element you can list an "
+"arbitrary number of additional XML files containing the actual constraint "
+"configuration. Mapping file names must be specified using their fully-"
+"qualified name on the classpath. Details on writing mapping files can be "
+"found in the next section."
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:118
+#, no-c-format
+msgid ""
+"Last but not least, you can specify provider specific properties via the "
+"<property>property</property> nodes. In the example we are using the "
+"Hibernate Validator specific <property>hibernate.validator.fail_fast</"
+"property> property (see <xref linkend=\"section-fail-fast\"/>)."
+msgstr ""
+
+#. Tag: title
+#: xml-configuration.xml:126
+#, no-c-format
+msgid "Mapping constraints via <property>constraint-mappings</property>"
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:129
+#, no-c-format
+msgid ""
+"Expressing constraints in XML is possible via files adhering to the schema "
+"seen in <xref linkend=\"image-mapping-configuration\"/>. Note that these "
+"mapping files are only processed if listed via <property>constraint-mapping</"
+"property> in <filename>validation.xml</filename>."
+msgstr ""
+
+#. Tag: title
+#: xml-configuration.xml:136
+#, no-c-format
+msgid "validation-mapping-1.1.xsd"
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:151
+#, no-c-format
+msgid ""
+"shows how our classes <classname>Car</classname> and <classname>RentalCar</"
+"classname> from <xref linkend=\"example-car\"/> resp. <xref linkend="
+"\"example-rental-car\"/> could be mapped in XML. Example x shows how method "
+"validation from example y can be expressed in xml. (TODO create example)"
+msgstr ""
+
+#. Tag: title
+#: xml-configuration.xml:158
+#, no-c-format
+msgid "constraints.xml"
+msgstr ""
+
+#. Tag: programlisting
+#: xml-configuration.xml:160
+#, no-c-format
+msgid ""
+"&lt;constraint-mappings\n"
+"    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+"    xsi:schemaLocation=\"http://jboss.org/xml/ns/javax/validation/mapping "
+"validation-mapping-1.1.xsd\"\n"
+"    xmlns=\"http://jboss.org/xml/ns/javax/validation/mapping\" version="
+"\"1.1\"&gt;\n"
+"\n"
+"    &lt;default-package&gt;org.hibernate.validator.quickstart&lt;/default-"
+"package&gt;\n"
+"    &lt;bean class=\"Car\" ignore-annotations=\"true\"&gt;\n"
+"        &lt;field name=\"manufacturer\"&gt;\n"
+"            &lt;constraint annotation=\"javax.validation.constraints.NotNull"
+"\"/&gt;\n"
+"        &lt;/field&gt;\n"
+"        &lt;field name=\"licensePlate\"&gt;\n"
+"            &lt;constraint annotation=\"javax.validation.constraints.NotNull"
+"\"/&gt;\n"
+"        &lt;/field&gt;\n"
+"        &lt;field name=\"seatCount\"&gt;\n"
+"            &lt;constraint annotation=\"javax.validation.constraints.Min"
+"\"&gt;\n"
+"                &lt;element name=\"value\"&gt;2&lt;/element&gt;\n"
+"            &lt;/constraint&gt;\n"
+"        &lt;/field&gt;\n"
+"        &lt;field name=\"driver\"&gt;\n"
+"            &lt;valid/&gt;\n"
+"        &lt;/field&gt;\n"
+"        &lt;getter name=\"passedVehicleInspection\" ignore-annotations=\"true"
+"\"&gt;\n"
+"            &lt;constraint annotation=\"javax.validation.constraints."
+"AssertTrue\"&gt;\n"
+"                &lt;message&gt;The car has to pass the vehicle inspection "
+"first&lt;/message&gt;\n"
+"                &lt;groups&gt;\n"
+"                    &lt;value&gt;CarChecks&lt;/value&gt;\n"
+"                &lt;/groups&gt;\n"
+"                &lt;element name=\"max\"&gt;10&lt;/element&gt;\n"
+"            &lt;/constraint&gt;\n"
+"        &lt;/getter&gt;\n"
+"    &lt;/bean&gt;\n"
+"    &lt;bean class=\"RentalCar\" ignore-annotations=\"true\"&gt;\n"
+"        &lt;class ignore-annotations=\"true\"&gt;\n"
+"            &lt;group-sequence&gt;\n"
+"                &lt;value&gt;RentalCar&lt;/value&gt;\n"
+"                &lt;value&gt;CarChecks&lt;/value&gt;\n"
+"            &lt;/group-sequence&gt;\n"
+"        &lt;/class&gt;\n"
+"    &lt;/bean&gt;\n"
+"    &lt;constraint-definition annotation=\"org.mycompany.CheckCase\"&gt;\n"
+"        &lt;validated-by include-existing-validators=\"false\"&gt;\n"
+"            &lt;value&gt;org.mycompany.CheckCaseValidator&lt;/value&gt;\n"
+"        &lt;/validated-by&gt;\n"
+"    &lt;/constraint-definition&gt;\n"
+"&lt;/constraint-mappings&gt;"
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:163
+#, no-c-format
+msgid ""
+"The XML configuration is closely mirroring the programmatic API. For this "
+"reason it should suffice to just add some comments. <property>default-"
+"package</property> is used for all fields where a class name is expected. If "
+"the specified class is not fully qualified the configured default package "
+"will be used. Every mapping file can then have several <property>bean</"
+"property> nodes, each describing the constraints on the entity with the "
+"specified class name.<warning> <para>A given entity can only be configured "
+"once across all configuration files. The same applies for constraint "
+"definitions for a given constraint annotation. It can only occur in one "
+"mapping file. If these rules are violated a <classname>ValidationException</"
+"classname> is thrown.</para> </warning>Setting <property>ignore-annotations</"
+"property> to <constant>true</constant> means that constraint annotations "
+"placed on the configured bean are ignored. The default for this value is "
+"<constant>true</constant>. ignore-annotations is also available for the "
+"nodes <property>class</property>, <property>fields</property> and "
+"<property>getter</property>. If not explicitly specified on these levels the "
+"configured <property>bean</property> value applies. Otherwise do the nodes "
+"<property>class</property>, <property>fields</property> and "
+"<property>getter</property> determine on which level the constraints are "
+"placed (see <xref linkend=\"section-declaring-bean-constraints\"/>). The "
+"<property>constraint</property> node is then used to add a constraint on the "
+"corresponding level. Each constraint definition must define the class via "
+"the <property>annotation</property> attribute. The constraint attributes "
+"required by the Bean Validation specification (<property>message</property>, "
+"<property>groups</property> and <property>payload</property>) have dedicated "
+"nodes. All other constraint specific attributes are configured using the "
+"<property>element</property> node."
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:194
+#, no-c-format
+msgid ""
+"The class node also allows to reconfigure the default group sequence (see "
+"<xref linkend=\"section-default-group-class\"/>) via the <property>group-"
+"sequence</property> node."
+msgstr ""
+
+#. Tag: para
+#: xml-configuration.xml:198
+#, no-c-format
+msgid ""
+"Last but not least, the list of <classname>ConstraintValidator</classname>s "
+"associated to a given constraint can be altered via the <property>constraint-"
+"definition</property> node. The <property>annotation</property> attribute "
+"represents the constraint annotation being altered. The <property>validated-"
+"by</property> elements represent the (ordered) list of "
+"<classname>ConstraintValidator</classname> implementations associated to the "
+"constraint. If <property>include-existing-validator</property> is set to "
+"<constant>false</constant>, validators defined on the constraint annotation "
+"are ignored. If set to <constant>true</constant>, the list of constraint "
+"validators described in XML is concatenated to the list of validators "
+"specified on the annotation."
+msgstr ""

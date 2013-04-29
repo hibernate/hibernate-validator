@@ -23,10 +23,10 @@
 <preface id="preface">
   <title>Preface</title>
 
-  <para>Validating data is a common task that occurs throughout any
-  application, from the presentation layer to the persistence layer. Often the
-  same validation logic is implemented in each layer, proving time consuming
-  and error-prone. To avoid duplication of these validations in each layer,
+  <para>Validating data is a common task that occurs throughout all
+  application layers, from the presentation to the persistence layer. Often
+  the same validation logic is implemented in each layer which is time
+  consuming and error-prone. To avoid duplication of these validations,
   developers often bundle validation logic directly into the domain model,
   cluttering domain classes with validation code which is really metadata
   about the class itself.</para>
@@ -43,10 +43,10 @@
   </mediaobject>
 
   <para>JSR 349 - Bean Validation 1.1 - defines a metadata model and API for
-  entity validation. The default metadata source is annotations, with the
-  ability to override and extend the meta-data through the use of XML. The API
-  is not tied to a specific application tier or programming model. It is
-  specifically not tied to either the web tier or the persistence tier, and is
+  entity and method validation. The default metadata source are annotations,
+  with the ability to override and extend the meta-data through the use of
+  XML. The API is not tied to a specific application tier nor programming
+  model. It is specifically not tied to either web or persistence tier, and is
   available for both server-side application programming, as well as rich
   client Swing application developers.</para>
 
@@ -61,8 +61,8 @@
       </imageobject>
     </mediaobject></para>
 
-  <para>Hibernate Validator is the reference implementation of this JSR. The
-  implementation itself as well as the Bean Validation API and TCK are all
+  <para>Hibernate Validator is the reference implementation of this JSR 349.
+  The implementation itself as well as the Bean Validation API and TCK are all
   provided and distributed under the <ulink
   url="http://www.apache.org/licenses/LICENSE-2.0">Apache Software License
   2.0</ulink>.</para>
