@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter10.injection;
+package org.hibernate.validator.referenceguide.chapter10.cdi.injection;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

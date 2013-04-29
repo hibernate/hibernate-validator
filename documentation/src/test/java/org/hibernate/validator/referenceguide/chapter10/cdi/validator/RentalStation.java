@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter10.validator;
+package org.hibernate.validator.referenceguide.chapter10.cdi.validator;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

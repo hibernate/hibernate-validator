@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter10.methodvalidation;
+package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation;
 
 import java.util.Date;
 import javax.enterprise.context.RequestScoped;
