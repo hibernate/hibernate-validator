@@ -20,5 +20,3 @@ public class RentalCar extends Car {
 		this.rented = rented;
 	}
 }
-
-

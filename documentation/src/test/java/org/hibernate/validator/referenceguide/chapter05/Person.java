@@ -3,8 +3,9 @@ package org.hibernate.validator.referenceguide.chapter05;
 import javax.validation.constraints.NotNull;
 
 public class Person {
+
 	@NotNull
-	private String name;
+	private final String name;
 
 	public Person(String name) {
 		this.name = name;
@@ -12,5 +13,3 @@ public class Person {
 
 	// getters and setters ...
 }
-
-
