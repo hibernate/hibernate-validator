@@ -389,7 +389,7 @@ public class Car {
       instance leads via the <classname>Validation</classname> class and a
       <classname>ValidatorFactory</classname>. The easiest way is to use the
       static method
-      <methodname>Validation.buildDefaultValidatorFactory()</methodname>:</para>
+      <methodname>Validation#buildDefaultValidatorFactory()</methodname>:</para>
 
       <example>
         <title>Validation#buildDefaultValidatorFactory()</title>
