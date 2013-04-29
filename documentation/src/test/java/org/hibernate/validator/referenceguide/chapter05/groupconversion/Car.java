@@ -11,6 +11,7 @@ import javax.validation.groups.Default;
 
 @GroupSequence({ CarChecks.class, Car.class })
 public class Car {
+
 	@NotNull
 	private String manufacturer;
 

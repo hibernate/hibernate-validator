@@ -2,8 +2,13 @@ package org.hibernate.validator.referenceguide.chapter05.groupconversion;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
-public class Driver extends Person {
+public class Driver {
+
+	@NotNull
+	private String name;
+
 	@Min(
 			value = 18,
 			message = "You have to be 18 to drive a car",
@@ -18,7 +23,7 @@ public class Driver extends Person {
 	public boolean hasDrivingLicense;
 
 	public Driver(String name) {
-		super( name );
+		this.name = name;
 	}
 
 	public void passedDrivingTest(boolean b) {
@@ -32,4 +37,6 @@ public class Driver extends Person {
 	public void setAge(int age) {
 		this.age = age;
 	}
+
+	// getters and setters ...
 }

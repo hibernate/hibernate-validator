@@ -8,6 +8,7 @@ import org.hibernate.validator.referenceguide.chapter05.RentalChecks;
 
 @GroupSequenceProvider(RentalCarGroupSequenceProvider.class)
 public class RentalCar extends Car {
+
 	@AssertFalse(message = "The car is currently rented out", groups = RentalChecks.class)
 	private boolean rented;
 
