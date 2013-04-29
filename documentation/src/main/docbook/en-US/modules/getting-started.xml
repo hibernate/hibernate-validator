@@ -92,7 +92,7 @@
       </example>
     </section>
 
-    <section id="validator-gettingstarted-cdi">
+    <section id="section-getting-started-cdi">
       <title>CDI</title>
 
       <para>Bean Validation defines integration points with CDI (Contexts and

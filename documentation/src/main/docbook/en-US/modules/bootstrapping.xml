@@ -30,7 +30,7 @@
   <classname>javax.validation.Validation</classname> in order to bootstrap
   specifically configured validators.</para>
 
-  <section>
+  <section id="section-retrieving-validator-factory-validator">
     <title>Retrieving <classname>ValidatorFactory</classname> and
     <classname>Validator</classname></title>
 
