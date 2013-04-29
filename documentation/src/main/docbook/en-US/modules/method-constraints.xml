@@ -23,9 +23,9 @@
 <chapter id="chapter-method-constraints">
   <title>Declaring and validating method constraints</title>
 
-  <para>As of Bean Validation 1.1, constraints can not only be applied to Java
-  beans and their properties, but also to the parameters and return values of
-  the methods and constructors of any Java type. That way Bean Validation
+  <para>As of Bean Validation 1.1, constraints can not only be applied to
+  JavaBeans and their properties, but also to the parameters and return values
+  of the methods and constructors of any Java type. That way Bean Validation
   constraints can be used to specify</para>
 
   <itemizedlist>
@@ -78,8 +78,8 @@
   </tip>
 
   <para>In the remainder of this chapter you will learn how to declare
-  parameter and return value constraints and how to validate the same using
-  the <classname>ExecutableValidator</classname> API.</para>
+  parameter and return value constraints and how to validate them using the
+  <classname>ExecutableValidator</classname> API.</para>
 
   <section id="section-declaring-method-constraints">
     <title>Declaring method constraints</title>
@@ -181,11 +181,13 @@ public class Car {
 
         <para>As you will learn in the next section, return value constraints
         are also declared on the method level. In order to distinguish
-        cross-parameter constraints from return value constraints, a
-        constraint's target is configured at its validator implementation(s).
-        You can find out about the details in <xref
+        cross-parameter constraints from return value constraints, the
+        constraint target is configured in the
+        <classname>ConstraintValidator</classname> implementation using the
+        <classname>@SupportedValidationTarget</classname> annotation. You can
+        find out about the details in <xref
         linkend="section-cross-parameter-constraints"/> which shows how to
-        implement your own cross-parameter constraints.</para>
+        implement your own cross-parameter constraint.</para>
 
         <para>In some cases a constraint can be applied to an executable's
         parameters (i.e. it is a cross-parameter constraint), but also to the
@@ -391,13 +393,12 @@ public class Car {
         </listitem>
 
         <listitem>
-          <para>implements <classname>java.util.Map</classname></para>
+          <para>or implements <classname>java.util.Map</classname></para>
         </listitem>
       </itemizedlist>
 
-      <para>then each contained element gets checked, when the parameter or
-      return value is validated. So when validating the arguments of the
-      <methodname>checkCars()</methodname> method in <xref
+      <para>each contained element gets validated. So when validating the
+      arguments of the <methodname>checkCars()</methodname> method in <xref
       linkend="example-cascaded-executable-validation-listtyped"/>, each
       element instance of the passed list will be validated and a
       <classname>ConstraintViolation</classname> created when any of the
@@ -422,8 +423,8 @@ public class Garage {
       <title id="section-method-validation-hierarchies">Method constraints in
       inheritance hierarchies</title>
 
-      <para>When declaring method constraints in inheritance hierarchies, it's
-      important to be aware of the following rules:</para>
+      <para>When declaring method constraints in inheritance hierarchies, it
+      is important to be aware of the following rules:</para>
 
       <itemizedlist>
         <listitem>
@@ -594,9 +595,9 @@ public class Car implements Vehicle {
     <para>The validation of method constraints is done using the
     <classname>ExecutableValidator</classname> interface.</para>
 
-    <para>In <xref linkend="section-obtaining-executable-validator"/> you'll
+    <para>In <xref linkend="section-obtaining-executable-validator"/> you will
     learn how to obtain an <classname>ExecutableValidator</classname> instance
-    while<xref linkend="section-executable-validator-methods"/> shows how to
+    while <xref linkend="section-executable-validator-methods"/> shows how to
     use the different methods offered by this interface.</para>
 
     <para>Instead of calling the ExecutableValidator methods directly from
@@ -691,7 +692,7 @@ public class Car {
       </example>
 
       <section>
-        <title><methodname>validateParameters()</methodname></title>
+        <title><methodname>ExecutableValidator.validateParameters()</methodname></title>
 
         <para>The method <methodname>validateParameters()</methodname> is used
         to validate the arguments of a method invocation. <xref
@@ -729,7 +730,7 @@ assertEquals( Max.class, constraintType );</programlisting>
       </section>
 
       <section>
-        <title><methodname>validateReturnValue()</methodname></title>
+        <title><methodname>ExecutableValidator.validateReturnValue()</methodname></title>
 
         <para>Using <methodname>validateReturnValue()</methodname> the return
         value of a method can can be validated. The validation in <xref
@@ -762,7 +763,7 @@ assertEquals( Size.class, constraintType );</programlisting>
       </section>
 
       <section>
-        <title><methodname>validateConstructorParameters()</methodname></title>
+        <title><methodname>ExecutableValidator.validateConstructorParameters()</methodname></title>
 
         <para>The arguments of constructor invocations can be validated with
         <methodname>validateConstructorParameters()</methodname> as shown in
@@ -794,7 +795,7 @@ assertEquals( NotNull.class, constraintType );</programlisting>
       </section>
 
       <section>
-        <title><methodname>validateConstructorReturnValue()</methodname></title>
+        <title><methodname>ExecutableValidator.validateConstructorReturnValue()</methodname></title>
 
         <para>Finally, by using
         <methodname>validateConstructorReturnValue()</methodname> you can
