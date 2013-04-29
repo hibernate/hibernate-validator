@@ -339,7 +339,7 @@
         <title>Retrieving validator factory and validator via
         <classname>@Inject</classname></title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.validator;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.cdi.validator;
 
 @ApplicationScoped
 public class RentalStation {
@@ -369,7 +369,7 @@ public class RentalStation {
       <example id="example-dependency-injection-using-hv">
         <title>Using the @HibernateValidator qualifier annotation</title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.validator.qualifier;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.cdi.validator.qualifier;
 
 @ApplicationScoped
 public class RentalStation {
@@ -413,7 +413,7 @@ public class RentalStation {
       <example id="example-constraint-validator-injected-bean">
         <title>Constraint validator with injected bean</title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.injection;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.cdi.injection;
 
 public class ValidLicensePlateValidator
 		implements ConstraintValidator&lt;ValidLicensePlate, String&gt; {
@@ -463,7 +463,7 @@ public class ValidLicensePlateValidator
       <example id="example-cdi-method-validation">
         <title>CDI managed beans with method-level constraints</title>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.methodvalidation;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation;
 
 @ApplicationScoped
 public class RentalStation {
@@ -488,7 +488,7 @@ public class RentalStation {
 	}
 }</programlisting>
 
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.methodvalidation;
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation;
 
 @RequestScoped
 public class RentCarRequest {
@@ -562,7 +562,7 @@ public class RentCarRequest {
         <example id="example-using-validateonexecution">
           <title>Using <classname>@ValidateOnExecution</classname></title>
 
-          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.methodvalidation.configuration;
+          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation.configuration;
 
 @ApplicationScoped
 @ValidateOnExecution(type = ExecutableType.ALL)
@@ -633,7 +633,7 @@ public class RentalStation {
         <example id="example-using-executabletype-implicit">
           <title>Using <classname>ExecutableType.IMPLICIT</classname></title>
 
-          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.methodvalidation.implicit;
+          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation.implicit;
 
 @ValidateOnExecution(type = ExecutableType.ALL)
 public interface RentalStation {
@@ -646,7 +646,7 @@ public interface RentalStation {
 			@Min(1) int durationInDays);
 }</programlisting>
 
-          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.methodvalidation.implicit;
+          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation.implicit;
 
 @ApplicationScoped
 @ValidateOnExecution(type = ExecutableType.IMPLICIT)
@@ -660,5 +660,50 @@ public class ExpressRentalStation implements RentalStation {
         </example>
       </section>
     </section>
+  </section>
+
+  <section>
+    <title>Java EE</title>
+
+    <para>When your application runs on a Java EE application server such as
+    WildFly, you also can obtain <classname>Validator</classname> and
+    <classname>ValidatorFactory</classname> instances via
+    <classname>@Resource</classname> injection in managed objects such as EJBs
+    etc., as shown in <xref
+    linkend="example-validator-resource-injection"/>.</para>
+
+    <example id="example-validator-resource-injection">
+      <title>Retrieving <classname>Validator</classname> and
+      <classname>ValidatorFactory</classname> via
+      <classname>@Resource</classname> injection</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter10.javaee;
+
+@Stateless
+public class RentalStationBean {
+
+	@Resource
+	private ValidatorFactory validatorFactory;
+
+	@Resource
+	private Validator validator;
+
+	//...
+}</programlisting>
+    </example>
+
+    <para>Alternatively you can obtain a validator and a validator factory
+    from JNDI under the names "java:comp/Validator" and
+    "java:comp/ValidatorFactory", respectively.</para>
+
+    <para>Similar to CDI-based injection via <classname>@Inject</classname>,
+    these objects represent default validator and validator factory and thus
+    can be configured using the XML descriptor
+    <filename>META-INF/validation.xml</filename> (see <xref
+    linkend="chapter-xml-configuration"/>).</para>
+
+    <para>When your application is CDI-enabled, the injected objects are
+    CDI-aware as well and e.g. support dependency injection in constraint
+    validators.</para>
   </section>
 </chapter>

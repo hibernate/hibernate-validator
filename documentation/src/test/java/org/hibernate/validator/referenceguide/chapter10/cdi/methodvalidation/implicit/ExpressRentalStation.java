@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter10.methodvalidation.implicit;
+package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation.implicit;
 
 import java.util.Date;
 import java.util.List;
