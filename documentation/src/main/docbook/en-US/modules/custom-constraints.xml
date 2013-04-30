@@ -355,59 +355,18 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
         a custom error message using a specified message template. In this
         example the use of the
         <classname>ConstraintValidatorContext</classname> results in the same
-        error message as the default error message generation. <tip>
-            <para>It is important to add each configured constraint violation
-            by calling <methodname>addConstraintViolation()</methodname>. Only
-            after that the new constraint violation will be created.</para>
-          </tip></para>
+        error message as the default error message generation.</para>
 
-        <para>In case you are implementing a
-        <classname>ConstraintValidator</classname> for a class-level
-        constraint it is also possible to adjust the property path for the
-        created constraint violations. This is important for the case where
-        you validate multiple properties of the class or even traverse the
-        object graph and want the constraint violation to point to one of the
-        involved properties only.</para>
+        <tip>
+          <para>It is important to add each configured constraint violation by
+          calling <methodname>addConstraintViolation()</methodname>. Only
+          after that the new constraint violation will be created.</para>
+        </tip>
 
-        <para>As an example, <xref linkend="example-custom-error"/> shows the
-        validator of a custom class-level constraint
-        <classname>@ValidPassengerCount</classname> which makes sure that a
-        car has not more passengers than seats. If this constraint is
-        violated, this violation is reported at the
-        <property>passengers</property> property.</para>
-
-        <example id="example-custom-error">
-          <title>Adding new <classname>ConstraintViolation</classname> with
-          custom property path</title>
-
-          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.custompath;
-
-public class ValidPassengerCountValidator
-		implements ConstraintValidator&lt;ValidPassengerCount, Car&gt; {
-
-	@Override
-	public void initialize(ValidPassengerCount constraintAnnotation) {
-	}
-
-	@Override
-	public boolean isValid(Car car, ConstraintValidatorContext constraintValidatorContext) {
-		if ( car == null ) {
-			return true;
-		}
-
-		boolean isValid = car.getPassengers().size() &lt;= car.getSeatCount();
-
-		if ( !isValid ) {
-			constraintValidatorContext.disableDefaultConstraintViolation();
-			constraintValidatorContext
-					.buildConstraintViolationWithTemplate( "{my.custom.template}" )
-					.addPropertyNode( "passengers" ).addConstraintViolation();
-		}
-
-		return isValid;
-	}
-}</programlisting>
-        </example>
+        <para>Refer to <xref linkend="section-custom-property-paths"/> to
+        learn how to use <classname>the ConstraintValidatorContext</classname>
+        API to control the property path of constraint violations for
+        class-level constraints.</para>
       </section>
     </section>
 
@@ -495,6 +454,119 @@ car = new Car( "Morris", "DD-AB-123", 4 );
 constraintViolations = validator.validate( car );
 
 assertEquals( 0, constraintViolations.size() );</programlisting>
+      </example>
+    </section>
+  </section>
+
+  <section id="section-class-level-constraints">
+    <title>Class-level constraints</title>
+
+    <para>As discussed earlier, constraints can also be applied on the class
+    level to validate the state of an entire object. Class-level constraints
+    are defined in the same was as are property constraints. <xref
+    linkend="example-implementing-classlevel-constraint"/> shows constraint
+    annotation and validator of the
+    <classname>@ValidPassengerCount</classname> constraint you already saw in
+    use in <xref linkend="example-class-level"/>.</para>
+
+    <example id="example-implementing-classlevel-constraint">
+      <title>Implementing a class-level constraint</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.classlevel;
+
+@Target({ TYPE, ANNOTATION_TYPE })
+@Retention(RUNTIME)
+@Constraint(validatedBy = { ValidPassengerCountValidator.class })
+@Documented
+public @interface ValidPassengerCount {
+
+	String message() default "{org.hibernate.validator.referenceguide.chapter06.classlevel." +
+			"ValidPassengerCount.message}";
+
+	Class&lt;?&gt;[] groups() default { };
+
+	Class&lt;? extends Payload&gt;[] payload() default { };
+}</programlisting>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.classlevel;
+
+public class ValidPassengerCountValidator
+		implements ConstraintValidator&lt;ValidPassengerCount, Car&gt; {
+
+	@Override
+	public void initialize(ValidPassengerCount constraintAnnotation) {
+	}
+
+	@Override
+	public boolean isValid(Car car, ConstraintValidatorContext context) {
+		if ( car == null ) {
+			return true;
+		}
+
+		return car.getPassengers().size() &lt;= car.getSeatCount();
+	}
+}</programlisting>
+    </example>
+
+    <para>As the example demonstrates, you need to use the element type
+    <classname>TYPE</classname> in the <classname>@Target</classname>
+    annotation. This allows the constraint to be put on type definitions. The
+    validator of the constraint in the example receives a
+    <classname>Car</classname> in the <methodname>isValid()</methodname>
+    method and can access the complete object state to decide whether the
+    given instance is valid or not.</para>
+
+    <section id="section-custom-property-paths">
+      <title>Custom property paths</title>
+
+      <para>By default the constraint violation for a class-level constraint
+      is reported on the level of the annotated type, e.g.
+      <classname>Car</classname>.</para>
+
+      <para>In some cases it is preferable though that the violation's
+      property path refers to one of the involved properties. For instance you
+      might want to report the <classname>@ValidPassengerCount</classname>
+      constraint against the <property>passengers</property> property instead
+      of the <classname>Car</classname> bean.</para>
+
+      <para><xref linkend="example-custom-error"/> shows how this can be done
+      by using the constraint validator context passed to
+      <methodname>isValid()</methodname> to build a custom constraint
+      violation with a property node for the property
+      <property>passengers</property>. Note that you also could add several
+      property nodes, pointing to a sub-entity of the validated bean.</para>
+
+      <example id="example-custom-error">
+        <title>Adding a new <classname>ConstraintViolation</classname> with
+        custom property path</title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.custompath;
+
+public class ValidPassengerCountValidator
+		implements ConstraintValidator&lt;ValidPassengerCount, Car&gt; {
+
+	@Override
+	public void initialize(ValidPassengerCount constraintAnnotation) {
+	}
+
+	@Override
+	public boolean isValid(Car car, ConstraintValidatorContext constraintValidatorContext) {
+		if ( car == null ) {
+			return true;
+		}
+
+		boolean isValid = car.getPassengers().size() &lt;= car.getSeatCount();
+
+		if ( !isValid ) {
+			constraintValidatorContext.disableDefaultConstraintViolation();
+			constraintValidatorContext
+					.buildConstraintViolationWithTemplate( "{my.custom.template}" )
+					.addPropertyNode( "passengers" ).addConstraintViolation();
+		}
+
+		return isValid;
+	}
+}</programlisting>
       </example>
     </section>
   </section>
@@ -618,9 +690,9 @@ public class ConsistentDateParameterValidator implements
 
     <tip>
       <para>Similar to class-level constraints, you can create custom
-      constraint violations on single parameters instead for the complete list
-      of parameters. Just obtain a node builder from the
-      <classname>ConstraintValidatorContext</classname> passed to
+      constraint violations on single parameters instead of all parameters
+      when validating a cross-parameter constraint. Just obtain a node builder
+      from the <classname>ConstraintValidatorContext</classname> passed to
       <methodname>isValid()</methodname> and add a parameter node by calling
       <methodname>addParameterNode()</methodname>. In the example you could
       use this to create a constraint violation on the end date parameter of

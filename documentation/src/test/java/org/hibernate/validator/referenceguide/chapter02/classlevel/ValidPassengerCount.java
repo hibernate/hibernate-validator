@@ -14,21 +14,21 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({ TYPE, ANNOTATION_TYPE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = { PassengerCount.Validator.class })
+@Constraint(validatedBy = { ValidPassengerCount.Validator.class })
 @Documented
-public @interface PassengerCount {
+public @interface ValidPassengerCount {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter02.classlevel.PassengerCount.message}";
+	String message() default "{org.hibernate.validator.referenceguide.chapter02.classlevel.ValidPassengerCount.message}";
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
 
 	public static class Validator
-			implements ConstraintValidator<PassengerCount, Car> {
+			implements ConstraintValidator<ValidPassengerCount, Car> {
 
 		@Override
-		public void initialize(PassengerCount constraintAnnotation) {
+		public void initialize(ValidPassengerCount constraintAnnotation) {
 		}
 
 		@Override
