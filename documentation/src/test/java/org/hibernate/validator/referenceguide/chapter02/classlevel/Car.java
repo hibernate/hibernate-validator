@@ -2,7 +2,7 @@ package org.hibernate.validator.referenceguide.chapter02.classlevel;
 
 import java.util.List;
 
-@PassengerCount
+@ValidPassengerCount
 public class Car {
 
 	private int seatCount;

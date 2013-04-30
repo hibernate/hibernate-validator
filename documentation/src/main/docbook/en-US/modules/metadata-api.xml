@@ -26,9 +26,9 @@
   <para>The Bean Validation specification provides not only a validation
   engine, but also an API for retrieving constraint metadata in a uniform way,
   no matter whether the constraints are declared using annotations or via XML
-  mappings. We'll have a closer look at this API and its possibilities in the
-  following sections. All the introduced API types can be found in the
-  <package>javax.validation.metadata</package> package.</para>
+  mappings. Read this chapter to learn more about this API and its
+  possibilities. You can find all the metadata API types in the package
+  <package>javax.validation.metadata</package>.</para>
 
   <para>The examples presented in this chapter are based on the classes and
   constraint declarations shown in <xref
@@ -130,7 +130,7 @@ public class Car implements Vehicle {
     id="section-bean-descriptor">BeanDescriptor</classname></title>
 
     <para>The entry point into the metadata API is the method
-    <code>Validator.getConstraintsForClass()</code>, which returns an instance
+    <code>Validator#getConstraintsForClass()</code>, which returns an instance
     of the <ulink
     url="http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/BeanDescriptor.html"><classname>BeanDescriptor</classname></ulink>
     interface. Using this descriptor, you can obtain metadata for constraints
@@ -237,9 +237,10 @@ assertNotNull(
     described in the following sections.</para>
 
     <para>Note that these methods consider constraints declared at super-types
-    according to the rules for constraint inheritance as described in TODO. An
-    example is the descriptor for the <varname>manufacturer</varname>
-    property, which provides access to all constraints defined on
+    according to the rules for constraint inheritance as described in <xref
+    linkend="section-constraint-inheritance"/>. An example is the descriptor
+    for the <varname>manufacturer</varname> property, which provides access to
+    all constraints defined on
     <methodname>Vehicle#getManufacturer()</methodname> and the implementing
     method <methodname>Car#getManufacturer()</methodname>.
     <literal>null</literal> is returned in case the specified element does not
@@ -305,8 +306,8 @@ assertEquals( 1, driverDescriptor.getGroupConversions().size() );</programlistin
   <section>
     <title>MethodDescriptor and ConstructorDescriptor</title>
 
-    <para>Constrained methods and constructors (together referred to as
-    "executables" in the following) are represented by the interfaces <ulink
+    <para>Constrained methods and constructors are represented by the
+    interfaces <ulink
     url="http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/MethodDescriptor.html"><classname>MethodDescriptor</classname></ulink>
     and <ulink
     url="http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ConstructorDescriptor.html"><classname>ConstructorDescriptor</classname></ulink>,
@@ -412,8 +413,10 @@ assertEquals(
     (<methodname>isValid()</methodname> and
     <methodname>getGroupConversions()</methodname>). For parameters, you also
     can retrieve the index and the name, as returned by the currently used
-    parameter name provider (see TODO) via <methodname>getName()</methodname>
-    and <methodname>getIndex()</methodname>.</para>
+    parameter name provider (see <xref
+    linkend="section-parameter-name-provider"/>) via
+    <methodname>getName()</methodname> and
+    <methodname>getIndex()</methodname>.</para>
 
     <tip>
       <para>Getter methods following the JavaBeans naming conventions are
@@ -421,10 +424,10 @@ assertEquals(
 
       <para>That means you can retrieve the related metadata either by
       obtaining a <classname>PropertyDescriptor</classname> (e.g.
-      <methodname>BeanDescriptor.getConstraintsForProperty("foo")</methodname>)
-      or by examining the return value descriptor of the getter's
+      <code>BeanDescriptor.getConstraintsForProperty("foo")</code>) or by
+      examining the return value descriptor of the getter's
       <classname>MethodDescriptor</classname> (e.g.
-      <methodname>BeanDescriptor.getConstraintsForMethod("getFoo").getReturnValueDescriptor()</methodname>).</para>
+      <code>BeanDescriptor.getConstraintsForMethod("getFoo").getReturnValueDescriptor()</code>).</para>
     </tip>
   </section>
 
@@ -558,10 +561,10 @@ assertEquals(
 );</programlisting>
     </example>
 
-    <para>Via <methodname>declaredOn()</methodname>, the API allows to return
-    only <classname>ConstraintDescriptor</classname>s declared on certain
-    element types. This is useful to search for property constraints declared
-    on either fields or getter methods.</para>
+    <para>Via <methodname>declaredOn()</methodname> you can search for
+    <classname>ConstraintDescriptor</classname>s declared on certain element
+    types. This is useful to find property constraints declared on either
+    fields or getter methods.</para>
 
     <para><methodname>unorderedAndMatchingGroups()</methodname> restricts the
     resulting constraints to those matching the given validation
@@ -573,7 +576,7 @@ assertEquals(
     element but hosted anywhere in the class hierarchy
     (<constant>Scope.HIERARCHY</constant>).</para>
 
-    <para>The different options also can be combined as shown in the last
+    <para>You can also combine the different options as shown in the last
     example.</para>
 
     <para><warning>
@@ -656,7 +659,8 @@ assertEquals(
 );
 assertEquals( Default.class, constraintDescriptor.getGroups().iterator().next() );
 assertEquals(
-		"There must not be more than {piecesOfLuggagePerPassenger} pieces of luggage per passenger.",
+		"There must not be more than {piecesOfLuggagePerPassenger} pieces of luggage per " +
+		"passenger.",
 		constraintDescriptor.getMessageTemplate()
 );
 

@@ -23,11 +23,11 @@
 <chapter id="validator-customconstraints">
   <title>Creating custom constraints</title>
 
-  <para>Though the Bean Validation API defines a whole set of standard
-  constraint annotations one can easily think of situations in which these
-  standard annotations won't suffice. For these cases you are able to create
-  custom constraints tailored to your specific validation requirements in a
-  simple manner.</para>
+  <para>The Bean Validation API defines a whole set of standard constraint
+  annotations such as <classname>@NotNull</classname>,
+  <classname>@Size</classname> etc. In cases where these buit-in constraints
+  are not sufficient, you cean easily create custom constraints tailored to
+  your specific validation requirements.</para>
 
   <section id="validator-customconstraints-simple">
     <title>Creating a simple constraint</title>
@@ -52,16 +52,17 @@
     <section id="validator-customconstraints-constraintannotation">
       <title>The constraint annotation</title>
 
-      <para>Let's write a constraint annotation, that can be used to express
-      that a given string shall either be upper case or lower case. We'll
-      apply it later on to the <property>licensePlate</property> field of the
+      <para>This section shows how to write a constraint annotation which can
+      be used to ensure that a given string is either completely upper case or
+      lower case. Later on this constraint will be applied to the
+      <property>licensePlate</property> field of the
       <classname>Car</classname> class from <xref
       linkend="validator-gettingstarted"/> to ensure, that the field is always
       an upper-case string.</para>
 
-      <para>First we need a way to express the two case modes. We might use
-      <classname>String</classname> constants, but a better way to go is to
-      use a Java 5 enum for that purpose:</para>
+      <para>The first thing needed is a way to express the two case modes.
+      While you could use <classname>String</classname> constants, a better
+      approach is using a Java 5 enum for that purpose:</para>
 
       <example>
         <title>Enum <classname>CaseMode</classname> to express upper vs. lower
@@ -75,12 +76,12 @@ public enum CaseMode {
 }</programlisting>
       </example>
 
-      <para>Now we can define the actual constraint annotation. If you've
-      never designed an annotation before, this may look a bit scary, but
-      actually it's not that hard:</para>
+      <para>The next step is to define the actual constraint annotation. If
+      you've never designed an annotation before, this may look a bit scary,
+      but actually it's not that hard:</para>
 
       <example id="example-defining-custom-constraint">
-        <title>Defining the <classname>CheckCase</classname> constraint
+        <title>Defining the <classname>@CheckCase</classname> constraint
         annotation</title>
 
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06;
@@ -91,7 +92,8 @@ public enum CaseMode {
 @Documented
 public @interface CheckCase {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter06.CheckCase.message}";
+	String message() default "{org.hibernate.validator.referenceguide.chapter06.CheckCase." +
+			"message}";
 
 	Class&lt;?&gt;[] groups() default { };
 
@@ -161,14 +163,14 @@ public class ContactDetails {
         </listitem>
       </itemizedlist>
 
-      <para>Besides these three mandatory attributes we add another one,
+      <para>Besides these three mandatory attributes there is another one,
       <property>value</property>, allowing for the required case mode to be
       specified. The name <property>value</property> is a special one, which
       can be omitted when using the annotation, if it is the only attribute
       specified, as e.g. in <code>@CheckCase(CaseMode.UPPER)</code>.</para>
 
-      <para>In addition we annotate the annotation type with a couple of meta
-      annotations:</para>
+      <para>In addition, the constraint annotation is decorated with a couple
+      of meta annotations:</para>
 
       <itemizedlist>
         <listitem>
@@ -177,19 +179,21 @@ public class ContactDetails {
           constraint. <classname>@CheckCase</classname> may be used on fields
           (element type <classname>FIELD</classname>), JavaBeans properties as
           well as method return values (<classname>METHOD</classname>) and
-          method/constructor parameters (<classname>PARAMETER</classname>). By
-          adding the element type <classname>ANNOTATION_TYPE</classname>, we
-          allow for the creation composed constraints (see <xref
+          method/constructor parameters (<classname>PARAMETER</classname>).
+          The element type <classname>ANNOTATION_TYPE</classname> allows for
+          the creation of composed constraints (see <xref
           linkend="section-constraint-composition"/>) based on
           <classname>@CheckCase</classname>.</para>
 
-          <para>Would we create a class-level constraint (see <xref
+          <para>When creating a class-level constraint (see <xref
           linkend="validator-usingvalidator-classlevel"/>), the element type
-          <classname>TYPE</classname> had to be used. Constraints targetting
-          the return value of a constructor need to support the element type
-          <classname>CONSTRUCTOR</classname>. Cross-parameter constraints (see
-          TODO) which are used to validate all the parameters of a method or
-          constructor together, must support <classname>METHOD</classname> or
+          <classname>TYPE</classname> would have to be used. Constraints
+          targetting the return value of a constructor need to support the
+          element type <classname>CONSTRUCTOR</classname>. Cross-parameter
+          constraints (see <xref
+          linkend="section-cross-parameter-constraints"/>) which are used to
+          validate all the parameters of a method or constructor together,
+          must support <classname>METHOD</classname> or
           <classname>CONSTRUCTOR</classname>, respectively.</para>
         </listitem>
 
@@ -218,25 +222,25 @@ public class ContactDetails {
       <para>Finally, there is an inner annotation type named
       <classname>List</classname>. This annotation allows to specify several
       <classname>@CheckCase</classname> annotations on the same element, e.g.
-      with different validation groups and messages. Note that while also
-      another name could be used, we follow the Bean Validation, which
-      recommends to use the name <classname>List</classname> and make the
-      annotation an inner annotation of the corresponding constraint
-      type.</para>
+      with different validation groups and messages. While also another name
+      could be used, the Bean Validation specification recommends to use the
+      name <classname>List</classname> and make the annotation an inner
+      annotation of the corresponding constraint type.</para>
     </section>
 
     <section id="validator-customconstraints-validator">
       <title id="section-constraint-validator">The constraint
       validator</title>
 
-      <para>Next, we need to implement a constraint validator, which is able
-      to validate elements with a <classname>@CheckCase</classname>
-      annotation. To do so, we implement the interface
-      <classname>ConstraintValidator</classname> as shown below:</para>
+      <para>Having defined the annotation, you need to create a constraint
+      validator, which is able to validate elements with a
+      <classname>@CheckCase</classname> annotation. To do so, implement the
+      interface <classname>ConstraintValidator</classname> as shown
+      below:</para>
 
       <example id="example-constraint-validator">
         <title>Implementing a constraint validator for the constraint
-        <classname>CheckCase</classname></title>
+        <classname>@CheckCase</classname></title>
 
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06;
 
@@ -266,29 +270,26 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       </example>
 
       <para>The <classname>ConstraintValidator</classname> interface defines
-      two type parameters, which we set in our implementation. The first one
-      specifies the annotation type to be validated (in our example
-      <classname>CheckCase</classname>), the second one the type of elements,
-      which the validator can handle (here
-      <classname>String</classname>).</para>
-
-      <para>In case a constraint annotation is allowed at elements of
-      different types, a <classname>ConstraintValidator</classname> for each
-      allowed type has to be implemented and registered at the constraint
-      annotation as shown above.</para>
+      two type parameters which are set in the implementation. The first one
+      specifies the annotation type to be validated
+      (<classname>CheckCase</classname>), the second one the type of elements,
+      which the validator can handle (<classname>String</classname>). In case
+      a constraint supports several data types, a
+      <classname>ConstraintValidator</classname> for each allowed type has to
+      be implemented and registered at the constraint annotation as shown
+      above.</para>
 
       <para>The implementation of the validator is straightforward. The
-      <methodname>initialize()</methodname> method gives us access to the
-      attribute values of the annotation to be validated. In the example we
-      store the <classname>CaseMode</classname> in a field of the validator
-      for further usage.</para>
+      <methodname>initialize()</methodname> method gives you access to the
+      attribute values of the validated constraint and allows you to store
+      them in a field of the validator as shown in the example.</para>
 
-      <para>In the <methodname>isValid()</methodname> method we implement the
-      logic, that determines, whether a <classname>String</classname> is valid
-      according to a given <classname>@CheckCase</classname> annotation or
-      not. This decision depends on the case mode retrieved in
-      <classname>initialize()</classname>. As the Bean Validation
-      specification recommends, we consider <code>null</code> values as being
+      <para>The <methodname>isValid()</methodname> method contains the actual
+      validation logic. For <classname>@CheckCase</classname> this is the
+      check whether a given string is either completely lower case or upper
+      case, depending on the case mode retrieved in
+      <classname>initialize()</classname>. Note that the Bean Validation
+      specification recommends to consider <code>null</code> values as being
       valid. If <code>null</code> is not a valid value for an element, it
       should be annotated with <code>@NotNull</code> explicitly.</para>
 
@@ -298,7 +299,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
         <para><xref linkend="example-constraint-validator"/> relies on the
         default error message generation by just returning
         <constant>true</constant> or <constant>false</constant> from the
-        <methodname>isValid</methodname> call. Using the passed
+        <methodname>isValid()</methodname> method. Using the passed
         <classname>ConstraintValidatorContext</classname> object it is
         possible to either add additional error messages or completely disable
         the default error message generation and solely define custom error
@@ -307,8 +308,8 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
         example:</para>
 
         <example id="example-constraint-validator-context">
-          <title>Use of ConstraintValidatorContext to define custom error
-          messages</title>
+          <title>Using <classname>ConstraintValidatorContext</classname> to
+          define custom error messages</title>
 
           <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.constraintvalidatorcontext;
 
@@ -338,9 +339,10 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
 		if ( !isValid ) {
 			constraintContext.disableDefaultConstraintViolation();
 			constraintContext.buildConstraintViolationWithTemplate(
-					"{org.hibernate.validator.referenceguide.chapter06.constraintvalidatorcontext.CheckCase.message}"
+					"{org.hibernate.validator.referenceguide.chapter03." +
+					"constraintvalidatorcontext.CheckCase.message}"
 			)
-					.addConstraintViolation();
+			.addConstraintViolation();
 		}
 
 		return isValid;
@@ -353,30 +355,192 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
         a custom error message using a specified message template. In this
         example the use of the
         <classname>ConstraintValidatorContext</classname> results in the same
-        error message as the default error message generation. <tip>
-            <para>It is important to add each configured constraint violation
-            by calling <methodname>addConstraintViolation()</methodname>. Only
-            after that the new constraint violation will be created.</para>
-          </tip></para>
+        error message as the default error message generation.</para>
 
-        <para>In case you are implementing a
-        <classname>ConstraintValidator</classname> for a class-level
-        constraint it is also possible to adjust the property path for the
-        created constraint violations. This is important for the case where
-        you validate multiple properties of the class or even traverse the
-        object graph and want the constraint violation to point to one of the
-        involved properties only. As an example, <xref
-        linkend="example-custom-error"/> shows the validator of a custom
-        class-level constraint <classname>@ValidPassengerCount</classname>
-        which makes sure that a car has not more passengers than seats. If
-        this constraint is violated, this violation is reported at the
-        <property>passengers</property> property.</para>
+        <tip>
+          <para>It is important to add each configured constraint violation by
+          calling <methodname>addConstraintViolation()</methodname>. Only
+          after that the new constraint violation will be created.</para>
+        </tip>
 
-        <example id="example-custom-error">
-          <title>Adding new <classname>ConstraintViolation</classname> with
-          custom property path</title>
+        <para>Refer to <xref linkend="section-custom-property-paths"/> to
+        learn how to use <classname>the ConstraintValidatorContext</classname>
+        API to control the property path of constraint violations for
+        class-level constraints.</para>
+      </section>
+    </section>
 
-          <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.custompath;
+    <section id="validator-customconstraints-errormessage">
+      <title>The error message</title>
+
+      <para>The last missing building block is an error message which should
+      be used in case a <classname>@CheckCase</classname> constraint is
+      violated. To define this, create a file<filename>
+      ValidationMessages.properties</filename> with the following contents
+      (see also <xref linkend="section-message-interpolation"/>):</para>
+
+      <example>
+        <title>Defining a custom error message for the
+        <classname>CheckCase</classname> constraint</title>
+
+        <programlisting>org.hibernate.validator.referenceguide.chapter06.CheckCase.message=Case mode must be {value}.</programlisting>
+      </example>
+
+      <para>If a validation error occurs, the validation runtime will use the
+      default value, that you specified for the message attribute of the
+      <classname>@CheckCase</classname> annotation to look up the error
+      message in this resource bundle.</para>
+    </section>
+
+    <section id="validator-customconstraints-using">
+      <title>Using the constraint</title>
+
+      <para>You can now use the constraint in the <classname>Car</classname>
+      class from the <xref linkend="validator-gettingstarted"/> chapter to
+      specify that the <property>licensePlate</property> field should only
+      contain upper-case strings:</para>
+
+      <example id="example-car-with-checkcase">
+        <title>Applying the <classname>@CheckCase</classname>
+        constraint</title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06;
+
+public class Car {
+
+	@NotNull
+	private String manufacturer;
+
+	@NotNull
+	@Size(min = 2, max = 14)
+	@CheckCase(CaseMode.UPPER)
+	private String licensePlate;
+
+	@Min(2)
+	private int seatCount;
+
+	public Car ( String manufacturer, String licencePlate, int seatCount ) {
+		this.manufacturer = manufacturer;
+		this.licensePlate = licencePlate;
+		this.seatCount = seatCount;
+	}
+
+	//getters and setters ...
+}</programlisting>
+      </example>
+
+      <para>Finally, <xref linkend="example-using-checkcase"/> demonstrates
+      how validating a <classname>Car</classname> object with an invalid
+      license plate causes the <classname>@CheckCase</classname> constraint to
+      be violated.</para>
+
+      <example id="example-using-checkcase">
+        <title>Validating objects with the @<classname>CheckCase</classname>
+        constraint</title>
+
+        <programlisting language="JAVA" role="JAVA">//invalid license plate
+Car car = new Car( "Morris", "dd-ab-123", 4 );
+Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
+		validator.validate( car );
+assertEquals( 1, constraintViolations.size() );
+assertEquals(
+		"Case mode must be UPPER.",
+		constraintViolations.iterator().next().getMessage()
+);
+
+//valid license plate
+car = new Car( "Morris", "DD-AB-123", 4 );
+
+constraintViolations = validator.validate( car );
+
+assertEquals( 0, constraintViolations.size() );</programlisting>
+      </example>
+    </section>
+  </section>
+
+  <section id="section-class-level-constraints">
+    <title>Class-level constraints</title>
+
+    <para>As discussed earlier, constraints can also be applied on the class
+    level to validate the state of an entire object. Class-level constraints
+    are defined in the same was as are property constraints. <xref
+    linkend="example-implementing-classlevel-constraint"/> shows constraint
+    annotation and validator of the
+    <classname>@ValidPassengerCount</classname> constraint you already saw in
+    use in <xref linkend="example-class-level"/>.</para>
+
+    <example id="example-implementing-classlevel-constraint">
+      <title>Implementing a class-level constraint</title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.classlevel;
+
+@Target({ TYPE, ANNOTATION_TYPE })
+@Retention(RUNTIME)
+@Constraint(validatedBy = { ValidPassengerCountValidator.class })
+@Documented
+public @interface ValidPassengerCount {
+
+	String message() default "{org.hibernate.validator.referenceguide.chapter06.classlevel." +
+			"ValidPassengerCount.message}";
+
+	Class&lt;?&gt;[] groups() default { };
+
+	Class&lt;? extends Payload&gt;[] payload() default { };
+}</programlisting>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.classlevel;
+
+public class ValidPassengerCountValidator
+		implements ConstraintValidator&lt;ValidPassengerCount, Car&gt; {
+
+	@Override
+	public void initialize(ValidPassengerCount constraintAnnotation) {
+	}
+
+	@Override
+	public boolean isValid(Car car, ConstraintValidatorContext context) {
+		if ( car == null ) {
+			return true;
+		}
+
+		return car.getPassengers().size() &lt;= car.getSeatCount();
+	}
+}</programlisting>
+    </example>
+
+    <para>As the example demonstrates, you need to use the element type
+    <classname>TYPE</classname> in the <classname>@Target</classname>
+    annotation. This allows the constraint to be put on type definitions. The
+    validator of the constraint in the example receives a
+    <classname>Car</classname> in the <methodname>isValid()</methodname>
+    method and can access the complete object state to decide whether the
+    given instance is valid or not.</para>
+
+    <section id="section-custom-property-paths">
+      <title>Custom property paths</title>
+
+      <para>By default the constraint violation for a class-level constraint
+      is reported on the level of the annotated type, e.g.
+      <classname>Car</classname>.</para>
+
+      <para>In some cases it is preferable though that the violation's
+      property path refers to one of the involved properties. For instance you
+      might want to report the <classname>@ValidPassengerCount</classname>
+      constraint against the <property>passengers</property> property instead
+      of the <classname>Car</classname> bean.</para>
+
+      <para><xref linkend="example-custom-error"/> shows how this can be done
+      by using the constraint validator context passed to
+      <methodname>isValid()</methodname> to build a custom constraint
+      violation with a property node for the property
+      <property>passengers</property>. Note that you also could add several
+      property nodes, pointing to a sub-entity of the validated bean.</para>
+
+      <example id="example-custom-error">
+        <title>Adding a new <classname>ConstraintViolation</classname> with
+        custom property path</title>
+
+        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.custompath;
 
 public class ValidPassengerCountValidator
 		implements ConstraintValidator&lt;ValidPassengerCount, Car&gt; {
@@ -401,115 +565,6 @@ public class ValidPassengerCountValidator
 		}
 
 		return isValid;
-	}
-}</programlisting>
-        </example>
-      </section>
-    </section>
-
-    <section id="validator-customconstraints-errormessage">
-      <title>The error message</title>
-
-      <para>Finally we need to specify the error message, that shall be used,
-      in case a <classname>@CheckCase</classname> constraint is violated. To
-      do so, we add the following to our custom
-      <filename>ValidationMessages.properties</filename> (see also <xref
-      linkend="section-message-interpolation"/>)</para>
-
-      <example>
-        <title>Defining a custom error message for the
-        <classname>CheckCase</classname> constraint</title>
-
-        <programlisting>org.hibernate.validator.referenceguide.chapter06.CheckCase.message=Case mode must be {value}.</programlisting>
-      </example>
-
-      <para>If a validation error occurs, the validation runtime will use the
-      default value, that we specified for the message attribute of the
-      <classname>@CheckCase</classname> annotation to look up the error
-      message in this file.</para>
-    </section>
-
-    <section id="validator-customconstraints-using">
-      <title>Using the constraint</title>
-
-      <para>Now that our first custom constraint is completed, we can use it
-      in the <classname>Car</classname> class from the <xref
-      linkend="validator-gettingstarted"/> chapter to specify that the
-      <property>licensePlate</property> field shall only contain upper-case
-      strings:</para>
-
-      <example id="example-car-with-checkcase">
-        <title>Applying the <classname>CheckCase</classname>
-        constraint</title>
-
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06;
-
-public class Car {
-
-	@NotNull
-	private final String manufacturer;
-
-	@NotNull
-	@Size(min = 2, max = 14)
-	@CheckCase(CaseMode.UPPER)
-	private final String licensePlate;
-
-	@Min(2)
-	private final int seatCount;
-
-	public Car ( String manufacturer, String licencePlate, int seatCount ) {
-		this.manufacturer = manufacturer;
-		this.licensePlate = licencePlate;
-		this.seatCount = seatCount;
-	}
-
-	//getters and setters ...
-}</programlisting>
-      </example>
-
-      <para>Finally let's demonstrate in a little test that the
-      <classname>@CheckCase</classname> constraint is properly
-      validated:</para>
-
-      <example>
-        <title>Testcase demonstrating the <classname>CheckCase</classname>
-        validation</title>
-
-        <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06;
-
-public class CarTest {
-
-	private static Validator validator;
-
-	@BeforeClass
-	public static void setUp() {
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-		validator = factory.getValidator();
-	}
-
-	@Test
-	public void testLicensePlateNotUpperCase() {
-
-		Car car = new Car( "Morris", "dd-ab-123", 4 );
-
-		Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
-				validator.validate( car );
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals(
-				"Case mode must be UPPER.",
-				constraintViolations.iterator().next().getMessage()
-		);
-	}
-
-	@Test
-	public void carIsValid() {
-
-		Car car = new Car( "Morris", "DD-AB-123", 4 );
-
-		Set&lt;ConstraintViolation&lt;Car&gt;&gt; constraintViolations =
-				validator.validate( car );
-
-		assertEquals( 0, constraintViolations.size() );
 	}
 }</programlisting>
       </example>
@@ -581,7 +636,7 @@ public @interface ConsistentDateParameters {
         return value constraints. In order to improve code readability, it is
         therefore recommended to chose constraint names — such as
         <classname>@ConsistentDateParameters</classname> — which make the
-        constraint target aparent.</para>
+        constraint target apparent.</para>
       </note></para>
 
     <example id="example-cross-parameter-validator">
@@ -625,18 +680,31 @@ public class ConsistentDateParameterValidator implements
     validator by using the <classname>@SupportedValidationTarget</classname>
     annotation. Since a cross-parameter constraint could be applied to any
     method or constructor, it is considered a best practice to check for the
-    expected number and types of parameters in the validator implementation.
-    As with generic constraints, <literal>null</literal> parameters should be
-    considered valid and <classname>@NotNull</classname> on the individual
-    parameters should be used to make sure that parameters are not
+    expected number and types of parameters in the validator
+    implementation.</para>
+
+    <para>As with generic constraints, <literal>null</literal> parameters
+    should be considered valid and <classname>@NotNull</classname> on the
+    individual parameters should be used to make sure that parameters are not
     <literal>null</literal>.</para>
+
+    <tip>
+      <para>Similar to class-level constraints, you can create custom
+      constraint violations on single parameters instead of all parameters
+      when validating a cross-parameter constraint. Just obtain a node builder
+      from the <classname>ConstraintValidatorContext</classname> passed to
+      <methodname>isValid()</methodname> and add a parameter node by calling
+      <methodname>addParameterNode()</methodname>. In the example you could
+      use this to create a constraint violation on the end date parameter of
+      the validated method.</para>
+    </tip>
 
     <para>In rare situations a constraint is both, generic and
     cross-parameter. This is the case if a constraint has a validator class
     which is annotated with
-    <classname>@SupportedValidationTarget({ValidationTarget.PARAMETERS,
-    ValidationTarget.ANNOTATED_ELEMENT})</classname> or if it has a generic
-    and a cross-parameter validator class.</para>
+    <code>@SupportedValidationTarget({ValidationTarget.PARAMETERS,
+    ValidationTarget.ANNOTATED_ELEMENT})</code> or if it has a generic and a
+    cross-parameter validator class.</para>
 
     <para>When declaring such a constraint on a method which has parameters
     and also a return value, the intended constraint target can't be
@@ -700,27 +768,25 @@ public Car buildCar(int seatCount, List&lt;Passenger&gt; passengers) {
   <section id="validator-customconstraints-compound">
     <title id="section-constraint-composition">Constraint composition</title>
 
-    <para>In the following, we'll discuss how to create higher level
-    constraints by composing several basic constraints.</para>
-
     <para>Looking at the <property>licensePlate</property> field of the
     <classname>Car</classname> class in <xref
-    linkend="example-car-with-checkcase"/>, we see three constraint
+    linkend="example-car-with-checkcase"/>, you see three constraint
     annotations already. In complexer scenarios, where even more constraints
     could be applied to one element, this might become a bit confusing easily.
-    Furthermore, if we had a <property>licensePlate</property> field in
-    another class, we would have to copy all constraint declarations to the
+    Furthermore, if there was a <property>licensePlate</property> field in
+    another class, you would have to copy all constraint declarations to the
     other class as well, violating the DRY principle.</para>
 
-    <para>This problem can be tackled using composed constraints. In the
-    following we create a new constraint annotation
-    <classname>@ValidLicensePlate</classname>, that comprises the constraints
+    <para>You can address this kind of problem by creating higher level
+    constraints, composed from several basic constraints. <xref
+    linkend="example-composed-constraint"/> shows a composed constraint
+    annotation which comprises the constraints
     <classname>@NotNull</classname>, <classname>@Size</classname> and
     <classname>@CheckCase</classname>:</para>
 
-    <example>
+    <example id="example-composed-constraint">
       <title>Creating a composing constraint
-      <classname>ValidLicensePlate</classname></title>
+      <classname>@ValidLicensePlate</classname></title>
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter06.constraintcomposition;
 
@@ -733,7 +799,8 @@ public Car buildCar(int seatCount, List&lt;Passenger&gt; passengers) {
 @Documented
 public @interface ValidLicensePlate {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter06.constraintcomposition.ValidLicensePlate.message}";
+	String message() default "{org.hibernate.validator.referenceguide.chapter06." +
+			"constraintcomposition.ValidLicensePlate.message}";
 
 	Class&lt;?&gt;[] groups() default { };
 
@@ -741,18 +808,18 @@ public @interface ValidLicensePlate {
 }</programlisting>
     </example>
 
-    <para>To do so, we just have to annotate the constraint declaration with
-    its comprising constraints (btw. that's exactly why we allowed annotation
-    types as target for the <classname>@CheckCase</classname> annotation). As
-    no additional validation is required for the
-    <classname>@ValidLicensePlate</classname> annotation itself, we don't
-    declare a validator within the <classname>@Constraint </classname>meta
-    annotation.</para>
+    <para>To create a composed constraint, simply annotate the constraint
+    declaration with its comprising constraints. If the composed constraint
+    itself requires a validator, this validator is to be specified within the
+    <classname>@Constraint</classname> annotation. For composed constraints
+    which don't need an additional validator such as
+    <classname>@ValidLicensePlate</classname>, just set
+    <methodname>validatedBy()</methodname> to an empty array.</para>
 
     <para>Using the new composed constraint at the
     <property>licensePlate</property> field is fully equivalent to the
-    previous version, where we declared the three constraints directly at the
-    field itself:</para>
+    previous version, where the three constraints were declared directly at
+    the field itself:</para>
 
     <example>
       <title>Application of composing constraint
@@ -779,13 +846,14 @@ public class Car {
     used as follows:</para>
 
     <example>
-      <title>Usage of <classname>@ReportAsSingleViolation</classname></title>
+      <title>Using <classname>@ReportAsSingleViolation</classname></title>
 
       <programlisting language="JAVA" role="JAVA">//...
 @ReportAsSingleViolation
 public @interface ValidLicensePlate {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter06.constraintcomposition.ValidLicensePlate.message}";
+	String message() default "{org.hibernate.validator.referenceguide.chapter06." +
+			"constraintcomposition.ValidLicensePlate.message}";
 
 	Class&lt;?&gt;[] groups() default { };
 

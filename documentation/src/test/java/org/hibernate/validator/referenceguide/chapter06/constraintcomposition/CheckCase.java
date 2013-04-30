@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface CheckCase {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter03.constraintcomposition.CheckCase.message}";
+	String message() default "{org.hibernate.validator.referenceguide.chapter06.constraintcomposition.CheckCase.message}";
 
 	Class<?>[] groups() default { };
 

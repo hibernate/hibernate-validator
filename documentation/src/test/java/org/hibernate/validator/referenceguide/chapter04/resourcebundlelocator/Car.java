@@ -9,6 +9,6 @@ public class Car {
 	private String licensePlate;
 
 	@Max(300)
-	private final int topSpeed = 400;
+	private int topSpeed = 400;
 
 }

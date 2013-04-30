@@ -4,6 +4,7 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 
 public class Driver extends Person {
+
 	@Min(
 			value = 18,
 			message = "You have to be 18 to drive a car",
@@ -33,5 +34,3 @@ public class Driver extends Person {
 		this.age = age;
 	}
 }
-
-

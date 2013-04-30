@@ -92,7 +92,7 @@
       </example>
     </section>
 
-    <section id="validator-gettingstarted-cdi">
+    <section id="section-getting-started-cdi">
       <title>CDI</title>
 
       <para>Bean Validation defines integration points with CDI (Contexts and
@@ -128,7 +128,8 @@
     constraints.</para>
 
     <example id="example-class-car">
-      <title>Class Car annotated with constraints</title>
+      <title>Class <classname>Car</classname> annotated with
+      constraints</title>
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter01;
 
@@ -177,6 +178,13 @@ public class Car {
 
       <listitem>
         <para><property>seatCount</property> must be at least 2</para>
+
+        <tip>
+          <para>You can find the complete source code of all examples used in
+          this reference guide in the Hibernate Validator <ulink
+          url="https://github.com/hibernate/hibernate-validator/tree/master/documentation/src/test">source
+          repository</ulink> on GitHub.</para>
+        </tip>
       </listitem>
     </itemizedlist>
   </section>
@@ -189,7 +197,8 @@ public class Car {
     test for <classname>Car</classname>:</para>
 
     <example>
-      <title>Class CarTest showing validation examples</title>
+      <title>Class <classname>CarTest</classname> showing validation
+      examples</title>
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter01;
 
@@ -275,7 +284,7 @@ public class CarTest {
 
     <para>The <methodname>validate()</methodname> method returns a set of
     <classname>ConstraintViolation</classname> instances, which you can
-    iterate ovr in order to see which validation errors occurred. The first
+    iterate over in order to see which validation errors occurred. The first
     three test methods show some expected constraint violations:</para>
 
     <itemizedlist>
@@ -309,7 +318,7 @@ public class CarTest {
     <title>Where to go next?</title>
 
     <para>That concludes the 5 minute tour through the world of Hibernate
-    Validator and Bean Validaiton. Continue exploring the code examples or
+    Validator and Bean Validation. Continue exploring the code examples or
     look at further examples referenced in <xref
     linkend="validator-further-reading"/>.</para>
 
