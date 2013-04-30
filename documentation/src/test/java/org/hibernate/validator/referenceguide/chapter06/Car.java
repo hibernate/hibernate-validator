@@ -17,7 +17,7 @@ public class Car {
 	@Min(2)
 	private int seatCount;
 
-	public Car ( String manufacturer, String licencePlate, int seatCount ) {
+	public Car(String manufacturer, String licencePlate, int seatCount) {
 		this.manufacturer = manufacturer;
 		this.licensePlate = licencePlate;
 		this.seatCount = seatCount;
