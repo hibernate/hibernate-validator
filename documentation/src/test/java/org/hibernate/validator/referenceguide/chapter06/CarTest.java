@@ -22,10 +22,9 @@ public class CarTest {
 	}
 
 	@Test
-	public void testLicensePlateNotUpperCase() {
-
+	public void testCheckCaseConstraint() {
+		//invalid license plate
 		Car car = new Car( "Morris", "dd-ab-123", 4 );
-
 		Set<ConstraintViolation<Car>> constraintViolations =
 				validator.validate( car );
 		assertEquals( 1, constraintViolations.size() );
@@ -33,15 +32,11 @@ public class CarTest {
 				"Case mode must be UPPER.",
 				constraintViolations.iterator().next().getMessage()
 		);
-	}
 
-	@Test
-	public void carIsValid() {
+		//valid license plate
+		car = new Car( "Morris", "DD-AB-123", 4 );
 
-		Car car = new Car( "Morris", "DD-AB-123", 4 );
-
-		Set<ConstraintViolation<Car>> constraintViolations =
-				validator.validate( car );
+		constraintViolations = validator.validate( car );
 
 		assertEquals( 0, constraintViolations.size() );
 	}
