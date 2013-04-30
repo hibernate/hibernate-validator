@@ -36,9 +36,9 @@
     <title>Declaring bean constraints</title>
 
     <para>Constraints in Bean Validation are expressed via Java annotations.
-    In this section we show how to enhance an object model with these
-    annotations. We have to differentiate between several types of constraint
-    annotations:</para>
+    In this section you will learn how to enhance an object model with these
+    annotations. There are the following three types of bean
+    constraints:</para>
 
     <para><itemizedlist>
         <listitem>
@@ -212,7 +212,7 @@ public class Car {
       </example>
     </section>
 
-    <section>
+    <section id="section-constraint-inheritance">
       <title>Constraint inheritance</title>
 
       <para>When a class implements an interface or extends another class, all
@@ -398,10 +398,10 @@ public class Car {
 Validator validator = factory.getValidator();</programlisting>
       </example>
 
-      <para>For other ways of obtaining a Validator instance see <xref
-      linkend="chapter-bootstrapping"/>. For now we just want to see how we
-      can use the <classname>Validator</classname> instance to validate entity
-      instances.</para>
+      <para>This bootstraps a validator in the default configuration. Refer to
+      <xref linkend="chapter-bootstrapping"/> to learn more about the
+      different bootstrapping methods and how to obtain a specifically
+      configured <classname>Validator</classname> instance.</para>
     </section>
 
     <section>
@@ -1188,7 +1188,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
           <para>In some cases neither the Bean Validation constraints nor the
           custom constraints provided by Hibernate Validator will fulfill your
           requirements. In this case you can easily write your own constraint.
-          We will discuss this in <xref
+          You can find more information in <xref
           linkend="validator-customconstraints"/>.</para>
         </tip>
       </section>

@@ -327,7 +327,7 @@ public class RentalStation {
 public class Garage {
 
 	@NotNull
-	private final String name;
+	private String name;
 
 	@Valid
 	public Garage(String name) {
@@ -344,11 +344,11 @@ public class Garage {
 public class Car {
 
 	@NotNull
-	private final String manufacturer;
+	private String manufacturer;
 
 	@NotNull
 	@Size(min = 2, max = 14)
-	private final String licensePlate;
+	private String licensePlate;
 
 	public Car(String manufacturer, String licencePlate) {
 		this.manufacturer = manufacturer;
@@ -470,8 +470,6 @@ public interface Vehicle {
 }</programlisting>
 
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.inheritance.parameter;
-
-import javax.validation.constraints.Max;
 
 public class Car implements Vehicle {
 
@@ -889,7 +887,8 @@ assertEquals( 0, parameterNode.getParameterIndex() );         </programlisting>
       </example>
 
       <para>The parameter name is determined using the current
-      <classname>ParameterNameProvider</classname> (see TODO) and defaults to
+      <classname>ParameterNameProvider</classname> (see <xref
+      linkend="section-parameter-name-provider"/>) and defaults to
       <literal>arg0</literal>, <literal>arg1</literal> etc.</para>
     </section>
   </section>
