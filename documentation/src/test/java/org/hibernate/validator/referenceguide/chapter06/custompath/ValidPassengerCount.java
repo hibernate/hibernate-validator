@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface ValidPassengerCount {
 
-	String message() default "{org.hibernate.validator.referenceguide.chapter03.custompath.ValidPassengerCount.message}";
+	String message() default "{org.hibernate.validator.referenceguide.chapter06.custompath.ValidPassengerCount.message}";
 
 	Class<?>[] groups() default { };
 
