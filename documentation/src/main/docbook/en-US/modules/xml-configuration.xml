@@ -31,20 +31,20 @@
   constraint declarations and closely matches the constraint declaration
   approach via annotations. Let's have a look at these two document
   types.<note>
-      <para>The xsd files are available via <ulink
+      <para>The XSD files are available via <ulink
       url="http://www.jboss.org/xml/ns/javax/validation/configuration/">http://www.jboss.org/xml/ns/javax/validation/configuration</ulink>
       and <ulink
       url="http://www.jboss.org/xml/ns/javax/validation/mapping">http://www.jboss.org/xml/ns/javax/validation/mapping</ulink>.</para>
     </note></para>
 
   <section id="section-configuration-validation-xml">
-    <title>Configuring ValidationFactory in
+    <title>Configuring the validator factory in
     <filename>validation.xml</filename></title>
 
     <para>The key to enable XML configuration for Hibernate Validator is the
     file <filename>META-INF/validation.xml</filename>. If this file exists on
     the classpath its configuration will be applied when the
-    <classname>ValidationFactory</classname> gets created. <xref
+    <classname>ValidatorFactory</classname> gets created. <xref
     linkend="image-validation-configuration"/> shows a model view of the XML
     schema to which <filename>validation.xml</filename> has to adhere.<example
         id="image-validation-configuration">
@@ -72,7 +72,7 @@
     configuration will be overridden by values explicitly specified via the
     programmatic API. It is even possible to ignore the XML configuration
     completely via
-    <methodname>Configuration.ignoreXmlConfiguration()</methodname>. See also
+    <methodname>Configuration#ignoreXmlConfiguration()</methodname>. See also
     <xref linkend="section-configuring-validator-factory"/>.</para>
 
     <example id="example-validation-xml">
@@ -173,13 +173,13 @@
       </mediaobject>
     </example>
 
-    <para><xref linkend="example-constraints-car"/> shows how our classes
+    <para><xref linkend="example-constraints-car"/> shows how the classes
     <classname>Car</classname> and <classname>RentalCar</classname> from <xref
     linkend="example-car"/> resp. <xref linkend="example-rental-car"/> could
     be mapped in XML.</para>
 
     <example id="example-constraints-car">
-      <title>Bean constraints configurred via XML</title>
+      <title>Bean constraints configured via XML</title>
 
       <programlisting language="XML" role="XML">&lt;constraint-mappings
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -233,10 +233,10 @@
     linkend="example-declaring-parameter-constraints"/>, <xref
     linkend="example-declaring-return-value-constraints"/> and <xref
     linkend="example-specifying-constraint-target"/> can be expressed in
-    xml.</para>
+    XML.</para>
 
     <example id="example-rental-station-xml">
-      <title>Method constraints configurred via XML</title>
+      <title>Method constraints configured via XML</title>
 
       <programlisting language="XML" role="XML">&lt;constraint-mappings
         xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
@@ -329,7 +329,7 @@
     <property>method</property>, <property>parameter</property>,
     <property>cross-parameter</property> and
     <property>return-value</property>. If not explicitly specified on these
-    levels the configured <property>bean</property> value applies. </para>
+    levels the configured <property>bean</property> value applies.</para>
 
     <para>The nodes <property>class</property>, <property>field</property>,
     <property>getter</property>, <property>constructor</property> and
@@ -344,12 +344,12 @@
     specific attributes are configured using the <property>element</property>
     node.</para>
 
-    <para>The class node also allows to reconfigure the default group sequence
-    (see <xref linkend="section-default-group-class"/>) via the
-    <property>group-sequence</property> node. Not shown in the example is the
-    use of <property>convert-group</property> to specify group conversions
-    (see <xref linkend="section-group-conversion"/>). This node is available
-    on <property>field</property>, <property>getter</property>,
+    <para>The <property>class</property> node also allows to reconfigure the
+    default group sequence (see <xref linkend="section-default-group-class"/>)
+    via the <property>group-sequence</property> node. Not shown in the example
+    is the use of <property>convert-group</property> to specify group
+    conversions (see <xref linkend="section-group-conversion"/>). This node is
+    available on <property>field</property>, <property>getter</property>,
     <property>parameter</property> and <property>return-value</property> and
     specifies a <property>from</property> and <property>to</property>
     attribute to specify the groups.</para>

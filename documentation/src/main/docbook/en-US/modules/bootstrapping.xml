@@ -24,7 +24,7 @@
   <title>Bootstrapping</title>
 
   <para>In <xref linkend="section-obtaining-validator"/> you already saw one
-  way for creating a <classname>Validator</classname> instance — via
+  way for creating a <classname>Validator</classname> instance - via
   <methodname>Validation#buildDefaultValidatorFactory()</methodname>. In this
   chapter you will learn how to use the other methods in
   <classname>javax.validation.Validation</classname> in order to bootstrap

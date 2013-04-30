@@ -294,7 +294,7 @@ public class CheckCaseValidator implements ConstraintValidator&lt;CheckCase, Str
       should be annotated with <code>@NotNull</code> explicitly.</para>
 
       <section>
-        <title>The ConstraintValidatorContext</title>
+        <title>The <classname>ConstraintValidatorContext</classname></title>
 
         <para><xref linkend="example-constraint-validator"/> relies on the
         default error message generation by just returning
@@ -634,8 +634,8 @@ public @interface ConsistentDateParameters {
         <para>Cross-parameter constraints are specified directly on the
         declaration of a method or constructor, which is also the case for
         return value constraints. In order to improve code readability, it is
-        therefore recommended to chose constraint names — such as
-        <classname>@ConsistentDateParameters</classname> — which make the
+        therefore recommended to chose constraint names - such as
+        <classname>@ConsistentDateParameters</classname> - which make the
         constraint target apparent.</para>
       </note></para>
 

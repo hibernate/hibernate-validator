@@ -26,8 +26,8 @@
   <para>Hibernate Validator is intended to be used to implement multi-layered
   data validation, where constraints are expressed in a single place (the
   annotated domain model) and checked in various different layers of the
-  application. For this reason there are multiple integrstion points with
-  other technologies. </para>
+  application. For this reason there are multiple integration points with
+  other technologies.</para>
 
   <section id="validator-checkconstraints-orm">
     <title>ORM integration</title>
@@ -198,11 +198,12 @@
       <para>The integration between JSF 2 and Bean Validation is described in
       the "Bean Validation Integration" chapter of <ulink
       url="http://jcp.org/en/jsr/detail?id=314">JSR-314</ulink>. It is
-      interesting to know that JSF 2 implements a custom MessageInterpolator
-      to ensure ensure proper localization. To encourage the use of the Bean
-      Validation message facility, JSF 2 will per default only display the
-      generated Bean Validation message. This can, however, be configured via
-      the application resource bundle by providing the following configuration
+      interesting to know that JSF 2 implements a custom
+      <classname>MessageInterpolator</classname> to ensure ensure proper
+      localization. To encourage the use of the Bean Validation message
+      facility, JSF 2 will per default only display the generated Bean
+      Validation message. This can, however, be configured via the application
+      resource bundle by providing the following configuration
       (<parameter>{0}</parameter> is replaced with the Bean Validation message
       and <parameter>{1}</parameter> is replaced with the JSF component
       label):</para>

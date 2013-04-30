@@ -304,7 +304,8 @@ assertEquals( 1, driverDescriptor.getGroupConversions().size() );</programlistin
   </section>
 
   <section>
-    <title>MethodDescriptor and ConstructorDescriptor</title>
+    <title><classname>MethodDescriptor</classname> and
+    <classname>ConstructorDescriptor</classname></title>
 
     <para>Constrained methods and constructors are represented by the
     interfaces <ulink

@@ -84,7 +84,7 @@
 
       <listitem>
         <para>only non-primitive fields or methods are annotated with
-        @Valid</para>
+        <classname>@Valid</classname></para>
       </listitem>
 
       <listitem>
@@ -100,7 +100,7 @@
 
       <listitem>
         <para>definition of dynamic default group sequence with
-        @GroupSequenceProvider is valid</para>
+        <classname>@GroupSequenceProvider</classname> is valid</para>
       </listitem>
     </itemizedlist>
   </section>

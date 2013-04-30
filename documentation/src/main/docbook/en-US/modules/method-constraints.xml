@@ -690,7 +690,7 @@ public class Car {
       </example>
 
       <section>
-        <title><methodname>ExecutableValidator.validateParameters()</methodname></title>
+        <title><methodname>ExecutableValidator#validateParameters()</methodname></title>
 
         <para>The method <methodname>validateParameters()</methodname> is used
         to validate the arguments of a method invocation. <xref
@@ -728,7 +728,7 @@ assertEquals( Max.class, constraintType );</programlisting>
       </section>
 
       <section>
-        <title><methodname>ExecutableValidator.validateReturnValue()</methodname></title>
+        <title><methodname>ExecutableValidator#validateReturnValue()</methodname></title>
 
         <para>Using <methodname>validateReturnValue()</methodname> the return
         value of a method can can be validated. The validation in <xref
@@ -761,7 +761,7 @@ assertEquals( Size.class, constraintType );</programlisting>
       </section>
 
       <section>
-        <title><methodname>ExecutableValidator.validateConstructorParameters()</methodname></title>
+        <title><methodname>ExecutableValidator#validateConstructorParameters()</methodname></title>
 
         <para>The arguments of constructor invocations can be validated with
         <methodname>validateConstructorParameters()</methodname> as shown in
@@ -793,7 +793,7 @@ assertEquals( NotNull.class, constraintType );</programlisting>
       </section>
 
       <section>
-        <title><methodname>ExecutableValidator.validateConstructorReturnValue()</methodname></title>
+        <title><methodname>ExecutableValidator#validateConstructorReturnValue()</methodname></title>
 
         <para>Finally, by using
         <methodname>validateConstructorReturnValue()</methodname> you can

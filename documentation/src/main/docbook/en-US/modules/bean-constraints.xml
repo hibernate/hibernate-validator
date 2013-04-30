@@ -427,7 +427,7 @@ Validator validator = factory.getValidator();</programlisting>
       linkend="chapter-groups"/>.</para>
 
       <section>
-        <title><methodname>Validator.validate()</methodname></title>
+        <title><methodname>Validator#validate()</methodname></title>
 
         <para>Use the <methodname>validate()</methodname> method to perform
         validation of all constraints of a given bean. <xref
@@ -452,7 +452,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
       </section>
 
       <section>
-        <title><methodname>Validator.validateProperty()</methodname></title>
+        <title><methodname>Validator#validateProperty()</methodname></title>
 
         <para>With help of the <methodname>validateProperty()</methodname> you
         can validate a single named property of a given object. The property
@@ -475,7 +475,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
       </section>
 
       <section>
-        <title><methodname>Validator.validateValue()</methodname></title>
+        <title><methodname>Validator#validateValue()</methodname></title>
 
         <para>By using the <methodname>validateValue() </methodname>method you
         can check whether a single property of a given class can be validated
