@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 public class Person {
 
 	@NotNull
-	private final String name;
+	private String name;
 
 	public Person(String name) {
 		this.name = name;

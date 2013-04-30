@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 public class Garage {
 
 	@NotNull
-	private final String name;
+	private String name;
 
 	@Valid
 	public Garage(String name) {

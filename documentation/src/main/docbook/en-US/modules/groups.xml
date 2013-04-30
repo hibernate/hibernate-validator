@@ -505,14 +505,10 @@ public class RentalCar extends Car {
 
       <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter05.groupconversion;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
 public class Driver {
 
 	@NotNull
-	private final String name;
+	private String name;
 
 	@Min(
 			value = 18,
@@ -544,14 +540,14 @@ public class Driver {
 public class Car {
 
 	@NotNull
-	private final String manufacturer;
+	private String manufacturer;
 
 	@NotNull
 	@Size(min = 2, max = 14)
-	private final String licensePlate;
+	private String licensePlate;
 
 	@Min(2)
-	private final int seatCount;
+	private int seatCount;
 
 	@AssertTrue(
 			message = "The car has to pass the vehicle inspection first",

@@ -9,30 +9,30 @@ import javax.validation.constraints.Size;
 public class Car {
 
 	@NotNull
-	private final String manufacturer;
+	private String manufacturer;
 
 	@Size(
 			min = 2,
 			max = 14,
 			message = "The license plate must be between {min} and {max} characters long"
 	)
-	private final String licensePlate;
+	private String licensePlate;
 
 	@Min(
 			value = 2,
 			message = "There must be at least {value} seat${value > 1 ? 's' : ''}"
 	)
-	private final int seatCount;
+	private int seatCount;
 
 	@DecimalMax(
 			value = "350",
 			message = "The top speed ${formatter.format('%1$.2f', validatedValue)} is higher " +
 					"than {value}"
 	)
-	private final double topSpeed;
+	private double topSpeed;
 
 	@DecimalMax(value = "100000", message = "Price must not be higher than ${value}")
-	private final BigDecimal price;
+	private BigDecimal price;
 
 	public Car(
 			String manufacturer,
