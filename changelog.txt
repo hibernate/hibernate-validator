@@ -1,6 +1,19 @@
 Hibernate Validator Changelog
 =============================
 
+5.0.1.Final (30.04.2013)
+------------------------
+
+** Bug
+    * [HV-702] - Upgrade JPA version used in HV
+    * [HV-725] - Update docbook documentation to reflect the changes of Bean Validation 1.1
+    * [HV-790] - Change EL impl dependency scope from runtime to provided
+    * [HV-791] - XML configuration fails for primitive types
+
+** Improvement
+    * [HV-604] - Class-level constraints section of online docs refers to PassengerCount example which is never shown
+
+
 5.0.0.Final (11.04.2013)
 ------------------------
 
