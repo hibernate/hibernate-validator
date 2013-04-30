@@ -96,40 +96,57 @@ public final class ReflectionHelper {
 	 */
 	private static final TypeResolver typeResolver = new TypeResolver();
 
+	private static final Map<String, Class<?>> PRIMITIVE_NAME_TO_PRIMITIVE;
+	static {
+		Map<String, Class<?>> tmpMap = newHashMap( 9 );
+
+		tmpMap.put( boolean.class.getName(), boolean.class );
+		tmpMap.put( char.class.getName(), char.class );
+		tmpMap.put( double.class.getName(), double.class );
+		tmpMap.put( float.class.getName(), float.class );
+		tmpMap.put( long.class.getName(), long.class );
+		tmpMap.put( int.class.getName(), int.class );
+		tmpMap.put( short.class.getName(), short.class );
+		tmpMap.put( byte.class.getName(), byte.class );
+		tmpMap.put( Void.TYPE.getName(), Void.TYPE );
+
+		PRIMITIVE_NAME_TO_PRIMITIVE = Collections.unmodifiableMap( tmpMap );
+	}
+
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
 
 	static {
-		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
+		Map<Class<?>, Class<?>> tmpMap = newHashMap( 9 );
 
-		temp.put( boolean.class, Boolean.class );
-		temp.put( char.class, Character.class );
-		temp.put( double.class, Double.class );
-		temp.put( float.class, Float.class );
-		temp.put( long.class, Long.class );
-		temp.put( int.class, Integer.class );
-		temp.put( short.class, Short.class );
-		temp.put( byte.class, Byte.class );
-		temp.put( Void.TYPE, Void.TYPE );
+		tmpMap.put( boolean.class, Boolean.class );
+		tmpMap.put( char.class, Character.class );
+		tmpMap.put( double.class, Double.class );
+		tmpMap.put( float.class, Float.class );
+		tmpMap.put( long.class, Long.class );
+		tmpMap.put( int.class, Integer.class );
+		tmpMap.put( short.class, Short.class );
+		tmpMap.put( byte.class, Byte.class );
+		tmpMap.put( Void.TYPE, Void.TYPE );
 
-		PRIMITIVE_TO_WRAPPER_TYPES = Collections.unmodifiableMap( temp );
+		PRIMITIVE_TO_WRAPPER_TYPES = Collections.unmodifiableMap( tmpMap );
 	}
 
-	private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITVES_TYPES;
+	private static final Map<Class<?>, Class<?>> WRAPPER_TO_PRIMITIVE_TYPES;
 
 	static {
-		Map<Class<?>, Class<?>> temp = newHashMap( 9 );
+		Map<Class<?>, Class<?>> tmpMap = newHashMap( 9 );
 
-		temp.put( Boolean.class, boolean.class );
-		temp.put( Character.class, char.class );
-		temp.put( Double.class, double.class );
-		temp.put( Float.class, float.class );
-		temp.put( Long.class, long.class );
-		temp.put( Integer.class, int.class );
-		temp.put( Short.class, short.class );
-		temp.put( Byte.class, byte.class );
-		temp.put( Void.TYPE, Void.TYPE );
+		tmpMap.put( Boolean.class, boolean.class );
+		tmpMap.put( Character.class, char.class );
+		tmpMap.put( Double.class, double.class );
+		tmpMap.put( Float.class, float.class );
+		tmpMap.put( Long.class, long.class );
+		tmpMap.put( Integer.class, int.class );
+		tmpMap.put( Short.class, short.class );
+		tmpMap.put( Byte.class, byte.class );
+		tmpMap.put( Void.TYPE, Void.TYPE );
 
-		WRAPPER_TO_PRIMITVES_TYPES = Collections.unmodifiableMap( temp );
+		WRAPPER_TO_PRIMITIVE_TYPES = Collections.unmodifiableMap( tmpMap );
 	}
 
 	/**
@@ -155,6 +172,10 @@ public final class ReflectionHelper {
 	}
 
 	public static Class<?> loadClass(String className, String defaultPackage, Class<?> caller) {
+		if( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className )) {
+		   return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
+		}
+
 		StringBuilder fullyQualifiedClass = new StringBuilder();
 		String tmpClassName = className;
 		if ( isArrayClassName( className ) ) {
@@ -685,7 +706,7 @@ public final class ReflectionHelper {
 	 * represent a primitive type.
 	 */
 	public static Class<?> unBoxedType(Class<?> type) {
-		Class<?> wrapperType = WRAPPER_TO_PRIMITVES_TYPES.get( type );
+		Class<?> wrapperType = WRAPPER_TO_PRIMITIVE_TYPES.get( type );
 
 		if ( wrapperType == null ) {
 			throw log.getHasToBeABoxedTypeException( type.getClass() );
