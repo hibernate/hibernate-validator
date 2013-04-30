@@ -1,0 +1,68 @@
+<constraint-mappings
+        xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation=
+                "http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.1.xsd" version="1.1">
+
+    <default-package>org.hibernate.validator.referenceguide.chapter07</default-package>
+
+    <bean class="RentalStation" ignore-annotations="true">
+        <constructor>
+            <return-value>
+                <constraint annotation="ValidRentalStation"/>
+            </return-value>
+        </constructor>
+
+        <constructor>
+            <parameter type="java.lang.String">
+                <constraint annotation="javax.validation.constraints.NotNull"/>
+            </parameter>
+        </constructor>
+
+        <method name="getCustomers">
+            <return-value>
+                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="javax.validation.constraints.Size">
+                    <element name="min">1</element>
+                </constraint>
+            </return-value>
+        </method>
+
+        <method name="rentCar">
+            <parameter type="Customer">
+                <constraint annotation="javax.validation.constraints.NotNull"/>
+            </parameter>
+            <parameter type="java.util.Date">
+                <constraint annotation="javax.validation.constraints.NotNull"/>
+                <constraint annotation="javax.validation.constraints.Future"/>
+            </parameter>
+            <parameter type="int">
+                <constraint annotation="javax.validation.constraints.Min">
+                    <element name="value">1</element>
+                </constraint>
+            </parameter>
+        </method>
+    </bean>
+
+    <bean class="Garage" ignore-annotations="true">
+        <method name="buildCar">
+            <parameter type="java.util.List"/>
+            <cross-parameter>
+                <constraint annotation="ELAssert">
+                    <element name="expression">...</element>
+                    <element name="validationAppliesTo">PARAMETERS</element>
+                </constraint>
+            </cross-parameter>
+        </method>
+        <method name="paintCar">
+            <parameter type="int"/>
+            <return-value>
+                <constraint annotation="ELAssert">
+                    <element name="expression">...</element>
+                    <element name="validationAppliesTo">RETURN_VALUE</element>
+                </constraint>
+            </return-value>
+        </method>
+    </bean>
+
+</constraint-mappings>

@@ -176,18 +176,17 @@
     <para><xref linkend="example-constraints-car"/> shows how our classes
     <classname>Car</classname> and <classname>RentalCar</classname> from <xref
     linkend="example-car"/> resp. <xref linkend="example-rental-car"/> could
-    be mapped in XML. Example x shows how method validation from example y can
-    be expressed in xml. (TODO create example)</para>
+    be mapped in XML.</para>
 
     <example id="example-constraints-car">
-      <title>constraints.xml</title>
+      <title>Bean constraints configurred via XML</title>
 
       <programlisting language="XML" role="XML">&lt;constraint-mappings
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.1.xsd"
     xmlns="http://jboss.org/xml/ns/javax/validation/mapping" version="1.1"&gt;
 
-    &lt;default-package&gt;org.hibernate.validator.quickstart&lt;/default-package&gt;
+    &lt;default-package&gt;org.hibernate.validator.referenceguide.chapter05&lt;/default-package&gt;
     &lt;bean class="Car" ignore-annotations="true"&gt;
         &lt;field name="manufacturer"&gt;
             &lt;constraint annotation="javax.validation.constraints.NotNull"/&gt;
@@ -229,6 +228,86 @@
 &lt;/constraint-mappings&gt;</programlisting>
     </example>
 
+    <para><xref linkend="example-rental-station-xml"/> shows how the
+    constraints from <xref
+    linkend="example-declaring-parameter-constraints"/>, <xref
+    linkend="example-declaring-return-value-constraints"/> and <xref
+    linkend="example-specifying-constraint-target"/> can be expressed in
+    xml.</para>
+
+    <example id="example-rental-station-xml">
+      <title>Method constraints configurred via XML</title>
+
+      <programlisting language="XML" role="XML">&lt;constraint-mappings
+        xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation=
+                "http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.1.xsd" version="1.1"&gt;
+
+    &lt;default-package&gt;org.hibernate.validator.referenceguide.chapter07&lt;/default-package&gt;
+
+    &lt;bean class="RentalStation" ignore-annotations="true"&gt;
+        &lt;constructor&gt;
+            &lt;return-value&gt;
+                &lt;constraint annotation="ValidRentalStation"/&gt;
+            &lt;/return-value&gt;
+        &lt;/constructor&gt;
+
+        &lt;constructor&gt;
+            &lt;parameter type="java.lang.String"&gt;
+                &lt;constraint annotation="javax.validation.constraints.NotNull"/&gt;
+            &lt;/parameter&gt;
+        &lt;/constructor&gt;
+
+        &lt;method name="getCustomers"&gt;
+            &lt;return-value&gt;
+                &lt;constraint annotation="javax.validation.constraints.NotNull"/&gt;
+                &lt;constraint annotation="javax.validation.constraints.Size"&gt;
+                    &lt;element name="min"&gt;1&lt;/element&gt;
+                &lt;/constraint&gt;
+            &lt;/return-value&gt;
+        &lt;/method&gt;
+
+        &lt;method name="rentCar"&gt;
+            &lt;parameter type="Customer"&gt;
+                &lt;constraint annotation="javax.validation.constraints.NotNull"/&gt;
+            &lt;/parameter&gt;
+            &lt;parameter type="java.util.Date"&gt;
+                &lt;constraint annotation="javax.validation.constraints.NotNull"/&gt;
+                &lt;constraint annotation="javax.validation.constraints.Future"/&gt;
+            &lt;/parameter&gt;
+            &lt;parameter type="int"&gt;
+                &lt;constraint annotation="javax.validation.constraints.Min"&gt;
+                    &lt;element name="value"&gt;1&lt;/element&gt;
+                &lt;/constraint&gt;
+            &lt;/parameter&gt;
+        &lt;/method&gt;
+    &lt;/bean&gt;
+
+    &lt;bean class="Garage" ignore-annotations="true"&gt;
+        &lt;method name="buildCar"&gt;
+            &lt;parameter type="java.util.List"/&gt;
+            &lt;cross-parameter&gt;
+                &lt;constraint annotation="ELAssert"&gt;
+                    &lt;element name="expression"&gt;...&lt;/element&gt;
+                    &lt;element name="validationAppliesTo"&gt;PARAMETERS&lt;/element&gt;
+                &lt;/constraint&gt;
+            &lt;/cross-parameter&gt;
+        &lt;/method&gt;
+        &lt;method name="paintCar"&gt;
+            &lt;parameter type="int"/&gt;
+            &lt;return-value&gt;
+                &lt;constraint annotation="ELAssert"&gt;
+                    &lt;element name="expression"&gt;...&lt;/element&gt;
+                    &lt;element name="validationAppliesTo"&gt;RETURN_VALUE&lt;/element&gt;
+                &lt;/constraint&gt;
+            &lt;/return-value&gt;
+        &lt;/method&gt;
+    &lt;/bean&gt;
+
+&lt;/constraint-mappings&gt;</programlisting>
+    </example>
+
     <para>The XML configuration is closely mirroring the programmatic API. For
     this reason it should suffice to just add some comments.
     <property>default-package</property> is used for all fields where a class
@@ -245,16 +324,21 @@
     <constant>true</constant> means that constraint annotations placed on the
     configured bean are ignored. The default for this value is
     <constant>true</constant>. ignore-annotations is also available for the
-    nodes <property>class</property>, <property>fields</property> and
-    <property>getter</property>. If not explicitly specified on these levels
-    the configured <property>bean</property> value applies. Otherwise do the
-    nodes <property>class</property>, <property>fields</property> and
-    <property>getter</property> determine on which level the constraints are
-    placed (see <xref linkend="section-declaring-bean-constraints"/>). The
-    <property>constraint</property> node is then used to add a constraint on
-    the corresponding level. Each constraint definition must define the class
-    via the <property>annotation</property> attribute. The constraint
-    attributes required by the Bean Validation specification
+    nodes <property>class</property>, <property>fields</property>,
+    <property>getter</property>, <property>constructor</property>,
+    <property>method</property>, <property>parameter</property>,
+    <property>cross-parameter</property> and
+    <property>return-value</property>. If not explicitly specified on these
+    levels the configured <property>bean</property> value applies. </para>
+
+    <para>The nodes <property>class</property>, <property>field</property>,
+    <property>getter</property>, <property>constructor</property> and
+    <property>method</property> (and its sub node
+    <property>parameter</property>) determine on which level the constraint
+    gets placed. The <property>constraint</property> node is then used to add
+    a constraint on the corresponding level. Each constraint definition must
+    define the class via the <property>annotation</property> attribute. The
+    constraint attributes required by the Bean Validation specification
     (<property>message</property>, <property>groups</property> and
     <property>payload</property>) have dedicated nodes. All other constraint
     specific attributes are configured using the <property>element</property>
@@ -262,7 +346,13 @@
 
     <para>The class node also allows to reconfigure the default group sequence
     (see <xref linkend="section-default-group-class"/>) via the
-    <property>group-sequence</property> node.</para>
+    <property>group-sequence</property> node. Not shown in the example is the
+    use of <property>convert-group</property> to specify group conversions
+    (see <xref linkend="section-group-conversion"/>). This node is available
+    on <property>field</property>, <property>getter</property>,
+    <property>parameter</property> and <property>return-value</property> and
+    specifies a <property>from</property> and <property>to</property>
+    attribute to specify the groups.</para>
 
     <para>Last but not least, the list of
     <classname>ConstraintValidator</classname>s associated to a given
