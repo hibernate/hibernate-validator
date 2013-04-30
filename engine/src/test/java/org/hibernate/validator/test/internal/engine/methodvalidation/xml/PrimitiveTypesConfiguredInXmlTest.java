@@ -17,33 +17,93 @@
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
 import javax.validation.Configuration;
+import javax.validation.Validator;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.MethodDescriptor;
 
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.internal.engine.methodvalidation.AbstractMethodValidationTest;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
+
+import static org.testng.Assert.assertNotNull;
 
 /**
  * @author Hardy Ferentschik
  */
-public class PrimitiveTypesConfiguredInXmlTest extends AbstractMethodValidationTest {
+@TestForIssue(jiraKey = "HV-791")
+public class PrimitiveTypesConfiguredInXmlTest {
 
-	@Override
+	private Validator validator;
+
 	@BeforeMethod
 	protected void setUp() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping(
 				PrimitiveTypesConfiguredInXmlTest.class.getResourceAsStream(
-						"method-validation-mapping.xml"
+						"primitive-types-mapping.xml"
 				)
 		);
 		validator = configuration.buildValidatorFactory().getValidator();
-		createProxy(  );
 	}
 
-	@Override
-	protected String messagePrefix() {
-		return "[XML] - ";
+	@Test
+	public void testPrimitiveParametersConstrained() {
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( PrimitiveWrapper.class );
+
+		Class<?>[] primitives = {
+				boolean.class,
+				char.class,
+				double.class,
+				float.class,
+				long.class,
+				int.class,
+				short.class,
+				byte.class,
+		};
+
+		for ( Class<?> primitive : primitives ) {
+			char[] stringArray = primitive.getName().toCharArray();
+			stringArray[0] = Character.toUpperCase( stringArray[0] );
+			String tmp = new String( stringArray );
+
+			MethodDescriptor methodDescriptor = beanDescriptor.getConstraintsForMethod(
+					"set" + tmp,
+					primitive
+			);
+
+			assertNotNull(
+					methodDescriptor,
+					"MethodDescriptor for set" + tmp + "() is expected to be not null since it is constrained via XML."
+			);
+		}
+	}
+
+	public class PrimitiveWrapper {
+		public void setBoolean(boolean b) {
+		}
+
+		public void setChar(char c) {
+		}
+
+		public void setDouble(double d) {
+		}
+
+		public void setFloat(float f) {
+		}
+
+		public void setLong(long l) {
+		}
+
+		public void setInt(int i) {
+		}
+
+		public void setShort(short s) {
+		}
+
+		public void setByte(byte b) {
+		}
 	}
 }
 

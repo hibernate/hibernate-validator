@@ -4,7 +4,7 @@
         xsi:schemaLocation=
                 "http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.1.xsd" version="1.1">
 
-    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.xml.XmlBasedMethodValidationTest$PrimitiveWrapper"
+    <bean class="org.hibernate.validator.test.internal.engine.methodvalidation.xml.PrimitiveTypesConfiguredInXmlTest$PrimitiveWrapper"
           ignore-annotations="true">
         <method name="setBoolean">
             <parameter type="boolean">
