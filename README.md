@@ -93,3 +93,4 @@ There are more build options available as well. For more information refer to [C
 * [Mailing Lists](http://www.hibernate.org/community/mailinglists.html)
 * [Source Code](git://github.com/hibernate/hibernate-validator.git)
 * [Issue Tracking](http://opensource.atlassian.com/projects/hibernate/browse/HV)
+* [Continous Integration](https://hibernate-validator.ci.cloudbees.com/) [![Build Status](https://hibernate-validator.ci.cloudbees.com/view/Hibernate%20Validator%205/job/HV-5-SNAPSHOT/badge/icon)](https://hibernate-validator.ci.cloudbees.com/view/Hibernate%20Validator%205/job/HV-5-SNAPSHOT/)
