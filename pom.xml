@@ -94,6 +94,10 @@
         <arquillian.version>1.0.2.Final</arquillian.version>
     </properties>
 
+    <prerequisites>
+        <maven>3.0.3</maven>
+    </prerequisites>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -259,6 +263,9 @@
                             <!-- require JDK 1.6 to run the build -->
                             <version>[1.6,)</version>
                         </requireJavaVersion>
+                        <requireMavenVersion>
+                            <version>3.0.3</version>
+                        </requireMavenVersion>
                     </rules>
                 </configuration>
             </plugin>
