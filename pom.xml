@@ -455,6 +455,11 @@
                     <version>2.7</version>
                 </plugin>
                 <plugin>
+                     <groupId>org.apache.maven.plugins</groupId>
+                     <artifactId>maven-antrun-plugin</artifactId>
+                     <version>1.7</version>
+                 </plugin>
+                <plugin>
                     <groupId>org.jboss.maven.plugins</groupId>
                     <artifactId>maven-injection-plugin</artifactId>
                     <version>1.0.2</version>

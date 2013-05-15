@@ -33,8 +33,8 @@
         <tck.version>1.1.0.Final</tck.version>
         <tck.suite.file>src/test/resources/tck-tests-without-RI-and-AS-failures.xml</tck.suite.file>
         <arquillian.version>1.0.0.Final</arquillian.version>
-        <jbossas.version>7.1.1.Final</jbossas.version>
-        <jbossTargetDir>${project.build.directory}/jboss-as-${jbossas.version}</jbossTargetDir>
+        <wildfly.version>8.0.0.Alpha1-SNAPSHOT</wildfly.version>
+        <wildflyTargetDir>${project.build.directory}/wildfly-${wildfly.version}</wildflyTargetDir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
     </properties>
@@ -234,9 +234,9 @@
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.jboss.as</groupId>
-                    <artifactId>jboss-as-arquillian-container-managed</artifactId>
-                    <version>${jbossas.version}</version>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-managed</artifactId>
+                    <version>${wildfly.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -246,7 +246,7 @@
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>unpack</id>
+                                <id>unpack-wildfly</id>
                                 <phase>generate-test-resources</phase>
                                 <goals>
                                     <goal>unpack</goal>
@@ -254,9 +254,9 @@
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>org.jboss.as</groupId>
-                                            <artifactId>jboss-as-dist</artifactId>
-                                            <version>${jbossas.version}</version>
+                                            <groupId>org.wildfly</groupId>
+                                            <artifactId>wildfly-dist</artifactId>
+                                            <version>${wildfly.version}</version>
                                             <type>zip</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${project.build.directory}</outputDirectory>
@@ -265,34 +265,14 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>copy-beanvalidation-api</id>
+                                <id>update-hv</id>
                                 <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
                                     <outputDirectory>
-                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/javax/validation/api/main
-                                    </outputDirectory>
-                                    <stripVersion>false</stripVersion>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>javax.validation</groupId>
-                                            <artifactId>validation-api</artifactId>
-                                            <destFileName>validation-api-${bv.api.version}.jar</destFileName>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>copy-hv</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>
-                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/org/hibernate/validator/main
+                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/main
                                     </outputDirectory>
                                     <stripVersion>false</stripVersion>
                                     <artifactItems>
@@ -303,42 +283,27 @@
                                     </artifactItems>
                                 </configuration>
                             </execution>
-                            <execution>
-                                <id>copy-classmate</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>
-                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/com/fasterxml/classmate/main
-                                    </outputDirectory>
-                                    <stripVersion>false</stripVersion>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>com.fasterxml</groupId>
-                                            <artifactId>classmate</artifactId>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.gmaven</groupId>
-                        <artifactId>gmaven-plugin</artifactId>
+                   <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>copy-modules</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>execute</goal>
-                                </goals>
+                                <id>update-hv-module-descriptor</id>
+                                <phase>process-test-resources</phase>
                                 <configuration>
-                                    <source>
-                                        ${pom.basedir}/src/script/setupAsModules.groovy
-                                    </source>
+                                    <target>
+                                        <replaceregexp
+                                            file="${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/main/module.xml"
+                                            match="hibernate-validator.*\.jar"
+                                            replace="hibernate-validator-${project.version}.jar"
+                                            />
+                                    </target>
                                 </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
