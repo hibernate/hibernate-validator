@@ -52,14 +52,26 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	public static final String USER_VALIDATION_MESSAGES = "ValidationMessages";
 
 	/**
-	 * Regular expression used to do locating message parameters.
+	 * Regular expression used to do locating message parameters. The expression consists of three capturing groups.
+	 * The first group captures all leading back slashes (escape character), the second captures the parameter including
+	 * the curly braces and the third captures potential back slashes before the closing brace.
 	 */
-	private static final Pattern MESSAGE_PARAMETER_PATTERN = Pattern.compile( "((\\\\*)\\{[^\\}]+?\\})" );
+	private static final Pattern MESSAGE_PARAMETER_PATTERN = Pattern.compile(
+			"(\\\\*)"   // leading escape characters
+					+ "(\\{[^\\}]+?" // match a opening brace and then whatever except the closing '}' (non eager)
+					+ "(\\\\*)\\})" // match potential escape characters before the closing brace including '}' itself
+	);
 
 	/**
-	 * Regular expression used to do locating message expressions.
+	 * Regular expression used to do locating message expressions. The expression consists of three capturing groups.
+	 * The first group captures all leading back slashes (escape character), the second captures the parameter including
+	 * the curly braces and $ character. The third group captures potential back slashes before the closing brace.
 	 */
-	private static final Pattern MESSAGE_EXPRESSION_PATTERN = Pattern.compile( "((\\\\*)\\$?\\{[^\\}]+?\\})" );
+	private static final Pattern MESSAGE_EXPRESSION_PATTERN = Pattern.compile(
+			"(\\\\*)"  // leading escape characters
+					+ "(\\$?\\{[^\\}]+?" // match a opening brace and then whatever except the closing '}' (non eager)
+					+ "(\\\\*)\\})" // match potential escape characters before the closing brace including '}' itself
+	);
 
 	/**
 	 * The default locale in the current JVM.
@@ -141,7 +153,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			resolvedMessage = resolvedMessages.get( localisedMessage );
 		}
 
-		// if the message is not already in the cache we have to run step 1-3 of the message resolution 
+		// if the message is not already in the cache we have to run step 1-3 of the message resolution
 		if ( resolvedMessage == null ) {
 			ResourceBundle userResourceBundle = userResourceBundleLocator
 					.getResourceBundle( locale );
@@ -202,17 +214,19 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return !origMessage.equals( newMessage );
 	}
 
-	private String interpolateBundleMessage(String message, ResourceBundle bundle, Locale locale, boolean recurse) {
+	private String interpolateBundleMessage(String message, ResourceBundle bundle, Locale locale, boolean recursive) {
 		Matcher matcher = MESSAGE_PARAMETER_PATTERN.matcher( message );
 		StringBuffer sb = new StringBuffer();
 		String resolvedParameterValue;
 		while ( matcher.find() ) {
-			String parameter = matcher.group( 1 );
-			resolvedParameterValue = resolveParameter(
-					parameter, bundle, locale, recurse
-			);
+			String parameter = matcher.group( 2 );
+			if ( !isEscaped( matcher.group( 1 ), matcher.group( 3 ) ) ) {
+				resolvedParameterValue = resolveParameter(
+						parameter, bundle, locale, recursive
+				);
 
-			matcher.appendReplacement( sb, Matcher.quoteReplacement( resolvedParameterValue ) );
+				matcher.appendReplacement( sb, Matcher.quoteReplacement( resolvedParameterValue ) );
+			}
 		}
 		matcher.appendTail( sb );
 		return sb.toString();
@@ -223,25 +237,26 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		StringBuffer sb = new StringBuffer();
 
 		while ( matcher.find() ) {
-			String match = matcher.group( 1 );
-			InterpolationTerm expression = new InterpolationTerm( match, locale );
-			if ( expression.needsEvaluation() ) {
+			String match = matcher.group( 2 );
+			if ( !isEscaped( matcher.group( 1 ), matcher.group( 3 ) ) ) {
+				InterpolationTerm expression = new InterpolationTerm( match, locale );
 				String resolvedExpression = expression.interpolate( context );
 				resolvedExpression = Matcher.quoteReplacement( resolvedExpression );
 				matcher.appendReplacement( sb, resolvedExpression );
 			}
 		}
+
 		matcher.appendTail( sb );
 		return sb.toString();
 	}
 
-	private String resolveParameter(String parameterName, ResourceBundle bundle, Locale locale, boolean recurse) {
+	private String resolveParameter(String parameterName, ResourceBundle bundle, Locale locale, boolean recursive) {
 		String parameterValue;
 		try {
 			if ( bundle != null ) {
 				parameterValue = bundle.getString( removeCurlyBraces( parameterName ) );
-				if ( recurse ) {
-					parameterValue = interpolateBundleMessage( parameterValue, bundle, locale, recurse );
+				if ( recursive ) {
+					parameterValue = interpolateBundleMessage( parameterValue, bundle, locale, recursive );
 				}
 			}
 			else {
@@ -257,5 +272,9 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 
 	private String removeCurlyBraces(String parameter) {
 		return parameter.substring( 1, parameter.length() - 1 );
+	}
+
+	private boolean isEscaped(String leadingEscapeCharacters, String trailingEscapeCharacters) {
+		return leadingEscapeCharacters.length() % 2 != 0 || trailingEscapeCharacters.length() % 2 != 0;
 	}
 }

@@ -71,11 +71,6 @@ public class InterpolationTerm {
 	private final String expression;
 
 	/**
-	 * Leading escape characters for the expression. Needed to determine whether evaluation is needed.
-	 */
-	private final String leadingEscapeCharacters;
-
-	/**
 	 * The type of the expression.
 	 */
 	private final ExpressionType type;
@@ -89,7 +84,6 @@ public class InterpolationTerm {
 		Matcher matcher = LEADING_ESCAPE_CHARACTER_PATTERN.matcher( expression );
 		matcher.find();
 		this.locale = locale;
-		this.leadingEscapeCharacters = matcher.group( 1 );
 		this.expression = matcher.group( 2 );
 		if ( expression.startsWith( EL_DESIGNATION_CHARACTER ) ) {
 			this.type = ExpressionType.EL;
@@ -97,10 +91,6 @@ public class InterpolationTerm {
 		else {
 			this.type = ExpressionType.PARAMETER;
 		}
-	}
-
-	public boolean needsEvaluation() {
-		return leadingEscapeCharacters.length() % 2 == 0;
 	}
 
 	public String interpolate(MessageInterpolator.Context context) {
@@ -117,7 +107,6 @@ public class InterpolationTerm {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "InterpolationExpression" );
 		sb.append( "{expression='" ).append( expression ).append( '\'' );
-		sb.append( ", leadingEscapeCharacters='" ).append( leadingEscapeCharacters ).append( '\'' );
 		sb.append( ", type=" ).append( type );
 		sb.append( '}' );
 		return sb.toString();
@@ -140,7 +129,7 @@ public class InterpolationTerm {
 			log.evaluatingExpressionLanguageExpressionCausedException( expression, e );
 		}
 
-		return leadingEscapeCharacters + resolvedExpression;
+		return resolvedExpression;
 	}
 
 	private String interpolateConstraintAnnotationValue(MessageInterpolator.Context context) {
@@ -159,7 +148,7 @@ public class InterpolationTerm {
 		else {
 			resolvedExpression = expression;
 		}
-		return leadingEscapeCharacters + resolvedExpression;
+		return resolvedExpression;
 	}
 
 	private String removeCurlyBraces(String parameter) {
