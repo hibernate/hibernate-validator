@@ -58,7 +58,7 @@ public class MessageInterpolationTest {
 	public void createValidator() throws Exception {
 		final StringBuilder lines = new StringBuilder();
 		lines.append( "bar=Message is \\\\{escaped\\\\}" ).append( "\r\n" );
-		lines.append( "baz=Message is US$ {value}" ).append( "\r\n" );
+		lines.append( "baz=Message is US\\$ {value}" ).append( "\r\n" );
 		lines.append( "buz=Message is {values}" ).append( "\r\n" );
 		lines.append( "qux=Message is {missing}" ).append( "\r\n" );
 		lines.append( "zap=Message is \\\\${value}" ).append( "\r\n" );

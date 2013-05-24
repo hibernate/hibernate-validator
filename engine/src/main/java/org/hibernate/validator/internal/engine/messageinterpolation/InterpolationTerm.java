@@ -19,8 +19,6 @@ package org.hibernate.validator.internal.engine.messageinterpolation;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
 import javax.el.PropertyNotFoundException;
@@ -61,11 +59,6 @@ public class InterpolationTerm {
 	}
 
 	/**
-	 * Regular expression used to split message parameter/expression into expression and leading back slashes
-	 */
-	private static final Pattern LEADING_ESCAPE_CHARACTER_PATTERN = Pattern.compile( "(\\\\*)(.*)" );
-
-	/**
 	 * The actual expression (parameter or EL expression).
 	 */
 	private final String expression;
@@ -73,7 +66,7 @@ public class InterpolationTerm {
 	/**
 	 * The type of the expression.
 	 */
-	private final ExpressionType type;
+	private final InterpolationTermType type;
 
 	/**
 	 * The locale for which to interpolate the expression.
@@ -81,20 +74,18 @@ public class InterpolationTerm {
 	private final Locale locale;
 
 	public InterpolationTerm(String expression, Locale locale) {
-		Matcher matcher = LEADING_ESCAPE_CHARACTER_PATTERN.matcher( expression );
-		matcher.find();
 		this.locale = locale;
-		this.expression = matcher.group( 2 );
+		this.expression = expression;
 		if ( expression.startsWith( EL_DESIGNATION_CHARACTER ) ) {
-			this.type = ExpressionType.EL;
+			this.type = InterpolationTermType.EL;
 		}
 		else {
-			this.type = ExpressionType.PARAMETER;
+			this.type = InterpolationTermType.PARAMETER;
 		}
 	}
 
 	public String interpolate(MessageInterpolator.Context context) {
-		if ( ExpressionType.EL.equals( type ) ) {
+		if ( InterpolationTermType.EL.equals( type ) ) {
 			return interpolateExpressionLanguageTerm( context );
 		}
 		else {
@@ -179,18 +170,6 @@ public class InterpolationTerm {
 		}
 
 		return expressionFactory.createValueExpression( elContext, messageTemplate, String.class );
-	}
-
-	private enum ExpressionType {
-		/**
-		 * EL message expression, eg ${foo}.
-		 */
-		EL,
-
-		/**
-		 * Message parameter, eg {foo}.
-		 */
-		PARAMETER
 	}
 }
 

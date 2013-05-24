@@ -58,15 +58,18 @@ public class EscapedInterpolationVariableTest {
 									return "\\{escapedParameterKey\\}";
 								}
 								else if ( "key-2".equals( key ) ) {
-									// since the closing brace is escaped it is not a interpolation variable and both braces will be preserved
+									// since {} are unbalanced the original key (key-2) should be returned from the interpolation
 									return "{escapedParameterKey\\}";
 								}
 								else if ( "key-3".equals( key ) ) {
-									// since the opening brace is escaped it is not a interpolation variable and both braces will be preserved
+									// since {} are unbalanced the original key (key-3) should be returned from the interpolation
 									return "\\{escapedParameterKey}";
 								}
+								else if ( "key-4".equals( key ) ) {
+									return "foo";
+								}
 								else {
-									fail( "Unexpected key" );
+									fail( "Unexpected key: " + key );
 								}
 								return null;
 							}
@@ -94,13 +97,19 @@ public class EscapedInterpolationVariableTest {
 	@Test
 	public void testEscapedClosingBrace() throws Exception {
 		Set<ConstraintViolation<B>> constraintViolations = validator.validate( new B() );
-		assertCorrectConstraintViolationMessages( constraintViolations, "{escapedParameterKey}" );
+		assertCorrectConstraintViolationMessages( constraintViolations, "{key-2}" );
 	}
 
 	@Test
 	public void testEscapedOpenBrace() throws Exception {
 		Set<ConstraintViolation<C>> constraintViolations = validator.validate( new C() );
-		assertCorrectConstraintViolationMessages( constraintViolations, "{escapedParameterKey}" );
+		assertCorrectConstraintViolationMessages( constraintViolations, "{key-3}" );
+	}
+
+	@Test
+	public void testMessageStaysUnchangedDueToSingleCurlyBrace() throws Exception {
+		Set<ConstraintViolation<D>> constraintViolations = validator.validate( new D() );
+		assertCorrectConstraintViolationMessages( constraintViolations, "{key-4} {" );
 	}
 
 	private class A {
@@ -115,6 +124,11 @@ public class EscapedInterpolationVariableTest {
 
 	private class C {
 		@Max(value = 1, message = "{key-3}")
+		private int a = 2;
+	}
+
+	private class D {
+		@Max(value = 1, message = "{key-4} {")
 		private int a = 2;
 	}
 }
