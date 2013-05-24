@@ -20,12 +20,15 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.validation.MessageInterpolator;
+import javax.xml.bind.ValidationException;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
+import org.hibernate.validator.internal.engine.messageinterpolation.MessageDescriptorFormatException;
+import org.hibernate.validator.internal.engine.messageinterpolation.MessageDescriptorParser;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
@@ -40,6 +43,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newConcurre
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class ResourceBundleMessageInterpolator implements MessageInterpolator {
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * The name of the default message bundle.
@@ -50,16 +54,6 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	 * The name of the user-provided message bundle as defined in the specification.
 	 */
 	public static final String USER_VALIDATION_MESSAGES = "ValidationMessages";
-
-	/**
-	 * Regular expression used to do locating message parameters.
-	 */
-	private static final Pattern MESSAGE_PARAMETER_PATTERN = Pattern.compile( "((\\\\*)\\{[^\\}]+?\\})" );
-
-	/**
-	 * Regular expression used to do locating message expressions.
-	 */
-	private static final Pattern MESSAGE_EXPRESSION_PATTERN = Pattern.compile( "((\\\\*)\\$?\\{[^\\}]+?\\})" );
 
 	/**
 	 * The default locale in the current JVM.
@@ -112,12 +106,26 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	public String interpolate(String message, Context context) {
 		// probably no need for caching, but it could be done by parameters since the map
 		// is immutable and uniquely built per Validation definition, the comparison has to be based on == and not equals though
-		return interpolateMessage( message, context, defaultLocale );
+		String interpolatedMessage = message;
+		try {
+			interpolatedMessage = interpolateMessage( message, context, defaultLocale );
+		}
+		catch ( MessageDescriptorFormatException e ) {
+			log.warn(e.getMessage()); // todo fix logging
+		}
+		return interpolatedMessage;
 	}
 
 	@Override
 	public String interpolate(String message, Context context, Locale locale) {
-		return interpolateMessage( message, context, locale );
+		String interpolatedMessage = message;
+		try {
+			interpolatedMessage = interpolateMessage( message, context, locale );
+		}
+		catch ( ValidationException e ) {
+			log.warn(e.getMessage());
+		}
+		return interpolatedMessage;
 	}
 
 	/**
@@ -133,7 +141,8 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	 *
 	 * @return the interpolated message.
 	 */
-	private String interpolateMessage(String message, Context context, Locale locale) {
+	private String interpolateMessage(String message, Context context, Locale locale)
+			throws MessageDescriptorFormatException {
 		LocalizedMessage localisedMessage = new LocalizedMessage( message, locale );
 		String resolvedMessage = null;
 
@@ -141,7 +150,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			resolvedMessage = resolvedMessages.get( localisedMessage );
 		}
 
-		// if the message is not already in the cache we have to run step 1-3 of the message resolution 
+		// if the message is not already in the cache we have to run step 1-3 of the message resolution
 		if ( resolvedMessage == null ) {
 			ResourceBundle userResourceBundle = userResourceBundleLocator
 					.getResourceBundle( locale );
@@ -183,18 +192,31 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			}
 		}
 
-		// resolve annotation attributes (step 4)
-		resolvedMessage = interpolateExpression( resolvedMessage, MESSAGE_PARAMETER_PATTERN, context, locale );
+		// resolve parameter expressions (step 4)
+		resolvedMessage = interpolateExpression(
+				MessageDescriptorParser.forParameter( resolvedMessage ),
+				context,
+				locale
+		);
 
-		// resolve annotation attributes (step 5)
-		resolvedMessage = interpolateExpression( resolvedMessage, MESSAGE_EXPRESSION_PATTERN, context, locale );
+		// resolve EL expressions (step 5)
+		resolvedMessage = interpolateExpression(
+				MessageDescriptorParser.forExpressionLanguage( resolvedMessage ),
+				context,
+				locale
+		);
 
 		// last but not least we have to take care of escaped literals
+		resolvedMessage = replaceEscapedLiterals( resolvedMessage );
+
+		return resolvedMessage;
+	}
+
+	private String replaceEscapedLiterals(String resolvedMessage) {
 		resolvedMessage = resolvedMessage.replace( "\\{", "{" );
 		resolvedMessage = resolvedMessage.replace( "\\}", "}" );
 		resolvedMessage = resolvedMessage.replace( "\\\\", "\\" );
 		resolvedMessage = resolvedMessage.replace( "\\$", "$" );
-
 		return resolvedMessage;
 	}
 
@@ -202,46 +224,39 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		return !origMessage.equals( newMessage );
 	}
 
-	private String interpolateBundleMessage(String message, ResourceBundle bundle, Locale locale, boolean recurse) {
-		Matcher matcher = MESSAGE_PARAMETER_PATTERN.matcher( message );
-		StringBuffer sb = new StringBuffer();
-		String resolvedParameterValue;
-		while ( matcher.find() ) {
-			String parameter = matcher.group( 1 );
-			resolvedParameterValue = resolveParameter(
-					parameter, bundle, locale, recurse
+	private String interpolateBundleMessage(String message, ResourceBundle bundle, Locale locale, boolean recursive)
+			throws MessageDescriptorFormatException {
+		MessageDescriptorParser descriptorParser = MessageDescriptorParser.forParameter( message );
+		while ( descriptorParser.hasMoreInterpolationTerms() ) {
+			String term = descriptorParser.nextInterpolationTerm();
+			String resolvedParameterValue = resolveParameter(
+					term, bundle, locale, recursive
 			);
-
-			matcher.appendReplacement( sb, Matcher.quoteReplacement( resolvedParameterValue ) );
+			descriptorParser.replaceCurrentInterpolationTerm( resolvedParameterValue );
 		}
-		matcher.appendTail( sb );
-		return sb.toString();
+		return descriptorParser.getInterpolatedMessage();
 	}
 
-	private String interpolateExpression(String message, Pattern pattern, Context context, Locale locale) {
-		Matcher matcher = pattern.matcher( message );
-		StringBuffer sb = new StringBuffer();
+	private String interpolateExpression(MessageDescriptorParser descriptorParser, Context context, Locale locale)
+			throws MessageDescriptorFormatException {
+		while ( descriptorParser.hasMoreInterpolationTerms() ) {
+			String term = descriptorParser.nextInterpolationTerm();
 
-		while ( matcher.find() ) {
-			String match = matcher.group( 1 );
-			InterpolationTerm expression = new InterpolationTerm( match, locale );
-			if ( expression.needsEvaluation() ) {
-				String resolvedExpression = expression.interpolate( context );
-				resolvedExpression = Matcher.quoteReplacement( resolvedExpression );
-				matcher.appendReplacement( sb, resolvedExpression );
-			}
+			InterpolationTerm expression = new InterpolationTerm( term, locale );
+			String resolvedExpression = expression.interpolate( context );
+			descriptorParser.replaceCurrentInterpolationTerm( resolvedExpression );
 		}
-		matcher.appendTail( sb );
-		return sb.toString();
+		return descriptorParser.getInterpolatedMessage();
 	}
 
-	private String resolveParameter(String parameterName, ResourceBundle bundle, Locale locale, boolean recurse) {
+	private String resolveParameter(String parameterName, ResourceBundle bundle, Locale locale, boolean recursive)
+			throws MessageDescriptorFormatException {
 		String parameterValue;
 		try {
 			if ( bundle != null ) {
 				parameterValue = bundle.getString( removeCurlyBraces( parameterName ) );
-				if ( recurse ) {
-					parameterValue = interpolateBundleMessage( parameterValue, bundle, locale, recurse );
+				if ( recursive ) {
+					parameterValue = interpolateBundleMessage( parameterValue, bundle, locale, recursive );
 				}
 			}
 			else {
