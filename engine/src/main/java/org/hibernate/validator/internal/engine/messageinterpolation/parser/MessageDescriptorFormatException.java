@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.internal.engine.messageinterpolation;
+package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
 import javax.xml.bind.ValidationException;
 

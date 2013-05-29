@@ -14,38 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.internal.engine.messageinterpolation;
+package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Hardy Ferentschik
  */
-public class MessageState implements ParserState {
+public class BeginState implements ParserState {
 	private static final Log log = LoggerFactory.make();
 
 	@Override
-	public void start(ParserContext context) {
-		throw new IllegalStateException( "The parsing of the message descriptor cannot start in this state." );
+	public void terminate(ParserContext context) throws MessageDescriptorFormatException {
 	}
 
 	@Override
-	public void terminate(ParserContext context) throws MessageDescriptorFormatException {
-		context.terminateToken();
+	public void start(ParserContext context) throws MessageDescriptorFormatException {
+		context.next();
 	}
 
 	@Override
 	public void handleNonMetaCharacter(char character, ParserContext context)
 			throws MessageDescriptorFormatException {
 		context.appendToToken( character );
+		context.transitionState( new MessageState() );
 		context.next();
 	}
 
 	@Override
 	public void handleBeginTerm(char character, ParserContext context) throws MessageDescriptorFormatException {
-		context.terminateToken();
-
 		context.appendToToken( character );
 		if ( context.getInterpolationType().equals( InterpolationTermType.PARAMETER ) ) {
 			context.makeParameterToken();
@@ -56,17 +55,13 @@ public class MessageState implements ParserState {
 
 	@Override
 	public void handleEndTerm(char character, ParserContext context) throws MessageDescriptorFormatException {
-		throw log.getNonTerminatedParameterException(
-				context.getOriginalMessageDescriptor(),
-				character
-		);
+		throw log.getNonTerminatedParameterException( context.getOriginalMessageDescriptor(), character );
 	}
 
 	@Override
 	public void handleEscapeCharacter(char character, ParserContext context)
 			throws MessageDescriptorFormatException {
 		context.appendToToken( character );
-
 		context.transitionState( new EscapedState( this ) );
 		context.next();
 	}
@@ -77,7 +72,8 @@ public class MessageState implements ParserState {
 			handleNonMetaCharacter( character, context );
 		}
 		else {
-			context.transitionState( new ELState() );
+			ParserState state = new ELState();
+			context.transitionState( state );
 			context.next();
 		}
 	}

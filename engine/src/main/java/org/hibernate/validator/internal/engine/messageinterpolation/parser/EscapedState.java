@@ -14,16 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.internal.engine.messageinterpolation;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ELState implements ParserState {
-	private static final Log log = LoggerFactory.make();
+public class EscapedState implements ParserState {
+	ParserState previousState;
+
+	public EscapedState(ParserState previousState) {
+		this.previousState = previousState;
+	}
 
 	@Override
 	public void start(ParserContext context) {
@@ -32,50 +33,43 @@ public class ELState implements ParserState {
 
 	@Override
 	public void terminate(ParserContext context) throws MessageDescriptorFormatException {
-		context.appendToToken( ParserContext.EL_DESIGNATOR );
 		context.terminateToken();
 	}
 
 	@Override
 	public void handleNonMetaCharacter(char character, ParserContext context)
 			throws MessageDescriptorFormatException {
-		context.appendToToken( ParserContext.EL_DESIGNATOR );
-		context.appendToToken( character );
-		context.terminateToken();
-		context.transitionState( new BeginState() );
-		context.next();
+		handleEscapedCharacter( character, context );
 	}
 
 	@Override
 	public void handleBeginTerm(char character, ParserContext context) throws MessageDescriptorFormatException {
-		context.terminateToken();
-
-		context.appendToToken( ParserContext.EL_DESIGNATOR );
-		context.appendToToken( character );
-		context.makeParameterToken();
-		context.transitionState( new InterpolationTermState() );
-		context.next();
+		handleEscapedCharacter( character, context );
 	}
 
 	@Override
 	public void handleEndTerm(char character, ParserContext context) throws MessageDescriptorFormatException {
-		throw log.getNonTerminatedParameterException(
-				context.getOriginalMessageDescriptor(),
-				character
-		);
+		handleEscapedCharacter( character, context );
 	}
 
 	@Override
 	public void handleEscapeCharacter(char character, ParserContext context)
 			throws MessageDescriptorFormatException {
-		context.transitionState( new EscapedState( this ) );
-		context.next();
+		handleEscapedCharacter( character, context );
 	}
 
 	@Override
 	public void handleELDesignator(char character, ParserContext context) throws MessageDescriptorFormatException {
-		handleNonMetaCharacter( character, context );
+		handleEscapedCharacter( character, context );
+	}
+
+	private void handleEscapedCharacter(char character, ParserContext context) throws MessageDescriptorFormatException {
+		context.appendToToken( character );
+		context.terminateToken();
+		context.transitionState( previousState );
+		context.next();
 	}
 }
+
 
 

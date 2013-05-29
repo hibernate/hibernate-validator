@@ -25,8 +25,8 @@ import javax.xml.bind.ValidationException;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
-import org.hibernate.validator.internal.engine.messageinterpolation.MessageDescriptorFormatException;
-import org.hibernate.validator.internal.engine.messageinterpolation.MessageDescriptorParser;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorParser;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;

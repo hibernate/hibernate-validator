@@ -14,9 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.internal.engine.messageinterpolation;
+package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
 import java.util.List;
+
+import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 

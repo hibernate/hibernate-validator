@@ -16,8 +16,8 @@
 */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
-import org.hibernate.validator.internal.engine.messageinterpolation.MessageDescriptorFormatException;
-import org.hibernate.validator.internal.engine.messageinterpolation.MessageDescriptorParser;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorParser;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
