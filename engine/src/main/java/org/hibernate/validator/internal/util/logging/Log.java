@@ -38,6 +38,7 @@ import javax.validation.ValidationException;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
@@ -604,4 +605,12 @@ public interface Log extends BasicLogger {
 	@Message(id = 167,
 			value = "A given constraint definition can only be overridden in one mapping file. %1$s is overridden in multiple files")
 	ValidationException getOverridingConstraintDefinitionsInMultipleMappingFilesException(String constraintClass);
+
+	@Message(id = 168,
+			value = "The message descriptor '%1$s' contains an unbalanced meta character '%2$c' parameter.")
+	MessageDescriptorFormatException getNonTerminatedParameterException(String messageDescriptor, char character);
+
+	@Message(id = 169,
+			value = "The message descriptor '%1$s' has nested parameters.")
+	MessageDescriptorFormatException getNestedParameterException(String messageDescriptor);
 }
