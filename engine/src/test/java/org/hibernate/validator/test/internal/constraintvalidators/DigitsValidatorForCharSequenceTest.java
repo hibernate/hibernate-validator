@@ -32,7 +32,7 @@ import static org.testng.Assert.assertTrue;
 /**
  * @author Alaa Nassef
  */
-public class DigitsValidatorForStringTest {
+public class DigitsValidatorForCharSequenceTest {
 
 	private static DigitsValidatorForCharSequence constraint;
 
