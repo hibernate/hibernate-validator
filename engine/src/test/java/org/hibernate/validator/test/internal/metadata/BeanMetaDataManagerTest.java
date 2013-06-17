@@ -20,15 +20,13 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertNotSame;
 import static org.testng.Assert.fail;
@@ -49,7 +47,7 @@ public class BeanMetaDataManagerTest {
 		int totalCreatedMetaDataInstances = 0;
 		int cachedBeanMetaDataInstances = 0;
 		for ( int i = 0; i < MAX_ENTITY_COUNT; i++ ) {
-			Class<?> c = new CustomClassLoader().loadClass( Fubar.class.getName() );
+			Class<?> c = new CustomClassLoader().loadClass( Engine.class.getName() );
 			BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );
 			assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
 			lastIterationsBean = meta.getBeanClass();
@@ -67,11 +65,6 @@ public class BeanMetaDataManagerTest {
 		if ( cachedBeanMetaDataInstances >= totalCreatedMetaDataInstances ) {
 			fail( "Metadata instances should be garbage collectible" );
 		}
-	}
-
-	public static class Fubar {
-		@NotNull
-		Object o;
 	}
 
 	public class CustomClassLoader extends ClassLoader {
@@ -112,8 +105,7 @@ public class BeanMetaDataManagerTest {
 
 			try {
 				String classPath = ClassLoader.getSystemResource(
-						className.replace( '.', File.separatorChar )
-								+ ".class"
+						className.replace( '.', '/' ) + ".class"
 				).getFile();
 				classByte = loadClassData( classPath );
 				result = defineClass( className, classByte, 0, classByte.length, null );
