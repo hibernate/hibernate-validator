@@ -37,6 +37,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+
 /**
  * This class provides useful functions to assert correctness of constraint violations raised
  * during tests.
@@ -53,6 +54,11 @@ public final class ConstraintViolationAssert {
 	private static final String CROSS_PARAMETER_NODE_NAME = "<cross-parameter>";
 
 	/**
+	 * Expected name for cross-parameter nodes.
+	 */
+	private static final String RETURN_VALUE_NODE_NAME = "<return value>";
+
+	/**
 	 * Private constructor in order to avoid instantiation.
 	 */
 	private ConstraintViolationAssert() {
@@ -64,7 +70,8 @@ public final class ConstraintViolationAssert {
 	 * @param violations The violation list to verify.
 	 * @param expectedMessages The expected constraint violation messages.
 	 */
-	public static void assertCorrectConstraintViolationMessages(Set<? extends ConstraintViolation<?>> violations, String... expectedMessages) {
+	public static void assertCorrectConstraintViolationMessages(Set<? extends ConstraintViolation<?>> violations,
+																String... expectedMessages) {
 		List<String> expectedMessagesAsList = Arrays.asList( expectedMessages );
 
 		List<String> actualMessages = newArrayList();
@@ -78,7 +85,8 @@ public final class ConstraintViolationAssert {
 		assertEquals( actualMessages, expectedMessagesAsList );
 	}
 
-	public static void assertCorrectConstraintViolationMessages(ConstraintViolationException e, String... expectedMessages) {
+	public static void assertCorrectConstraintViolationMessages(ConstraintViolationException e,
+																String... expectedMessages) {
 		assertCorrectConstraintViolationMessages( e.getConstraintViolations(), expectedMessages );
 	}
 
@@ -89,7 +97,8 @@ public final class ConstraintViolationAssert {
 	 * @param violations The violation list to verify.
 	 * @param expectedConstraintTypes The expected constraint types.
 	 */
-	public static <T> void assertCorrectConstraintTypes(Set<ConstraintViolation<T>> violations, Class<?>... expectedConstraintTypes) {
+	public static <T> void assertCorrectConstraintTypes(Set<ConstraintViolation<T>> violations,
+														Class<?>... expectedConstraintTypes) {
 		List<Class<? extends Annotation>> actualConstraintTypes = newArrayList();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualConstraintTypes.add( violation.getConstraintDescriptor().getAnnotation().annotationType() );
@@ -104,7 +113,8 @@ public final class ConstraintViolationAssert {
 	 * @param violations The violation list to verify.
 	 * @param expectedPropertyPaths The expected property paths.
 	 */
-	public static void assertCorrectPropertyPaths(Set<? extends ConstraintViolation<?>> violations, String... expectedPropertyPaths) {
+	public static void assertCorrectPropertyPaths(Set<? extends ConstraintViolation<?>> violations,
+												  String... expectedPropertyPaths) {
 		List<String> expectedPathsAsList = Arrays.asList( expectedPropertyPaths );
 
 		List<String> actualPaths = newArrayList();
@@ -136,7 +146,8 @@ public final class ConstraintViolationAssert {
 	 * @param invalidValue The expected invalid value.
 	 * @param propertyPath The expected property path.
 	 */
-	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage, Class<?> rootBeanClass, Object invalidValue, String propertyPath) {
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
+												 Class<?> rootBeanClass, Object invalidValue, String propertyPath) {
 		assertTrue(
 				pathsAreEqual( violation.getPropertyPath(), createPathFromString( propertyPath ) ),
 				"Wrong propertyPath"
@@ -153,7 +164,8 @@ public final class ConstraintViolationAssert {
 	 * @param rootBeanClass The expected root bean class.
 	 * @param invalidValue The expected invalid value.
 	 */
-	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage, Class<?> rootBeanClass, Object invalidValue) {
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
+												 Class<?> rootBeanClass, Object invalidValue) {
 		assertEquals( violation.getInvalidValue(), invalidValue, "Wrong invalid value" );
 		assertConstraintViolation( violation, errorMessage, rootBeanClass );
 	}
@@ -166,7 +178,8 @@ public final class ConstraintViolationAssert {
 	 * @param errorMessage The expected error message.
 	 * @param rootBeanClass The expected root bean class.
 	 */
-	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage, Class<?> rootBeanClass) {
+	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
+												 Class<?> rootBeanClass) {
 		assertEquals( violation.getRootBean().getClass(), rootBeanClass, "Wrong root bean type" );
 		assertConstraintViolation( violation, errorMessage );
 	}
@@ -187,7 +200,8 @@ public final class ConstraintViolationAssert {
 	 * @param violations The violation list to verify.
 	 * @param numberOfViolations The expected number of violation.
 	 */
-	public static void assertNumberOfViolations(Set<? extends ConstraintViolation<?>> violations, int numberOfViolations) {
+	public static void assertNumberOfViolations(Set<? extends ConstraintViolation<?>> violations,
+												int numberOfViolations) {
 		assertEquals(
 				violations.size(),
 				numberOfViolations,
@@ -195,7 +209,8 @@ public final class ConstraintViolationAssert {
 		);
 	}
 
-	public static void assertConstraintTypes(Set<ConstraintDescriptor<?>> descriptors, Class<?>... expectedConstraintTypes) {
+	public static void assertConstraintTypes(Set<ConstraintDescriptor<?>> descriptors,
+											 Class<?>... expectedConstraintTypes) {
 		List<Class<? extends Annotation>> actualConstraintTypes = newArrayList();
 
 		for ( ConstraintDescriptor<?> descriptor : descriptors ) {
@@ -308,7 +323,8 @@ public final class ConstraintViolationAssert {
 	 * @param actualConstraintTypes The actual constraint types.
 	 * @param expectedConstraintTypes The expected constraint types.
 	 */
-	private static <T> void assertCorrectConstraintTypes(Iterable<Class<? extends Annotation>> actualConstraintTypes, Class<?>... expectedConstraintTypes) {
+	private static <T> void assertCorrectConstraintTypes(Iterable<Class<? extends Annotation>> actualConstraintTypes,
+														 Class<?>... expectedConstraintTypes) {
 		List<String> expectedConstraintTypeNames = newArrayList();
 		for ( Class<?> expectedConstraintType : expectedConstraintTypes ) {
 			expectedConstraintTypeNames.add( expectedConstraintType.getName() );
@@ -389,6 +405,11 @@ public final class ConstraintViolationAssert {
 		}
 	}
 
+	/**
+	 * A property path expected to be returned by a given {@link ConstraintViolation}.
+	 *
+	 * @author Gunnar Morling
+	 */
 	public static class PathExpectation {
 
 		private final List<NodeExpectation> nodes = newArrayList();
@@ -416,7 +437,7 @@ public final class ConstraintViolationAssert {
 		}
 
 		public PathExpectation property(String name) {
-			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, false, null, null, null ) );
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY ) );
 			return this;
 		}
 
@@ -426,7 +447,7 @@ public final class ConstraintViolationAssert {
 		}
 
 		public PathExpectation bean() {
-			nodes.add( new NodeExpectation( null, ElementKind.BEAN, false, null, null, null ) );
+			nodes.add( new NodeExpectation( null, ElementKind.BEAN ) );
 			return this;
 		}
 
@@ -436,7 +457,7 @@ public final class ConstraintViolationAssert {
 		}
 
 		public PathExpectation method(String name) {
-			nodes.add( new NodeExpectation( name, ElementKind.METHOD, false, null, null, null ) );
+			nodes.add( new NodeExpectation( name, ElementKind.METHOD ) );
 			return this;
 		}
 
@@ -446,16 +467,12 @@ public final class ConstraintViolationAssert {
 		}
 
 		public PathExpectation crossParameter() {
-			nodes.add(
-					new NodeExpectation(
-							CROSS_PARAMETER_NODE_NAME,
-							ElementKind.CROSS_PARAMETER,
-							false,
-							null,
-							null,
-							null
-					)
-			);
+			nodes.add( new NodeExpectation( CROSS_PARAMETER_NODE_NAME, ElementKind.CROSS_PARAMETER ) );
+			return this;
+		}
+
+		public PathExpectation returnValue() {
+			nodes.add( new NodeExpectation( RETURN_VALUE_NODE_NAME, ElementKind.RETURN_VALUE ) );
 			return this;
 		}
 
@@ -502,6 +519,11 @@ public final class ConstraintViolationAssert {
 		}
 	}
 
+	/**
+	 * A node expected to be contained in the property path returned by a given {@link ConstraintViolation}.
+	 *
+	 * @author Gunnar Morling
+	 */
 	private static class NodeExpectation {
 		private final String name;
 		private final ElementKind kind;
@@ -510,7 +532,12 @@ public final class ConstraintViolationAssert {
 		private final Integer index;
 		private final Integer parameterIndex;
 
-		private NodeExpectation(String name, ElementKind kind, boolean inIterable, Object key, Integer index, Integer parameterIndex) {
+		private NodeExpectation(String name, ElementKind kind) {
+			this( name, kind, false, null, null, null );
+		}
+
+		private NodeExpectation(String name, ElementKind kind, boolean inIterable, Object key, Integer index,
+								Integer parameterIndex) {
 			this.name = name;
 			this.kind = kind;
 			this.inIterable = inIterable;
