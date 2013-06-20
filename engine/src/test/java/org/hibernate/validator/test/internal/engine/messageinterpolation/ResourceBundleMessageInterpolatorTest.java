@@ -33,7 +33,6 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
@@ -62,21 +61,19 @@ public class ResourceBundleMessageInterpolatorTest {
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		notNull = AnnotationFactory.create( descriptor );
 		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
+				new ConstraintHelper(),
 				null,
 				notNull,
-				new ConstraintHelper(),
-				java.lang.annotation.ElementType.FIELD,
-				ConstraintOrigin.DEFINED_LOCALLY
+				java.lang.annotation.ElementType.FIELD
 		);
 
 		AnnotationDescriptor<Size> sizeAnnotationDescriptor = new AnnotationDescriptor<Size>( Size.class );
 		size = AnnotationFactory.create( sizeAnnotationDescriptor );
 		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
+				new ConstraintHelper(),
 				null,
 				size,
-				new ConstraintHelper(),
-				java.lang.annotation.ElementType.FIELD,
-				ConstraintOrigin.DEFINED_LOCALLY
+				java.lang.annotation.ElementType.FIELD
 		);
 	}
 
@@ -221,11 +218,10 @@ public class ResourceBundleMessageInterpolatorTest {
 		Max max = AnnotationFactory.create( descriptor );
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
+				new ConstraintHelper(),
 				null,
 				max,
-				new ConstraintHelper(),
-				java.lang.annotation.ElementType.FIELD,
-				ConstraintOrigin.DEFINED_LOCALLY
+				java.lang.annotation.ElementType.FIELD
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator(
@@ -251,11 +247,10 @@ public class ResourceBundleMessageInterpolatorTest {
 
 
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
+				new ConstraintHelper(),
 				null,
 				max,
-				new ConstraintHelper(),
-				java.lang.annotation.ElementType.FIELD,
-				ConstraintOrigin.DEFINED_LOCALLY
+				java.lang.annotation.ElementType.FIELD
 		);
 
 		interpolator = new ResourceBundleMessageInterpolator(

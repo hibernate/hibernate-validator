@@ -125,7 +125,11 @@ public final class ConstraintViolationAssert {
 		Collections.sort( expectedPathsAsList );
 		Collections.sort( actualPaths );
 
-		assertEquals( actualPaths, expectedPathsAsList );
+		assertEquals(
+				actualPaths,
+				expectedPathsAsList,
+				String.format( "Expected %s, but got %s", expectedPathsAsList, actualPaths )
+		);
 	}
 
 	public static ConstraintViolationSetAssert assertThat(Set<? extends ConstraintViolation<?>> actualViolations) {

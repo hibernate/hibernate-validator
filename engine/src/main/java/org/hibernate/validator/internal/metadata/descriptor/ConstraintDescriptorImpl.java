@@ -149,12 +149,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private CompositionType compositionType = AND;
 
 	@SuppressWarnings("unchecked")
-	public ConstraintDescriptorImpl(T annotation,
-									ConstraintHelper constraintHelper,
-									Class<?> implicitGroup,
+	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
+									Member member,
+									T annotation,
 									ElementType type,
-									ConstraintOrigin definedOn,
-									Member member) {
+									Class<?> implicitGroup,
+									ConstraintOrigin definedOn) {
 		this.annotation = annotation;
 		this.annotationType = (Class<T>) this.annotation.annotationType();
 		this.elementType = type;
@@ -200,12 +200,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 	}
 
-	public ConstraintDescriptorImpl(Member member,
+	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
+									Member member,
 									T annotation,
-									ConstraintHelper constraintHelper,
-									ElementType type,
-									ConstraintOrigin definedOn) {
-		this( annotation, constraintHelper, null, type, definedOn, member );
+									ElementType type) {
+		this( constraintHelper, member, annotation, type, null, ConstraintOrigin.DEFINED_LOCALLY );
 	}
 
 	@Override
@@ -629,9 +628,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotationType ) ) {
 				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
 						member,
-						declaredAnnotation,
 						overrideParameters,
 						OVERRIDES_PARAMETER_DEFAULT_INDEX,
+						declaredAnnotation,
 						constraintHelper
 				);
 				composingConstraintsSet.add( descriptor );
@@ -642,7 +641,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				int index = 0;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
 					ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
-							member, constraintAnnotation, overrideParameters, index, constraintHelper
+							member, overrideParameters, index, constraintAnnotation, constraintHelper
 					);
 					composingConstraintsSet.add( descriptor );
 					log.debugf( "Adding composing constraint: %s.", descriptor );
@@ -655,29 +654,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(
 			Member member,
-			U declaredAnnotation,
-			Map<ClassIndexWrapper, Map<String, Object>> overrideParameters,
-			int index,
-			ConstraintHelper constraintHelper) {
-		@SuppressWarnings("unchecked")
-		final Class<U> annotationType = (Class<U>) declaredAnnotation.annotationType();
-		return createComposingConstraintDescriptor(
-				member,
-				overrideParameters,
-				index,
-				declaredAnnotation,
-				annotationType,
-				constraintHelper
-		);
-	}
-
-	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(
-			Member member,
 			Map<ClassIndexWrapper, Map<String, Object>> overrideParameters,
 			int index,
 			U constraintAnnotation,
-			Class<U> annotationType,
 			ConstraintHelper constraintHelper) {
+
+		@SuppressWarnings("unchecked")
+		final Class<U> annotationType = (Class<U>) constraintAnnotation.annotationType();
+
 		// use a annotation proxy
 		AnnotationDescriptor<U> annotationDescriptor = new AnnotationDescriptor<U>(
 				annotationType, buildAnnotationParameterMap( constraintAnnotation )
@@ -704,7 +688,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
 		return new ConstraintDescriptorImpl<U>(
-				member, annotationProxy, constraintHelper, elementType, definedOn
+				constraintHelper, member, annotationProxy, elementType, null, definedOn
 		);
 	}
 

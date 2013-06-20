@@ -26,7 +26,6 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
@@ -51,21 +50,19 @@ public class ExpressionLanguageMessageInterpolationTest {
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		NotNull notNull = AnnotationFactory.create( descriptor );
 		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
+				new ConstraintHelper(),
 				null,
 				notNull,
-				new ConstraintHelper(),
-				java.lang.annotation.ElementType.FIELD,
-				ConstraintOrigin.DEFINED_LOCALLY
+				java.lang.annotation.ElementType.FIELD
 		);
 
 		AnnotationDescriptor<Size> sizeAnnotationDescriptor = new AnnotationDescriptor<Size>( Size.class );
 		Size size = AnnotationFactory.create( sizeAnnotationDescriptor );
 		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
+				new ConstraintHelper(),
 				null,
 				size,
-				new ConstraintHelper(),
-				java.lang.annotation.ElementType.FIELD,
-				ConstraintOrigin.DEFINED_LOCALLY
+				java.lang.annotation.ElementType.FIELD
 		);
 
 		interpolatorUnderTest = new ResourceBundleMessageInterpolator();
