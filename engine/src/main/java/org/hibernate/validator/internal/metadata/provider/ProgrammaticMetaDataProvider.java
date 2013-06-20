@@ -34,6 +34,7 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
@@ -247,7 +248,8 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 				constraintHelper,
 				config.getLocation().getMember(),
 				config.createAnnotationProxy(),
-				config.getLocation().getElementType()
+				config.getLocation().getElementType(),
+				ConstraintType.GENERIC //ok since currently cross-parameter constraints can't be configured via the API
 		);
 
 		return new MetaConstraint<A>( constraintDescriptor, config.getLocation() );

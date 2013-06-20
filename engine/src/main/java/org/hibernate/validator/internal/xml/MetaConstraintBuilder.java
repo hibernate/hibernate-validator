@@ -57,7 +57,8 @@ public class MetaConstraintBuilder {
 																			   ConstraintType constraint,
 																			   java.lang.annotation.ElementType type,
 																			   String defaultPackage,
-																			   ConstraintHelper constraintHelper) {
+																			   ConstraintHelper constraintHelper,
+																			   ConstraintDescriptorImpl.ConstraintType constraintType) {
 		Class<A> annotationClass;
 		try {
 			annotationClass = (Class<A>) ReflectionHelper.loadClass( constraint.getAnnotation(), defaultPackage );
@@ -92,7 +93,7 @@ public class MetaConstraintBuilder {
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
 		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				constraintHelper, constraintLocation.getMember(), annotation, type
+				constraintHelper, constraintLocation.getMember(), annotation, type, constraintType
 		);
 
 		return new MetaConstraint<A>( constraintDescriptor, constraintLocation );

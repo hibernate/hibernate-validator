@@ -87,8 +87,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private final ParameterNameProvider parameterNameProvider;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
-									  ParameterNameProvider parameterNameProvider,
-									  AnnotationProcessingOptions annotationProcessingOptions) {
+			ParameterNameProvider parameterNameProvider,
+			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
 		this.parameterNameProvider = parameterNameProvider;
 		this.annotationProcessingOptions = annotationProcessingOptions;
@@ -174,15 +174,16 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		if ( groupSequenceProviderAnnotation != null ) {
 			@SuppressWarnings("unchecked")
-			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass = (Class<? extends DefaultGroupSequenceProvider<? super T>>) groupSequenceProviderAnnotation
-					.value();
+			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass =
+					(Class<? extends DefaultGroupSequenceProvider<? super T>>) groupSequenceProviderAnnotation.value();
 			return newGroupSequenceProviderClassInstance( beanClass, providerClass );
 		}
 
 		return null;
 	}
 
-	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass, Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
+	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass,
+			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
 		Method[] providerMethods = getMethods( providerClass );
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
@@ -497,8 +498,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *         single nor multi-valued annotation.
 	 */
 	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
-																							   A annotation,
-																							   ElementType type) {
+			A annotation,
+			ElementType type) {
 		List<ConstraintDescriptorImpl<?>> constraintDescriptors = newArrayList();
 
 		List<Annotation> constraints = newArrayList();
@@ -556,34 +557,34 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass,
-																		  ConstraintDescriptorImpl<A> descriptor) {
+			ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( declaringClass ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member,
-																		  ConstraintDescriptorImpl<A> descriptor) {
+			ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( member ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(ExecutableElement member,
-																				   int parameterIndex,
-																				   ConstraintDescriptorImpl<A> descriptor) {
+			int parameterIndex,
+			ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member, parameterIndex ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member,
-																					 ConstraintDescriptorImpl<A> descriptor) {
+			ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(ExecutableElement member,
-																						ConstraintDescriptorImpl<A> descriptor) {
+			ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new CrossParameterConstraintLocation( member ) );
 	}
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Member member,
-																						 A annotation,
-																						 ElementType type) {
+			A annotation,
+			ElementType type) {
 		return new ConstraintDescriptorImpl<A>(
 				constraintHelper,
 				member,

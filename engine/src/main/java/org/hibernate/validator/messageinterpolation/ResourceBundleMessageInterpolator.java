@@ -157,7 +157,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 			ResourceBundle defaultResourceBundle = defaultResourceBundleLocator
 					.getResourceBundle( locale );
 
-			String userBundleResolvedMessage = message;
+			String userBundleResolvedMessage;
 			resolvedMessage = message;
 			boolean evaluatedDefaultBundleOnce = false;
 			do {

@@ -62,7 +62,8 @@ public class ConstrainedFieldBuilder {
 						constraint,
 						java.lang.annotation.ElementType.FIELD,
 						defaultPackage,
-						constraintHelper
+						constraintHelper,
+						null
 				);
 				metaConstraints.add( metaConstraint );
 			}

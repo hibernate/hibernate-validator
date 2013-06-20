@@ -411,8 +411,6 @@ public final class ConstraintViolationAssert {
 
 	/**
 	 * A property path expected to be returned by a given {@link ConstraintViolation}.
-	 *
-	 * @author Gunnar Morling
 	 */
 	public static class PathExpectation {
 
@@ -525,8 +523,6 @@ public final class ConstraintViolationAssert {
 
 	/**
 	 * A node expected to be contained in the property path returned by a given {@link ConstraintViolation}.
-	 *
-	 * @author Gunnar Morling
 	 */
 	private static class NodeExpectation {
 		private final String name;

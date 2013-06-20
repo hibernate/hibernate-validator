@@ -158,7 +158,8 @@ public abstract class MetaDataBuilder {
 				constraint.getDescriptor().getAnnotation(),
 				constraint.getElementType(),
 				constraintClass.isInterface() ? constraintClass : null,
-				definedIn
+				definedIn,
+				constraint.getDescriptor().getConstraintType()
 		);
 
 		return new MetaConstraint<A>(
