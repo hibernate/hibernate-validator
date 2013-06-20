@@ -66,7 +66,8 @@ public class ConstrainedTypeBuilder {
 					constraint,
 					java.lang.annotation.ElementType.TYPE,
 					defaultPackage,
-					constraintHelper
+					constraintHelper,
+					null
 			);
 			metaConstraints.add( metaConstraint );
 		}

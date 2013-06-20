@@ -26,7 +26,6 @@ import javax.validation.ValidationException;
 import javax.xml.bind.JAXBElement;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -58,7 +57,8 @@ public class MetaConstraintBuilder {
 																			   ConstraintType constraint,
 																			   java.lang.annotation.ElementType type,
 																			   String defaultPackage,
-																			   ConstraintHelper constraintHelper) {
+																			   ConstraintHelper constraintHelper,
+																			   ConstraintDescriptorImpl.ConstraintType constraintType) {
 		Class<A> annotationClass;
 		try {
 			annotationClass = (Class<A>) ReflectionHelper.loadClass( constraint.getAnnotation(), defaultPackage );
@@ -93,7 +93,7 @@ public class MetaConstraintBuilder {
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
 		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				constraintLocation.getMember(), annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
+				constraintHelper, constraintLocation.getMember(), annotation, type, constraintType
 		);
 
 		return new MetaConstraint<A>( constraintDescriptor, constraintLocation );

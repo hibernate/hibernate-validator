@@ -66,7 +66,8 @@ public class ConstrainedGetterBuilder {
 						constraint,
 						java.lang.annotation.ElementType.METHOD,
 						defaultPackage,
-						constraintHelper
+						constraintHelper,
+						null
 				);
 				metaConstraints.add( metaConstraint );
 			}

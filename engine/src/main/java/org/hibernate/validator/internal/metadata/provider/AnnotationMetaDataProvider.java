@@ -37,7 +37,6 @@ import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
@@ -586,11 +585,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 																						 A annotation,
 																						 ElementType type) {
 		return new ConstraintDescriptorImpl<A>(
+				constraintHelper,
 				member,
 				annotation,
-				constraintHelper,
-				type,
-				ConstraintOrigin.DEFINED_LOCALLY
+				type
 		);
 	}
 }

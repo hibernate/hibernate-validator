@@ -61,7 +61,8 @@ public class ConstrainedParameterBuilder {
 						constraint,
 						ElementType.PARAMETER,
 						defaultPackage,
-						constraintHelper
+						constraintHelper,
+						null
 				);
 				metaConstraints.add( metaConstraint );
 			}

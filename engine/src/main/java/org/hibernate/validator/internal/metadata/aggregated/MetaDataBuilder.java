@@ -153,12 +153,13 @@ public abstract class MetaDataBuilder {
 		Class<?> constraintClass = constraint.getLocation().getBeanClass();
 
 		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
-				constraint.getDescriptor().getAnnotation(),
 				constraintHelper,
-				constraintClass.isInterface() ? constraintClass : null,
+				constraint.getLocation().getMember(),
+				constraint.getDescriptor().getAnnotation(),
 				constraint.getElementType(),
+				constraintClass.isInterface() ? constraintClass : null,
 				definedIn,
-				constraint.getLocation().getMember()
+				constraint.getDescriptor().getConstraintType()
 		);
 
 		return new MetaConstraint<A>(
