@@ -154,7 +154,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 									T annotation,
 									ElementType type,
 									Class<?> implicitGroup,
-									ConstraintOrigin definedOn) {
+									ConstraintOrigin definedOn,
+									ConstraintType externalConstraintType) {
 		this.annotation = annotation;
 		this.annotationType = (Class<T>) this.annotation.annotationType();
 		this.elementType = type;
@@ -187,9 +188,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				member,
 				type,
 				!genericValidatorClasses.isEmpty(),
-				!crossParameterValidatorClasses.isEmpty()
+				!crossParameterValidatorClasses.isEmpty(),
+				externalConstraintType
 		);
-		this.composingConstraints = parseComposingConstraints( member, constraintHelper );
+		this.composingConstraints = parseComposingConstraints( member, constraintHelper, externalConstraintType );
 		validateComposingConstraintTypes();
 
 		if ( constraintType == ConstraintType.GENERIC ) {
@@ -204,7 +206,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 									Member member,
 									T annotation,
 									ElementType type) {
-		this( constraintHelper, member, annotation, type, null, ConstraintOrigin.DEFINED_LOCALLY );
+		this( constraintHelper, member, annotation, type, null, ConstraintOrigin.DEFINED_LOCALLY, null );
+	}
+
+	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper, Member member,
+									T annotation,
+									ElementType type,
+									ConstraintType constraintType) {
+		this( constraintHelper, member, annotation, type, null, ConstraintOrigin.DEFINED_LOCALLY, constraintType );
 	}
 
 	@Override
@@ -344,13 +353,15 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * @param hasGenericValidators Whether the constraint has at least one generic validator or
 	 * not
 	 * @param hasCrossParameterValidator Whether the constraint has a cross-parameter validator
+	 * @param externalConstraintType constraint type as derived from external context, e.g. for
+	 * constraints declared in XML via {@code &lt;return-value/gt;}
 	 *
 	 * @return The type of this constraint
 	 */
 	private ConstraintType determineConstraintType(Member member,
 												   ElementType elementType,
 												   boolean hasGenericValidators,
-												   boolean hasCrossParameterValidator) {
+												   boolean hasCrossParameterValidator, ConstraintType externalConstraintType) {
 		ConstraintTarget constraintTarget = (ConstraintTarget) attributes.get( ConstraintHelper.VALIDATION_APPLIES_TO );
 		ConstraintType constraintType;
 		boolean isExecutable = isExecutable( elementType );
@@ -374,6 +385,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				);
 			}
 			constraintType = ConstraintType.CROSS_PARAMETER;
+		}
+		//target set by external context (e.g. <return-value> element in XML or returnValue() method in prog. API)
+		else if ( externalConstraintType != null ) {
+			constraintType = externalConstraintType;
 		}
 		//target set to IMPLICIT or not set at all
 		else {
@@ -605,7 +620,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 	}
 
-	private Set<ConstraintDescriptorImpl<?>> parseComposingConstraints(Member member, ConstraintHelper constraintHelper) {
+	private Set<ConstraintDescriptorImpl<?>> parseComposingConstraints(Member member, ConstraintHelper constraintHelper, ConstraintType externalConstraintType) {
 		Set<ConstraintDescriptorImpl<?>> composingConstraintsSet = newHashSet();
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
 
@@ -631,6 +646,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 						overrideParameters,
 						OVERRIDES_PARAMETER_DEFAULT_INDEX,
 						declaredAnnotation,
+						externalConstraintType,
 						constraintHelper
 				);
 				composingConstraintsSet.add( descriptor );
@@ -641,7 +657,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				int index = 0;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
 					ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
-							member, overrideParameters, index, constraintAnnotation, constraintHelper
+							member,
+							overrideParameters,
+							index,
+							constraintAnnotation,
+							externalConstraintType,
+							constraintHelper
 					);
 					composingConstraintsSet.add( descriptor );
 					log.debugf( "Adding composing constraint: %s.", descriptor );
@@ -657,6 +678,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			Map<ClassIndexWrapper, Map<String, Object>> overrideParameters,
 			int index,
 			U constraintAnnotation,
+			ConstraintType externalConstraintType,
 			ConstraintHelper constraintHelper) {
 
 		@SuppressWarnings("unchecked")
@@ -688,7 +710,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
 		return new ConstraintDescriptorImpl<U>(
-				constraintHelper, member, annotationProxy, elementType, null, definedOn
+				constraintHelper, member, annotationProxy, elementType, null, definedOn, externalConstraintType
 		);
 	}
 

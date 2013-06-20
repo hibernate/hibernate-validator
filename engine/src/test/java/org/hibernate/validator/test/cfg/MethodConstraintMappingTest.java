@@ -35,9 +35,12 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertNull;
@@ -583,6 +586,34 @@ public class MethodConstraintMappingTest {
 		assertCorrectPropertyPaths( violations, "user.name" );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-769")
+	public void shouldDetermineConstraintTargetForReturnValueConstraint() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class, String.class )
+				.returnValue()
+				.constraint(
+						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+								GenericAndCrossParameterConstraint.class
+						)
+				);
+		config.addMapping( mapping );
+
+		Validator validator = config.buildValidatorFactory().getValidator();
+		GreetingService service = getValidatingProxy( wrappedObject, validator );
+
+		try {
+			service.greet( null, null );
+			fail( "Expected exception wasn't thrown" );
+		}
+		catch ( ConstraintViolationException cve ) {
+			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
+					pathWith().method( "greet" ).returnValue()
+			);
+		}
+	}
+
 	public class User {
 
 		@NotNull
@@ -599,7 +630,6 @@ public class MethodConstraintMappingTest {
 
 	public class Message {
 
-		@SuppressWarnings("unused")
 		@NotNull
 		private final String message;
 
