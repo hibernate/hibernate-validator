@@ -43,14 +43,15 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 
 	private static final Log log = LoggerFactory.make();
 
-	private final List<String> parameterNameProvider;
+	private final List<String> parameterNames;
 	private final List<MessageAndPath> messageAndPaths = newArrayList( 3 );
 	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
 
-	public ConstraintValidatorContextImpl(List<String> parameterNames, PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
-		this.parameterNameProvider = parameterNames;
+	public ConstraintValidatorContextImpl(List<String> parameterNames, PathImpl propertyPath,
+										  ConstraintDescriptor<?> constraintDescriptor) {
+		this.parameterNames = parameterNames;
 		this.basePath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
@@ -68,7 +69,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	@Override
 	public final ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
 		return new ConstraintViolationBuilderImpl(
-				parameterNameProvider,
+				parameterNames,
 				messageTemplate,
 				PathImpl.createCopy( basePath )
 		);
@@ -99,6 +100,10 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			);
 		}
 		return returnedMessageAndPaths;
+	}
+
+	public List<String> getParameterNames() {
+		return parameterNames;
 	}
 
 	private abstract class NodeBuilderBase {

@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -20,70 +20,51 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
+import javax.validation.ParameterNameProvider;
 import javax.validation.Payload;
 
-import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * <p>
- * A class-level constraint, that evaluates a script expression against the
- * annotated element. This constraint can be used to implement validation
- * routines, that depend on multiple attributes of the annotated element.
+ * A method-level constraint, that evaluates a script expression against the
+ * annotated method or constructor. This constraint can be used to implement
+ * validation routines that depend on several parameters of the annotated
+ * executable.
  * </p>
  * <p>
  * Script expressions can be written in any scripting or expression language,
  * for which a <a href="http://jcp.org/en/jsr/detail?id=223">JSR 223</a>
  * ("Scripting for the Java<sup>TM</sup> Platform") compatible engine can be
- * found on the classpath. The following listing shows an example using the
- * JavaScript engine, which comes with the JDK:
+ * found on the classpath. To refer to a parameter within the scripting
+ * expression, use its name as obtained by the active
+ * {@link ParameterNameProvider}. By default, {@code arg0}, {@code arg1} etc.
+ * will be used as parameter names.
  * </p>
- * <p/>
- *
+ * <p>
+ * The following listing shows an example using the JavaScript engine which
+ * comes with the JDK:
+ * </p>
  * <pre>
- * {@code @ScriptAssert(lang = "javascript", script = "_this.startDate.before(_this.endDate)")
- * public class CalendarEvent {
- *
- * 	private Date startDate;
- *
- * 	private Date endDate;
- *
- * 	//...
- *
- * }
+ * {@code @ParametersScriptAssert(script = "arg0.before(arg1)", lang = "javascript")
+ * public void createEvent(Date start, Date end) { ... }
  * }
  * </pre>
  * <p>
- * Using a real expression language in conjunction with a shorter object alias
- * allows for very compact expressions:
- * </p>
- *
- * <pre>
- * {@code @ScriptAssert(lang = "jexl", script = "_.startDate > _.endDate", alias = "_")
- * public class CalendarEvent {
- *
- * 	private Date startDate;
- *
- * 	private Date endDate;
- *
- * 	//...
- *
- * }
- * }
- * </pre>
- * <p>
- * Accepts any type.
+ * Can be specified on any method or constructor.
  * </p>
  *
  * @author Gunnar Morling
  */
-@Target({ TYPE })
+@Target({ CONSTRUCTOR, METHOD })
 @Retention(RUNTIME)
 @Constraint(validatedBy = { })
 @Documented
-public @interface ScriptAssert {
+public @interface ParameterScriptAssert {
 
-	String message() default "{org.hibernate.validator.constraints.ScriptAssert.message}";
+	String message() default "{org.hibernate.validator.constraints.ParametersScriptAssert.message}";
 
 	Class<?>[] groups() default { };
 
@@ -99,31 +80,24 @@ public @interface ScriptAssert {
 
 	/**
 	 * @return The script to be executed. The script must return
-	 *         <code>Boolean.TRUE</code>, if the annotated element could
+	 *         <code>Boolean.TRUE</code>, if the executable parameters could
 	 *         successfully be validated, otherwise <code>Boolean.FALSE</code>.
 	 *         Returning null or any type other than Boolean will cause a
 	 *         {@link javax.validation.ConstraintDeclarationException} upon validation. Any
 	 *         exception occurring during script evaluation will be wrapped into
 	 *         a ConstraintDeclarationException, too. Within the script, the
-	 *         validated object can be accessed from the {@link javax.script.ScriptContext
-	 *         script context} using the name specified in the
-	 *         <code>alias</code> attribute.
+	 *         validated parameters can be accessed using their names as retrieved from the
+	 *         active {@link ParameterNameProvider}.
 	 */
 	String script();
 
 	/**
-	 * @return The name, under which the annotated element shall be registered
-	 *         within the script context. Defaults to "_this".
+	 * Defines several {@link ParameterScriptAssert} annotations on the same executable.
 	 */
-	String alias() default "_this";
-
-	/**
-	 * Defines several {@code @ScriptAssert} annotations on the same element.
-	 */
-	@Target({ TYPE })
+	@Target({ CONSTRUCTOR, METHOD })
 	@Retention(RUNTIME)
 	@Documented
 	public @interface List {
-		ScriptAssert[] value();
+		ParameterScriptAssert[] value();
 	}
 }
