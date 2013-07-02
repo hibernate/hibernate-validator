@@ -48,6 +48,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
@@ -73,6 +74,7 @@ import org.hibernate.validator.internal.constraintvalidators.ModCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.NotBlankValidator;
 import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.NullValidator;
+import org.hibernate.validator.internal.constraintvalidators.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.PastValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.PastValidatorForDate;
 import org.hibernate.validator.internal.constraintvalidators.PastValidatorForReadableInstant;
@@ -213,6 +215,10 @@ public class ConstraintHelper {
 		constraintList = newArrayList();
 		constraintList.add( NotBlankValidator.class );
 		builtinConstraints.put( NotBlank.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( ParameterScriptAssertValidator.class );
+		builtinConstraints.put( ParameterScriptAssert.class, constraintList );
 
 		constraintList = newArrayList();
 		constraintList.add( SafeHtmlValidator.class );

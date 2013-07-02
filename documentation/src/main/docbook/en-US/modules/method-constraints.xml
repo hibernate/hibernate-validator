@@ -892,4 +892,40 @@ assertEquals( 0, parameterNode.getParameterIndex() );         </programlisting>
       <literal>arg0</literal>, <literal>arg1</literal> etc.</para>
     </section>
   </section>
+
+  <section id="section-builtin-method-constraints">
+    <title>Built-in method constraints</title>
+
+    <para>In addition to the built-in bean and property-level constraints
+    discussed in <xref linkend="section-builtin-constraints"/>, Hibernate
+    Validator currently provides one method-level constraint,
+    <classname>@ParameterScriptAssert</classname>. This is a generic
+    cross-parameter constraint which allows to implement validation routines
+    using any JSR 223 compatible ("Scripting for the
+    Java<superscript>TM</superscript> Platform") scripting language, provided
+    an engine for this language is available on the classpath.</para>
+
+    <para>To refer to the executable's parameters from within the expression,
+    use their name as obtained from the active parameter name provider (see
+    <xref linkend="section-parameter-name-provider"/>). <xref
+    linkend="example-parameterscriptassert"/> shows how the validation logic
+    of the <classname>@LuggageCountMatchesPassengerCount</classname>
+    constraint from <xref linkend="example-using-cross-parameter-constraint"/>
+    could be expressed with the help of
+    <classname>@ParameterScriptAssert</classname>.</para>
+
+    <example id="example-parameterscriptassert">
+      <title>Using <classname>@ParameterScriptAssert</classname></title>
+
+      <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.parametersscriptassert;
+
+public class Car {
+
+	@ParameterScriptAssert(lang = "javascript", script = "arg1.size() &lt;= arg0.size() * 2")
+	public void load(List&lt;Person&gt; passengers, List&lt;PieceOfLuggage&gt; luggage) {
+		//...
+	}
+}     </programlisting>
+    </example>
+  </section>
 </chapter>

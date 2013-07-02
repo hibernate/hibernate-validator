@@ -16,8 +16,10 @@
 */
 package org.hibernate.validator.internal.util.scriptengine;
 
+import java.util.Map;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 
 /**
  * A wrapper around JSR 223 {@link ScriptEngine}s. This class is thread-safe.
@@ -39,32 +41,29 @@ public class ScriptEvaluator {
 	}
 
 	/**
-	 * Makes the given object available in then engine-scoped script context and executes the given script.
-	 * The execution of the script happens either synchronized or unsynchronized, depending on the engine's
-	 * threading abilities.
+	 * Executes the given script, using the given variable bindings. The execution of the script happens either synchronized or
+	 * unsynchronized, depending on the engine's threading abilities.
 	 *
 	 * @param script The script to be executed.
-	 * @param obj The object to be put into the context.
-	 * @param objectAlias The name under which the given object shall be put into the context.
+	 * @param bindings The bindings to be used.
 	 *
 	 * @return The script's result.
 	 *
 	 * @throws ScriptException In case of any errors during script execution.
 	 */
-	public Object evaluate(String script, Object obj, String objectAlias) throws ScriptException {
+	public Object evaluate(String script, Map<String, Object> bindings) throws ScriptException {
 		if ( engineAllowsParallelAccessFromMultipleThreads() ) {
-			return doEvaluate( script, obj, objectAlias );
+			return doEvaluate( script, bindings );
 		}
 		else {
 			synchronized ( engine ) {
-				return doEvaluate( script, obj, objectAlias );
+				return doEvaluate( script, bindings );
 			}
 		}
 	}
 
-	private Object doEvaluate(String script, Object obj, String objectAlias) throws ScriptException {
-		engine.put( objectAlias, obj );
-		return engine.eval( script );
+	private Object doEvaluate(String script, Map<String, Object> bindings) throws ScriptException {
+		return engine.eval( script, new SimpleBindings( bindings ) );
 	}
 
 	/**
@@ -73,7 +72,6 @@ public class ScriptEvaluator {
 	 * @return True, if the given engine is thread-safe, false otherwise.
 	 */
 	private boolean engineAllowsParallelAccessFromMultipleThreads() {
-
 		String threadingType = (String) engine.getFactory().getParameter( "THREADING" );
 
 		return "THREAD-ISOLATED".equals( threadingType ) || "STATELESS".equals( threadingType );

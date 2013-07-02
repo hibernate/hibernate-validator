@@ -38,13 +38,13 @@ import javax.validation.ValidationException;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
-import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
 import org.jboss.logging.LogMessage;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageLogger;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
@@ -613,4 +613,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 169,
 			value = "The message descriptor '%1$s' has nested parameters.")
 	MessageDescriptorFormatException getNestedParameterException(String messageDescriptor);
+
+	@Message(id = 170, value = "No JSR-223 scripting engine could be bootstrapped for language \"%s\".")
+	ConstraintDeclarationException getCreationOfScriptExecutorFailedException(String languageName, @Cause Exception e);
 }
