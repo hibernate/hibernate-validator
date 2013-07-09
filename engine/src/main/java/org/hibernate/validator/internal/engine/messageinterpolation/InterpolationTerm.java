@@ -25,6 +25,7 @@ import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
 import javax.validation.MessageInterpolator;
 
+import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver;
 import org.hibernate.validator.internal.engine.messageinterpolation.el.SimpleELContext;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -167,6 +168,15 @@ public class InterpolationTerm {
 				.entrySet() ) {
 			valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
 			elContext.setVariable( entry.getKey(), valueExpression );
+		}
+
+		// check for custom parameters provided by HibernateConstraintValidatorContext
+		if ( messageInterpolatorContext instanceof MessageInterpolatorContext ) {
+			MessageInterpolatorContext internalContext = (MessageInterpolatorContext) messageInterpolatorContext;
+			for ( Map.Entry<String, Object> entry : internalContext.getMessageParameters().entrySet() ) {
+				valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
+				elContext.setVariable( entry.getKey(), valueExpression );
+			}
 		}
 
 		return expressionFactory.createValueExpression( elContext, messageTemplate, String.class );

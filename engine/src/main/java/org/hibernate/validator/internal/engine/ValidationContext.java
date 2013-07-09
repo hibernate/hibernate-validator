@@ -36,9 +36,8 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
-import org.hibernate.validator.internal.engine.path.MessageAndPath;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.IdentitySet;
@@ -61,11 +60,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public class ValidationContext<T> {
 
 	private static final Log log = LoggerFactory.make();
-
-	/**
-	 * Access to the cached bean meta data
-	 */
-	private final BeanMetaDataManager beanMetaDataManager;
 
 	/**
 	 * Caches and manages life cycle of constraint validator instances.
@@ -143,19 +137,17 @@ public class ValidationContext<T> {
 	 */
 	private final boolean failFast;
 
-	private ValidationContext(BeanMetaDataManager beanMetaDataManager,
-							  ConstraintValidatorManager constraintValidatorManager,
-							  MessageInterpolator messageInterpolator,
-							  ConstraintValidatorFactory constraintValidatorFactory,
-							  TraversableResolver traversableResolver,
-							  ParameterNameProvider parameterNameProvider,
-							  boolean failFast,
-							  T rootBean,
-							  Class<T> rootBeanClass,
-							  ExecutableElement executable,
-							  Object[] executableParameters,
-							  Object executableReturnValue) {
-		this.beanMetaDataManager = beanMetaDataManager;
+	private ValidationContext(ConstraintValidatorManager constraintValidatorManager,
+			MessageInterpolator messageInterpolator,
+			ConstraintValidatorFactory constraintValidatorFactory,
+			TraversableResolver traversableResolver,
+			ParameterNameProvider parameterNameProvider,
+			boolean failFast,
+			T rootBean,
+			Class<T> rootBeanClass,
+			ExecutableElement executable,
+			Object[] executableParameters,
+			Object executableReturnValue) {
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.messageInterpolator = messageInterpolator;
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -175,7 +167,6 @@ public class ValidationContext<T> {
 	}
 
 	public static ValidationContextBuilder getValidationContext(
-			BeanMetaDataManager beanMetaDataManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
@@ -183,7 +174,6 @@ public class ValidationContext<T> {
 			boolean failFast) {
 
 		return new ValidationContextBuilder(
-				beanMetaDataManager,
 				constraintValidatorManager,
 				messageInterpolator,
 				constraintValidatorFactory,
@@ -212,10 +202,6 @@ public class ValidationContext<T> {
 		return failFast;
 	}
 
-	public BeanMetaDataManager getBeanMetaDataManager() {
-		return beanMetaDataManager;
-	}
-
 	public ConstraintValidatorManager getConstraintValidatorManager() {
 		return constraintValidatorManager;
 	}
@@ -240,11 +226,12 @@ public class ValidationContext<T> {
 	}
 
 	public Set<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
-																  ConstraintValidatorContextImpl constraintValidatorContext) {
+			ConstraintValidatorContextImpl constraintValidatorContext) {
 		Set<ConstraintViolation<T>> constraintViolations = newHashSet();
-		for ( MessageAndPath messageAndPath : constraintValidatorContext.getMessageAndPathList() ) {
+		for ( ConstraintViolationCreationContext constraintViolationCreationContext : constraintValidatorContext.getConstraintViolationCreationContexts() ) {
 			ConstraintViolation<T> violation = createConstraintViolation(
-					localContext, messageAndPath, constraintValidatorContext.getConstraintDescriptor()
+					localContext,
+					constraintViolationCreationContext, constraintValidatorContext.getConstraintDescriptor()
 			);
 			constraintViolations.add( violation );
 		}
@@ -279,14 +266,15 @@ public class ValidationContext<T> {
 	}
 
 
-	public ConstraintViolation<T> createConstraintViolation(ValueContext<?, ?> localContext, MessageAndPath messageAndPath, ConstraintDescriptor<?> descriptor) {
-		String messageTemplate = messageAndPath.getMessage();
+	public ConstraintViolation<T> createConstraintViolation(ValueContext<?, ?> localContext, ConstraintViolationCreationContext constraintViolationCreationContext, ConstraintDescriptor<?> descriptor) {
+		String messageTemplate = constraintViolationCreationContext.getMessage();
 		String interpolatedMessage = interpolate(
 				messageTemplate,
 				localContext.getCurrentValidatedValue(),
-				descriptor
+				descriptor,
+				constraintViolationCreationContext.getMessageParameters()
 		);
-		Path path = messageAndPath.getPath();
+		Path path = constraintViolationCreationContext.getPath();
 
 		if ( executableParameters != null ) {
 			return ConstraintViolationImpl.forParameterValidation(
@@ -359,11 +347,15 @@ public class ValidationContext<T> {
 		return sb.toString();
 	}
 
-	private String interpolate(String messageTemplate, Object validatedValue, ConstraintDescriptor<?> descriptor) {
+	private String interpolate(String messageTemplate,
+			Object validatedValue,
+			ConstraintDescriptor<?> descriptor,
+			Map<String, Object> messageParameters) {
 		MessageInterpolatorContext context = new MessageInterpolatorContext(
 				descriptor,
 				validatedValue,
-				getRootBeanClass()
+				getRootBeanClass(),
+				messageParameters
 		);
 
 		try {
@@ -441,15 +433,13 @@ public class ValidationContext<T> {
 	/**
 	 * Builder for creating {@link ValidationContext}s suited for the different
 	 * kinds of validation. Retrieve a builder with all common attributes via
-	 * {@link ValidationContext#getValidationContext(BeanMetaDataManager, ConstraintValidatorManager,
+	 * {@link ValidationContext#getValidationContext(ConstraintValidatorManager,
 	 * MessageInterpolator, ConstraintValidatorFactory, TraversableResolver, boolean)} and then invoke one of
 	 * the dedicated methods such as {@link #forValidate(Object)}.
 	 *
 	 * @author Gunnar Morling
 	 */
 	public static class ValidationContextBuilder {
-
-		private final BeanMetaDataManager beanMetaDataManager;
 		private final ConstraintValidatorManager constraintValidatorManager;
 		private final MessageInterpolator messageInterpolator;
 		private final ConstraintValidatorFactory constraintValidatorFactory;
@@ -457,14 +447,11 @@ public class ValidationContext<T> {
 		private final boolean failFast;
 
 		private ValidationContextBuilder(
-				BeanMetaDataManager beanMetaDataManager,
 				ConstraintValidatorManager constraintValidatorManager,
 				MessageInterpolator messageInterpolator,
 				ConstraintValidatorFactory constraintValidatorFactory,
 				TraversableResolver traversableResolver,
 				boolean failFast) {
-
-			this.beanMetaDataManager = beanMetaDataManager;
 			this.constraintValidatorManager = constraintValidatorManager;
 			this.messageInterpolator = messageInterpolator;
 			this.constraintValidatorFactory = constraintValidatorFactory;
@@ -476,7 +463,6 @@ public class ValidationContext<T> {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 			return new ValidationContext<T>(
-					beanMetaDataManager,
 					constraintValidatorManager,
 					messageInterpolator,
 					constraintValidatorFactory,
@@ -495,7 +481,6 @@ public class ValidationContext<T> {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
 			return new ValidationContext<T>(
-					beanMetaDataManager,
 					constraintValidatorManager,
 					messageInterpolator,
 					constraintValidatorFactory,
@@ -512,7 +497,6 @@ public class ValidationContext<T> {
 
 		public <T> ValidationContext<T> forValidateValue(Class<T> rootBeanClass) {
 			return new ValidationContext<T>(
-					beanMetaDataManager,
 					constraintValidatorManager,
 					messageInterpolator,
 					constraintValidatorFactory,
@@ -536,7 +520,6 @@ public class ValidationContext<T> {
 			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getMember()
 					.getDeclaringClass();
 			return new ValidationContext<T>(
-					beanMetaDataManager,
 					constraintValidatorManager,
 					messageInterpolator,
 					constraintValidatorFactory,
@@ -559,7 +542,6 @@ public class ValidationContext<T> {
 			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getMember()
 					.getDeclaringClass();
 			return new ValidationContext<T>(
-					beanMetaDataManager,
 					constraintValidatorManager,
 					messageInterpolator,
 					constraintValidatorFactory,

@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import java.util.Map;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -36,11 +37,16 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final Object validatedValue;
 	private final Class<?> rootBeanType;
+	private final Map<String, Object> messageParameters;
 
-	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor, Object validatedValue, Class<?> rootBeanType) {
+	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor,
+			Object validatedValue,
+			Class<?> rootBeanType,
+			Map<String, Object> messageParameters) {
 		this.constraintDescriptor = constraintDescriptor;
 		this.validatedValue = validatedValue;
 		this.rootBeanType = rootBeanType;
+		this.messageParameters = messageParameters;
 	}
 
 	@Override
@@ -56,6 +62,10 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	@Override
 	public Class<?> getRootBeanType() {
 		return rootBeanType;
+	}
+
+	public Map<String, Object> getMessageParameters() {
+		return messageParameters;
 	}
 
 	@Override

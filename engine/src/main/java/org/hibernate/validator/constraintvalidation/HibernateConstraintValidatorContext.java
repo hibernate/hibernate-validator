@@ -1,0 +1,40 @@
+/*
+ * JBoss, Home of Professional Open Source
+ * Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.hibernate.validator.constraintvalidation;
+
+import javax.validation.ConstraintValidatorContext;
+
+/**
+ * A custom {@link ConstraintValidatorContext} which allows to set additional message parameters for
+ * interpolation.
+ *
+ * @author Hardy Ferentschik
+ */
+public interface HibernateConstraintValidatorContext extends ConstraintValidatorContext {
+
+	/**
+	 * Allows to set an additional named parameter which can be interpolated in the constraint violation message.
+	 *
+	 * @param name the name under which to bind the parameter, cannot be {@code null}
+	 * @param value the value to be bound to the specified name
+	 *
+	 * @return a reference to itself to allow method chaining
+	 *
+	 * @throws IllegalArgumentException in case the provided name is {@code null}
+	 */
+	HibernateConstraintValidatorContext addMessageParameter(String name, Object value);
+}
