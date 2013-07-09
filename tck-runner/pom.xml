@@ -33,8 +33,8 @@
         <tck.version>1.1.0.Final</tck.version>
         <tck.suite.file>src/test/resources/tck-tests-without-RI-and-AS-failures.xml</tck.suite.file>
         <arquillian.version>1.0.0.Final</arquillian.version>
-        <jbossas.version>7.1.1.Final</jbossas.version>
-        <jbossTargetDir>${project.build.directory}/jboss-as-${jbossas.version}</jbossTargetDir>
+        <wildfly.version>8.0.0.Alpha3</wildfly.version>
+        <jbossTargetDir>${project.build.directory}/wildfly-${wildfly.version}</jbossTargetDir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
     </properties>
@@ -53,11 +53,7 @@
             <artifactId>hibernate-validator-cdi</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.el</groupId>
-            <artifactId>javax.el-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.web</groupId>
+            <groupId>org.glassfish</groupId>
             <artifactId>javax.el</artifactId>
         </dependency>
         <dependency>
@@ -234,9 +230,9 @@
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.jboss.as</groupId>
-                    <artifactId>jboss-as-arquillian-container-managed</artifactId>
-                    <version>${jbossas.version}</version>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-managed</artifactId>
+                    <version>${wildfly.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -254,9 +250,9 @@
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>org.jboss.as</groupId>
-                                            <artifactId>jboss-as-dist</artifactId>
-                                            <version>${jbossas.version}</version>
+                                            <groupId>org.wildfly</groupId>
+                                            <artifactId>wildfly-dist</artifactId>
+                                            <version>${wildfly.version}</version>
                                             <type>zip</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${project.build.directory}</outputDirectory>
@@ -272,7 +268,7 @@
                                 </goals>
                                 <configuration>
                                     <outputDirectory>
-                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/javax/validation/api/main
+                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/javax/validation/api/main
                                     </outputDirectory>
                                     <stripVersion>false</stripVersion>
                                     <artifactItems>
@@ -292,7 +288,7 @@
                                 </goals>
                                 <configuration>
                                     <outputDirectory>
-                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/org/hibernate/validator/main
+                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/main
                                     </outputDirectory>
                                     <stripVersion>false</stripVersion>
                                     <artifactItems>
@@ -311,7 +307,7 @@
                                 </goals>
                                 <configuration>
                                     <outputDirectory>
-                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/com/fasterxml/classmate/main
+                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/com/fasterxml/classmate/main
                                     </outputDirectory>
                                     <stripVersion>false</stripVersion>
                                     <artifactItems>
@@ -320,24 +316,6 @@
                                             <artifactId>classmate</artifactId>
                                         </artifactItem>
                                     </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.codehaus.gmaven</groupId>
-                        <artifactId>gmaven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-modules</id>
-                                <phase>generate-test-resources</phase>
-                                <goals>
-                                    <goal>execute</goal>
-                                </goals>
-                                <configuration>
-                                    <source>
-                                        ${pom.basedir}/src/script/setupAsModules.groovy
-                                    </source>
                                 </configuration>
                             </execution>
                         </executions>
