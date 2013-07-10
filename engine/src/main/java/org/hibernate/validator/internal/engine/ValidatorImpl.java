@@ -279,7 +279,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private ValidationContextBuilder getValidationContext() {
 		return ValidationContext.getValidationContext(
-				beanMetaDataManager,
 				constraintValidatorManager,
 				messageInterpolator,
 				constraintValidatorFactory,

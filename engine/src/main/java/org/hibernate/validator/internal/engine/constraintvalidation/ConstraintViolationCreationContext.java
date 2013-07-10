@@ -14,22 +14,30 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.engine.path;
+package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import java.util.Collections;
+import java.util.Map;
 import javax.validation.Path;
 
 /**
- * Container class for a validation error message and its corresponding path.
+ * Container class for the information needed to create a constraint violation.
  *
  * @author Hardy Ferentschik
  */
-public class MessageAndPath {
+public class ConstraintViolationCreationContext {
 	private final String message;
 	private final Path propertyPath;
+	private final Map<String, Object> messageParameters;
 
-	public MessageAndPath(String message, Path property) {
+	public ConstraintViolationCreationContext(String message, Path property) {
+		this( message, property, Collections.<String, Object>emptyMap() );
+	}
+
+	public ConstraintViolationCreationContext(String message, Path property, Map<String, Object> messageParameters) {
 		this.message = message;
 		this.propertyPath = property;
+		this.messageParameters = messageParameters;
 	}
 
 	public final String getMessage() {
@@ -38,5 +46,19 @@ public class MessageAndPath {
 
 	public final Path getPath() {
 		return propertyPath;
+	}
+
+	public Map<String, Object> getMessageParameters() {
+		return messageParameters;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder( "ConstraintViolationCreationContext{" );
+		sb.append( "message='" ).append( message ).append( '\'' );
+		sb.append( ", propertyPath=" ).append( propertyPath );
+		sb.append( ", messageParameters=" ).append( messageParameters );
+		sb.append( '}' );
+		return sb.toString();
 	}
 }

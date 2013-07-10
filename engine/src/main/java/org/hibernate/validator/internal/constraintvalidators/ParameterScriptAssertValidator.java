@@ -49,7 +49,7 @@ public class ParameterScriptAssertValidator implements ConstraintValidator<Param
 	@Override
 	public boolean isValid(Object[] arguments, ConstraintValidatorContext constraintValidatorContext) {
 		List<String> parameterNames = ( (ConstraintValidatorContextImpl) constraintValidatorContext )
-				.getParameterNames();
+				.getMethodParameterNames();
 
 		Map<String, Object> bindings = getBindings( arguments, parameterNames );
 
