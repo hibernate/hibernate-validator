@@ -23,11 +23,37 @@ import javax.validation.ConstraintValidatorContext;
  * interpolation.
  *
  * @author Hardy Ferentschik
+ * @experimental Adding custom parameter to the context is considered experimental, especially the exact semantics
+ * regarding to which generated constraint violation these parameters apply might change. At the moment they apply
+ * to all violations.
  */
 public interface HibernateConstraintValidatorContext extends ConstraintValidatorContext {
 
 	/**
-	 * Allows to set an additional named parameter which can be interpolated in the constraint violation message.
+	 * Allows to set an additional named parameter which can be interpolated in the constraint violation message. The
+	 * parameters will be available for interpolation for all constraint violations generated for this constraint.
+	 * This includes the default one as well as all violations created by the {@link ConstraintViolationBuilder}.
+	 * To create multiple constraint violation with different values for the same parameter, this method can be called
+	 * between successive calls to {@link javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder#addConstraintViolation()}.
+	 * For example:
+	 * <pre>
+	 * {@code
+	 * public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+	 *     HibernateConstraintValidatorContext context = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class );
+	 *
+	 *     context.setMessageParameter( "foo", "bar" );
+	 *     context.buildConstraintViolationWithTemplate( "${foo}" )
+	 *            .addConstraintViolation();
+	 *
+	 *     context.setMessageParameter( "foo", "snafu" );
+	 *     context.buildConstraintViolationWithTemplate( "${foo}" )
+	 *            .addConstraintViolation();
+	 *
+	 *     return false;
+	 *  }
+	 *  }
+	 *
+	 * </pre>
 	 *
 	 * @param name the name under which to bind the parameter, cannot be {@code null}
 	 * @param value the value to be bound to the specified name
