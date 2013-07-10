@@ -361,7 +361,7 @@ constraintMapping
     <emphasis>AND</emphasis>, <emphasis>OR</emphasis> and
     <emphasis>ALL_FALSE</emphasis>.</para>
 
-    <para> <xref linkend="example-boolean-constraint-composition"/> shows how
+    <para><xref linkend="example-boolean-constraint-composition"/> shows how
     to build a composed constraint <classname>@PatternOrSize</classname> where
     only one of the composing constraints needs to be valid in order to pass
     the validation. Either the validated string is all lower-cased or it is
@@ -410,5 +410,108 @@ public @interface PatternOrSize {
     interpolation algorithm as defined by the specification. Refer to <xref
     linkend="section-resource-bundle-locator"/> to learn how to make use of
     that SPI.</para>
+  </section>
+
+  <section>
+    <title>Custom contexts</title>
+
+    <para>The Bean Validation specification offers at several points in its
+    API the possibilty to unwrap a given interface to a implementor specific
+    subtype. In the case of constraint violation creation in
+    <classname>ConstraintValidator</classname> implementations as well as
+    message interpolation in <classname>Messageinterpolator</classname>
+    instances, there exist <methodname>unwrap</methodname> methods for the
+    provided context instances -
+    <classname>ConstraintValidatorContext</classname> respectively
+    <classname>MessageInterpolatorContext</classname>. Hibernate Validator
+    provides custom implementations for both of these interfaces. </para>
+
+    <section>
+      <title>HibernateConstraintValidatorContext</title>
+
+      <para
+      id="section-custom-constraint-validator-context"><classname>HibernateConstraintValidatorContext</classname>
+      is a subtype of <classname>ConstraintValidatorContext</classname> which
+      allows you to set arbitrary parameters for interpolation via the
+      Expression Language message interpolation facility (see <xref
+      linkend="section-interpolation-with-message-expressions"/>). For example
+      the default error message for the <classname>@Future</classname>
+      constraint is "must be in the future". What if I would like to include
+      the current date to make the message more explicit. <xref
+      linkend="example-custom-message-parameter"/> shows how this could be
+      achieved. </para>
+
+      <example id="example-custom-message-parameter">
+        <title>Custom <classname>@Future</classname> validator with message
+        parameters</title>
+
+        <programlisting language="JAVA" role="JAVA">public class MyFutureValidator implements ConstraintValidator&lt;Future, Date&gt; {
+
+	public void initialize(Future constraintAnnotation) {
+	}
+
+	public boolean isValid(Date value, ConstraintValidatorContext context) {
+		Date now = GregorianCalendar.getInstance().getTime();
+
+		if ( value.before( now ) ) {
+			HibernateConstraintValidatorContext hibernateContext =
+					context.unwrap( HibernateConstraintValidatorContext.class );
+
+			hibernateContext.disableDefaultConstraintViolation();
+			hibernateContext.addMessageParameter( "now", now )
+					.buildConstraintViolationWithTemplate( "Must be after ${now}" )
+					.addConstraintViolation();
+
+			return false;
+		}
+
+		return true;
+	}
+}</programlisting>
+      </example>
+
+      <note>
+        <para>Note that the parameters specifed via
+        <methodname>addMessageParameter(String, Object)</methodname> are
+        global and apply for all constraint violations created by this isValid
+        invocation. This includes the default constraint violation, but also
+        all violations created by the
+        <classname>ConstraintViolationBuilder</classname>. You can, however,
+        update the parameters between invocations of
+        <methodname>ConstraintViolationBuilder.addConstraintViolation()</methodname>.</para>
+      </note>
+
+      <warning>
+        <para>This functionality is currently experimental and might change in
+        future versions.</para>
+      </warning>
+    </section>
+
+    <section>
+      <title>HibernateMessageInterpolatorContext</title>
+
+      <para>Hibernate Validator also offers a custom implementation of
+      <classname>MessageInterpolatorContext</classname>, namely
+      <classname>HibernateMessageInterpolatorContext</classname> (see <xref
+      linkend="example-custom-message-interpolator-context"/>). This subtype
+      was introduced to allow a better integration of Hibernate Validator into
+      the Glassfish. The root bean type was in this case needed to determine
+      the right classloader for the message resource bundle. If you have any
+      other usecases, let us know.</para>
+
+      <example id="example-custom-message-interpolator-context">
+        <title>HibernateMessageInterpolatorContext</title>
+
+        <programlisting language="JAVA" role="JAVA">public interface HibernateMessageInterpolatorContext extends MessageInterpolator.Context {
+
+	/**
+	 * Returns the currently validated root bean type.
+	 *
+	 * @return The currently validated root bean type.
+	 */
+	Class&lt;?&gt; getRootBeanType();
+}</programlisting>
+      </example>
+    </section>
   </section>
 </chapter>
