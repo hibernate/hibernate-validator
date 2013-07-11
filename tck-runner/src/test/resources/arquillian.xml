@@ -40,7 +40,7 @@
     <container qualifier="incontainer">
         <protocol type="Servlet 3.0"/> <!-- Takes no effect - ARQ-579 -->
         <configuration>
-            <property name="jbossHome">${jbossTargetDir}</property>
+            <property name="jbossHome">${wildflyTargetDir}</property>
             <property name="javaVmArguments">-Xmx1024m -XX:MaxPermSize=512m ${remote.debug} -Dvalidation.provider=${validation.provider}</property>
             <property name="allowConnectingToRunningServer">true</property>
         </configuration>

@@ -14,6 +14,14 @@
         </packages>
 
         <classes>
+            <class name="org.hibernate.beanvalidation.tck.tests.integration.cdi.defaultinjection.DefaultInjectionTest">
+                <methods>
+                    <exclude name="testDefaultValidatorFactoryGetsInjected"/>
+                    <exclude name="testQualifiedDefaultValidatorFactoryGetsInjected"/>
+                    <exclude name="testDefaultValidatorGetsInjected"/>
+                    <exclude name="testQualifiedDefaultValidatorGetsInjected"/>
+                </methods>
+            </class>
             <class name="org.hibernate.beanvalidation.tck.tests.integration.cdi.executable.ExecutableValidationTest">
                 <methods>
                     <exclude name="testParameterValidationOfConstrainedMethod"/>
