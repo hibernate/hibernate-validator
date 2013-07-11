@@ -293,7 +293,7 @@ constraintMapping
     </example>
 
     <para>By invoking <methodname>valid()</methodname> a member is marked for
-    cascasded validation which is equivalent to annotating it with
+    cascaded validation which is equivalent to annotating it with
     <classname>@Valid</classname>. An example can be seen in <xref lang=""
     linkend="example-cascading-constraints"/>.</para>
 
@@ -315,8 +315,8 @@ constraintMapping
     <para>Not only bean constraints but also method constraints can be
     configured using the fluent API. As shown in <xref lang=""
     linkend="example-method-constraint-mapping"/> methods are identified by
-    their name and parameter types. Having selected a method, you can marke
-    its parameters and/or return value for cascaded validation and add
+    their name and parameter types. Having selected a method, you can mark its
+    parameters and/or return value for cascaded validation and add
     constraints.</para>
 
     <example id="example-method-constraint-mapping">
@@ -356,7 +356,7 @@ constraintMapping
   <section id="section-boolean-constraint-composition">
     <title>Boolean composition of constraints</title>
 
-    <para>Bean Validation specificies that the constraints of a composed
+    <para>Bean Validation specifies that the constraints of a composed
     constraint (see <xref linkend="section-constraint-composition"/>) are all
     combined via a logical <emphasis>AND</emphasis>. This means all of the
     composing constraints need to return <constant>true</constant> in order
@@ -467,7 +467,7 @@ public @interface PatternOrSize {
 					context.unwrap( HibernateConstraintValidatorContext.class );
 
 			hibernateContext.disableDefaultConstraintViolation();
-			hibernateContext.addMessageParameter( "now", now )
+			hibernateContext.addExpressionVariable( "now", now )
 					.buildConstraintViolationWithTemplate( "Must be after ${now}" )
 					.addConstraintViolation();
 
@@ -480,8 +480,8 @@ public @interface PatternOrSize {
       </example>
 
       <note>
-        <para>Note that the parameters specifed via
-        <methodname>addMessageParameter(String, Object)</methodname> are
+        <para>Note that the parameters specified via
+        <methodname>addExpressionVariable(String, Object)</methodname> are
         global and apply for all constraint violations created by this
         <methodname>isValid()</methodname> invocation. This includes the
         default constraint violation, but also all violations created by the
