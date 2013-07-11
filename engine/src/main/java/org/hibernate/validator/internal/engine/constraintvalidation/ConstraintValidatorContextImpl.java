@@ -90,7 +90,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	@Override
 	public HibernateConstraintValidatorContext addMessageParameter(String name, Object value) {
-		Contracts.assertNotNull( name, "null is not a valid " );
+		Contracts.assertNotNull( name, "null is not a valid value" );
 		this.messageParameters.put( name, value );
 		return this;
 	}

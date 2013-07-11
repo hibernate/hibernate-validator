@@ -43,7 +43,7 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 public class HibernateConstraintValidatorContextTest {
 
 	private static final String QUESTION_1 = "The answer to life?";
-	private static final String QUESTION_2 = "What is 1+1 and what is he answer to life?";
+	private static final String QUESTION_2 = "What is 1+1 and what is the answer to life?";
 
 	@Test
 	@TestForIssue(jiraKey = "HV-701")
@@ -74,7 +74,7 @@ public class HibernateConstraintValidatorContextTest {
 
 	public class Foo {
 		@OracleConstraint
-		private String question;
+		private final String question;
 
 		public Foo(String question) {
 			this.question = question;
@@ -95,9 +95,11 @@ public class HibernateConstraintValidatorContextTest {
 	public static class OracleConstraintImpl
 			implements ConstraintValidator<OracleConstraint, String> {
 
+		@Override
 		public void initialize(OracleConstraint constraintAnnotation) {
 		}
 
+		@Override
 		public boolean isValid(String question, ConstraintValidatorContext context) {
 			HibernateConstraintValidatorContext hibernateContext = context.unwrap( HibernateConstraintValidatorContext.class );
 

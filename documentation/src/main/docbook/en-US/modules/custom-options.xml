@@ -90,6 +90,15 @@
           </row>
 
           <row>
+            <entry><package>org.hibernate.validator.constraintvalidation</package></entry>
+
+            <entry>Extended constraint validator context which allows to set
+            custom attributes for message interpolation. <xref
+            linkend="section-hibernateconstraintvalidatorcontext"/> describes
+            how to make use of that feature.</entry>
+          </row>
+
+          <row>
             <entry><package>org.hibernate.validator.group</package>,
             <package>org.hibernate.validator.spi.group</package></entry>
 
@@ -416,18 +425,18 @@ public @interface PatternOrSize {
     <title>Custom contexts</title>
 
     <para>The Bean Validation specification offers at several points in its
-    API the possibilty to unwrap a given interface to a implementor specific
+    API the possibility to unwrap a given interface to a implementor specific
     subtype. In the case of constraint violation creation in
     <classname>ConstraintValidator</classname> implementations as well as
     message interpolation in <classname>Messageinterpolator</classname>
-    instances, there exist <methodname>unwrap</methodname> methods for the
+    instances, there exist <methodname>unwrap()</methodname> methods for the
     provided context instances -
     <classname>ConstraintValidatorContext</classname> respectively
     <classname>MessageInterpolatorContext</classname>. Hibernate Validator
-    provides custom implementations for both of these interfaces. </para>
+    provides custom extensions for both of these interfaces.</para>
 
-    <section>
-      <title>HibernateConstraintValidatorContext</title>
+    <section id="section-hibernateconstraintvalidatorcontext">
+      <title><classname>HibernateConstraintValidatorContext</classname></title>
 
       <para
       id="section-custom-constraint-validator-context"><classname>HibernateConstraintValidatorContext</classname>
@@ -436,10 +445,10 @@ public @interface PatternOrSize {
       Expression Language message interpolation facility (see <xref
       linkend="section-interpolation-with-message-expressions"/>). For example
       the default error message for the <classname>@Future</classname>
-      constraint is "must be in the future". What if I would like to include
-      the current date to make the message more explicit. <xref
+      constraint is "must be in the future". What if you would like to include
+      the current date to make the message more explicit? <xref
       linkend="example-custom-message-parameter"/> shows how this could be
-      achieved. </para>
+      achieved.</para>
 
       <example id="example-custom-message-parameter">
         <title>Custom <classname>@Future</classname> validator with message
@@ -473,12 +482,12 @@ public @interface PatternOrSize {
       <note>
         <para>Note that the parameters specifed via
         <methodname>addMessageParameter(String, Object)</methodname> are
-        global and apply for all constraint violations created by this isValid
-        invocation. This includes the default constraint violation, but also
-        all violations created by the
+        global and apply for all constraint violations created by this
+        <methodname>isValid()</methodname> invocation. This includes the
+        default constraint violation, but also all violations created by the
         <classname>ConstraintViolationBuilder</classname>. You can, however,
         update the parameters between invocations of
-        <methodname>ConstraintViolationBuilder.addConstraintViolation()</methodname>.</para>
+        <methodname>ConstraintViolationBuilder#addConstraintViolation()</methodname>.</para>
       </note>
 
       <warning>
@@ -488,9 +497,9 @@ public @interface PatternOrSize {
     </section>
 
     <section>
-      <title>HibernateMessageInterpolatorContext</title>
+      <title><classname>HibernateMessageInterpolatorContext</classname></title>
 
-      <para>Hibernate Validator also offers a custom implementation of
+      <para>Hibernate Validator also offers a custom extension of
       <classname>MessageInterpolatorContext</classname>, namely
       <classname>HibernateMessageInterpolatorContext</classname> (see <xref
       linkend="example-custom-message-interpolator-context"/>). This subtype
@@ -500,7 +509,7 @@ public @interface PatternOrSize {
       other usecases, let us know.</para>
 
       <example id="example-custom-message-interpolator-context">
-        <title>HibernateMessageInterpolatorContext</title>
+        <title><classname>HibernateMessageInterpolatorContext</classname></title>
 
         <programlisting language="JAVA" role="JAVA">public interface HibernateMessageInterpolatorContext extends MessageInterpolator.Context {
 
