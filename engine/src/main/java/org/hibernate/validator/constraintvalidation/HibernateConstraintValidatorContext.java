@@ -23,17 +23,17 @@ import javax.validation.ConstraintValidatorContext;
  * interpolation.
  *
  * @author Hardy Ferentschik
- * @experimental Adding custom parameters to the context is considered experimental, especially the exact semantics
+ * @hv.experimental Adding custom parameters to the context is considered experimental, especially the exact semantics
  * regarding to which generated constraint violation these parameters apply might change. At the moment they apply
  * to all violations.
  */
 public interface HibernateConstraintValidatorContext extends ConstraintValidatorContext {
 
 	/**
-	 * Allows to set an additional named parameter which can be interpolated in the constraint violation message. The
-	 * parameters will be available for interpolation for all constraint violations generated for this constraint.
+	 * Allows to set an additional named variable which can be interpolated in the constraint violation message. The
+	 * variable will be available for interpolation for all constraint violations generated for this constraint.
 	 * This includes the default one as well as all violations created by the {@link ConstraintViolationBuilder}.
-	 * To create multiple constraint violation with different values for the same parameter, this method can be called
+	 * To create multiple constraint violations with different variable values, this method can be called
 	 * between successive calls to {@link javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder#addConstraintViolation()}.
 	 * For example:
 	 * <pre>
@@ -41,11 +41,11 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
 	 *     HibernateConstraintValidatorContext context = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class );
 	 *
-	 *     context.setMessageParameter( "foo", "bar" );
+	 *     context.addExpressionVariable( "foo", "bar" );
 	 *     context.buildConstraintViolationWithTemplate( "${foo}" )
 	 *            .addConstraintViolation();
 	 *
-	 *     context.setMessageParameter( "foo", "snafu" );
+	 *     context.addExpressionVariable( "foo", "snafu" );
 	 *     context.buildConstraintViolationWithTemplate( "${foo}" )
 	 *            .addConstraintViolation();
 	 *
@@ -62,5 +62,5 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 *
 	 * @throws IllegalArgumentException in case the provided name is {@code null}
 	 */
-	HibernateConstraintValidatorContext addMessageParameter(String name, Object value);
+	HibernateConstraintValidatorContext addExpressionVariable(String name, Object value);
 }

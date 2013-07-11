@@ -44,6 +44,7 @@ public class HibernateConstraintValidatorContextTest {
 
 	private static final String QUESTION_1 = "The answer to life?";
 	private static final String QUESTION_2 = "What is 1+1 and what is the answer to life?";
+	private static final String QUESTION_3 = "This is a trick question";
 
 	@Test
 	@TestForIssue(jiraKey = "HV-701")
@@ -70,6 +71,16 @@ public class HibernateConstraintValidatorContextTest {
 
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectConstraintViolationMessages( constraintViolations, "answer 1: 2", "answer 2: 42" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-701")
+	public void testExpressionTermAsAttributeValueIsTreatedAsString() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( QUESTION_3 ) );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectConstraintViolationMessages( constraintViolations, "the answer is: ${foo}" );
 	}
 
 	public class Foo {
@@ -105,26 +116,41 @@ public class HibernateConstraintValidatorContextTest {
 
 
 			if ( question.equals( QUESTION_1 ) ) {
-				hibernateContext.addMessageParameter( "answer", 42 );
+				createSingleConstraintViolation( hibernateContext );
 			}
 			else if ( question.equals( QUESTION_2 ) ) {
-				hibernateContext.disableDefaultConstraintViolation();
-
-				hibernateContext.addMessageParameter( "answer", 2 );
-				hibernateContext.buildConstraintViolationWithTemplate( "answer 1: ${answer}" )
-						.addConstraintViolation();
-
-				// resetting the parameters
-				hibernateContext.addMessageParameter( "answer", 42 );
-				context.buildConstraintViolationWithTemplate( "answer 2: ${answer}" )
-						.addConstraintViolation();
+				createMultipleConstraintViolationsUpdatingVariableValues( hibernateContext );
+			}
+			else if ( question.equals( QUESTION_3 ) ) {
+				hibernateContext.addExpressionVariable( "answer", "${foo}" );
 			}
 			else {
-				hibernateContext.addMessageParameter( null, "foo" );
+				tryingToIllegallyUseNullAttributeName( hibernateContext );
 			}
 
 			// always return false to trigger constraint violation and message creation
 			return false;
+		}
+
+		private void tryingToIllegallyUseNullAttributeName(HibernateConstraintValidatorContext hibernateContext) {
+			hibernateContext.addExpressionVariable( null, "foo" );
+		}
+
+		private void createMultipleConstraintViolationsUpdatingVariableValues(HibernateConstraintValidatorContext hibernateContext) {
+			hibernateContext.disableDefaultConstraintViolation();
+
+			hibernateContext.addExpressionVariable( "answer", 2 );
+			hibernateContext.buildConstraintViolationWithTemplate( "answer 1: ${answer}" )
+					.addConstraintViolation();
+
+			// resetting the parameters
+			hibernateContext.addExpressionVariable( "answer", 42 );
+			hibernateContext.buildConstraintViolationWithTemplate( "answer 2: ${answer}" )
+					.addConstraintViolation();
+		}
+
+		private void createSingleConstraintViolation(HibernateConstraintValidatorContext hibernateContext) {
+			hibernateContext.addExpressionVariable( "answer", 42 );
 		}
 	}
 }

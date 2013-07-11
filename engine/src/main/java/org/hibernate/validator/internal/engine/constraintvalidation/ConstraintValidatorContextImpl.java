@@ -46,7 +46,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Map<String, Object> messageParameters = newHashMap();
+	private final Map<String, Object> expressionVariables = newHashMap();
 	private final List<String> methodParameterNames;
 	private final List<ConstraintViolationCreationContext> constraintViolationCreationContexts = newArrayList( 3 );
 	private final PathImpl basePath;
@@ -89,9 +89,9 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	}
 
 	@Override
-	public HibernateConstraintValidatorContext addMessageParameter(String name, Object value) {
+	public HibernateConstraintValidatorContext addExpressionVariable(String name, Object value) {
 		Contracts.assertNotNull( name, "null is not a valid value" );
-		this.messageParameters.put( name, value );
+		this.expressionVariables.put( name, value );
 		return this;
 	}
 
@@ -109,7 +109,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		);
 		if ( !defaultDisabled ) {
 			Map<String, Object> parameterMapCopy = newHashMap();
-			parameterMapCopy.putAll( messageParameters );
+			parameterMapCopy.putAll( expressionVariables );
 			returnedConstraintViolationCreationContexts.add(
 					new ConstraintViolationCreationContext(
 							getDefaultConstraintMessageTemplate(),
@@ -136,7 +136,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 		public ConstraintValidatorContext addConstraintViolation() {
 			Map<String, Object> parameterMapCopy = newHashMap();
-			parameterMapCopy.putAll( messageParameters );
+			parameterMapCopy.putAll( expressionVariables );
 			constraintViolationCreationContexts.add(
 					new ConstraintViolationCreationContext(
 							messageTemplate,
