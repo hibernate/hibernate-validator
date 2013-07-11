@@ -23,7 +23,7 @@ import javax.validation.ConstraintValidatorContext;
  * interpolation.
  *
  * @author Hardy Ferentschik
- * @experimental Adding custom parameters to the context is considered experimental, especially the exact semantics
+ * @hv.experimental Adding custom parameters to the context is considered experimental, especially the exact semantics
  * regarding to which generated constraint violation these parameters apply might change. At the moment they apply
  * to all violations.
  */
