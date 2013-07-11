@@ -112,7 +112,7 @@
                     </links>
                     <tags>
                         <tag>
-                            <name>experimental</name>
+                            <name>hv.experimental</name>
                             <placement>a</placement>
                             <head>Experimental</head>
                         </tag>
