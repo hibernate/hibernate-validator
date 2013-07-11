@@ -21,7 +21,7 @@ public class MyFutureValidator implements ConstraintValidator<Future, Date> {
 					context.unwrap( HibernateConstraintValidatorContext.class );
 
 			hibernateContext.disableDefaultConstraintViolation();
-			hibernateContext.addMessageParameter( "now", now )
+			hibernateContext.addExpressionVariable( "now", now )
 					.buildConstraintViolationWithTemplate( "Must be after ${now}" )
 					.addConstraintViolation();
 

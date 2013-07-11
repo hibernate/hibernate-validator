@@ -28,16 +28,16 @@ import javax.validation.Path;
 public class ConstraintViolationCreationContext {
 	private final String message;
 	private final Path propertyPath;
-	private final Map<String, Object> messageParameters;
+	private final Map<String, Object> expressionVariables;
 
 	public ConstraintViolationCreationContext(String message, Path property) {
 		this( message, property, Collections.<String, Object>emptyMap() );
 	}
 
-	public ConstraintViolationCreationContext(String message, Path property, Map<String, Object> messageParameters) {
+	public ConstraintViolationCreationContext(String message, Path property, Map<String, Object> expressionVariables) {
 		this.message = message;
 		this.propertyPath = property;
-		this.messageParameters = messageParameters;
+		this.expressionVariables = expressionVariables;
 	}
 
 	public final String getMessage() {
@@ -48,8 +48,8 @@ public class ConstraintViolationCreationContext {
 		return propertyPath;
 	}
 
-	public Map<String, Object> getMessageParameters() {
-		return messageParameters;
+	public Map<String, Object> getExpressionVariables() {
+		return expressionVariables;
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class ConstraintViolationCreationContext {
 		final StringBuilder sb = new StringBuilder( "ConstraintViolationCreationContext{" );
 		sb.append( "message='" ).append( message ).append( '\'' );
 		sb.append( ", propertyPath=" ).append( propertyPath );
-		sb.append( ", messageParameters=" ).append( messageParameters );
+		sb.append( ", messageParameters=" ).append( expressionVariables );
 		sb.append( '}' );
 		return sb.toString();
 	}

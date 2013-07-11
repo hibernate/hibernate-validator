@@ -272,7 +272,7 @@ public class ValidationContext<T> {
 				messageTemplate,
 				localContext.getCurrentValidatedValue(),
 				descriptor,
-				constraintViolationCreationContext.getMessageParameters()
+				constraintViolationCreationContext.getExpressionVariables()
 		);
 		Path path = constraintViolationCreationContext.getPath();
 
