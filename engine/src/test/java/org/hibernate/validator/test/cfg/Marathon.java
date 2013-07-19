@@ -35,7 +35,7 @@ public class Marathon implements Tournament {
 
 	private Date tournamentDate;
 
-	private List<Runner> runners;
+	private final List<Runner> runners;
 
 	public Marathon() {
 		runners = new ArrayList<Runner>();
@@ -49,6 +49,7 @@ public class Marathon implements Tournament {
 		this.name = name;
 	}
 
+	@Override
 	public Date getTournamentDate() {
 		return tournamentDate;
 	}
@@ -61,9 +62,8 @@ public class Marathon implements Tournament {
 		return runners;
 	}
 
-	public void addRunner(Runner runner) {
-		runners.add( runner );
+	public boolean addRunner(Runner runner) {
+		return runners.add( runner );
 	}
 }
-
 

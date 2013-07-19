@@ -48,7 +48,13 @@ import org.hibernate.validator.cfg.defs.RangeDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
-import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
@@ -57,7 +63,8 @@ import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 /**
  * Unit test for {@link ConstraintMapping} et al.
@@ -76,7 +83,6 @@ public class ConstraintMappingTest {
 		mapping = (DefaultConstraintMapping) config.createConstraintMapping();
 	}
 
-
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
 			expectedExceptionsMessageRegExp = "HV[0-9]*: The parameter \"mapping\" must not be null."
@@ -94,11 +100,10 @@ public class ConstraintMappingTest {
 				.property( "numberOfHelpers", FIELD )
 				.constraint( new MinDef().value( 1 ) );
 
-		ConstraintMappingContext context = mapping.getContext();
-
-		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
-		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 1 );
-		assertTrue( context.getMethodConstraintConfig().get( Marathon.class ).size() == 1 );
+		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
+		assertNotNull( beanConfiguration );
+		assertEquals( getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size(), 1 );
+		assertEquals( getConstrainedExecutable( beanConfiguration, "getName" ).getConstraints().size(), 1 );
 	}
 
 	@Test
@@ -107,13 +112,12 @@ public class ConstraintMappingTest {
 				.property( "name", METHOD )
 				.constraint( new GenericConstraintDef<NotNull>( NotNull.class ) )
 				.property( "numberOfHelpers", FIELD )
-				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 1 ) );
+				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 1L ) );
 
-		ConstraintMappingContext context = mapping.getContext();
-
-		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
-		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 1 );
-		assertTrue( context.getMethodConstraintConfig().get( Marathon.class ).size() == 1 );
+		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
+		assertNotNull( beanConfiguration );
+		assertEquals( getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size(), 1 );
+		assertEquals( getConstrainedExecutable( beanConfiguration, "getName" ).getConstraints().size(), 1 );
 	}
 
 	@Test
@@ -121,12 +125,11 @@ public class ConstraintMappingTest {
 		mapping.type( Marathon.class )
 				.property( "numberOfHelpers", FIELD )
 				.constraint( new MinDef().value( 1 ) )
-				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 1 ) );
+				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 2L ) );
 
-		ConstraintMappingContext context = mapping.getContext();
-
-		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
-		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 2 );
+		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
+		assertNotNull( beanConfiguration );
+		assertEquals( getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size(), 2 );
 	}
 
 	@Test
@@ -468,6 +471,45 @@ public class ConstraintMappingTest {
 				violations,
 				"size must be between 3 and 10", "size must be between 4 and 10"
 		);
+	}
+
+	private <T> BeanConfiguration<T> getBeanConfiguration(Class<T> type) {
+		Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations(
+				new ConstraintHelper(),
+				new DefaultParameterNameProvider()
+		);
+
+		for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
+			if ( beanConfiguration.getBeanClass() == type ) {
+				@SuppressWarnings("unchecked")
+				BeanConfiguration<T> configuration = (BeanConfiguration<T>) beanConfiguration;
+				return configuration;
+			}
+		}
+
+		return null;
+	}
+
+	private ConstrainedField getConstrainedField(BeanConfiguration<?> beanConfiguration, String fieldName) {
+		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
+			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD &&
+					constrainedElement.getLocation().getMember().getName().equals( fieldName ) ) {
+				return (ConstrainedField) constrainedElement;
+			}
+		}
+
+		return null;
+	}
+
+	private ConstrainedExecutable getConstrainedExecutable(BeanConfiguration<?> beanConfiguration, String executableName) {
+		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
+			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
+					constrainedElement.getLocation().getMember().getName().equals( executableName ) ) {
+				return (ConstrainedExecutable) constrainedElement;
+			}
+		}
+
+		return null;
 	}
 
 	private interface Foo {

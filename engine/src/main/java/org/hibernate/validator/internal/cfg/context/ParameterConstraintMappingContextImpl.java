@@ -16,14 +16,17 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.lang.reflect.Method;
+import java.util.Collections;
+import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
@@ -36,28 +39,25 @@ public final class ParameterConstraintMappingContextImpl
 		extends ConstraintMappingContextImplBase
 		implements ParameterConstraintMappingContext {
 
-	private static final Log log = LoggerFactory.make();
-
-	private final Method method;
+	private final MethodConstraintMappingContextImpl methodContext;
 	private final int parameterIndex;
+	private boolean isCascading;
 
-	public ParameterConstraintMappingContextImpl(Class<?> beanClass, Method method, int parameterIndex, ConstraintMappingContext mapping) {
 
-		super( beanClass, mapping );
+	public ParameterConstraintMappingContextImpl(MethodConstraintMappingContextImpl methodContext, int parameterIndex) {
+		super( methodContext.getTypeContext().getConstraintMapping() );
 
-		if ( parameterIndex < 0 || parameterIndex >= method.getParameterTypes().length ) {
-			throw log.getInvalidMethodParameterIndexException( method.getName() );
-		}
-
-		this.method = method;
+		this.methodContext = methodContext;
 		this.parameterIndex = parameterIndex;
 	}
 
+	@Override
 	public ParameterConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-
-		mapping.addMethodConstraintConfig(
+		super.addConstraint(
 				ConfiguredConstraint.forParameter(
-						definition, method, parameterIndex
+						definition,
+						methodContext.getMethod(),
+						parameterIndex
 				)
 		);
 		return this;
@@ -68,12 +68,9 @@ public final class ParameterConstraintMappingContextImpl
 	 *
 	 * @return Returns itself for method chaining.
 	 */
+	@Override
 	public ParameterConstraintMappingContext valid() {
-		mapping.addMethodCascadeConfig(
-				new ExecutableConstraintLocation(
-						method, parameterIndex
-				)
-		);
+		isCascading = true;
 		return this;
 	}
 
@@ -84,10 +81,9 @@ public final class ParameterConstraintMappingContextImpl
 	 *
 	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
 	 */
+	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
-		return new ParameterConstraintMappingContextImpl(
-				beanClass, method, index, mapping
-		);
+		return methodContext.parameter( index );
 	}
 
 	/**
@@ -95,10 +91,24 @@ public final class ParameterConstraintMappingContextImpl
 	 *
 	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
 	 */
+	@Override
 	public ReturnValueConstraintMappingContext returnValue() {
-		return new ReturnValueConstraintMappingContextImpl(
-				beanClass, method, mapping
-		);
+		return methodContext.returnValue();
 	}
 
+	@Override
+	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
+		return methodContext.getTypeContext().method( name, parameterTypes );
+	}
+
+	public ConstrainedParameter build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+		return new ConstrainedParameter(
+				ConfigurationSource.API,
+				new ExecutableConstraintLocation( methodContext.getMethod(), parameterIndex ),
+				parameterNameProvider.getParameterNames( methodContext.getMethod() ).get( parameterIndex ),
+				getConstraints( constraintHelper ),
+				Collections.<Class<?>, Class<?>>emptyMap(),
+				isCascading
+		);
+	}
 }

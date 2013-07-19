@@ -16,12 +16,10 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.lang.reflect.Method;
-
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method return value.
@@ -34,15 +32,17 @@ public final class ReturnValueConstraintMappingContextImpl
 		extends ConstraintMappingContextImplBase
 		implements ReturnValueConstraintMappingContext {
 
-	private final Method method;
+	private final MethodConstraintMappingContextImpl methodContext;
+	private boolean isCascaded;
 
-	public ReturnValueConstraintMappingContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
-		super( beanClass, mapping );
-		this.method = method;
+	public ReturnValueConstraintMappingContextImpl(MethodConstraintMappingContextImpl methodContext) {
+		super( methodContext.getTypeContext().getConstraintMapping() );
+		this.methodContext = methodContext;
 	}
 
+	@Override
 	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		mapping.addMethodConstraintConfig( ConfiguredConstraint.forReturnValue( definition, method ) );
+		super.addConstraint( ConfiguredConstraint.forReturnValue( definition, methodContext.getMethod() ) );
 		return this;
 	}
 
@@ -51,8 +51,9 @@ public final class ReturnValueConstraintMappingContextImpl
 	 *
 	 * @return Returns itself for method chaining.
 	 */
+	@Override
 	public ReturnValueConstraintMappingContext valid() {
-		mapping.addMethodCascadeConfig( new ExecutableConstraintLocation( method ) );
+		isCascaded = true;
 		return this;
 	}
 
@@ -63,7 +64,17 @@ public final class ReturnValueConstraintMappingContextImpl
 	 *
 	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
 	 */
+	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
-		return new ParameterConstraintMappingContextImpl( beanClass, method, index, mapping );
+		return methodContext.parameter( index );
+	}
+
+	public boolean isCascaded() {
+		return isCascaded;
+	}
+
+	@Override
+	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
+		return methodContext.getTypeContext().method( name, parameterTypes );
 	}
 }

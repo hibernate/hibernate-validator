@@ -155,7 +155,7 @@ public class URLValidatorTest {
 		// now the same test with programmatic configuration
 		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( URLContainerNoAnnotations.class )
+		mapping.type( URLContainer.class )
 				.property( "url", METHOD )
 				.constraint( new URLDef().regexp( "^http://\\S+[\\.htm|\\.html]{1}$" ) );
 		config.addMapping( mapping );
@@ -177,7 +177,7 @@ public class URLValidatorTest {
 		// now the same test with programmatic configuration
 		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( URLContainerNoAnnotations.class )
+		mapping.type( URLContainer.class )
 				.property( "url", METHOD )
 				.constraint(
 						new URLDef().regexp( "^http://\\S+[\\.htm|\\.html]{1}$" ).flags( Flag.CASE_INSENSITIVE )
