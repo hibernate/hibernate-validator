@@ -31,7 +31,7 @@ import javax.validation.spi.ConfigurationState;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
-import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -81,7 +81,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * Programmatic constraints passed via the Hibernate Validator specific API. Empty if there are
 	 * no programmatic constraints
 	 */
-	private final Set<ConstraintMapping> constraintMappings;
+	private final Set<DefaultConstraintMapping> constraintMappings;
 
 	/**
 	 * Helper for dealing with built-in validators and determining custom constraint annotations.

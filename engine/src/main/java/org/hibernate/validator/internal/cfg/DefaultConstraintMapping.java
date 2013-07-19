@@ -16,12 +16,20 @@
  */
 package org.hibernate.validator.internal.cfg;
 
+import java.util.Set;
+import javax.validation.ParameterNameProvider;
+
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
-import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
 import org.hibernate.validator.internal.cfg.context.TypeConstraintMappingContextImpl;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
@@ -32,19 +40,57 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public class DefaultConstraintMapping implements ConstraintMapping {
-	private ConstraintMappingContext context;
+
+	private static final Log log = LoggerFactory.make();
+
+	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+	private final Set<Class<?>> configuredTypes;
+	private final Set<TypeConstraintMappingContextImpl<?>> typeContexts;
 
 	public DefaultConstraintMapping() {
-		context = new ConstraintMappingContext();
+		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
+		this.configuredTypes = newHashSet();
+		this.typeContexts = newHashSet();
 	}
 
 	@Override
-	public final <C> TypeConstraintMappingContext<C> type(Class<C> beanClass) {
-		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeMustNotBeNull() );
-		return new TypeConstraintMappingContextImpl<C>( beanClass, context );
+	public final <C> TypeConstraintMappingContext<C> type(Class<C> type) {
+		Contracts.assertNotNull( type, MESSAGES.beanTypeMustNotBeNull() );
+
+		if ( configuredTypes.contains( type ) ) {
+			throw log.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type.getName() );
+		}
+
+		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<C>( this, type );
+		typeContexts.add( typeContext );
+		configuredTypes.add( type );
+
+		return typeContext;
 	}
 
-	public ConstraintMappingContext getContext() {
-		return context;
+	public final AnnotationProcessingOptionsImpl getAnnotationProcessingOptions() {
+		return annotationProcessingOptions;
+	}
+
+	public Set<Class<?>> getConfiguredTypes() {
+		return configuredTypes;
+	}
+
+	/**
+	 * Returns all bean configurations configured through this constraint mapping.
+	 *
+	 * @param constraintHelper constraint helper required for building constraint descriptors
+	 * @param parameterNameProvider parameter name provider required for building parameter elements
+	 *
+	 * @return a set of {@link BeanConfiguration}s with an element for each type configured through this mapping
+	 */
+	public Set<BeanConfiguration<?>> getBeanConfigurations(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+		Set<BeanConfiguration<?>> configurations = newHashSet();
+
+		for ( TypeConstraintMappingContextImpl<?> typeContext : typeContexts ) {
+			configurations.add( typeContext.build( constraintHelper, parameterNameProvider ) );
+		}
+
+		return configurations;
 	}
 }
