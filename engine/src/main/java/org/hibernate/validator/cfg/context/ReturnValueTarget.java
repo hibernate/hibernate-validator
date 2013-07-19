@@ -25,7 +25,8 @@ package org.hibernate.validator.cfg.context;
  */
 public interface ReturnValueTarget {
 	/**
-	 * Selects the current method's return value as the target for the next operations.
+	 * Selects the current method's return value as the target for the next operations. The return value
+	 * of one method may only be configured more once.
 	 *
 	 * @return A creational context representing the current method's return value.
 	 */
