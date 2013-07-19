@@ -18,9 +18,8 @@ package org.hibernate.validator.test.internal.util;
 
 import java.util.Arrays;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.util.StringHelper;
+import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -39,7 +38,7 @@ public class StringHelperTest {
 	}
 
 	@Test
-	public void shouldReturnEmptyStringForEmtpyIterable() {
+	public void shouldReturnEmptyStringForEmptyIterable() {
 		assertThat( StringHelper.join( newArrayList(), "," ) ).isEmpty();
 		assertThat( StringHelper.join( new Object[0], "," ) ).isEmpty();
 	}
@@ -68,6 +67,11 @@ public class StringHelperTest {
 		assertThat( StringHelper.join( new Object[] { new PolarBear(), new Giraffe() }, ", " ) ).isEqualTo(
 				"polar bear, giraffe"
 		);
+	}
+
+	@Test
+	public void shouldPrintLiteralNullForNullValues() {
+		assertThat( StringHelper.join( new Integer[] { 1, null, 2 }, "," ) ).isEqualTo( "1,null,2" );
 	}
 
 	private static class PolarBear {
