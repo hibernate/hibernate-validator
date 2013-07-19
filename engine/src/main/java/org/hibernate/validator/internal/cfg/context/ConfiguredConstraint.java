@@ -105,6 +105,11 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 		}
 	}
 
+	@Override
+	public String toString() {
+		return constraint.toString();
+	}
+
 	/**
 	 * Provides access to the members of a {@link ConstraintDef}.
 	 */

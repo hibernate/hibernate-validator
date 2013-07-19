@@ -16,11 +16,34 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
+import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
+import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Constraint mapping creational context which allows to configure the class-level constraints for one bean.
@@ -34,35 +57,149 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 public final class TypeConstraintMappingContextImpl<C> extends ConstraintMappingContextImplBase
 		implements TypeConstraintMappingContext<C> {
 
-	public TypeConstraintMappingContextImpl(Class<?> beanClass, ConstraintMappingContext mapping) {
-		super( beanClass, mapping );
+	private static final Log log = LoggerFactory.make();
+
+	private final Set<MethodConstraintMappingContextImpl> methodContexts = newHashSet();
+	private final Set<PropertyConstraintMappingContextImpl> propertyContexts = newHashSet();
+	private final Set<Member> configuredProperties = newHashSet();
+	private final Set<Member> configuredMethods = newHashSet();
+	private final Class<C> beanClass;
+
+	private List<Class<?>> defaultGroupSequence;
+	private Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass;
+
+	public TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass) {
+		super( mapping );
+		this.beanClass = beanClass;
 		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.FALSE );
 	}
 
+	@Override
 	public TypeConstraintMappingContext<C> constraint(ConstraintDef<?, ?> definition) {
-		mapping.addConstraintConfig( ConfiguredConstraint.forType( definition, beanClass ) );
+		addConstraint( ConfiguredConstraint.forType( definition, beanClass ) );
 		return this;
 	}
 
+	@Override
 	public TypeConstraintMappingContext<C> ignoreAnnotations() {
 		mapping.getAnnotationProcessingOptions().ignoreClassLevelConstraintAnnotations( beanClass, Boolean.TRUE );
 		return this;
 	}
 
+	@Override
 	public TypeConstraintMappingContext<C> ignoreAllAnnotations() {
 		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.TRUE );
 		return this;
 	}
 
+	@Override
 	public TypeConstraintMappingContext<C> defaultGroupSequence(Class<?>... defaultGroupSequence) {
-		mapping.addDefaultGroupSequence( beanClass, Arrays.asList( defaultGroupSequence ) );
+		this.defaultGroupSequence = Arrays.asList( defaultGroupSequence );
 		return this;
 	}
 
+	@Override
 	public TypeConstraintMappingContext<C> defaultGroupSequenceProviderClass(Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass) {
-		@SuppressWarnings("unchecked")
-		Class<C> clazz = (Class<C>) beanClass;
-		mapping.addDefaultGroupSequenceProvider( clazz, defaultGroupSequenceProviderClass );
+		this.defaultGroupSequenceProviderClass = defaultGroupSequenceProviderClass;
 		return this;
+	}
+
+	@Override
+	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
+		Contracts.assertNotNull( property, "The property name must not be null." );
+		Contracts.assertNotNull( elementType, "The element type must not be null." );
+		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
+
+		Member member = ReflectionHelper.getMember(
+				beanClass, property, elementType
+		);
+
+		if ( member == null || member.getDeclaringClass() != beanClass ) {
+			throw log.getUnableToFindPropertyWithAccessException( beanClass, property, elementType );
+		}
+
+		if ( configuredProperties.contains( member ) ) {
+			throw log.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass.getName(), property );
+		}
+
+		PropertyConstraintMappingContextImpl context = new PropertyConstraintMappingContextImpl(
+				this,
+				member
+		);
+
+		configuredProperties.add( member );
+		propertyContexts.add( context );
+		return context;
+	}
+
+	@Override
+	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
+		Contracts.assertNotNull( name, MESSAGES.methodNameMustNotBeNull() );
+
+		Method method = ReflectionHelper.getDeclaredMethod( beanClass, name, parameterTypes );
+
+		if ( method == null || method.getDeclaringClass() != beanClass ) {
+			throw log.getUnableToFindMethodException( beanClass, name, StringHelper.join( parameterTypes, ", " ) );
+		}
+
+		if ( configuredMethods.contains( method ) ) {
+			throw log.getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(
+					beanClass.getName(),
+					name,
+					StringHelper.join( parameterTypes, ", " )
+			);
+		}
+
+		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, method );
+		configuredMethods.add( method );
+		methodContexts.add( context );
+
+		return context;
+	}
+
+	public BeanConfiguration<C> build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+		return new BeanConfiguration<C>(
+				ConfigurationSource.API,
+				beanClass,
+				buildConstraintElements( constraintHelper, parameterNameProvider ),
+				defaultGroupSequence,
+				getDefaultGroupSequenceProvider()
+		);
+	}
+
+	private Set<ConstrainedElement> buildConstraintElements(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+		Set<ConstrainedElement> elements = newHashSet();
+
+		//class-level configuration
+		elements.add(
+				new ConstrainedType(
+						ConfigurationSource.API,
+						new BeanConstraintLocation( beanClass ),
+						getConstraints( constraintHelper )
+				)
+		);
+
+		//methods
+		for ( MethodConstraintMappingContextImpl methodContext : methodContexts ) {
+			elements.add( methodContext.build( constraintHelper, parameterNameProvider ) );
+		}
+
+		//properties
+		for ( PropertyConstraintMappingContextImpl propertyContext : propertyContexts ) {
+			elements.add( propertyContext.build( constraintHelper ) );
+		}
+
+		return elements;
+	}
+
+	private DefaultGroupSequenceProvider<? super C> getDefaultGroupSequenceProvider() {
+		return defaultGroupSequenceProviderClass != null ? ReflectionHelper.newInstance(
+				defaultGroupSequenceProviderClass,
+				"default group sequence provider"
+		) : null;
+	}
+
+	public Class<?> getBeanClass() {
+		return beanClass;
 	}
 }

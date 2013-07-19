@@ -27,7 +27,8 @@ import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
  */
 public interface ConstraintMapping {
 	/**
-	 * Starts defining constraints on the specified bean class.
+	 * Starts defining constraints on the specified bean class. Each bean class may only be configured once within all 
+	 * constraint mappings used for configuring one validator factory.
 	 *
 	 * @param <C> The type to be configured.
 	 * @param beanClass The bean class on which to define constraints. All constraints defined after calling this method

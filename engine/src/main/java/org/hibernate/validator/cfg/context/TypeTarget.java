@@ -25,7 +25,7 @@ package org.hibernate.validator.cfg.context;
  */
 public interface TypeTarget {
 	/**
-	 * Selects the type to which the next operations shall apply.
+	 * Selects the type to which the next operations shall apply. A given type may only be configured once.
 	 *
 	 * @param <C> The type to select.
 	 * @param type The type to select.

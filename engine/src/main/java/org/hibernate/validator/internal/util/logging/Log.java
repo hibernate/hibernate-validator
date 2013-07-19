@@ -250,9 +250,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 59, value = "Unable to retrieve annotation parameter value.")
 	ValidationException getUnableToRetrieveAnnotationParameterValueException(@Cause Exception e);
 
+	//TODO: Unused; Decide whether to remove or keep it to avoid re-using the id
 	@Message(id = 60, value = "Multiple definitions of default group sequence provider.")
 	GroupDefinitionException getMultipleDefinitionOfDefaultGroupSequenceProviderException();
 
+	//TODO: Unused; Decide whether to remove or keep it to avoid re-using the id
 	@Message(id = 61, value = "Multiple definitions of default group sequence.")
 	GroupDefinitionException getMultipleDefinitionOfDefaultGroupSequenceException();
 
@@ -616,4 +618,23 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 170, value = "No JSR-223 scripting engine could be bootstrapped for language \"%s\".")
 	ConstraintDeclarationException getCreationOfScriptExecutorFailedException(String languageName, @Cause Exception e);
+
+	@Message(id = 171, value = "%s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName);
+
+	@Message(id = 172,
+			value = "Property \"%2$s\" of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String propertyName);
+
+	@Message(id = 173,
+			value = "Method %2$s(%3$s) of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String methodName, String parameterTypes);
+
+	@Message(id = 174,
+			value = "Parameter %4$s of method %2$s(%3$s) of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String methodName, String parameterTypes, int parameterIndex);
+
+	@Message(id = 175,
+			value = "The return value of method %2$s(%3$s) of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String methodName, String parameterTypes);
 }

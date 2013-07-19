@@ -30,6 +30,9 @@ public interface MethodTarget {
 	 * Until this method is called constraints apply on class level. After calling this method constraints
 	 * apply to the specified method.
 	 * </p>
+	 * <p>
+	 * A given method only be configured once.
+	 * </p>
 	 *
 	 * @param name The method name.
 	 * @param parameterTypes The method parameter types.

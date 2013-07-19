@@ -132,7 +132,7 @@ public class EmailValidatorTest {
 		// now the same test with programmatic configuration
 		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
 		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( EmailContainerNoAnnotations.class )
+		mapping.type( EmailContainer.class )
 				.property( "email", METHOD )
 				.constraint(
 						new EmailDef().regexp( noOrgEmailAddressRegexp )

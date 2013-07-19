@@ -270,6 +270,19 @@ Validator validator = configuration.addMapping( constraintMapping )
     configured via annotations or XML are ignored for the given
     element.</para>
 
+    <note>
+      <para>Each element (type, property, method etc.) may only be configured
+      once within all the constraint mappings used to set up one validator
+      factory. Otherwise a <classname>ValidationException</classname> is
+      raised.</para>
+    </note>
+
+    <note>
+      <para>It is not supported to add constraints to non-overridden supertype
+      properties and methods by configuring a subtype. Instead you need to
+      configure the supertype in this case.</para>
+    </note>
+
     <para>Having configured the mapping, you must add it back to the
     configuration object from which you then can obtain a validator
     factory.</para>

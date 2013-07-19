@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +33,19 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class ConstrainedParameter extends AbstractConstrainedElement {
 	private final String name;
+
+	public ConstrainedParameter(ConfigurationSource source,
+								ExecutableConstraintLocation location,
+								String name) {
+		this(
+				source,
+				location,
+				name,
+				Collections.<MetaConstraint<?>>emptySet(),
+				Collections.<Class<?>, Class<?>>emptyMap(),
+				false
+		);
+	}
 
 	/**
 	 * Creates a new parameter meta data object.
