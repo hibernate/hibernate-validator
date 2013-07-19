@@ -25,7 +25,7 @@ package org.hibernate.validator.cfg.context;
  */
 public interface ParameterTarget {
 	/**
-	 * Changes the parameter for which added constraints apply.
+	 * Changes the parameter for which added constraints apply. A given parameter may only be configured once.
 	 *
 	 * @param index The parameter index.
 	 *
