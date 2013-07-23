@@ -135,7 +135,7 @@ public class ConstrainedExecutableBuilder {
 					defaultPackage
 			);
 
-			final Constructor<?> constructor = ReflectionHelper.getConstructor(
+			final Constructor<?> constructor = ReflectionHelper.getDeclaredConstructor(
 					beanClass,
 					constructorParameterTypes.toArray( new Class[constructorParameterTypes.size()] )
 			);

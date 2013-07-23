@@ -55,7 +55,10 @@ public class AnnotationFactory {
 	private static <T extends Annotation> T getProxyInstance(Class<T> proxyClass, InvocationHandler handler) throws
 			SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
 			IllegalAccessException, InvocationTargetException {
-		final Constructor<T> constructor = ReflectionHelper.getConstructor( proxyClass, InvocationHandler.class );
+		final Constructor<T> constructor = ReflectionHelper.getDeclaredConstructor(
+				proxyClass,
+				InvocationHandler.class
+		);
 		return ReflectionHelper.newConstructorInstance( constructor, handler );
 	}
 }
