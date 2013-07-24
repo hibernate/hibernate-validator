@@ -32,11 +32,10 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public final class ReturnValueConstraintMappingContextImpl
-		extends ConstraintMappingContextImplBase
+		extends CascadableConstraintMappingContextImplBase<ReturnValueConstraintMappingContext>
 		implements ReturnValueConstraintMappingContext {
 
 	private final ExecutableConstraintMappingContextImpl executableContext;
-	private boolean isCascaded;
 
 	public ReturnValueConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
 		super( executableContext.getTypeContext().getConstraintMapping() );
@@ -44,14 +43,13 @@ public final class ReturnValueConstraintMappingContextImpl
 	}
 
 	@Override
-	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		super.addConstraint( ConfiguredConstraint.forExecutable( definition, executableContext.getExecutable() ) );
+	protected ReturnValueConstraintMappingContext getThis() {
 		return this;
 	}
 
 	@Override
-	public ReturnValueConstraintMappingContext valid() {
-		isCascaded = true;
+	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
+		super.addConstraint( ConfiguredConstraint.forExecutable( definition, executableContext.getExecutable() ) );
 		return this;
 	}
 
@@ -63,10 +61,6 @@ public final class ReturnValueConstraintMappingContextImpl
 	@Override
 	public CrossParameterConstraintMappingContext crossParameter() {
 		return executableContext.crossParameter();
-	}
-
-	public boolean isCascaded() {
-		return isCascaded;
 	}
 
 	@Override

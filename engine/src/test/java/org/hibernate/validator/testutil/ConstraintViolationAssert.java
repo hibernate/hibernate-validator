@@ -29,6 +29,7 @@ import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.fest.assertions.Assertions;
 import org.fest.assertions.CollectionAssert;
 
 import static org.fest.assertions.Formatting.format;
@@ -72,17 +73,12 @@ public final class ConstraintViolationAssert {
 	 */
 	public static void assertCorrectConstraintViolationMessages(Set<? extends ConstraintViolation<?>> violations,
 																String... expectedMessages) {
-		List<String> expectedMessagesAsList = Arrays.asList( expectedMessages );
-
 		List<String> actualMessages = newArrayList();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualMessages.add( violation.getMessage() );
 		}
 
-		Collections.sort( expectedMessagesAsList );
-		Collections.sort( actualMessages );
-
-		assertEquals( actualMessages, expectedMessagesAsList );
+		Assertions.assertThat( actualMessages ).containsOnly( (Object[]) expectedMessages );
 	}
 
 	public static void assertCorrectConstraintViolationMessages(ConstraintViolationException e,

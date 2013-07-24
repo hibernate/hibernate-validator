@@ -31,6 +31,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -234,6 +235,50 @@ public class ConstraintMappingTest {
 		violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
 		assertConstraintViolation( violations.iterator().next(), "must be true" );
+	}
+
+	@Test
+	public void testValidWithGroupConversion() {
+		mapping.type( Marathon.class )
+				.property( "runners", METHOD )
+				.valid()
+				.convertGroup( Default.class ).to( Foo.class )
+				.type( Runner.class )
+				.property( "paidEntryFee", FIELD )
+				.constraint( new AssertTrueDef().groups( Foo.class ) );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "New York Marathon" );
+
+		marathon.addRunner( new Runner() );
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "must be true" );
+	}
+
+	@Test
+	public void testValidWithSeveralGroupConversions() {
+		mapping.type( Marathon.class )
+				.property( "runners", METHOD )
+				.valid()
+				.convertGroup( Default.class ).to( Foo.class )
+				.convertGroup( Bar.class ).to( Default.class )
+				.type( Runner.class )
+				.property( "paidEntryFee", FIELD )
+				.constraint( new AssertTrueDef().groups( Foo.class ) )
+				.constraint( new AssertTrueDef().message( "really, it must be true" ) );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "New York Marathon" );
+
+		marathon.addRunner( new Runner() );
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon, Default.class, Bar.class );
+		assertNumberOfViolations( violations, 2 );
+		assertCorrectConstraintViolationMessages( violations, "must be true", "really, it must be true" );
 	}
 
 	@Test(
@@ -513,6 +558,9 @@ public class ConstraintMappingTest {
 	}
 
 	private interface Foo {
+	}
+
+	private interface Bar {
 	}
 
 	@GroupSequence({ Foo.class, A.class })

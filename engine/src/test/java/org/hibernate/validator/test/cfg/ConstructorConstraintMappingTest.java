@@ -17,6 +17,7 @@
 package org.hibernate.validator.test.cfg;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -32,6 +33,7 @@ import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.executable.ExecutableValidator;
+import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -105,6 +107,33 @@ public class ConstructorConstraintMappingTest {
 				parameterValues
 		);
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
+		assertCorrectPropertyPaths( violations, "GreetingService.arg0.name" );
+	}
+
+	@Test
+	public void testCascadingConstructorParameterDefinitionWithGroupConversion() throws Exception {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.constructor( User.class )
+				.parameter( 0 )
+				.valid()
+				.convertGroup( Default.class ).to( TestGroup.class )
+				.type( User.class )
+				.property( "name", ElementType.FIELD )
+				.constraint( new NotNullDef().message( "name must not be null" ).groups( TestGroup.class ) );
+		config.addMapping( mapping );
+
+
+		Constructor<GreetingService> constructor = GreetingService.class.getConstructor( User.class );
+		Object[] parameterValues = new Object[] { new User( null ) };
+
+		ExecutableValidator executableValidator = getConfiguredExecutableValidator();
+
+		Set<ConstraintViolation<GreetingService>> violations = executableValidator.validateConstructorParameters(
+				constructor,
+				parameterValues
+		);
+		assertCorrectConstraintViolationMessages( violations, "name must not be null" );
 		assertCorrectPropertyPaths( violations, "GreetingService.arg0.name" );
 	}
 
@@ -396,6 +425,9 @@ public class ConstructorConstraintMappingTest {
 
 	private ExecutableValidator getConfiguredExecutableValidator() {
 		return config.buildValidatorFactory().getValidator().forExecutables();
+	}
+
+	public interface TestGroup {
 	}
 
 	public static class User {

@@ -16,7 +16,6 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.util.Collections;
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -39,19 +38,22 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public final class ParameterConstraintMappingContextImpl
-		extends ConstraintMappingContextImplBase
+		extends CascadableConstraintMappingContextImplBase<ParameterConstraintMappingContext>
 		implements ParameterConstraintMappingContext {
 
 	private final ExecutableConstraintMappingContextImpl executableContext;
 	private final int parameterIndex;
-	private boolean isCascading;
-
 
 	public ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
 		super( executableContext.getTypeContext().getConstraintMapping() );
 
 		this.executableContext = executableContext;
 		this.parameterIndex = parameterIndex;
+	}
+
+	@Override
+	protected ParameterConstraintMappingContext getThis() {
+		return this;
 	}
 
 	@Override
@@ -63,12 +65,6 @@ public final class ParameterConstraintMappingContextImpl
 						parameterIndex
 				)
 		);
-		return this;
-	}
-
-	@Override
-	public ParameterConstraintMappingContext valid() {
-		isCascading = true;
 		return this;
 	}
 
@@ -103,7 +99,7 @@ public final class ParameterConstraintMappingContextImpl
 				new ExecutableConstraintLocation( executableContext.getExecutable(), parameterIndex ),
 				executableContext.getExecutable().getParameterNames( parameterNameProvider ).get( parameterIndex ),
 				getConstraints( constraintHelper ),
-				Collections.<Class<?>, Class<?>>emptyMap(),
+				groupConversions,
 				isCascading
 		);
 	}

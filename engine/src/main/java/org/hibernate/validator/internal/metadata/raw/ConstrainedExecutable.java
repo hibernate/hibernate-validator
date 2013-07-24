@@ -60,6 +60,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param location The location of the represented executable.
 	 * @param returnValueConstraints The return value constraints of the represented executable, if
 	 * any.
+	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
 	 * return value shall be performed or not.
 	 */
@@ -67,6 +68,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			ConfigurationSource source,
 			ExecutableConstraintLocation location,
 			Set<MetaConstraint<?>> returnValueConstraints,
+			Map<Class<?>, Class<?>> groupConversions,
 			boolean isCascading) {
 		this(
 				source,
@@ -74,7 +76,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
-				Collections.<Class<?>, Class<?>>emptyMap(),
+				groupConversions,
 				isCascading
 		);
 	}

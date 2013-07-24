@@ -20,7 +20,6 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.Collections;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
@@ -43,17 +42,22 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public final class PropertyConstraintMappingContextImpl extends ConstraintMappingContextImplBase
+public final class PropertyConstraintMappingContextImpl
+		extends CascadableConstraintMappingContextImplBase<PropertyConstraintMappingContext>
 		implements PropertyConstraintMappingContext {
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
 	private final Member member;
-	private boolean isCascading;
 
 	public PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Member member) {
 		super( typeContext.getConstraintMapping() );
 		this.typeContext = typeContext;
 		this.member = member;
+	}
+
+	@Override
+	protected PropertyConstraintMappingContextImpl getThis() {
+		return this;
 	}
 
 	@Override
@@ -82,12 +86,6 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 	}
 
 	@Override
-	public PropertyConstraintMappingContext valid() {
-		isCascading = true;
-		return this;
-	}
-
-	@Override
 	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
 		return typeContext.property( property, elementType );
 	}
@@ -108,7 +106,7 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 					ConfigurationSource.API,
 					new BeanConstraintLocation( member ),
 					getConstraints( constraintHelper ),
-					Collections.<Class<?>, Class<?>>emptyMap(),
+					groupConversions,
 					isCascading
 			);
 		}
@@ -117,6 +115,7 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 					ConfigurationSource.API,
 					new ExecutableConstraintLocation( (Method) member ),
 					getConstraints( constraintHelper ),
+					groupConversions,
 					isCascading
 			);
 		}
