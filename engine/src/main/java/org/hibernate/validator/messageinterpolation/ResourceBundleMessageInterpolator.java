@@ -28,9 +28,9 @@ import org.hibernate.validator.internal.engine.messageinterpolation.Interpolatio
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
-import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenIterator;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.Token;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenCollector;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenIterator;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -91,17 +91,17 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private final ResourceBundleLocator defaultResourceBundleLocator;
 
 	/**
-	 * Step 1-4 of message interpolation can be cached. We do this in this map.
+	 * Step 1-3 of message interpolation can be cached. We do this in this map.
 	 */
 	private final ConcurrentReferenceHashMap<LocalizedMessage, String> resolvedMessages;
 
 	/**
-	 * TODO HV-637 - document
+	 * Step 4 of message interpolation replaces message parameters. The token list for message parameters is cached in this map.
 	 */
 	private final ConcurrentReferenceHashMap<String, List<Token>> tokenizedParameterMessages;
 
 	/**
-	 * TODO HV-637 - document
+	 * Step 5 of message interpolation replaces EL expressions. The token list for EL expressions is cached in this map.
 	 */
 	private final ConcurrentReferenceHashMap<String, List<Token>> tokenizedELMessages;
 
@@ -173,7 +173,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		try {
 			interpolatedMessage = interpolateMessage( message, context, defaultLocale );
 		}
-		catch (MessageDescriptorFormatException e) {
+		catch ( MessageDescriptorFormatException e ) {
 			log.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
@@ -185,7 +185,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		try {
 			interpolatedMessage = interpolateMessage( message, context, locale );
 		}
-		catch (ValidationException e) {
+		catch ( ValidationException e ) {
 			log.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
@@ -349,7 +349,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 				parameterValue = parameterName;
 			}
 		}
-		catch (MissingResourceException e) {
+		catch ( MissingResourceException e ) {
 			// return parameter itself
 			parameterValue = parameterName;
 		}

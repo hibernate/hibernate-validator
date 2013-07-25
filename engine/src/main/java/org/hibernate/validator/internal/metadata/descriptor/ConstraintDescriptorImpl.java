@@ -512,7 +512,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 					Class[].class
 			);
 		}
-		catch (ValidationException e) {
+		catch ( ValidationException e ) {
 			//ignore people not defining payloads
 			payloadFromAnnotation = null;
 		}
@@ -548,10 +548,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			try {
 				parameters.put( m.getName(), m.invoke( annotation ) );
 			}
-			catch (IllegalAccessException e) {
+			catch ( IllegalAccessException e ) {
 				throw log.getUnableToReadAnnotationAttributesException( annotation.getClass(), e );
 			}
-			catch (InvocationTargetException e) {
+			catch ( InvocationTargetException e ) {
 				throw log.getUnableToReadAnnotationAttributesException( annotation.getClass(), e );
 			}
 		}
@@ -564,10 +564,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			value = m.invoke( annotation );
 		}
 		// should never happen
-		catch (IllegalAccessException e) {
+		catch ( IllegalAccessException e ) {
 			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
 		}
-		catch (InvocationTargetException e) {
+		catch ( InvocationTargetException e ) {
 			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
 		}
 		return value;

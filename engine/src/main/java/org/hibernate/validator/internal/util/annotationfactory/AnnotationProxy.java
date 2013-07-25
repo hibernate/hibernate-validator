@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.internal.util.annotationfactory;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
@@ -35,6 +33,8 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 /**
  * A concrete implementation of <code>Annotation</code> that pretends it is a
  * "real" source code annotation. It's also an <code>InvocationHandler</code>.
@@ -51,7 +51,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Paolo Perrotta
  * @author Davide Marchignoli
  * @author Gunnar Morling
- *
  * @see java.lang.annotation.Annotation
  */
 public class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
@@ -67,54 +66,6 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 		this.annotationType = descriptor.type();
 		values = Collections.unmodifiableMap( getAnnotationValues( descriptor ) );
 		this.hashCode = calculateHashCode();
-	}
-
-	private Map<String, Object> getAnnotationValues(AnnotationDescriptor<?> descriptor) {
-		Map<String, Object> result = newHashMap();
-		int processedValuesFromDescriptor = 0;
-		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotationType );
-		for ( Method m : declaredMethods ) {
-			if ( descriptor.containsElement( m.getName() ) ) {
-				result.put( m.getName(), descriptor.valueOf( m.getName() ) );
-				processedValuesFromDescriptor++;
-			}
-			else if ( m.getDefaultValue() != null ) {
-				result.put( m.getName(), m.getDefaultValue() );
-			}
-			else {
-				throw log.getNoValueProvidedForAnnotationParameterException(
-						m.getName(),
-						annotationType.getSimpleName()
-				);
-			}
-		}
-		if ( processedValuesFromDescriptor != descriptor.numberOfElements() ) {
-
-			Set<String> unknownParameters = descriptor.getElements().keySet();
-			unknownParameters.removeAll( result.keySet() );
-
-			throw log.getTryingToInstantiateAnnotationWithUnknownParametersException(
-					annotationType,
-					unknownParameters
-			);
-		}
-		return result;
-	}
-
-	private Object getAnnotationMemberValue(Annotation annotation, String name) {
-		try {
-			return ReflectionHelper.getDeclaredMethod( annotation.annotationType(), name )
-					.invoke( annotation );
-		}
-		catch ( IllegalAccessException e ) {
-			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
-		}
-		catch ( IllegalArgumentException e ) {
-			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
-		}
-		catch ( InvocationTargetException e ) {
-			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
-		}
 	}
 
 	@Override
@@ -180,33 +131,6 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 		return hashCode;
 	}
 
-	private int calculateHashCode() {
-
-		int hashCode = 0;
-
-		for ( Entry<String, Object> member : values.entrySet() ) {
-			Object value = member.getValue();
-
-			int nameHashCode = member.getKey().hashCode();
-
-			int valueHashCode =
-					!value.getClass().isArray() ? value.hashCode() :
-					value.getClass() == boolean[].class ? Arrays.hashCode( (boolean[]) value ) :
-					value.getClass() == byte[].class ? Arrays.hashCode( (byte[]) value ) :
-					value.getClass() == char[].class ? Arrays.hashCode( (char[]) value ) :
-					value.getClass() == double[].class ? Arrays.hashCode( (double[]) value ) :
-					value.getClass() == float[].class ? Arrays.hashCode( (float[]) value ) :
-					value.getClass() == int[].class ? Arrays.hashCode( (int[]) value ) :
-					value.getClass() == long[].class ? Arrays.hashCode( (long[]) value ) :
-					value.getClass() == short[].class ? Arrays.hashCode( (short[]) value ) :
-					Arrays.hashCode( (Object[]) value );
-
-			hashCode += 127 * nameHashCode ^ valueHashCode;
-		}
-
-		return hashCode;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
@@ -226,6 +150,68 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 		return result.toString();
 	}
 
+
+	private Map<String, Object> getAnnotationValues(AnnotationDescriptor<?> descriptor) {
+		Map<String, Object> result = newHashMap();
+		int processedValuesFromDescriptor = 0;
+		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotationType );
+		for ( Method m : declaredMethods ) {
+			if ( descriptor.containsElement( m.getName() ) ) {
+				result.put( m.getName(), descriptor.valueOf( m.getName() ) );
+				processedValuesFromDescriptor++;
+			}
+			else if ( m.getDefaultValue() != null ) {
+				result.put( m.getName(), m.getDefaultValue() );
+			}
+			else {
+				throw log.getNoValueProvidedForAnnotationParameterException(
+						m.getName(),
+						annotationType.getSimpleName()
+				);
+			}
+		}
+		if ( processedValuesFromDescriptor != descriptor.numberOfElements() ) {
+
+			Set<String> unknownParameters = descriptor.getElements().keySet();
+			unknownParameters.removeAll( result.keySet() );
+
+			throw log.getTryingToInstantiateAnnotationWithUnknownParametersException(
+					annotationType,
+					unknownParameters
+			);
+		}
+		return result;
+	}
+
+	private int calculateHashCode() {
+		int hashCode = 0;
+
+		for ( Entry<String, Object> member : values.entrySet() ) {
+			Object value = member.getValue();
+
+			int nameHashCode = member.getKey().hashCode();
+
+			int valueHashCode =
+					!value.getClass().isArray() ? value.hashCode() :
+							value.getClass() == boolean[].class ? Arrays.hashCode( (boolean[]) value ) :
+									value.getClass() == byte[].class ? Arrays.hashCode( (byte[]) value ) :
+											value.getClass() == char[].class ? Arrays.hashCode( (char[]) value ) :
+													value.getClass() == double[].class ? Arrays.hashCode( (double[]) value ) :
+															value.getClass() == float[].class ? Arrays.hashCode( (float[]) value ) :
+																	value.getClass() == int[].class ? Arrays.hashCode( (int[]) value ) :
+																			value.getClass() == long[].class ? Arrays.hashCode(
+																					(long[]) value
+																			) :
+																					value.getClass() == short[].class ? Arrays
+																							.hashCode( (short[]) value ) :
+																							Arrays.hashCode( (Object[]) value );
+
+			hashCode += 127 * nameHashCode ^ valueHashCode;
+		}
+
+		return hashCode;
+	}
+
 	private SortedSet<String> getRegisteredMethodsInAlphabeticalOrder() {
 		SortedSet<String> result = new TreeSet<String>();
 		result.addAll( values.keySet() );
@@ -235,14 +221,48 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 	private boolean areEqual(Object o1, Object o2) {
 		return
 				!o1.getClass().isArray() ? o1.equals( o2 ) :
-				o1.getClass() == boolean[].class ? Arrays.equals( (boolean[]) o1, (boolean[]) o2 ) :
-				o1.getClass() == byte[].class ? Arrays.equals( (byte[]) o1, (byte[]) o2 ) :
-				o1.getClass() == char[].class ? Arrays.equals( (char[]) o1, (char[]) o2 ) :
-				o1.getClass() == double[].class ? Arrays.equals( (double[]) o1, (double[]) o2 ) :
-				o1.getClass() == float[].class ? Arrays.equals( (float[]) o1, (float[]) o2 ) :
-				o1.getClass() == int[].class ? Arrays.equals( (int[]) o1, (int[]) o2 ) :
-				o1.getClass() == long[].class ? Arrays.equals( (long[]) o1, (long[]) o2 ) :
-				o1.getClass() == short[].class ? Arrays.equals( (short[]) o1, (short[]) o2 ) :
-				Arrays.equals( (Object[]) o1, (Object[]) o2 );
+						o1.getClass() == boolean[].class ? Arrays.equals( (boolean[]) o1, (boolean[]) o2 ) :
+								o1.getClass() == byte[].class ? Arrays.equals( (byte[]) o1, (byte[]) o2 ) :
+										o1.getClass() == char[].class ? Arrays.equals( (char[]) o1, (char[]) o2 ) :
+												o1.getClass() == double[].class ? Arrays.equals(
+														(double[]) o1,
+														(double[]) o2
+												) :
+														o1.getClass() == float[].class ? Arrays.equals(
+																(float[]) o1,
+																(float[]) o2
+														) :
+																o1.getClass() == int[].class ? Arrays.equals(
+																		(int[]) o1,
+																		(int[]) o2
+																) :
+																		o1.getClass() == long[].class ? Arrays.equals(
+																				(long[]) o1,
+																				(long[]) o2
+																		) :
+																				o1.getClass() == short[].class ? Arrays.equals(
+																						(short[]) o1,
+																						(short[]) o2
+																				) :
+																						Arrays.equals(
+																								(Object[]) o1,
+																								(Object[]) o2
+																						);
+	}
+
+	private Object getAnnotationMemberValue(Annotation annotation, String name) {
+		try {
+			return ReflectionHelper.getDeclaredMethod( annotation.annotationType(), name )
+					.invoke( annotation );
+		}
+		catch ( IllegalAccessException e ) {
+			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
+		}
+		catch ( IllegalArgumentException e ) {
+			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
+		}
+		catch ( InvocationTargetException e ) {
+			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
+		}
 	}
 }

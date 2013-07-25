@@ -364,10 +364,10 @@ public class ValidationContext<T> {
 					context
 			);
 		}
-		catch (ValidationException ve) {
+		catch ( ValidationException ve ) {
 			throw ve;
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			throw log.getExceptionOcurredDuringMessageInterpolationException( e );
 		}
 	}

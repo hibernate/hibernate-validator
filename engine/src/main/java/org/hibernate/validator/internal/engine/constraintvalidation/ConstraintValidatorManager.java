@@ -244,7 +244,7 @@ public class ConstraintValidatorManager {
 		try {
 			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
-		catch (RuntimeException e) {
+		catch ( RuntimeException e ) {
 			throw log.getUnableToInitializeConstraintValidatorException( constraintValidator.getClass().getName(), e );
 		}
 	}
