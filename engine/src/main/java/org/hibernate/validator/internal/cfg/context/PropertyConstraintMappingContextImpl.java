@@ -27,6 +27,7 @@ import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -66,7 +67,7 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 		}
 		else {
 			super.addConstraint(
-					ConfiguredConstraint.forReturnValue(
+					ConfiguredConstraint.forExecutable(
 							definition, ExecutableElement.forMethod( (Method) member )
 					)
 			);
@@ -119,5 +120,10 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 					isCascading
 			);
 		}
+	}
+
+	@Override
+	protected ConstraintType getConstraintType() {
+		return ConstraintType.GENERIC;
 	}
 }

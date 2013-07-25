@@ -123,7 +123,7 @@ public class MethodConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: A valid parameter index has to be specified for method 'greet'"
+			expectedExceptionsMessageRegExp = "HV000015.*"
 	)
 	public void testCascadingDefinitionOnInvalidMethodParameter() {
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -610,6 +610,38 @@ public class MethodConstraintMappingTest {
 			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
 					pathWith().method( "greet" ).returnValue()
 			);
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-642")
+	public void crossParameterConstraint() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class, String.class )
+				.crossParameter()
+				.constraint(
+						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+								GenericAndCrossParameterConstraint.class
+						)
+				);
+		config.addMapping( mapping );
+
+		try {
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
+			service.greet( "", "" );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( ConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "default message"
+			);
+			assertCorrectPropertyPaths( e, "greet.<cross-parameter>" );
 		}
 	}
 

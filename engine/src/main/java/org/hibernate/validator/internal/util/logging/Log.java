@@ -641,4 +641,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 176,
 			value = "Constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
 	ValidationException getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String constructor);
+
+	@Message(id = 177,
+			value = "Cross-parameter constraints for the method or constructor %2$s of type %1$s are declared more than once via the programmatic constraint declaration API.")
+	ValidationException getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String executable);
 }

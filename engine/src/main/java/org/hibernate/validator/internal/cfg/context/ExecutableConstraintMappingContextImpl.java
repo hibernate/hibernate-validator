@@ -23,6 +23,7 @@ import java.util.List;
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
@@ -55,6 +56,7 @@ public class ExecutableConstraintMappingContextImpl
 	private final ExecutableElement executable;
 	private final ParameterConstraintMappingContextImpl[] parameterContexts;
 	private ReturnValueConstraintMappingContextImpl returnValueContext;
+	private CrossParameterConstraintMappingContextImpl crossParameterContext;
 
 	public ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Constructor<?> constructor) {
 		this( typeContext, ExecutableElement.forConstructor( constructor ) );
@@ -93,6 +95,19 @@ public class ExecutableConstraintMappingContextImpl
 	}
 
 	@Override
+	public CrossParameterConstraintMappingContext crossParameter() {
+		if ( crossParameterContext != null ) {
+			throw log.getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(
+					typeContext.getBeanClass().getName(),
+					executable.getAsString()
+			);
+		}
+
+		crossParameterContext = new CrossParameterConstraintMappingContextImpl( this );
+		return crossParameterContext;
+	}
+
+	@Override
 	public ReturnValueConstraintMappingContext returnValue() {
 		if ( returnValueContext != null ) {
 			throw log.getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(
@@ -118,7 +133,7 @@ public class ExecutableConstraintMappingContextImpl
 				ConfigurationSource.API,
 				new ExecutableConstraintLocation( executable ),
 				getParameters( constraintHelper, parameterNameProvider ),
-				Collections.<MetaConstraint<?>>emptySet(),
+				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
 				returnValueContext != null ? returnValueContext.isCascaded() : false

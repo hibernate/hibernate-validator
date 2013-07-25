@@ -25,6 +25,6 @@ package org.hibernate.validator.cfg.context;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public interface ReturnValueConstraintMappingContext
-		extends TypeTarget, ParameterTarget, ConstructorTarget, MethodTarget, Constrainable<ReturnValueConstraintMappingContext>, Cascadable<ReturnValueConstraintMappingContext> {
+		extends TypeTarget, ParameterTarget, CrossParameterTarget, ConstructorTarget, MethodTarget, Constrainable<ReturnValueConstraintMappingContext>, Cascadable<ReturnValueConstraintMappingContext> {
 
 }

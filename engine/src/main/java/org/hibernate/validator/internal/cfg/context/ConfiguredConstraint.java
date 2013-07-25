@@ -68,7 +68,7 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 		);
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A, ExecutableConstraintLocation> forReturnValue(ConstraintDef<?, A> constraint, ExecutableElement executable) {
+	public static <A extends Annotation> ConfiguredConstraint<A, ExecutableConstraintLocation> forExecutable(ConstraintDef<?, A> constraint, ExecutableElement executable) {
 		return new ConfiguredConstraint<A, ExecutableConstraintLocation>(
 				constraint, new ExecutableConstraintLocation( executable )
 		);

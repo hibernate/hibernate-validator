@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -17,10 +17,11 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * Constraint mapping creational context representing a method. Allows to
- * navigate to the method's parameters and return value.
+ * Constraint mapping creational context allowing to add cross-parameter constraints to a method or constructor and to
+ * navigate to other constraint targets.
  *
  * @author Gunnar Morling
  */
-public interface MethodConstraintMappingContext extends ParameterTarget, CrossParameterTarget, ReturnValueTarget {
+public interface CrossParameterConstraintMappingContext
+		extends TypeTarget, ConstructorTarget, MethodTarget, ParameterTarget, ReturnValueTarget, Constrainable<CrossParameterConstraintMappingContext> {
 }

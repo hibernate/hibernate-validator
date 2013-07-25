@@ -32,6 +32,7 @@ import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -234,5 +235,10 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	public Class<?> getBeanClass() {
 		return beanClass;
+	}
+
+	@Override
+	protected ConstraintType getConstraintType() {
+		return ConstraintType.GENERIC;
 	}
 }

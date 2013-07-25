@@ -21,10 +21,12 @@ import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
@@ -64,34 +66,22 @@ public final class ParameterConstraintMappingContextImpl
 		return this;
 	}
 
-	/**
-	 * Marks the currently selected method parameter as cascadable.
-	 *
-	 * @return Returns itself for method chaining.
-	 */
 	@Override
 	public ParameterConstraintMappingContext valid() {
 		isCascading = true;
 		return this;
 	}
 
-	/**
-	 * Changes the parameter for which added constraints apply.
-	 *
-	 * @param index The parameter index.
-	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
-	 */
 	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
 		return executableContext.parameter( index );
 	}
 
-	/**
-	 * Defines constraints on the return value of the current method.
-	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
-	 */
+	@Override
+	public CrossParameterConstraintMappingContext crossParameter() {
+		return executableContext.crossParameter();
+	}
+
 	@Override
 	public ReturnValueConstraintMappingContext returnValue() {
 		return executableContext.returnValue();
@@ -116,5 +106,10 @@ public final class ParameterConstraintMappingContextImpl
 				Collections.<Class<?>, Class<?>>emptyMap(),
 				isCascading
 		);
+	}
+
+	@Override
+	protected ConstraintType getConstraintType() {
+		return ConstraintType.GENERIC;
 	}
 }

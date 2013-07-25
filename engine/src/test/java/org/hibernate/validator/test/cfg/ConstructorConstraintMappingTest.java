@@ -367,6 +367,33 @@ public class ConstructorConstraintMappingTest {
 		assertCorrectPropertyPaths( violations, "GreetingService.<return value>" );
 	}
 
+	@Test
+	public void crossParameterConstraint() throws Exception {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.constructor( String.class, String.class )
+				.crossParameter()
+				.constraint(
+						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+								GenericAndCrossParameterConstraint.class
+						)
+				);
+		config.addMapping( mapping );
+
+		Constructor<GreetingService> constructor = GreetingService.class.getConstructor( String.class, String.class );
+		Object[] parameterValues = new Object[] { "", "" };
+
+		ExecutableValidator executableValidator = getConfiguredExecutableValidator();
+
+		Set<ConstraintViolation<GreetingService>> violations = executableValidator.validateConstructorParameters(
+				constructor,
+				parameterValues
+		);
+
+		assertCorrectConstraintViolationMessages( violations, "default message" );
+		assertCorrectPropertyPaths( violations, "GreetingService.<cross-parameter>" );
+	}
+
 	private ExecutableValidator getConfiguredExecutableValidator() {
 		return config.buildValidatorFactory().getValidator().forExecutables();
 	}
