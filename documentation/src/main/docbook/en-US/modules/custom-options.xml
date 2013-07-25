@@ -253,7 +253,7 @@ constraintMapping
 			.constraint( new SizeDef().min( 2 ).max( 14 ) )
 	.type( RentalCar.class )
 		.property( "rentalStation", METHOD )
-				.constraint( new NotNullDef() );
+			.constraint( new NotNullDef() );
 
 Validator validator = configuration.addMapping( constraintMapping )
 		.buildValidatorFactory()
@@ -305,10 +305,13 @@ constraintMapping
 			); </programlisting>
     </example>
 
-    <para>By invoking <methodname>valid()</methodname> a member is marked for
-    cascaded validation which is equivalent to annotating it with
-    <classname>@Valid</classname>. An example can be seen in <xref lang=""
-    linkend="example-cascading-constraints"/>.</para>
+    <para>By invoking <methodname>valid()</methodname> you can mark a member
+    for cascaded validation which is equivalent to annotating it with
+    <classname>@Valid</classname>. Configure any group conversions to be
+    applied during cascaded validation using the
+    <methodname>convertGroup()</methodname> method (equivalent to
+    <classname>@ConvertGroup</classname>). An example can be seen in <xref
+    lang="" linkend="example-cascading-constraints"/>.</para>
 
     <example id="example-cascading-constraints">
       <title>Marking a property for cascaded validation</title>
@@ -320,32 +323,47 @@ constraintMapping
 		.property( "driver", FIELD )
 			.constraint( new NotNullDef() )
 			.valid()
+			.convertGroup( Default.class ).to( PersonDefault.class )
 	.type( Person.class )
 		.property( "name", FIELD )
-			.constraint( new NotNullDef() );</programlisting>
+			.constraint( new NotNullDef().groups( PersonDefault.class ) );</programlisting>
     </example>
 
-    <para>Not only bean constraints but also method constraints can be
-    configured using the fluent API. As shown in <xref lang=""
-    linkend="example-method-constraint-mapping"/> methods are identified by
-    their name and parameter types. Having selected a method, you can mark its
-    parameters and/or return value for cascaded validation and add
-    constraints.</para>
+    <para>You can not only configure bean constraints using the fluent API but
+    also method and constructor constraints. As shown in <xref lang=""
+    linkend="example-method-constraint-mapping"/> constructors are identified
+    by their parameter types and methods by their name and parameter types.
+    Having selected a method or constructor, you can mark its parameters
+    and/or return value for cascaded validation and add constraints as well as
+    cross-parameter constraints.</para>
 
     <example id="example-method-constraint-mapping">
-      <title>Programmatic declaration of method constraints</title>
+      <title>Programmatic declaration of method and constructor
+      constraints</title>
 
       <programlisting language="JAVA" role="JAVA">ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
 constraintMapping
 	.type( Car.class )
+		.constructor( String.class )
+			.parameter( 0 )
+				.constraint( new SizeDef().min( 3 ).max( 50 ) )
+			.returnValue()
+				.valid()
 		.method( "drive", int.class )
 			.parameter( 0 )
 				.constraint( new MaxDef().value ( 75 ) )
+		.method( "load", List.class, List.class )
+			.crossParameter()
+				.constraint( new GenericConstraintDef&lt;LuggageCountMatchesPassengerCount&gt;(
+						LuggageCountMatchesPassengerCount.class ).param(
+							"piecesOfLuggagePerPassenger", 2
+						)
+				)
 		.method( "getDriver" )
 			.returnValue()
 				.constraint( new NotNullDef() )
-				.valid();     </programlisting>
+				.valid();</programlisting>
     </example>
 
     <para>Last but not least you can configure the default group sequence or
