@@ -24,6 +24,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.validation.MessageInterpolator;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
@@ -250,7 +252,6 @@ public class ResourceBundleMessageInterpolatorTest {
 		descriptor.setValue( "value", 10L );
 		Max max = AnnotationFactory.create( descriptor );
 
-
 		ConstraintDescriptorImpl<Max> constraintDescriptor = new ConstraintDescriptorImpl<Max>(
 				new ConstraintHelper(),
 				null,
@@ -270,49 +271,17 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 	}
 
+	@Test(expectedExceptions = RuntimeException.class,
+			expectedExceptionsMessageRegExp = "ReadOnceOnlyResourceBundle can only be accessed once!")
+	@TestForIssue(jiraKey = "HV-330")
+	public void testResourceBundleGetsAccessedMultipleTimesWhenCachingIsDisabled() {
+		runInterpolation( false );
+	}
+
 	@Test
 	@TestForIssue(jiraKey = "HV-330")
-	public void testMessageCaching() {
-		// do the whole tests first with caching enabled
-		TestResourceBundle testBundle = new TestResourceBundle();
-		interpolator = new ResourceBundleMessageInterpolator(
-				new TestResourceBundleLocator( testBundle )
-		);
-		MessageInterpolator.Context messageInterpolatorContext = createMessageInterpolatorContext( notNullDescriptor );
-
-		String expected = "{hv-330}";
-		String actual = interpolator.interpolate( "{hv-330}", messageInterpolatorContext );
-		assertEquals( actual, expected, "The key should not not exist in the bundle." );
-
-		testBundle.addOrUpdateMessage( "hv-330", "success" );
-		expected = "{hv-330}";
-		actual = interpolator.interpolate( "{hv-330}", messageInterpolatorContext );
-		assertEquals(
-				actual,
-				expected,
-				"The message has not changed since per default the ResourceBundleMessageInterpolator caches the messages"
-		);
-
-		// now without caching
-		testBundle = new TestResourceBundle();
-		interpolator = new ResourceBundleMessageInterpolator(
-				new TestResourceBundleLocator( testBundle ), false
-		);
-
-		messageInterpolatorContext = createMessageInterpolatorContext( notNullDescriptor );
-
-		expected = "{hv-330}";
-		actual = interpolator.interpolate( "{hv-330}", messageInterpolatorContext );
-		assertEquals( actual, expected, "The key should not not exist in the bundle." );
-
-		testBundle.addOrUpdateMessage( "hv-330", "success" );
-		expected = "success";
-		actual = interpolator.interpolate( "{hv-330}", messageInterpolatorContext );
-		assertEquals(
-				actual,
-				expected,
-				"The message should change since ResourceBundleMessageInterpolator does not cache"
-		);
+	public void testResourceBundleGetsAccessedOnlyOnceWhenCachingIsEnabled() {
+		runInterpolation( true );
 	}
 
 	private MessageInterpolatorContext createMessageInterpolatorContext(ConstraintDescriptorImpl<?> descriptor) {
@@ -324,8 +293,23 @@ public class ResourceBundleMessageInterpolatorTest {
 		);
 	}
 
+	private void runInterpolation(boolean cachingEnabled) {
+		ReadOnceOnlyResourceBundle testBundle = new ReadOnceOnlyResourceBundle();
+		interpolator = new ResourceBundleMessageInterpolator(
+				new TestResourceBundleLocator( testBundle ), cachingEnabled
+		);
+		MessageInterpolator.Context messageInterpolatorContext = createMessageInterpolatorContext( notNullDescriptor );
+
+		// the ReadOnceOnlyResourceBundle will throw an exception in case the bundle is read more than once!
+		for ( int i = 0; i < 3; i++ ) {
+			String expected = "fixed";
+			String actual = interpolator.interpolate( "{hv-330}", messageInterpolatorContext );
+			assertEquals( actual, expected, "Wrong interpolation" );
+		}
+	}
+
 	/**
-	 * A dummy locator always returning a {@link TestResourceBundle}.
+	 * A dummy locator always returning a {@link org.hibernate.validator.test.internal.engine.messageinterpolation.ResourceBundleMessageInterpolatorTest.ReadOnceOnlyResourceBundle}.
 	 */
 	private static class TestResourceBundleLocator implements ResourceBundleLocator {
 
@@ -389,10 +373,50 @@ public class ResourceBundleMessageInterpolatorTest {
 				throw new NoSuchElementException();
 			}
 		}
+	}
 
-		public void addOrUpdateMessage(String key, String message) {
-			testResources.put( key, message );
-			iter = testResources.keySet().iterator();
+	/**
+	 * A dummy resource bundle which can be passed to the constructor of ResourceBundleMessageInterpolator to replace
+	 * the user specified resource bundle.
+	 */
+	private static class ReadOnceOnlyResourceBundle extends ResourceBundle {
+		private AtomicInteger counter;
+		private final String key = "hv-330";
+		private final String value = "fixed";
+
+		public ReadOnceOnlyResourceBundle() {
+			counter = new AtomicInteger( 1 );
+		}
+
+		@Override
+		public Object handleGetObject(String key) {
+			if ( counter.decrementAndGet() < 0 ) {
+				throw new RuntimeException( "ReadOnceOnlyResourceBundle can only be accessed once!" );
+			}
+			if ( this.key.equals( key ) ) {
+				return value;
+			}
+			else {
+				throw new RuntimeException( "Unexpected key: " + key );
+			}
+
+		}
+
+		@Override
+		public Enumeration<String> getKeys() {
+			return new Enumeration<String>() {
+				AtomicBoolean hasMoreElements = new AtomicBoolean( Boolean.TRUE );
+
+				@Override
+				public boolean hasMoreElements() {
+					return hasMoreElements.getAndSet( Boolean.FALSE );
+				}
+
+				@Override
+				public String nextElement() {
+					return value;
+				}
+			};
 		}
 	}
 }

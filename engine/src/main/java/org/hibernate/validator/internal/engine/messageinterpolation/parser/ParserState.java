@@ -23,18 +23,18 @@ package org.hibernate.validator.internal.engine.messageinterpolation.parser;
  * @author Hardy Ferentschik
  */
 public interface ParserState {
-	void start(ParserContext context) throws MessageDescriptorFormatException;
+	void start(TokenCollector tokenCollector) throws MessageDescriptorFormatException;
 
-	void terminate(ParserContext context) throws MessageDescriptorFormatException;
+	void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException;
 
-	void handleNonMetaCharacter(char character, ParserContext context) throws MessageDescriptorFormatException;
+	void handleNonMetaCharacter(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException;
 
-	void handleBeginTerm(char character, ParserContext context) throws MessageDescriptorFormatException;
+	void handleBeginTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException;
 
-	void handleEndTerm(char character, ParserContext context) throws MessageDescriptorFormatException;
+	void handleEndTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException;
 
-	void handleEscapeCharacter(char character, ParserContext context) throws MessageDescriptorFormatException;
+	void handleEscapeCharacter(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException;
 
-	void handleELDesignator(char character, ParserContext context) throws MessageDescriptorFormatException;
+	void handleELDesignator(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException;
 }
 

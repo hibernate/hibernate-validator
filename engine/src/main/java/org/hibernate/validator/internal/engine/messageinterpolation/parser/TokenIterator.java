@@ -16,14 +16,15 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
-
 /**
+ * Allows to iterate over a list of message tokens and replace parameters.
+ *
  * @author Hardy Ferentschik
  */
-public class MessageDescriptorParser {
+public class TokenIterator {
 	private final List<Token> tokenList;
 
 	private int currentPosition;
@@ -31,21 +32,8 @@ public class MessageDescriptorParser {
 	private boolean allInterpolationTermsProcessed;
 	private boolean currentTokenAvailable;
 
-	public static MessageDescriptorParser forExpressionLanguage(String messageDescriptor)
-			throws MessageDescriptorFormatException {
-		return new MessageDescriptorParser( messageDescriptor, InterpolationTermType.EL );
-	}
-
-	public static MessageDescriptorParser forParameter(String messageDescriptor)
-			throws MessageDescriptorFormatException {
-		return new MessageDescriptorParser( messageDescriptor, InterpolationTermType.PARAMETER );
-	}
-
-	private MessageDescriptorParser(String messageDescriptor, InterpolationTermType interpolationTermType)
-			throws MessageDescriptorFormatException {
-		ParserContext context = new ParserContext( messageDescriptor, interpolationTermType );
-		context.parse();
-		this.tokenList = context.getTokenList();
+	public TokenIterator(List<Token> tokens) {
+		this.tokenList = new ArrayList<Token>( tokens );
 	}
 
 	/**

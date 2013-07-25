@@ -16,6 +16,7 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
@@ -23,9 +24,12 @@ import org.hibernate.validator.internal.engine.messageinterpolation.Interpolatio
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
+ * Used to creates a list of tokens from a message descriptor.
+ *
  * @author Hardy Ferentschik
+ * @see Token
  */
-public class ParserContext {
+public class TokenCollector {
 	public static final char BEGIN_TERM = '{';
 	public static final char END_TERM = '}';
 	public static final char EL_DESIGNATOR = '$';
@@ -39,11 +43,14 @@ public class ParserContext {
 	private int currentPosition;
 	private Token currentToken;
 
-	public ParserContext(String originalMessageDescriptor, InterpolationTermType interpolationTermType) {
+	public TokenCollector(String originalMessageDescriptor, InterpolationTermType interpolationTermType)
+			throws MessageDescriptorFormatException {
 		this.originalMessageDescriptor = originalMessageDescriptor;
 		this.interpolationTermType = interpolationTermType;
 		this.currentParserState = new BeginState();
 		this.tokenList = newArrayList();
+
+		parse();
 	}
 
 	public void terminateToken() {
@@ -111,7 +118,7 @@ public class ParserContext {
 	}
 
 	public List<Token> getTokenList() {
-		return tokenList;
+		return Collections.unmodifiableList( tokenList );
 	}
 
 	public String getOriginalMessageDescriptor() {

@@ -16,23 +16,28 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentMap;
 import javax.validation.MessageInterpolator;
 import javax.xml.bind.ValidationException;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
+import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
-import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorParser;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenIterator;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.Token;
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenCollector;
+import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 /**
  * Resource bundle backed message interpolator.
@@ -44,6 +49,21 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newConcurre
  */
 public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private static final Log log = LoggerFactory.make();
+
+	/**
+	 * The default initial capacity for this cache.
+	 */
+	private static final int DEFAULT_INITIAL_CAPACITY = 100;
+
+	/**
+	 * The default load factor for this cache.
+	 */
+	private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+	/**
+	 * The default concurrency level for this cache.
+	 */
+	private static final int DEFAULT_CONCURRENCY_LEVEL = 16;
 
 	/**
 	 * The name of the default message bundle.
@@ -71,14 +91,24 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 	private final ResourceBundleLocator defaultResourceBundleLocator;
 
 	/**
-	 * Step 1-3 of message interpolation can be cached. We do this in this map.
+	 * Step 1-4 of message interpolation can be cached. We do this in this map.
 	 */
-	private final ConcurrentMap<LocalizedMessage, String> resolvedMessages = newConcurrentHashMap();
+	private final ConcurrentReferenceHashMap<LocalizedMessage, String> resolvedMessages;
 
 	/**
-	 * Flag indicating whether this interpolator should chance some of the interpolation steps.
+	 * TODO HV-637 - document
 	 */
-	private final boolean cacheMessages;
+	private final ConcurrentReferenceHashMap<String, List<Token>> tokenizedParameterMessages;
+
+	/**
+	 * TODO HV-637 - document
+	 */
+	private final ConcurrentReferenceHashMap<String, List<Token>> tokenizedELMessages;
+
+	/**
+	 * Flag indicating whether this interpolator should cache some of the interpolation steps.
+	 */
+	private final boolean cachingEnabled;
 
 	public ResourceBundleMessageInterpolator() {
 		this( null );
@@ -99,7 +129,40 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		}
 
 		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES );
-		this.cacheMessages = cacheMessages;
+		this.cachingEnabled = cacheMessages;
+
+		if ( cachingEnabled ) {
+			this.resolvedMessages = new ConcurrentReferenceHashMap<LocalizedMessage, String>(
+					DEFAULT_INITIAL_CAPACITY,
+					DEFAULT_LOAD_FACTOR,
+					DEFAULT_CONCURRENCY_LEVEL,
+					SOFT,
+					SOFT,
+					EnumSet.noneOf( ConcurrentReferenceHashMap.Option.class )
+			);
+			this.tokenizedParameterMessages = new ConcurrentReferenceHashMap<String, List<Token>>(
+					DEFAULT_INITIAL_CAPACITY,
+					DEFAULT_LOAD_FACTOR,
+					DEFAULT_CONCURRENCY_LEVEL,
+					SOFT,
+					SOFT,
+					EnumSet.noneOf( ConcurrentReferenceHashMap.Option.class )
+			);
+			this.tokenizedELMessages = new ConcurrentReferenceHashMap<String, List<Token>>(
+					DEFAULT_INITIAL_CAPACITY,
+					DEFAULT_LOAD_FACTOR,
+					DEFAULT_CONCURRENCY_LEVEL,
+					SOFT,
+					SOFT,
+					EnumSet.noneOf( ConcurrentReferenceHashMap.Option.class )
+			);
+		}
+		else {
+			resolvedMessages = null;
+			tokenizedParameterMessages = null;
+			tokenizedELMessages = null;
+		}
+
 	}
 
 	@Override
@@ -110,8 +173,8 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		try {
 			interpolatedMessage = interpolateMessage( message, context, defaultLocale );
 		}
-		catch ( MessageDescriptorFormatException e ) {
-			log.warn(e.getMessage());
+		catch (MessageDescriptorFormatException e) {
+			log.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
 	}
@@ -122,8 +185,8 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		try {
 			interpolatedMessage = interpolateMessage( message, context, locale );
 		}
-		catch ( ValidationException e ) {
-			log.warn(e.getMessage());
+		catch (ValidationException e) {
+			log.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
 	}
@@ -146,7 +209,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		LocalizedMessage localisedMessage = new LocalizedMessage( message, locale );
 		String resolvedMessage = null;
 
-		if ( cacheMessages ) {
+		if ( cachingEnabled ) {
 			resolvedMessage = resolvedMessages.get( localisedMessage );
 		}
 
@@ -185,7 +248,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		}
 
 		// cache resolved message
-		if ( cacheMessages ) {
+		if ( cachingEnabled ) {
 			String cachedResolvedMessage = resolvedMessages.putIfAbsent( localisedMessage, resolvedMessage );
 			if ( cachedResolvedMessage != null ) {
 				resolvedMessage = cachedResolvedMessage;
@@ -193,15 +256,37 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		}
 
 		// resolve parameter expressions (step 4)
+		List<Token> tokens = null;
+		if ( cachingEnabled ) {
+			tokens = tokenizedParameterMessages.get( resolvedMessage );
+		}
+		if ( tokens == null ) {
+			TokenCollector tokenCollector = new TokenCollector( resolvedMessage, InterpolationTermType.PARAMETER );
+			tokens = tokenCollector.getTokenList();
+		}
+		if ( cachingEnabled ) {
+			tokenizedParameterMessages.putIfAbsent( resolvedMessage, tokens );
+		}
 		resolvedMessage = interpolateExpression(
-				MessageDescriptorParser.forParameter( resolvedMessage ),
+				new TokenIterator( tokens ),
 				context,
 				locale
 		);
 
 		// resolve EL expressions (step 5)
+		tokens = null;
+		if ( cachingEnabled ) {
+			tokens = tokenizedELMessages.get( resolvedMessage );
+		}
+		if ( tokens == null ) {
+			TokenCollector tokenCollector = new TokenCollector( resolvedMessage, InterpolationTermType.EL );
+			tokens = tokenCollector.getTokenList();
+		}
+		if ( cachingEnabled ) {
+			tokenizedELMessages.putIfAbsent( resolvedMessage, tokens );
+		}
 		resolvedMessage = interpolateExpression(
-				MessageDescriptorParser.forExpressionLanguage( resolvedMessage ),
+				new TokenIterator( tokens ),
 				context,
 				locale
 		);
@@ -226,27 +311,28 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 
 	private String interpolateBundleMessage(String message, ResourceBundle bundle, Locale locale, boolean recursive)
 			throws MessageDescriptorFormatException {
-		MessageDescriptorParser descriptorParser = MessageDescriptorParser.forParameter( message );
-		while ( descriptorParser.hasMoreInterpolationTerms() ) {
-			String term = descriptorParser.nextInterpolationTerm();
+		TokenCollector tokenCollector = new TokenCollector( message, InterpolationTermType.PARAMETER );
+		TokenIterator tokenIterator = new TokenIterator( tokenCollector.getTokenList() );
+		while ( tokenIterator.hasMoreInterpolationTerms() ) {
+			String term = tokenIterator.nextInterpolationTerm();
 			String resolvedParameterValue = resolveParameter(
 					term, bundle, locale, recursive
 			);
-			descriptorParser.replaceCurrentInterpolationTerm( resolvedParameterValue );
+			tokenIterator.replaceCurrentInterpolationTerm( resolvedParameterValue );
 		}
-		return descriptorParser.getInterpolatedMessage();
+		return tokenIterator.getInterpolatedMessage();
 	}
 
-	private String interpolateExpression(MessageDescriptorParser descriptorParser, Context context, Locale locale)
+	private String interpolateExpression(TokenIterator tokenIterator, Context context, Locale locale)
 			throws MessageDescriptorFormatException {
-		while ( descriptorParser.hasMoreInterpolationTerms() ) {
-			String term = descriptorParser.nextInterpolationTerm();
+		while ( tokenIterator.hasMoreInterpolationTerms() ) {
+			String term = tokenIterator.nextInterpolationTerm();
 
 			InterpolationTerm expression = new InterpolationTerm( term, locale );
 			String resolvedExpression = expression.interpolate( context );
-			descriptorParser.replaceCurrentInterpolationTerm( resolvedExpression );
+			tokenIterator.replaceCurrentInterpolationTerm( resolvedExpression );
 		}
-		return descriptorParser.getInterpolatedMessage();
+		return tokenIterator.getInterpolatedMessage();
 	}
 
 	private String resolveParameter(String parameterName, ResourceBundle bundle, Locale locale, boolean recursive)
@@ -263,7 +349,7 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 				parameterValue = parameterName;
 			}
 		}
-		catch ( MissingResourceException e ) {
+		catch (MissingResourceException e) {
 			// return parameter itself
 			parameterValue = parameterName;
 		}
