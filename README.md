@@ -38,18 +38,13 @@ Logging will delegate any log requests to that provider.
             <version>5.0.1.Final</version>
         </dependency>
 
-      You also need an API and implementation of the Unified Expression Language. This dependencies must be explicitly added in an SE environment.
+      You also need an API and implementation of the Unified Expression Language. These dependencies must be explicitly added in an SE environment.
       In an EE environment they are often already provided.
 
         <dependency>
-           <groupId>javax.el</groupId>
-           <artifactId>javax.el-api</artifactId>
-           <version>2.2.4</version>
-        </dependency>
-        <dependency>
-           <groupId>org.glassfish.web</groupId>
-           <artifactId>javax.el</artifactId>
-           <version>2.2.4</version>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.0</version>
         </dependency>
 
 * Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs

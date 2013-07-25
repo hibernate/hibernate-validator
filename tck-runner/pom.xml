@@ -15,7 +15,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -31,12 +33,12 @@
     <description>Aggregates dependencies and runs the JSR-303 TCK</description>
     <properties>
         <tck.version>1.1.0.Final</tck.version>
-        <tck.suite.file>src/test/resources/tck-tests-without-RI-and-AS-failures.xml</tck.suite.file>
+        <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
         <arquillian.version>1.0.0.Final</arquillian.version>
         <wildfly.version>8.0.0.Alpha3</wildfly.version>
         <jbossTargetDir>${project.build.directory}/wildfly-${wildfly.version}</jbossTargetDir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
-        <remote.debug />
+        <remote.debug/>
     </properties>
 
     <dependencies>
@@ -261,27 +263,7 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>copy-beanvalidation-api</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>
-                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/javax/validation/api/main
-                                    </outputDirectory>
-                                    <stripVersion>false</stripVersion>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>javax.validation</groupId>
-                                            <artifactId>validation-api</artifactId>
-                                            <destFileName>validation-api-${bv.api.version}.jar</destFileName>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>copy-hv</id>
+                                <id>copy-hv-snapshot</id>
                                 <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>copy</goal>
@@ -299,23 +281,22 @@
                                     </artifactItems>
                                 </configuration>
                             </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <executions>
                             <execution>
-                                <id>copy-classmate</id>
-                                <phase>process-test-resources</phase>
+                                <id>copy-modules</id>
+                                <phase>generate-test-resources</phase>
                                 <goals>
-                                    <goal>copy</goal>
+                                    <goal>execute</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>
-                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/com/fasterxml/classmate/main
-                                    </outputDirectory>
-                                    <stripVersion>false</stripVersion>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>com.fasterxml</groupId>
-                                            <artifactId>classmate</artifactId>
-                                        </artifactItem>
-                                    </artifactItems>
+                                    <source>
+                                        $ { pom.basedir } / src / script / setupAsModules.groovy
+                                    </source>
                                 </configuration>
                             </execution>
                         </executions>
