@@ -35,6 +35,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -141,7 +142,10 @@ public class ConstrainedExecutableBuilder {
 			);
 
 			if ( constructor == null ) {
-				throw log.getBeanDoesNotContainConstructorException( beanClass.getName(), constructorParameterTypes );
+				throw log.getBeanDoesNotContainConstructorException(
+						beanClass.getName(),
+						StringHelper.join( constructorParameterTypes, ", " )
+				);
 			}
 			if ( alreadyProcessedConstructors.contains( constructor ) ) {
 				throw log.getConstructorIsDefinedTwiceInMappingXmlForBeanException(

@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -32,6 +33,7 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -65,7 +67,7 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 		else {
 			super.addConstraint(
 					ConfiguredConstraint.forReturnValue(
-							definition, (Method) member
+							definition, ExecutableElement.forMethod( (Method) member )
 					)
 			);
 		}
@@ -87,6 +89,11 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 	@Override
 	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
 		return typeContext.property( property, elementType );
+	}
+
+	@Override
+	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
+		return typeContext.constructor( parameterTypes );
 	}
 
 	@Override

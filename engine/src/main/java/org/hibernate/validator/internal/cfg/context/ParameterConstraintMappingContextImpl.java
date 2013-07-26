@@ -20,6 +20,7 @@ import java.util.Collections;
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
@@ -39,15 +40,15 @@ public final class ParameterConstraintMappingContextImpl
 		extends ConstraintMappingContextImplBase
 		implements ParameterConstraintMappingContext {
 
-	private final MethodConstraintMappingContextImpl methodContext;
+	private final ExecutableConstraintMappingContextImpl executableContext;
 	private final int parameterIndex;
 	private boolean isCascading;
 
 
-	public ParameterConstraintMappingContextImpl(MethodConstraintMappingContextImpl methodContext, int parameterIndex) {
-		super( methodContext.getTypeContext().getConstraintMapping() );
+	public ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
+		super( executableContext.getTypeContext().getConstraintMapping() );
 
-		this.methodContext = methodContext;
+		this.executableContext = executableContext;
 		this.parameterIndex = parameterIndex;
 	}
 
@@ -56,7 +57,7 @@ public final class ParameterConstraintMappingContextImpl
 		super.addConstraint(
 				ConfiguredConstraint.forParameter(
 						definition,
-						methodContext.getMethod(),
+						executableContext.getExecutable(),
 						parameterIndex
 				)
 		);
@@ -83,7 +84,7 @@ public final class ParameterConstraintMappingContextImpl
 	 */
 	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
-		return methodContext.parameter( index );
+		return executableContext.parameter( index );
 	}
 
 	/**
@@ -93,19 +94,24 @@ public final class ParameterConstraintMappingContextImpl
 	 */
 	@Override
 	public ReturnValueConstraintMappingContext returnValue() {
-		return methodContext.returnValue();
+		return executableContext.returnValue();
+	}
+
+	@Override
+	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
+		return executableContext.getTypeContext().constructor( parameterTypes );
 	}
 
 	@Override
 	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
-		return methodContext.getTypeContext().method( name, parameterTypes );
+		return executableContext.getTypeContext().method( name, parameterTypes );
 	}
 
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
 		return new ConstrainedParameter(
 				ConfigurationSource.API,
-				new ExecutableConstraintLocation( methodContext.getMethod(), parameterIndex ),
-				parameterNameProvider.getParameterNames( methodContext.getMethod() ).get( parameterIndex ),
+				new ExecutableConstraintLocation( executableContext.getExecutable(), parameterIndex ),
+				executableContext.getExecutable().getParameterNames( parameterNameProvider ).get( parameterIndex ),
 				getConstraints( constraintHelper ),
 				Collections.<Class<?>, Class<?>>emptyMap(),
 				isCascading

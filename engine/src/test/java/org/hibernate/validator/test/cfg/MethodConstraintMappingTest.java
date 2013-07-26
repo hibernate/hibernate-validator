@@ -51,7 +51,6 @@ import static org.testng.Assert.fail;
  *
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-@Test
 public class MethodConstraintMappingTest {
 	private HibernateValidatorConfiguration config;
 	private GreetingService wrappedObject;

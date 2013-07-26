@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
@@ -32,17 +33,17 @@ public final class ReturnValueConstraintMappingContextImpl
 		extends ConstraintMappingContextImplBase
 		implements ReturnValueConstraintMappingContext {
 
-	private final MethodConstraintMappingContextImpl methodContext;
+	private final ExecutableConstraintMappingContextImpl executableContext;
 	private boolean isCascaded;
 
-	public ReturnValueConstraintMappingContextImpl(MethodConstraintMappingContextImpl methodContext) {
-		super( methodContext.getTypeContext().getConstraintMapping() );
-		this.methodContext = methodContext;
+	public ReturnValueConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
+		super( executableContext.getTypeContext().getConstraintMapping() );
+		this.executableContext = executableContext;
 	}
 
 	@Override
 	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		super.addConstraint( ConfiguredConstraint.forReturnValue( definition, methodContext.getMethod() ) );
+		super.addConstraint( ConfiguredConstraint.forReturnValue( definition, executableContext.getExecutable() ) );
 		return this;
 	}
 
@@ -66,7 +67,7 @@ public final class ReturnValueConstraintMappingContextImpl
 	 */
 	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
-		return methodContext.parameter( index );
+		return executableContext.parameter( index );
 	}
 
 	public boolean isCascaded() {
@@ -75,6 +76,11 @@ public final class ReturnValueConstraintMappingContextImpl
 
 	@Override
 	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
-		return methodContext.getTypeContext().method( name, parameterTypes );
+		return executableContext.getTypeContext().method( name, parameterTypes );
+	}
+
+	@Override
+	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
+		return executableContext.getTypeContext().constructor( parameterTypes );
 	}
 }

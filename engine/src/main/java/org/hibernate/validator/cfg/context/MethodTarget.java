@@ -31,7 +31,7 @@ public interface MethodTarget {
 	 * apply to the specified method.
 	 * </p>
 	 * <p>
-	 * A given method only be configured once.
+	 * A given method may only be configured once.
 	 * </p>
 	 *
 	 * @param name The method name.

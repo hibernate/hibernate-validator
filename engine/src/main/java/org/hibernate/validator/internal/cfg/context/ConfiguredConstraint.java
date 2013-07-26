@@ -18,13 +18,13 @@ package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -62,15 +62,15 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 		);
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A, ExecutableConstraintLocation> forParameter(ConstraintDef<?, A> constraint, Method method, int parameterIndex) {
+	public static <A extends Annotation> ConfiguredConstraint<A, ExecutableConstraintLocation> forParameter(ConstraintDef<?, A> constraint, ExecutableElement executable, int parameterIndex) {
 		return new ConfiguredConstraint<A, ExecutableConstraintLocation>(
-				constraint, new ExecutableConstraintLocation( method, parameterIndex )
+				constraint, new ExecutableConstraintLocation( executable, parameterIndex )
 		);
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A, ExecutableConstraintLocation> forReturnValue(ConstraintDef<?, A> constraint, Method method) {
+	public static <A extends Annotation> ConfiguredConstraint<A, ExecutableConstraintLocation> forReturnValue(ConstraintDef<?, A> constraint, ExecutableElement executable) {
 		return new ConfiguredConstraint<A, ExecutableConstraintLocation>(
-				constraint, new ExecutableConstraintLocation( method )
+				constraint, new ExecutableConstraintLocation( executable )
 		);
 	}
 

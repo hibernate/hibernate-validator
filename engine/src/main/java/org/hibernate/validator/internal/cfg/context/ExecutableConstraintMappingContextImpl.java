@@ -16,11 +16,13 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import javax.validation.ParameterNameProvider;
 
+import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
@@ -31,7 +33,7 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -44,25 +46,35 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Gunnar Morling
  */
-public class MethodConstraintMappingContextImpl implements MethodConstraintMappingContext {
+public class ExecutableConstraintMappingContextImpl
+		implements ConstructorConstraintMappingContext, MethodConstraintMappingContext {
 
 	private static final Log log = LoggerFactory.make();
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
-	private final Method method;
+	private final ExecutableElement executable;
 	private final ParameterConstraintMappingContextImpl[] parameterContexts;
 	private ReturnValueConstraintMappingContextImpl returnValueContext;
 
-	public MethodConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Method method) {
-		this.typeContext = typeContext;
-		this.method = method;
-		this.parameterContexts = new ParameterConstraintMappingContextImpl[method.getParameterTypes().length];
+	public ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Constructor<?> constructor) {
+		this( typeContext, ExecutableElement.forConstructor( constructor ) );
 	}
+
+	public ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Method method) {
+		this( typeContext, ExecutableElement.forMethod( method ) );
+	}
+
+	private ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, ExecutableElement executable) {
+		this.typeContext = typeContext;
+		this.executable = executable;
+		this.parameterContexts = new ParameterConstraintMappingContextImpl[executable.getParameterTypes().length];
+	}
+
 
 	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
-		if ( index < 0 || index >= method.getParameterTypes().length ) {
-			throw log.getInvalidMethodParameterIndexException( method.getName() );
+		if ( index < 0 || index >= executable.getParameterTypes().length ) {
+			throw log.getInvalidExecutableParameterIndexException( executable.getAsString() );
 		}
 
 		ParameterConstraintMappingContextImpl context = parameterContexts[index];
@@ -70,7 +82,7 @@ public class MethodConstraintMappingContextImpl implements MethodConstraintMappi
 		if ( context != null ) {
 			throw log.getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass().getName(),
-					StringHelper.getExecutableAsString( method.getName(), method.getParameterTypes() ),
+					executable.getAsString(),
 					index
 			);
 		}
@@ -85,7 +97,7 @@ public class MethodConstraintMappingContextImpl implements MethodConstraintMappi
 		if ( returnValueContext != null ) {
 			throw log.getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass().getName(),
-					StringHelper.getExecutableAsString( method.getName(), method.getParameterTypes() )
+					executable.getAsString()
 			);
 		}
 
@@ -93,8 +105,8 @@ public class MethodConstraintMappingContextImpl implements MethodConstraintMappi
 		return returnValueContext;
 	}
 
-	public Method getMethod() {
-		return method;
+	public ExecutableElement getExecutable() {
+		return executable;
 	}
 
 	public TypeConstraintMappingContextImpl<?> getTypeContext() {
@@ -104,7 +116,7 @@ public class MethodConstraintMappingContextImpl implements MethodConstraintMappi
 	public ConstrainedElement build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
 		return new ConstrainedExecutable(
 				ConfigurationSource.API,
-				new ExecutableConstraintLocation( method ),
+				new ExecutableConstraintLocation( executable ),
 				getParameters( constraintHelper, parameterNameProvider ),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
@@ -125,8 +137,8 @@ public class MethodConstraintMappingContextImpl implements MethodConstraintMappi
 				constrainedParameters.add(
 						new ConstrainedParameter(
 								ConfigurationSource.API,
-								new ExecutableConstraintLocation( method, i ),
-								parameterNameProvider.getParameterNames( method ).get( i )
+								new ExecutableConstraintLocation( executable, i ),
+								executable.getParameterNames( parameterNameProvider ).get( i )
 						)
 				);
 			}
