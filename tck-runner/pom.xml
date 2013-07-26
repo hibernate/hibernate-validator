@@ -55,7 +55,11 @@
             <artifactId>hibernate-validator-cdi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.glassfish</groupId>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.web</groupId>
             <artifactId>javax.el</artifactId>
         </dependency>
         <dependency>
@@ -288,14 +292,14 @@
                         <artifactId>gmaven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>copy-modules</id>
+                                <id>update-modules</id>
                                 <phase>generate-test-resources</phase>
                                 <goals>
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
                                     <source>
-                                        $ { pom.basedir } / src / script / setupAsModules.groovy
+                                        $ { pom.basedir } / src / script / setupModules.groovy
                                     </source>
                                 </configuration>
                             </execution>

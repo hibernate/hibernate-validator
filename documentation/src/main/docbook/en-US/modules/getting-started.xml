@@ -77,8 +77,8 @@
                 your application runs in a Java EE container such as JBoss AS, an EL
                 implementation is already provided by the container. In a Java SE
                 environment, however, you have to add an implementation as dependency to
-                your POM file. For instance you can add the following two dependency to
-                use the JSR 341<ulink url="http://uel.java.net/">reference
+                your POM file. For instance you can add the following two dependencies
+                to use the JSR 341<ulink url="http://uel.java.net/">reference
                     implementation</ulink>:
             </para>
 
@@ -88,9 +88,14 @@
                 </title>
 
                 <programlisting language="XML" role="XML">&lt;dependency&gt;
-                    &lt;groupId&gt;org.glassfish&lt;/groupId&gt;
+                    &lt;groupId&gt;javax.el&lt;/groupId&gt;
+                    &lt;artifactId&gt;javax.el-api&lt;/artifactId&gt;
+                    &lt;version&gt;2.2.4&lt;/version&gt;
+                    &lt;/dependency&gt;
+                    &lt;dependency&gt;
+                    &lt;groupId&gt;org.glassfish.web&lt;/groupId&gt;
                     &lt;artifactId&gt;javax.el&lt;/artifactId&gt;
-                    &lt;version&gt;3.0.0&lt;/version&gt;
+                    &lt;version&gt;2.2.4&lt;/version&gt;
                     &lt;/dependency&gt;</programlisting>
             </example>
         </section>
