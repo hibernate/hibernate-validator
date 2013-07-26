@@ -110,6 +110,46 @@ public abstract class ExecutableElement {
 		return ReflectionHelper.overrides( (Method) getMember(), (Method) other.getMember() );
 	}
 
+	/**
+	 * Returns a string representation of this executable in the form {@code <name>(<parameterType 0> ...  <parmeterType n>)},
+	 * e.g. for logging purposes.
+	 *
+	 * @return A string representation of the given executable.
+	 */
+	public String getAsString() {
+		return getExecutableAsString( getSimpleName(), getParameterTypes() );
+	}
+
+	/**
+	 * Returns a string representation of an executable with the given name and parameter types in the form
+	 * {@code <name>(<parameterType 0> ...  <parmeterType n>)}, e.g. for logging purposes.
+	 *
+	 * @param name the name of the executable
+	 * @param parameterTypes the types of the executable's parameters
+	 *
+	 * @return A string representation of the given executable.
+	 */
+	public static String getExecutableAsString(String name, Class<?>... parameterTypes) {
+		StringBuilder sb = new StringBuilder( name );
+		sb.append( "(" );
+
+		boolean isFirst = true;
+
+		for ( Class<?> parameterType : parameterTypes ) {
+			if ( !isFirst ) {
+				sb.append( ", " );
+			}
+			else {
+				isFirst = false;
+			}
+
+			sb.append( parameterType.getSimpleName() );
+		}
+
+		sb.append( ")" );
+		return sb.toString();
+	}
+
 	private static class ConstructorElement extends ExecutableElement {
 
 		private final Constructor<?> constructor;

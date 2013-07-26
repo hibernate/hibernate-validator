@@ -139,14 +139,16 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Method method = ReflectionHelper.getDeclaredMethod( beanClass, name, parameterTypes );
 
 		if ( method == null || method.getDeclaringClass() != beanClass ) {
-			throw log.getUnableToFindMethodException( beanClass, name, StringHelper.join( parameterTypes, ", " ) );
+			throw log.getUnableToFindMethodException(
+					beanClass,
+					StringHelper.getExecutableAsString( name, parameterTypes )
+			);
 		}
 
 		if ( configuredMethods.contains( method ) ) {
 			throw log.getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(
 					beanClass.getName(),
-					name,
-					StringHelper.join( parameterTypes, ", " )
+					StringHelper.getExecutableAsString( name, parameterTypes )
 			);
 		}
 

@@ -70,8 +70,7 @@ public class MethodConstraintMappingContextImpl implements MethodConstraintMappi
 		if ( context != null ) {
 			throw log.getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass().getName(),
-					method.getName(),
-					StringHelper.join( method.getParameterTypes(), ", " ),
+					StringHelper.getExecutableAsString( method.getName(), method.getParameterTypes() ),
 					index
 			);
 		}
@@ -86,8 +85,7 @@ public class MethodConstraintMappingContextImpl implements MethodConstraintMappi
 		if ( returnValueContext != null ) {
 			throw log.getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass().getName(),
-					method.getName(),
-					StringHelper.join( method.getParameterTypes(), ", " )
+					StringHelper.getExecutableAsString( method.getName(), method.getParameterTypes() )
 			);
 		}
 

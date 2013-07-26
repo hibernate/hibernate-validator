@@ -109,8 +109,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 13, value = "The class %1$s does not have a property '%2$s' with access %3$s.")
 	ValidationException getUnableToFindPropertyWithAccessException(Class<?> beanClass, String property, ElementType elementType);
 
-	@Message(id = 14, value = "Type %1$s doesn't have a method %2$s(%3$s).")
-	IllegalArgumentException getUnableToFindMethodException(Class<?> beanClass, String name, String parametersType);
+	@Message(id = 14, value = "Type %1$s doesn't have a method %2$s.")
+	IllegalArgumentException getUnableToFindMethodException(Class<?> beanClass, String method);
 
 	@Message(id = 15, value = "A valid parameter index has to be specified for method '%s'")
 	IllegalArgumentException getInvalidMethodParameterIndexException(String methodName);
@@ -627,14 +627,14 @@ public interface Log extends BasicLogger {
 	ValidationException getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String propertyName);
 
 	@Message(id = 173,
-			value = "Method %2$s(%3$s) of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String methodName, String parameterTypes);
+			value = "Method %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String method);
 
 	@Message(id = 174,
-			value = "Parameter %4$s of method %2$s(%3$s) of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String methodName, String parameterTypes, int parameterIndex);
+			value = "Parameter %3$s of method %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String method, int parameterIndex);
 
 	@Message(id = 175,
-			value = "The return value of method %2$s(%3$s) of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String methodName, String parameterTypes);
+			value = "The return value of method %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String method);
 }

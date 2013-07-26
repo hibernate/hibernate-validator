@@ -25,6 +25,9 @@ import java.util.Arrays;
  */
 public class StringHelper {
 
+	private StringHelper() {
+	}
+
 	/**
 	 * Joins the elements of the given array to a string, separated by the given separator string.
 	 *

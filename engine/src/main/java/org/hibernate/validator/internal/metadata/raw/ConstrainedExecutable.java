@@ -148,7 +148,10 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw log.getInvalidMethodParameterIndexException( getLocation().getMember().getName(), parameterIndex );
+			throw log.getInvalidMethodParameterIndexException(
+					getLocation().getExecutableElement().getAsString(),
+					parameterIndex
+			);
 		}
 
 		return parameterMetaData.get( parameterIndex );
