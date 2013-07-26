@@ -299,7 +299,7 @@
                                 </goals>
                                 <configuration>
                                     <source>
-                                        $ { pom.basedir } / src / script / setupModules.groovy
+                                        ${pom.basedir}/src/script/setupModules.groovy
                                     </source>
                                 </configuration>
                             </execution>
