@@ -50,7 +50,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.ConstructorInstance;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.GetConstructor;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructors;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredFields;
@@ -97,6 +97,7 @@ public final class ReflectionHelper {
 	private static final TypeResolver typeResolver = new TypeResolver();
 
 	private static final Map<String, Class<?>> PRIMITIVE_NAME_TO_PRIMITIVE;
+
 	static {
 		Map<String, Class<?>> tmpMap = newHashMap( 9 );
 
@@ -172,8 +173,8 @@ public final class ReflectionHelper {
 	}
 
 	public static Class<?> loadClass(String className, String defaultPackage, Class<?> caller) {
-		if( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className )) {
-		   return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
+		if ( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className ) ) {
+			return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
 		}
 
 		StringBuilder fullyQualifiedClass = new StringBuilder();
@@ -209,10 +210,6 @@ public final class ReflectionHelper {
 
 	private static boolean isQualifiedClass(String clazz) {
 		return clazz.contains( PACKAGE_SEPARATOR );
-	}
-
-	public static <T> Constructor<T> getConstructor(Class<T> clazz, Class<?>... params) {
-		return run( GetConstructor.action( clazz, params ) );
 	}
 
 	public static <T> T newInstance(Class<T> clazz, String message) {
@@ -656,6 +653,19 @@ public final class ReflectionHelper {
 	 */
 	public static Constructor<?>[] getDeclaredConstructors(Class<?> clazz) {
 		return run( GetDeclaredConstructors.action( clazz ) );
+	}
+
+	/**
+	 * Returns the declared constructor with the specified parameter types or {@code null} if
+	 * it does not exist.
+	 *
+	 * @param clazz The class to check.
+	 * @param parameterTypes The constructor parameter types.
+	 *
+	 * @return Returns the declared constructor with the specified name or {@code null} if it does not exist.
+	 */
+	public static <T> Constructor<T> getDeclaredConstructor(Class<T> clazz, Class<?>... params) {
+		return run( GetDeclaredConstructor.action( clazz, params ) );
 	}
 
 	/**

@@ -22,22 +22,22 @@ import java.security.PrivilegedAction;
 /**
  * @author Emmanuel Bernard
  */
-public final class GetConstructor<T> implements PrivilegedAction<Constructor<T>> {
+public final class GetDeclaredConstructor<T> implements PrivilegedAction<Constructor<T>> {
 	private final Class<T> clazz;
 	private final Class<?>[] params;
 
-	public static <T> GetConstructor<T> action(Class<T> clazz, Class<?>... params) {
-		return new GetConstructor<T>( clazz, params );
+	public static <T> GetDeclaredConstructor<T> action(Class<T> clazz, Class<?>... params) {
+		return new GetDeclaredConstructor<T>( clazz, params );
 	}
 
-	private GetConstructor(Class<T> clazz, Class<?>... params) {
+	private GetDeclaredConstructor(Class<T> clazz, Class<?>... params) {
 		this.clazz = clazz;
 		this.params = params;
 	}
 
 	public Constructor<T> run() {
 		try {
-			return clazz.getDeclaredConstructor(params);
+			return clazz.getDeclaredConstructor( params );
 		}
 		catch ( NoSuchMethodException e ) {
 			return null;

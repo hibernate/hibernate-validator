@@ -124,7 +124,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 */
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaDataList.size() - 1 ) {
-			throw log.getInvalidMethodParameterIndexException( getName(), parameterIndex );
+			throw log.getInvalidExecutableParameterIndexException(
+					ExecutableElement.getExecutableAsString(
+							getName(),
+							parameterTypes
+					), parameterIndex
+			);
 		}
 
 		return parameterMetaDataList.get( parameterIndex );

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -25,30 +25,23 @@ import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 
 /**
- * Constraint mapping creational context which allows to configure the constraints for one method return value.
+ * Constraint mapping creational context which allows to configure cross-parameter constraints for a method or constructor.
  *
- * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public final class ReturnValueConstraintMappingContextImpl
-		extends CascadableConstraintMappingContextImplBase<ReturnValueConstraintMappingContext>
-		implements ReturnValueConstraintMappingContext {
+public final class CrossParameterConstraintMappingContextImpl
+		extends ConstraintMappingContextImplBase
+		implements CrossParameterConstraintMappingContext {
 
 	private final ExecutableConstraintMappingContextImpl executableContext;
 
-	public ReturnValueConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
+	public CrossParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
 		super( executableContext.getTypeContext().getConstraintMapping() );
 		this.executableContext = executableContext;
 	}
 
 	@Override
-	protected ReturnValueConstraintMappingContext getThis() {
-		return this;
-	}
-
-	@Override
-	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
+	public CrossParameterConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
 		super.addConstraint( ConfiguredConstraint.forExecutable( definition, executableContext.getExecutable() ) );
 		return this;
 	}
@@ -56,11 +49,6 @@ public final class ReturnValueConstraintMappingContextImpl
 	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
 		return executableContext.parameter( index );
-	}
-
-	@Override
-	public CrossParameterConstraintMappingContext crossParameter() {
-		return executableContext.crossParameter();
 	}
 
 	@Override
@@ -74,7 +62,12 @@ public final class ReturnValueConstraintMappingContextImpl
 	}
 
 	@Override
+	public ReturnValueConstraintMappingContext returnValue() {
+		return executableContext.returnValue();
+	}
+
+	@Override
 	protected ConstraintType getConstraintType() {
-		return ConstraintType.GENERIC;
+		return ConstraintType.CROSS_PARAMETER;
 	}
 }

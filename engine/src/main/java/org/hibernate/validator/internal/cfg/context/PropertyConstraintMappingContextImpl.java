@@ -20,18 +20,20 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.Collections;
 
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -40,17 +42,22 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public final class PropertyConstraintMappingContextImpl extends ConstraintMappingContextImplBase
+public final class PropertyConstraintMappingContextImpl
+		extends CascadableConstraintMappingContextImplBase<PropertyConstraintMappingContext>
 		implements PropertyConstraintMappingContext {
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
 	private final Member member;
-	private boolean isCascading;
 
 	public PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Member member) {
 		super( typeContext.getConstraintMapping() );
 		this.typeContext = typeContext;
 		this.member = member;
+	}
+
+	@Override
+	protected PropertyConstraintMappingContextImpl getThis() {
+		return this;
 	}
 
 	@Override
@@ -64,8 +71,8 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 		}
 		else {
 			super.addConstraint(
-					ConfiguredConstraint.forReturnValue(
-							definition, (Method) member
+					ConfiguredConstraint.forExecutable(
+							definition, ExecutableElement.forMethod( (Method) member )
 					)
 			);
 		}
@@ -79,14 +86,13 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 	}
 
 	@Override
-	public PropertyConstraintMappingContext valid() {
-		isCascading = true;
-		return this;
+	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
+		return typeContext.property( property, elementType );
 	}
 
 	@Override
-	public PropertyConstraintMappingContext property(String property, ElementType elementType) {
-		return typeContext.property( property, elementType );
+	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
+		return typeContext.constructor( parameterTypes );
 	}
 
 	@Override
@@ -100,7 +106,7 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 					ConfigurationSource.API,
 					new BeanConstraintLocation( member ),
 					getConstraints( constraintHelper ),
-					Collections.<Class<?>, Class<?>>emptyMap(),
+					groupConversions,
 					isCascading
 			);
 		}
@@ -109,8 +115,14 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 					ConfigurationSource.API,
 					new ExecutableConstraintLocation( (Method) member ),
 					getConstraints( constraintHelper ),
+					groupConversions,
 					isCascading
 			);
 		}
+	}
+
+	@Override
+	protected ConstraintType getConstraintType() {
+		return ConstraintType.GENERIC;
 	}
 }

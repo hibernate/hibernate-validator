@@ -16,14 +16,16 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.util.Collections;
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
@@ -36,19 +38,22 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
 public final class ParameterConstraintMappingContextImpl
-		extends ConstraintMappingContextImplBase
+		extends CascadableConstraintMappingContextImplBase<ParameterConstraintMappingContext>
 		implements ParameterConstraintMappingContext {
 
-	private final MethodConstraintMappingContextImpl methodContext;
+	private final ExecutableConstraintMappingContextImpl executableContext;
 	private final int parameterIndex;
-	private boolean isCascading;
 
+	public ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
+		super( executableContext.getTypeContext().getConstraintMapping() );
 
-	public ParameterConstraintMappingContextImpl(MethodConstraintMappingContextImpl methodContext, int parameterIndex) {
-		super( methodContext.getTypeContext().getConstraintMapping() );
-
-		this.methodContext = methodContext;
+		this.executableContext = executableContext;
 		this.parameterIndex = parameterIndex;
+	}
+
+	@Override
+	protected ParameterConstraintMappingContext getThis() {
+		return this;
 	}
 
 	@Override
@@ -56,59 +61,51 @@ public final class ParameterConstraintMappingContextImpl
 		super.addConstraint(
 				ConfiguredConstraint.forParameter(
 						definition,
-						methodContext.getMethod(),
+						executableContext.getExecutable(),
 						parameterIndex
 				)
 		);
 		return this;
 	}
 
-	/**
-	 * Marks the currently selected method parameter as cascadable.
-	 *
-	 * @return Returns itself for method chaining.
-	 */
-	@Override
-	public ParameterConstraintMappingContext valid() {
-		isCascading = true;
-		return this;
-	}
-
-	/**
-	 * Changes the parameter for which added constraints apply.
-	 *
-	 * @param index The parameter index.
-	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
-	 */
 	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
-		return methodContext.parameter( index );
+		return executableContext.parameter( index );
 	}
 
-	/**
-	 * Defines constraints on the return value of the current method.
-	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
-	 */
+	@Override
+	public CrossParameterConstraintMappingContext crossParameter() {
+		return executableContext.crossParameter();
+	}
+
 	@Override
 	public ReturnValueConstraintMappingContext returnValue() {
-		return methodContext.returnValue();
+		return executableContext.returnValue();
+	}
+
+	@Override
+	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
+		return executableContext.getTypeContext().constructor( parameterTypes );
 	}
 
 	@Override
 	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
-		return methodContext.getTypeContext().method( name, parameterTypes );
+		return executableContext.getTypeContext().method( name, parameterTypes );
 	}
 
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
 		return new ConstrainedParameter(
 				ConfigurationSource.API,
-				new ExecutableConstraintLocation( methodContext.getMethod(), parameterIndex ),
-				parameterNameProvider.getParameterNames( methodContext.getMethod() ).get( parameterIndex ),
+				new ExecutableConstraintLocation( executableContext.getExecutable(), parameterIndex ),
+				executableContext.getExecutable().getParameterNames( parameterNameProvider ).get( parameterIndex ),
 				getConstraints( constraintHelper ),
-				Collections.<Class<?>, Class<?>>emptyMap(),
+				groupConversions,
 				isCascading
 		);
+	}
+
+	@Override
+	protected ConstraintType getConstraintType() {
+		return ConstraintType.GENERIC;
 	}
 }

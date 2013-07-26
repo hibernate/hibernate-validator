@@ -18,12 +18,14 @@ package org.hibernate.validator.test.internal.metadata.raw;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Date;
 
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Unit test for {@link ExecutableElement}.
@@ -289,6 +291,26 @@ public class ExecutableElementTest {
 		).isFalse();
 	}
 
+	@Test
+	public void executableAsStringShouldReturnMethodNameWithBracesForParameterlessMethod() throws Exception {
+		assertEquals( ExecutableElement.getExecutableAsString( "foo" ), "foo()" );
+		assertEquals( ExecutableElement.forMethod( Foo.class.getMethod( "zap" ) ).getAsString(), "zap()" );
+		assertEquals( ExecutableElement.forConstructor( Bar.class.getConstructor() ).getAsString(), "Bar()" );
+	}
+
+	@Test
+	public void executableAsStringShouldReturnMethodNameWithSimpleParamerTypeNames() throws Exception {
+		assertEquals( ExecutableElement.getExecutableAsString( "foo", int.class, Foo.class ), "foo(int, Foo)" );
+		assertEquals(
+				ExecutableElement.forMethod( Bar.class.getMethod( "zap", int.class, Date.class ) ).getAsString(),
+				"zap(int, Date)"
+		);
+		assertEquals(
+				ExecutableElement.forConstructor( Bar.class.getConstructor( int.class, Date.class ) )
+						.getAsString(), "Bar(int, Date)"
+		);
+	}
+
 	public abstract static class GenericServiceBase<T> {
 		public abstract void doSomething(T t);
 	}
@@ -401,6 +423,9 @@ public class ExecutableElementTest {
 		public Bar() {
 		}
 
+		public Bar(int i, Date date) {
+		}
+
 		public void Foo() {
 		}
 
@@ -412,6 +437,9 @@ public class ExecutableElementTest {
 
 		@Override
 		public void zap() {
+		}
+
+		public void zap(int i, Date date) {
 		}
 	}
 

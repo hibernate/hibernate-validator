@@ -1,7 +1,10 @@
 package org.hibernate.validator.referenceguide.chapter11.constraintapi;
 
+import java.util.List;
+
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.groups.Default;
 
 import org.junit.Test;
 
@@ -10,7 +13,6 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.MaxDef;
-import org.hibernate.validator.cfg.defs.MinDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 
@@ -73,13 +75,14 @@ public class ConstraintApiTest {
 				.property( "driver", FIELD )
 					.constraint( new NotNullDef() )
 					.valid()
+					.convertGroup( Default.class ).to( PersonDefault.class )
 			.type( Person.class )
 				.property( "name", FIELD )
-					.constraint( new NotNullDef() );
+					.constraint( new NotNullDef().groups( PersonDefault.class ) );
 	}
 
 	@Test
-	public void methodConfiguration() {
+	public void executableConfiguration() {
 		HibernateValidatorConfiguration configuration = Validation
 				.byProvider( HibernateValidator.class )
 				.configure();
@@ -88,9 +91,21 @@ public class ConstraintApiTest {
 
 		constraintMapping
 			.type( Car.class )
+				.constructor( String.class )
+					.parameter( 0 )
+						.constraint( new SizeDef().min( 3 ).max( 50 ) )
+					.returnValue()
+						.valid()
 				.method( "drive", int.class )
 					.parameter( 0 )
 						.constraint( new MaxDef().value ( 75 ) )
+				.method( "load", List.class, List.class )
+					.crossParameter()
+						.constraint( new GenericConstraintDef<LuggageCountMatchesPassengerCount>(
+								LuggageCountMatchesPassengerCount.class ).param(
+									"piecesOfLuggagePerPassenger", 2
+								)
+						)
 				.method( "getDriver" )
 					.returnValue()
 						.constraint( new NotNullDef() )
@@ -110,5 +125,8 @@ public class ConstraintApiTest {
 				.defaultGroupSequence( Car.class, CarChecks.class )
 			.type( RentalCar.class )
 				.defaultGroupSequenceProviderClass( RentalCarGroupSequenceProvider.class );
+	}
+
+	public interface PersonDefault {
 	}
 }

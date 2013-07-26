@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -25,16 +26,19 @@ import java.util.Set;
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -59,11 +63,11 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Set<MethodConstraintMappingContextImpl> methodContexts = newHashSet();
-	private final Set<PropertyConstraintMappingContextImpl> propertyContexts = newHashSet();
-	private final Set<Member> configuredProperties = newHashSet();
-	private final Set<Member> configuredMethods = newHashSet();
 	private final Class<C> beanClass;
+
+	private final Set<ExecutableConstraintMappingContextImpl> executableContexts = newHashSet();
+	private final Set<PropertyConstraintMappingContextImpl> propertyContexts = newHashSet();
+	private final Set<Member> configuredMembers = newHashSet();
 
 	private List<Class<?>> defaultGroupSequence;
 	private Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass;
@@ -118,7 +122,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			throw log.getUnableToFindPropertyWithAccessException( beanClass, property, elementType );
 		}
 
-		if ( configuredProperties.contains( member ) ) {
+		if ( configuredMembers.contains( member ) ) {
 			throw log.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass.getName(), property );
 		}
 
@@ -127,7 +131,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 				member
 		);
 
-		configuredProperties.add( member );
+		configuredMembers.add( member );
 		propertyContexts.add( context );
 		return context;
 	}
@@ -139,20 +143,50 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Method method = ReflectionHelper.getDeclaredMethod( beanClass, name, parameterTypes );
 
 		if ( method == null || method.getDeclaringClass() != beanClass ) {
-			throw log.getUnableToFindMethodException( beanClass, name, StringHelper.join( parameterTypes, ", " ) );
+			throw log.getUnableToFindMethodException(
+					beanClass,
+					ExecutableElement.getExecutableAsString( name, parameterTypes )
+			);
 		}
 
-		if ( configuredMethods.contains( method ) ) {
+		if ( configuredMembers.contains( method ) ) {
 			throw log.getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(
 					beanClass.getName(),
-					name,
+					ExecutableElement.getExecutableAsString( name, parameterTypes )
+			);
+		}
+
+		ExecutableConstraintMappingContextImpl context = new ExecutableConstraintMappingContextImpl( this, method );
+		configuredMembers.add( method );
+		executableContexts.add( context );
+
+		return context;
+	}
+
+	@Override
+	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
+		Constructor<C> constructor = ReflectionHelper.getDeclaredConstructor( beanClass, parameterTypes );
+
+		if ( constructor == null || constructor.getDeclaringClass() != beanClass ) {
+			throw log.getBeanDoesNotContainConstructorException(
+					beanClass.getName(),
 					StringHelper.join( parameterTypes, ", " )
 			);
 		}
 
-		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, method );
-		configuredMethods.add( method );
-		methodContexts.add( context );
+		if ( configuredMembers.contains( constructor ) ) {
+			throw log.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(
+					beanClass.getName(),
+					ExecutableElement.getExecutableAsString( beanClass.getSimpleName(), parameterTypes )
+			);
+		}
+
+		ExecutableConstraintMappingContextImpl context = new ExecutableConstraintMappingContextImpl(
+				this,
+				constructor
+		);
+		configuredMembers.add( constructor );
+		executableContexts.add( context );
 
 		return context;
 	}
@@ -179,9 +213,9 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 				)
 		);
 
-		//methods
-		for ( MethodConstraintMappingContextImpl methodContext : methodContexts ) {
-			elements.add( methodContext.build( constraintHelper, parameterNameProvider ) );
+		//constructors/methods
+		for ( ExecutableConstraintMappingContextImpl executableContext : executableContexts ) {
+			elements.add( executableContext.build( constraintHelper, parameterNameProvider ) );
 		}
 
 		//properties
@@ -201,5 +235,10 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	public Class<?> getBeanClass() {
 		return beanClass;
+	}
+
+	@Override
+	protected ConstraintType getConstraintType() {
+		return ConstraintType.GENERIC;
 	}
 }

@@ -27,6 +27,7 @@ package org.hibernate.validator.cfg.context;
 public interface PropertyConstraintMappingContext extends Constrainable<PropertyConstraintMappingContext>,
 		TypeTarget,
 		PropertyTarget,
+		ConstructorTarget,
 		MethodTarget,
 		Cascadable<PropertyConstraintMappingContext>,
 		AnnotationProcessingOptions<PropertyConstraintMappingContext> {

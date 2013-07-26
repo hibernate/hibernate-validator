@@ -24,6 +24,7 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -51,7 +52,6 @@ import static org.testng.Assert.fail;
  *
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-@Test
 public class MethodConstraintMappingTest {
 	private HibernateValidatorConfiguration config;
 	private GreetingService wrappedObject;
@@ -83,6 +83,36 @@ public class MethodConstraintMappingTest {
 		}
 		catch ( ConstraintViolationException e ) {
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
+			assertCorrectPropertyPaths( e, "greet.<return value>.message" );
+		}
+	}
+
+	@Test
+	public void testCascadingMethodReturnDefinitionWithGroupConversion() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", User.class )
+				.returnValue()
+				.valid()
+				.convertGroup( Default.class ).to( TestGroup.class )
+				.type( Message.class )
+				.property( "message", ElementType.FIELD )
+				.constraint(
+						new NotNullDef()
+								.message( "message must not be null" )
+								.groups( TestGroup.class )
+				);
+
+		config.addMapping( mapping );
+
+		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
+
+		try {
+			service.greet( new User( "foo" ) );
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( ConstraintViolationException e ) {
+			assertCorrectConstraintViolationMessages( e, "message must not be null" );
 			assertCorrectPropertyPaths( e, "greet.<return value>.message" );
 		}
 	}
@@ -124,7 +154,7 @@ public class MethodConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: A valid parameter index has to be specified for method 'greet'"
+			expectedExceptionsMessageRegExp = "HV000015.*"
 	)
 	public void testCascadingDefinitionOnInvalidMethodParameter() {
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -612,6 +642,41 @@ public class MethodConstraintMappingTest {
 					pathWith().method( "greet" ).returnValue()
 			);
 		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-642")
+	public void crossParameterConstraint() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class, String.class )
+				.crossParameter()
+				.constraint(
+						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+								GenericAndCrossParameterConstraint.class
+						)
+				);
+		config.addMapping( mapping );
+
+		try {
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
+			service.greet( "", "" );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( ConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "default message"
+			);
+			assertCorrectPropertyPaths( e, "greet.<cross-parameter>" );
+		}
+	}
+
+	private interface TestGroup {
 	}
 
 	public class User {

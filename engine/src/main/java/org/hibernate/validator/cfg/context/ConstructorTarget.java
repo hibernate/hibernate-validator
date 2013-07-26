@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -17,10 +17,26 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * Constraint mapping creational context representing a method. Allows to
- * navigate to the method's parameters and return value.
+ * Facet of a constraint mapping creational context which allows to the select the bean
+ * constructor to which the next operations shall apply.
  *
  * @author Gunnar Morling
  */
-public interface MethodConstraintMappingContext extends ParameterTarget, CrossParameterTarget, ReturnValueTarget {
+public interface ConstructorTarget {
+
+	/**
+	 * Selects a constructor to which the next operations shall apply.
+	 * <p>
+	 * Until this method is called constraints apply on class level. After calling this method constraints
+	 * apply to the specified constructor.
+	 * </p>
+	 * <p>
+	 * A given constructor may only be configured once.
+	 * </p>
+	 *
+	 * @param parameterTypes The constructor parameter types.
+	 *
+	 * @return A creational context representing the selected constructor.
+	 */
+	ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes);
 }

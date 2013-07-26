@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.AssertFalseDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
@@ -165,6 +166,21 @@ public class MultipleConstraintMappingsTest {
 						.constraint( new AssertFalseDef() )
 					.parameter( 0 )
 					.returnValue();
+	}
+
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000177.*")
+	public void testCrossParameterConfiguredSeveralTimesCausesException() {
+		ConstraintMapping marathonMapping = config.createConstraintMapping();
+		marathonMapping.type( Marathon.class )
+				.method( "addRunner", Runner.class )
+					.crossParameter()
+						.constraint(
+							new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+								GenericAndCrossParameterConstraint.class
+							)
+						)
+					.parameter( 0 )
+					.crossParameter();
 	}
 
 	private interface Foo {

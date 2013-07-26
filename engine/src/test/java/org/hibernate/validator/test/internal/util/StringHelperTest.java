@@ -18,8 +18,9 @@ package org.hibernate.validator.test.internal.util;
 
 import java.util.Arrays;
 
-import org.hibernate.validator.internal.util.StringHelper;
 import org.testng.annotations.Test;
+
+import org.hibernate.validator.internal.util.StringHelper;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -32,25 +33,25 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 public class StringHelperTest {
 
 	@Test
-	public void shouldReturnNullForNullIterable() {
+	public void joinShouldReturnNullForNullIterable() {
 		assertThat( StringHelper.join( (Iterable<?>) null, "," ) ).isNull();
 		assertThat( StringHelper.join( (Object[]) null, "," ) ).isNull();
 	}
 
 	@Test
-	public void shouldReturnEmptyStringForEmptyIterable() {
+	public void joinShouldReturnEmptyStringForEmptyIterable() {
 		assertThat( StringHelper.join( newArrayList(), "," ) ).isEmpty();
 		assertThat( StringHelper.join( new Object[0], "," ) ).isEmpty();
 	}
 
 	@Test
-	public void shouldReturnElementForIterableWithOneElement() {
+	public void joinShouldReturnElementForIterableWithOneElement() {
 		assertThat( StringHelper.join( Arrays.asList( "polar bear" ), "," ) ).isEqualTo( "polar bear" );
 		assertThat( StringHelper.join( new String[] { "polar bear" }, "," ) ).isEqualTo( "polar bear" );
 	}
 
 	@Test
-	public void shouldReturnElementJoinedElements() {
+	public void joinShouldReturnElementJoinedElements() {
 		assertThat( StringHelper.join( Arrays.asList( "polar bear", "giraffe", "guinea pig" ), " and " ) ).isEqualTo(
 				"polar bear and giraffe and guinea pig"
 		);
@@ -60,7 +61,7 @@ public class StringHelperTest {
 	}
 
 	@Test
-	public void shouldInvokeToStringForObjects() {
+	public void joinShouldInvokeToStringForObjects() {
 		assertThat( StringHelper.join( Arrays.asList( new PolarBear(), new Giraffe() ), ", " ) ).isEqualTo(
 				"polar bear, giraffe"
 		);
@@ -70,7 +71,7 @@ public class StringHelperTest {
 	}
 
 	@Test
-	public void shouldPrintLiteralNullForNullValues() {
+	public void joinShouldPrintLiteralNullForNullValues() {
 		assertThat( StringHelper.join( new Integer[] { 1, null, 2 }, "," ) ).isEqualTo( "1,null,2" );
 	}
 

@@ -48,14 +48,33 @@ public abstract class ConstraintMappingContextImplBase {
 		return mapping.type( type );
 	}
 
+	/**
+	 * Returns the type of constraints hosted on the element configured by this creational context.
+	 *
+	 * @return the type of constraints hosted on the element configured by this creational context
+	 */
+	protected abstract ConstraintType getConstraintType();
+
 	protected DefaultConstraintMapping getConstraintMapping() {
 		return mapping;
 	}
 
+	/**
+	 * Adds a constraint to the set of constraints managed by this creational context.
+	 *
+	 * @param constraint the constraint to add
+	 */
 	protected void addConstraint(ConfiguredConstraint<?, ?> constraint) {
 		constraints.add( constraint );
 	}
 
+	/**
+	 * Converts all constraints managed by this creational context into {@link MetaConstraint}s.
+	 *
+	 * @param constraintHelper constraint helper required for creation of meta constraints.
+	 *
+	 * @return All constraints of this context as meta constraints.
+	 */
 	protected Set<MetaConstraint<?>> getConstraints(ConstraintHelper constraintHelper) {
 		if ( constraints == null ) {
 			return Collections.emptySet();
@@ -76,7 +95,7 @@ public abstract class ConstraintMappingContextImplBase {
 				config.getLocation().getMember(),
 				config.createAnnotationProxy(),
 				config.getLocation().getElementType(),
-				ConstraintType.GENERIC //ok since currently cross-parameter constraints can't be configured via the API
+				getConstraintType()
 		);
 
 		return new MetaConstraint<A>( constraintDescriptor, config.getLocation() );

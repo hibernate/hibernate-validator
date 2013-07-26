@@ -109,11 +109,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 13, value = "The class %1$s does not have a property '%2$s' with access %3$s.")
 	ValidationException getUnableToFindPropertyWithAccessException(Class<?> beanClass, String property, ElementType elementType);
 
-	@Message(id = 14, value = "Type %1$s doesn't have a method %2$s(%3$s).")
-	IllegalArgumentException getUnableToFindMethodException(Class<?> beanClass, String name, String parametersType);
+	@Message(id = 14, value = "Type %1$s doesn't have a method %2$s.")
+	IllegalArgumentException getUnableToFindMethodException(Class<?> beanClass, String method);
 
-	@Message(id = 15, value = "A valid parameter index has to be specified for method '%s'")
-	IllegalArgumentException getInvalidMethodParameterIndexException(String methodName);
+	@Message(id = 15, value = "A valid parameter index has to be specified for method or constructor %s.")
+	IllegalArgumentException getInvalidExecutableParameterIndexException(String executable);
 
 	@Message(id = 16, value = "%s does not represent a valid BigDecimal format.")
 	IllegalArgumentException getInvalidBigDecimalFormatException(String value, @Cause NumberFormatException e);
@@ -238,8 +238,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 55, value = "The default group sequence provider defined for %s has the wrong type")
 	GroupDefinitionException getWrongDefaultGroupSequenceProviderTypeException(String beanClassName);
 
-	@Message(id = 56, value = "Method %1$s doesn't have a parameter with index %2$d.")
-	IllegalArgumentException getInvalidMethodParameterIndexException(String method, int index);
+	@Message(id = 56, value = "Method or constructor %1$s doesn't have a parameter with index %2$d.")
+	IllegalArgumentException getInvalidExecutableParameterIndexException(String executable, int index);
 
 	@Message(id = 57, value = "Unable to find constraints for  %s.")
 	ValidationException getUnableToFindAnnotationConstraintsException(Class<? extends Annotation> annotationClass);
@@ -483,7 +483,7 @@ public interface Log extends BasicLogger {
 	ConstraintDeclarationException getVoidMethodsMustNotBeConstrainedException(Member member);
 
 	@Message(id = 133, value = "%1$s does not contain a constructor with the parameter types %2$s.")
-	ValidationException getBeanDoesNotContainConstructorException(String beanClassName, List<Class<?>> parameterTypes);
+	ValidationException getBeanDoesNotContainConstructorException(String beanClassName, String parameterTypes);
 
 	@Message(id = 134, value = "Unable to load parameter of type '%1$s' in %2$s.")
 	ValidationException getInvalidParameterTypeException(String type, String beanClassName);
@@ -627,14 +627,22 @@ public interface Log extends BasicLogger {
 	ValidationException getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String propertyName);
 
 	@Message(id = 173,
-			value = "Method %2$s(%3$s) of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String methodName, String parameterTypes);
+			value = "Method %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String method);
 
 	@Message(id = 174,
-			value = "Parameter %4$s of method %2$s(%3$s) of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String methodName, String parameterTypes, int parameterIndex);
+			value = "Parameter %3$s of method or constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String executable, int parameterIndex);
 
 	@Message(id = 175,
-			value = "The return value of method %2$s(%3$s) of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String methodName, String parameterTypes);
+			value = "The return value of method or constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String executable);
+
+	@Message(id = 176,
+			value = "Constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String constructor);
+
+	@Message(id = 177,
+			value = "Cross-parameter constraints for the method or constructor %2$s of type %1$s are declared more than once via the programmatic constraint declaration API.")
+	ValidationException getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String executable);
 }
