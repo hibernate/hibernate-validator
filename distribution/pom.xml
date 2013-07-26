@@ -106,7 +106,7 @@
                     </sourcepath>
                     <links>
                         <link>http://docs.oracle.com/javase/6/docs/api</link>
-                        <link>http://docs.oracle.com/javaee/6/api</link>
+                        <link>http://docs.oracle.com/javaee/7/api</link>
                         <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api</link>
                         <link>http://docs.jboss.org/cdi/api/1.1-PFD</link>
                     </links>
