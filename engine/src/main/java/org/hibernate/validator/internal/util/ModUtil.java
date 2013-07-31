@@ -18,6 +18,8 @@ package org.hibernate.validator.internal.util;
 
 import java.util.List;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
 /**
  * Helper class for modulo 10/11.
  *
@@ -30,26 +32,38 @@ public final class ModUtil {
 	/**
 	 * Check if the input passes the mod11 test
 	 *
-	 * @param digits The digits over which to calculate the mod 11 algorithm
+	 * @param digits the digits over which to calculate the mod 11 algorithm
+	 * @param checkDigit the check digit
 	 * @param multiplier the multiplier for the modulo algorithm
 	 *
 	 * @return {@code true} if the mod 11 result matches the check digit, {@code false} otherwise
 	 */
-	public static boolean passesMod11Test(final List<Integer> digits, int multiplier) {
+	public static boolean passesMod11Test(final List<Integer> digits, int checkDigit, int multiplier) {
 		int modResult = mod11( digits, multiplier );
-		return modResult == 0;
+		// the MOD-11 algorithm has the problem that by using modulo 11 you get also two two-digit values (10 and 11)
+		// which need to be mapped to a single digit. It is quite usual to use 0 for the case of 11, whereas for the
+		// case of 10 a non digit character is used. This code assumes that a remainder of 10 also results into a check
+		// digit of 0. It might be necessary to extend @ModCheck to allow the configuration of a check digit. See also
+		// HV-808
+		if ( modResult == 10 || modResult == 11 ) {
+			modResult = 0;
+		}
+		return modResult == checkDigit;
 	}
 
 	/**
 	 * Mod10 (Luhn) algorithm implementation
 	 *
 	 * @param digits The digits over which to calculate the checksum
+	 * @param checkDigit the check digit
 	 * @param multiplier Multiplier used in the algorithm
 	 *
 	 * @return {@code true} if the mod 10 result matches the check digit, {@code false} otherwise
 	 */
-	public static boolean passesMod10Test(final List<Integer> digits, final int multiplier) {
-		int modResult = mod10( digits, multiplier );
+	public static boolean passesMod10Test(final List<Integer> digits, int checkDigit, int multiplier) {
+		List<Integer> digitsIncludingCheckDigit = newArrayList( digits );
+		digitsIncludingCheckDigit.add( checkDigit );
+		int modResult = mod10( digitsIncludingCheckDigit, multiplier );
 		return modResult == 0;
 	}
 
@@ -63,7 +77,7 @@ public final class ModUtil {
 	 */
 	private static int mod11(final List<Integer> digits, final int multiplier) {
 		int sum = 0;
-		int weight = 1;
+		int weight = 2;
 
 		for ( int index = digits.size() - 1; index >= 0; index-- ) {
 			sum += digits.get( index ) * weight++;
@@ -71,8 +85,7 @@ public final class ModUtil {
 				weight = 2;
 			}
 		}
-		int mod = 11 - ( sum % 11 );
-		return ( mod > 9 ) ? 0 : mod;
+		return 11 - ( sum % 11 );
 	}
 
 	/**
