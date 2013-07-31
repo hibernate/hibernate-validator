@@ -60,6 +60,72 @@ public class CPFValidatorTest {
 		assertNumberOfViolations( violations, 1 );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-808")
+	public void testCPFBoundaryConditionsForAllSameDigitValidMod11() {
+		String[] invalidCPFs = { "000.000.000-00", "111.111.111-11", "222.222.222-22",
+		"333.333.333-33", "444.444.444-44", "555.555.555-55",
+		"666.666.666-66", "777.777.777-77", "888.888.888-88",
+		"999.999.999-99" };
+
+		Set<ConstraintViolation<Person>> violations = null;
+
+		for(String cpf : invalidCPFs){
+			violations = ValidatorUtil.getValidator().validate(
+				new Person( cpf )
+			);
+
+			assertNumberOfViolations( violations, 1 );
+
+			violations = ValidatorUtil.getValidator().validate(
+				new Person( cpf.replaceAll( "[^0-9]", "" ) )
+			);
+			assertNumberOfViolations( violations, 1 );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-808")
+	public void testCorrectFormattedCPFWithReportAsSingleViolationForCheckDigitSelfValidation() {
+		//Valid CPF
+		Set<ConstraintViolation<Person>> violations = ValidatorUtil.getValidator().validate(
+				new Person( "378.796.950-01" )
+		);
+		assertNumberOfViolations( violations, 0 );
+
+		/*
+		 * Invalid CPF reported as valid because of a issue in ModUtil class.
+		 * This issue happens when 2 different digits can me used to grant the same mod result.
+		 * Check digit must not be used in the validation or can self validate, ie
+		 * changing only the check digit does not invalidates the value.
+		 */
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "378.796.950-02" )
+		);
+		assertNumberOfViolations( violations, 1 );
+
+		//Valid CPF
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "331.814.296-43" )
+		);
+		assertNumberOfViolations( violations, 0 );
+
+		/*
+		 * Same as above but in this case both check digits are wrong,
+		 * the fist invalid digit affects the result of the sencond mod11 check
+		 * and the second can be change too resulting in 3 valid pairs of check digits
+		 */
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "331.814.296-52" )
+		);
+		assertNumberOfViolations( violations, 1 );
+
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "331.814.296-51" )
+		);
+		assertNumberOfViolations( violations, 1 );
+	}
+
 	public static class Person {
 		@CPF
 		private String cpf;

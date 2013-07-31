@@ -102,7 +102,7 @@ public @interface ModCheck {
 		 */
 		MOD10,
 		/**
-		 * Represents a MOD11 algorithm
+		 * Represents a MOD11 algorithm. A remainder of 10 or 11 in the algorithm is mapped to the check digit 0.
 		 */
 		MOD11
 	}
