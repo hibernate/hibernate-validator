@@ -23,6 +23,8 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.ModUtil;
 
+import org.hibernate.validator.testutil.TestForIssue;
+
 import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
@@ -69,5 +71,27 @@ public class ModUtilTest {
 
 		digits = Arrays.asList( 0, 3, 6, 5, 3, 2, 1 );
 		assertFalse( ModUtil.passesMod11Test( digits, 11 ) );
+	}
+	
+	@Test
+	@TestForIssue(jiraKey = "HV-808")
+	public void testFailMod11SelfValidation() throws Exception {
+		/* 
+		 * This issue happens when 2 different digits can be used to grant the same mod result.
+		 * The check digit should not be used for validating or it can validate itself,
+		 * ie changing only the check digit does not invalidates the value.
+		 */
+		List<Integer> digits = Arrays.asList( 0, 1 );
+		assertFalse("'0-1' must be invalid", ModUtil.passesMod11Test( digits, 11 ) );
+
+		digits = Arrays.asList( 0, 0, 0, 0, 0, 0, 0 );
+		assertTrue("'000000-0' must be valid",  ModUtil.passesMod11Test( digits, 11 ) );
+		
+		digits = Arrays.asList( 0, 0, 0, 0, 0, 0, 1 );
+		assertFalse("'000000-1' must be invalid",  ModUtil.passesMod11Test( digits, 11 ) );
+		
+		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6, 5 );
+		assertFalse("'331814296-5' must be invalid",  ModUtil.passesMod11Test( digits, 11 ) );
+		
 	}
 }
