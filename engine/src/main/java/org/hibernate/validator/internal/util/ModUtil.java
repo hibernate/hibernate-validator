@@ -30,14 +30,14 @@ public final class ModUtil {
 	/**
 	 * Check if the input passes the mod11 test
 	 *
-	 * @param digits The digits over which to calculate the mod 11 algorithm
+	 * @param digits The digits over which to calculate the mod 11 algorithm, plus check digit on last position
 	 * @param multiplier the multiplier for the modulo algorithm
 	 *
 	 * @return {@code true} if the mod 11 result matches the check digit, {@code false} otherwise
 	 */
 	public static boolean passesMod11Test(final List<Integer> digits, int multiplier) {
 		int modResult = mod11( digits, multiplier );
-		return modResult == 0;
+		return modResult == digits.get( digits.size() - 1 );
 	}
 
 	/**
@@ -56,23 +56,23 @@ public final class ModUtil {
 	/**
 	 * Calculate Mod11
 	 *
-	 * @param digits the digits for which to calculate the checksum
+	 * @param digits the digits for which to calculate the checksum, plus the check digit
 	 * @param multiplier multiplier for the modulo algorithm
 	 *
 	 * @return the result of the mod11 calculation
 	 */
 	private static int mod11(final List<Integer> digits, final int multiplier) {
 		int sum = 0;
-		int weight = 1;
+		int weight = 2;
 
-		for ( int index = digits.size() - 1; index >= 0; index-- ) {
+		for ( int index = digits.size() - 2; index >= 0; index-- ) {
 			sum += digits.get( index ) * weight++;
 			if ( weight > multiplier ) {
 				weight = 2;
 			}
 		}
-		int mod = 11 - ( sum % 11 );
-		return ( mod > 9 ) ? 0 : mod;
+		int mod = sum % 11 >= 2 ? 11 - (sum % 11) : 0;
+		return mod;
 	}
 
 	/**
