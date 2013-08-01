@@ -386,6 +386,16 @@ public class MyParameterNameProvider implements ParameterNameProvider {
 		.buildValidatorFactory();
 Validator validator = validatorFactory.getValidator();</programlisting>
       </example>
+
+      <tip>
+        <para>Hibernate Validator comes with a custom
+        <classname>ParameterNameProvider</classname> implementation based on
+        the <ulink url="http://paranamer.codehaus.org/">ParaNamer</ulink>
+        library which provides several ways for obtaining parameter names at
+        runtime. Refer to <xref
+        linkend="section-paranamer-parameternameprovider"/> to learn more
+        about this specific implementation.</para>
+      </tip>
     </section>
 
     <section>

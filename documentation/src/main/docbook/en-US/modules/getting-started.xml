@@ -50,7 +50,7 @@
         <title>Project set up</title>
 
         <para>In order to use Hibernate Validator within a Maven project, simply
-            add the following dependency to your<filename>pom.xml</filename>:
+            add the following dependency to your <filename>pom.xml</filename>:
         </para>
 
         <example>
