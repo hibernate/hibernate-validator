@@ -58,6 +58,7 @@
                 <include>joda-time:joda-time</include>
                 <include>org.hibernate.javax.persistence:hibernate-jpa-2.1-api</include>
                 <include>org.jsoup:jsoup</include>
+                <include>com.thoughtworks.paranamer:paranamer</include>
             </includes>
         </dependencySet>
     </dependencySets>

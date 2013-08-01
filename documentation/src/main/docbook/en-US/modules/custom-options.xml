@@ -122,6 +122,14 @@
             bundles (see <xref linkend="section-resource-bundle-locator"/>)
             and its default implementation.</entry>
           </row>
+
+          <row>
+            <entry><package>org.hibernate.validator.parameternameprovider</package></entry>
+
+            <entry>A <classname>ParameterNameProvider</classname> based on the
+            ParaNamer library, see <xref
+            linkend="section-paranamer-parameternameprovider"/>.</entry>
+          </row>
         </tbody>
       </tgroup>
     </table>
@@ -553,5 +561,45 @@ public @interface PatternOrSize {
 }</programlisting>
       </example>
     </section>
+  </section>
+
+  <section id="section-paranamer-parameternameprovider">
+    <title>ParaNamer based
+    <classname>ParameterNameProvider</classname></title>
+
+    <para>Hibernate Validator comes with a
+    <classname>ParameterNameProvider</classname> implementation which
+    leverages the <ulink
+    url="http://paranamer.codehaus.org/">ParaNamer</ulink> library.</para>
+
+    <para>This library provides several ways for obtaining parameter names at
+    runtime, e.g. based on debug symbols created by the Java compiler,
+    constants with the parameter names woven into the bytecode in a
+    post-compile step or annotations such as the <classname>@Named</classname>
+    annotation from JSR 330.</para>
+
+    <para>In order to use
+    <classname>ParanamerParameterNameProvider</classname>, either pass an
+    instance when bootstrapping a validator as shown in <xref
+    linkend="example-using-custom-parameter-name-provider"/> or specify
+    <property>org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider</property>
+    as value for the <property>&lt;parameter-name-provider&gt;</property>
+    element in the <filename>META-INF/validation.xml</filename> file.</para>
+
+    <tip>
+      <para>When using this parameter name provider, you need to add the
+      ParaNamer library to your classpath. It is available in the Maven
+      Central repository with the group id
+      <literal>com.thoughtworks.paranamer</literal> and the artifact id
+      <literal>paranamer</literal>.</para>
+    </tip>
+
+    <para>By default <classname>ParanamerParameterNameProvider</classname>
+    retrieves parameter names from constants added to the byte code at build
+    time (via <classname>DefaultParanamer</classname>) and debug symbols (via
+    <classname>BytecodeReadingParanamer</classname>). Alternatively you can
+    specify a <classname>Paranamer</classname> implementation of your choice
+    when creating a <classname>ParanamerParameterNameProvider</classname>
+    instance. </para>
   </section>
 </chapter>
