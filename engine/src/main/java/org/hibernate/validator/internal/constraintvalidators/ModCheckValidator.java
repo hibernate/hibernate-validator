@@ -105,46 +105,54 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 			valueAsString = valueAsString.replaceAll( NUMBERS_ONLY_REGEXP, "" );
 		}
 
+		String digitsAsString;
+		String checkDigitAsString;
 		try {
-			valueAsString = extractVerificationString( valueAsString );
+			digitsAsString = extractVerificationString( valueAsString );
+			checkDigitAsString = extractCheckDigitString( valueAsString );
 		}
-		catch ( IndexOutOfBoundsException e ) {
+		catch (IndexOutOfBoundsException e) {
 			return false;
 		}
 
 		List<Integer> digits;
+		int checkDigit;
 		try {
-			digits = extractDigits( valueAsString );
+			digits = extractDigits( digitsAsString );
+			checkDigit = extractDigits( checkDigitAsString ).get( 0 );
 		}
-		catch ( NumberFormatException e ) {
+		catch (NumberFormatException e) {
 			return false;
 		}
 
 		boolean isValid;
 
 		if ( modType.equals( ModType.MOD10 ) ) {
-			isValid = ModUtil.passesMod10Test( digits, multiplier );
+			isValid = ModUtil.passesMod10Test( digits, checkDigit, multiplier );
 		}
 		else {
-			isValid = ModUtil.passesMod11Test( digits, multiplier );
+			isValid = ModUtil.passesMod11Test( digits, checkDigit, multiplier );
 		}
 		return isValid;
 	}
 
 	private String extractVerificationString(String value) throws IndexOutOfBoundsException {
-		// the whole string should be verified (check digit is implicit)
+		// the string contains the check digit, just return the digits to verify
 		if ( endIndex == Integer.MAX_VALUE ) {
-			return value;
+			return value.substring( 0, value.length() - 1 );
 		}
 
-		String verificationString = value.substring( startIndex, endIndex );
+		return value.substring( startIndex, endIndex );
+	}
 
-		// append the check digit of explicitly specified
-		if ( checkDigitIndex > 0 ) {
-			verificationString = verificationString + value.charAt( checkDigitIndex );
+	private String extractCheckDigitString(String value) throws IndexOutOfBoundsException {
+		// the string contains the check digit, just return the check digit
+		if ( checkDigitIndex == -1 ) {
+			return value.substring( value.length() - 1, value.length() );
 		}
-
-		return verificationString;
+		else {
+			return value.substring( checkDigitIndex, checkDigitIndex + 1 );
+		}
 	}
 
 	/**
