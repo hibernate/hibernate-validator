@@ -398,7 +398,7 @@ public final class ReflectionHelper {
 		try {
 			return field.get( object );
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw log.getUnableToAccessMemberException( field.getName(), e );
 		}
 	}
@@ -407,10 +407,10 @@ public final class ReflectionHelper {
 		try {
 			return method.invoke( object );
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw log.getUnableToAccessMemberException( method.getName(), e );
 		}
-		catch ( InvocationTargetException e ) {
+		catch (InvocationTargetException e) {
 			throw log.getUnableToAccessMemberException( method.getName(), e );
 		}
 	}
@@ -660,7 +660,7 @@ public final class ReflectionHelper {
 	 * it does not exist.
 	 *
 	 * @param clazz The class to check.
-	 * @param parameterTypes The constructor parameter types.
+	 * @param params The constructor parameter types.
 	 *
 	 * @return Returns the declared constructor with the specified name or {@code null} if it does not exist.
 	 */

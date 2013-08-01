@@ -44,7 +44,7 @@ public abstract class CascadableConstraintMappingContextImplBase<C extends Casca
 	 *
 	 * @return this object, narrowed down to the specific sub-type
 	 *
-	 * @see http://www.angelikalanger.com/GenericsFAQ/FAQSections/ProgrammingIdioms.html#FAQ206 ("Get this" trick)
+	 * @see <a href="http://www.angelikalanger.com/GenericsFAQ/FAQSections/ProgrammingIdioms.html#FAQ206">"Get this" trick</a>
 	 */
 	protected abstract C getThis();
 
