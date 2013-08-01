@@ -88,6 +88,11 @@
             <artifactId>jsoup</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.paranamer</groupId>
+            <artifactId>paranamer</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!--
         Test dependencies
@@ -236,6 +241,7 @@
                             org.hibernate.validator.constraintvalidation.*;version="${project.version}",
                             org.hibernate.validator.group;version="${project.version}",
                             org.hibernate.validator.messageinterpolation;version="${project.version}",
+                            org.hibernate.validator.parameternameprovider;version="${project.version}",
                             org.hibernate.validator.resourceloading;version="${project.version}",
                             org.hibernate.validator.spi.*;version="${project.version}"
                         </Export-Package>
