@@ -24,7 +24,8 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
 import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
+
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * Tests for the {@code ModUtil}.
@@ -35,55 +36,55 @@ public class ModUtilTest {
 	@Test
 	public void testPassMod10() throws Exception {
 		List<Integer> digits = Arrays.asList( 7 );
-		assertTrue( ModUtil.passesMod10Test( digits, 3, 1 ) );
+		assertEquals( ModUtil.mod10( digits, 3, 1 ), 0 );
 
 		digits = Arrays.asList( 7, 9, 9, 2, 7, 3, 9, 8, 7, 1 );
-		assertTrue( ModUtil.passesMod10Test( digits, 3, 2 ) );
+		assertEquals( ModUtil.mod10( digits, 3, 2 ), 0 );
 	}
 
 	@Test
 	public void testFailMod10() throws Exception {
 		List<Integer> digits = Arrays.asList( 7 );
-		assertFalse( ModUtil.passesMod10Test( digits, 2, 1 ) );
+		assertFalse( ModUtil.mod10( digits, 2, 1 ) == 0 );
 
 		digits = Arrays.asList( 7, 9, 9, 2, 7, 3, 9, 8, 7, 1 );
-		assertFalse( ModUtil.passesMod10Test( digits, 4, 2 ) );
+		assertFalse( ModUtil.mod10( digits, 4, 2 ) == 0 );
 	}
 
 	@Test
 	public void testPassMod11() throws Exception {
 		List<Integer> digits = Arrays.asList( 2 );
-//		assertTrue( ModUtil.passesMod11Test( digits, 7, 11 ) );
+//		assertTrue( ModUtil.mod11( digits, 7, 11 ) );
 //
 //		digits = Arrays.asList( 0, 3, 6, 5, 3, 2 );
-//		assertTrue( ModUtil.passesMod11Test( digits, 7, 11 ) );
+//		assertTrue( ModUtil.mod11( digits, 7, 11 ) );
 
 		digits = Arrays.asList( 1, 3, 4, 2, 4, 1, 3, 1, 3 );
-		assertTrue( ModUtil.passesMod11Test( digits, 0, 11 ) );
+		assertEquals( ModUtil.mod11( digits, 11 ), 10 );
 	}
 
 	@Test
 	public void testFailMod11() throws Exception {
 		List<Integer> digits = Arrays.asList( 2 );
-		assertFalse( ModUtil.passesMod11Test( digits, 6, 11 ) );
+		assertFalse( ModUtil.mod11( digits, 11 ) == 6 );
 
 		digits = Arrays.asList( 0, 3, 6, 5, 3, 2 );
-		assertFalse( ModUtil.passesMod11Test( digits, 1, 11 ) );
+		assertFalse( ModUtil.mod11( digits, 11 ) == 1);
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-808")
 	public void testFailMod11SelfValidation() throws Exception {
 		List<Integer> digits = Arrays.asList( 0 );
-		assertFalse( "'0-1' must be invalid", ModUtil.passesMod11Test( digits, 1, 11 ) );
+		assertFalse( "'0-1' must be invalid", ModUtil.mod11( digits, 11 ) == 1 );
 
 		digits = Arrays.asList( 0, 0, 0, 0, 0, 0 );
-		assertTrue( "'000000-0' must be valid", ModUtil.passesMod11Test( digits, 0, 11 ) );
+		assertEquals( "'000000-0' must be valid", ModUtil.mod11( digits, 11 ), 11 );
 
 		digits = Arrays.asList( 0, 0, 0, 0, 0, 0 );
-		assertFalse( "'000000-1' must be invalid", ModUtil.passesMod11Test( digits, 1, 11 ) );
+		assertFalse( "'000000-1' must be invalid", ModUtil.mod11( digits, 11 ) == 1 );
 
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
-		assertFalse( "'331814296-5' must be invalid", ModUtil.passesMod11Test( digits, 5, 11 ) );
+		assertFalse( "'331814296-5' must be invalid", ModUtil.mod11( digits, 11 ) == 5 );
 	}
 }

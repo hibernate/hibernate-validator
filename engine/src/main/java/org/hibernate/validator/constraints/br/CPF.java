@@ -57,11 +57,15 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 		@ModCheck(modType = ModType.MOD11,
 				checkDigitPosition = 9,
 				multiplier = 10,
-				endIndex = 9),
+				endIndex = 9,
+				mod11CheckDigit10 = '0',
+				mod11CheckDigit11 = '0'),
 		@ModCheck(modType = ModType.MOD11,
 				checkDigitPosition = 10,
 				multiplier = 11,
-				endIndex = 10)
+				endIndex = 10,
+				mod11CheckDigit10 = '0',
+				mod11CheckDigit11 = '0')
 })
 @ReportAsSingleViolation
 @Documented
