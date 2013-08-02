@@ -85,6 +85,16 @@ public @interface ModCheck {
 	 *         characters.
 	 */
 	boolean ignoreNonDigitCharacters() default true;
+	
+	/**
+	 * @return The {@code char} that represents the check digit when mod11 checksum equals 10. If not specified {@code 'X'} is assumed. 
+	 */
+	char mod11CheckDigit10() default 'X';
+	
+	/**
+	 * @return The {@code char} that represents the check digit when mod11 checksum equals 11. If not specified {@code '0'} is assumed.
+	 */
+	char mod11CheckDigit11()  default '0';
 
 	/**
 	 * Defines several {@code @ModCheck} annotations on the same element.
@@ -102,7 +112,7 @@ public @interface ModCheck {
 		 */
 		MOD10,
 		/**
-		 * Represents a MOD11 algorithm
+		 * Represents a MOD11 algorithm. A remainder of 10 or 11 in the algorithm is mapped to the check digit 0.
 		 */
 		MOD11
 	}

@@ -41,20 +41,31 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Pattern.List({
 		@Pattern(regexp = "([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}-[0-9]{2})|([0-9]{11})"),
-		// 000.000.000-00 is not a valid CPF, but passes the mod check. Needs to be singled out via regexp
-		@Pattern(regexp = "^(?:(?!000\\.000\\.000-00).)*$"),
-		// same for 999.999.999-99
-		@Pattern(regexp = "^(?:(?!999\\.999\\.999-99).)*$")
+		// XXX.XXX.XXX-XX where X is always the same digit are not a valid CPFs, but all of them passes the mod check. Needs to be singled out each one via regexp
+		@Pattern(regexp = "^(?:(?!000\\.?000\\.?000-?00).)*$"),
+		@Pattern(regexp = "^(?:(?!111\\.?111\\.?111-?11).)*$"),
+		@Pattern(regexp = "^(?:(?!222\\.?222\\.?222-?22).)*$"),
+		@Pattern(regexp = "^(?:(?!333\\.?333\\.?333-?33).)*$"),
+		@Pattern(regexp = "^(?:(?!444\\.?444\\.?444-?44).)*$"),
+		@Pattern(regexp = "^(?:(?!555\\.?555\\.?555-?55).)*$"),
+		@Pattern(regexp = "^(?:(?!666\\.?666\\.?666-?66).)*$"),
+		@Pattern(regexp = "^(?:(?!777\\.?777\\.?777-?77).)*$"),
+		@Pattern(regexp = "^(?:(?!888\\.?888\\.?888-?88).)*$"),
+		@Pattern(regexp = "^(?:(?!999\\.?999\\.?999-?99).)*$")
 })
 @ModCheck.List({
 		@ModCheck(modType = ModType.MOD11,
 				checkDigitPosition = 9,
 				multiplier = 10,
-				endIndex = 9),
+				endIndex = 9,
+				mod11CheckDigit10 = '0',
+				mod11CheckDigit11 = '0'),
 		@ModCheck(modType = ModType.MOD11,
 				checkDigitPosition = 10,
 				multiplier = 11,
-				endIndex = 10)
+				endIndex = 10,
+				mod11CheckDigit10 = '0',
+				mod11CheckDigit11 = '0')
 })
 @ReportAsSingleViolation
 @Documented

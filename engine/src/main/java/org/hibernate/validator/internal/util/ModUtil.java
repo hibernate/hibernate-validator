@@ -18,6 +18,8 @@ package org.hibernate.validator.internal.util;
 
 import java.util.List;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
 /**
  * Helper class for modulo 10/11.
  *
@@ -26,33 +28,7 @@ import java.util.List;
 public final class ModUtil {
 	private ModUtil() {
 	}
-
-	/**
-	 * Check if the input passes the mod11 test
-	 *
-	 * @param digits The digits over which to calculate the mod 11 algorithm
-	 * @param multiplier the multiplier for the modulo algorithm
-	 *
-	 * @return {@code true} if the mod 11 result matches the check digit, {@code false} otherwise
-	 */
-	public static boolean passesMod11Test(final List<Integer> digits, int multiplier) {
-		int modResult = mod11( digits, multiplier );
-		return modResult == 0;
-	}
-
-	/**
-	 * Mod10 (Luhn) algorithm implementation
-	 *
-	 * @param digits The digits over which to calculate the checksum
-	 * @param multiplier Multiplier used in the algorithm
-	 *
-	 * @return {@code true} if the mod 10 result matches the check digit, {@code false} otherwise
-	 */
-	public static boolean passesMod10Test(final List<Integer> digits, final int multiplier) {
-		int modResult = mod10( digits, multiplier );
-		return modResult == 0;
-	}
-
+	
 	/**
 	 * Calculate Mod11
 	 *
@@ -61,9 +37,9 @@ public final class ModUtil {
 	 *
 	 * @return the result of the mod11 calculation
 	 */
-	private static int mod11(final List<Integer> digits, final int multiplier) {
+	public static int mod11(final List<Integer> digits, final int multiplier) {
 		int sum = 0;
-		int weight = 1;
+		int weight = 2;
 
 		for ( int index = digits.size() - 1; index >= 0; index-- ) {
 			sum += digits.get( index ) * weight++;
@@ -71,19 +47,18 @@ public final class ModUtil {
 				weight = 2;
 			}
 		}
-		int mod = 11 - ( sum % 11 );
-		return ( mod > 9 ) ? 0 : mod;
+		return 11 - ( sum % 11 );
 	}
 
 	/**
-	 * Calculate Mod10 (Luhn)
+	 * Calculate Mod10 (Luhn) algorithm implementation
 	 *
-	 * @param digits the digits for which to calculate the checksum
+	 * @param digits the digits for which to calculate the checksum including check digit;
 	 * @param multiplier multiplier for the modulo algorithm
 	 *
 	 * @return the result of the mod10 calculation
 	 */
-	private static int mod10(final List<Integer> digits, final int multiplier) {
+	public static int mod10(final List<Integer> digits, final int multiplier) {
 		int sum = 0;
 		boolean even = false;
 		for ( int index = digits.size() - 1; index >= 0; index-- ) {
@@ -98,6 +73,21 @@ public final class ModUtil {
 			even = !even;
 		}
 		return sum % 10;
+	}
+	
+	/**
+	 * Calculate Mod10 (Luhn)
+	 *
+	 * @param digits the digits for which to calculate the checksum;
+	 * @param checkDigit the check digit
+	 * @param multiplier multiplier for the modulo algorithm
+	 *
+	 * @return the result of the mod10 calculation
+	 */
+	public static int mod10(final List<Integer> digits, int checkDigit, final int multiplier) {
+		List<Integer> digitsIncludingCheckDigit = newArrayList( digits );
+		digitsIncludingCheckDigit.add( checkDigit );
+		return mod10( digitsIncludingCheckDigit, multiplier );
 	}
 }
 
