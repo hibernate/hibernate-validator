@@ -25,15 +25,15 @@ import javax.validation.TraversableResolver;
 /**
  * Cache results of a delegated traversable resolver to optimize calls.
  * It works only for a single validate* call and should not be used if
- * the TraversableResolver is accessed concurrently.
+ * {@code TraversableResolver} is accessed concurrently.
  *
  * @author Emmanuel Bernard
  */
-public class SingleThreadCachedTraversableResolver implements TraversableResolver {
+public class CachingTraversableResolverForSingleValidation implements TraversableResolver {
 	private TraversableResolver delegate;
 	private Map<TraversableHolder, TraversableHolder> traversables = new HashMap<TraversableHolder, TraversableHolder>();
 
-	public SingleThreadCachedTraversableResolver(TraversableResolver delegate) {
+	public CachingTraversableResolverForSingleValidation(TraversableResolver delegate) {
 		this.delegate = delegate;
 	}
 
@@ -123,7 +123,7 @@ public class SingleThreadCachedTraversableResolver implements TraversableResolve
 				return false;
 			}
 
-			TraversableHolder that = ( TraversableHolder ) o;
+			TraversableHolder that = (TraversableHolder) o;
 
 			if ( elementType != that.elementType ) {
 				return false;

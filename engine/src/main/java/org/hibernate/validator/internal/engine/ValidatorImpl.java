@@ -45,7 +45,7 @@ import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.engine.resolver.SingleThreadCachedTraversableResolver;
+import org.hibernate.validator.internal.engine.resolver.CachingTraversableResolverForSingleValidation;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
@@ -1271,7 +1271,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @return The resolver for the duration of a full validation.
 	 */
 	private TraversableResolver getCachingTraversableResolver() {
-		return new SingleThreadCachedTraversableResolver( traversableResolver );
+		return new CachingTraversableResolverForSingleValidation( traversableResolver );
 	}
 
 	private boolean isValidationRequired(ValidationContext<?> validationContext,
