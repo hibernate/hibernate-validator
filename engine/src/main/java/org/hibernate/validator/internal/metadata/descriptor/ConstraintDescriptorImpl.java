@@ -53,7 +53,6 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
-import static org.hibernate.validator.constraints.CompositionType.AND;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -146,7 +145,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * Type indicating how composing constraints should be combined. By default this is set to
 	 * {@code ConstraintComposition.CompositionType.AND}.
 	 */
-	private CompositionType compositionType = AND;
+	private final CompositionType compositionType;
+
+	private final int hashCode;
 
 	@SuppressWarnings("unchecked")
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
@@ -192,6 +193,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				externalConstraintType
 		);
 		this.composingConstraints = parseComposingConstraints( member, constraintHelper, externalConstraintType );
+		this.compositionType = parseCompositionType( constraintHelper );
 		validateComposingConstraintTypes();
 
 		if ( constraintType == ConstraintType.GENERIC ) {
@@ -200,6 +202,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		else {
 			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( crossParameterValidatorClasses );
 		}
+
+		this.hashCode = annotation.hashCode();
 	}
 
 	public ConstraintDescriptorImpl(ConstraintHelper constraintHelper,
@@ -311,7 +315,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public int hashCode() {
-		return annotation != null ? annotation.hashCode() : 0;
+		return hashCode;
 	}
 
 	@Override
@@ -632,15 +636,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				continue;
 			}
 
-			//If there is a @ConstraintCompositionType annotation, set its value as the local compositionType field
-			if ( constraintHelper.isConstraintComposition( declaredAnnotationType ) ) {
-				this.setCompositionType( ( (ConstraintComposition) declaredAnnotation ).value() );
-				if ( log.isDebugEnabled() ) {
-					log.debugf( "Adding Bool %s.", declaredAnnotationType.getName() );
-				}
-				continue;
-			}
-
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotationType ) ) {
 				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
 						member,
@@ -672,6 +667,24 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			}
 		}
 		return Collections.unmodifiableSet( composingConstraintsSet );
+	}
+
+	private CompositionType parseCompositionType(ConstraintHelper constraintHelper) {
+		for ( Annotation declaredAnnotation : annotationType.getDeclaredAnnotations() ) {
+			Class<? extends Annotation> declaredAnnotationType = declaredAnnotation.annotationType();
+			if ( NON_COMPOSING_CONSTRAINT_ANNOTATIONS.contains( declaredAnnotationType.getName() ) ) {
+				// ignore the usual suspects which will be in almost any constraint, but are no composing constraint
+				continue;
+			}
+
+			if ( constraintHelper.isConstraintComposition( declaredAnnotationType ) ) {
+				if ( log.isDebugEnabled() ) {
+					log.debugf( "Adding Bool %s.", declaredAnnotationType.getName() );
+				}
+				return ( (ConstraintComposition) declaredAnnotation ).value();
+			}
+		}
+		return CompositionType.AND;
 	}
 
 	private <U extends Annotation> ConstraintDescriptorImpl<U> createComposingConstraintDescriptor(
@@ -713,13 +726,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return new ConstraintDescriptorImpl<U>(
 				constraintHelper, member, annotationProxy, elementType, null, definedOn, externalConstraintType
 		);
-	}
-
-	/**
-	 * @param compositionType the compositionType to set
-	 */
-	private void setCompositionType(CompositionType compositionType) {
-		this.compositionType = compositionType;
 	}
 
 	/**

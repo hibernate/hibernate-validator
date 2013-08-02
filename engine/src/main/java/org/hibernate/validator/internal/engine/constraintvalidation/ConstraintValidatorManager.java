@@ -78,8 +78,8 @@ public class ConstraintValidatorManager {
 	 * @return A initialized constraint validator for the given type and annotation of the value to be validated.
 	 */
 	public <V, A extends Annotation> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType,
-																					   ConstraintDescriptorImpl<A> descriptor,
-																					   ConstraintValidatorFactory constraintFactory) {
+			ConstraintDescriptorImpl<A> descriptor,
+			ConstraintValidatorFactory constraintFactory) {
 		Contracts.assertNotNull( validatedValueType );
 		Contracts.assertNotNull( descriptor );
 		Contracts.assertNotNull( constraintFactory );
@@ -115,9 +115,9 @@ public class ConstraintValidatorManager {
 
 
 	private void putInitializedValidator(Type validatedValueType,
-										 Annotation annotation,
-										 ConstraintValidatorFactory constraintFactory,
-										 ConstraintValidator<?, ?> constraintValidator) {
+			Annotation annotation,
+			ConstraintValidatorFactory constraintFactory,
+			ConstraintValidator<?, ?> constraintValidator) {
 		// we only cache constraint validator instance for the default and least recently used factory
 		if ( constraintFactory != defaultConstraintValidatorFactory && constraintFactory != leastRecentlyUsedNonDefaultConstraintValidatorFactory ) {
 			clearEntriesForFactory( leastRecentlyUsedNonDefaultConstraintValidatorFactory );
@@ -280,11 +280,13 @@ public class ConstraintValidatorManager {
 		private final Annotation annotation;
 		private final Type validatedType;
 		private final ConstraintValidatorFactory constraintFactory;
+		private final int hashCode;
 
 		private CacheKey(Annotation annotation, Type validatorType, ConstraintValidatorFactory constraintFactory) {
 			this.annotation = annotation;
 			this.validatedType = validatorType;
 			this.constraintFactory = constraintFactory;
+			this.hashCode = createHashCode();
 		}
 
 		public ConstraintValidatorFactory getConstraintFactory() {
@@ -317,6 +319,10 @@ public class ConstraintValidatorManager {
 
 		@Override
 		public int hashCode() {
+			return hashCode;
+		}
+
+		private int createHashCode() {
 			int result = annotation != null ? annotation.hashCode() : 0;
 			result = 31 * result + ( validatedType != null ? validatedType.hashCode() : 0 );
 			result = 31 * result + ( constraintFactory != null ? constraintFactory.hashCode() : 0 );

@@ -44,6 +44,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	private final ElementType elementType;
 	private final Object[] executableParameters;
 	private final Object executableReturnValue;
+	private final int hashCode;
 
 	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, T rootBean, Object leafBeanInstance, Object value, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType) {
 		return new ConstraintViolationImpl<T>(
@@ -93,7 +94,17 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		);
 	}
 
-	private ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, T rootBean, Object leafBeanInstance, Object value, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType, Object[] executableParameters, Object executableReturnValue) {
+	private ConstraintViolationImpl(String messageTemplate,
+			String interpolatedMessage,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Object leafBeanInstance,
+			Object value,
+			Path propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			ElementType elementType,
+			Object[] executableParameters,
+			Object executableReturnValue) {
 		this.messageTemplate = messageTemplate;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
@@ -105,6 +116,8 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		this.elementType = elementType;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
+		// pre-calculate hash code, the class is immutable and hashCode is needed often
+		this.hashCode = createHashCode();
 	}
 
 	@Override
@@ -210,16 +223,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 
 	@Override
 	public int hashCode() {
-		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
-		result = 31 * result + ( propertyPath != null ? propertyPath.hashCode() : 0 );
-		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
-		result = 31 * result + ( leafBeanInstance != null ? leafBeanInstance.hashCode() : 0 );
-		result = 31 * result + ( value != null ? value.hashCode() : 0 );
-		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
-		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
-		result = 31 * result + ( rootBeanClass != null ? rootBeanClass.hashCode() : 0 );
-		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
-		return result;
+		return hashCode;
 	}
 
 	@Override
@@ -232,5 +236,18 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		sb.append( ", messageTemplate='" ).append( messageTemplate ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	private int createHashCode() {
+		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
+		result = 31 * result + ( propertyPath != null ? propertyPath.hashCode() : 0 );
+		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
+		result = 31 * result + ( leafBeanInstance != null ? leafBeanInstance.hashCode() : 0 );
+		result = 31 * result + ( value != null ? value.hashCode() : 0 );
+		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
+		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
+		result = 31 * result + ( rootBeanClass != null ? rootBeanClass.hashCode() : 0 );
+		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
+		return result;
 	}
 }

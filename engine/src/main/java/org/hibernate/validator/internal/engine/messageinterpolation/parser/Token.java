@@ -21,6 +21,10 @@ package org.hibernate.validator.internal.engine.messageinterpolation.parser;
  * keeps track of its token value and whether the token is a parameter which can
  * be interpolated.
  *
+ * Note, tokens are not centred around word delimiters, but rather around message parameter and EL expressions.
+ * For example, the message descriptor "must be between {min} and {max}" gets parsed into the tokens 'must be between ',
+ * '{min}', ' and ', '{max}', where the min and max tokens are parameters.
+ *
  * @author Hardy Ferentschik
  */
 public class Token {

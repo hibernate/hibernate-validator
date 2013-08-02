@@ -560,10 +560,13 @@ public class ValidationContext<T> {
 	private static final class BeanAndPath {
 		private final Object bean;
 		private final Path path;
+		private final int hashCode;
 
 		private BeanAndPath(Object bean, Path path) {
 			this.bean = bean;
 			this.path = path;
+			// pre-calculate hash code, the class is immutable and hashCode is needed often
+			this.hashCode = createHashCode();
 		}
 
 		@Override
@@ -589,6 +592,10 @@ public class ValidationContext<T> {
 
 		@Override
 		public int hashCode() {
+			return hashCode;
+		}
+
+		private int createHashCode() {
 			int result = bean != null ? bean.hashCode() : 0;
 			result = 31 * result + path.hashCode();
 			return result;

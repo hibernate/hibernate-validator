@@ -27,47 +27,49 @@ public class EscapedState implements ParserState {
 	}
 
 	@Override
-	public void start(ParserContext context) {
-		throw new IllegalStateException("Parsing of message descriptor cannot start in this state");
+	public void start(TokenCollector tokenCollector) {
+		throw new IllegalStateException( "Parsing of message descriptor cannot start in this state" );
 	}
 
 	@Override
-	public void terminate(ParserContext context) throws MessageDescriptorFormatException {
-		context.terminateToken();
+	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
+		tokenCollector.terminateToken();
 	}
 
 	@Override
-	public void handleNonMetaCharacter(char character, ParserContext context)
+	public void handleNonMetaCharacter(char character, TokenCollector tokenCollector)
 			throws MessageDescriptorFormatException {
-		handleEscapedCharacter( character, context );
+		handleEscapedCharacter( character, tokenCollector );
 	}
 
 	@Override
-	public void handleBeginTerm(char character, ParserContext context) throws MessageDescriptorFormatException {
-		handleEscapedCharacter( character, context );
+	public void handleBeginTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException {
+		handleEscapedCharacter( character, tokenCollector );
 	}
 
 	@Override
-	public void handleEndTerm(char character, ParserContext context) throws MessageDescriptorFormatException {
-		handleEscapedCharacter( character, context );
+	public void handleEndTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException {
+		handleEscapedCharacter( character, tokenCollector );
 	}
 
 	@Override
-	public void handleEscapeCharacter(char character, ParserContext context)
+	public void handleEscapeCharacter(char character, TokenCollector tokenCollector)
 			throws MessageDescriptorFormatException {
-		handleEscapedCharacter( character, context );
+		handleEscapedCharacter( character, tokenCollector );
 	}
 
 	@Override
-	public void handleELDesignator(char character, ParserContext context) throws MessageDescriptorFormatException {
-		handleEscapedCharacter( character, context );
+	public void handleELDesignator(char character, TokenCollector tokenCollector)
+			throws MessageDescriptorFormatException {
+		handleEscapedCharacter( character, tokenCollector );
 	}
 
-	private void handleEscapedCharacter(char character, ParserContext context) throws MessageDescriptorFormatException {
-		context.appendToToken( character );
-		context.terminateToken();
-		context.transitionState( previousState );
-		context.next();
+	private void handleEscapedCharacter(char character, TokenCollector tokenCollector)
+			throws MessageDescriptorFormatException {
+		tokenCollector.appendToToken( character );
+		tokenCollector.terminateToken();
+		tokenCollector.transitionState( previousState );
+		tokenCollector.next();
 	}
 }
 

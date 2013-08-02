@@ -43,7 +43,6 @@ import com.fasterxml.classmate.ResolvedTypeWithMembers;
 import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.classmate.members.RawMethod;
 import com.fasterxml.classmate.members.ResolvedMethod;
-
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -398,7 +397,7 @@ public final class ReflectionHelper {
 		try {
 			return field.get( object );
 		}
-		catch (IllegalAccessException e) {
+		catch ( IllegalAccessException e ) {
 			throw log.getUnableToAccessMemberException( field.getName(), e );
 		}
 	}
@@ -407,10 +406,10 @@ public final class ReflectionHelper {
 		try {
 			return method.invoke( object );
 		}
-		catch (IllegalAccessException e) {
+		catch ( IllegalAccessException e ) {
 			throw log.getUnableToAccessMemberException( method.getName(), e );
 		}
-		catch (InvocationTargetException e) {
+		catch ( InvocationTargetException e ) {
 			throw log.getUnableToAccessMemberException( method.getName(), e );
 		}
 	}

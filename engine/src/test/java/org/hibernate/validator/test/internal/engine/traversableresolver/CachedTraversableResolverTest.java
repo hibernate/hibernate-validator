@@ -20,25 +20,25 @@ import java.lang.annotation.ElementType;
 import java.util.HashSet;
 import java.util.Set;
 import javax.validation.Configuration;
+import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.Path;
 import javax.validation.groups.Default;
 
-import static org.testng.Assert.fail;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.fail;
 
 /**
  * @author Emmanuel Bernard
  */
-//this test is specific to Hibernate Validator
 public class CachedTraversableResolverTest {
 	@Test
 	public void testCache() {
 		TraversableResolver resolver = new AskOnceTR();
-		Configuration<?> config = (Configuration<?>) Validation.byDefaultProvider()
+		Configuration<?> config = Validation.byDefaultProvider()
 				.configure()
 				.traversableResolver( resolver );
 		ValidatorFactory factory = config.buildValidatorFactory();
@@ -52,7 +52,7 @@ public class CachedTraversableResolverTest {
 		try {
 			v.validate( suit, Default.class, Cloth.class );
 		}
-		catch ( IllegalStateException e ) {
+		catch (IllegalStateException e) {
 			fail( "Traversable Called several times for a given object" );
 		}
 
@@ -60,7 +60,7 @@ public class CachedTraversableResolverTest {
 		try {
 			v.validateProperty( suit, "size", Default.class, Cloth.class );
 		}
-		catch ( IllegalStateException e ) {
+		catch (IllegalStateException e) {
 			fail( "Traversable Called several times for a given object" );
 		}
 
@@ -68,7 +68,7 @@ public class CachedTraversableResolverTest {
 		try {
 			v.validateValue( Suit.class, "size", 2, Default.class, Cloth.class );
 		}
-		catch ( IllegalStateException e ) {
+		catch (IllegalStateException e) {
 			fail( "Traversable Called several times for a given object" );
 		}
 	}
@@ -77,7 +77,7 @@ public class CachedTraversableResolverTest {
 		private Set<Holder> askedReach = new HashSet<Holder>();
 		private Set<Holder> askedCascade = new HashSet<Holder>();
 
-		private boolean isTraversable(Set<Holder> asked, Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
+		private boolean isTraversable(Set<Holder> asked, Object traversableObject, Path.Node traversableProperty) {
 			Holder h = new Holder( traversableObject, traversableProperty );
 			if ( asked.contains( h ) ) {
 				throw new IllegalStateException( "Called twice" );
@@ -86,25 +86,27 @@ public class CachedTraversableResolverTest {
 			return true;
 		}
 
-		public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
+		public boolean isReachable(Object traversableObject,
+				Path.Node traversableProperty,
+				Class<?> rootBeanType,
+				Path pathToTraversableObject,
+				ElementType elementType) {
 			return isTraversable(
 					askedReach,
 					traversableObject,
-					traversableProperty,
-					rootBeanType,
-					pathToTraversableObject,
-					elementType
+					traversableProperty
 			);
 		}
 
-		public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
+		public boolean isCascadable(Object traversableObject,
+				Path.Node traversableProperty,
+				Class<?> rootBeanType,
+				Path pathToTraversableObject,
+				ElementType elementType) {
 			return isTraversable(
 					askedCascade,
 					traversableObject,
-					traversableProperty,
-					rootBeanType,
-					pathToTraversableObject,
-					elementType
+					traversableProperty
 			);
 		}
 
@@ -128,7 +130,7 @@ public class CachedTraversableResolverTest {
 				if ( !( obj instanceof Holder ) ) {
 					return false;
 				}
-				Holder that = ( Holder ) obj;
+				Holder that = (Holder) obj;
 
 				return to != NULL && to == that.to && tp.equals( that.tp );
 			}

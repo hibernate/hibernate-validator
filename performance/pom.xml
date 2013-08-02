@@ -15,7 +15,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -31,9 +33,11 @@
     <description>Hibernate Validator performance tests.</description>
 
     <properties>
-        <profilingOptions>
-            -agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait
-        </profilingOptions>
+        <!--
+        Need to specify something, since the plugin cannot handle empty options. Using something which does not have
+        any runtime effects. The actual profiling options are either passed via the command line or set via a profile.
+        -->
+        <profilingOptions>-showversion</profilingOptions>
         <history.directory>${project.basedir}/history</history.directory>
     </properties>
 
@@ -66,7 +70,8 @@
                 <artifactId>chronos-jmeter-maven-plugin</artifactId>
                 <configuration>
                     <input>${basedir}/src/jmx</input>
-                    <jMeterRemoteLocation>http://www.apache.org/dist/jmeter/binaries/apache-jmeter-2.8.zip</jMeterRemoteLocation>
+                    <jMeterRemoteLocation>http://www.apache.org/dist/jmeter/binaries/apache-jmeter-2.8.zip
+                    </jMeterRemoteLocation>
                     <jmeterhome>${project.basedir}/jmeter</jmeterhome>
                     <jmeterOutput>${project.basedir}/target/chronos/performancetest</jmeterOutput>
                     <historydir>${history.directory}</historydir>
@@ -78,9 +83,9 @@
                             <value>${validator.version}</value>
                         </property>
                     </jmeterVariables>
-                    <!--<options>-->
-                    <!--<option>${profilingOptions}</option>-->
-                    <!--</options>-->
+                    <options>
+                        <option>${profilingOptions}</option>
+                    </options>
                 </configuration>
             </plugin>
         </plugins>
@@ -102,6 +107,44 @@
 
     <profiles>
         <profile>
+            <id>jprofiler</id>
+            <properties>
+                <profilingOptions>
+                    -agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait
+                </profilingOptions>
+            </properties>
+        </profile>
+        <profile>
+            <id>hv-5.1</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-5.1</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>javax.el</groupId>
+                    <artifactId>javax.el-api</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.web</groupId>
+                    <artifactId>javax.el</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </dependency>
+            </dependencies>
+            <properties>
+                <validator.version>HV 5.1.0-SNAPSHOT</validator.version>
+            </properties>
+        </profile>
+        <profile>
             <id>hv-5.0</id>
             <activation>
                 <property>
@@ -113,6 +156,15 @@
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
+                    <version>5.0.1.Final</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.el</groupId>
+                    <artifactId>javax.el-api</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.web</groupId>
+                    <artifactId>javax.el</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -120,7 +172,7 @@
                 </dependency>
             </dependencies>
             <properties>
-                <validator.version>HV 5.0.0-SNAPSHOT</validator.version>
+                <validator.version>HV 5.0.1.Final</validator.version>
             </properties>
         </profile>
         <profile>
@@ -195,27 +247,27 @@
             </properties>
         </profile>
         <profile>
-            <id>bval-0.4</id>
+            <id>bval-0.5</id>
             <activation>
                 <property>
                     <name>validator</name>
-                    <value>bval-0.4</value>
+                    <value>bval-0.5</value>
                 </property>
             </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.apache.bval</groupId>
                     <artifactId>bval-core</artifactId>
-                    <version>0.4</version>
+                    <version>0.5</version>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.bval</groupId>
                     <artifactId>bval-jsr303</artifactId>
-                    <version>0.4</version>
+                    <version>0.5</version>
                 </dependency>
             </dependencies>
             <properties>
-                <validator.version>BVAL 0.4</validator.version>
+                <validator.version>BVAL 0.5</validator.version>
             </properties>
         </profile>
     </profiles>

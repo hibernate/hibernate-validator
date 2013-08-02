@@ -26,55 +26,56 @@ public class ELState implements ParserState {
 	private static final Log log = LoggerFactory.make();
 
 	@Override
-	public void start(ParserContext context) {
-		throw new IllegalStateException("Parsing of message descriptor cannot start in this state");
+	public void start(TokenCollector tokenCollector) {
+		throw new IllegalStateException( "Parsing of message descriptor cannot start in this state" );
 	}
 
 	@Override
-	public void terminate(ParserContext context) throws MessageDescriptorFormatException {
-		context.appendToToken( ParserContext.EL_DESIGNATOR );
-		context.terminateToken();
+	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
+		tokenCollector.appendToToken( TokenCollector.EL_DESIGNATOR );
+		tokenCollector.terminateToken();
 	}
 
 	@Override
-	public void handleNonMetaCharacter(char character, ParserContext context)
+	public void handleNonMetaCharacter(char character, TokenCollector tokenCollector)
 			throws MessageDescriptorFormatException {
-		context.appendToToken( ParserContext.EL_DESIGNATOR );
-		context.appendToToken( character );
-		context.terminateToken();
-		context.transitionState( new BeginState() );
-		context.next();
+		tokenCollector.appendToToken( TokenCollector.EL_DESIGNATOR );
+		tokenCollector.appendToToken( character );
+		tokenCollector.terminateToken();
+		tokenCollector.transitionState( new BeginState() );
+		tokenCollector.next();
 	}
 
 	@Override
-	public void handleBeginTerm(char character, ParserContext context) throws MessageDescriptorFormatException {
-		context.terminateToken();
+	public void handleBeginTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException {
+		tokenCollector.terminateToken();
 
-		context.appendToToken( ParserContext.EL_DESIGNATOR );
-		context.appendToToken( character );
-		context.makeParameterToken();
-		context.transitionState( new InterpolationTermState() );
-		context.next();
+		tokenCollector.appendToToken( TokenCollector.EL_DESIGNATOR );
+		tokenCollector.appendToToken( character );
+		tokenCollector.makeParameterToken();
+		tokenCollector.transitionState( new InterpolationTermState() );
+		tokenCollector.next();
 	}
 
 	@Override
-	public void handleEndTerm(char character, ParserContext context) throws MessageDescriptorFormatException {
+	public void handleEndTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException {
 		throw log.getNonTerminatedParameterException(
-				context.getOriginalMessageDescriptor(),
+				tokenCollector.getOriginalMessageDescriptor(),
 				character
 		);
 	}
 
 	@Override
-	public void handleEscapeCharacter(char character, ParserContext context)
+	public void handleEscapeCharacter(char character, TokenCollector tokenCollector)
 			throws MessageDescriptorFormatException {
-		context.transitionState( new EscapedState( this ) );
-		context.next();
+		tokenCollector.transitionState( new EscapedState( this ) );
+		tokenCollector.next();
 	}
 
 	@Override
-	public void handleELDesignator(char character, ParserContext context) throws MessageDescriptorFormatException {
-		handleNonMetaCharacter( character, context );
+	public void handleELDesignator(char character, TokenCollector tokenCollector)
+			throws MessageDescriptorFormatException {
+		handleNonMetaCharacter( character, tokenCollector );
 	}
 }
 
