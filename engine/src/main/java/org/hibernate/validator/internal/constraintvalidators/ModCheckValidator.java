@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.constraintvalidators;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -106,20 +107,19 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 		}
 
 		String digitsAsString;
-		String checkDigitAsString;
+		char checkDigit;
 		try {
 			digitsAsString = extractVerificationString( valueAsString );
-			checkDigitAsString = extractCheckDigitString( valueAsString );
+			checkDigit = extractCheckDigit( valueAsString );
 		}
 		catch (IndexOutOfBoundsException e) {
 			return false;
 		}
 
 		List<Integer> digits;
-		int checkDigit;
+
 		try {
 			digits = extractDigits( digitsAsString );
-			checkDigit = extractDigits( checkDigitAsString ).get( 0 );
 		}
 		catch (NumberFormatException e) {
 			return false;
@@ -128,10 +128,10 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 		boolean isValid;
 
 		if ( modType.equals( ModType.MOD10 ) ) {
-			isValid = ModUtil.passesMod10Test( digits, checkDigit, multiplier );
+			isValid = this.passesMod10Test( digits, checkDigit );
 		}
 		else {
-			isValid = ModUtil.passesMod11Test( digits, checkDigit, multiplier );
+			isValid = this.passesMod11Test( digits, checkDigit );
 		}
 		return isValid;
 	}
@@ -145,13 +145,13 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 		return value.substring( startIndex, endIndex );
 	}
 
-	private String extractCheckDigitString(String value) throws IndexOutOfBoundsException {
+	private char extractCheckDigit(String value) throws IndexOutOfBoundsException {
 		// the string contains the check digit, just return the check digit
 		if ( checkDigitIndex == -1 ) {
-			return value.substring( value.length() - 1, value.length() );
+			return value.charAt( value.length() - 1 );
 		}
 		else {
-			return value.substring( checkDigitIndex, checkDigitIndex + 1 );
+			return value.charAt( checkDigitIndex );
 		}
 	}
 
@@ -162,19 +162,72 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 	 *
 	 * @return List of {@code Integer} objects.
 	 *
-	 * @throws NumberFormatException in case ant of the characters is not a digit
+	 * @throws NumberFormatException in case any of the characters is not a digit
 	 */
-	private List<Integer> extractDigits(final String value) throws NumberFormatException {
+	private static List<Integer> extractDigits(final String value) throws NumberFormatException {
 		List<Integer> digits = new ArrayList<Integer>( value.length() );
 		char[] chars = value.toCharArray();
 		for ( char c : chars ) {
-			if ( Character.isDigit( c ) ) {
-				digits.add( Character.digit( c, DEC_RADIX ) );
-			}
-			else {
-				throw log.getCharacterIsNotADigitException( c );
-			}
+			digits.add( extractDigit( c ) );
 		}
 		return digits;
 	}
+	
+	/**
+	 * Returns the numeric {@code int} value of a {@code char}
+	 *
+	 * @param value the input {@code char} to be parsed
+	 *
+	 * @return the numeric {@code int} value represented by the character.
+	 *
+	 * @throws NumberFormatException in case character is not a digit
+	 */
+	private static int extractDigit(char c) throws NumberFormatException {
+		if ( Character.isDigit( c ) ) {
+			return Character.digit( c, DEC_RADIX );
+		}
+		else {
+			throw log.getCharacterIsNotADigitException( c );
+		}
+	}
+	
+	/**
+	 * Mod10 (Luhn) algorithm implementation
+	 *
+	 * @param digits The digits over which to calculate the checksum
+	 * @param checkDigit the check digit
+	 * @param multiplier Multiplier used in the algorithm
+	 *
+	 * @return {@code true} if the mod 10 result matches the check digit, {@code false} otherwise
+	 */
+	public boolean passesMod10Test(final List<Integer> digits, char checkDigit) {
+		int modResult = ModUtil.mod10sum(digits, multiplier );
+		int checkValue = extractDigit( checkDigit );
+		
+		return modResult == checkValue;
+	}
+	
+	/**
+	 * Check if the input passes the mod11 test
+	 *
+	 * @param digits the digits over which to calculate the mod 11 algorithm
+	 * @param checkDigit the check digit
+	 *
+	 * @return {@code true} if the mod 11 result matches the check digit, {@code false} otherwise
+	 */
+	public boolean passesMod11Test(final List<Integer> digits, char  checkDigit) {
+		// This method and the mod10 equivalent are is just a stubs, the idea is
+		// to extend the ModCheckValidator and overriding this methods with the
+		// new behaviors for the constraints @Mod1x in planed for HV-809
+
+		int modResult = ModUtil.mod11sum( digits, multiplier );
+		int checkValue = extractDigit( checkDigit );
+		
+		if ( modResult == 10 || modResult == 11 ) {
+			modResult = 0;
+		}
+		
+		return modResult == checkValue;
+	}
+	
 }
