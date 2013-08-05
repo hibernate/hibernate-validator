@@ -25,9 +25,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-
 /**
- * Tests for {@code MessageDescriptorParser}.
+ * Tests for {@code TokenIterator}.
  *
  * @author Hardy Ferentschik
  */
@@ -70,10 +69,10 @@ public class TokenIteratorTest {
 		TokenCollector tokenCollector = new TokenCollector( message, InterpolationTermType.PARAMETER );
 		TokenIterator tokenIterator = new TokenIterator( tokenCollector.getTokenList() );
 
-		assertTrue( tokenIterator.hasMoreInterpolationTerms(), "The should be term" );
+		assertTrue( tokenIterator.hasMoreInterpolationTerms(), "There should be a term" );
 		assertEquals( tokenIterator.nextInterpolationTerm(), "{foo}", "{foo} should be the first term" );
 
-		assertTrue( tokenIterator.hasMoreInterpolationTerms(), "The should be term" );
+		assertTrue( tokenIterator.hasMoreInterpolationTerms(), "There should be a term" );
 		assertEquals( tokenIterator.nextInterpolationTerm(), "{bar}", "{bar} should be the second term" );
 
 		assertFalse( tokenIterator.hasMoreInterpolationTerms(), "There should be no more interpolation terms" );
@@ -85,7 +84,7 @@ public class TokenIteratorTest {
 		TokenCollector tokenCollector = new TokenCollector( message, InterpolationTermType.PARAMETER );
 		TokenIterator tokenIterator = new TokenIterator( tokenCollector.getTokenList() );
 
-		assertFalse( tokenIterator.hasMoreInterpolationTerms(), "The should be no term" );
+		assertFalse( tokenIterator.hasMoreInterpolationTerms(), "There should be no term" );
 		assertEquals(
 				tokenIterator.getInterpolatedMessage(),
 				message,
@@ -173,13 +172,13 @@ public class TokenIteratorTest {
 			String termReplacement,
 			String interpolatedMessage)
 			throws Exception {
-		assertTrue( tokenIterator.hasMoreInterpolationTerms(), "The should be a term" );
+		assertTrue( tokenIterator.hasMoreInterpolationTerms(), "There should be a term" );
 
 		String actualTerm = tokenIterator.nextInterpolationTerm();
 		assertEquals( actualTerm, term, "Wrong term" );
 		tokenIterator.replaceCurrentInterpolationTerm( termReplacement );
 
-		assertFalse( tokenIterator.hasMoreInterpolationTerms(), "The should be no more term" );
+		assertFalse( tokenIterator.hasMoreInterpolationTerms(), "There should be no more term" );
 		assertEquals(
 				tokenIterator.getInterpolatedMessage(),
 				interpolatedMessage,

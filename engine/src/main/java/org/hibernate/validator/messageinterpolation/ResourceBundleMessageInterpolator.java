@@ -263,9 +263,10 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		if ( tokens == null ) {
 			TokenCollector tokenCollector = new TokenCollector( resolvedMessage, InterpolationTermType.PARAMETER );
 			tokens = tokenCollector.getTokenList();
-		}
-		if ( cachingEnabled ) {
-			tokenizedParameterMessages.putIfAbsent( resolvedMessage, tokens );
+
+			if ( cachingEnabled ) {
+				tokenizedParameterMessages.putIfAbsent( resolvedMessage, tokens );
+			}
 		}
 		resolvedMessage = interpolateExpression(
 				new TokenIterator( tokens ),
@@ -281,9 +282,10 @@ public class ResourceBundleMessageInterpolator implements MessageInterpolator {
 		if ( tokens == null ) {
 			TokenCollector tokenCollector = new TokenCollector( resolvedMessage, InterpolationTermType.EL );
 			tokens = tokenCollector.getTokenList();
-		}
-		if ( cachingEnabled ) {
-			tokenizedELMessages.putIfAbsent( resolvedMessage, tokens );
+
+			if ( cachingEnabled ) {
+				tokenizedELMessages.putIfAbsent( resolvedMessage, tokens );
+			}
 		}
 		resolvedMessage = interpolateExpression(
 				new TokenIterator( tokens ),
