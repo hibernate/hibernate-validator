@@ -52,7 +52,7 @@ public class CachedTraversableResolverTest {
 		try {
 			v.validate( suit, Default.class, Cloth.class );
 		}
-		catch (IllegalStateException e) {
+		catch ( IllegalStateException e ) {
 			fail( "Traversable Called several times for a given object" );
 		}
 
@@ -60,7 +60,7 @@ public class CachedTraversableResolverTest {
 		try {
 			v.validateProperty( suit, "size", Default.class, Cloth.class );
 		}
-		catch (IllegalStateException e) {
+		catch ( IllegalStateException e ) {
 			fail( "Traversable Called several times for a given object" );
 		}
 
@@ -68,7 +68,7 @@ public class CachedTraversableResolverTest {
 		try {
 			v.validateValue( Suit.class, "size", 2, Default.class, Cloth.class );
 		}
-		catch (IllegalStateException e) {
+		catch ( IllegalStateException e ) {
 			fail( "Traversable Called several times for a given object" );
 		}
 	}
@@ -87,10 +87,10 @@ public class CachedTraversableResolverTest {
 		}
 
 		public boolean isReachable(Object traversableObject,
-				Path.Node traversableProperty,
-				Class<?> rootBeanType,
-				Path pathToTraversableObject,
-				ElementType elementType) {
+								   Path.Node traversableProperty,
+								   Class<?> rootBeanType,
+								   Path pathToTraversableObject,
+								   ElementType elementType) {
 			return isTraversable(
 					askedReach,
 					traversableObject,
@@ -99,10 +99,10 @@ public class CachedTraversableResolverTest {
 		}
 
 		public boolean isCascadable(Object traversableObject,
-				Path.Node traversableProperty,
-				Class<?> rootBeanType,
-				Path pathToTraversableObject,
-				ElementType elementType) {
+									Path.Node traversableProperty,
+									Class<?> rootBeanType,
+									Path pathToTraversableObject,
+									ElementType elementType) {
 			return isTraversable(
 					askedCascade,
 					traversableObject,

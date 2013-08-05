@@ -21,9 +21,8 @@ import org.hibernate.validator.internal.engine.messageinterpolation.parser.Messa
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.TokenCollector;
 import org.testng.annotations.Test;
 
-
 /**
- * Tests for {@code MessageDescriptorParser}.
+ * Tests for {@code TokenCollector}.
  *
  * @author Hardy Ferentschik
  */
@@ -47,7 +46,6 @@ public class TokenCollectorTest {
 	@Test(expectedExceptions = MessageDescriptorFormatException.class, expectedExceptionsMessageRegExp = "HV000168.*")
 	public void testTermWithoutClosingBraceThrowsException() throws Exception {
 		new TokenCollector( "{foo", InterpolationTermType.PARAMETER );
-
 	}
 
 	@Test(expectedExceptions = MessageDescriptorFormatException.class, expectedExceptionsMessageRegExp = "HV000168.*")
