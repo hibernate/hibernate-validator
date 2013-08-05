@@ -35,33 +35,52 @@ public final class ModUtil {
 	 *
 	 * @return the result of the mod11 checksum calculation
 	 */
-	public static int mod10sum(final List<Integer> digits, int multiplier) {
+	public static int mod10sum(final List<Integer> digits, int multiplier, int weight) {
 		int sum = 0;
 		boolean even = true;
 		for ( int index = digits.size() - 1; index >= 0; index-- ) {
 			int digit = digits.get( index );
+
 			if ( even ) {
 				digit *= multiplier;
+			}else{
+			    digit *= weight;
 			}
+
 			if ( digit > 9 ) {
 				digit = digit / 10 + digit % 10;
 			}
 			sum += digit;
 			even = !even;
 		}
-		return 10 - ( sum % 10 );
+		return 10 - (sum % 10);
 	}
 
 	/**
 	 * Calculate Mod10 sum (Luhn algorithm implementation)
 	 *
 	 * @param digits The digits over which to calculate the checksum
+	 * @param multiplier Multiplier used in the algorithm
 	 *
-	 * @return the result of the mod10 checksum calculation assuming multiplier is 2
+	 * @return the result of the mod11 checksum calculation assuming weight = 1
+	 */
+	public static int mod10sum(final List<Integer> digits, int multiplier) {
+		return mod10sum(digits, multiplier, 1);
+	}
+
+	/**
+	 * Calculate Mod10 sum (Luhn algorithm implementation)
+	 *
+	 * @param digits The digits over which to calculate the checksum
+	 * @param multiplier Multiplier used in the algorithm
+	 *
+	 * @return the result of the mod11 checksum calculation assuming multiplier = 2 and weight = 1
 	 */
 	public static int mod10sum(final List<Integer> digits) {
-		return mod10sum( digits, 2 );
+		return mod10sum(digits, 2, 1);
 	}
+
+
 
 	/**
 	 * Calculate Mod11 sum

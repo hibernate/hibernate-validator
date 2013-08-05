@@ -95,6 +95,12 @@ public class ModUtilTest {
 
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
 		assertFalse( ModUtil.mod11sum( digits ) == 5 );
+
+		digits = Arrays.asList( 3, 7, 8, 7, 9, 6, 9, 5, 0, 0 );
+		assertFalse( ModUtil.mod11sum( digits ) == 2 );
+
+		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6, 5 );
+		assertFalse( ModUtil.mod11sum( digits ) == 2);
 	}
 
 }

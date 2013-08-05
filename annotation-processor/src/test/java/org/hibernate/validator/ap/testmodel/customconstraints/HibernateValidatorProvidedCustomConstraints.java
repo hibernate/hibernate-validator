@@ -42,6 +42,8 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@Email
 	@Length
 	@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)
+	@Mod10Check
+	@Mod11Check
 	@NotBlank
 	@NotEmpty
 	@Range
@@ -59,6 +61,8 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@Email
 	@Length
 	@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)
+	@Mod10Check
+	@Mod11Check
 	@NotBlank
 	@NotEmpty
 	@Range
