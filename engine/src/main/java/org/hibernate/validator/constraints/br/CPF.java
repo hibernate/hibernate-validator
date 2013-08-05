@@ -16,17 +16,6 @@
  */
 package org.hibernate.validator.constraints.br;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import javax.validation.Constraint;
-import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
-import javax.validation.constraints.Pattern;
-
-import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.ModCheck.ModType;
-
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -34,10 +23,21 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
+import javax.validation.ReportAsSingleViolation;
+import javax.validation.constraints.Pattern;
+
+import org.hibernate.validator.constraints.Mod11Check;
 /**
  * Validates a CPF (Cadastro de Pessoa F\u00edsica - Brazilian individual taxpayer registry number).
  *
  * @author George Gastaldi
+ * @author Victor Rezende dos Santos
  */
 @Pattern.List({
 		@Pattern(regexp = "([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}-[0-9]{2})|([0-9]{11})"),
@@ -53,15 +53,15 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 		@Pattern(regexp = "^(?:(?!888\\.?888\\.?888-?88).)*$"),
 		@Pattern(regexp = "^(?:(?!999\\.?999\\.?999-?99).)*$")
 })
-@ModCheck.List({
-		@ModCheck(modType = ModType.MOD11,
-				checkDigitPosition = 9,
-				multiplier = 10,
-				endIndex = 9),
-		@ModCheck(modType = ModType.MOD11,
-				checkDigitPosition = 10,
-				multiplier = 11,
-				endIndex = 10)
+@Mod11Check.List({
+    	@Mod11Check(multiplier = 10,
+			checkDigitPosition = 9,
+			endIndex = 9,
+			treatCheck10As='0'),
+	@Mod11Check(multiplier = 11,
+			checkDigitPosition = 10,
+			endIndex = 10,
+			treatCheck10As='0')
 })
 @ReportAsSingleViolation
 @Documented

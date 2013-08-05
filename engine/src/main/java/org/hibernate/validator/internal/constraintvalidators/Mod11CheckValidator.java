@@ -16,72 +16,78 @@
  */
 package org.hibernate.validator.internal.constraintvalidators;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.ModCheck.ModType;
+import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.internal.util.ModUtil;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * Mod check validator for MOD10 and MOD11 algorithms
+ * Mod11 Check Digit validator
  *
- * http://en.wikipedia.org/wiki/Luhn_algorithm
  * http://en.wikipedia.org/wiki/Check_digit
  *
  * @author George Gastaldi
  * @author Hardy Ferentschik
+ * @author Victor Rezende dos Santos
  */
-public class ModCheckValidator extends ModCheckCommonValidator implements ConstraintValidator<ModCheck, CharSequence> {
-	/**
-	 * Multiplier used by the mod algorithms
-	 */
-	private int multiplier;
-	/**
-	 * The type of checksum algorithm
-	 */
-	private ModType modType;
+public class Mod11CheckValidator extends ModCheckCommonValidator
+		implements ConstraintValidator<Mod11Check, CharSequence> {
 
-	public void initialize(ModCheck constraintAnnotation) {
-		this.modType = constraintAnnotation.modType();
-		this.multiplier = constraintAnnotation.multiplier();
+	private static final Log log = LoggerFactory.make();
+	private boolean reverseOrder;
+	private char treatCheck10As;
+	private char treatCheck11As;
+
+	public void initialize(Mod11Check constraintAnnotation) {
 		this.startIndex = constraintAnnotation.startIndex();
 		this.endIndex = constraintAnnotation.endIndex();
 		this.checkDigitIndex = constraintAnnotation.checkDigitPosition();
 		this.ignoreNonDigitCharacters = constraintAnnotation.ignoreNonDigitCharacters();
+		this.multiplier = constraintAnnotation.multiplier();
+
+		this.reverseOrder = constraintAnnotation.reverseOrder();
+
+		this.treatCheck10As = constraintAnnotation.treatCheck10As();
+		this.treatCheck11As = constraintAnnotation.treatCheck11As();
 
 		this.validateOptions();
+
+		if ( !Character.isLetterOrDigit( this.treatCheck10As ) ) {
+			throw log.getTreatCheckAsIsNotADigitNorALetterException( this.treatCheck10As );
+		}
+
+		if ( !Character.isLetterOrDigit( this.treatCheck11As ) ) {
+			throw log.getTreatCheckAsIsNotADigitNorALetterException( this.treatCheck11As );
+		}
 	}
 
 	/**
-	 * Check if the input passes the Mod10 (Luhn algorithm implementation) or Mod11 test
+	 * Validate check digit using Mod11 checksum
 	 *
-	 * @param digits the digits over which to calculate the Mod10 or Mod11 checksum
+	 * @param digits The digits over which to calculate the checksum
 	 * @param checkDigit the check digit
 	 *
-	 * @return {@code true} if the mod 11 result matches the check digit, {@code false} otherwise
+	 * @return {@code true} if the mod11 result matches the check digit, {@code false} otherwise
 	 */
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {
-		int modResult = -1;
-		int checkValue = extractDigit( checkDigit );
-
-		if ( modType.equals( ModType.MOD11 ) ) {
-			modResult = ModUtil.mod11sum( digits, multiplier );
-
-			if ( modResult == 10 || modResult == 11 ) {
-				modResult = 0;
-			}
-		}
-		else {
-			modResult = ModUtil.mod10sum( digits, multiplier );
+		if ( !reverseOrder ) {
+			Collections.reverse( digits );
 		}
 
-		return checkValue == modResult;
+		int modResult = ModUtil.mod11sum( digits, this.multiplier );
+		switch ( modResult ) {
+			case 10:
+				return checkDigit == this.treatCheck10As;
+			case 11:
+				return checkDigit == this.treatCheck11As;
+			default:
+				return Character.isDigit( checkDigit ) && modResult == extractDigit( checkDigit );
+		}
 	}
 
 }
