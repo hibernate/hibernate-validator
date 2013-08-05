@@ -35,17 +35,18 @@ public final class ModUtil {
 	 *
 	 * @return the result of the mod11 checksum calculation
 	 */
-	public static int mod10sum(final List<Integer> digits, int multiplier) {
-		if( multiplier == 2 )
-			return mod10sum( digits );
-		
+	public static int mod10sum(final List<Integer> digits, int multiplier, int weight) {		
 		int sum = 0;
 		boolean even = true;
 		for ( int index = digits.size() - 1; index >= 0; index-- ) {
 			int digit = digits.get( index );
+	
 			if ( even ) {
 				digit *= multiplier;
+			}else{
+			    digit *= weight;
 			}
+			
 			if ( digit > 9 ) {
 				digit = digit / 10 + digit % 10;
 			}
@@ -57,30 +58,29 @@ public final class ModUtil {
 	
 	/**
 	 * Calculate Mod10 sum (Luhn algorithm implementation)
-	 * This version is optimized for classic implementation that assumes multiplier is 2
 	 *
 	 * @param digits The digits over which to calculate the checksum
+	 * @param multiplier Multiplier used in the algorithm
 	 *
-	 * @return the result of the mod10 checksum calculation
+	 * @return the result of the mod11 checksum calculation assuming weight = 1
+	 */
+	public static int mod10sum(final List<Integer> digits, int multiplier) {
+		return mod10sum(digits, multiplier, 1);
+	}
+	
+	/**
+	 * Calculate Mod10 sum (Luhn algorithm implementation)
+	 *
+	 * @param digits The digits over which to calculate the checksum
+	 * @param multiplier Multiplier used in the algorithm
+	 *
+	 * @return the result of the mod11 checksum calculation assuming multiplier = 2 and weight = 1
 	 */
 	public static int mod10sum(final List<Integer> digits) {
-		 
-		int sum = 0;
-		boolean even = true;
-		for ( int index = digits.size() - 1 ; index >= 0 ; index-- ) {
-			int digit = digits.get( index ); // Assume this values is n 
-			if ( even ) {
-				digit <<= 1; // optimization for n *= 2, not really necessary compiler or the JVM will do
-			}
-			if ( digit > 9 ) {
-				digit -= 9;
-			}
-			sum += digit;
-			even = !even;
-		}
-		
-		return 10 - (sum % 10); 
+	    	return mod10sum(digits, 2, 1);
 	}
+	
+       
 	
 	/**
 	 * Calculate Mod11 sum
