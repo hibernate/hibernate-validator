@@ -24,6 +24,8 @@ import org.hibernate.validator.internal.util.StringHelper;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 /**
  * Unit test for {@link StringHelper}.
@@ -73,6 +75,36 @@ public class StringHelperTest {
 	@Test
 	public void joinShouldPrintLiteralNullForNullValues() {
 		assertThat( StringHelper.join( new Integer[] { 1, null, 2 }, "," ) ).isEqualTo( "1,null,2" );
+	}
+
+	@Test
+	public void decapitalizeShouldReturnNullForNullString() {
+		assertNull( StringHelper.decapitalize( null ) );
+	}
+
+	@Test
+	public void decapitalizeShouldReturnEmptyStringForEmptyString() {
+		assertEquals( StringHelper.decapitalize( "" ), "" );
+	}
+
+	@Test
+	public void decapitalizeShouldReturnLowerCaseLetter() {
+		assertEquals( StringHelper.decapitalize( "A" ), "a" );
+	}
+
+	@Test
+	public void decapitalizeShouldReturnDecapizalizedWord() {
+		assertEquals( StringHelper.decapitalize( "Giraffe" ), "giraffe" );
+	}
+
+	@Test
+	public void decapitalizeShouldReturnSameWordForDecapizalizedWord() {
+		assertEquals( StringHelper.decapitalize( "giraffe" ), "giraffe" );
+	}
+
+	@Test
+	public void decapitalizeShouldReturnSameWordForWordWithSeveralLeadingCapitalLetters() {
+		assertEquals( StringHelper.decapitalize( "GIRaffe" ), "GIRaffe" );
 	}
 
 	private static class PolarBear {

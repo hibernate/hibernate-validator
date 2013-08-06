@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.internal.util;
 
-import java.beans.Introspector;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
@@ -43,6 +42,7 @@ import com.fasterxml.classmate.ResolvedTypeWithMembers;
 import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.classmate.members.RawMethod;
 import com.fasterxml.classmate.members.ResolvedMethod;
+
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -256,7 +256,7 @@ public final class ReflectionHelper {
 			String methodName = member.getName();
 			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
 				if ( methodName.startsWith( prefix ) ) {
-					name = Introspector.decapitalize( methodName.substring( prefix.length() ) );
+					name = StringHelper.decapitalize( methodName.substring( prefix.length() ) );
 				}
 			}
 		}
