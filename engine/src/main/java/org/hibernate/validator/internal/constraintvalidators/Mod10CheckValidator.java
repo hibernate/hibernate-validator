@@ -20,67 +20,63 @@ import java.util.List;
 
 import javax.validation.ConstraintValidator;
 
-import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.ModCheck.ModType;
+import org.hibernate.validator.constraints.Mod10Check;
 
 import org.hibernate.validator.internal.util.ModUtil;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 /**
- * Mod check validator for MOD10 and MOD11 algorithms
+ * Mod10 (Luhn algorithm implementation) Check validator
  *
  * http://en.wikipedia.org/wiki/Luhn_algorithm
  * http://en.wikipedia.org/wiki/Check_digit
  *
  * @author George Gastaldi
  * @author Hardy Ferentschik
+ * @author Victor Rezende dos Santos
  */
-public class ModCheckValidator extends ModCheckCommonValidator implements ConstraintValidator<ModCheck, CharSequence> {
-	/**
-	 * Multiplier used by the mod algorithms
+public class Mod10CheckValidator extends ModCheckCommonValidator implements ConstraintValidator<Mod10Check, CharSequence> {
+    
+    	private static final Log log = LoggerFactory.make();
+    	
+    	/**
+	 * Weight to be used by even digits on Mod10 algorithm
 	 */
-	private int multiplier;
-
-	/**
-	 * The type of checksum algorithm
-	 */
-	private ModType modType;
-
-	public void initialize(ModCheck constraintAnnotation) {
-		this.modType = constraintAnnotation.modType();
-		this.multiplier = constraintAnnotation.multiplier();
+	private int weight;
+    
+	public void initialize(Mod10Check constraintAnnotation) {
 		this.startIndex = constraintAnnotation.startIndex();
 		this.endIndex = constraintAnnotation.endIndex();
 		this.checkDigitIndex = constraintAnnotation.checkDigitPosition();
 		this.ignoreNonDigitCharacters = constraintAnnotation.ignoreNonDigitCharacters();
+		this.multiplier = constraintAnnotation.multipler();
+		this.weight = constraintAnnotation.weight();
 
+		if ( this.weight < 0){
+		    throw log.getWeightCannotBeNegativeException( this.weight );
+		}
+		
 		this.validateOptions();
-	}
+		
+		
+	}	
 	
 	/**
-	 * Check if the input passes the Mod10 (Luhn algorithm implementation) or Mod11 test
+	 * Validate check digit using Mod10 
 	 *
-	 * @param digits the digits over which to calculate the Mod10 or Mod11 checksum
+	 * @param digits The digits over which to calculate the checksum
 	 * @param checkDigit the check digit
 	 *
-	 * @return {@code true} if the mod 11 result matches the check digit, {@code false} otherwise
+	 * @return {@code true} if the mod 10 result matches the check digit, {@code false} otherwise
 	 */
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {
-		int modResult = -1;
+		int modResult = ModUtil.mod10sum(digits, this.multiplier, this.weight);
 		int checkValue = extractDigit( checkDigit );
-				
-		if ( modType.equals( ModType.MOD11 ) ) {
-			modResult = ModUtil.mod11sum( digits, multiplier );
-			
-			if ( modResult == 10 || modResult == 11 ) {
-				modResult = 0;
-			}
-		}
-		else {
-			modResult = ModUtil.mod10sum( digits, multiplier );			
-		}
 		
-		return checkValue == modResult;
+		return modResult == checkValue;
 	}
 	
 }

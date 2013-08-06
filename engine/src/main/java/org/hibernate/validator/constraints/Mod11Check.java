@@ -19,6 +19,7 @@ package org.hibernate.validator.constraints;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
@@ -30,43 +31,58 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Modulo check constraint.
+ * Modulo 11 check constraint.
  * <p>
- * Allows to validate that a series of digits pass the mod 10 or mod 11 checksum algorithm.
+ * Allows to validate that a series of digits pass the mod 11 checksum
+ * algorithm. <br />
+ * The most common Mod11 variant the sum is done by multiplying a weight from
+ * the rightmost digit (excluding the check digit) to the leftmost, the weight 2
+ * starts with 2 an increases by one each new digit, then the result is used to
+ * calculate the check digit using {@code 11 - ( sum % 11 )}
  * </p>
+ * <p>
+ * Example: The check digit for 24187 is 3<br />
+ * Sum = 7x2 + 8x3 + 1x4 + 4x5 + 2x6 = 74 <br />
+ * 11 - (74 % 11) = 11 - 8 = 3 so 24187-3 is valid number.
+ * </p>
+ * <p>
+ * Mod11 check digit can result in 10 or 11, per default 10 is treat as
+ * {@code 'X'} and 11 as {@code '0'}, this behavior can be changed using the
+ * options {@code treatCheck10As} and {@code treatCheck10As} No special
+ * characters are accepted the digit must be a Letter or a Digit
+ * 
+ * Some implementations do the sum in the reverse order (left to right), 
+ * </p>
+ * 
  * <p>
  * The supported type is {@code CharSequence}. {@code null} is considered valid.
  * </p>
- *
+ * 
  * @author George Gastaldi
  * @author Hardy Ferentschik
+ * @author Victor Rezende dos Santos
  */
 @Documented
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
-public @interface ModCheck {
-	String message() default "{org.hibernate.validator.constraints.ModCheck.message}";
+public @interface Mod11Check {
+	String message() default "{org.hibernate.validator.constraints.Mod11Check.message}";
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
-
+	
 	/**
-	 * @return The modulus algorithm to be used
+	 * @return The multiplier to be used by odd digits on Mod10 algorithm
 	 */
-	ModType modType();
-
-	/**
-	 * @return The multiplier to be used by the chosen mod algorithm
-	 */
-	int multiplier();
-
+	int multiplier() default 11;
+	
 	/**
 	 * @return the start index (inclusive) for calculating the checksum. If not specified 0 is assumed.
 	 */
 	int startIndex() default 0;
-
+	
 	/**
 	 * @return the end index (exclusive) for calculating the checksum. If not specified the whole value is considered
 	 */
@@ -85,25 +101,32 @@ public @interface ModCheck {
 	 *         characters.
 	 */
 	boolean ignoreNonDigitCharacters() default true;
-
+	
 	/**
-	 * Defines several {@code @ModCheck} annotations on the same element.
+	 * @return The {@code char} that represents the check digit when mod11
+	 *         checksum equals 10. If not specified {@code '0'} is assumed.
+	 */
+	char treatCheck10As() default 'X';
+	
+	/**
+	 * @return The {@code char} that represents the check digit when mod11
+	 *         checksum equals 10. If not specified {@code '0'} is assumed.
+	 */
+	char treatCheck11As() default '0';
+	
+        /**
+         * @return Returns {@code true} if the Mod11 checksum must be done from the rightmost to the leftmost digit {@code false} otherwise.
+         *         If not specified {@code true} is assumed.
+         */
+	boolean reverseOrder() default true;
+	
+	/**
+	 * Defines several {@code @ModCheck11} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)
 	@Documented
 	public @interface List {
-		ModCheck[] value();
-	}
-
-	public enum ModType {
-		/**
-		 * Represents a MOD10 algorithm (Also known as Luhn algorithm)
-		 */
-		MOD10,
-		/**
-		 * Represents a MOD11 algorithm. A remainder of 10 or 11 in the algorithm is mapped to the check digit 0.
-		 */
-		MOD11
+		Mod11Check[] value();
 	}
 }

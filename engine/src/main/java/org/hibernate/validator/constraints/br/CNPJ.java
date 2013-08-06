@@ -19,14 +19,14 @@ package org.hibernate.validator.constraints.br;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 
-import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.ModCheck.List;
-import org.hibernate.validator.constraints.ModCheck.ModType;
+import org.hibernate.validator.constraints.Mod11Check;
+import org.hibernate.validator.constraints.Mod11Check.List;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -41,15 +41,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author George Gastaldi
  */
 @Pattern(regexp = "([0-9]{2}[.]?[0-9]{3}[.]?[0-9]{3}[/]?[0-9]{4}[-]?[0-9]{2})")
-@List({
-		@ModCheck(modType = ModType.MOD11,
-				checkDigitPosition = 12,
-				multiplier = 9,
-				endIndex = 12),
-		@ModCheck(modType = ModType.MOD11,
-				checkDigitPosition = 13,
-				multiplier = 9,
-				endIndex = 13)
+@List({ 
+    @Mod11Check( multiplier = 9, 
+	    endIndex = 12, 
+	    checkDigitPosition = 12 ),
+    @Mod11Check( multiplier = 9, 
+    	    endIndex = 13, 
+    	    checkDigitPosition = 13 )
 })
 @ReportAsSingleViolation
 @Documented

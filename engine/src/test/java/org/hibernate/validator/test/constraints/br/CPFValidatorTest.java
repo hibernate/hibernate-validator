@@ -50,12 +50,65 @@ public class CPFValidatorTest {
 		);
 		assertNumberOfViolations( violations, 1 );
 	}
-
+	
 	@Test
 	@TestForIssue(jiraKey = "HV-491")
 	public void testIncorrectFormattedCPFWithReportAsSingleViolation() {
 		Set<ConstraintViolation<Person>> violations = ValidatorUtil.getValidator().validate(
 				new Person( "48255-77" )
+		);
+		assertNumberOfViolations( violations, 1 );
+	}
+	
+	@Test
+	@TestForIssue(jiraKey = "HV-808")
+	public void testCPFBoundaryConditionsForAllSameDigitValidMod11() {
+		String[] invalidCPFs = { "000.000.000-00", "111.111.111-11", "222.222.222-22",
+		"333.333.333-33", "444.444.444-44", "555.555.555-55",
+		"666.666.666-66", "777.777.777-77", "888.888.888-88",
+		"999.999.999-99" };
+
+		Set<ConstraintViolation<Person>> violations = null;
+		
+		for(String cpf : invalidCPFs){
+			violations = ValidatorUtil.getValidator().validate(
+				new Person( cpf )
+			);
+			
+			assertNumberOfViolations( violations, 1 );
+			
+			violations = ValidatorUtil.getValidator().validate(
+				new Person( cpf.replaceAll( "[^0-9]", "" ) )
+			);
+			assertNumberOfViolations( violations, 1 );
+		}
+	}
+	
+	@Test
+	@TestForIssue(jiraKey = "HV-808")
+	public void testCorrectFormattedCPFWithReportAsSingleViolationForCheckDigitSelfValidation() {
+		Set<ConstraintViolation<Person>> violations = ValidatorUtil.getValidator().validate(
+				new Person( "378.796.950-01" )
+		);
+		assertNumberOfViolations( violations, 0 );
+		
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "378.796.950-02" )
+		);
+		assertNumberOfViolations( violations, 1 );
+		
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "331.814.296-43" )
+		);
+		assertNumberOfViolations( violations, 0 );
+		
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "331.814.296-52" )
+		);
+		assertNumberOfViolations( violations, 1 );		
+		
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "331.814.296-51" )
 		);
 		assertNumberOfViolations( violations, 1 );
 	}
