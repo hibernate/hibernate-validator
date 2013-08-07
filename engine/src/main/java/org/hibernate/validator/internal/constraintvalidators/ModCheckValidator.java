@@ -39,35 +39,28 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequence> {
 
 	private static final Log log = LoggerFactory.make();
-
 	private static final String NUMBERS_ONLY_REGEXP = "[^0-9]";
 	private static final int DEC_RADIX = 10;
-
 	/**
 	 * Multiplier used by the mod algorithms
 	 */
 	private int multiplier;
-
 	/**
 	 * The start index for the checksum calculation
 	 */
 	private int startIndex;
-
 	/**
 	 * The end index for the checksum calculation
 	 */
 	private int endIndex;
-
 	/**
 	 * The index of the checksum digit
 	 */
 	private int checkDigitIndex;
-
 	/**
 	 * The type of checksum algorithm
 	 */
 	private ModType modType;
-
 	private boolean ignoreNonDigitCharacters;
 
 	public void initialize(ModCheck constraintAnnotation) {
@@ -106,34 +99,37 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 		}
 
 		String digitsAsString;
-		String checkDigitAsString;
+		char checkDigit;
 		try {
 			digitsAsString = extractVerificationString( valueAsString );
-			checkDigitAsString = extractCheckDigitString( valueAsString );
+			checkDigit = extractCheckDigit( valueAsString );
 		}
-		catch (IndexOutOfBoundsException e) {
+		catch ( IndexOutOfBoundsException e ) {
 			return false;
 		}
 
 		List<Integer> digits;
-		int checkDigit;
+
 		try {
 			digits = extractDigits( digitsAsString );
-			checkDigit = extractDigits( checkDigitAsString ).get( 0 );
 		}
-		catch (NumberFormatException e) {
+		catch ( NumberFormatException e ) {
 			return false;
 		}
 
-		boolean isValid;
+		int modResult = -1;
+		int checkValue = extractDigit( checkDigit );
 
 		if ( modType.equals( ModType.MOD10 ) ) {
-			isValid = ModUtil.passesMod10Test( digits, checkDigit, multiplier );
+			modResult = ModUtil.mod10sum( digits, multiplier );
 		}
 		else {
-			isValid = ModUtil.passesMod11Test( digits, checkDigit, multiplier );
+			modResult = ModUtil.mod11sum( digits, multiplier );
+			if ( modResult == 10 || modResult == 11 ) {
+				modResult = 0;
+			}
 		}
-		return isValid;
+		return modResult == checkValue;
 	}
 
 	private String extractVerificationString(String value) throws IndexOutOfBoundsException {
@@ -145,13 +141,13 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 		return value.substring( startIndex, endIndex );
 	}
 
-	private String extractCheckDigitString(String value) throws IndexOutOfBoundsException {
+	private char extractCheckDigit(String value) throws IndexOutOfBoundsException {
 		// the string contains the check digit, just return the check digit
 		if ( checkDigitIndex == -1 ) {
-			return value.substring( value.length() - 1, value.length() );
+			return value.charAt( value.length() - 1 );
 		}
 		else {
-			return value.substring( checkDigitIndex, checkDigitIndex + 1 );
+			return value.charAt( checkDigitIndex );
 		}
 	}
 
@@ -162,19 +158,33 @@ public class ModCheckValidator implements ConstraintValidator<ModCheck, CharSequ
 	 *
 	 * @return List of {@code Integer} objects.
 	 *
-	 * @throws NumberFormatException in case ant of the characters is not a digit
+	 * @throws NumberFormatException in case any of the characters is not a digit
 	 */
-	private List<Integer> extractDigits(final String value) throws NumberFormatException {
+	private static List<Integer> extractDigits(final String value) throws NumberFormatException {
 		List<Integer> digits = new ArrayList<Integer>( value.length() );
 		char[] chars = value.toCharArray();
 		for ( char c : chars ) {
-			if ( Character.isDigit( c ) ) {
-				digits.add( Character.digit( c, DEC_RADIX ) );
-			}
-			else {
-				throw log.getCharacterIsNotADigitException( c );
-			}
+			digits.add( extractDigit( c ) );
 		}
 		return digits;
 	}
+
+	/**
+	 * Returns the numeric {@code int} value of a {@code char}
+	 *
+	 * @param value the input {@code char} to be parsed
+	 *
+	 * @return the numeric {@code int} value represented by the character.
+	 *
+	 * @throws NumberFormatException in case character is not a digit
+	 */
+	private static int extractDigit(char value) throws NumberFormatException {
+		if ( Character.isDigit( value ) ) {
+			return Character.digit( value, DEC_RADIX );
+		}
+		else {
+			throw log.getCharacterIsNotADigitException( value );
+		}
+	}
+
 }
