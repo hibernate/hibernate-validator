@@ -79,7 +79,7 @@ public class Mod10CheckValidatorTest {
 
 		assertTrue( validator.isValid( new MyCustomStringImpl( "A79927398713" ), null ) );
 	}
-	
+
 	@Test
 	public void testValidMod10() throws Exception {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
@@ -97,7 +97,7 @@ public class Mod10CheckValidatorTest {
 
 		assertFalse( validator.isValid( new MyCustomStringImpl( "79927398714" ), null ) );
 	}
-		
+
 	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
 		AnnotationDescriptor<Mod10Check> descriptor = new AnnotationDescriptor<Mod10Check>( Mod10Check.class );
 		descriptor.setValue( "startIndex", start );

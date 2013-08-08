@@ -40,8 +40,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @author George Gastaldi
  * @author Hardy Ferentschik
+ * @deprecated As of release 5.1.0, replaced by {@link Mod10Check} and {@link Mod11Check}
  */
 @Documented
+@Deprecated
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)

@@ -78,7 +78,7 @@ public class ModCheckValidatorTest {
 
 		assertTrue( validator.isValid( new MyCustomStringImpl( "A79927398713" ), null ) );
 	}
-	
+
 	@Test
 	public void testValidMod10() throws Exception {
 		ModCheckValidator validator = new ModCheckValidator();
@@ -96,7 +96,7 @@ public class ModCheckValidatorTest {
 
 		assertFalse( validator.isValid( new MyCustomStringImpl( "79927398714" ), null ) );
 	}
-	
+
 	@Test
 	public void testValidMod11() throws Exception {
 		ModCheckValidator validator = new ModCheckValidator();
@@ -104,9 +104,9 @@ public class ModCheckValidatorTest {
 		validator.initialize( modCheck );
 
 		assertTrue( validator.isValid( "23322023583", null ) );
-		
+
 		assertTrue( validator.isValid( "37879695001", null ) );
-		
+
 		assertTrue( validator.isValid( "33181429643", null ) );
 	}
 
@@ -117,11 +117,11 @@ public class ModCheckValidatorTest {
 		validator.initialize( modCheck );
 
 		assertFalse( validator.isValid( "23322023584", null ) );
-		
+
 		assertFalse( validator.isValid( "37879695002", null ) );
-		
+
 		assertFalse( validator.isValid( "33181429652", null ) );
-		
+
 	}
 
 	private ModCheck createModCheckAnnotation(ModCheck.ModType modType, int multiplier, int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {

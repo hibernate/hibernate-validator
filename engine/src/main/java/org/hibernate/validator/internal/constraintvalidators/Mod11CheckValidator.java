@@ -21,6 +21,7 @@ import java.util.List;
 import javax.validation.ConstraintValidator;
 
 import org.hibernate.validator.constraints.Mod11Check;
+import org.hibernate.validator.constraints.Mod11Check.ProcessingDirection;
 import org.hibernate.validator.internal.util.ModUtil;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -34,11 +35,11 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Victor Rezende dos Santos
  */
-public class Mod11CheckValidator extends ModCheckCommonValidator
+public class Mod11CheckValidator extends ModCheckBase
 		implements ConstraintValidator<Mod11Check, CharSequence> {
 
 	private static final Log log = LoggerFactory.make();
-	private boolean reverseOrder;
+	private ProcessingDirection reverseOrder;
 	private char treatCheck10As;
 	private char treatCheck11As;
 
@@ -75,7 +76,7 @@ public class Mod11CheckValidator extends ModCheckCommonValidator
 	 */
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {
-		if ( !reverseOrder ) {
+		if ( reverseOrder == ProcessingDirection.LEFT_TO_RIGHT ) {
 			Collections.reverse( digits );
 		}
 

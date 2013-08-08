@@ -16,6 +16,16 @@
  */
 package org.hibernate.validator.constraints.br;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import javax.validation.Constraint;
+import javax.validation.Payload;
+import javax.validation.ReportAsSingleViolation;
+import javax.validation.constraints.Pattern;
+
+import org.hibernate.validator.constraints.Mod11Check;
+
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -23,16 +33,6 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import javax.validation.Constraint;
-import javax.validation.Payload;
-import javax.validation.ReportAsSingleViolation;
-import javax.validation.constraints.Pattern;
-
-import org.hibernate.validator.constraints.Mod11Check;
 /**
  * Validates a CPF (Cadastro de Pessoa F\u00edsica - Brazilian individual taxpayer registry number).
  *
@@ -54,14 +54,14 @@ import org.hibernate.validator.constraints.Mod11Check;
 		@Pattern(regexp = "^(?:(?!999\\.?999\\.?999-?99).)*$")
 })
 @Mod11Check.List({
-    	@Mod11Check(multiplier = 10,
-			checkDigitPosition = 9,
-			endIndex = 9,
-			treatCheck10As='0'),
-	@Mod11Check(multiplier = 11,
-			checkDigitPosition = 10,
-			endIndex = 10,
-			treatCheck10As='0')
+		@Mod11Check(multiplier = 10,
+				checkDigitPosition = 9,
+				endIndex = 9,
+				treatCheck10As = '0'),
+		@Mod11Check(multiplier = 11,
+				checkDigitPosition = 10,
+				endIndex = 10,
+				treatCheck10As = '0')
 })
 @ReportAsSingleViolation
 @Documented

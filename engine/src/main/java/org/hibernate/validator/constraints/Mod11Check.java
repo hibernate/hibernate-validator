@@ -114,13 +114,13 @@ public @interface Mod11Check {
 	char treatCheck11As() default '0';
 
 	/**
-	 * @return Returns {@code true} if the Mod11 checksum must be done from the rightmost to the leftmost digit.
-	 * e.g. Code 12345-?
-	 * {@code true} the sum (5*2 + 4*3 + 3*4 + 2*5 + 1*6) with check digit 5
-	 * {@code false} the sum (1*2 + 2*3 + 3*4 + 4*5 + 5*6) with check digit 7
-	 *  If not specified {@code true} is assumed, it is the default Mod11 behavior.
+	 * @return Returns {@code RIGHT_TO_LEFT} if the Mod11 checksum must be done from the rightmost to the leftmost digit.
+	 *         e.g. Code 12345-?
+	 *         {@code RIGHT_TO_LEFT} the sum (5*2 + 4*3 + 3*4 + 2*5 + 1*6) with check digit 5
+	 *         {@code LEFT_TO_RIGHT} the sum (1*2 + 2*3 + 3*4 + 4*5 + 5*6) with check digit 7
+	 *         If not specified {@code RIGHT_TO_LEFT} is assumed, it is the default Mod11 behavior.
 	 */
-	boolean reverseOrder() default true;
+	ProcessingDirection reverseOrder() default ProcessingDirection.RIGHT_TO_LEFT;
 
 	/**
 	 * Defines several {@code @ModCheck11} annotations on the same element.
@@ -130,5 +130,10 @@ public @interface Mod11Check {
 	@Documented
 	public @interface List {
 		Mod11Check[] value();
+	}
+
+	public enum ProcessingDirection {
+		RIGHT_TO_LEFT,
+		LEFT_TO_RIGHT
 	}
 }

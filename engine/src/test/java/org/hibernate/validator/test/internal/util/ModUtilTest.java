@@ -19,12 +19,13 @@ package org.hibernate.validator.test.internal.util;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hibernate.validator.internal.util.ModUtil;
-import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
-import static org.testng.AssertJUnit.assertFalse;
+import org.hibernate.validator.internal.util.ModUtil;
+import org.hibernate.validator.testutil.TestForIssue;
+
 import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
 
 /**
  * Tests for the {@code ModUtil}.
@@ -32,7 +33,7 @@ import static org.testng.AssertJUnit.assertEquals;
  * @author Hardy Ferentschik
  */
 public class ModUtilTest {
-		
+
 	@Test
 	public void testPassMod10Sum() throws Exception {
 		List<Integer> digits = Arrays.asList( 7 );
@@ -40,7 +41,7 @@ public class ModUtilTest {
 
 		digits = Arrays.asList( 7, 9, 9, 2, 7, 3, 9, 8, 7, 1 );
 		assertEquals( ModUtil.mod10sum( digits ), 3 );
-		
+
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
 		assertEquals( ModUtil.mod10sum( digits ), 9 );
 	}
@@ -52,7 +53,7 @@ public class ModUtilTest {
 
 		digits = Arrays.asList( 7, 9, 9, 2, 7, 3, 9, 8, 7, 1 );
 		assertFalse( ModUtil.mod10sum( digits ) == 4 );
-		
+
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
 		assertFalse( ModUtil.mod10sum( digits ) == 0 );
 	}
@@ -76,7 +77,7 @@ public class ModUtilTest {
 
 		digits = Arrays.asList( 0, 3, 6, 5, 3, 2 );
 		assertFalse( ModUtil.mod11sum( digits ) == 1 );
-		
+
 		digits = Arrays.asList( 1, 3, 4, 2, 4, 1, 3, 1, 3 );
 		assertFalse( ModUtil.mod11sum( digits ) == 9 );
 	}
@@ -95,12 +96,12 @@ public class ModUtilTest {
 
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
 		assertFalse( ModUtil.mod11sum( digits ) == 5 );
-		
+
 		digits = Arrays.asList( 3, 7, 8, 7, 9, 6, 9, 5, 0, 0 );
-		assertFalse( ModUtil.mod11sum( digits ) == 2 );	
-		
+		assertFalse( ModUtil.mod11sum( digits ) == 2 );
+
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6, 5 );
-		assertFalse( ModUtil.mod11sum( digits ) == 2);
+		assertFalse( ModUtil.mod11sum( digits ) == 2 );
 	}
-	
+
 }
