@@ -43,8 +43,9 @@ public final class ModUtil {
 
 			if ( even ) {
 				digit *= multiplier;
-			}else{
-			    digit *= weight;
+			}
+			else {
+				digit *= weight;
 			}
 
 			if ( digit > 9 ) {
@@ -53,7 +54,7 @@ public final class ModUtil {
 			sum += digit;
 			even = !even;
 		}
-		return 10 - (sum % 10);
+		return 10 - ( sum % 10 );
 	}
 
 	/**
@@ -65,22 +66,19 @@ public final class ModUtil {
 	 * @return the result of the mod11 checksum calculation assuming weight = 1
 	 */
 	public static int mod10sum(final List<Integer> digits, int multiplier) {
-		return mod10sum(digits, multiplier, 1);
+		return mod10sum( digits, multiplier, 1 );
 	}
 
 	/**
 	 * Calculate Mod10 sum (Luhn algorithm implementation)
 	 *
 	 * @param digits The digits over which to calculate the checksum
-	 * @param multiplier Multiplier used in the algorithm
 	 *
 	 * @return the result of the mod11 checksum calculation assuming multiplier = 2 and weight = 1
 	 */
 	public static int mod10sum(final List<Integer> digits) {
-		return mod10sum(digits, 2, 1);
+		return mod10sum( digits, 2, 1 );
 	}
-
-
 
 	/**
 	 * Calculate Mod11 sum

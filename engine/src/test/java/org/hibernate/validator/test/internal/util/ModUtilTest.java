@@ -19,12 +19,13 @@ package org.hibernate.validator.test.internal.util;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hibernate.validator.internal.util.ModUtil;
-import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
-import static org.testng.AssertJUnit.assertFalse;
+import org.hibernate.validator.internal.util.ModUtil;
+import org.hibernate.validator.testutil.TestForIssue;
+
 import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
 
 /**
  * Tests for the {@code ModUtil}.
@@ -100,7 +101,7 @@ public class ModUtilTest {
 		assertFalse( ModUtil.mod11sum( digits ) == 2 );
 
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6, 5 );
-		assertFalse( ModUtil.mod11sum( digits ) == 2);
+		assertFalse( ModUtil.mod11sum( digits ) == 2 );
 	}
 
 }

@@ -57,7 +57,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface Mod10Check {
-	String message() default "{org.hibernate.validator.constraints.ModCheck.message}";
+	String message() default "{org.hibernate.validator.constraints.Mod10Check.message}";
 
 	Class<?>[] groups() default { };
 

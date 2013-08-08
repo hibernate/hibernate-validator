@@ -16,16 +16,12 @@
  */
 package org.hibernate.validator.internal.constraintvalidators;
 
-import java.util.ArrayList;
 import java.util.List;
 import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.ModCheck.ModType;
 import org.hibernate.validator.internal.util.ModUtil;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Mod check validator for MOD10 and MOD11 algorithms
@@ -35,8 +31,10 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  *
  * @author George Gastaldi
  * @author Hardy Ferentschik
+ * @deprecated As of release 5.1.0, replaced by {@link Mod10CheckValidator} and {@link Mod11CheckValidator}
  */
-public class ModCheckValidator extends ModCheckCommonValidator implements ConstraintValidator<ModCheck, CharSequence> {
+@Deprecated
+public class ModCheckValidator extends ModCheckBase implements ConstraintValidator<ModCheck, CharSequence> {
 	/**
 	 * Multiplier used by the mod algorithms
 	 */

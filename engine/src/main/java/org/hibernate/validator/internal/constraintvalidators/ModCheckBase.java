@@ -24,7 +24,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * Mod check Validator common methods and options
+ * ModCheckBase contains all shared methods and options used by Mod Check Validators
  *
  * http://en.wikipedia.org/wiki/Check_digit
  *
@@ -33,7 +33,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Victor Rezende dos Santos
  */
 
-public abstract class ModCheckCommonValidator {
+public abstract class ModCheckBase {
 
 	protected static final String NUMBERS_ONLY_REGEXP = "[^0-9]";
 	protected static final int DEC_RADIX = 10;

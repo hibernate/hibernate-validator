@@ -34,7 +34,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Victor Rezende dos Santos
  */
-public class Mod10CheckValidator extends ModCheckCommonValidator
+public class Mod10CheckValidator extends ModCheckBase
 		implements ConstraintValidator<Mod10Check, CharSequence> {
 
 	private static final Log log = LoggerFactory.make();

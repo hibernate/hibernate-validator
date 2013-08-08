@@ -19,6 +19,7 @@ package org.hibernate.validator.test.internal.constraintvalidators;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.Mod11Check;
+import org.hibernate.validator.constraints.Mod11Check.ProcessingDirection;
 import org.hibernate.validator.internal.constraintvalidators.Mod11CheckValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
@@ -37,35 +38,35 @@ public class Mod11CheckValidatorTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testInvalidStartIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation(  -1, Integer.MAX_VALUE, -1, false, '0', '0', true );
+		Mod11Check modCheck = createMod11CheckAnnotation( -1, Integer.MAX_VALUE, -1, false, '0', '0', ProcessingDirection.RIGHT_TO_LEFT );
 		validator.initialize( modCheck );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testInvalidEndIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation(  0, -1, -1, false, '0', '0', true );
+		Mod11Check modCheck = createMod11CheckAnnotation( 0, -1, -1, false, '0', '0', ProcessingDirection.RIGHT_TO_LEFT );
 		validator.initialize( modCheck );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testEndIndexLessThanStartIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation(  5, 0, -1, false, '0', '0', true );
+		Mod11Check modCheck = createMod11CheckAnnotation( 5, 0, -1, false, '0', '0', ProcessingDirection.RIGHT_TO_LEFT );
 		validator.initialize( modCheck );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testInvalidCheckDigitPosition() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation(  0, 10, 5, false, '0', '0', true );
+		Mod11Check modCheck = createMod11CheckAnnotation( 0, 10, 5, false, '0', '0', ProcessingDirection.RIGHT_TO_LEFT );
 		validator.initialize( modCheck );
 	}
 
 	@Test
 	public void testFailOnNonNumeric() throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation(  0, Integer.MAX_VALUE, -1, false, '0', '0', true );
+		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, '0', '0', ProcessingDirection.RIGHT_TO_LEFT );
 		validator.initialize( modCheck );
 
 		assertFalse( validator.isValid( new MyCustomStringImpl( "Z54679542616" ), null ) );
@@ -74,7 +75,7 @@ public class Mod11CheckValidatorTest {
 	@Test
 	public void testIgnoreNonNumeric() throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation(  0, Integer.MAX_VALUE, -1, true, '0', '0', true );
+		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, true, '0', '0', ProcessingDirection.RIGHT_TO_LEFT );
 		validator.initialize( modCheck );
 
 		assertTrue( validator.isValid( new MyCustomStringImpl( "Z54679542616" ), null ) );
@@ -83,7 +84,7 @@ public class Mod11CheckValidatorTest {
 	@Test
 	public void testValidMod11() throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, true , '0', '0', true );
+		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, true, '0', '0', ProcessingDirection.RIGHT_TO_LEFT );
 		validator.initialize( modCheck );
 
 		assertTrue( validator.isValid( "23322023583", null ) );
@@ -96,7 +97,7 @@ public class Mod11CheckValidatorTest {
 	@Test
 	public void testInvalidMod11() throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, true, '0', '0', true );
+		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, true, '0', '0', ProcessingDirection.RIGHT_TO_LEFT );
 		validator.initialize( modCheck );
 
 		assertFalse( validator.isValid( "23322023584", null ) );
@@ -109,7 +110,7 @@ public class Mod11CheckValidatorTest {
 	@Test
 	public void testValidMod11CharCheckDigit() throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, false , 'X', 'Z', true );
+		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, 'X', 'Z', ProcessingDirection.RIGHT_TO_LEFT );
 		validator.initialize( modCheck );
 
 		assertTrue( validator.isValid( "123456Z", null ) );
@@ -120,7 +121,7 @@ public class Mod11CheckValidatorTest {
 	@Test
 	public void testInvalidMod11CharCheckDigit() throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, false , 'X', 'Z', true );
+		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, 'X', 'Z', ProcessingDirection.RIGHT_TO_LEFT );
 		validator.initialize( modCheck );
 
 		assertFalse( validator.isValid( "123458Z", null ) );
@@ -131,7 +132,7 @@ public class Mod11CheckValidatorTest {
 	@Test
 	public void testValidMod11ReverseOrder() throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, false , 'X', 'Z', false );
+		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, 'X', 'Z', ProcessingDirection.LEFT_TO_RIGHT );
 		validator.initialize( modCheck );
 
 		assertTrue( validator.isValid( "059697873Z", null ) );
@@ -142,7 +143,7 @@ public class Mod11CheckValidatorTest {
 	@Test
 	public void testInvalidMod11ReverseOrder() throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
-		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, false , 'X', 'Z', false );
+		Mod11Check modCheck = createMod11CheckAnnotation( 0, Integer.MAX_VALUE, -1, false, 'X', 'Z', ProcessingDirection.LEFT_TO_RIGHT );
 		validator.initialize( modCheck );
 
 		assertFalse( validator.isValid( "378796950Z", null ) );
@@ -150,7 +151,7 @@ public class Mod11CheckValidatorTest {
 		assertFalse( validator.isValid( "1234557X", null ) );
 	}
 
-	private Mod11Check createMod11CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits, char treatCheck10As, char treatCheck11As, boolean reverseOrder) {
+	private Mod11Check createMod11CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits, char treatCheck10As, char treatCheck11As, ProcessingDirection reverseOrder) {
 		AnnotationDescriptor<Mod11Check> descriptor = new AnnotationDescriptor<Mod11Check>( Mod11Check.class );
 		descriptor.setValue( "startIndex", start );
 		descriptor.setValue( "endIndex", end );
