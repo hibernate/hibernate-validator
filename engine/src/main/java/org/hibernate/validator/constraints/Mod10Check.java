@@ -30,9 +30,19 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Modulo check constraint.
+ * Modulo 10 (Luhn algorithm) check constraint.
  * <p>
- * Allows to validate that a series of digits pass the mod 10 or mod 11 checksum algorithm.
+ * Allows to validate that a series of digits pass the mod 10 checksum
+ * algorithm. The classic Mod10 is calculated by sum the digits with every odd
+ * digit (from right to left) value multiplied by 2, but there are other
+ * implementations that uses different multipliers, ISBN-13 for example use 3
+ * multiplier instead of 2.
+ * </p>
+ * <p>
+ * There are known cases of codes using multipliers for both even and odd
+ * digits, to support this kind of implementations the Mod10 Constraint uses the
+ * {@code weight} option, has the same effect as the multiplier but for even
+ * numbers
  * </p>
  * <p>
  * The supported type is {@code CharSequence}. {@code null} is considered valid.
@@ -40,29 +50,28 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @author George Gastaldi
  * @author Hardy Ferentschik
- * @deprecated As of release 5.1.0, replaced by {@link Mod10Check} and {@link Mod11Check}
+ * @author Victor Rezende dos Santos
  */
 @Documented
-@Deprecated
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
-public @interface ModCheck {
-	String message() default "{org.hibernate.validator.constraints.ModCheck.message}";
+public @interface Mod10Check {
+	String message() default "{org.hibernate.validator.constraints.Mod10Check.message}";
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
 
 	/**
-	 * @return The modulus algorithm to be used
+	 * @return The multiplier to be used by odd digits on Mod10 algorithm
 	 */
-	ModType modType();
+	int multipler() default 2;
 
 	/**
-	 * @return The multiplier to be used by the chosen mod algorithm
+	 * @return The weight to be used by even digits on Mod10 algorithm
 	 */
-	int multiplier();
+	int weight() default 1;
 
 	/**
 	 * @return the start index (inclusive) for calculating the checksum. If not specified 0 is assumed.
@@ -88,6 +97,7 @@ public @interface ModCheck {
 	 */
 	boolean ignoreNonDigitCharacters() default true;
 
+
 	/**
 	 * Defines several {@code @ModCheck} annotations on the same element.
 	 */
@@ -95,17 +105,6 @@ public @interface ModCheck {
 	@Retention(RUNTIME)
 	@Documented
 	public @interface List {
-		ModCheck[] value();
-	}
-
-	public enum ModType {
-		/**
-		 * Represents a MOD10 algorithm (Also known as Luhn algorithm)
-		 */
-		MOD10,
-		/**
-		 * Represents a MOD11 algorithm. A remainder of 10 or 11 in the algorithm is mapped to the check digit 0.
-		 */
-		MOD11
+		Mod10Check[] value();
 	}
 }

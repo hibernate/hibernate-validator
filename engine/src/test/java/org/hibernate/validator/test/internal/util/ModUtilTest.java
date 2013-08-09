@@ -22,9 +22,10 @@ import java.util.List;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.ModUtil;
+import org.hibernate.validator.testutil.TestForIssue;
 
+import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
 
 /**
  * Tests for the {@code ModUtil}.
@@ -32,42 +33,75 @@ import static org.testng.AssertJUnit.assertTrue;
  * @author Hardy Ferentschik
  */
 public class ModUtilTest {
-	@Test
-	public void testPassMod10() throws Exception {
-		List<Integer> digits = Arrays.asList( 7, 3 );
-		assertTrue( ModUtil.passesMod10Test( digits, 1 ) );
 
-		digits = Arrays.asList( 7, 9, 9, 2, 7, 3, 9, 8, 7, 1, 3 );
-		assertTrue( ModUtil.passesMod10Test( digits, 2 ) );
+	@Test
+	public void testPassMod10Sum() throws Exception {
+		List<Integer> digits = Arrays.asList( 7 );
+		assertEquals( ModUtil.mod10sum( digits ), 5 );
+
+		digits = Arrays.asList( 7, 9, 9, 2, 7, 3, 9, 8, 7, 1 );
+		assertEquals( ModUtil.mod10sum( digits ), 3 );
+
+		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
+		assertEquals( ModUtil.mod10sum( digits ), 9 );
 	}
 
 	@Test
-	public void testFailMod10() throws Exception {
-		List<Integer> digits = Arrays.asList( 7, 2 );
-		assertFalse( ModUtil.passesMod10Test( digits, 1 ) );
+	public void testFailMod10Sum() throws Exception {
+		List<Integer> digits = Arrays.asList( 7 );
+		assertFalse( ModUtil.mod10sum( digits ) == 2 );
 
-		digits = Arrays.asList( 7, 9, 9, 2, 7, 3, 9, 8, 7, 1, 4 );
-		assertFalse( ModUtil.passesMod10Test( digits, 2 ) );
+		digits = Arrays.asList( 7, 9, 9, 2, 7, 3, 9, 8, 7, 1 );
+		assertFalse( ModUtil.mod10sum( digits ) == 4 );
+
+		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
+		assertFalse( ModUtil.mod10sum( digits ) == 0 );
 	}
 
 	@Test
-	public void testPassMod11() throws Exception {
-		List<Integer> digits = Arrays.asList( 2, 7 );
-		assertTrue( ModUtil.passesMod11Test( digits, 11 ) );
+	public void testPassMod11Sum() throws Exception {
+		List<Integer> digits = Arrays.asList( 2 );
+		assertEquals( ModUtil.mod11sum( digits ), 7 );
 
-		digits = Arrays.asList( 0, 3, 6, 5, 3, 2, 7 );
-		assertTrue( ModUtil.passesMod11Test( digits, 11 ) );
+		digits = Arrays.asList( 0, 3, 6, 5, 3, 2 );
+		assertEquals( ModUtil.mod11sum( digits ), 7 );
 
-		digits = Arrays.asList( 1, 3, 4, 2, 4, 1, 3, 1, 3, 0 );
-		assertTrue( ModUtil.passesMod11Test( digits, 11 ) );
+		digits = Arrays.asList( 1, 3, 4, 2, 4, 1, 3, 1, 3 );
+		assertEquals( ModUtil.mod11sum( digits ), 10 );
 	}
 
 	@Test
-	public void testFailMod11() throws Exception {
-		List<Integer> digits = Arrays.asList( 2, 6 );
-		assertFalse( ModUtil.passesMod11Test( digits, 11 ) );
+	public void testFailMod11Sum() throws Exception {
+		List<Integer> digits = Arrays.asList( 2 );
+		assertFalse( ModUtil.mod11sum( digits ) == 6 );
 
-		digits = Arrays.asList( 0, 3, 6, 5, 3, 2, 1 );
-		assertFalse( ModUtil.passesMod11Test( digits, 11 ) );
+		digits = Arrays.asList( 0, 3, 6, 5, 3, 2 );
+		assertFalse( ModUtil.mod11sum( digits ) == 1 );
+
+		digits = Arrays.asList( 1, 3, 4, 2, 4, 1, 3, 1, 3 );
+		assertFalse( ModUtil.mod11sum( digits ) == 9 );
 	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-808")
+	public void testFailMod11SelfValidation() throws Exception {
+		List<Integer> digits = Arrays.asList( 0 );
+		assertFalse( ModUtil.mod11sum( digits ) == 1 );
+
+		digits = Arrays.asList( 0, 0, 0, 0, 0, 0 );
+		assertEquals( ModUtil.mod11sum( digits ), 11 );
+
+		digits = Arrays.asList( 0, 0, 0, 0, 0, 0 );
+		assertFalse( ModUtil.mod11sum( digits ) == 1 );
+
+		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
+		assertFalse( ModUtil.mod11sum( digits ) == 5 );
+
+		digits = Arrays.asList( 3, 7, 8, 7, 9, 6, 9, 5, 0, 0 );
+		assertFalse( ModUtil.mod11sum( digits ) == 2 );
+
+		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6, 5 );
+		assertFalse( ModUtil.mod11sum( digits ) == 2 );
+	}
+
 }

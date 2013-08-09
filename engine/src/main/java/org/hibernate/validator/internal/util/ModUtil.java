@@ -28,42 +28,69 @@ public final class ModUtil {
 	}
 
 	/**
-	 * Check if the input passes the mod11 test
-	 *
-	 * @param digits The digits over which to calculate the mod 11 algorithm
-	 * @param multiplier the multiplier for the modulo algorithm
-	 *
-	 * @return {@code true} if the mod 11 result matches the check digit, {@code false} otherwise
-	 */
-	public static boolean passesMod11Test(final List<Integer> digits, int multiplier) {
-		int modResult = mod11( digits, multiplier );
-		return modResult == 0;
-	}
-
-	/**
-	 * Mod10 (Luhn) algorithm implementation
+	 * Calculate Mod10 sum (Luhn algorithm implementation)
 	 *
 	 * @param digits The digits over which to calculate the checksum
 	 * @param multiplier Multiplier used in the algorithm
 	 *
-	 * @return {@code true} if the mod 10 result matches the check digit, {@code false} otherwise
+	 * @return the result of the mod11 checksum calculation
 	 */
-	public static boolean passesMod10Test(final List<Integer> digits, final int multiplier) {
-		int modResult = mod10( digits, multiplier );
-		return modResult == 0;
+	public static int mod10sum(final List<Integer> digits, int multiplier, int weight) {
+		int sum = 0;
+		boolean even = true;
+		for ( int index = digits.size() - 1; index >= 0; index-- ) {
+			int digit = digits.get( index );
+
+			if ( even ) {
+				digit *= multiplier;
+			}
+			else {
+				digit *= weight;
+			}
+
+			if ( digit > 9 ) {
+				digit = digit / 10 + digit % 10;
+			}
+			sum += digit;
+			even = !even;
+		}
+		return 10 - ( sum % 10 );
 	}
 
 	/**
-	 * Calculate Mod11
+	 * Calculate Mod10 sum (Luhn algorithm implementation)
+	 *
+	 * @param digits The digits over which to calculate the checksum
+	 * @param multiplier Multiplier used in the algorithm
+	 *
+	 * @return the result of the mod11 checksum calculation assuming weight = 1
+	 */
+	public static int mod10sum(final List<Integer> digits, int multiplier) {
+		return mod10sum( digits, multiplier, 1 );
+	}
+
+	/**
+	 * Calculate Mod10 sum (Luhn algorithm implementation)
+	 *
+	 * @param digits The digits over which to calculate the checksum
+	 *
+	 * @return the result of the mod11 checksum calculation assuming multiplier = 2 and weight = 1
+	 */
+	public static int mod10sum(final List<Integer> digits) {
+		return mod10sum( digits, 2, 1 );
+	}
+
+	/**
+	 * Calculate Mod11 sum
 	 *
 	 * @param digits the digits for which to calculate the checksum
 	 * @param multiplier multiplier for the modulo algorithm
 	 *
-	 * @return the result of the mod11 calculation
+	 * @return the result of the mod11 checksum calculation
 	 */
-	private static int mod11(final List<Integer> digits, final int multiplier) {
+	public static int mod11sum(final List<Integer> digits, final int multiplier) {
 		int sum = 0;
-		int weight = 1;
+		int weight = 2;
 
 		for ( int index = digits.size() - 1; index >= 0; index-- ) {
 			sum += digits.get( index ) * weight++;
@@ -71,33 +98,18 @@ public final class ModUtil {
 				weight = 2;
 			}
 		}
-		int mod = 11 - ( sum % 11 );
-		return ( mod > 9 ) ? 0 : mod;
+		return 11 - ( sum % 11 );
 	}
 
 	/**
-	 * Calculate Mod10 (Luhn)
+	 * Calculate Mod11 sum assuming that the multiplier is 11
 	 *
 	 * @param digits the digits for which to calculate the checksum
-	 * @param multiplier multiplier for the modulo algorithm
 	 *
-	 * @return the result of the mod10 calculation
+	 * @return the result of the mod11 checksum calculation
 	 */
-	private static int mod10(final List<Integer> digits, final int multiplier) {
-		int sum = 0;
-		boolean even = false;
-		for ( int index = digits.size() - 1; index >= 0; index-- ) {
-			int digit = digits.get( index );
-			if ( even ) {
-				digit *= multiplier;
-			}
-			if ( digit > 9 ) {
-				digit = digit / 10 + digit % 10;
-			}
-			sum += digit;
-			even = !even;
-		}
-		return sum % 10;
+	public static int mod11sum(final List<Integer> digits) {
+		return mod11sum( digits, 11 );
 	}
 }
 
