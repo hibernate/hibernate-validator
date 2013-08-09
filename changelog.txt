@@ -1,6 +1,36 @@
 Hibernate Validator Changelog
 =============================
 
+5.1.0.Alpha1 (09.08.2013)
+-------------------------
+
+** Bug
+    * [HV-691] - Failed tests:   testBeanMetaDataCanBeGarbageCollected(org.hibernate.validator.test.internal.metadata.BeanMetaDataManagerTest)
+    * [HV-716] - Refactor programmatic API to instantiate the raw model classes directly
+    * [HV-798] - Escaping validator messages doesn't work
+
+** Improvement
+    * [HV-652] - Update JavaDoc stylesheet when building with Java 7
+    * [HV-760] - Align line endings style
+    * [HV-769] - Derive constraint target automatically for XML-configured constraints
+    * [HV-779] - Remove dependency to run in Android
+    * [HV-796] - Convert missing files with incorrect line endings
+
+** New Feature
+    * [HV-642] - Extend programmatic constraint API to support new constructs from BV 1.1
+    * [HV-701] - Provide API to make additional objects available for message interpolation
+    * [HV-714] - Provide cross-parameter validator for @ScriptAssert
+
+** Patch
+    * [HV-797] - Require Maven 3.0.3 to build
+
+** Task
+    * [HV-619] - Use WildFly for tck-runner module
+    * [HV-637] - Investigate performance regression between HV 4.3 and 5.0
+    * [HV-684] - Some follow-up tasks/minor todos
+    * [HV-802] - Investigate integration with ParaNamer
+
+
 5.0.1.Final (30.04.2013)
 ------------------------
 
