@@ -39,9 +39,25 @@ public class Mod11CheckValidator extends ModCheckBase
 		implements ConstraintValidator<Mod11Check, CharSequence> {
 
 	private static final Log log = LoggerFactory.make();
+
 	private boolean reverseOrder;
+
+	/**
+	 * The {@code char} that represents the check digit when mod11
+	 * checksum equals 10.
+	 */
 	private char treatCheck10As;
+
+	/**
+	 * The {@code char} that represents the check digit when mod11
+	 * checksum equals 10.
+	 */
 	private char treatCheck11As;
+
+	/**
+	 * @return The threshold for the algorithm multiplier multiplier growth
+	 */
+	private int threshold;
 
 	@Override
 	public void initialize(Mod11Check constraintAnnotation) {
@@ -49,7 +65,7 @@ public class Mod11CheckValidator extends ModCheckBase
 		this.endIndex = constraintAnnotation.endIndex();
 		this.checkDigitIndex = constraintAnnotation.checkDigitPosition();
 		this.ignoreNonDigitCharacters = constraintAnnotation.ignoreNonDigitCharacters();
-		this.multiplier = constraintAnnotation.multiplier();
+		this.threshold = constraintAnnotation.threshold();
 
 		this.reverseOrder = constraintAnnotation.processingDirection() == ProcessingDirection.LEFT_TO_RIGHT;
 
@@ -77,11 +93,11 @@ public class Mod11CheckValidator extends ModCheckBase
 	 */
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {
-		if ( reverseOrder  ) {
+		if ( reverseOrder ) {
 			Collections.reverse( digits );
 		}
 
-		int modResult = ModUtil.mod11sum( digits, this.multiplier );
+		int modResult = ModUtil.mod11sum( digits, this.threshold );
 		switch ( modResult ) {
 			case 10:
 				return checkDigit == this.treatCheck10As;

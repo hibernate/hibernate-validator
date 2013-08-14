@@ -151,7 +151,7 @@ public class Mod11CheckValidatorTest {
 		assertFalse( validator.isValid( "1234557X", null ) );
 	}
 
-	private Mod11Check createMod11CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits, char treatCheck10As, char treatCheck11As, ProcessingDirection reverseOrder) {
+	private Mod11Check createMod11CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits, char treatCheck10As, char treatCheck11As, ProcessingDirection processingDirection) {
 		AnnotationDescriptor<Mod11Check> descriptor = new AnnotationDescriptor<Mod11Check>( Mod11Check.class );
 		descriptor.setValue( "startIndex", start );
 		descriptor.setValue( "endIndex", end );
@@ -159,7 +159,7 @@ public class Mod11CheckValidatorTest {
 		descriptor.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
 		descriptor.setValue( "treatCheck10As", treatCheck10As );
 		descriptor.setValue( "treatCheck11As", treatCheck11As );
-		descriptor.setValue( "reverseOrder", reverseOrder );
+		descriptor.setValue( "processingDirection", processingDirection );
 
 		return AnnotationFactory.create( descriptor );
 	}

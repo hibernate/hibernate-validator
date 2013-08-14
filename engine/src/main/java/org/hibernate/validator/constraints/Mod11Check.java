@@ -73,9 +73,9 @@ public @interface Mod11Check {
 	Class<? extends Payload>[] payload() default { };
 
 	/**
-	 * @return The multiplier to be used by odd digits on Mod10 algorithm
+	 * @return The threshold for the Mod11 algorithm multiplier growth, if no value is specified the multiplier will grown indefinitely
 	 */
-	int multiplier() default 11;
+	int threshold() default Integer.MAX_VALUE;
 
 	/**
 	 * @return the start index (inclusive) for calculating the checksum. If not specified 0 is assumed.

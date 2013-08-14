@@ -54,12 +54,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 		@Pattern(regexp = "^(?:(?!999\\.?999\\.?999-?99).)*$")
 })
 @Mod11Check.List({
-		@Mod11Check(multiplier = 10,
-				checkDigitPosition = 9,
+		@Mod11Check(checkDigitPosition = 9,
 				endIndex = 9,
 				treatCheck10As = '0'),
-		@Mod11Check(multiplier = 11,
-				checkDigitPosition = 10,
+		@Mod11Check(checkDigitPosition = 10,
 				endIndex = 10,
 				treatCheck10As = '0')
 })

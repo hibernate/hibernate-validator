@@ -39,6 +39,7 @@ public class ModCheckValidator extends ModCheckBase implements ConstraintValidat
 	 * Multiplier used by the mod algorithms
 	 */
 	private int multiplier;
+
 	/**
 	 * The type of checksum algorithm
 	 */

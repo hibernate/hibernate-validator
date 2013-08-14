@@ -38,10 +38,7 @@ public abstract class ModCheckBase {
 	protected static final String NUMBERS_ONLY_REGEXP = "[^0-9]";
 	protected static final int DEC_RADIX = 10;
 	private static final Log log = LoggerFactory.make();
-	/**
-	 * Multiplier used by the mod algorithms
-	 */
-	protected int multiplier;
+
 	/**
 	 * The start index for the checksum calculation
 	 */
@@ -54,6 +51,7 @@ public abstract class ModCheckBase {
 	 * The index of the checksum digit
 	 */
 	protected int checkDigitIndex;
+
 	protected boolean ignoreNonDigitCharacters;
 
 	/**
@@ -139,10 +137,6 @@ public abstract class ModCheckBase {
 
 		if ( this.checkDigitIndex > 0 && this.startIndex <= this.checkDigitIndex && this.endIndex > this.checkDigitIndex ) {
 			throw log.getInvalidCheckDigitException( this.startIndex, this.endIndex );
-		}
-
-		if ( this.multiplier < 0 ) {
-			throw log.getMultiplierCannotBeNegativeException( this.multiplier );
 		}
 
 		return true;

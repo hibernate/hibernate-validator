@@ -80,36 +80,37 @@ public final class ModUtil {
 		return mod10sum( digits, 2, 1 );
 	}
 
+
 	/**
 	 * Calculate Mod11 sum
 	 *
 	 * @param digits the digits for which to calculate the checksum
-	 * @param multiplier multiplier for the modulo algorithm
+	 * @param threshold the threshold for the Mod11 algorithm multiplier growth
 	 *
 	 * @return the result of the mod11 checksum calculation
 	 */
-	public static int mod11sum(final List<Integer> digits, final int multiplier) {
+	public static int mod11sum(final List<Integer> digits, final int threshold) {
 		int sum = 0;
-		int weight = 2;
+		int multiplier = 2;
 
 		for ( int index = digits.size() - 1; index >= 0; index-- ) {
-			sum += digits.get( index ) * weight++;
-			if ( weight > multiplier ) {
-				weight = 2;
+			sum += digits.get( index ) * multiplier++;
+			if ( multiplier > threshold ) {
+				multiplier = 2;
 			}
 		}
 		return 11 - ( sum % 11 );
 	}
 
 	/**
-	 * Calculate Mod11 sum assuming that the multiplier is 11
+	 * Calculate Mod11 sum assuming that the threshold is Integer.MAX_VALUE
 	 *
 	 * @param digits the digits for which to calculate the checksum
 	 *
 	 * @return the result of the mod11 checksum calculation
 	 */
 	public static int mod11sum(final List<Integer> digits) {
-		return mod11sum( digits, 11 );
+		return mod11sum( digits, Integer.MAX_VALUE );
 	}
 }
 

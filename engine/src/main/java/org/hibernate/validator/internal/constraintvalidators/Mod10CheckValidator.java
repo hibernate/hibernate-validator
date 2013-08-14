@@ -38,6 +38,12 @@ public class Mod10CheckValidator extends ModCheckBase
 		implements ConstraintValidator<Mod10Check, CharSequence> {
 
 	private static final Log log = LoggerFactory.make();
+
+	/**
+	 * Multiplier to be used by odd digits on Mod10 algorithm
+	 */
+	private int multiplier;
+
 	/**
 	 * Weight to be used by even digits on Mod10 algorithm
 	 */
@@ -51,6 +57,9 @@ public class Mod10CheckValidator extends ModCheckBase
 		this.multiplier = constraintAnnotation.multipler();
 		this.weight = constraintAnnotation.weight();
 
+		if ( this.multiplier < 0 ) {
+			throw log.getMultiplierCannotBeNegativeException( this.multiplier );
+		}
 		if ( this.weight < 0 ) {
 			throw log.getWeightCannotBeNegativeException( this.weight );
 		}

@@ -41,10 +41,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Pattern(regexp = "[0-9]{12}")
 @List({
-		@Mod11Check(multiplier = 9,
+		@Mod11Check(threshold = 9,
 				endIndex = 8,
 				checkDigitPosition = 10),
-		@Mod11Check(multiplier = 9,
+		@Mod11Check(threshold = 9,
 				startIndex = 8,
 				endIndex = 11,
 				checkDigitPosition = 11)
