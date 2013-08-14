@@ -39,10 +39,11 @@ public class Mod11CheckValidator extends ModCheckBase
 		implements ConstraintValidator<Mod11Check, CharSequence> {
 
 	private static final Log log = LoggerFactory.make();
-	private ProcessingDirection reverseOrder;
+	private boolean reverseOrder;
 	private char treatCheck10As;
 	private char treatCheck11As;
 
+	@Override
 	public void initialize(Mod11Check constraintAnnotation) {
 		this.startIndex = constraintAnnotation.startIndex();
 		this.endIndex = constraintAnnotation.endIndex();
@@ -50,7 +51,7 @@ public class Mod11CheckValidator extends ModCheckBase
 		this.ignoreNonDigitCharacters = constraintAnnotation.ignoreNonDigitCharacters();
 		this.multiplier = constraintAnnotation.multiplier();
 
-		this.reverseOrder = constraintAnnotation.reverseOrder();
+		this.reverseOrder = constraintAnnotation.processingDirection() == ProcessingDirection.LEFT_TO_RIGHT;
 
 		this.treatCheck10As = constraintAnnotation.treatCheck10As();
 		this.treatCheck11As = constraintAnnotation.treatCheck11As();
@@ -76,7 +77,7 @@ public class Mod11CheckValidator extends ModCheckBase
 	 */
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {
-		if ( reverseOrder == ProcessingDirection.LEFT_TO_RIGHT ) {
+		if ( reverseOrder  ) {
 			Collections.reverse( digits );
 		}
 

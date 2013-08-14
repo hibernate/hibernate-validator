@@ -120,7 +120,7 @@ public @interface Mod11Check {
 	 *         {@code LEFT_TO_RIGHT} the sum (1*2 + 2*3 + 3*4 + 4*5 + 5*6) with check digit 7
 	 *         If not specified {@code RIGHT_TO_LEFT} is assumed, it is the default Mod11 behavior.
 	 */
-	ProcessingDirection reverseOrder() default ProcessingDirection.RIGHT_TO_LEFT;
+	ProcessingDirection processingDirection() default ProcessingDirection.RIGHT_TO_LEFT;
 
 	/**
 	 * Defines several {@code @ModCheck11} annotations on the same element.
