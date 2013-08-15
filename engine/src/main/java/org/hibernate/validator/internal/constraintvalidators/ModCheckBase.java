@@ -18,6 +18,8 @@ package org.hibernate.validator.internal.constraintvalidators;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -32,27 +34,37 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Victor Rezende dos Santos
  */
-
 public abstract class ModCheckBase {
 
-	protected static final String NUMBERS_ONLY_REGEXP = "[^0-9]";
-	protected static final int DEC_RADIX = 10;
 	private static final Log log = LoggerFactory.make();
+
+	private static final Pattern NUMBERS_ONLY_REGEXP = Pattern.compile( "[^0-9]" );
+
+	private static final int DEC_RADIX = 10;
 
 	/**
 	 * The start index for the checksum calculation
 	 */
-	protected int startIndex;
+	private int startIndex;
+
 	/**
 	 * The end index for the checksum calculation
 	 */
-	protected int endIndex;
+	private int endIndex;
+
 	/**
 	 * The index of the checksum digit
 	 */
-	protected int checkDigitIndex;
+	private int checkDigitIndex;
 
-	protected boolean ignoreNonDigitCharacters;
+	private boolean ignoreNonDigitCharacters;
+
+	protected void initialize(int startIndex, int endIndex, int checkDigitIndex, boolean ignoreNonDigitCharacters) {
+		this.startIndex = startIndex;
+		this.endIndex = endIndex;
+		this.checkDigitIndex = checkDigitIndex;
+		this.ignoreNonDigitCharacters = ignoreNonDigitCharacters;
+	}
 
 	/**
 	 * Parses the {@link String} value as a {@link List} of {@link Integer} objects
@@ -63,7 +75,7 @@ public abstract class ModCheckBase {
 	 *
 	 * @throws NumberFormatException in case any of the characters is not a digit
 	 */
-	protected static List<Integer> extractDigits(final String value) throws NumberFormatException {
+	private List<Integer> extractDigits(final String value) throws NumberFormatException {
 		List<Integer> digits = new ArrayList<Integer>( value.length() );
 		char[] chars = value.toCharArray();
 		for ( char c : chars ) {
@@ -81,7 +93,7 @@ public abstract class ModCheckBase {
 	 *
 	 * @throws NumberFormatException in case character is not a digit
 	 */
-	protected static int extractDigit(char value) throws NumberFormatException {
+	protected int extractDigit(char value) throws NumberFormatException {
 		if ( Character.isDigit( value ) ) {
 			return Character.digit( value, DEC_RADIX );
 		}
@@ -97,7 +109,7 @@ public abstract class ModCheckBase {
 			return true;
 		}
 
-		String valueAsString = this.checkString( value.toString() );
+		String valueAsString = this.stripNonDigitsIfRequired( value.toString() );
 
 		String digitsAsString;
 		char checkDigit;
@@ -141,34 +153,32 @@ public abstract class ModCheckBase {
 		return true;
 	}
 
-	protected String checkString(String value) {
+	private String stripNonDigitsIfRequired(String value) {
 		if ( ignoreNonDigitCharacters ) {
-			return value.replaceAll( NUMBERS_ONLY_REGEXP, "" );
+			return NUMBERS_ONLY_REGEXP.matcher( value ).replaceAll( "" );
 		}
 		else {
 			return value;
 		}
 	}
 
-	protected String extractVerificationString(String value) throws IndexOutOfBoundsException {
+	private String extractVerificationString(String value) throws IndexOutOfBoundsException {
 		// the string contains the check digit, just return the digits to verify
-		String verification = this.checkString( value );
 		if ( endIndex == Integer.MAX_VALUE ) {
-			return verification.substring( 0, value.length() - 1 );
+			return value.substring( 0, value.length() - 1 );
 		}
 		else {
-			return verification.substring( startIndex, endIndex );
+			return value.substring( startIndex, endIndex );
 		}
 	}
 
-	protected char extractCheckDigit(String value) throws IndexOutOfBoundsException {
+	private char extractCheckDigit(String value) throws IndexOutOfBoundsException {
 		// the string contains the check digit, just return the check digit
-		String verification = this.checkString( value );
 		if ( checkDigitIndex == -1 ) {
-			return verification.charAt( value.length() - 1 );
+			return value.charAt( value.length() - 1 );
 		}
 		else {
-			return verification.charAt( checkDigitIndex );
+			return value.charAt( checkDigitIndex );
 		}
 	}
 

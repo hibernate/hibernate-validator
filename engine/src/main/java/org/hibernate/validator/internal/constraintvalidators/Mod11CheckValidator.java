@@ -61,10 +61,12 @@ public class Mod11CheckValidator extends ModCheckBase
 
 	@Override
 	public void initialize(Mod11Check constraintAnnotation) {
-		this.startIndex = constraintAnnotation.startIndex();
-		this.endIndex = constraintAnnotation.endIndex();
-		this.checkDigitIndex = constraintAnnotation.checkDigitPosition();
-		this.ignoreNonDigitCharacters = constraintAnnotation.ignoreNonDigitCharacters();
+		super.initialize(
+				constraintAnnotation.startIndex(),
+				constraintAnnotation.endIndex(),
+				constraintAnnotation.checkDigitPosition(),
+				constraintAnnotation.ignoreNonDigitCharacters()
+		);
 		this.threshold = constraintAnnotation.threshold();
 
 		this.reverseOrder = constraintAnnotation.processingDirection() == ProcessingDirection.LEFT_TO_RIGHT;

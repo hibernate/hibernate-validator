@@ -51,10 +51,12 @@ public class Mod10CheckValidator extends ModCheckBase
 
 	@Override
 	public void initialize(Mod10Check constraintAnnotation) {
-		this.startIndex = constraintAnnotation.startIndex();
-		this.endIndex = constraintAnnotation.endIndex();
-		this.checkDigitIndex = constraintAnnotation.checkDigitPosition();
-		this.ignoreNonDigitCharacters = constraintAnnotation.ignoreNonDigitCharacters();
+		super.initialize(
+				constraintAnnotation.startIndex(),
+				constraintAnnotation.endIndex(),
+				constraintAnnotation.checkDigitPosition(),
+				constraintAnnotation.ignoreNonDigitCharacters()
+		);
 		this.multiplier = constraintAnnotation.multiplier();
 		this.weight = constraintAnnotation.weight();
 

@@ -47,13 +47,15 @@ public class ModCheckValidator extends ModCheckBase implements ConstraintValidat
 
 	@Override
 	public void initialize(ModCheck constraintAnnotation) {
+		super.initialize(
+				constraintAnnotation.startIndex(),
+				constraintAnnotation.endIndex(),
+				constraintAnnotation.checkDigitPosition(),
+				constraintAnnotation.ignoreNonDigitCharacters()
+		);
+
 		this.modType = constraintAnnotation.modType();
 		this.multiplier = constraintAnnotation.multiplier();
-		this.startIndex = constraintAnnotation.startIndex();
-		this.endIndex = constraintAnnotation.endIndex();
-		this.checkDigitIndex = constraintAnnotation.checkDigitPosition();
-		this.ignoreNonDigitCharacters = constraintAnnotation.ignoreNonDigitCharacters();
-
 		this.validateOptions();
 	}
 
