@@ -973,8 +973,8 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
             </row>
 
             <row>
-              <entry><classname>@ModCheck(modType=,</classname>
-              <classname>multiplier=, startIndex=,</classname>
+              <entry><classname>@Mod10Check(multiplier=,</classname>
+              <classname>weight=, startIndex=,</classname>
               <classname>endIndex=,</classname>
               <classname>checkDigitPosition=,</classname>
               <classname>ignoreNonDigitCharacters=)</classname></entry>
@@ -982,20 +982,46 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
               <entry><classname>CharSequence</classname></entry>
 
               <entry>Checks that the digits within the annotated character
-              sequence pass the mod 10 or mod 11 checksum algorithm.
-              <constant>modType</constant> is used to select the modulo type
-              and the <constant>multiplier</constant> determines the algorithm
-              specific multiplier (see also <ulink
+              sequence pass the mod 10 checksum algorithm (see also <ulink
               url="http://en.wikipedia.org/wiki/Luhn_algorithm">Luhn
-              algorithm</ulink>). <constant>startIndex</constant> and
-              <constant>endIndex</constant> allow to only run the modulo
-              algorithm on the specified sub-string.
+              algorithm</ulink>). <constant>multiplier</constant> determines
+              the multiplier for odd numbers (defaults to 2),
+              <constant>weight</constant> the weight for even numbers
+              (defaults to 1). <constant>startIndex</constant> and
+              <constant>endIndex</constant> allow to only run the algorithm on
+              the specified sub-string.
               <constant>checkDigitPosition</constant> allows to use an
-              arbitrary digit within the character sequence to be the check
+              arbitrary digit within the character sequence as the check
               digit. If not specified it is assumed that the check digit is
               part of the specified range. Last but not least,
               <constant>ignoreNonDigitCharacters</constant> allows to ignore
               non digit characters.</entry>
+
+              <entry>None</entry>
+            </row>
+
+            <row>
+              <entry><classname>@Mod11Check(threshold=,</classname>
+              <classname>startIndex=, endIndex=,</classname>
+              <classname>checkDigitPosition=,</classname>
+              <classname>ignoreNonDigitCharacters=,</classname>
+              <classname>treatCheck10As=,</classname>
+              <classname>treatCheck11As=)</classname></entry>
+
+              <entry><classname>CharSequence</classname></entry>
+
+              <entry>Checks that the digits within the annotated character
+              sequence pass the mod 11 checksum algorithm.
+              <constant>threshold</constant> specifies the threshold for the
+              mod11 multiplier growth; if no value is specified the multiplier
+              will grow indefinitely. <classname>treatCheck10As</classname>
+              and <classname>treatCheck11As</classname> specify the check
+              digits to be used when the mod 11 checksum equals 10 or 11,
+              respectively. Default to X and 0, respectively.
+              <constant>startIndex</constant>, <constant>endIndex</constant>
+              a<constant>checkDigitPosition</constant> and
+              <constant>ignoreNonDigitCharacters</constant> carry the same
+              semantics as in <classname>@Mod10Check</classname>.</entry>
 
               <entry>None</entry>
             </row>
@@ -1007,8 +1033,9 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
 
               <entry>Checks that the annotated character sequence is not null
               and the trimmed length is greater than 0. The difference to
-              @NotEmpty is that this constraint can only be applied on strings
-              and that trailing whitespaces are ignored.</entry>
+              <classname>@NotEmpty</classname> is that this constraint can
+              only be applied on strings and that trailing whitespaces are
+              ignored.</entry>
 
               <entry>None</entry>
             </row>
