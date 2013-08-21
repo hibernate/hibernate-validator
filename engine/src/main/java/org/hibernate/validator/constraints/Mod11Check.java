@@ -32,27 +32,28 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Modulo 11 check constraint.
  * <p>
- * Allows to validate that a series of digits pass the mod 11 checksum
- * algorithm. <br />
- * The most common Mod11 variant the sum is done by multiplying a weight from
- * the rightmost digit (excluding the check digit) to the leftmost, the weight 2
- * starts with 2 an increases by one each new digit, then the result is used to
- * calculate the check digit using {@code 11 - ( sum % 11 )}
+ * Allows to validate that a series of digits passes the Mod11 checksum
+ * algorithm.
+ * For the most common Mod11 variant the sum calculation is done by multiplying a weight from
+ * the rightmost digit (excluding the check digit) to the leftmost. The weight
+ * starts with 2 and increases by 1 for each digit. Then the result is used to
+ * calculate the check digit using {@code 11 - ( sum % 11 )}.
  * </p>
  * <p>
  * Example: The check digit for 24187 is 3<br />
  * Sum = 7x2 + 8x3 + 1x4 + 4x5 + 2x6 = 74 <br />
- * 11 - (74 % 11) = 11 - 8 = 3 so 24187-3 is valid number.
+ * 11 - (74 % 11) = 11 - 8 = 3, so "24187-3" is a valid character sequence.
  * </p>
  * <p>
- * Mod11 check digit can result in 10 or 11, per default 10 is treat as
+ * The Mod11 calculation can result in 10 or 11; per default 10 is treated as
  * {@code 'X'} and 11 as {@code '0'}, this behavior can be changed using the
- * options {@code treatCheck10As} and {@code treatCheck10As} No special
- * characters are accepted the digit must be a Letter or a Digit
- *
- * Some implementations do the sum in the reverse order (left to right),
+ * options {@code treatCheck10As} and {@code treatCheck10As}.
+ *</p>
+ *<p>
+ * Some implementations do the sum calculation in the reverse order (left to right);
+ * specify the processing direction {@link ProcessingDirection#LEFT_TO_RIGHT} in
+ * this case.
  * </p>
- *
  * <p>
  * The supported type is {@code CharSequence}. {@code null} is considered valid.
  * </p>
@@ -73,7 +74,7 @@ public @interface Mod11Check {
 	Class<? extends Payload>[] payload() default { };
 
 	/**
-	 * @return The threshold for the Mod11 algorithm multiplier growth, if no value is specified the multiplier will grown indefinitely
+	 * @return The threshold for the Mod11 algorithm multiplier growth, if no value is specified the multiplier will grow indefinitely
 	 */
 	int threshold() default Integer.MAX_VALUE;
 
@@ -88,28 +89,30 @@ public @interface Mod11Check {
 	int endIndex() default Integer.MAX_VALUE;
 
 	/**
-	 * @return The position of the check digit in input. Per default it is assumes that the check digit is part of the
-	 *         specified range. If set, the digit at the specified position is used as check digit. If set it the following holds
-	 *         true: {@code checkDigitPosition > 0 && (checkDigitPosition < startIndex || checkDigitPosition >= endIndex}.
+	 * @return The position of the check digit in the input. Per default it is assumed that the check digit is the last
+	 *         digit of the specified range. If set, the digit at the specified position is used as check digit. If set
+	 *         the following must hold true:
+	 *         {@code checkDigitPosition > 0 && (checkDigitPosition < startIndex || checkDigitPosition >= endIndex}.
 	 */
 	int checkDigitPosition() default -1;
 
 	/**
-	 * @return Returns {@code true} if non digit characters should be ignored, {@code false} if a non digit character
-	 *         results in a validation error. {@code startIndex} and {@code endIndex} are always only referring to digit
-	 *         characters.
+	 * @return Whether non-digit characters in the validated input should be ignored ({@code true}) or result in a
+	 *         validation error ({@code false}). Note that the values given for {@code startIndex}, {@code endIndex}
+	 *         and {@code checkDigitPosition} need to take into account either digits only or all characters depending
+	 *         on the setting of this option.
 	 */
-	boolean ignoreNonDigitCharacters() default true;
+	boolean ignoreNonDigitCharacters() default false;
 
 	/**
-	 * @return The {@code char} that represents the check digit when mod11
-	 *         checksum equals 10. If not specified {@code '0'} is assumed.
+	 * @return The {@code char} that represents the check digit when the Mod11
+	 *         checksum equals 10. If not specified {@code 'X'} is assumed.
 	 */
 	char treatCheck10As() default 'X';
 
 	/**
-	 * @return The {@code char} that represents the check digit when mod11
-	 *         checksum equals 10. If not specified {@code 'X'} is assumed.
+	 * @return The {@code char} that represents the check digit when the Mod11
+	 *         checksum equals 11. If not specified {@code '0'} is assumed.
 	 */
 	char treatCheck11As() default '0';
 

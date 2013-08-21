@@ -45,6 +45,7 @@ public class ModCheckValidator extends ModCheckBase implements ConstraintValidat
 	 */
 	private ModType modType;
 
+	@Override
 	public void initialize(ModCheck constraintAnnotation) {
 		this.modType = constraintAnnotation.modType();
 		this.multiplier = constraintAnnotation.multiplier();
@@ -62,7 +63,7 @@ public class ModCheckValidator extends ModCheckBase implements ConstraintValidat
 	 * @param digits the digits over which to calculate the Mod10 or Mod11 checksum
 	 * @param checkDigit the check digit
 	 *
-	 * @return {@code true} if the mod 11 result matches the check digit, {@code false} otherwise
+	 * @return {@code true} if the mod 10/11 result matches the check digit, {@code false} otherwise
 	 */
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {

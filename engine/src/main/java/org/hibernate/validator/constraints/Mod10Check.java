@@ -32,17 +32,17 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * Modulo 10 (Luhn algorithm) check constraint.
  * <p>
- * Allows to validate that a series of digits pass the mod 10 checksum
- * algorithm. The classic Mod10 is calculated by sum the digits with every odd
- * digit (from right to left) value multiplied by 2, but there are other
- * implementations that uses different multipliers, ISBN-13 for example use 3
- * multiplier instead of 2.
+ * Allows to validate that a series of digits pass the Mod10 checksum
+ * algorithm. The classic Mod10 is calculated by summing up the digits, with every odd
+ * digit (from right to left) value multiplied by 2. But there are other
+ * implementations that use different multipliers, ISBN-13 for example uses 3
+ * as multiplier instead of 2.
  * </p>
  * <p>
  * There are known cases of codes using multipliers for both even and odd
- * digits, to support this kind of implementations the Mod10 Constraint uses the
- * {@code weight} option, has the same effect as the multiplier but for even
- * numbers
+ * digits; To support this kind of implementations the Mod10 constraint uses the
+ * {@code weight} option, which has the same effect as the multiplier but for even
+ * numbers.
  * </p>
  * <p>
  * The supported type is {@code CharSequence}. {@code null} is considered valid.
@@ -64,12 +64,12 @@ public @interface Mod10Check {
 	Class<? extends Payload>[] payload() default { };
 
 	/**
-	 * @return The multiplier to be used by odd digits on Mod10 algorithm
+	 * @return The multiplier to be used for odd digits when calculating the Mod10 checksum.
 	 */
-	int multipler() default 2;
+	int multiplier() default 2;
 
 	/**
-	 * @return The weight to be used by even digits on Mod10 algorithm
+	 * @return The weight to be used for even digits when calculating the Mod10 checksum.
 	 */
 	int weight() default 1;
 
@@ -79,27 +79,28 @@ public @interface Mod10Check {
 	int startIndex() default 0;
 
 	/**
-	 * @return the end index (exclusive) for calculating the checksum. If not specified the whole value is considered
+	 * @return the end index (exclusive) for calculating the checksum. If not specified the whole value is considered.
 	 */
 	int endIndex() default Integer.MAX_VALUE;
 
 	/**
-	 * @return The position of the check digit in input. Per default it is assumes that the check digit is part of the
-	 *         specified range. If set, the digit at the specified position is used as check digit. If set it the following holds
-	 *         true: {@code checkDigitPosition > 0 && (checkDigitPosition < startIndex || checkDigitPosition >= endIndex}.
+	 * @return The position of the check digit in the input. Per default it is assumed that the check digit is the last
+	 *         digit of the specified range. If set, the digit at the specified position is used as check digit. If set
+	 *         the following must hold true:
+	 *         {@code checkDigitPosition > 0 && (checkDigitPosition < startIndex || checkDigitPosition >= endIndex}.
 	 */
 	int checkDigitPosition() default -1;
 
 	/**
-	 * @return Returns {@code true} if non digit characters should be ignored, {@code false} if a non digit character
-	 *         results in a validation error. {@code startIndex} and {@code endIndex} are always only referring to digit
-	 *         characters.
+	 * @return Whether non-digit characters in the validated input should be ignored ({@code true}) or result in a
+	 *         validation error ({@code false}). Note that the values given for {@code startIndex}, {@code endIndex}
+	 *         and {@code checkDigitPosition} need to take into account either digits only or all characters depending
+	 *         on the setting of this option.
 	 */
 	boolean ignoreNonDigitCharacters() default true;
 
-
 	/**
-	 * Defines several {@code @ModCheck} annotations on the same element.
+	 * Defines several {@code @ModCheck10} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)

@@ -56,10 +56,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Mod11Check.List({
 		@Mod11Check(checkDigitPosition = 9,
 				endIndex = 9,
-				treatCheck10As = '0'),
+				treatCheck10As = '0',
+				ignoreNonDigitCharacters = true),
 		@Mod11Check(checkDigitPosition = 10,
 				endIndex = 10,
-				treatCheck10As = '0')
+				treatCheck10As = '0',
+				ignoreNonDigitCharacters = true)
 })
 @ReportAsSingleViolation
 @Documented

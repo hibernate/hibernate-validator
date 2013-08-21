@@ -122,7 +122,6 @@ public abstract class ModCheckBase {
 	}
 
 	public boolean validateOptions() {
-
 		if ( this.startIndex < 0 ) {
 			throw log.getStartIndexCannotBeNegativeException( this.startIndex );
 		}

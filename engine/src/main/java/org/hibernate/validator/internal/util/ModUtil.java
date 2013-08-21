@@ -33,7 +33,7 @@ public final class ModUtil {
 	 * @param digits The digits over which to calculate the checksum
 	 * @param multiplier Multiplier used in the algorithm
 	 *
-	 * @return the result of the mod11 checksum calculation
+	 * @return the result of the mod10 checksum calculation
 	 */
 	public static int mod10sum(final List<Integer> digits, int multiplier, int weight) {
 		int sum = 0;
@@ -63,7 +63,7 @@ public final class ModUtil {
 	 * @param digits The digits over which to calculate the checksum
 	 * @param multiplier Multiplier used in the algorithm
 	 *
-	 * @return the result of the mod11 checksum calculation assuming weight = 1
+	 * @return the result of the mod10 checksum calculation assuming weight = 1
 	 */
 	public static int mod10sum(final List<Integer> digits, int multiplier) {
 		return mod10sum( digits, multiplier, 1 );
@@ -74,7 +74,7 @@ public final class ModUtil {
 	 *
 	 * @param digits The digits over which to calculate the checksum
 	 *
-	 * @return the result of the mod11 checksum calculation assuming multiplier = 2 and weight = 1
+	 * @return the result of the mod10 checksum calculation assuming multiplier = 2 and weight = 1
 	 */
 	public static int mod10sum(final List<Integer> digits) {
 		return mod10sum( digits, 2, 1 );
@@ -113,5 +113,3 @@ public final class ModUtil {
 		return mod11sum( digits, Integer.MAX_VALUE );
 	}
 }
-
-
