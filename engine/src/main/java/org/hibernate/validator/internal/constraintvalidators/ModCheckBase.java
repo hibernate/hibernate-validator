@@ -167,13 +167,16 @@ public abstract class ModCheckBase {
 		if ( endIndex == Integer.MAX_VALUE ) {
 			return value.substring( 0, value.length() - 1 );
 		}
+		else if ( checkDigitIndex == -1 ) {
+			return value.substring( startIndex, endIndex - 1 );
+		}
 		else {
 			return value.substring( startIndex, endIndex );
 		}
 	}
 
-	private char extractCheckDigit(String value) throws IndexOutOfBoundsException {
-		// the string contains the check digit, just return the check digit
+	private char extractCheckDigit(String value ) throws IndexOutOfBoundsException {
+		// take last character of string to be validated unless the index is given explicitly
 		if ( checkDigitIndex == -1 ) {
 			return value.charAt( value.length() - 1 );
 		}

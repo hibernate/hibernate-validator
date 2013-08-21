@@ -90,6 +90,24 @@ public class Mod10CheckValidatorTest {
 	}
 
 	@Test
+	public void testValidMod10WithGivenRange() throws Exception {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		Mod10Check modCheck = createMod10CheckAnnotation( 3, 14, -1, true );
+		validator.initialize( modCheck );
+
+		assertTrue( validator.isValid( "123-7992739871-3", null ) );
+	}
+
+	@Test
+	public void testValidMod10WithGivenRangeAndCheckDigitIndex() throws Exception {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		Mod10Check modCheck = createMod10CheckAnnotation( 3, 13, 13, true );
+		validator.initialize( modCheck );
+
+		assertTrue( validator.isValid( "123-7992739871-3-456", null ) );
+	}
+
+	@Test
 	public void testInvalidMod10() throws Exception {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false );
