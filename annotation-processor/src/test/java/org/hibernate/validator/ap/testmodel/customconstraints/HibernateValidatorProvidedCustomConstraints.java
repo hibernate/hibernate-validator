@@ -21,6 +21,8 @@ import java.util.Date;
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.Mod10Check;
+import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -42,6 +44,8 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@Email
 	@Length
 	@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)
+	@Mod10Check
+	@Mod11Check
 	@NotBlank
 	@NotEmpty
 	@Range
@@ -59,6 +63,8 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@Email
 	@Length
 	@ModCheck(modType = ModCheck.ModType.MOD10, multiplier = 2)
+	@Mod10Check
+	@Mod11Check
 	@NotBlank
 	@NotEmpty
 	@Range

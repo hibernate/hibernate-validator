@@ -645,4 +645,13 @@ public interface Log extends BasicLogger {
 	@Message(id = 177,
 			value = "Cross-parameter constraints for the method or constructor %2$s of type %1$s are declared more than once via the programmatic constraint declaration API.")
 	ValidationException getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String executable);
+
+	@Message(id = 178, value = "Multiplier cannot be negative: %d.")
+	IllegalArgumentException getMultiplierCannotBeNegativeException(int multiplier);
+
+	@Message(id = 179, value = "Weight cannot be negative: %d.")
+	IllegalArgumentException getWeightCannotBeNegativeException(int weight);
+
+	@Message(id = 180, value = "'%c' is not a digit nor a letter.")
+	IllegalArgumentException getTreatCheckAsIsNotADigitNorALetterException(int weight);
 }

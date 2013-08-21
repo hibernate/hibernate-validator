@@ -24,8 +24,7 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 
-import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.ModCheck.ModType;
+import org.hibernate.validator.constraints.Mod11Check;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -38,6 +37,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Validates a CPF (Cadastro de Pessoa F\u00edsica - Brazilian individual taxpayer registry number).
  *
  * @author George Gastaldi
+ * @author Victor Rezende dos Santos
  */
 @Pattern.List({
 		@Pattern(regexp = "([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}-[0-9]{2})|([0-9]{11})"),
@@ -53,15 +53,15 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 		@Pattern(regexp = "^(?:(?!888\\.?888\\.?888-?88).)*$"),
 		@Pattern(regexp = "^(?:(?!999\\.?999\\.?999-?99).)*$")
 })
-@ModCheck.List({
-		@ModCheck(modType = ModType.MOD11,
-				checkDigitPosition = 9,
-				multiplier = 10,
-				endIndex = 9),
-		@ModCheck(modType = ModType.MOD11,
-				checkDigitPosition = 10,
-				multiplier = 11,
-				endIndex = 10)
+@Mod11Check.List({
+		@Mod11Check(checkDigitPosition = 9,
+				endIndex = 9,
+				treatCheck10As = '0',
+				ignoreNonDigitCharacters = true),
+		@Mod11Check(checkDigitPosition = 10,
+				endIndex = 10,
+				treatCheck10As = '0',
+				ignoreNonDigitCharacters = true)
 })
 @ReportAsSingleViolation
 @Documented

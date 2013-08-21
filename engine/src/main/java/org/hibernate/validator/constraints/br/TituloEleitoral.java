@@ -24,9 +24,8 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 
-import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.ModCheck.List;
-import org.hibernate.validator.constraints.ModCheck.ModType;
+import org.hibernate.validator.constraints.Mod11Check;
+import org.hibernate.validator.constraints.Mod11Check.List;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -42,15 +41,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Pattern(regexp = "[0-9]{12}")
 @List({
-		@ModCheck(modType = ModType.MOD11,
-				checkDigitPosition = 10,
-				multiplier = 9,
-				endIndex = 8),
-		@ModCheck(modType = ModType.MOD11,
-				checkDigitPosition = 11,
-				multiplier = 9,
+		@Mod11Check(threshold = 9,
+				endIndex = 8,
+				checkDigitPosition = 10),
+		@Mod11Check(threshold = 9,
 				startIndex = 8,
-				endIndex = 11)
+				endIndex = 11,
+				checkDigitPosition = 11)
 })
 @ReportAsSingleViolation
 @Documented
@@ -58,7 +55,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface TituloEleitoral {
-	String message() default "{org.hibernate.validator.constraints.br.TituloEleitor.message}";
+	String message() default "{org.hibernate.validator.constraints.br.TituloEleitoral.message}";
 
 	Class<?>[] groups() default { };
 

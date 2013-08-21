@@ -104,6 +104,10 @@ public class ModCheckValidatorTest {
 		validator.initialize( modCheck );
 
 		assertTrue( validator.isValid( "23322023583", null ) );
+
+		assertTrue( validator.isValid( "37879695001", null ) );
+
+		assertTrue( validator.isValid( "33181429643", null ) );
 	}
 
 	@Test
@@ -113,6 +117,11 @@ public class ModCheckValidatorTest {
 		validator.initialize( modCheck );
 
 		assertFalse( validator.isValid( "23322023584", null ) );
+
+		assertFalse( validator.isValid( "37879695002", null ) );
+
+		assertFalse( validator.isValid( "33181429652", null ) );
+
 	}
 
 	private ModCheck createModCheckAnnotation(ModCheck.ModType modType, int multiplier, int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
