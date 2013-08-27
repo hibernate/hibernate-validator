@@ -776,7 +776,7 @@ public final class ReflectionHelper {
 		// The ClassMate doc says that overridden methods are flattened to one
 		// resolved method. But that is the case only for methods without any
 		// generic parameters.
-		if ( resolvedMethods.length == 1 ) {
+		if ( resolvedMethods.length <= 1 ) {
 			return true;
 		}
 
