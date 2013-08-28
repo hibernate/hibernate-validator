@@ -744,15 +744,23 @@ public final class ReflectionHelper {
 		if ( !superTypeMethod.getDeclaringClass().isAssignableFrom( subTypeMethod.getDeclaringClass() ) ) {
 			return false;
 		}
-		
-		if ( Modifier.isStatic(superTypeMethod.getModifiers()) || Modifier.isStatic(subTypeMethod.getModifiers() ) ) {
+
+		if ( Modifier.isStatic( superTypeMethod.getModifiers() ) || Modifier.isStatic( subTypeMethod.getModifiers() ) ) {
 			return false;
 		}
 
-		return parametersResolveToSameTypes( subTypeMethod, superTypeMethod );
+		return instanceMethodParametersResolveToSameTypes( subTypeMethod, superTypeMethod );
 	}
 
-	private static boolean parametersResolveToSameTypes(Method subTypeMethod, Method superTypeMethod) {
+	/**
+	 * Whether the parameters of the two given instance methods resolve to the same types or not. Takes type parameters into account.
+	 *
+	 * @param subTypeMethod a method on a supertype
+	 * @param superTypeMethod a method on a subtype
+	 *
+	 * @return {@code true} if the parameters of the two methods resolve to the same types, {@code false otherwise}.
+	 */
+	private static boolean instanceMethodParametersResolveToSameTypes(Method subTypeMethod, Method superTypeMethod) {
 		if ( subTypeMethod.getParameterTypes().length == 0 ) {
 			return true;
 		}
