@@ -74,8 +74,6 @@ public class Mod11CheckValidator extends ModCheckBase
 		this.treatCheck10As = constraintAnnotation.treatCheck10As();
 		this.treatCheck11As = constraintAnnotation.treatCheck11As();
 
-		this.validateOptions();
-
 		if ( !Character.isLetterOrDigit( this.treatCheck10As ) ) {
 			throw log.getTreatCheckAsIsNotADigitNorALetterException( this.treatCheck10As );
 		}
@@ -99,7 +97,7 @@ public class Mod11CheckValidator extends ModCheckBase
 			Collections.reverse( digits );
 		}
 
-		int modResult = ModUtil.mod11sum( digits, this.threshold );
+		int modResult = ModUtil.calculateMod11Check( digits, this.threshold );
 		switch ( modResult ) {
 			case 10:
 				return checkDigit == this.treatCheck10As;

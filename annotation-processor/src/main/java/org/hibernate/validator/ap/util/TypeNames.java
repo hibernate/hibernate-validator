@@ -65,6 +65,7 @@ public class TypeNames {
 		public static final String EMAIL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Email";
 		public static final String LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Length";
 		public static final String MOD_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ModCheck";
+		public static final String LUHN_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".LuhnCheck";
 		public static final String MOD_10_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Mod10Check";
 		public static final String MOD_11_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Mod11Check";
 		public static final String NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotBlank";

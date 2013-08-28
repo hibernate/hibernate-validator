@@ -43,7 +43,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 @ReportAsSingleViolation
-@Mod10Check
+@LuhnCheck
 public @interface CreditCardNumber {
 	String message() default "{org.hibernate.validator.constraints.CreditCardNumber.message}";
 

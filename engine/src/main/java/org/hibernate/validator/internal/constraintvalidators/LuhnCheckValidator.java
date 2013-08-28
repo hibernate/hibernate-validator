@@ -19,7 +19,7 @@ package org.hibernate.validator.internal.constraintvalidators;
 import java.util.List;
 import javax.validation.ConstraintValidator;
 
-import org.hibernate.validator.constraints.Mod10Check;
+import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.internal.util.ModUtil;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -34,38 +34,19 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Victor Rezende dos Santos
  */
-public class Mod10CheckValidator extends ModCheckBase
-		implements ConstraintValidator<Mod10Check, CharSequence> {
+public class LuhnCheckValidator extends ModCheckBase
+		implements ConstraintValidator<LuhnCheck, CharSequence> {
 
 	private static final Log log = LoggerFactory.make();
 
-	/**
-	 * Multiplier to be used by odd digits on Mod10 algorithm
-	 */
-	private int multiplier;
-
-	/**
-	 * Weight to be used by even digits on Mod10 algorithm
-	 */
-	private int weight;
-
 	@Override
-	public void initialize(Mod10Check constraintAnnotation) {
+	public void initialize(LuhnCheck constraintAnnotation) {
 		super.initialize(
 				constraintAnnotation.startIndex(),
 				constraintAnnotation.endIndex(),
 				constraintAnnotation.checkDigitPosition(),
 				constraintAnnotation.ignoreNonDigitCharacters()
 		);
-		this.multiplier = constraintAnnotation.multiplier();
-		this.weight = constraintAnnotation.weight();
-
-		if ( this.multiplier < 0 ) {
-			throw log.getMultiplierCannotBeNegativeException( this.multiplier );
-		}
-		if ( this.weight < 0 ) {
-			throw log.getWeightCannotBeNegativeException( this.weight );
-		}
 	}
 
 	/**
@@ -78,10 +59,10 @@ public class Mod10CheckValidator extends ModCheckBase
 	 */
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {
-		int modResult = ModUtil.calculateMod10Check( digits, this.multiplier, this.weight );
+		int modResult = ModUtil.calculateLuhnMod10Check( digits );
 		int checkValue = extractDigit( checkDigit );
 
-		return modResult < 10 ? checkValue == modResult : checkValue == 0;
+		return modResult == checkValue;
 	}
 
 }

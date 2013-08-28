@@ -200,6 +200,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.EMAIL, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.LENGTH, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_CHECK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.LUHN_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_10_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_11_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NOT_BLANK, CharSequence.class );
