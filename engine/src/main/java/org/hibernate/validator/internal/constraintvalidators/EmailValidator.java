@@ -68,7 +68,7 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 		}
 
 		// split email at '@' and consider local and domain part separately
-		String[] emailParts = value.toString().split( "@" );
+		String[] emailParts = value.toString().split( "@" , 3);
 		if ( emailParts.length != 2 ) {
 			return false;
 		}
