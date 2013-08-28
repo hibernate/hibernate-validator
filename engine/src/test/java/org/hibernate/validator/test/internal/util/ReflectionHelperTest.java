@@ -187,6 +187,41 @@ public class ReflectionHelperTest {
 		assertFalse( ReflectionHelper.isGetterMethod( method ) );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-818")
+	public void testOverrides() throws Exception {
+		Method getBar = Bar.class.getMethod("getBar");
+		Method getBarString = Bar.class.getMethod("getBar",String.class);
+		
+		Method getSuperBar = Foo.class.getMethod("getBar");
+		Method getSuperBarString = Foo.class.getMethod("getBar",String.class);
+		Method getBarInteger = Foo.class.getMethod("getBar",Integer.class);
+		
+		Method getFooLong = Foo.class.getMethod("getFoo",Long.class);
+		Method getStaticFoo = Foo.class.getMethod("getFoo");
+		Method getStaticFooString = Foo.class.getMethod("getFoo",String.class);
+		Method getStaticFooInteger = Foo.class.getMethod("getFoo",Integer.class);
+        
+		assertTrue(ReflectionHelper.overrides(getSuperBar,getBar));
+		assertTrue(ReflectionHelper.overrides(getSuperBarString,getBarString));
+		
+        assertFalse(ReflectionHelper.overrides(getBar,getBarString));
+		assertFalse(ReflectionHelper.overrides(getBar,getBarInteger));
+		assertFalse(ReflectionHelper.overrides(getBarString,getBarInteger));
+		assertFalse(ReflectionHelper.overrides(getSuperBar,getBarInteger));
+		assertFalse(ReflectionHelper.overrides(getSuperBar,getBarString));
+		assertFalse(ReflectionHelper.overrides(getSuperBarString,getBarInteger));
+		assertFalse(ReflectionHelper.overrides(getSuperBarString,getBar));
+		assertFalse(ReflectionHelper.overrides(getSuperBarString,getSuperBar));
+		
+		assertFalse(ReflectionHelper.overrides(getStaticFoo,getStaticFooString));
+		assertFalse(ReflectionHelper.overrides(getStaticFoo,getStaticFooInteger));
+		assertFalse(ReflectionHelper.overrides(getStaticFooString,getStaticFooInteger));
+		assertFalse(ReflectionHelper.overrides(getFooLong,getStaticFoo));
+		assertFalse(ReflectionHelper.overrides(getFooLong,getStaticFooInteger));
+		assertFalse(ReflectionHelper.overrides(getFooLong,getStaticFooString));
+	}
+	
 	@SuppressWarnings("unused")
 	private static class TestTypes {
 		public List<String> stringList;
@@ -201,6 +236,37 @@ public class ReflectionHelperTest {
 		}
 
 		public String getBar(String param) {
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private static class Foo extends Bar {
+		public String getBar() {
+			return null;
+		}
+		
+		public String getBar(String param) {
+			return null;
+		}
+		
+		public String getBar(Integer param) {
+			return null;
+		}
+		
+		public String getFoo(Long param) {
+			return null;
+		}
+
+		public static String getFoo() {
+			return null;
+		}
+		
+		public static String getFoo(Integer param) {
+			return null;
+		}
+
+		public static String getFoo(String param) {
 			return null;
 		}
 	}
