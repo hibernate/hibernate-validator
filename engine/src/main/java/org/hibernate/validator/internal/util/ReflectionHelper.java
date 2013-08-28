@@ -23,6 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -752,6 +753,10 @@ public final class ReflectionHelper {
 		if ( !superTypeMethod.getDeclaringClass().isAssignableFrom( subTypeMethod.getDeclaringClass() ) ) {
 			return false;
 		}
+		
+		if ( Modifier.isStatic(superTypeMethod.getModifiers()) || Modifier.isStatic(subTypeMethod.getModifiers() ) ) {
+			return false;
+		}
 
 		return parametersResolveToSameTypes( subTypeMethod, superTypeMethod );
 	}
@@ -776,7 +781,7 @@ public final class ReflectionHelper {
 		// The ClassMate doc says that overridden methods are flattened to one
 		// resolved method. But that is the case only for methods without any
 		// generic parameters.
-		if ( resolvedMethods.length <= 1 ) {
+		if ( resolvedMethods.length == 1 ) {
 			return true;
 		}
 
