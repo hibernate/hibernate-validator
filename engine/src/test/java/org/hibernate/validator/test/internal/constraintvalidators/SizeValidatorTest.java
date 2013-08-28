@@ -53,7 +53,7 @@ import static org.testng.Assert.assertTrue;
 
 /**
  * @author Alaa Nassef
- * @author Hardy Feretnschik
+ * @author Hardy Ferentschik
  */
 public class SizeValidatorTest {
 

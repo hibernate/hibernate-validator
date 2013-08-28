@@ -2,7 +2,9 @@ Alaa Nassef
 Carlos Vara
 Dag Hovland
 Davide Marchignoli
+Doug Lea
 Emmanuel Bernard
+Efthymis Sarbanis
 Federico
 Federico Mancini
 Gavin King
@@ -11,12 +13,17 @@ Gerhard Petracek
 Gunnar Morling
 Hardy Ferentschik
 Henno Vermeulen
+Jason T. Greene
 Juraci Krohling
 Justin Nauman
 Kevin Pollet
-kevinpollet
+Leonardo Loch Zanivan
+Mark Hobson
 Paolo Perrotta
 Pete Muir
+Sanne Grinovero
 Shane Bryzak
+Shelly McGowan
 Steve Ebersole
 Strong Liu
+Victor Rezende dos Santos
