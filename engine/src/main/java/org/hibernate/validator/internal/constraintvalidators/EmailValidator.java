@@ -48,27 +48,29 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 	/**
 	 * Regular expression for the local part of an email address (everything before '@')
 	 */
-	private Pattern localPattern = java.util.regex.Pattern.compile(
+	private final Pattern localPattern = java.util.regex.Pattern.compile(
 			ATOM + "+(\\." + ATOM + "+)*", CASE_INSENSITIVE
 	);
 
 	/**
 	 * Regular expression for the domain part of an email address (everything after '@')
 	 */
-	private Pattern domainPattern = java.util.regex.Pattern.compile(
+	private final Pattern domainPattern = java.util.regex.Pattern.compile(
 			DOMAIN + "|" + IP_DOMAIN, CASE_INSENSITIVE
 	);
 
+	@Override
 	public void initialize(Email annotation) {
 	}
 
+	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
 		if ( value == null || value.length() == 0 ) {
 			return true;
 		}
 
 		// split email at '@' and consider local and domain part separately
-		String[] emailParts = value.toString().split( "@" , 3);
+		String[] emailParts = value.toString().split( "@", 2 );
 		if ( emailParts.length != 2 ) {
 			return false;
 		}
