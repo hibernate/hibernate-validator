@@ -99,7 +99,7 @@ public @interface Mod10Check {
 	boolean ignoreNonDigitCharacters() default true;
 
 	/**
-	 * Defines several {@code @ModCheck10} annotations on the same element.
+	 * Defines several {@code @Mod10Check} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)

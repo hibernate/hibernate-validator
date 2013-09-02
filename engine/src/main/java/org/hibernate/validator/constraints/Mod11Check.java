@@ -126,7 +126,7 @@ public @interface Mod11Check {
 	ProcessingDirection processingDirection() default ProcessingDirection.RIGHT_TO_LEFT;
 
 	/**
-	 * Defines several {@code @ModCheck11} annotations on the same element.
+	 * Defines several {@code @Mod11Check} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)

@@ -25,7 +25,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * Mod10 (Luhn algorithm implementation) Check validator
+ * Luhn algorithm checksum validator
  *
  * http://en.wikipedia.org/wiki/Luhn_algorithm
  * http://en.wikipedia.org/wiki/Check_digit
@@ -50,12 +50,12 @@ public class LuhnCheckValidator extends ModCheckBase
 	}
 
 	/**
-	 * Validate check digit using Mod10
+	 * Validate check digit using Luhn algorithm
 	 *
 	 * @param digits The digits over which to calculate the checksum
 	 * @param checkDigit the check digit
 	 *
-	 * @return {@code true} if the mod 10 result matches the check digit, {@code false} otherwise
+	 * @return {@code true} if the luhn check result matches the check digit, {@code false} otherwise
 	 */
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {

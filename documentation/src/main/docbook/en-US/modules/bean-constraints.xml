@@ -973,6 +973,30 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
             </row>
 
             <row>
+              <entry><classname>@LuhnCheck(</classname><classname>startIndex=,</classname>
+              <classname>endIndex=,</classname>
+              <classname>checkDigitPosition=,</classname>
+              <classname>ignoreNonDigitCharacters=)</classname></entry>
+
+              <entry><classname>CharSequence</classname></entry>
+
+              <entry>Checks that the digits within the annotated character
+              sequence pass the Luhn checksum algorithm (see also <ulink
+              url="http://en.wikipedia.org/wiki/Luhn_algorithm">Luhn
+              algorithm</ulink>). <constant>startIndex</constant> and
+              <constant>endIndex</constant> allow to only run the algorithm on
+              the specified sub-string.
+              <constant>checkDigitPosition</constant> allows to use an
+              arbitrary digit within the character sequence as the check
+              digit. If not specified it is assumed that the check digit is
+              part of the specified range. Last but not least,
+              <constant>ignoreNonDigitCharacters</constant> allows to ignore
+              non digit characters.</entry>
+
+              <entry>None</entry>
+            </row>
+
+            <row>
               <entry><classname>@Mod10Check(multiplier=,</classname>
               <classname>weight=, startIndex=,</classname>
               <classname>endIndex=,</classname>
@@ -982,12 +1006,11 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
               <entry><classname>CharSequence</classname></entry>
 
               <entry>Checks that the digits within the annotated character
-              sequence pass the mod 10 checksum algorithm (see also <ulink
-              url="http://en.wikipedia.org/wiki/Luhn_algorithm">Luhn
-              algorithm</ulink>). <constant>multiplier</constant> determines
-              the multiplier for odd numbers (defaults to 2),
-              <constant>weight</constant> the weight for even numbers
-              (defaults to 1). <constant>startIndex</constant> and
+              sequence pass the generic mod 10 checksum algorithm.
+              <constant>multiplier</constant> determines the multiplier for
+              odd numbers (defaults to 3), <constant>weight</constant> the
+              weight for even numbers (defaults to 1).
+              <constant>startIndex</constant> and
               <constant>endIndex</constant> allow to only run the algorithm on
               the specified sub-string.
               <constant>checkDigitPosition</constant> allows to use an
