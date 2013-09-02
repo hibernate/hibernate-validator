@@ -56,11 +56,10 @@ public class ModCheckValidator extends ModCheckBase implements ConstraintValidat
 
 		this.modType = constraintAnnotation.modType();
 		this.multiplier = constraintAnnotation.multiplier();
-		this.validateOptions();
 	}
 
 	/**
-	 * Check if the input passes the Mod10 (Luhn algorithm implementation) or Mod11 test
+	 * Check if the input passes the Mod10 (Luhn algorithm implementation only) or Mod11 test
 	 *
 	 * @param digits the digits over which to calculate the Mod10 or Mod11 checksum
 	 * @param checkDigit the check digit
@@ -73,14 +72,14 @@ public class ModCheckValidator extends ModCheckBase implements ConstraintValidat
 		int checkValue = extractDigit( checkDigit );
 
 		if ( modType.equals( ModType.MOD11 ) ) {
-			modResult = ModUtil.mod11sum( digits, multiplier );
+			modResult = ModUtil.calculateMod11Check( digits, multiplier );
 
 			if ( modResult == 10 || modResult == 11 ) {
 				modResult = 0;
 			}
 		}
 		else {
-			modResult = ModUtil.mod10sum( digits, multiplier );
+			modResult = ModUtil.calculateLuhnMod10Check( digits );
 		}
 
 		return checkValue == modResult;

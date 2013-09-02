@@ -30,18 +30,12 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Modulo 10 check constraint.
+ * Luhn algorithm check constraint.
  * <p>
- * Allows to validate that a series of digits pass the Mod10 checksum
- * algorithm. The classic Mod10 is calculated by summing up the digits, with every odd
- * digit (from right to left) value multiplied by a {@code multiplier}.
- * As example ISBN-13 is Modulo 10 checksum with {@code multiplier = 3}.
- * </p>
- * <p>
- * There are known cases of codes using multipliers for both even and odd
- * digits; To support this kind of implementations the Mod10 constraint uses the
- * {@code weight} option, which has the same effect as the multiplier but for even
- * numbers.
+ * Allows to validate that a series of digits pass the Luhn Modulo 10 checksum
+ * algorithm. The Luhn Mod10 is calculated by summing up the digits, with every odd
+ * digit (from right to left) value multiplied by 2, if the value is greater than 9 the
+ * the result digits a summed before the total summing.
  * </p>
  * <p>
  * The supported type is {@code CharSequence}. {@code null} is considered valid.
@@ -55,22 +49,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
-public @interface Mod10Check {
-	String message() default "{org.hibernate.validator.constraints.Mod10Check.message}";
+public @interface LuhnCheck {
+	String message() default "{org.hibernate.validator.constraints.LuhnCheck.message}";
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
-
-	/**
-	 * @return The multiplier to be used for odd digits when calculating the Mod10 checksum.
-	 */
-	int multiplier() default 3;
-
-	/**
-	 * @return The weight to be used for even digits when calculating the Mod10 checksum.
-	 */
-	int weight() default 1;
 
 	/**
 	 * @return the start index (inclusive) for calculating the checksum. If not specified 0 is assumed.
@@ -99,12 +83,12 @@ public @interface Mod10Check {
 	boolean ignoreNonDigitCharacters() default true;
 
 	/**
-	 * Defines several {@code @Mod10Check} annotations on the same element.
+	 * Defines several {@code @LuhnCheck} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)
 	@Documented
 	public @interface List {
-		Mod10Check[] value();
+		LuhnCheck[] value();
 	}
 }

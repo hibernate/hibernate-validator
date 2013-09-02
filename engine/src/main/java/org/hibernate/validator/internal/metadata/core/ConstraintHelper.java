@@ -46,9 +46,10 @@ import javax.validation.constraintvalidation.ValidationTarget;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.ModCheck;
+import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
+import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.SafeHtml;
@@ -68,13 +69,14 @@ import org.hibernate.validator.internal.constraintvalidators.FutureValidatorForD
 import org.hibernate.validator.internal.constraintvalidators.FutureValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.FutureValidatorForReadablePartial;
 import org.hibernate.validator.internal.constraintvalidators.LengthValidator;
+import org.hibernate.validator.internal.constraintvalidators.LuhnCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.MaxValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.MaxValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.MinValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.MinValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.ModCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.Mod10CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.Mod11CheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.ModCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.NotBlankValidator;
 import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.NullValidator;
@@ -215,6 +217,10 @@ public class ConstraintHelper {
 		constraintList = newArrayList();
 		constraintList.add( ModCheckValidator.class );
 		builtinConstraints.put( ModCheck.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( LuhnCheckValidator.class );
+		builtinConstraints.put( LuhnCheck.class, constraintList );
 
 		constraintList = newArrayList();
 		constraintList.add( Mod10CheckValidator.class );

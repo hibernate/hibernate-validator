@@ -19,7 +19,6 @@ package org.hibernate.validator.internal.constraintvalidators;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -64,6 +63,8 @@ public abstract class ModCheckBase {
 		this.endIndex = endIndex;
 		this.checkDigitIndex = checkDigitIndex;
 		this.ignoreNonDigitCharacters = ignoreNonDigitCharacters;
+
+		this.validateOptions();
 	}
 
 	/**
@@ -175,7 +176,7 @@ public abstract class ModCheckBase {
 		}
 	}
 
-	private char extractCheckDigit(String value ) throws IndexOutOfBoundsException {
+	private char extractCheckDigit(String value) throws IndexOutOfBoundsException {
 		// take last character of string to be validated unless the index is given explicitly
 		if ( checkDigitIndex == -1 ) {
 			return value.charAt( value.length() - 1 );

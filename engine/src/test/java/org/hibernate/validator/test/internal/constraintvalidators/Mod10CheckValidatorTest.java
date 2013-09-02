@@ -22,6 +22,7 @@ import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.internal.constraintvalidators.Mod10CheckValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
@@ -68,7 +69,7 @@ public class Mod10CheckValidatorTest {
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false );
 		validator.initialize( modCheck );
 
-		assertFalse( validator.isValid( new MyCustomStringImpl( "A79927398713" ), null ) );
+		assertFalse( validator.isValid( new MyCustomStringImpl( "A79927398712" ), null ) );
 	}
 
 	@Test
@@ -77,7 +78,7 @@ public class Mod10CheckValidatorTest {
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, true );
 		validator.initialize( modCheck );
 
-		assertTrue( validator.isValid( new MyCustomStringImpl( "A79927398713" ), null ) );
+		assertTrue( validator.isValid( new MyCustomStringImpl( "A79927398712" ), null ) );
 	}
 
 	@Test
@@ -86,7 +87,7 @@ public class Mod10CheckValidatorTest {
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false );
 		validator.initialize( modCheck );
 
-		assertTrue( validator.isValid( "79927398713", null ) );
+		assertTrue( validator.isValid( "79927398712", null ) );
 	}
 
 	@Test
@@ -95,7 +96,7 @@ public class Mod10CheckValidatorTest {
 		Mod10Check modCheck = createMod10CheckAnnotation( 3, 14, -1, true );
 		validator.initialize( modCheck );
 
-		assertTrue( validator.isValid( "123-7992739871-3", null ) );
+		assertTrue( validator.isValid( "123-7992739871-2", null ) );
 	}
 
 	@Test
@@ -104,7 +105,7 @@ public class Mod10CheckValidatorTest {
 		Mod10Check modCheck = createMod10CheckAnnotation( 3, 13, 13, true );
 		validator.initialize( modCheck );
 
-		assertTrue( validator.isValid( "123-7992739871-3-456", null ) );
+		assertTrue( validator.isValid( "123-7992739871-2-456", null ) );
 	}
 
 	@Test
@@ -113,16 +114,78 @@ public class Mod10CheckValidatorTest {
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, false );
 		validator.initialize( modCheck );
 
-		assertFalse( validator.isValid( new MyCustomStringImpl( "79927398714" ), null ) );
+		assertFalse( validator.isValid( new MyCustomStringImpl( "79927398713" ), null ) );
 	}
 
-	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
+	@Test
+	@TestForIssue(jiraKey = "HV-813")
+	public void testValidEAN_GTIN_13() throws Exception {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		Mod10Check modCheck = createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, true );
+		validator.initialize( modCheck );
+
+		assertTrue( validator.isValid( new MyCustomStringImpl( "4 007630 00011 6" ), null ) );
+		assertTrue( validator.isValid( new MyCustomStringImpl( "1 234567 89012 8" ), null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-813")
+	public void testValidEAN_GTIN_14() throws Exception {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		Mod10Check modCheck = createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, true );
+		validator.initialize( modCheck );
+
+		assertTrue( validator.isValid( new MyCustomStringImpl( "0 40 07630 00011 6" ), null ) );
+		assertTrue( validator.isValid( new MyCustomStringImpl( "3 07 12345 00001 0" ), null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-813")
+	public void testValidEAN_14WithEAN_128() throws Exception {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		Mod10Check modCheck = createMod10CheckAnnotation( 2, 16, -1, true );
+		validator.initialize( modCheck );
+		assertTrue( validator.isValid( new MyCustomStringImpl( "(01) 1 23 45678 90123 1" ), null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-813")
+	public void testValidISBN_13() throws Exception {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		Mod10Check modCheck = createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, true );
+		validator.initialize( modCheck );
+
+		assertTrue( validator.isValid( new MyCustomStringImpl( "978-85-61411-03-9" ), null ) );
+		assertTrue( validator.isValid( new MyCustomStringImpl( "978-1-4302-1957-6" ), null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-813")
+	public void testValidIdentcode() throws Exception {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		Mod10Check modCheck = createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, true, 4, 9 );
+		validator.initialize( modCheck );
+
+		assertTrue( validator.isValid( new MyCustomStringImpl( "56.310 243.031 3" ), null ) );
+	}
+
+	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits, int multiplier, int weight) {
 		AnnotationDescriptor<Mod10Check> descriptor = new AnnotationDescriptor<Mod10Check>( Mod10Check.class );
 		descriptor.setValue( "startIndex", start );
 		descriptor.setValue( "endIndex", end );
 		descriptor.setValue( "checkDigitPosition", checkDigitIndex );
 		descriptor.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
+		descriptor.setValue( "multiplier", multiplier );
+		descriptor.setValue( "weight", weight );
 
 		return AnnotationFactory.create( descriptor );
+	}
+
+	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
+		return this.createMod10CheckAnnotation( start, end, checkDigitIndex, ignoreNonDigits, 3, 1 );
+	}
+
+	private Mod10Check createMod10CheckAnnotation(boolean ignoreNonDigits, int multiplier, int weight) {
+		return this.createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, ignoreNonDigits, multiplier, weight );
 	}
 }
