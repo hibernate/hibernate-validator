@@ -12,14 +12,14 @@ hvModuleXml = new File( project.properties['jbossTargetDir'], 'modules/system/la
 def hvArtifactName = 'hibernate-validator-' + project.version + '.jar';
 println "[INFO] Using HV version " + hvArtifactName;
 processFileInplace( hvModuleXml ) { text ->
-    text.replace( /hibernate-validator-.*.jar/, hvArtifactName )
+    text.replaceAll( /hibernate-validator.*jar/, hvArtifactName )
 }
 
 hvCdiModuleXml = new File( project.properties['jbossTargetDir'], 'modules/system/layers/base/org/hibernate/validator/cdi/main/module.xml' )
 def hvCdiArtifactName = 'hibernate-validator-cdi-' + project.version + '.jar';
 println "[INFO] Using HV CDI Portable Extension version " + hvCdiArtifactName;
 processFileInplace( hvCdiModuleXml ) { text ->
-    text.replace( /hibernate-validator-cdi-.*.jar/, hvCdiArtifactName )
+    text.replaceAll( /hibernate-validator-cdi.*jar/, hvCdiArtifactName )
 }
 
 println "[INFO] ------------------------------------------------------------------------";
