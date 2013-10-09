@@ -950,6 +950,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		BeanMetaData<T> beanMetaData = beanMetaDataManager.getBeanMetaData( validationContext.getRootBeanClass() );
 		ExecutableMetaData executableMetaData = beanMetaData.getMetaDataFor( validationContext.getExecutable() );
 
+		if ( parameterValues.length != executableMetaData.getParameterTypes().length ) {
+			throw log.getInvalidParameterCountForExecutableException(
+					ExecutableElement.getExecutableAsString(
+							executableMetaData.getType().toString() + "#" + executableMetaData.getName(),
+							executableMetaData.getParameterTypes()
+					), parameterValues.length, executableMetaData.getParameterTypes().length
+			);
+		}
+
 		// TODO GM: define behavior with respect to redefined default sequences. Should only the
 		// sequence from the validated bean be honored or also default sequence definitions up in
 		// the inheritance tree?

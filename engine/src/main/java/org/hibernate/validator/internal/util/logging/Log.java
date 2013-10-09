@@ -653,4 +653,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 180, value = "'%c' is not a digit nor a letter.")
 	IllegalArgumentException getTreatCheckAsIsNotADigitNorALetterException(int weight);
+
+	@Message(id = 181,
+			value = "Wrong number of parameters. Method or constructor %1$s expects %2$d parameters, but got %3$d.")
+	IllegalArgumentException getInvalidParameterCountForExecutableException(String executable, int expectedParameterCount, int actualParameterCount);
 }
