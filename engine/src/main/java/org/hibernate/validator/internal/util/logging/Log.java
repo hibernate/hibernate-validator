@@ -53,6 +53,11 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * The logger interface for JBoss Logging.
+ * <p>
+ * <b>Note</b>:<br/>
+ * New log messages must always use a new (incremented) message id. Don't re-use of existing message ids, even
+ * if a given log method is not used anymore. Unused messages can be deleted.
+ * </p>
  *
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2012 SERLI
  */
@@ -91,10 +96,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = 8, value = "Unable to close input stream.")
 	void unableToCloseInputStream();
-
-	@LogMessage(level = WARN)
-	@Message(id = 9, value = "Unable to load provider class %s.")
-	void unableToLoadProviderClass(String providerName);
 
 	@LogMessage(level = WARN)
 	@Message(id = 10, value = "Unable to close input stream for %s.")
@@ -251,12 +252,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 59, value = "Unable to retrieve annotation parameter value.")
 	ValidationException getUnableToRetrieveAnnotationParameterValueException(@Cause Exception e);
 
-	@Message(id = 60, value = "Multiple definitions of default group sequence provider.")
-	GroupDefinitionException getMultipleDefinitionOfDefaultGroupSequenceProviderException();
-
-	@Message(id = 61, value = "Multiple definitions of default group sequence.")
-	GroupDefinitionException getMultipleDefinitionOfDefaultGroupSequenceException();
-
 	@Message(id = 62,
 			value = "Method %1$s has %2$s parameters, but the passed list of parameter meta data has a size of %3$s.")
 	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(ExecutableElement executableElement, int nbParameters, int listSize);
@@ -273,12 +268,6 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToLoadClassException(String className);
 
 	ValidationException getUnableToLoadClassException(String className, @Cause Exception e);
-
-	@Message(id = 66, value = "Unable to instantiate Bean Validation provider %s.")
-	ValidationException getUnableToInstantiateBeanValidationProviderException(List<String> providerName, @Cause Exception e);
-
-	@Message(id = 67, value = "Unable to read %s.")
-	ValidationException getUnableToReadServicesFileException(String servicesFileName, @Cause Exception e);
 
 	@Message(id = 68, value = "Start index cannot be negative: %d.")
 	IllegalArgumentException getStartIndexCannotBeNegativeException(int startIndex);
@@ -430,9 +419,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 116, value = "%s")
 	IllegalArgumentException getIllegalArgumentException(String message);
 
-	@Message(id = 117, value = "Invalid value for property %s: %s")
-	ValidationException getInvalidPropertyValueException(String propertyName, String propertyValue, @Cause Exception e);
-
 	@Message(id = 118, value = "Unable to cast %s (with element kind %s) to %s")
 	ClassCastException getUnableToNarrowNodeTypeException(String actualDescriptorType, ElementKind kind, String expectedDescriptorType);
 
@@ -460,10 +446,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 127, value = "Found group conversion using a group sequence as source: %s.")
 	ConstraintDeclarationException getGroupConversionForSequenceException(Class<?> from);
-
-	@Message(id = 128,
-			value = "Annotation type %s is no constraint annotation. It needs to be annotated with @Constraint or @CrossParameterConstraint.")
-	ConstraintDefinitionException getAnnotationIsNoConstraintTypeException(Class<? extends Annotation> annotationType);
 
 	@LogMessage(level = WARN)
 	@Message(id = 129, value = "EL expression '%s' references an unknown property")
@@ -502,10 +484,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 139,
 			value = "The constraint '%1$s' defines multiple cross parameter validators. Only one is allowed.")
 	ConstraintDefinitionException getMultipleCrossParameterValidatorClassesException(String constraint);
-
-	@Message(id = 140,
-			value = "The constraint %1$s has both generic and cross-parameter validators, but does not specify the parameter 'validationAppliesTo'")
-	ConstraintDefinitionException getGenericAndCrossParameterValidatorWithoutConstraintTargetException(String constraint);
 
 	@Message(id = 141,
 			value = "The constraint %1$s used ConstraintTarget#IMPLICIT where the target cannot be inferred.")
