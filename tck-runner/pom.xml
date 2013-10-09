@@ -33,7 +33,6 @@
         <tck.version>1.1.0.Final</tck.version>
         <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
         <arquillian.version>1.0.0.Final</arquillian.version>
-        <wildfly.version>8.0.0.Alpha3</wildfly.version>
         <jbossTargetDir>${project.build.directory}/wildfly-${wildfly.version}</jbossTargetDir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
@@ -279,6 +278,25 @@
                                         <artifactItem>
                                             <groupId>org.hibernate</groupId>
                                             <artifactId>hibernate-validator</artifactId>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-hv-cdi-snapshot</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>
+                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/cdi/main
+                                    </outputDirectory>
+                                    <stripVersion>false</stripVersion>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.hibernate</groupId>
+                                            <artifactId>hibernate-validator-cdi</artifactId>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
