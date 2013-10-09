@@ -56,6 +56,7 @@ import static org.jboss.logging.Logger.Level.WARN;
  *
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2012 SERLI
  */
+@SuppressWarnings("deprecation")
 @MessageLogger(projectCode = "HV")
 public interface Log extends BasicLogger {
 
@@ -250,11 +251,9 @@ public interface Log extends BasicLogger {
 	@Message(id = 59, value = "Unable to retrieve annotation parameter value.")
 	ValidationException getUnableToRetrieveAnnotationParameterValueException(@Cause Exception e);
 
-	//TODO: Unused; Decide whether to remove or keep it to avoid re-using the id
 	@Message(id = 60, value = "Multiple definitions of default group sequence provider.")
 	GroupDefinitionException getMultipleDefinitionOfDefaultGroupSequenceProviderException();
 
-	//TODO: Unused; Decide whether to remove or keep it to avoid re-using the id
 	@Message(id = 61, value = "Multiple definitions of default group sequence.")
 	GroupDefinitionException getMultipleDefinitionOfDefaultGroupSequenceException();
 
@@ -533,11 +532,11 @@ public interface Log extends BasicLogger {
 	ValidationException getConstrainedElementConfiguredMultipleTimesException(String location);
 
 	@LogMessage(level = WARN)
-	@Message(id = 148, value = "An exception ocurred during evaluation of EL expression '%s'")
+	@Message(id = 148, value = "An exception occurred during evaluation of EL expression '%s'")
 	void evaluatingExpressionLanguageExpressionCausedException(String expression, @Cause Exception e);
 
-	@Message(id = 149, value = "An exception occured during message interpolation")
-	ValidationException getExceptionOcurredDuringMessageInterpolationException(@Cause Exception e);
+	@Message(id = 149, value = "An exception occurred during message interpolation")
+	ValidationException getExceptionOccurredDuringMessageInterpolationException(@Cause Exception e);
 
 	@Message(id = 150,
 			value = "The constraint '%s' defines multiple validators for the type '%s'. Only one is allowed.")
