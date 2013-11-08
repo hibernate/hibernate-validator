@@ -43,7 +43,7 @@ import javax.validation.executable.ExecutableValidator;
  */
 @MethodValidated
 @Interceptor
-@Priority(4800)
+@Priority(Interceptor.Priority.PLATFORM_AFTER + 800)
 public class ValidationInterceptor implements Serializable {
 
 	private static final long serialVersionUID = 604440259030722151L;
