@@ -25,6 +25,7 @@ import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
+import org.hibernate.validator.internal.metadata.aggregated.UnconstrainedEntityMetaDataSingleton;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -102,7 +103,12 @@ public class BeanMetaDataManager {
 	 * @param executableHelper the executable helper
 	 */
 	public BeanMetaDataManager(ConstraintHelper constraintHelper, ExecutableHelper executableHelper) {
-		this( constraintHelper, executableHelper, new DefaultParameterNameProvider(), Collections.<MetaDataProvider>emptyList() );
+		this(
+				constraintHelper,
+				executableHelper,
+				new DefaultParameterNameProvider(),
+				Collections.<MetaDataProvider>emptyList()
+		);
 	}
 
 	/**
@@ -141,26 +147,12 @@ public class BeanMetaDataManager {
 		this.metaDataProviders.add( defaultProvider );
 	}
 
-	@SuppressWarnings("unchecked")
+	public boolean isConstrained(Class<?> beanClass) {
+		return getOrCreateBeanMetaData( beanClass, true ).hasConstraints();
+	}
+
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
-		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeCannotBeNull() );
-
-		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.get( beanClass );
-
-		// create a new BeanMetaData in case none is cached
-		if ( beanMetaData == null ) {
-			beanMetaData = createBeanMetaData( beanClass );
-
-			final BeanMetaData<T> cachedBeanMetaData = (BeanMetaData<T>) beanMetaDataCache.putIfAbsent(
-					beanClass,
-					beanMetaData
-			);
-			if ( cachedBeanMetaData != null ) {
-				beanMetaData = cachedBeanMetaData;
-			}
-		}
-
-		return beanMetaData;
+		return getOrCreateBeanMetaData( beanClass, false );
 	}
 
 	public void clear() {
@@ -202,5 +194,38 @@ public class BeanMetaDataManager {
 		}
 
 		return options;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> BeanMetaData<T> getOrCreateBeanMetaData(Class<T> beanClass, boolean allowUnconstrainedTypeSingleton) {
+		Contracts.assertNotNull( beanClass, MESSAGES.beanTypeCannotBeNull() );
+
+		BeanMetaData<T> beanMetaData = (BeanMetaData<T>) beanMetaDataCache.get( beanClass );
+
+		// create a new BeanMetaData in case none is cached
+		if ( beanMetaData == null ) {
+			beanMetaData = createBeanMetaData( beanClass );
+			if ( !beanMetaData.hasConstraints() && allowUnconstrainedTypeSingleton ) {
+				beanMetaData = (BeanMetaData<T>) UnconstrainedEntityMetaDataSingleton.getSingleton();
+			}
+
+			final BeanMetaData<T> cachedBeanMetaData = (BeanMetaData<T>) beanMetaDataCache.putIfAbsent(
+					beanClass,
+					beanMetaData
+			);
+			if ( cachedBeanMetaData != null ) {
+				beanMetaData = cachedBeanMetaData;
+			}
+		}
+
+		if ( beanMetaData instanceof UnconstrainedEntityMetaDataSingleton && !allowUnconstrainedTypeSingleton ) {
+			beanMetaData = createBeanMetaData( beanClass );
+			beanMetaDataCache.put(
+					beanClass,
+					beanMetaData
+			);
+		}
+
+		return beanMetaData;
 	}
 }
