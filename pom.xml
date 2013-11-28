@@ -89,7 +89,7 @@
         <!-- Don't upgrade to 1.1.0 yet. Dependencies get copied to wrong location -->
         <org.codehaus.mojo.chronos.version>1.0-beta-3</org.codehaus.mojo.chronos.version>
         <bv.api.version>1.1.0.Final</bv.api.version>
-        <classmate.version>0.8.0</classmate.version>
+        <classmate.version>1.0.0</classmate.version>
         <jbossas.version>7.1.1.Final</jbossas.version>
         <arquillian.version>1.0.2.Final</arquillian.version>
     </properties>
