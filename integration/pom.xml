@@ -15,7 +15,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -25,13 +27,13 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>hibernate-validator-integrationtest-as</artifactId>
+    <artifactId>hibernate-validator-integrationtest-wildfly</artifactId>
 
-    <name>Hibernate Validator AS Integration Tests</name>
+    <name>Hibernate Validator Wildfly Integration Tests</name>
     <description>Hibernate Validator integration tests.</description>
 
     <properties>
-        <jbossTargetDir>${basedir}/target/jboss-as-${jbossas.version}</jbossTargetDir>
+        <wildflyTargetDir>${basedir}/target/wildfly-${wildfly.version}</wildflyTargetDir>
     </properties>
 
     <dependencies>
@@ -83,9 +85,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-	    <groupId>org.hibernate.javax.persistence</groupId>
-	    <artifactId>hibernate-jpa-2.1-api</artifactId>
-	    <scope>test</scope>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.shrinkwrap.resolver</groupId>
@@ -98,8 +100,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.as</groupId>
-            <artifactId>jboss-as-arquillian-container-managed</artifactId>
+            <groupId>org.wildfly</groupId>
+            <artifactId>wildfly-arquillian-container-managed</artifactId>
+            <version>${wildfly.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -147,10 +150,10 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.jboss.as</groupId>
-                                    <artifactId>jboss-as-dist</artifactId>
-                                    <version>${jbossas.version}</version>
-                                    <type>zip</type>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${wildfly.version}</version>
+                                    <type>tar.gz</type>
                                     <overWrite>false</overWrite>
                                 </artifactItem>
                             </artifactItems>
@@ -158,24 +161,41 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy</id>
-                        <phase>pre-integration-test</phase>
+                        <id>copy-hv-snapshot</id>
+                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
                         <configuration>
+                            <outputDirectory>
+                                ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/main
+                            </outputDirectory>
+                            <stripVersion>false</stripVersion>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>javax.validation</groupId>
-                                    <artifactId>validation-api</artifactId>
-                                    <version>${bv.api.version}</version>
-                                    <overWrite>true</overWrite>
-                                    <destFileName>validation-api-${bv.api.version}.jar</destFileName>
-                                    <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-validator</artifactId>
                                 </artifactItem>
                             </artifactItems>
-                            <stripVersion>true</stripVersion>
-                            <outputDirectory>${project.build.directory}/dependencies</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-hv-cdi-snapshot</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/cdi/main
+                            </outputDirectory>
+                            <stripVersion>false</stripVersion>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-validator-cdi</artifactId>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
@@ -185,42 +205,13 @@
                 <artifactId>gmaven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-modules</id>
+                        <id>update-modules</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <source>
-                                println "[INFO] ------------------------------------------------------------------------";
-                                println "[INFO] INTEGRATION BUILD INFO                                                  ";
-                                println "[INFO] ------------------------------------------------------------------------";
-                                println "[INFO] These tests will replace the default Bean Validation API module with a  ";
-                                println "[INFO] custom on based on Bean Validation 1.1.                                 ";
-                                println "[INFO] ------------------------------------------------------------------------";
-
-
-                                def toDir = new File(project.properties['jbossTargetDir'], 'modules/javax/validation')
-                                def fromDir = new File(project.basedir, 'src/as7config/modules/javax/validation')
-
-                                log.info('Deleting old Bean Validation 1.0 module from ' + fromDir )
-                                ant.delete(dir : toDir)
-
-                                log.info('Copying Bean Validation 1.1 module from ' + fromDir + ' to ' + toDir)
-                                ant.copy(todir: toDir, filtering: true) {
-                                    fileset(dir: fromDir)
-                                    filterset() {
-                                       filter(token:'BV-API-VERSION', value:project.properties['bv.api.version'])
-                                    }
-                                }
-
-                                def apiDependencyDir = new File(project.basedir, 'target/dependencies')
-                                def apiTargetDir = new File(project.properties['jbossTargetDir'], 'modules/javax/validation/api/main')
-                                log.info('Copying Bean Validation ' + project.properties['bv.api.version'] + ' jar from ' + apiDependencyDir + ' to ' + toDir)
-                                ant.copy( todir: apiTargetDir) {
-                                    fileset(dir: apiDependencyDir)
-                                }
-                            </source>
+                            <source>${pom.basedir}/src/script/setupModules.groovy</source>
                         </configuration>
                     </execution>
                 </executions>

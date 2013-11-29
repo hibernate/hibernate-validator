@@ -58,11 +58,7 @@ public class ConstraintValidatorInjectionUnitIT {
 						PingServiceImpl.class,
 						PingableValidator.class
 				)
-				.addAsLibraries( IntegrationTestUtil.bundleHibernateValidatorWithDependencies( false ) )
-				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
-				.addAsLibraries( IntegrationTestUtil.bundleOptionalDependencies() )
 				.addAsResource( "log4j.properties" )
-				.addAsWebInfResource( "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 

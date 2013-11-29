@@ -57,12 +57,8 @@ public class ConfigurationInjectionUnitIT {
 						ParameterNameProviderWithInjection.class,
 						TraversableResolverWithInjection.class
 				)
-				.addAsLibraries( IntegrationTestUtil.bundleHibernateValidatorWithDependencies( false ) )
-				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
-				.addAsLibraries( IntegrationTestUtil.bundleOptionalDependencies() )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( "validation-custom-config.xml", "META-INF/validation.xml" )
-				.addAsWebInfResource( "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
