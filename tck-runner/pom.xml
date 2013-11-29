@@ -15,7 +15,9 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -28,14 +30,14 @@
     <artifactId>hibernate-validator-tck-runner</artifactId>
 
     <name>Hibernate Validator TCK Runner</name>
-    <description>Aggregates dependencies and runs the JSR-303 TCK</description>
+    <description>Aggregates dependencies and runs the JSR-349 TCK</description>
     <properties>
         <tck.version>1.1.0.Final</tck.version>
         <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
         <arquillian.version>1.0.0.Final</arquillian.version>
-        <jbossTargetDir>${project.build.directory}/wildfly-${wildfly.version}</jbossTargetDir>
+        <wildflyTargetDir>${project.build.directory}/wildfly-${wildfly.version}</wildflyTargetDir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
-        <remote.debug />
+        <remote.debug/>
     </properties>
 
     <dependencies>
@@ -256,7 +258,7 @@
                                             <groupId>org.wildfly</groupId>
                                             <artifactId>wildfly-dist</artifactId>
                                             <version>${wildfly.version}</version>
-                                            <type>zip</type>
+                                            <type>tar.gz</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${project.build.directory}</outputDirectory>
                                         </artifactItem>
@@ -314,9 +316,7 @@
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
-                                    <source>
-                                        ${pom.basedir}/src/script/setupModules.groovy
-                                    </source>
+                                    <source>${pom.basedir}/src/script/setupModules.groovy</source>
                                 </configuration>
                             </execution>
                         </executions>
