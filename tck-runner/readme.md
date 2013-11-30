@@ -12,19 +12,13 @@ used when running
 
 ## In container
 
-You can also run the TCK test against JBoss AS7. In this case the tests are bundled as war files and executed
-in a remote JBoss AS7 instance:
+You can also run the TCK test against Wildfly. In this case the tests are bundled as war files and executed
+in a remote Wildfly instance (the HV dependencies are updated to the latest SNAPSHOT version):
 
     $ mvn clean test -Dincontainer
 
-In this mode the tests will run against the Hibernate Validator version bundled with AS 7 (currently 4.2.0.Final. See also _modules/org/hibernate/validator/main_ in the AS 7 installation).
-
-You can also bundle the Hibernate Validator jar with the deployed war files:
-
-    $ mvn test -Dincontainer -Dbundled-dependencies
-
 You can enforce the TCK via:
 
-    $ mvn test -Dincontainer -Djsr303.tck.version=1.0.4.GA
+    $ mvn test -Dincontainer -Dtck.version=1.1.2.Final
 
-You can find more information about the Bean Validation TCK [here](http://docs.jboss.org/hibernate/stable/beanvalidation/tck/reference/html_single/).
+You can find more information about the Bean Validation TCK [here](http://beanvalidation.org/1.1/).

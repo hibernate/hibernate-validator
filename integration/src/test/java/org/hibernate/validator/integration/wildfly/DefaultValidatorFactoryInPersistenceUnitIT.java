@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.jbossas7;
+package org.hibernate.validator.integration.wildfly;
 
 import java.util.Map;
 import javax.persistence.EntityManager;
@@ -37,28 +37,29 @@ import org.junit.runner.RunWith;
 
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests the integration of Hibernate Validator in JBoss AS 7
+ * Tests the integration of Hibernate Validator in Wildfly
  *
  * @author Hardy Ferentschik
+ * @todo the test should execute an actual validation. It is not guaranteed that one can access the validator factory
+ * under javax.persistence.validation.factory
  */
 @RunWith(Arquillian.class)
-public class CustomValidatorFactoryInPersistenceUnitIT {
-	private static final String WAR_FILE_NAME = CustomValidatorFactoryInPersistenceUnitIT.class.getSimpleName() + ".war";
-	private static final Logger log = Logger.getLogger( CustomValidatorFactoryInPersistenceUnitIT.class );
+public class DefaultValidatorFactoryInPersistenceUnitIT {
+	private static final String WAR_FILE_NAME = DefaultValidatorFactoryInPersistenceUnitIT.class.getSimpleName() + ".war";
+	private static final Logger log = Logger.getLogger( DefaultValidatorFactoryInPersistenceUnitIT.class );
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap
 				.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses( User.class )
-				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
 				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
-				.addAsResource( "validation.xml", "META-INF/validation.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
@@ -80,20 +81,19 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 	EntityManager em;
 
 	@Test
-	// TODO see HV-546
 	public void testValidatorFactoryPassedToPersistenceUnit() throws Exception {
 		log.debug( "Running testValidatorFactoryPassedToPersistenceUnit..." );
 		Map<String, Object> properties = em.getEntityManagerFactory().getProperties();
-
 		// TODO the test should also execute an actual validation. It is not guaranteed that one can access the validator factory
 		// under javax.persistence.validation.factory. This works for the JBoss AS purposes, but not generically
 		Object obj = properties.get( "javax.persistence.validation.factory" );
 		assertTrue( "There should be an object under this property", obj != null );
 		ValidatorFactory factory = (ValidatorFactory) obj;
-//		assertTrue(
-//				"The Custom Validator implementation should be used",
-//				factory instanceof MyValidationProvider.DummyValidatorFactory
-//		);
+		assertEquals(
+				"The Hibernate Validator implementation should be used",
+				"ValidatorImpl",
+				factory.getValidator().getClass().getSimpleName()
+		);
 		log.debug( "testValidatorFactoryPassedToPersistenceUnit completed" );
 	}
 }

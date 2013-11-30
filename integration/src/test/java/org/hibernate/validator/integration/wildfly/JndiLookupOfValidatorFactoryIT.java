@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.integration.jbossas7;
+package org.hibernate.validator.integration.wildfly;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -37,7 +37,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * Tests the integration of Hibernate Validator in JBoss AS 7.
+ * Tests the integration of Hibernate Validator in Wildfly.
  *
  * @author Hardy Ferentschik
  */
@@ -69,7 +69,7 @@ public class JndiLookupOfValidatorFactoryIT {
 					factory.getValidator().getClass().getSimpleName()
 			);
 		}
-		catch ( NamingException e ) {
+		catch( NamingException e ) {
 			fail( "The default validator factory should be bound" );
 		}
 		log.debug( "testDefaultValidatorFactoryLookup completed" );

@@ -24,12 +24,12 @@
         <property name="deploymentExportPath">target/</property>
     </engine>
 
-    <container qualifier="jboss" default="true">
-        <protocol type="jmx-as7">
+    <container qualifier="wildfly" default="true">
+        <protocol type="jmx-wildfly">
             <property name="executionType">REMOTE</property>
         </protocol>
         <configuration>
-            <property name="jbossHome">${basedir}/target/jboss-as-${jbossas.version}</property>
+            <property name="jbossHome">${basedir}/target/wildfly-${wildfly.version}</property>
             <!--<property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=5005,server=y,suspend=y -Xmx512m -XX:MaxPermSize=128m</property>-->
         </configuration>
     </container>
