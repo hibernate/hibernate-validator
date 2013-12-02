@@ -27,11 +27,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableType;
 import javax.validation.groups.Default;
 import javax.validation.metadata.MethodDescriptor;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -39,8 +38,10 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.testng.Assert.assertEquals;
 
@@ -307,6 +308,23 @@ public class XmlMappingTest {
 			}
 		}
 		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-836")
+	public void testCascadedValidation() {
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "cascaded-validation-mapping.xml" ) );
+
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
+
+		System system = new System();
+		system.addPart( new Part() );
+		Set<ConstraintViolation<System>> violations = validator.validate( system );
+
+		assertEquals( violations.size(), 1 );
+		assertCorrectConstraintTypes( violations, NotNull.class );
 	}
 
 	/**
