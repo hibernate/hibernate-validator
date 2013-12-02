@@ -1,4 +1,3 @@
-// Needed while running against an AS instance which is not bundled with HV 5
 println "[INFO] ------------------------------------------------------------------------";
 println "[INFO] UPDATING BEAN VALIDATION RELATED WILDFLY MODULES                        ";
 println "[INFO] ------------------------------------------------------------------------";
