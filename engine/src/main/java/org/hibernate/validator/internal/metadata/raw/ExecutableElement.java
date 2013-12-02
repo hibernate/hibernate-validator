@@ -111,7 +111,7 @@ public abstract class ExecutableElement {
 	}
 
 	/**
-	 * Returns a string representation of this executable in the form {@code <name>(<parameterType 0> ...  <parmeterType n>)},
+	 * Returns a string representation of this executable in the form {@code <name>(<parameterType 0> ...  <parameterType n>)},
 	 * e.g. for logging purposes.
 	 *
 	 * @return A string representation of the given executable.
@@ -122,7 +122,7 @@ public abstract class ExecutableElement {
 
 	/**
 	 * Returns a string representation of an executable with the given name and parameter types in the form
-	 * {@code <name>(<parameterType 0> ...  <parmeterType n>)}, e.g. for logging purposes.
+	 * {@code <name>(<parameterType 0> ...  <parameterType n>)}, e.g. for logging purposes.
 	 *
 	 * @param name the name of the executable
 	 * @param parameterTypes the types of the executable's parameters

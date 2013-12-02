@@ -18,6 +18,7 @@ package org.hibernate.validator.test.constraints;
 
 import java.lang.annotation.Retention;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -153,7 +154,7 @@ public class ConstraintValidatorContextTest {
 		Set<ConstraintViolation<User>> constraintViolations = executableValidator.validateParameters(
 				new User(),
 				User.class.getMethod( "setAddresses", Map.class ),
-				new Object[] { }
+				new java.lang.Object[] { new HashMap() }
 		);
 
 		assertThat( constraintViolations ).containsOnlyPaths(
@@ -178,7 +179,7 @@ public class ConstraintValidatorContextTest {
 		Set<ConstraintViolation<User>> constraintViolations = executableValidator.validateParameters(
 				new User(),
 				User.class.getMethod( "setAddresses", Map.class ),
-				new Object[] { }
+				new java.lang.Object[] { new HashMap() }
 		);
 
 
@@ -256,7 +257,7 @@ public class ConstraintValidatorContextTest {
 
 	private static class Address {
 		@SuppressWarnings("unused")
-        public String getStreet() {
+		public String getStreet() {
 			return null;
 		}
 

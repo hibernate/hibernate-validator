@@ -19,13 +19,12 @@ package org.hibernate.validator.test.internal.engine.methodvalidation;
 import java.lang.reflect.Method;
 import javax.validation.executable.ExecutableValidator;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.test.internal.bootstrap.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -53,9 +52,15 @@ public class WrongMethodOrParameterForMethodValidationTest {
 		validator.validateParameters( customerRepository, method, new Object[] { new Customer() } );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000056.*")
-	public void testPassingNonMatchingMethodParametersCountsThrowsException() throws Exception {
+	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000181.*")
+	public void testPassingToManyParametersThrowsException() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
 		validator.validateParameters( customerRepository, method, new Object[] { "foo", "bar" } );
+	}
+
+	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000181.*")
+	public void testPassingNoParametersThrowsException() throws Exception {
+		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
+		validator.validateParameters( customerRepository, method, new Object[] { } );
 	}
 }

@@ -368,7 +368,7 @@ public class ValidationContext<T> {
 			throw ve;
 		}
 		catch ( Exception e ) {
-			throw log.getExceptionOcurredDuringMessageInterpolationException( e );
+			throw log.getExceptionOccurredDuringMessageInterpolationException( e );
 		}
 	}
 
