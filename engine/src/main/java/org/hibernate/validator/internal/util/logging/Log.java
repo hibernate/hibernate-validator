@@ -114,9 +114,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 14, value = "Type %1$s doesn't have a method %2$s.")
 	IllegalArgumentException getUnableToFindMethodException(Class<?> beanClass, String method);
 
-	@Message(id = 15, value = "A valid parameter index has to be specified for method or constructor %s.")
-	IllegalArgumentException getInvalidExecutableParameterIndexException(String executable);
-
 	@Message(id = 16, value = "%s does not represent a valid BigDecimal format.")
 	IllegalArgumentException getInvalidBigDecimalFormatException(String value, @Cause NumberFormatException e);
 

@@ -53,7 +53,7 @@ public class WrongMethodOrParameterForMethodValidationTest {
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "HV000181.*")
-	public void testPassingToManyParametersThrowsException() throws Exception {
+	public void testPassingTooManyParametersThrowsException() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "findCustomerByName", String.class );
 		validator.validateParameters( customerRepository, method, new Object[] { "foo", "bar" } );
 	}

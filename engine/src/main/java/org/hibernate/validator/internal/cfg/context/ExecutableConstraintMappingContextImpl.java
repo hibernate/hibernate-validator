@@ -76,7 +76,7 @@ public class ExecutableConstraintMappingContextImpl
 	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
 		if ( index < 0 || index >= executable.getParameterTypes().length ) {
-			throw log.getInvalidExecutableParameterIndexException( executable.getAsString() );
+			throw log.getInvalidExecutableParameterIndexException( executable.getAsString(), index );
 		}
 
 		ParameterConstraintMappingContextImpl context = parameterContexts[index];
