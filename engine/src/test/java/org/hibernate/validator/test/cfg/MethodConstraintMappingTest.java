@@ -154,7 +154,7 @@ public class MethodConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV000015.*"
+			expectedExceptionsMessageRegExp = "HV000056.*"
 	)
 	public void testCascadingDefinitionOnInvalidMethodParameter() {
 		ConstraintMapping mapping = config.createConstraintMapping();
