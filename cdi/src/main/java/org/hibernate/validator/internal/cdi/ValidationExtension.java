@@ -57,6 +57,7 @@ import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotatedType;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.OverrideHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -77,6 +78,7 @@ public class ValidationExtension implements Extension {
 	private static final EnumSet<ExecutableType> DEFAULT_EXECUTABLE_TYPES =
 			EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS );
 
+	private final OverrideHelper overrideHelper;
 	private final Validator validator;
 	private final Set<ExecutableType> globalExecutableTypes;
 	private final boolean isExecutableValidationEnabled;
@@ -92,6 +94,7 @@ public class ValidationExtension implements Extension {
 		globalExecutableTypes = bootstrap.getDefaultValidatedExecutableTypes();
 		isExecutableValidationEnabled = bootstrap.isExecutableValidationEnabled();
 		validator = config.buildValidatorFactory().getValidator();
+		overrideHelper = new OverrideHelper();
 	}
 
 	/**
@@ -386,7 +389,7 @@ public class ValidationExtension implements Extension {
 		Iterator<Method> iterator = list.descendingIterator();
 		while ( iterator.hasNext() ) {
 			Method overriddenOrInterfaceMethod = iterator.next();
-			if ( ReflectionHelper.overrides( method, overriddenOrInterfaceMethod ) ) {
+			if ( overrideHelper.overrides( method, overriddenOrInterfaceMethod ) ) {
 				if ( method.getAnnotation( ValidateOnExecution.class ) != null ) {
 					throw log.getValidateOnExecutionOnOverriddenOrInterfaceMethodException( method );
 				}

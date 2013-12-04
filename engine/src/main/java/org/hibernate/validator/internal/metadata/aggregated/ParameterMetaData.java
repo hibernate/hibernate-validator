@@ -31,6 +31,7 @@ import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.OverrideHelper;
 
 /**
  * An aggregated view of the constraint related meta data for a single method
@@ -116,8 +117,8 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		private final int parameterIndex;
 		private String name;
 
-		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
-			super( beanClass, constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper, OverrideHelper overrideHelper) {
+			super( beanClass, constraintHelper, overrideHelper );
 
 			this.parameterType = constrainedParameter.getLocation().getParameterType();
 			this.parameterIndex = constrainedParameter.getLocation().getParameterIndex();

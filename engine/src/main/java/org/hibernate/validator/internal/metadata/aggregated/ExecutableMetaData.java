@@ -41,6 +41,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.OverrideHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -298,8 +299,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * executable with a given signature within a type hierarchy.
 		 * @param constraintHelper the constraint helper
 		 */
-		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedExecutable, ConstraintHelper constraintHelper) {
-			super( beanClass, constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedExecutable, ConstraintHelper constraintHelper, OverrideHelper overrideHelper) {
+			super( beanClass, constraintHelper, overrideHelper );
 
 			kind = constrainedExecutable.getKind();
 			location = constrainedExecutable.getLocation();
@@ -319,9 +320,10 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			//does one of the executables override the other one?
 			return
 					location.getExecutableElement().equals( executableElement ) ||
-							location.getExecutableElement().overrides( executableElement ) ||
+							location.getExecutableElement().overrides( executableElement, overrideHelper ) ||
 							executableElement.overrides(
-									location.getExecutableElement()
+									location.getExecutableElement(),
+									overrideHelper
 							);
 		}
 
@@ -398,7 +400,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 								new ParameterMetaData.Builder(
 										location.getBeanClass(),
 										oneParameter,
-										constraintHelper
+										constraintHelper,
+										overrideHelper
 								)
 						);
 					}
