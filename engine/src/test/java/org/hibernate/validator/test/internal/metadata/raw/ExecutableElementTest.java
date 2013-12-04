@@ -23,6 +23,7 @@ import java.util.Date;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.OverrideHelper;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
@@ -34,6 +35,8 @@ import static org.testng.Assert.assertEquals;
  */
 public class ExecutableElementTest {
 
+	private final OverrideHelper overrideHelper = new OverrideHelper();
+
 	@Test
 	public void methodFromSubTypeOverridesSuperTypeMethod() throws Exception {
 
@@ -42,7 +45,7 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isTrue();
 	}
 
@@ -54,7 +57,7 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isTrue();
 	}
 
@@ -66,7 +69,7 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromBase )
-						.overrides( ExecutableElement.forMethod( methodFromImpl ) )
+						.overrides( ExecutableElement.forMethod( methodFromImpl ), overrideHelper )
 		).isFalse();
 	}
 
@@ -78,7 +81,7 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isFalse();
 	}
 
@@ -90,7 +93,7 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isFalse();
 	}
 
@@ -102,7 +105,7 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( other )
-						.overrides( ExecutableElement.forMethod( first ) )
+						.overrides( ExecutableElement.forMethod( first ), overrideHelper )
 		).isFalse();
 	}
 
@@ -114,7 +117,7 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forConstructor( other )
-						.overrides( ExecutableElement.forConstructor( first ) )
+						.overrides( ExecutableElement.forConstructor( first ), overrideHelper )
 		).isFalse();
 	}
 
@@ -126,7 +129,7 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( other )
-						.overrides( ExecutableElement.forConstructor( first ) )
+						.overrides( ExecutableElement.forConstructor( first ), overrideHelper )
 		).isFalse();
 	}
 
@@ -139,14 +142,14 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isTrue();
 
 		methodFromImpl = SimpleServiceImpl1.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isFalse();
 	}
 
@@ -160,14 +163,14 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isTrue();
 
 		methodFromImpl = SimpleServiceImpl2.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isFalse();
 	}
 
@@ -180,14 +183,14 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isTrue();
 
 		methodFromImpl = GenericServiceImpl1.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isFalse();
 	}
 
@@ -200,14 +203,14 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isTrue();
 
 		methodFromImpl = GenericServiceImpl2.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isFalse();
 	}
 
@@ -220,14 +223,14 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isTrue();
 
 		methodFromImpl = GenericServiceImpl2.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isFalse();
 	}
 
@@ -240,14 +243,14 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isTrue();
 
 		methodFromImpl = ParameterizedSubType.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isFalse();
 	}
 
@@ -260,14 +263,14 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isTrue();
 
 		methodFromImpl = GenericInterfaceImpl1.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isFalse();
 	}
 
@@ -280,14 +283,14 @@ public class ExecutableElementTest {
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isTrue();
 
 		methodFromImpl = WildcardInterfaceImpl.class.getDeclaredMethod( "doSomething", Long.class );
 
 		assertThat(
 				ExecutableElement.forMethod( methodFromImpl )
-						.overrides( ExecutableElement.forMethod( methodFromBase ) )
+						.overrides( ExecutableElement.forMethod( methodFromBase ), overrideHelper )
 		).isFalse();
 	}
 

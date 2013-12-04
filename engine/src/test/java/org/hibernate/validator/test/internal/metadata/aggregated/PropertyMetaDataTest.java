@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
@@ -30,6 +28,9 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.util.OverrideHelper;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author Gunnar Morling
@@ -40,7 +41,7 @@ public class PropertyMetaDataTest {
 
 	@BeforeMethod
 	public void setupBeanMetaDataManager() {
-		beanMetaDataManager = new BeanMetaDataManager( new ConstraintHelper() );
+		beanMetaDataManager = new BeanMetaDataManager( new ConstraintHelper(), new OverrideHelper() );
 	}
 
 	@Test

@@ -36,6 +36,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.util.OverrideHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -163,24 +164,24 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		private final Type propertyType;
 		private Member cascadingMember;
 
-		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
-			super( beanClass, constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, OverrideHelper overrideHelper) {
+			super( beanClass, constraintHelper, overrideHelper );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedField.getLocation().getMember() );
 			this.propertyType = ( (Field) constrainedField.getLocation().getMember() ).getGenericType();
 			add( constrainedField );
 		}
 
-		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
-			super( beanClass, constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintHelper constraintHelper, OverrideHelper overrideHelper) {
+			super( beanClass, constraintHelper, overrideHelper );
 
 			this.propertyName = null;
 			this.propertyType = null;
 			add( constrainedType );
 		}
 
-		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper) {
-			super( beanClass, constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper, OverrideHelper overrideHelper) {
+			super( beanClass, constraintHelper, overrideHelper );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getLocation().getMember() );
 			this.propertyType = constrainedMethod.getLocation().typeOfAnnotatedElement();

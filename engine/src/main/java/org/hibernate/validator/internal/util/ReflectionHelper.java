@@ -9,7 +9,7 @@
 * You may obtain a copy of the License at
 * http://www.apache.org/licenses/LICENSE-2.0
 * Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,  
+* distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
@@ -23,7 +23,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -35,14 +34,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.classmate.Filter;
-import com.fasterxml.classmate.MemberResolver;
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.ResolvedTypeWithMembers;
-import com.fasterxml.classmate.TypeResolver;
-import com.fasterxml.classmate.members.RawMethod;
-import com.fasterxml.classmate.members.ResolvedMethod;
 
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -90,11 +81,6 @@ public final class ReflectionHelper {
 	};
 
 	private static final Log log = LoggerFactory.make();
-
-	/**
-	 * Used for resolving type parameters. Thread-safe.
-	 */
-	private static final TypeResolver typeResolver = new TypeResolver();
 
 	private static final Map<String, Class<?>> PRIMITIVE_NAME_TO_PRIMITIVE;
 
@@ -723,107 +709,5 @@ public final class ReflectionHelper {
 		}
 
 		return wrapperType;
-	}
-
-	/**
-	 * Checks, whether {@code subTypeMethod} overrides {@code superTypeMethod}.
-	 *
-	 * @param subTypeMethod The sub type method (cannot be {@code null}).
-	 * @param superTypeMethod The super type method (cannot be {@code null}).
-	 *
-	 * @return Returns {@code true} if {@code subTypeMethod} overrides {@code superTypeMethod},
-	 *         {@code false} otherwise.
-	 */
-	public static boolean overrides(Method subTypeMethod, Method superTypeMethod) {
-		Contracts.assertValueNotNull( subTypeMethod, "subTypeMethod" );
-		Contracts.assertValueNotNull( superTypeMethod, "superTypeMethod" );
-
-		if ( subTypeMethod.equals( superTypeMethod ) ) {
-			return false;
-		}
-
-		if ( !subTypeMethod.getName().equals( superTypeMethod.getName() ) ) {
-			return false;
-		}
-
-		if ( subTypeMethod.getParameterTypes().length != superTypeMethod.getParameterTypes().length ) {
-			return false;
-		}
-
-		if ( !superTypeMethod.getDeclaringClass().isAssignableFrom( subTypeMethod.getDeclaringClass() ) ) {
-			return false;
-		}
-
-		if ( Modifier.isStatic( superTypeMethod.getModifiers() ) || Modifier.isStatic( subTypeMethod.getModifiers() ) ) {
-			return false;
-		}
-
-		return instanceMethodParametersResolveToSameTypes( subTypeMethod, superTypeMethod );
-	}
-
-	/**
-	 * Whether the parameters of the two given instance methods resolve to the same types or not. Takes type parameters into account.
-	 *
-	 * @param subTypeMethod a method on a supertype
-	 * @param superTypeMethod a method on a subtype
-	 *
-	 * @return {@code true} if the parameters of the two methods resolve to the same types, {@code false otherwise}.
-	 */
-	private static boolean instanceMethodParametersResolveToSameTypes(Method subTypeMethod, Method superTypeMethod) {
-		if ( subTypeMethod.getParameterTypes().length == 0 ) {
-			return true;
-		}
-
-		ResolvedType resolvedSubType = typeResolver.resolve( subTypeMethod.getDeclaringClass() );
-
-		MemberResolver memberResolver = new MemberResolver( typeResolver );
-		memberResolver.setMethodFilter( new SimpleMethodFilter( subTypeMethod, superTypeMethod ) );
-		ResolvedTypeWithMembers typeWithMembers = memberResolver.resolve(
-				resolvedSubType,
-				null,
-				null
-		);
-
-		ResolvedMethod[] resolvedMethods = typeWithMembers.getMemberMethods();
-
-		// The ClassMate doc says that overridden methods are flattened to one
-		// resolved method. But that is the case only for methods without any
-		// generic parameters.
-		if ( resolvedMethods.length == 1 ) {
-			return true;
-		}
-
-		// For methods with generic parameters I have to compare the argument
-		// types (which are resolved) of the two filtered member methods.
-		for ( int i = 0; i < resolvedMethods[0].getArgumentCount(); i++ ) {
-
-			if ( !resolvedMethods[0].getArgumentType( i )
-					.equals( resolvedMethods[1].getArgumentType( i ) ) ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * A filter implementation filtering methods matching given methods.
-	 *
-	 * @author Gunnar Morling
-	 */
-	private static class SimpleMethodFilter implements Filter<RawMethod> {
-		private final Method method1;
-		private final Method method2;
-
-		private SimpleMethodFilter(Method method1, Method method2) {
-			this.method1 = method1;
-			this.method2 = method2;
-		}
-
-		@Override
-		public boolean include(RawMethod element) {
-			return element.getRawMember().equals( method1 ) || element.getRawMember()
-					.equals( method2 );
-		}
 	}
 }
