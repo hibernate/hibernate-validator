@@ -34,6 +34,7 @@ import javax.validation.groups.Default;
 
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.internal.util.OverrideHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
@@ -203,25 +204,27 @@ public class ReflectionHelperTest {
 		Method getStaticFooInteger = Foo.class.getMethod( "getFoo", Integer.class );
 		Method getSuperTypeStaticFoo = Bar.class.getMethod( "getFoo" );
 
-		assertTrue( ReflectionHelper.overrides( getSubTypeBar, getBar ) );
-		assertTrue( ReflectionHelper.overrides( getSubTypeBarString, getBarString ) );
+		final OverrideHelper overrideHelper = new OverrideHelper();
 
-		assertFalse( ReflectionHelper.overrides( getBar, getBarString ) );
-		assertFalse( ReflectionHelper.overrides( getBar, getBarInteger ) );
-		assertFalse( ReflectionHelper.overrides( getBarString, getBarInteger ) );
-		assertFalse( ReflectionHelper.overrides( getSubTypeBar, getBarInteger ) );
-		assertFalse( ReflectionHelper.overrides( getSubTypeBar, getBarString ) );
-		assertFalse( ReflectionHelper.overrides( getSubTypeBarString, getBarInteger ) );
-		assertFalse( ReflectionHelper.overrides( getSubTypeBarString, getBar ) );
-		assertFalse( ReflectionHelper.overrides( getSubTypeBarString, getSubTypeBar ) );
+		assertTrue( overrideHelper.overrides( getSubTypeBar, getBar ) );
+		assertTrue( overrideHelper.overrides( getSubTypeBarString, getBarString ) );
 
-		assertFalse( ReflectionHelper.overrides( getStaticFoo, getStaticFooString ) );
-		assertFalse( ReflectionHelper.overrides( getStaticFoo, getStaticFooInteger ) );
-		assertFalse( ReflectionHelper.overrides( getStaticFooString, getStaticFooInteger ) );
-		assertFalse( ReflectionHelper.overrides( getFooLong, getStaticFoo ) );
-		assertFalse( ReflectionHelper.overrides( getFooLong, getStaticFooInteger ) );
-		assertFalse( ReflectionHelper.overrides( getFooLong, getStaticFooString ) );
-		assertFalse( ReflectionHelper.overrides( getStaticFoo, getSuperTypeStaticFoo ) );
+		assertFalse( overrideHelper.overrides( getBar, getBarString ) );
+		assertFalse( overrideHelper.overrides( getBar, getBarInteger ) );
+		assertFalse( overrideHelper.overrides( getBarString, getBarInteger ) );
+		assertFalse( overrideHelper.overrides( getSubTypeBar, getBarInteger ) );
+		assertFalse( overrideHelper.overrides( getSubTypeBar, getBarString ) );
+		assertFalse( overrideHelper.overrides( getSubTypeBarString, getBarInteger ) );
+		assertFalse( overrideHelper.overrides( getSubTypeBarString, getBar ) );
+		assertFalse( overrideHelper.overrides( getSubTypeBarString, getSubTypeBar ) );
+
+		assertFalse( overrideHelper.overrides( getStaticFoo, getStaticFooString ) );
+		assertFalse( overrideHelper.overrides( getStaticFoo, getStaticFooInteger ) );
+		assertFalse( overrideHelper.overrides( getStaticFooString, getStaticFooInteger ) );
+		assertFalse( overrideHelper.overrides( getFooLong, getStaticFoo ) );
+		assertFalse( overrideHelper.overrides( getFooLong, getStaticFooInteger ) );
+		assertFalse( overrideHelper.overrides( getFooLong, getStaticFooString ) );
+		assertFalse( overrideHelper.overrides( getStaticFoo, getSuperTypeStaticFoo ) );
 	}
 
 	@SuppressWarnings("unused")

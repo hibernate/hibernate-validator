@@ -9,7 +9,7 @@
 * You may obtain a copy of the License at
 * http://www.apache.org/licenses/LICENSE-2.0
 * Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,  
+* distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
@@ -45,6 +45,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
+import org.hibernate.validator.internal.util.OverrideHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -438,6 +439,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		private final Set<BuilderDelegate> builders = newHashSet();
 
+		private final OverrideHelper overrideHelper;
+
 		private ConfigurationSource sequenceSource;
 
 		private ConfigurationSource providerSource;
@@ -447,13 +450,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		private DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
 
 
-		public BeanMetaDataBuilder(ConstraintHelper constraintHelper, Class<T> beanClass) {
+		public BeanMetaDataBuilder(ConstraintHelper constraintHelper, OverrideHelper overrideHelper, Class<T> beanClass) {
 			this.beanClass = beanClass;
 			this.constraintHelper = constraintHelper;
+			this.overrideHelper = overrideHelper;
 		}
 
-		public static <T> BeanMetaDataBuilder<T> getInstance(ConstraintHelper constraintHelper, Class<T> beanClass) {
-			return new BeanMetaDataBuilder<T>( constraintHelper, beanClass );
+		public static <T> BeanMetaDataBuilder<T> getInstance(ConstraintHelper constraintHelper, OverrideHelper overrideHelper, Class<T> beanClass) {
+			return new BeanMetaDataBuilder<T>( constraintHelper, overrideHelper, beanClass );
 		}
 
 		public void add(BeanConfiguration<? super T> configuration) {
@@ -493,7 +497,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					new BuilderDelegate(
 							beanClass,
 							constrainableElement,
-							constraintHelper
+							constraintHelper,
+							overrideHelper
 					)
 			);
 		}
@@ -517,12 +522,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private static class BuilderDelegate {
 		private final Class<?> beanClass;
 		private final ConstraintHelper constraintHelper;
+		private final OverrideHelper overrideHelper;
 		private MetaDataBuilder propertyBuilder;
 		private ExecutableMetaData.Builder methodBuilder;
 
-		public BuilderDelegate(Class<?> beanClass, ConstrainedElement constrainedElement, ConstraintHelper constraintHelper) {
+		public BuilderDelegate(Class<?> beanClass, ConstrainedElement constrainedElement, ConstraintHelper constraintHelper, OverrideHelper overrideHelper) {
 			this.beanClass = beanClass;
 			this.constraintHelper = constraintHelper;
+			this.overrideHelper = overrideHelper;
 
 			switch ( constrainedElement.getKind() ) {
 				case FIELD:
@@ -530,7 +537,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					propertyBuilder = new PropertyMetaData.Builder(
 							beanClass,
 							constrainedField,
-							constraintHelper
+							constraintHelper,
+							overrideHelper
 					);
 					break;
 				case CONSTRUCTOR:
@@ -539,14 +547,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					methodBuilder = new ExecutableMetaData.Builder(
 							beanClass,
 							constrainedExecutable,
-							constraintHelper
+							constraintHelper,
+							overrideHelper
 					);
 
 					if ( constrainedExecutable.isGetterMethod() ) {
 						propertyBuilder = new PropertyMetaData.Builder(
 								beanClass,
 								constrainedExecutable,
-								constraintHelper
+								constraintHelper,
+								overrideHelper
 						);
 					}
 					break;
@@ -555,7 +565,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					propertyBuilder = new PropertyMetaData.Builder(
 							beanClass,
 							constrainedType,
-							constraintHelper
+							constraintHelper,
+							overrideHelper
 					);
 					break;
 			}
@@ -577,7 +588,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					methodBuilder = new ExecutableMetaData.Builder(
 							beanClass,
 							constrainedMethod,
-							constraintHelper
+							constraintHelper,
+							overrideHelper
 					);
 				}
 
