@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import javax.validation.ParameterNameProvider;
 
-import org.hibernate.validator.internal.util.OverrideHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -92,23 +91,6 @@ public abstract class ExecutableElement {
 
 	public String getIdentifier() {
 		return getSimpleName() + Arrays.toString( getParameterTypes() );
-	}
-
-	/**
-	 * Checks, whether the represented method overrides the given method.
-	 *
-	 * @param other The method to test.
-	 *
-	 * @return {@code true} If this methods overrides the passed method,
-	 *         {@code false} otherwise.
-	 */
-	public boolean overrides(ExecutableElement other, OverrideHelper overrideHelper) {
-		//constructors never override another constructor
-		if ( getMember() instanceof Constructor || other.getMember() instanceof Constructor ) {
-			return false;
-		}
-
-		return overrideHelper.overrides( (Method) getMember(), (Method) other.getMember() );
 	}
 
 	/**

@@ -38,7 +38,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
-import org.hibernate.validator.internal.util.OverrideHelper;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -92,7 +92,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	/**
 	 * Used for resolving type parameters. Thread-safe.
 	 */
-	private final OverrideHelper overrideHelper;
+	private final ExecutableHelper executableHelper;
 
 	/**
 	 * Hibernate Validator specific flag to abort validation on first constraint violation.
@@ -119,7 +119,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.parameterNameProvider = configurationState.getParameterNameProvider();
 		this.beanMetaDataManagerMap = Collections.synchronizedMap( new IdentityHashMap<ParameterNameProvider, BeanMetaDataManager>() );
 		this.constraintHelper = new ConstraintHelper();
-		this.overrideHelper = new OverrideHelper();
+		this.executableHelper = new ExecutableHelper();
 		this.constraintMappings = newHashSet();
 
 		// HV-302; don't load XmlMappingParser if not necessary
@@ -213,7 +213,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
 			beanMetaDataManager = new BeanMetaDataManager(
 					constraintHelper,
-					overrideHelper,
+					executableHelper,
 					parameterNameProvider,
 					buildDataProviders( parameterNameProvider )
 			);

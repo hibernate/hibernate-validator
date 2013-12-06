@@ -33,7 +33,7 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-import org.hibernate.validator.internal.util.OverrideHelper;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
@@ -189,7 +189,7 @@ public class PathImplTest {
 						Item.class
 				)
 		);
-		ExecutableMetaData executableMetaData = new BeanMetaDataManager( new ConstraintHelper(), new OverrideHelper() ).getBeanMetaData(
+		ExecutableMetaData executableMetaData = new BeanMetaDataManager( new ConstraintHelper(), new ExecutableHelper() ).getBeanMetaData(
 				Container.class
 		).getMetaDataFor( executable );
 
