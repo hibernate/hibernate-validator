@@ -27,7 +27,6 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.OverrideHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -46,17 +45,15 @@ public abstract class MetaDataBuilder {
 	private static final Log log = LoggerFactory.make();
 
 	protected final ConstraintHelper constraintHelper;
-	protected final OverrideHelper overrideHelper;
 
 	private final Class<?> beanClass;
 	private final Set<MetaConstraint<?>> constraints = newHashSet();
 	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
 
-	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, OverrideHelper overrideHelper) {
+	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
-		this.overrideHelper = overrideHelper;
 	}
 
 	/**
