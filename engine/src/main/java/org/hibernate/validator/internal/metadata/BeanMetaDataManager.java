@@ -33,7 +33,7 @@ import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.OverrideHelper;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
@@ -92,33 +92,35 @@ public class BeanMetaDataManager {
 	/**
 	 * Used for resolving type parameters. Thread-safe.
 	 */
-	private final OverrideHelper overrideHelper;
+	private final ExecutableHelper executableHelper;
 
 	/**
 	 * Creates a new {@code BeanMetaDataManager}. {@link DefaultParameterNameProvider} is used as parameter name
 	 * provider, no meta data providers besides the annotation-based providers are used.
 	 *
-	 * @param constraintHelper The constraint helper
+	 * @param constraintHelper the constraint helper
+	 * @param executableHelper the executable helper
 	 */
-	public BeanMetaDataManager(ConstraintHelper constraintHelper, OverrideHelper overrideHelper) {
-		this( constraintHelper, overrideHelper, new DefaultParameterNameProvider(), Collections.<MetaDataProvider>emptyList() );
+	public BeanMetaDataManager(ConstraintHelper constraintHelper, ExecutableHelper executableHelper) {
+		this( constraintHelper, executableHelper, new DefaultParameterNameProvider(), Collections.<MetaDataProvider>emptyList() );
 	}
 
 	/**
 	 * Creates a new {@code BeanMetaDataManager}.
 	 *
 	 * @param constraintHelper the constraint helper
+	 * @param executableHelper the executable helper
 	 * @param parameterNameProvider the parameter name provider
 	 * @param optionalMetaDataProviders optional meta data provider used on top of the annotation based provider
 	 */
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
-							   OverrideHelper overrideHelper,
+							   ExecutableHelper executableHelper,
 							   ParameterNameProvider parameterNameProvider,
 							   List<MetaDataProvider> optionalMetaDataProviders) {
 		this.constraintHelper = constraintHelper;
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
-		this.overrideHelper = overrideHelper;
+		this.executableHelper = executableHelper;
 
 		this.beanMetaDataCache = new ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>>(
 				DEFAULT_INITIAL_CAPACITY,
@@ -179,7 +181,7 @@ public class BeanMetaDataManager {
 	 * @return A bean meta data object for the given type.
 	 */
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
-		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, overrideHelper, clazz );
+		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, executableHelper, clazz );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {

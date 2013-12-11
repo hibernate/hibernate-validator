@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -27,17 +28,35 @@ import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.classmate.members.RawMethod;
 import com.fasterxml.classmate.members.ResolvedMethod;
 
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+
 /**
- * Some reflection utility methods. Where necessary calls will be performed as {@code PrivilegedAction} which is necessary
- * for situations where a security manager is in place.
+ * Provides shared functionalities dealing with executables.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public final class OverrideHelper {
+public final class ExecutableHelper {
 
 	private final TypeResolver typeResolver = new TypeResolver();
+
+	/**
+	 * Checks, whether the represented method overrides the given method.
+	 *
+	 * @param other The method to test.
+	 *
+	 * @return {@code true} If this methods overrides the passed method,
+	 *         {@code false} otherwise.
+	 */
+	public boolean overrides(ExecutableElement executableElement, ExecutableElement other) {
+		//constructors never override another constructor
+		if ( executableElement.getMember() instanceof Constructor || other.getMember() instanceof Constructor ) {
+			return false;
+		}
+
+		return overrides( (Method) executableElement.getMember(), (Method) other.getMember() );
+	}
 
 	/**
 	 * Checks, whether {@code subTypeMethod} overrides {@code superTypeMethod}.
