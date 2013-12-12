@@ -1,6 +1,17 @@
 Hibernate Validator Changelog
 =============================
 
+5.0.2.Final (12.12.2013)
+------------------------
+
+** Bug
+    * [HV-818] - ArrayIndexOutOfBoundsException in ReflectionHelper#parametersResolveToSameTypes()
+    * [HV-838] - ReflectionHelper leaks deployment classes in wildfly integration
+
+** Improvement
+    * [HV-835] - Update to Classmate 1.0.0
+
+
 5.0.1.Final (30.04.2013)
 ------------------------
 
