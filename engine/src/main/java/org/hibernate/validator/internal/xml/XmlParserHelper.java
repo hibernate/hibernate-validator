@@ -57,7 +57,7 @@ public class XmlParserHelper {
 	private static final int NUMBER_OF_SCHEMAS = 4;
 	private static final String DEFAULT_VERSION = "1.0";
 
-	private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+	private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
 	/**
 	 * Read limit for the buffered input stream. Resetting the stream after
