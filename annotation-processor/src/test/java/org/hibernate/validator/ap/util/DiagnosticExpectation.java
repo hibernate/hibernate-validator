@@ -16,11 +16,10 @@
 */
 package org.hibernate.validator.ap.util;
 
-import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
 
 /**
- * Expectation value to be matched against a given {@link Diagnostic}.
+ * Expectation value to be matched against a given {@link javax.tools.Diagnostic}.
  *
  * @author Gunnar Morling
  */

@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.validation.ConstraintDeclarationException;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
@@ -438,8 +437,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * on the overridden method.
 		 * </p>
 		 *
-		 * @throws ConstraintDeclarationException In case any of the rules mandated by the specification is
-		 * violated.
+		 * @throws javax.validation.ConstraintDeclarationException In case any of the rules mandated by the
+		 * specification are violated.
 		 */
 		private void assertCorrectnessOfConfiguration() {
 			for ( Entry<Class<?>, ConstrainedExecutable> entry : executablesByDeclaringType.entrySet() ) {

@@ -27,7 +27,6 @@ import javax.validation.executable.ExecutableValidator;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
-import org.hibernate.validator.internal.constraintvalidators.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 
@@ -38,7 +37,7 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 import static org.testng.Assert.fail;
 
 /**
- * Test for {@link ParameterScriptAssertValidator}.
+ * Test for {@link org.hibernate.validator.internal.constraintvalidators.ParameterScriptAssertValidator}.
  *
  * @author Gunnar Morling
  */

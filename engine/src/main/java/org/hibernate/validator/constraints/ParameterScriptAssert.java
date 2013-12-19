@@ -20,7 +20,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
-import javax.validation.ParameterNameProvider;
 import javax.validation.Payload;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -40,7 +39,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * ("Scripting for the Java<sup>TM</sup> Platform") compatible engine can be
  * found on the classpath. To refer to a parameter within the scripting
  * expression, use its name as obtained by the active
- * {@link ParameterNameProvider}. By default, {@code arg0}, {@code arg1} etc.
+ * {@link javax.validation.ParameterNameProvider}. By default, {@code arg0}, {@code arg1} etc.
  * will be used as parameter names.
  * </p>
  * <p>
@@ -87,7 +86,7 @@ public @interface ParameterScriptAssert {
 	 *         exception occurring during script evaluation will be wrapped into
 	 *         a ConstraintDeclarationException, too. Within the script, the
 	 *         validated parameters can be accessed using their names as retrieved from the
-	 *         active {@link ParameterNameProvider}.
+	 *         active {@link javax.validation.ParameterNameProvider}.
 	 */
 	String script();
 

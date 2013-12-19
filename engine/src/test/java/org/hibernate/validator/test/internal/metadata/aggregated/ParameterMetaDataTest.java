@@ -29,7 +29,6 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.test.internal.metadata.Customer;
@@ -42,7 +41,8 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Tests creation of {@link ConstrainedParameter} in {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl}.
+ * Tests creation of {@link org.hibernate.validator.internal.metadata.raw.ConstrainedParameter} in
+ * {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl}.
  *
  * @author Gunnar Morling
  */

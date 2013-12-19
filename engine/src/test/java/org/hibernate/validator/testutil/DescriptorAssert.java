@@ -17,15 +17,14 @@
 package org.hibernate.validator.testutil;
 
 import java.util.Set;
-
-import javax.validation.metadata.ElementDescriptor;
 import javax.validation.metadata.GroupConversionDescriptor;
+
 import org.fest.assertions.CollectionAssert;
 
 import static org.fest.assertions.Formatting.format;
 
 /**
- * Provides assertion methods for testing {@link ElementDescriptor}
+ * Provides assertion methods for testing {@link javax.validation.metadata.ElementDescriptor}
  * implementations and collections thereof.
  *
  * @author Gunnar Morling

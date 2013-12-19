@@ -24,14 +24,13 @@ import javax.validation.GroupSequence;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.metadata.descriptor.GroupConversionDescriptorImpl;
-import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * Provides group conversion functionality to {@link Cascadable}s.
+ * Provides group conversion functionality to {@link org.hibernate.validator.cfg.context.Cascadable}s.
  *
  * @author Gunnar Morling
  */

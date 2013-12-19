@@ -33,7 +33,6 @@ import javax.validation.constraints.NotNull;
 import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Address;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
@@ -57,7 +56,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
 
 /**
- * Integration test for the method-level validation related features of {@link ValidatorImpl}.
+ * Integration test for the method-level validation related features of {@link org.hibernate.validator.internal.engine.ValidatorImpl}.
  *
  * @author Gunnar Morling
  * @author Hardy Ferentschik

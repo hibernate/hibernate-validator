@@ -33,7 +33,6 @@ import org.hibernate.validator.integration.cdi.constraint.Pingable;
 import org.hibernate.validator.integration.cdi.constraint.PingableValidator;
 import org.hibernate.validator.integration.cdi.service.PingService;
 import org.hibernate.validator.integration.cdi.service.PingServiceImpl;
-import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
 import static org.junit.Assert.assertNotNull;
 

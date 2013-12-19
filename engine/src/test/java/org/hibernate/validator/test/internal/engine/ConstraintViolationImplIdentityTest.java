@@ -26,13 +26,12 @@ import javax.validation.constraints.Size;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 
 /**
- * Test related to the identity of {@link ConstraintViolationImpl}s.
+ * Test related to the identity of {@link org.hibernate.validator.internal.engine.ConstraintViolationImpl}s.
  *
  * @author Gunnar Morling
  */

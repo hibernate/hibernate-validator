@@ -30,7 +30,6 @@ import org.junit.runner.RunWith;
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.integration.cdi.service.PingService;
 import org.hibernate.validator.integration.cdi.service.PingServiceImpl;
-import org.hibernate.validator.integration.util.IntegrationTestUtil;
 
 import static junit.framework.Assert.assertEquals;
 

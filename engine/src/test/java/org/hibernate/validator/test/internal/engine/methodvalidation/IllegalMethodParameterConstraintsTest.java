@@ -24,13 +24,13 @@ import javax.validation.constraints.Size;
 import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
- * Integration test for {@link ValidatorImpl} and {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl} which
+ * Integration test for {@link org.hibernate.validator.internal.engine.ValidatorImpl} and
+ * {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl} which
  * tests that illegal method parameter constraints are handled properly.
  *
  * @author Gunnar Morling
