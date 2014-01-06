@@ -25,7 +25,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * Check that a string's length is between min and max.
+ * Check that a collection's size is between min and max.
  *
  * @author Hardy Ferentschik
  */
@@ -36,6 +36,7 @@ public class SizeValidatorForCollection implements ConstraintValidator<Size, Col
 	private int min;
 	private int max;
 
+	@Override
 	public void initialize(Size parameters) {
 		min = parameters.min();
 		max = parameters.max();
@@ -43,15 +44,16 @@ public class SizeValidatorForCollection implements ConstraintValidator<Size, Col
 	}
 
 	/**
-	 * Checks the number of entries in a map.
+	 * Checks the number of entries in a collection.
 	 *
-	 * @param collection The collection to validate.
-	 * @param constraintValidatorContext context in which the constraint is evaluated.
+	 * @param collection the collection to validate
+	 * @param constraintValidatorContext context in which the constraint is evaluated
 	 *
-	 * @return Returns <code>true</code> if the collection is <code>null</code> or the number of entries in
-	 *         <code>collection</code> is between the specified <code>min</code> and <code>max</code> values (inclusive),
-	 *         <code>false</code> otherwise.
+	 * @return {@code true} if the collection is {@code null} or the number of entries in
+	 *         {@code collection} is between the specified {@code min} and {@code max} values (inclusive),
+	 *         {@code false} otherwise.
 	 */
+	@Override
 	public boolean isValid(Collection<?> collection, ConstraintValidatorContext constraintValidatorContext) {
 		if ( collection == null ) {
 			return true;
