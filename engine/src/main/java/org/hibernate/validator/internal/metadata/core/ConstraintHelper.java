@@ -401,28 +401,20 @@ public class ConstraintHelper {
 	 */
 	public <A extends Annotation> List<Annotation> getMultiValueConstraints(A annotation) {
 		List<Annotation> annotationList = newArrayList();
-		try {
-			final Method method = ReflectionHelper.getMethod( annotation.getClass(), "value" );
-			if ( method != null ) {
-				Class<?> returnType = method.getReturnType();
-				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
-					ReflectionHelper.setAccessibility( method );
-					Annotation[] annotations = (Annotation[]) method.invoke( annotation );
-					for ( Annotation a : annotations ) {
-						Class<? extends Annotation> annotationType = a.annotationType();
-						if ( isConstraintAnnotation( annotationType ) || isBuiltinConstraint( annotationType ) ) {
-							annotationList.add( a );
-						}
+		final Method method = ReflectionHelper.getMethod( annotation.getClass(), "value" );
+		if ( method != null ) {
+			Class<?> returnType = method.getReturnType();
+			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
+				Annotation[] annotations = ReflectionHelper.getAnnotationParameter( annotation, "value", Annotation[].class );
+				for ( Annotation a : annotations ) {
+					Class<? extends Annotation> annotationType = a.annotationType();
+					if ( isConstraintAnnotation( annotationType ) || isBuiltinConstraint( annotationType ) ) {
+						annotationList.add( a );
 					}
 				}
 			}
 		}
-		catch ( IllegalAccessException iae ) {
-			// ignore
-		}
-		catch ( InvocationTargetException ite ) {
-			// ignore
-		}
+
 		return annotationList;
 	}
 

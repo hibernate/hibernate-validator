@@ -46,12 +46,13 @@ public final class GetAnnotationParameter<T> implements PrivilegedAction<T> {
 		this.type = type;
 	}
 
+	@Override
 	public T run() {
 		try {
 			Method m = annotation.getClass().getMethod( parameterName );
 			m.setAccessible( true );
 			Object o = m.invoke( annotation );
-			if ( o.getClass().getName().equals( type.getName() ) ) {
+			if ( type.isAssignableFrom( o.getClass() ) ) {
 				return (T) o;
 			}
 			else {
