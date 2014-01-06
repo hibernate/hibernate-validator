@@ -243,9 +243,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 57, value = "Unable to find constraints for  %s.")
 	ValidationException getUnableToFindAnnotationConstraintsException(Class<? extends Annotation> annotationClass);
 
-	@Message(id = 58, value = "Unable to read annotation attributes: %s.")
-	ValidationException getUnableToReadAnnotationAttributesException(Class<? extends Annotation> annotationClass, @Cause Exception e);
-
 	@Message(id = 59, value = "Unable to retrieve annotation parameter value.")
 	ValidationException getUnableToRetrieveAnnotationParameterValueException(@Cause Exception e);
 

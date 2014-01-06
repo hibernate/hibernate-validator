@@ -17,7 +17,6 @@
 package org.hibernate.validator.internal.metadata.core;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
@@ -391,37 +390,22 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks whether a given annotation is a multi value constraint and returns the contained constraints if so.
+	 * Returns the constraints which are part of the given multi-value constraint.
+	 * <p>
+	 * Invoke {@link #isMultiValueConstraint(Class)} prior to calling this method to check whether a given constraint
+	 * actually is a multi-value constraint.
 	 *
-	 * @param annotation the annotation to check.
+	 * @param multiValueConstraint the multi-value constraint annotation from which to retrieve the contained constraints
 	 *
-	 * @return A list of constraint annotations or the empty list if <code>annotation</code> is not a multi constraint
-	 *         annotation.
+	 * @return A list of constraint annotations, may be empty but never {@code null}.
 	 */
-	public <A extends Annotation> List<Annotation> getMultiValueConstraints(A annotation) {
-		List<Annotation> annotationList = newArrayList();
-		try {
-			final Method method = ReflectionHelper.getMethod( annotation.getClass(), "value" );
-			if ( method != null ) {
-				Class<?> returnType = method.getReturnType();
-				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
-					Annotation[] annotations = (Annotation[]) method.invoke( annotation );
-					for ( Annotation a : annotations ) {
-						Class<? extends Annotation> annotationType = a.annotationType();
-						if ( isConstraintAnnotation( annotationType ) || isBuiltinConstraint( annotationType ) ) {
-							annotationList.add( a );
-						}
-					}
-				}
-			}
-		}
-		catch ( IllegalAccessException iae ) {
-			// ignore
-		}
-		catch ( InvocationTargetException ite ) {
-			// ignore
-		}
-		return annotationList;
+	public <A extends Annotation> List<Annotation> getConstraintsFromMultiValueConstraint(A multiValueConstraint) {
+		Annotation[] annotations = ReflectionHelper.getAnnotationParameter(
+				multiValueConstraint,
+				"value",
+				Annotation[].class
+		);
+		return Arrays.asList( annotations );
 	}
 
 	/**

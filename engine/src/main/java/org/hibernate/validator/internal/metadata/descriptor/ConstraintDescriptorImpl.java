@@ -24,7 +24,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -545,32 +544,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotation.annotationType() );
 		Map<String, Object> parameters = newHashMap( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
-			try {
-				parameters.put( m.getName(), m.invoke( annotation ) );
-			}
-			catch ( IllegalAccessException e ) {
-				throw log.getUnableToReadAnnotationAttributesException( annotation.getClass(), e );
-			}
-			catch ( InvocationTargetException e ) {
-				throw log.getUnableToReadAnnotationAttributesException( annotation.getClass(), e );
-			}
+			Object value = ReflectionHelper.getAnnotationParameter( annotation, m.getName(), Object.class );
+			parameters.put( m.getName(), value );
 		}
 		return Collections.unmodifiableMap( parameters );
-	}
-
-	private Object getMethodValue(Annotation annotation, Method m) {
-		Object value;
-		try {
-			value = m.invoke( annotation );
-		}
-		// should never happen
-		catch ( IllegalAccessException e ) {
-			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
-		}
-		catch ( InvocationTargetException e ) {
-			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
-		}
-		return value;
 	}
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
@@ -594,8 +571,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void addOverrideAttributes(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Method m, OverridesAttribute... attributes) {
-
-		Object value = getMethodValue( annotation, m );
+		Object value = ReflectionHelper.getAnnotationParameter( annotation, m.getName(), Object.class );
 		for ( OverridesAttribute overridesAttribute : attributes ) {
 			ensureAttributeIsOverridable( m, overridesAttribute );
 
@@ -649,7 +625,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				log.debugf( "Adding composing constraint: %s.", descriptor );
 			}
 			else if ( constraintHelper.isMultiValueConstraint( declaredAnnotationType ) ) {
-				List<Annotation> multiValueConstraints = constraintHelper.getMultiValueConstraints( declaredAnnotation );
+				List<Annotation> multiValueConstraints = constraintHelper.getConstraintsFromMultiValueConstraint( declaredAnnotation );
 				int index = 0;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
 					ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(

@@ -19,7 +19,6 @@ package org.hibernate.validator.test.internal.metadata.core;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.List;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.testng.annotations.BeforeClass;
@@ -27,9 +26,9 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.test.internal.metadata.Engine;
-import org.hibernate.validator.test.internal.metadata.Order;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
@@ -46,30 +45,31 @@ public class ConstraintHelperTest {
 	}
 
 	@Test
-	public void testGetMultiValueConstraints() throws Exception {
+	public void testIsMultiValueConstraintRecognizesMultiValueConstraint() {
+		assertTrue( constraintHelper.isMultiValueConstraint( Pattern.List.class ) );
+	}
+
+	@Test
+	public void testIsMultiValueConstraintRecognizesNonMultiValueConstraint() {
+		assertFalse( constraintHelper.isMultiValueConstraint( Pattern.class ) );
+	}
+
+	@Test
+	public void testGetConstraintsFromMultiValueConstraint() throws Exception {
 		Engine engine = new Engine();
-		Field[] fields = engine.getClass().getDeclaredFields();
-		assertNotNull( fields );
-		assertTrue( fields.length == 1 );
-		ReflectionHelper.setAccessibility( fields[0] );
+		Field field = engine.getClass().getDeclaredField( "serialNumber" );
 
-		Annotation annotation = fields[0].getAnnotation( Pattern.List.class );
+		Annotation annotation = field.getAnnotation( Pattern.List.class );
 		assertNotNull( annotation );
-		List<Annotation> multiValueConstraintAnnotations = constraintHelper.getMultiValueConstraints( annotation );
+		List<Annotation> multiValueConstraintAnnotations = constraintHelper.getConstraintsFromMultiValueConstraint(
+				annotation
+		);
 		assertTrue( multiValueConstraintAnnotations.size() == 2, "There should be two constraint annotations" );
+
 		assertTrue( multiValueConstraintAnnotations.get( 0 ) instanceof Pattern, "Wrong constraint annotation" );
+		assertEquals( ( (Pattern) multiValueConstraintAnnotations.get( 0 ) ).regexp(), "^[A-Z0-9-]+$" );
+
 		assertTrue( multiValueConstraintAnnotations.get( 1 ) instanceof Pattern, "Wrong constraint annotation" );
-
-
-		Order order = new Order();
-		fields = order.getClass().getDeclaredFields();
-		assertNotNull( fields );
-		assertTrue( fields.length == 1 );
-		ReflectionHelper.setAccessibility( fields[0] );
-
-		annotation = fields[0].getAnnotation( NotNull.class );
-		assertNotNull( annotation );
-		multiValueConstraintAnnotations = constraintHelper.getMultiValueConstraints( annotation );
-		assertTrue( multiValueConstraintAnnotations.size() == 0, "There should be no constraint annotations" );
+		assertEquals( ( (Pattern) multiValueConstraintAnnotations.get( 1 ) ).regexp(), "^....-....-....$" );
 	}
 }
