@@ -546,6 +546,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		Map<String, Object> parameters = newHashMap( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
 			try {
+				ReflectionHelper.setAccessibility( m );
 				parameters.put( m.getName(), m.invoke( annotation ) );
 			}
 			catch ( IllegalAccessException e ) {

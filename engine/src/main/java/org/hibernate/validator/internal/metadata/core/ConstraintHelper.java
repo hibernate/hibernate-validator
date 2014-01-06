@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
@@ -405,6 +406,7 @@ public class ConstraintHelper {
 			if ( method != null ) {
 				Class<?> returnType = method.getReturnType();
 				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
+					ReflectionHelper.setAccessibility( method );
 					Annotation[] annotations = (Annotation[]) method.invoke( annotation );
 					for ( Annotation a : annotations ) {
 						Class<? extends Annotation> annotationType = a.annotationType();
