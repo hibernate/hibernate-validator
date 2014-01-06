@@ -596,7 +596,7 @@ public class ValidationContext<T> {
 		}
 
 		private int createHashCode() {
-			int result = bean != null ? bean.hashCode() : 0;
+			int result = System.identityHashCode( bean );
 			result = 31 * result + path.hashCode();
 			return result;
 		}
