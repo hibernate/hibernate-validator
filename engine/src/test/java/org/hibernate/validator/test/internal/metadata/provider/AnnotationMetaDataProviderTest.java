@@ -21,10 +21,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Constraint;
@@ -85,10 +82,7 @@ public class AnnotationMetaDataProviderTest {
 
 		assertThat( beanConfigurations ).hasSize( 2 );
 
-		ConstrainedExecutable constructor = findConstrainedExecutable(
-				beanConfigurations,
-				Foo.class.getConstructor( String.class )
-		);
+		ConstrainedExecutable constructor = findConstrainedConstructor( beanConfigurations, Foo.class, String.class );
 
 		assertThat( constructor.getKind() ).isEqualTo( ConstrainedElementKind.CONSTRUCTOR );
 		assertThat( constructor.isConstrained() ).isTrue();
@@ -107,9 +101,12 @@ public class AnnotationMetaDataProviderTest {
 				Calendar.class
 		);
 
-		ConstrainedExecutable createEvent = findConstrainedExecutable(
+		ConstrainedExecutable createEvent = findConstrainedMethod(
 				beanConfigurations,
-				Calendar.class.getMethod( "createEvent", DateMidnight.class, DateMidnight.class )
+				Calendar.class,
+				"createEvent",
+				DateMidnight.class,
+				DateMidnight.class
 		);
 
 		//then
@@ -151,7 +148,7 @@ public class AnnotationMetaDataProviderTest {
 	public void noGroupConversionOnField() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "mail" ) );
+		ConstrainedField field = findConstrainedField( beanConfigurations, User.class, "mail" );
 
 		//then
 		assertThat( field.getGroupConversions() ).isEmpty();
@@ -161,7 +158,7 @@ public class AnnotationMetaDataProviderTest {
 	public void singleGroupConversionOnField() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "phone" ) );
+		ConstrainedField field = findConstrainedField( beanConfigurations, User.class, "phone" );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -174,7 +171,7 @@ public class AnnotationMetaDataProviderTest {
 	public void multipleGroupConversionsOnField() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "address" ) );
+		ConstrainedField field = findConstrainedField( beanConfigurations, User.class, "address" );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -193,10 +190,7 @@ public class AnnotationMetaDataProviderTest {
 	public void noGroupConversionOnMethod() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
-				beanConfigurations,
-				User.class.getMethod( "getMail1" )
-		);
+		ConstrainedExecutable method = findConstrainedMethod( beanConfigurations, User.class, "getMail1" );
 
 		//then
 		assertThat( method.getGroupConversions() ).isEmpty();
@@ -206,10 +200,7 @@ public class AnnotationMetaDataProviderTest {
 	public void singleGroupConversionOnMethod() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
-				beanConfigurations,
-				User.class.getMethod( "getPhone1" )
-		);
+		ConstrainedExecutable method = findConstrainedMethod( beanConfigurations, User.class, "getPhone1" );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -222,10 +213,7 @@ public class AnnotationMetaDataProviderTest {
 	public void multipleGroupConversionsOnMethod() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
-				beanConfigurations,
-				User.class.getMethod( "getAddress1" )
-		);
+		ConstrainedExecutable method = findConstrainedMethod( beanConfigurations, User.class, "getAddress1" );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -239,9 +227,11 @@ public class AnnotationMetaDataProviderTest {
 	public void noGroupConversionOnParameter() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
+		ConstrainedExecutable method = findConstrainedMethod(
 				beanConfigurations,
-				User.class.getMethod( "setMail1", String.class )
+				User.class,
+				"setMail1",
+				String.class
 		);
 
 		//then
@@ -252,9 +242,11 @@ public class AnnotationMetaDataProviderTest {
 	public void singleGroupConversionOnParameter() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
+		ConstrainedExecutable method = findConstrainedMethod(
 				beanConfigurations,
-				User.class.getMethod( "setPhone1", PhoneNumber.class )
+				User.class,
+				"setPhone1",
+				PhoneNumber.class
 		);
 
 		//then
@@ -268,9 +260,11 @@ public class AnnotationMetaDataProviderTest {
 	public void multipleGroupConversionsOnParameter() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
+		ConstrainedExecutable method = findConstrainedMethod(
 				beanConfigurations,
-				User.class.getMethod( "setAddress1", Address.class )
+				User.class,
+				"setAddress1",
+				Address.class
 		);
 
 		//then
@@ -290,10 +284,7 @@ public class AnnotationMetaDataProviderTest {
 	public void singleGroupConversionOnConstructor() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable constructor = findConstrainedExecutable(
-				beanConfigurations,
-				User.class.getConstructor()
-		);
+		ConstrainedExecutable constructor = findConstrainedConstructor( beanConfigurations, User.class );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -306,10 +297,7 @@ public class AnnotationMetaDataProviderTest {
 	public void multipleGroupConversionsOnConstructorParameter() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable constructor = findConstrainedExecutable(
-				beanConfigurations,
-				User.class.getConstructor( Address.class )
-		);
+		ConstrainedExecutable constructor = findConstrainedConstructor( beanConfigurations, User.class, Address.class );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -347,19 +335,30 @@ public class AnnotationMetaDataProviderTest {
 		provider.getBeanConfigurationForHierarchy( User3.class );
 	}
 
-	private ConstrainedField findConstrainedField(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Field field) {
-		return (ConstrainedField) findConstrainedElement( beanConfigurations, field );
+	private <T> ConstrainedField findConstrainedField(Iterable<BeanConfiguration<? super T>> beanConfigurations,
+			Class<? super T> clazz, String fieldName) throws Exception {
+		return (ConstrainedField) findConstrainedElement( beanConfigurations, clazz.getDeclaredField( fieldName ) );
 	}
 
-	private ConstrainedExecutable findConstrainedExecutable(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Method method) {
-		return (ConstrainedExecutable) findConstrainedElement( beanConfigurations, method );
+	private <T> ConstrainedExecutable findConstrainedMethod(Iterable<BeanConfiguration<? super T>> beanConfigurations,
+			Class<? super T> clazz, String methodName, Class<?>... parameterTypes) throws Exception {
+		return (ConstrainedExecutable) findConstrainedElement(
+				beanConfigurations,
+				clazz.getMethod( methodName, parameterTypes )
+		);
 	}
 
-	private <T> ConstrainedExecutable findConstrainedExecutable(Iterable<BeanConfiguration<? super T>> beanConfigurations, Constructor<T> constructor) {
-		return (ConstrainedExecutable) findConstrainedElement( beanConfigurations, constructor );
+	private <T> ConstrainedExecutable findConstrainedConstructor(
+			Iterable<BeanConfiguration<? super T>> beanConfigurations, Class<? super T> clazz,
+			Class<?>... parameterTypes) throws Exception {
+		return (ConstrainedExecutable) findConstrainedElement(
+				beanConfigurations,
+				clazz.getConstructor( parameterTypes )
+		);
 	}
 
-	private <T> ConstrainedType findConstrainedType(Iterable<BeanConfiguration<? super T>> beanConfigurations, Class<? super T> type) {
+	private <T> ConstrainedType findConstrainedType(Iterable<BeanConfiguration<? super T>> beanConfigurations,
+			Class<? super T> type) {
 		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
 			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
 				if ( constrainedElement.getLocation().getElementType() == ElementType.TYPE ) {
@@ -374,7 +373,8 @@ public class AnnotationMetaDataProviderTest {
 		throw new RuntimeException( "Found no constrained element for type " + type );
 	}
 
-	private ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Member member) {
+	private ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations,
+			Member member) {
 		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
 			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
 				if ( constrainedElement.getLocation().getMember().equals( member ) ) {
