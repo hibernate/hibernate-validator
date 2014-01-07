@@ -31,7 +31,7 @@ import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.integration.cdi.service.PingService;
 import org.hibernate.validator.integration.cdi.service.PingServiceImpl;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
