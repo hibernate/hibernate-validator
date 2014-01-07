@@ -15,6 +15,9 @@
         <module name="AvoidStarImport"/>
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="junit.framework"/>
+        </module>
 
         <!-- Modifier Checks  -->
         <module name="ModifierOrder"/>

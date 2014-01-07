@@ -31,8 +31,8 @@ import org.junit.runner.RunWith;
 
 import org.hibernate.validator.internal.cdi.ValidationExtension;
 
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
@@ -56,8 +56,10 @@ public class InvalidConfiguredClassInheritanceMethodValidationTest {
 		AnnotatedType<CIA> annotatedType = beanManager.createAnnotatedType( CIA.class );
 		try {
 			extension.processAnnotatedType( new ProcessAnnotatedTypeImpl<CIA>( annotatedType ) );
-			fail( "ValidationExtension should throw an exception, because the validated method overrides another " +
-					"method and adds @ValidateOnExecution " );
+			fail(
+					"ValidationExtension should throw an exception, because the validated method overrides another " +
+							"method and adds @ValidateOnExecution "
+			);
 		}
 		catch ( ValidationException e ) {
 			assertTrue( e.getMessage().startsWith( "HV000166" ) );
