@@ -101,7 +101,7 @@ public final class ParameterConstraintMappingContextImpl
 				getConstraints( constraintHelper ),
 				groupConversions,
 				isCascading,
-				false
+				isUnwrapValidatedValue()
 		);
 	}
 

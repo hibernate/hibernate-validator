@@ -108,7 +108,7 @@ public final class PropertyConstraintMappingContextImpl
 					getConstraints( constraintHelper ),
 					groupConversions,
 					isCascading,
-					false
+					isUnwrapValidatedValue()
 			);
 		}
 		else {
@@ -118,7 +118,7 @@ public final class PropertyConstraintMappingContextImpl
 					getConstraints( constraintHelper ),
 					groupConversions,
 					isCascading,
-					false
+					isUnwrapValidatedValue()
 			);
 		}
 	}

@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2014, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -17,14 +17,18 @@
 package org.hibernate.validator.cfg.context;
 
 /**
- * Constraint mapping creational context representing a method return value. Allows
- * to place constraints on the return value, mark it as cascadable and to
- * navigate to other constraint targets.
+ * Facet of a constraint mapping creational context which allows to mark the underlying element as to be unwrapped prior
+ * to validation.
  *
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public interface ReturnValueConstraintMappingContext
-		extends TypeTarget, ParameterTarget, CrossParameterTarget, ConstructorTarget, MethodTarget, Constrainable<ReturnValueConstraintMappingContext>, Cascadable<ReturnValueConstraintMappingContext>, Unwrapable<ReturnValueConstraintMappingContext> {
+public interface Unwrapable<U extends Unwrapable<U>> {
 
+	/**
+	 * Marks the current element (property, parameter etc.) as unwrapable. Equivalent to annotating this element with
+	 * {@link org.hibernate.validator.unwrapping.UnwrapValidatedValue}.
+	 *
+	 * @return The current creational context following the method chaining pattern.
+	 */
+	U unwrapValidatedValue();
 }

@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.test.internal.engine.valueunwrapping;
 
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -25,9 +26,12 @@ import javax.validation.Validator;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.test.internal.engine.valueunwrapping.model.Account;
 import org.hibernate.validator.test.internal.engine.valueunwrapping.model.Customer;
 import org.hibernate.validator.test.internal.engine.valueunwrapping.model.Order;
+import org.hibernate.validator.test.internal.engine.valueunwrapping.model.OrderLine;
 import org.hibernate.validator.test.internal.engine.valueunwrapping.model.Property;
 import org.hibernate.validator.test.internal.engine.valueunwrapping.model.PropertyValueUnwrapper;
 import org.hibernate.validator.test.internal.engine.valueunwrapping.model.UiInputValueUnwrapper;
@@ -94,5 +98,70 @@ public class UnwrapValidatedValueTest {
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000182.*")
 	public void shouldRaiseExceptionIfNoMatchingUnwrapperIsFound() {
 		validator.validate( new Order() );
+	}
+
+	@Test
+	public void shouldUnwrapPropertyValueBasedOnProgrammaticConfiguration() {
+		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+		ConstraintMapping mapping = configuration.createConstraintMapping();
+		mapping.type( OrderLine.class )
+				.property( "id", ElementType.FIELD )
+					.unwrapValidatedValue();
+
+		Validator validator = configuration.addMapping( mapping )
+				.addValidationValueUnwrapper( new PropertyValueUnwrapper() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<OrderLine>> violations = validator.validate( new OrderLine() );
+		assertEquals( violations.size(), 1 );
+	}
+
+	@Test
+	public void shouldUnwrapParameterValueBasedOnProgrammaticConfiguration() throws Exception {
+		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+		ConstraintMapping mapping = configuration.createConstraintMapping();
+		mapping.type( OrderLine.class )
+				.method( "setId", Property.class )
+					.parameter( 0 )
+						.unwrapValidatedValue();
+
+		Validator validator = configuration.addMapping( mapping )
+				.addValidationValueUnwrapper( new PropertyValueUnwrapper() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		OrderLine orderLine = new OrderLine();
+		Method method = OrderLine.class.getMethod( "setId", Property.class );
+		Object[] parameterValues = new Object[] { new Property<Long>( 0L ) };
+
+		Set<ConstraintViolation<OrderLine>> violations = validator.forExecutables()
+				.validateParameters( orderLine, method, parameterValues );
+
+		assertEquals( violations.size(), 1 );
+	}
+
+	@Test
+	public void shouldUnwrapReturnValueBasedOnProgrammaticConfiguration() throws Exception {
+		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+		ConstraintMapping mapping = configuration.createConstraintMapping();
+		mapping.type( OrderLine.class )
+				.method( "getId" )
+					.returnValue()
+						.unwrapValidatedValue();
+
+		Validator validator = configuration.addMapping( mapping )
+				.addValidationValueUnwrapper( new PropertyValueUnwrapper() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		OrderLine orderLine = new OrderLine();
+		Method method = OrderLine.class.getMethod( "getId" );
+		Object returnValue = new Property<Long>( 0L );
+
+		Set<ConstraintViolation<OrderLine>> violations = validator.forExecutables()
+				.validateReturnValue( orderLine, method, returnValue );
+
+		assertEquals( violations.size(), 1 );
 	}
 }
