@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
@@ -60,6 +61,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -124,11 +126,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final boolean failFast;
 
+	/**
+	 * Contains unwrappers to be applied when validating elements annotated with {@code UnwrapValidationValue}.
+	 */
+	private final List<ValidationValueUnwrapper<?>> validationValueUnwrappers;
+
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 						 MessageInterpolator messageInterpolator,
 						 TraversableResolver traversableResolver,
 						 BeanMetaDataManager beanMetaDataManager,
 						 ParameterNameProvider parameterNameProvider,
+						 List<ValidationValueUnwrapper<?>> validationValueUnwrappers,
 						 ConstraintValidatorManager constraintValidatorManager,
 						 boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -136,6 +144,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.parameterNameProvider = parameterNameProvider;
+		this.validationValueUnwrappers = validationValueUnwrappers;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
 

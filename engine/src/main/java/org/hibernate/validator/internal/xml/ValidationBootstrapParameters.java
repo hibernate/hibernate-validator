@@ -18,8 +18,7 @@ package org.hibernate.validator.internal.xml;
 
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.BootstrapConfiguration;
@@ -34,6 +33,11 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.ResourceLoaderHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * @author Hardy Ferentschik
@@ -45,10 +49,11 @@ public class ValidationBootstrapParameters {
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
 	private ParameterNameProvider parameterNameProvider;
+	private final List<ValidationValueUnwrapper<?>> validationValueUnwrappers = newArrayList();
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
-	private final Map<String, String> configProperties = new HashMap<String, String>();
-	private final Set<InputStream> mappings = new HashSet<InputStream>();
+	private final Map<String, String> configProperties = newHashMap();
+	private final Set<InputStream> mappings = newHashSet();
 
 	public ValidationBootstrapParameters() {
 	}
@@ -227,5 +232,13 @@ public class ValidationBootstrapParameters {
 		for ( Map.Entry<String, String> entry : properties.entrySet() ) {
 			configProperties.put( entry.getKey(), entry.getValue() );
 		}
+	}
+
+	public void addValidationValueUnwrapper(ValidationValueUnwrapper<?> unwrapper) {
+		validationValueUnwrappers.add( unwrapper );
+	}
+
+	public List<ValidationValueUnwrapper<?>> getValidationValueUnwrappers() {
+		return validationValueUnwrappers;
 	}
 }

@@ -20,6 +20,7 @@ import javax.validation.Configuration;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
 
 /**
  * Uniquely identifies Hibernate Validator in the Bean Validation bootstrap
@@ -98,4 +99,15 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @return {@code this} following the chaining method pattern
 	 */
 	HibernateValidatorConfiguration failFast(boolean failFast);
+
+	/**
+	 * Registers the given validation value unwrapper. When validating an element annotated with
+	 * {@link org.hibernate.validator.unwrapping.UnwrapValidatedValue} the registered unwrapper(s) will be applied to
+	 * retrieve the value to validate.
+	 *
+	 * @param unwrapper the unwrapper to register.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 */
+	HibernateValidatorConfiguration addValidationValueUnwrapper(ValidationValueUnwrapper<?> unwrapper);
 }

@@ -22,6 +22,8 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidatorContext;
 
+import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+
 /**
  * Represents a Hibernate Validator specific context that is used to create
  * {@link javax.validation.Validator} instances. Adds additional configuration options to those
@@ -32,10 +34,13 @@ import javax.validation.ValidatorContext;
  */
 public interface HibernateValidatorContext extends ValidatorContext {
 
+	@Override
 	HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator);
 
+	@Override
 	HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver);
 
+	@Override
 	HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory);
 
 	/**
@@ -48,4 +53,14 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 */
 	HibernateValidatorContext failFast(boolean failFast);
 
+	/**
+	 * Registers the given validation value unwrapper. When validating an element annotated with
+	 * {@link org.hibernate.validator.unwrapping.UnwrapValidatedValue} the registered unwrapper(s) will be applied to
+	 * retrieve the value to validate.
+	 *
+	 * @param unwrapper the unwrapper to register.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 */
+	HibernateValidatorContext addValidationValueUnwrapper(ValidationValueUnwrapper<?> unwrapper);
 }
