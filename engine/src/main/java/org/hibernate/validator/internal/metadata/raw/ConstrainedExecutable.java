@@ -69,7 +69,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			ExecutableConstraintLocation location,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
-			boolean isCascading) {
+			boolean isCascading,
+			boolean requiresUnwrapping) {
 		this(
 				source,
 				location,
@@ -77,7 +78,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				requiresUnwrapping
 		);
 	}
 
@@ -95,6 +97,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
 	 * return value shall be performed or not.
+	 * @param requiresUnwrapping Whether the value of the executable's return value must be unwrapped prior to
+	 * validation or not
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
@@ -103,14 +107,16 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
-			boolean isCascading) {
+			boolean isCascading,
+			boolean requiresUnwrapping) {
 		super(
 				source,
 				location.getElementType() == ElementType.CONSTRUCTOR ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				location,
 				returnValueConstraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				requiresUnwrapping
 		);
 
 		ExecutableElement executable = location.getExecutableElement();
@@ -291,7 +297,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				mergedCrossParameterConstraints,
 				mergedReturnValueConstraints,
 				mergedGroupConversions,
-				isCascading || other.isCascading
+				isCascading || other.isCascading,
+				requiresUnwrapping || other.requiresUnwrapping
 		);
 	}
 

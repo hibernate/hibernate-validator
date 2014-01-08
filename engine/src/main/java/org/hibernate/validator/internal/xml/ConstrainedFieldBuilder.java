@@ -77,7 +77,8 @@ public class ConstrainedFieldBuilder {
 					constraintLocation,
 					metaConstraints,
 					groupConversions,
-					fieldType.getValid() != null
+					fieldType.getValid() != null,
+					false
 			);
 			constrainedFields.add( constrainedField );
 

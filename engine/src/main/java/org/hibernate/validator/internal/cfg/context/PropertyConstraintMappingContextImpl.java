@@ -107,7 +107,8 @@ public final class PropertyConstraintMappingContextImpl
 					new BeanConstraintLocation( member ),
 					getConstraints( constraintHelper ),
 					groupConversions,
-					isCascading
+					isCascading,
+					false
 			);
 		}
 		else {
@@ -116,7 +117,8 @@ public final class PropertyConstraintMappingContextImpl
 					new ExecutableConstraintLocation( (Method) member ),
 					getConstraints( constraintHelper ),
 					groupConversions,
-					isCascading
+					isCascading,
+					false
 			);
 		}
 	}

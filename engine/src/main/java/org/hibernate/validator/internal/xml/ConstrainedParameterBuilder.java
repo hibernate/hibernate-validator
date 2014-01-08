@@ -86,7 +86,8 @@ public class ConstrainedParameterBuilder {
 					parameterNames.get( i ),
 					metaConstraints,
 					groupConversions,
-					parameterType.getValid() != null
+					parameterType.getValid() != null,
+					false
 			);
 			constrainedParameters.add( constrainedParameter );
 			i++;

@@ -69,14 +69,16 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 							 Type type,
 							 Set<MetaConstraint<?>> constraints,
 							 Map<Class<?>, Class<?>> groupConversions,
-							 Member cascadingMember) {
+							 Member cascadingMember,
+							 boolean requiresUnwrapping) {
 		super(
 				propertyName,
 				type,
 				constraints,
 				ElementKind.PROPERTY,
 				cascadingMember != null,
-				cascadingMember != null || !constraints.isEmpty()
+				cascadingMember != null || !constraints.isEmpty(),
+				requiresUnwrapping
 		);
 
 		if ( cascadingMember != null ) {
@@ -221,7 +223,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 					propertyType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					getGroupConversions(),
-					cascadingMember
+					cascadingMember,
+					requiresUnwrapping()
 			);
 		}
 

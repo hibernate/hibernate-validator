@@ -46,6 +46,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 				location,
 				constraints,
 				Collections.<Class<?>, Class<?>>emptyMap(),
+				false,
 				false
 		);
 	}
@@ -54,5 +55,4 @@ public class ConstrainedType extends AbstractConstrainedElement {
 	public BeanConstraintLocation getLocation() {
 		return (BeanConstraintLocation) super.getLocation();
 	}
-
 }

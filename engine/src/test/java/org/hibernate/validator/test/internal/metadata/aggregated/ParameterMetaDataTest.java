@@ -98,6 +98,7 @@ public class ParameterMetaDataTest {
 		assertFalse( parameterMetaData.isCascading() );
 		assertFalse( parameterMetaData.isConstrained() );
 		assertThat( parameterMetaData ).isEmpty();
+		assertFalse( parameterMetaData.requiresUnwrapping() );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
@@ -117,5 +118,15 @@ public class ParameterMetaDataTest {
 				methodMetaData.getParameterMetaData( 0 )
 						.convertGroup( Default.class )
 		).isEqualTo( ValidationGroup.class );
+	}
+
+	@Test
+	public void parameterRequiringUnwrapping() throws Exception {
+		Method method = CustomerRepository.class.getMethod( "methodWithParameterRequiringUnwrapping", long.class );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+
+		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
+
+		assertTrue( parameterMetaData.requiresUnwrapping() );
 	}
 }

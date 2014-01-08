@@ -29,8 +29,11 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.unwrapping.UnwrapValidatedValue;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Gunnar Morling
@@ -61,6 +64,28 @@ public class PropertyMetaDataTest {
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
 	public void groupConversionInHierarchyWithSameFrom() {
 		beanMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" );
+	}
+
+	@Test
+	public void unwrapValidatedValueGivenOnField() {
+		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( Customer.class ).getMetaDataFor( "name" );
+		assertTrue( property.requiresUnwrapping() );
+
+		property = beanMetaDataManager.getBeanMetaData( Customer.class ).getMetaDataFor( "age" );
+		assertFalse( property.requiresUnwrapping() );
+	}
+
+	@Test
+	public void unwrapValidatedValueGivenOnProperty() {
+		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( Customer.class ).getMetaDataFor( "firstName" );
+		assertTrue( property.requiresUnwrapping() );
+	}
+
+	@Test
+	public void unwrapValidatedValueGivenOnPropertyInSuperClass() {
+		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( RetailCustomer.class )
+				.getMetaDataFor( "firstName" );
+		assertTrue( property.requiresUnwrapping() );
 	}
 
 	public interface Complete extends Default {
@@ -103,5 +128,24 @@ public class PropertyMetaDataTest {
 		public Set<Address> getAddresses() {
 			return super.getAddresses();
 		}
+	}
+
+	@SuppressWarnings("unused")
+	private static class Customer {
+
+		@UnwrapValidatedValue
+		private String name;
+
+		private int age;
+
+		private String firstName;
+
+		@UnwrapValidatedValue
+		public String getFirstName() {
+			return firstName;
+		}
+	}
+
+	private static class RetailCustomer extends Customer {
 	}
 }

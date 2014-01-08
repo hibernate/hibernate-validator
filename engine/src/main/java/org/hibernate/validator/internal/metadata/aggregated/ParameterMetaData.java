@@ -44,27 +44,21 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	private final GroupConversionHelper groupConversionHelper;
 	private final int index;
 
-	/**
-	 * @param index the parameter index
-	 * @param name the parameter name
-	 * @param type the parameter type
-	 * @param constraints the constraints defined for this parameter
-	 * @param isCascading should cascading constraints be evaluated. Returns {@code true} is the constrained element
-	 * is marked for cascaded validation ({@code @Valid}), {@code false} otherwise.
-	 */
 	private ParameterMetaData(int index,
 							  String name,
 							  Class<?> type,
 							  Set<MetaConstraint<?>> constraints,
 							  boolean isCascading,
-							  Map<Class<?>, Class<?>> groupConversions) {
+							  Map<Class<?>, Class<?>> groupConversions,
+							  boolean requiresUnwrapping) {
 		super(
 				name,
 				type,
 				constraints,
 				ElementKind.PARAMETER,
 				isCascading,
-				!constraints.isEmpty() || isCascading
+				!constraints.isEmpty() || isCascading,
+				requiresUnwrapping
 		);
 
 		this.index = index;
@@ -152,7 +146,8 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					parameterType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					isCascading(),
-					getGroupConversions()
+					getGroupConversions(),
+					requiresUnwrapping()
 			);
 		}
 	}

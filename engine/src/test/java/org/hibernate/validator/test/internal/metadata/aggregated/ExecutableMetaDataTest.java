@@ -208,6 +208,30 @@ public class ExecutableMetaDataTest {
 	}
 
 	@Test
+	public void requiresUnwrappingForMethod() throws Exception {
+		Method method = CustomerRepositoryExt.class.getMethod( "methodRequiringUnwrapping" );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
+				ExecutableElement.forMethod(
+						method
+				)
+		);
+
+		assertTrue( methodMetaData.requiresUnwrapping() );
+	}
+
+	@Test
+	public void requiresUnwrappingForConstructor() throws Exception {
+		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( long.class );
+		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor(
+				ExecutableElement.forConstructor(
+						constructor
+				)
+		);
+
+		assertTrue( constructorMetaData.requiresUnwrapping() );
+	}
+
+	@Test
 	public void methodWithConstrainedParameter() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
@@ -386,6 +410,7 @@ public class ExecutableMetaDataTest {
 		assertFalse( methodMetaData.isConstrained() );
 		assertThat( methodMetaData ).isEmpty();
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
+		assertFalse( methodMetaData.requiresUnwrapping() );
 
 		assertThat( methodMetaData.getParameterMetaData( 0 ).isConstrained() ).isFalse();
 		assertThat( methodMetaData.getParameterMetaData( 0 ).isCascading() ).isFalse();

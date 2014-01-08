@@ -40,29 +40,22 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	private final Set<MetaConstraint<?>> constraints;
 	private final boolean isCascading;
 	private final boolean isConstrained;
+	private final boolean requiresUnwrapping;
 
-	/**
-	 * @param name the name of the constrained property, method or parameter
-	 * @param type the type of the constrained element
-	 * @param constraints the set of constraints
-	 * @param constrainedMetaDataKind the type of constraint - property, method or parameter constraint
-	 * @param isCascading should cascading constraints be evaluated. Returns {@code true} is the constrained element
-	 * is marked for cascaded validation ({@code @Valid}), {@code false} otherwise.
-	 * @param isConstrained returns {@code true} is there are direct constraints defined on this element or it is
-	 * marked for cascaded validation, {@code false} otherwise.
-	 */
 	public AbstractConstraintMetaData(String name,
 									  Type type,
 									  Set<MetaConstraint<?>> constraints,
 									  ElementKind constrainedMetaDataKind,
 									  boolean isCascading,
-									  boolean isConstrained) {
+									  boolean isConstrained,
+									  boolean requiresUnwrapping) {
 		this.name = name;
 		this.type = type;
 		this.constraints = Collections.unmodifiableSet( constraints );
 		this.constrainedMetaDataKind = constrainedMetaDataKind;
 		this.isCascading = isCascading;
 		this.isConstrained = isConstrained;
+		this.requiresUnwrapping = requiresUnwrapping;
 	}
 
 	@Override
@@ -100,11 +93,17 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	}
 
 	@Override
+	public boolean requiresUnwrapping() {
+		return requiresUnwrapping;
+	}
+
+	@Override
 	public String toString() {
-		return "AbstractConstraintMetaData [name=" + name
+		return "AbstractConstraintMetaData [name=" + name + ", type=" + type
 				+ ", constrainedMetaDataKind=" + constrainedMetaDataKind
 				+ ", constraints=" + constraints + ", isCascading="
-				+ isCascading + ", isConstrained=" + isConstrained + "]";
+				+ isCascading + ", isConstrained=" + isConstrained
+				+ ", requiresUnwrapping=" + requiresUnwrapping + "]";
 	}
 
 	@Override

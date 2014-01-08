@@ -41,14 +41,16 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param groupConversions The group conversions of the represented field, if any.
 	 * @param isCascading Whether a cascaded validation of the represented field shall
 	 * be performed or not.
+	 * @param requiresUnwrapping Whether the value of the field must be unwrapped prior to validation or not
 	 */
 	public ConstrainedField(ConfigurationSource source,
 							BeanConstraintLocation location,
 							Set<MetaConstraint<?>> constraints,
 							Map<Class<?>, Class<?>> groupConversions,
-							boolean isCascading) {
+							boolean isCascading,
+							boolean requiresUnwrapping) {
 
-		super( source, ConstrainedElementKind.FIELD, location, constraints, groupConversions, isCascading );
+		super( source, ConstrainedElementKind.FIELD, location, constraints, groupConversions, isCascading, requiresUnwrapping );
 
 		Member member = location.getMember();
 		if ( member != null && isConstrained() ) {

@@ -52,11 +52,13 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.unwrapping.UnwrapValidatedValue;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for {@link AnnotationMetaDataProvider}.
@@ -335,6 +337,84 @@ public class AnnotationMetaDataProviderTest {
 		provider.getBeanConfigurationForHierarchy( User3.class );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-819")
+	public void unwrapValidatedValueOnField() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
+
+		ConstrainedField constrainedField = findConstrainedField( beanConfigurations, GolfPlayer.class, "name" );
+
+		assertTrue( constrainedField.requiresUnwrapping() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-819")
+	public void unwrapValidatedValueOnProperty() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
+
+		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
+				beanConfigurations,
+				GolfPlayer.class,
+				"getHandicap"
+		);
+
+		assertTrue( constrainedMethod.requiresUnwrapping() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-819")
+	public void unwrapValidatedValueOnMethod() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
+
+		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
+				beanConfigurations,
+				GolfPlayer.class,
+				"enterTournament"
+		);
+
+		assertTrue( constrainedMethod.requiresUnwrapping() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-819")
+	public void unwrapValidatedValueOnConstructor() throws Exception {
+		@SuppressWarnings("rawtypes")
+		List<BeanConfiguration<? super Wrapper>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				Wrapper.class
+		);
+
+		ConstrainedExecutable constrainedConstructor = findConstrainedConstructor(
+				beanConfigurations,
+				Wrapper.class,
+				Object.class
+		);
+
+		assertTrue( constrainedConstructor.requiresUnwrapping() );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-819")
+	public void unwrapValidatedValueOnParameter() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
+
+		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
+				beanConfigurations,
+				GolfPlayer.class,
+				"practice",
+				Wrapper.class
+		);
+
+		assertTrue( constrainedMethod.getParameterMetaData( 0 ).requiresUnwrapping() );
+	}
+
 	private <T> ConstrainedField findConstrainedField(Iterable<BeanConfiguration<? super T>> beanConfigurations,
 			Class<? super T> clazz, String fieldName) throws Exception {
 		return (ConstrainedField) findConstrainedElement( beanConfigurations, clazz.getDeclaredField( fieldName ) );
@@ -535,5 +615,35 @@ public class AnnotationMetaDataProviderTest {
 		Class<? extends Payload>[] payload() default { };
 
 		String value();
+	}
+
+	private static class GolfPlayer {
+
+		@UnwrapValidatedValue
+		private Wrapper<String> name;
+
+		@UnwrapValidatedValue
+		public Wrapper<Double> getHandicap() {
+			return null;
+		}
+
+		@UnwrapValidatedValue
+		public Wrapper<Boolean> enterTournament() {
+			return null;
+		}
+
+		@SuppressWarnings("unused")
+		public void practice(@UnwrapValidatedValue Wrapper<Integer> numberOfBalls) {
+		}
+	}
+
+	private static class Wrapper<T> {
+		@SuppressWarnings("unused")
+		public T value;
+
+		@UnwrapValidatedValue
+		public Wrapper(T value) {
+			this.value = value;
+		}
 	}
 }

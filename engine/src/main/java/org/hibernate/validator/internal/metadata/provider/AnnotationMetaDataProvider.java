@@ -59,6 +59,7 @@ import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.unwrapping.UnwrapValidatedValue;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -245,13 +246,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 
 		boolean isCascading = field.isAnnotationPresent( Valid.class );
+		boolean requiresUnwrapping = field.isAnnotationPresent( UnwrapValidatedValue.class );
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
 				new BeanConstraintLocation( field ),
 				constraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				requiresUnwrapping
 		);
 	}
 
@@ -331,12 +334,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		Set<MetaConstraint<?>> returnValueConstraints;
 		Map<Class<?>, Class<?>> groupConversions;
 		boolean isCascading;
+		boolean requiresUnwrapping = false;
 		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable.getMember() ) ) {
 			returnValueConstraints = Collections.emptySet();
 			groupConversions = Collections.emptyMap();
 			isCascading = false;
 		}
 		else {
+			requiresUnwrapping = executable.getAccessibleObject().isAnnotationPresent( UnwrapValidatedValue.class );
+
 			returnValueConstraints = convertToMetaConstraints(
 					executableConstraints.get( ConstraintType.GENERIC ),
 					executable
@@ -355,7 +361,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				crossParameterConstraints,
 				returnValueConstraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				requiresUnwrapping
 		);
 	}
 
@@ -396,6 +403,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
 			ConvertGroup groupConversion = null;
 			ConvertGroup.List groupConversionList = null;
+			boolean requiresUnwrapping = false;
 
 			if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( executable.getMember(), i ) ) {
 				metaData.add(
@@ -405,6 +413,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 								parameterName,
 								parameterConstraints,
 								getGroupConversions( groupConversion, groupConversionList ),
+								false,
 								false
 						)
 				);
@@ -413,28 +422,30 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			}
 
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
-				//1. collect constraints if this annotation is a constraint annotation
-				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						executable.getMember(), parameterAnnotation, ElementType.PARAMETER
-				);
-				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
-					parameterConstraints.add(
-							createParameterMetaConstraint(
-									executable, i, constraintDescriptorImpl
-							)
-					);
-				}
-
-				//2. mark parameter as cascading if this annotation is the @Valid annotation
+				//1. mark parameter as cascading if this annotation is the @Valid annotation
 				if ( parameterAnnotation.annotationType().equals( Valid.class ) ) {
 					parameterIsCascading = true;
 				}
-				//3. determine group conversions
+				//2. determine group conversions
 				else if ( parameterAnnotation.annotationType().equals( ConvertGroup.class ) ) {
 					groupConversion = (ConvertGroup) parameterAnnotation;
 				}
 				else if ( parameterAnnotation.annotationType().equals( ConvertGroup.List.class ) ) {
 					groupConversionList = (ConvertGroup.List) parameterAnnotation;
+				}
+				//3. unwrapping required?
+				else if ( parameterAnnotation.annotationType().equals( UnwrapValidatedValue.class ) ) {
+					requiresUnwrapping = true;
+				}
+
+				//4. collect constraints if this annotation is a constraint annotation
+				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
+						executable.getMember(), parameterAnnotation, ElementType.PARAMETER
+				);
+				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
+					parameterConstraints.add(
+							createParameterMetaConstraint( executable, i, constraintDescriptorImpl )
+					);
 				}
 			}
 
@@ -445,7 +456,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 							parameterName,
 							parameterConstraints,
 							getGroupConversions( groupConversion, groupConversionList ),
-							parameterIsCascading
+							parameterIsCascading,
+							requiresUnwrapping
 					)
 			);
 			i++;
@@ -561,15 +573,16 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( declaringClass ) );
 	}
 
-	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member,
-			ConstraintDescriptorImpl<A> descriptor) {
+	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( member ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(ExecutableElement member,
-			int parameterIndex,
-			ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member, parameterIndex ) );
+			int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<A>(
+				descriptor,
+				new ExecutableConstraintLocation( member, parameterIndex )
+		);
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member,

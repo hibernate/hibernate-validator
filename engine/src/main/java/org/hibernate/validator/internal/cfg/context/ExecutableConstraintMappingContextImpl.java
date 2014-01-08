@@ -136,7 +136,8 @@ public class ExecutableConstraintMappingContextImpl
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
-				returnValueContext != null ? returnValueContext.isCascading() : false
+				returnValueContext != null ? returnValueContext.isCascading() : false,
+				false
 		);
 	}
 

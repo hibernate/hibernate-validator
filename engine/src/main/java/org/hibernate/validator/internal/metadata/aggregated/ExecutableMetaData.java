@@ -93,14 +93,16 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Map<Class<?>, Class<?>> returnValueGroupConversions,
 			boolean isCascading,
 			boolean isConstrained,
-			boolean isGetter) {
+			boolean isGetter,
+			boolean requiresUnwrapping) {
 		super(
 				name,
 				returnType,
 				returnValueConstraints,
 				kind,
 				isCascading,
-				isConstrained
+				isConstrained,
+				requiresUnwrapping
 		);
 
 		this.parameterTypes = parameterTypes;
@@ -111,7 +113,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				returnType,
 				returnValueConstraints,
 				isCascading,
-				returnValueGroupConversions
+				returnValueGroupConversions,
+				requiresUnwrapping
 		);
 		this.isGetter = isGetter;
 	}
@@ -377,7 +380,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					getGroupConversions(),
 					isCascading(),
 					isConstrained,
-					executableElement.isGetterMethod()
+					executableElement.isGetterMethod(),
+					requiresUnwrapping()
 			);
 		}
 
