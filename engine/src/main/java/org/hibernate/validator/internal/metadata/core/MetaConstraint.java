@@ -79,7 +79,7 @@ public class MetaConstraint<A extends Annotation> {
 
 	public boolean validateConstraint(ValidationContext<?> executionContext, ValueContext<?, ?> valueContext) {
 		valueContext.setElementType( getElementType() );
-		valueContext.setTypeOfAnnotatedElement( location.typeOfAnnotatedElement() );
+		valueContext.setTypeOfAnnotatedElement( location.getTypeForValidatorResolution() );
 
 		boolean validationResult = constraintTree.validateConstraints( executionContext, valueContext );
 		executionContext.markConstraintProcessed( valueContext.getCurrentBean(), valueContext.getPropertyPath(), this );

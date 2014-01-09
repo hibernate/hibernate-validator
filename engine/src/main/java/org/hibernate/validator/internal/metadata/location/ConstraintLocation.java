@@ -24,7 +24,17 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 
 /**
- * Describes the location at which a constraint is specified (a bean, a method parameter etc.).
+ * Provides information related to the location a constraint is declared on (e.g. a bean, field or method parameter).
+ * <p>
+ * Note that while the validation engine works on the aggregated meta-model (which e.g. provides a unified view for
+ * properties, be them represented via fields or getter methods) most of the time, in some situations the physical
+ * element which hosts a constraint is relevant. This includes
+ * <ul>
+ * <li>retrieval of property values to be validated (either field or getter access)</li>
+ * <li>constraint validator resolution; a field and the corresponding getter method may have different types, causing
+ * potentially different validators to kick in for the constraints declared on either element</li>
+ * <li>determination of a constraint's scope (locally defined or up in the hierarchy)</li>
+ * </ul>
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
@@ -37,23 +47,23 @@ public class ConstraintLocation {
 	private final Member member;
 
 	/**
-	 * The class of the bean hosting this constraint.
+	 * The type hosting this location.
 	 */
-	private final Class<?> beanClass;
+	private final Class<?> declaringClass;
 
 	/**
-	 * The type of the annotated element
+	 * The type to be used for validator resolution for constraints at this location.
 	 */
-	private final Type typeOfAnnotatedElement;
+	private final Type typeForValidatorResolution;
 
-	public static ConstraintLocation forClass(Class<?> beanClass) {
+	public static ConstraintLocation forClass(Class<?> declaringClass) {
 		// HV-623 - create a ParameterizedType in case the class has type parameters. Needed for constraint validator
 		// resolution (HF)
-		Type type = beanClass.getTypeParameters().length == 0 ?
-				beanClass :
-				TypeHelper.parameterizedType( beanClass, beanClass.getTypeParameters() );
+		Type type = declaringClass.getTypeParameters().length == 0 ?
+				declaringClass :
+				TypeHelper.parameterizedType( declaringClass, declaringClass.getTypeParameters() );
 
-		return new ConstraintLocation( beanClass, null, type );
+		return new ConstraintLocation( declaringClass, null, type );
 	}
 
 	public static ConstraintLocation forProperty(Member member) {
@@ -88,50 +98,51 @@ public class ConstraintLocation {
 		);
 	}
 
-	private ConstraintLocation(Class<?> beanClass, Member member, Type typeOfAnnotatedElement) {
-		this.beanClass = beanClass;
+	private ConstraintLocation(Class<?> declaringClass, Member member, Type typeOfAnnotatedElement) {
+		this.declaringClass = declaringClass;
 		this.member = member;
 
 		if ( typeOfAnnotatedElement instanceof Class && ( (Class<?>) typeOfAnnotatedElement ).isPrimitive() ) {
-			this.typeOfAnnotatedElement = ReflectionHelper.boxedType( (Class<?>) typeOfAnnotatedElement );
+			this.typeForValidatorResolution = ReflectionHelper.boxedType( (Class<?>) typeOfAnnotatedElement );
 		}
 		else {
-			this.typeOfAnnotatedElement = typeOfAnnotatedElement;
+			this.typeForValidatorResolution = typeOfAnnotatedElement;
 		}
 	}
 
 	/**
-	 * Returns the class on which the constraint is defined.
+	 * Returns the class hosting this location.
 	 *
-	 * @return the class on which the constraint is defined.
+	 * @return the class hosting this location
 	 */
-	public Class<?> getBeanClass() {
-		return beanClass;
+	public Class<?> getDeclaringClass() {
+		return declaringClass;
 	}
 
 	/**
-	 * Returns the member the constraint is defined on.
+	 * Returns the member represented by this location.
 	 *
-	 * @return the member the constraint is defined on.
+	 * @return the member represented by this location. Will be {@code null} when this location represents a type.
 	 */
 	public Member getMember() {
 		return member;
 	}
 
 	/**
-	 * Returns the type of the element at this constraint location. Depending
-	 * on the concrete implementation this might be the type of an annotated bean, method parameter etc.
+	 * Returns the type to be used when resolving constraint validators for constraints at this location. Note that this
+	 * is not always the same type as the type of the element described by this location; E.g. the wrapper type will is
+	 * used for constraint validator resolution, if a constraint is declared in an element with a primitive type.
 	 *
-	 * @return The type of the element at this constraint location.
+	 * @return The type to be used when resolving constraint validators for constraints at this location
 	 */
-	public Type typeOfAnnotatedElement() {
-		return typeOfAnnotatedElement;
+	public Type getTypeForValidatorResolution() {
+		return typeForValidatorResolution;
 	}
 
 	@Override
 	public String toString() {
-		return "ConstraintLocation [member=" + member + ", beanClass="
-				+ beanClass + ", typeOfAnnotatedElement="
-				+ typeOfAnnotatedElement + "]";
+		return "ConstraintLocation [member=" + member + ", declaringClass="
+				+ declaringClass + ", typeForValidatorResolution="
+				+ typeForValidatorResolution + "]";
 	}
 }
