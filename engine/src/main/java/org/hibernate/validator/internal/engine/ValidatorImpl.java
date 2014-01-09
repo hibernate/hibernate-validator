@@ -60,6 +60,7 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
@@ -131,6 +132,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final boolean failFast;
 
 	/**
+	 * Used for resolving generic type information.
+	 */
+	private final TypeResolutionHelper typeResolutionHelper;
+
+	/**
 	 * Contains unwrappers to be applied when validating elements annotated with {@code UnwrapValidationValue}.
 	 */
 	private final List<ValidationValueUnwrapper<?>> validationValueUnwrappers;
@@ -140,6 +146,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						 TraversableResolver traversableResolver,
 						 BeanMetaDataManager beanMetaDataManager,
 						 ParameterNameProvider parameterNameProvider,
+						 TypeResolutionHelper typeResolutionHelper,
 						 List<ValidationValueUnwrapper<?>> validationValueUnwrappers,
 						 ConstraintValidatorManager constraintValidatorManager,
 						 boolean failFast) {
@@ -148,6 +155,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.parameterNameProvider = parameterNameProvider;
+		this.typeResolutionHelper = typeResolutionHelper;
 		this.validationValueUnwrappers = validationValueUnwrappers;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
@@ -1428,8 +1436,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @return the unwrapper for the given type or {@code null} if no matching unwrapper was found
 	 */
 	public ValidationValueUnwrapper<?> getValidationValueUnwrapper(Type type) {
-		//TODO re-use shared instance
-		TypeResolver typeResolver = new TypeResolver();
+		TypeResolver typeResolver = typeResolutionHelper.getTypeResolver();
 
 		for ( ValidationValueUnwrapper<?> unwrapper : validationValueUnwrappers ) {
 			ResolvedType unwrapperType = typeResolver.resolve( unwrapper.getClass() );

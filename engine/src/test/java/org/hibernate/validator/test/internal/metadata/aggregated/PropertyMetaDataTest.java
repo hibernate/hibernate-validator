@@ -30,6 +30,7 @@ import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.unwrapping.UnwrapValidatedValue;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertFalse;
@@ -44,7 +45,10 @@ public class PropertyMetaDataTest {
 
 	@BeforeMethod
 	public void setupBeanMetaDataManager() {
-		beanMetaDataManager = new BeanMetaDataManager( new ConstraintHelper(), new ExecutableHelper() );
+		beanMetaDataManager = new BeanMetaDataManager(
+				new ConstraintHelper(),
+				new ExecutableHelper( new TypeResolutionHelper() )
+		);
 	}
 
 	@Test

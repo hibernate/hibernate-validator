@@ -39,6 +39,7 @@ import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
@@ -93,6 +94,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	/**
 	 * Used for resolving type parameters. Thread-safe.
 	 */
+	private final TypeResolutionHelper typeResolutionHelper;
+
+	/**
+	 * Used for discovering overridden methods. Thread-safe.
+	 */
 	private final ExecutableHelper executableHelper;
 
 	/**
@@ -125,7 +131,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.parameterNameProvider = configurationState.getParameterNameProvider();
 		this.beanMetaDataManagerMap = Collections.synchronizedMap( new IdentityHashMap<ParameterNameProvider, BeanMetaDataManager>() );
 		this.constraintHelper = new ConstraintHelper();
-		this.executableHelper = new ExecutableHelper();
+		this.typeResolutionHelper = new TypeResolutionHelper();
+		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
 		this.constraintMappings = newHashSet();
 
 		// HV-302; don't load XmlMappingParser if not necessary
@@ -248,6 +255,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				beanMetaDataManager,
 				parameterNameProvider,
+				typeResolutionHelper,
 				validationValueUnwrappers,
 				constraintValidatorManager,
 				failFast

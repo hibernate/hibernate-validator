@@ -39,7 +39,11 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
  */
 public final class ExecutableHelper {
 
-	private final TypeResolver typeResolver = new TypeResolver();
+	private final TypeResolver typeResolver;
+
+	public ExecutableHelper(TypeResolutionHelper typeResolutionHelper) {
+		this.typeResolver = typeResolutionHelper.getTypeResolver();
+	}
 
 	/**
 	 * Checks, whether the represented method overrides the given method.
