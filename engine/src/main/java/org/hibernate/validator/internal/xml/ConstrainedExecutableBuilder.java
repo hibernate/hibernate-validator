@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ParameterNameProvider;
 import javax.validation.ValidationException;
 
@@ -28,8 +29,7 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.metadata.location.CrossParameterConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
@@ -222,7 +222,7 @@ public class ConstrainedExecutableBuilder {
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.XML,
-				new ExecutableConstraintLocation( executableElement ),
+				ConstraintLocation.forReturnValue( executableElement ),
 				parameterMetaData,
 				crossParameterConstraints,
 				returnValueConstraints,
@@ -243,9 +243,7 @@ public class ConstrainedExecutableBuilder {
 			return crossParameterConstraints;
 		}
 
-		CrossParameterConstraintLocation constraintLocation = new CrossParameterConstraintLocation(
-				executableElement
-		);
+		ConstraintLocation constraintLocation = ConstraintLocation.forCrossParameter( executableElement );
 
 		for ( ConstraintType constraintType : crossParameterType.getConstraint() ) {
 			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
@@ -281,7 +279,7 @@ public class ConstrainedExecutableBuilder {
 			return false;
 		}
 
-		ExecutableConstraintLocation constraintLocation = new ExecutableConstraintLocation( executableElement );
+		ConstraintLocation constraintLocation = ConstraintLocation.forReturnValue( executableElement );
 		for ( ConstraintType constraint : returnValueType.getConstraint() ) {
 			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
 					constraintLocation,

@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 /**
  * Represents a Java type and all its associated meta-data relevant in the
@@ -38,7 +38,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 	 * @param location The location of the represented type.
 	 * @param constraints The constraints of the represented type, if any.
 	 */
-	public ConstrainedType(ConfigurationSource source, BeanConstraintLocation location, Set<MetaConstraint<?>> constraints) {
+	public ConstrainedType(ConfigurationSource source, ConstraintLocation location, Set<MetaConstraint<?>> constraints) {
 
 		super(
 				source,
@@ -52,7 +52,34 @@ public class ConstrainedType extends AbstractConstrainedElement {
 	}
 
 	@Override
-	public BeanConstraintLocation getLocation() {
-		return (BeanConstraintLocation) super.getLocation();
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result
+				+ ( ( getLocation().getBeanClass() == null ) ? 0 : getLocation().getBeanClass().hashCode() );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( !super.equals( obj ) ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ConstrainedType other = (ConstrainedType) obj;
+		if ( getLocation().getBeanClass() == null ) {
+			if ( other.getLocation().getBeanClass() != null ) {
+				return false;
+			}
+		}
+		else if ( !getLocation().getBeanClass().equals( other.getLocation().getBeanClass() ) ) {
+			return false;
+		}
+		return true;
 	}
 }

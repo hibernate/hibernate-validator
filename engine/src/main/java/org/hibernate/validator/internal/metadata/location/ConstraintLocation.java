@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2010, Red Hat Middleware LLC, and individual contributors
+* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -18,22 +18,117 @@ package org.hibernate.validator.internal.metadata.location;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeHelper;
+
 /**
- * Implementations describe the location at which a constraint is specified (a
- * bean, a method parameter etc.).
+ * Describes the location at which a constraint is specified (a bean, a method parameter etc.).
  *
+ * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public interface ConstraintLocation {
+public class ConstraintLocation {
+
+	/**
+	 * The member the constraint was defined on.
+	 */
+	private final Member member;
+
+	/**
+	 * The class of the bean hosting this constraint.
+	 */
+	private final Class<?> beanClass;
+
+	/**
+	 * The type of element hosting this constraint. One of TYPE, FIELD or METHOD.
+	 */
+	private final ElementType elementType;
+
+	/**
+	 * The type of the annotated element
+	 */
+	private final Type typeOfAnnotatedElement;
+
+	public static ConstraintLocation forClass(Class<?> beanClass) {
+		// HV-623 - create a ParameterizedType in case the class has type parameters. Needed for constraint validator
+		// resolution (HF)
+		Type type = beanClass.getTypeParameters().length == 0 ?
+				beanClass :
+				TypeHelper.parameterizedType( beanClass, beanClass.getTypeParameters() );
+
+		return new ConstraintLocation( beanClass, null, ElementType.TYPE, type );
+	}
+
+	public static ConstraintLocation forProperty(Member member) {
+		return new ConstraintLocation(
+				member.getDeclaringClass(),
+				member,
+				( member instanceof Method ) ? ElementType.METHOD : ElementType.FIELD,
+				ReflectionHelper.typeOf( member )
+		);
+	}
+
+	public static ConstraintLocation forReturnValue(ExecutableElement executable) {
+		return new ConstraintLocation(
+				executable.getMember().getDeclaringClass(),
+				executable.getMember(),
+				executable.getElementType(),
+				ReflectionHelper.typeOf( executable.getMember() )
+		);
+	}
+
+	public static ConstraintLocation forCrossParameter(ExecutableElement executable) {
+		return new ConstraintLocation(
+				executable.getMember().getDeclaringClass(),
+				executable.getMember(),
+				executable.getElementType(),
+				Object[].class
+		);
+	}
+
+	public static ConstraintLocation forParameter(ExecutableElement executable, int index) {
+		return new ConstraintLocation(
+				executable.getMember().getDeclaringClass(),
+				executable.getMember(),
+				ElementType.PARAMETER,
+				ReflectionHelper.typeOf( executable, index )
+		);
+	}
+
+	private ConstraintLocation(Class<?> beanClass, Member member, ElementType elementType, Type typeOfAnnotatedElement) {
+		this.beanClass = beanClass;
+		this.member = member;
+		this.elementType = elementType;
+
+		if ( typeOfAnnotatedElement instanceof Class && ( (Class<?>) typeOfAnnotatedElement ).isPrimitive() ) {
+			this.typeOfAnnotatedElement = ReflectionHelper.boxedType( (Class<?>) typeOfAnnotatedElement );
+		}
+		else {
+			this.typeOfAnnotatedElement = typeOfAnnotatedElement;
+		}
+	}
 
 	/**
 	 * Returns the class on which the constraint is defined.
 	 *
 	 * @return the class on which the constraint is defined.
 	 */
-	Class<?> getBeanClass();
+	public Class<?> getBeanClass() {
+		return beanClass;
+	}
+
+	/**
+	 * Returns the member the constraint is defined on.
+	 *
+	 * @return the member the constraint is defined on.
+	 */
+	public Member getMember() {
+		return member;
+	}
 
 	/**
 	 * Returns the type of the element at this constraint location. Depending
@@ -41,19 +136,23 @@ public interface ConstraintLocation {
 	 *
 	 * @return The type of the element at this constraint location.
 	 */
-	Type typeOfAnnotatedElement();
+	public Type typeOfAnnotatedElement() {
+		return typeOfAnnotatedElement;
+	}
 
 	/**
 	 * Returns the {@code ElementType} on which the constraint is defined.
 	 *
 	 * @return the {@code ElementType} on which the constraint is defined.
 	 */
-	ElementType getElementType();
+	public ElementType getElementType() {
+		return elementType;
+	}
 
-	/**
-	 * Returns the member the constraint is defined on.
-	 *
-	 * @return the member the constraint is defined on.
-	 */
-	Member getMember();
+	@Override
+	public String toString() {
+		return "BeanConstraintLocation [member=" + member + ", beanClass="
+				+ beanClass + ", elementType=" + elementType
+				+ ", typeOfAnnotatedElement=" + typeOfAnnotatedElement + "]";
+	}
 }

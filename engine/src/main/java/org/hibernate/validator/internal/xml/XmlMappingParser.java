@@ -276,13 +276,18 @@ public class XmlMappingParser {
 		if ( constrainedElements.containsKey( beanClass ) ) {
 			Set<ConstrainedElement> existingConstrainedElements = constrainedElements.get( beanClass );
 			for ( ConstrainedElement constrainedElement : newConstrainedElements ) {
-				if ( existingConstrainedElements.contains( constrainedElement ) ) {
-					ConstraintLocation location = constrainedElement.getLocation();
-					throw log.getConstrainedElementConfiguredMultipleTimesException( location.getMember().toString() );
+				for ( ConstrainedElement existingConstrainedElement : existingConstrainedElements ) {
+					if ( existingConstrainedElement.getLocation().getMember() != null &&
+							existingConstrainedElement.getLocation().getMember().equals(
+									constrainedElement.getLocation().getMember()
+							) ) {
+						ConstraintLocation location = constrainedElement.getLocation();
+						throw log.getConstrainedElementConfiguredMultipleTimesException(
+								location.getMember().toString()
+						);
+					}
 				}
-				else {
-					existingConstrainedElements.add( constrainedElement );
-				}
+				existingConstrainedElements.add( constrainedElement );
 			}
 		}
 		else {

@@ -1049,7 +1049,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					if ( parameterMetaData.getType() instanceof Class && ( (Class<?>) parameterMetaData.getType() ).isPrimitive() ) {
 						valueType = ReflectionHelper.unBoxedType( valueType );
 					}
-					if ( !TypeHelper.isAssignable( parameterMetaData.getType(), valueType ) ) {
+					if ( !TypeHelper.isAssignable( TypeHelper.getErasedType( parameterMetaData.getType() ), valueType ) ) {
 						throw log.getParameterTypesDoNotMatchException(
 								valueType.getName(),
 								parameterMetaData.getType().toString(),

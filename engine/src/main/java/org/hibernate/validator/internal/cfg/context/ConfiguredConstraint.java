@@ -21,9 +21,7 @@ import java.lang.reflect.Member;
 import java.util.Map;
 
 import org.hibernate.validator.cfg.ConstraintDef;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
@@ -36,41 +34,36 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  *
  * @author Gunnar Morling
  */
-public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLocation> {
+public class ConfiguredConstraint<A extends Annotation> {
 
 	private static final Log log = LoggerFactory.make();
 
 	private final ConstraintDefAccessor<A> constraint;
-	private final L location;
+	private final ConstraintLocation location;
 
-	private ConfiguredConstraint(ConstraintDef<?, A> constraint, L location) {
+	private ConfiguredConstraint(ConstraintDef<?, A> constraint, ConstraintLocation location) {
 
 		this.constraint = new ConstraintDefAccessor<A>( constraint );
 		this.location = location;
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
-		return new ConfiguredConstraint<A, BeanConstraintLocation>(
-				constraint, new BeanConstraintLocation( beanType )
+	public static <A extends Annotation> ConfiguredConstraint<A> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
+		return new ConfiguredConstraint<A>( constraint, ConstraintLocation.forClass( beanType ) );
+	}
+
+	public static <A extends Annotation> ConfiguredConstraint<A> forProperty(ConstraintDef<?, A> constraint, Member member) {
+		return new ConfiguredConstraint<A>( constraint, ConstraintLocation.forProperty( member ) );
+	}
+
+	public static <A extends Annotation> ConfiguredConstraint<A> forParameter(ConstraintDef<?, A> constraint, ExecutableElement executable, int parameterIndex) {
+		return new ConfiguredConstraint<A>(
+				constraint, ConstraintLocation.forParameter( executable, parameterIndex )
 		);
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forProperty(ConstraintDef<?, A> constraint, Member member) {
-
-		return new ConfiguredConstraint<A, BeanConstraintLocation>(
-				constraint, new BeanConstraintLocation( member )
-		);
-	}
-
-	public static <A extends Annotation> ConfiguredConstraint<A, ExecutableConstraintLocation> forParameter(ConstraintDef<?, A> constraint, ExecutableElement executable, int parameterIndex) {
-		return new ConfiguredConstraint<A, ExecutableConstraintLocation>(
-				constraint, new ExecutableConstraintLocation( executable, parameterIndex )
-		);
-	}
-
-	public static <A extends Annotation> ConfiguredConstraint<A, ExecutableConstraintLocation> forExecutable(ConstraintDef<?, A> constraint, ExecutableElement executable) {
-		return new ConfiguredConstraint<A, ExecutableConstraintLocation>(
-				constraint, new ExecutableConstraintLocation( executable )
+	public static <A extends Annotation> ConfiguredConstraint<A> forExecutable(ConstraintDef<?, A> constraint, ExecutableElement executable) {
+		return new ConfiguredConstraint<A>(
+				constraint, ConstraintLocation.forReturnValue( executable )
 		);
 	}
 
@@ -78,7 +71,7 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 		return constraint;
 	}
 
-	public L getLocation() {
+	public ConstraintLocation getLocation() {
 		return location;
 	}
 

@@ -103,6 +103,12 @@ public abstract class ExecutableElement {
 		return getExecutableAsString( getSimpleName(), getParameterTypes() );
 	}
 
+	@Override
+	public abstract boolean equals(Object obj);
+
+	@Override
+	public abstract int hashCode();
+
 	/**
 	 * Returns a string representation of an executable with the given name and parameter types in the form
 	 * {@code <name>(<parameterType 0> ...  <parameterType n>)}, e.g. for logging purposes.
