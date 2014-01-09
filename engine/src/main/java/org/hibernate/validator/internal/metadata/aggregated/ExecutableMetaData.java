@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -83,7 +85,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 	private ExecutableMetaData(
 			String name,
-			Class<?> returnType,
+			Type returnType,
 			Class<?>[] parameterTypes,
 			ElementKind kind,
 			Set<MetaConstraint<?>> returnValueConstraints,
@@ -367,7 +369,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 			return new ExecutableMetaData(
 					executable.getSimpleName(),
-					executable.getReturnType(),
+					ReflectionHelper.typeOf( executable.getMember() ),
 					executable.getParameterTypes(),
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
 					adaptOriginsAndImplicitGroups( getConstraints() ),

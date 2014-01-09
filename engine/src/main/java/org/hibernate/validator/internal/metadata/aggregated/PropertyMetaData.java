@@ -169,7 +169,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			super( beanClass, constraintHelper );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedField.getLocation().getMember() );
-			this.propertyType = ( (Field) constrainedField.getLocation().getMember() ).getGenericType();
+			this.propertyType = ReflectionHelper.typeOf( constrainedField.getLocation().getMember() );
 			add( constrainedField );
 		}
 
@@ -185,7 +185,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			super( beanClass, constraintHelper );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getLocation().getMember() );
-			this.propertyType = constrainedMethod.getLocation().typeOfAnnotatedElement();
+			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getLocation().getMember() );
 			add( constrainedMethod );
 		}
 
