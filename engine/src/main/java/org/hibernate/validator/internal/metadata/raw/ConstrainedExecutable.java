@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -115,7 +114,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			boolean requiresUnwrapping) {
 		super(
 				source,
-				location.getElementType() == ElementType.CONSTRUCTOR ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
+				( location.getMember() instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				location,
 				returnValueConstraints,
 				groupConversions,
