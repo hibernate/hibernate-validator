@@ -94,7 +94,7 @@ public abstract class ConstraintMappingContextImplBase {
 				constraintHelper,
 				config.getLocation().getMember(),
 				config.createAnnotationProxy(),
-				config.getLocation().getElementType(),
+				config.getElementType(),
 				getConstraintType()
 		);
 

@@ -16,9 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
@@ -44,11 +42,6 @@ public class ConstraintLocation {
 	private final Class<?> beanClass;
 
 	/**
-	 * The type of element hosting this constraint. One of TYPE, FIELD or METHOD.
-	 */
-	private final ElementType elementType;
-
-	/**
 	 * The type of the annotated element
 	 */
 	private final Type typeOfAnnotatedElement;
@@ -60,14 +53,13 @@ public class ConstraintLocation {
 				beanClass :
 				TypeHelper.parameterizedType( beanClass, beanClass.getTypeParameters() );
 
-		return new ConstraintLocation( beanClass, null, ElementType.TYPE, type );
+		return new ConstraintLocation( beanClass, null, type );
 	}
 
 	public static ConstraintLocation forProperty(Member member) {
 		return new ConstraintLocation(
 				member.getDeclaringClass(),
 				member,
-				( member instanceof Method ) ? ElementType.METHOD : ElementType.FIELD,
 				ReflectionHelper.typeOf( member )
 		);
 	}
@@ -76,7 +68,6 @@ public class ConstraintLocation {
 		return new ConstraintLocation(
 				executable.getMember().getDeclaringClass(),
 				executable.getMember(),
-				executable.getElementType(),
 				ReflectionHelper.typeOf( executable.getMember() )
 		);
 	}
@@ -85,7 +76,6 @@ public class ConstraintLocation {
 		return new ConstraintLocation(
 				executable.getMember().getDeclaringClass(),
 				executable.getMember(),
-				executable.getElementType(),
 				Object[].class
 		);
 	}
@@ -94,15 +84,13 @@ public class ConstraintLocation {
 		return new ConstraintLocation(
 				executable.getMember().getDeclaringClass(),
 				executable.getMember(),
-				ElementType.PARAMETER,
 				ReflectionHelper.typeOf( executable, index )
 		);
 	}
 
-	private ConstraintLocation(Class<?> beanClass, Member member, ElementType elementType, Type typeOfAnnotatedElement) {
+	private ConstraintLocation(Class<?> beanClass, Member member, Type typeOfAnnotatedElement) {
 		this.beanClass = beanClass;
 		this.member = member;
-		this.elementType = elementType;
 
 		if ( typeOfAnnotatedElement instanceof Class && ( (Class<?>) typeOfAnnotatedElement ).isPrimitive() ) {
 			this.typeOfAnnotatedElement = ReflectionHelper.boxedType( (Class<?>) typeOfAnnotatedElement );
@@ -140,19 +128,10 @@ public class ConstraintLocation {
 		return typeOfAnnotatedElement;
 	}
 
-	/**
-	 * Returns the {@code ElementType} on which the constraint is defined.
-	 *
-	 * @return the {@code ElementType} on which the constraint is defined.
-	 */
-	public ElementType getElementType() {
-		return elementType;
-	}
-
 	@Override
 	public String toString() {
-		return "BeanConstraintLocation [member=" + member + ", beanClass="
-				+ beanClass + ", elementType=" + elementType
-				+ ", typeOfAnnotatedElement=" + typeOfAnnotatedElement + "]";
+		return "ConstraintLocation [member=" + member + ", beanClass="
+				+ beanClass + ", typeOfAnnotatedElement="
+				+ typeOfAnnotatedElement + "]";
 	}
 }

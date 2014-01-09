@@ -17,6 +17,8 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Map;
 
@@ -40,30 +42,36 @@ public class ConfiguredConstraint<A extends Annotation> {
 
 	private final ConstraintDefAccessor<A> constraint;
 	private final ConstraintLocation location;
+	private final ElementType elementType;
 
-	private ConfiguredConstraint(ConstraintDef<?, A> constraint, ConstraintLocation location) {
+	private ConfiguredConstraint(ConstraintDef<?, A> constraint, ConstraintLocation location, ElementType elementType) {
 
 		this.constraint = new ConstraintDefAccessor<A>( constraint );
 		this.location = location;
+		this.elementType = elementType;
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
-		return new ConfiguredConstraint<A>( constraint, ConstraintLocation.forClass( beanType ) );
+		return new ConfiguredConstraint<A>( constraint, ConstraintLocation.forClass( beanType ), ElementType.TYPE );
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forProperty(ConstraintDef<?, A> constraint, Member member) {
-		return new ConfiguredConstraint<A>( constraint, ConstraintLocation.forProperty( member ) );
+		return new ConfiguredConstraint<A>(
+				constraint,
+				ConstraintLocation.forProperty( member ),
+				( member instanceof Field ) ? ElementType.FIELD : ElementType.METHOD
+		);
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forParameter(ConstraintDef<?, A> constraint, ExecutableElement executable, int parameterIndex) {
 		return new ConfiguredConstraint<A>(
-				constraint, ConstraintLocation.forParameter( executable, parameterIndex )
+				constraint, ConstraintLocation.forParameter( executable, parameterIndex ), executable.getElementType()
 		);
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forExecutable(ConstraintDef<?, A> constraint, ExecutableElement executable) {
 		return new ConfiguredConstraint<A>(
-				constraint, ConstraintLocation.forReturnValue( executable )
+				constraint, ConstraintLocation.forReturnValue( executable ), executable.getElementType()
 		);
 	}
 
@@ -122,4 +130,7 @@ public class ConfiguredConstraint<A extends Annotation> {
 		}
 	}
 
+	public ElementType getElementType() {
+		return elementType;
+	}
 }

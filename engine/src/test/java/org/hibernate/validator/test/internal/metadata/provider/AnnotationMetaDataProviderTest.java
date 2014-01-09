@@ -127,7 +127,6 @@ public class AnnotationMetaDataProviderTest {
 						DateMidnight.class
 				)
 		);
-		assertThat( location.getElementType() ).isEqualTo( ElementType.METHOD );
 
 		MetaConstraint<?> constraint = createEvent.getCrossParameterConstraints().iterator().next();
 
@@ -441,7 +440,7 @@ public class AnnotationMetaDataProviderTest {
 			Class<? super T> type) {
 		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
 			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
-				if ( constrainedElement.getLocation().getElementType() == ElementType.TYPE ) {
+				if ( constrainedElement.getLocation().getMember() == null ) {
 					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
 					if ( constrainedType.getLocation().getBeanClass().equals( type ) ) {
 						return constrainedType;
