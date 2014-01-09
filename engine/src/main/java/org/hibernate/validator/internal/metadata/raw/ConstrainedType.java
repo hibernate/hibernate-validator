@@ -56,7 +56,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result
-				+ ( ( getLocation().getBeanClass() == null ) ? 0 : getLocation().getBeanClass().hashCode() );
+				+ ( ( getLocation().getDeclaringClass() == null ) ? 0 : getLocation().getDeclaringClass().hashCode() );
 		return result;
 	}
 
@@ -72,12 +72,12 @@ public class ConstrainedType extends AbstractConstrainedElement {
 			return false;
 		}
 		ConstrainedType other = (ConstrainedType) obj;
-		if ( getLocation().getBeanClass() == null ) {
-			if ( other.getLocation().getBeanClass() != null ) {
+		if ( getLocation().getDeclaringClass() == null ) {
+			if ( other.getLocation().getDeclaringClass() != null ) {
 				return false;
 			}
 		}
-		else if ( !getLocation().getBeanClass().equals( other.getLocation().getBeanClass() ) ) {
+		else if ( !getLocation().getDeclaringClass().equals( other.getLocation().getDeclaringClass() ) ) {
 			return false;
 		}
 		return true;

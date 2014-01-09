@@ -135,7 +135,7 @@ public class AnnotationMetaDataProviderTest {
 						.getAnnotation()
 						.annotationType()
 		).isEqualTo( ConsistentDateParameters.class );
-		assertThat( constraint.getLocation().typeOfAnnotatedElement() ).isEqualTo( Object[].class );
+		assertThat( constraint.getLocation().getTypeForValidatorResolution() ).isEqualTo( Object[].class );
 	}
 
 	@Test
@@ -442,7 +442,7 @@ public class AnnotationMetaDataProviderTest {
 			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
 				if ( constrainedElement.getLocation().getMember() == null ) {
 					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
-					if ( constrainedType.getLocation().getBeanClass().equals( type ) ) {
+					if ( constrainedType.getLocation().getDeclaringClass().equals( type ) ) {
 						return constrainedType;
 					}
 				}

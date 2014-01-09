@@ -150,13 +150,13 @@ public abstract class MetaDataBuilder {
 	}
 
 	private <A extends Annotation> MetaConstraint<A> adaptOriginAndImplicitGroup(MetaConstraint<A> constraint) {
-		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getBeanClass() );
+		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getDeclaringClass() );
 
 		if ( definedIn == ConstraintOrigin.DEFINED_LOCALLY ) {
 			return constraint;
 		}
 
-		Class<?> constraintClass = constraint.getLocation().getBeanClass();
+		Class<?> constraintClass = constraint.getLocation().getDeclaringClass();
 
 		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
 				constraintHelper,

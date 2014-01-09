@@ -452,7 +452,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
 					// time. An interface can define more than one constraint, we have to check the class we are validating.
-					final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
+					final Class<?> declaringClass = metaConstraint.getLocation().getDeclaringClass();
 					if ( declaringClass.isInterface() ) {
 						Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
 						if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
@@ -877,7 +877,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
 					// time. An interface can define more than one constraint, we have to check the class we are validating.
-					final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
+					final Class<?> declaringClass = metaConstraint.getLocation().getDeclaringClass();
 					if ( declaringClass.isInterface() ) {
 						Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
 						if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
