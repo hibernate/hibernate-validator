@@ -27,8 +27,7 @@ import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -104,7 +103,7 @@ public final class PropertyConstraintMappingContextImpl
 		if ( member instanceof Field ) {
 			return new ConstrainedField(
 					ConfigurationSource.API,
-					new BeanConstraintLocation( member ),
+					ConstraintLocation.forProperty( member ),
 					getConstraints( constraintHelper ),
 					groupConversions,
 					isCascading,
@@ -114,7 +113,7 @@ public final class PropertyConstraintMappingContextImpl
 		else {
 			return new ConstrainedExecutable(
 					ConfigurationSource.API,
-					new ExecutableConstraintLocation( (Method) member ),
+					ConstraintLocation.forProperty( member ),
 					getConstraints( constraintHelper ),
 					groupConversions,
 					isCascading,

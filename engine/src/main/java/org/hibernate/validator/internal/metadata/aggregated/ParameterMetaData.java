@@ -17,9 +17,11 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
@@ -46,7 +48,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 	private ParameterMetaData(int index,
 							  String name,
-							  Class<?> type,
+							  Type type,
 							  Set<MetaConstraint<?>> constraints,
 							  boolean isCascading,
 							  Map<Class<?>, Class<?>> groupConversions,
@@ -106,15 +108,15 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	}
 
 	public static class Builder extends MetaDataBuilder {
-		private final Class<?> parameterType;
+		private final Type parameterType;
 		private final int parameterIndex;
 		private String name;
 
 		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );
 
-			this.parameterType = constrainedParameter.getLocation().getParameterType();
-			this.parameterIndex = constrainedParameter.getLocation().getParameterIndex();
+			this.parameterType = constrainedParameter.getType();
+			this.parameterIndex = constrainedParameter.getIndex();
 
 			add( constrainedParameter );
 		}
@@ -125,7 +127,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				return false;
 			}
 
-			return ( (ConstrainedParameter) constrainedElement ).getLocation().getParameterIndex() == parameterIndex;
+			return ( (ConstrainedParameter) constrainedElement ).getIndex() == parameterIndex;
 		}
 
 		@Override
@@ -134,7 +136,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 			ConstrainedParameter constrainedParameter = (ConstrainedParameter) constrainedElement;
 
 			if ( name == null ) {
-				name = constrainedParameter.getParameterName();
+				name = constrainedParameter.getName();
 			}
 		}
 

@@ -41,9 +41,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.CrossParameterConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -151,7 +149,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			ConstrainedType classLevelMetaData =
 					new ConstrainedType(
 							ConfigurationSource.ANNOTATION,
-							new BeanConstraintLocation( beanClass ),
+							ConstraintLocation.forClass( beanClass ),
 							classLevelConstraints
 					);
 			constrainedElements.add( classLevelMetaData );
@@ -251,7 +249,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
-				new BeanConstraintLocation( field ),
+				ConstraintLocation.forProperty( field ),
 				constraints,
 				groupConversions,
 				isCascading,
@@ -357,7 +355,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.ANNOTATION,
-				new ExecutableConstraintLocation( executable ),
+				ConstraintLocation.forReturnValue( executable ),
 				parameterConstraints,
 				crossParameterConstraints,
 				returnValueConstraints,
@@ -410,7 +408,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				metaData.add(
 						new ConstrainedParameter(
 								ConfigurationSource.ANNOTATION,
-								new ExecutableConstraintLocation( executable, i ),
+								ConstraintLocation.forParameter( executable, i ),
+								ReflectionHelper.typeOf( executable, i ),
+								i,
 								parameterName,
 								parameterConstraints,
 								getGroupConversions( groupConversion, groupConversionList ),
@@ -453,7 +453,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			metaData.add(
 					new ConstrainedParameter(
 							ConfigurationSource.ANNOTATION,
-							new ExecutableConstraintLocation( executable, i ),
+							ConstraintLocation.forParameter( executable, i ),
+							ReflectionHelper.typeOf( executable, i ),
+							i,
 							parameterName,
 							parameterConstraints,
 							getGroupConversions( groupConversion, groupConversionList ),
@@ -571,29 +573,29 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass,
 			ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( declaringClass ) );
+		return new MetaConstraint<A>( descriptor, ConstraintLocation.forClass( declaringClass ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( member ) );
+		return new MetaConstraint<A>( descriptor, ConstraintLocation.forProperty( member ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(ExecutableElement member,
 			int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<A>(
 				descriptor,
-				new ExecutableConstraintLocation( member, parameterIndex )
+				ConstraintLocation.forParameter( member, parameterIndex )
 		);
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member,
 			ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member ) );
+		return new MetaConstraint<A>( descriptor, ConstraintLocation.forReturnValue( member ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(ExecutableElement member,
 			ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new CrossParameterConstraintLocation( member ) );
+		return new MetaConstraint<A>( descriptor, ConstraintLocation.forCrossParameter( member ) );
 	}
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Member member,

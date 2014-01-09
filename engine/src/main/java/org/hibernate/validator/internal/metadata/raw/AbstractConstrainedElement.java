@@ -108,7 +108,6 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ( ( location == null ) ? 0 : location.hashCode() );
 		result = prime * result + ( ( source == null ) ? 0 : source.hashCode() );
 		return result;
 	}
@@ -125,20 +124,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 			return false;
 		}
 		AbstractConstrainedElement other = (AbstractConstrainedElement) obj;
-		if ( location == null ) {
-			if ( other.location != null ) {
-				return false;
-			}
-		}
-		else if ( !location.equals( other.location ) ) {
-			return false;
-		}
-		if ( source == null ) {
-			if ( other.source != null ) {
-				return false;
-			}
-		}
-		else if ( !source.equals( other.source ) ) {
+		if ( source != other.source ) {
 			return false;
 		}
 		return true;

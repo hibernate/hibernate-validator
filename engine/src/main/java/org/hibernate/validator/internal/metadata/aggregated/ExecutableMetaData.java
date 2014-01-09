@@ -35,7 +35,6 @@ import org.hibernate.validator.internal.metadata.aggregated.rule.VoidMethodsMust
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
@@ -283,7 +282,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 */
 		private final ConstrainedElement.ConstrainedElementKind kind;
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
-		private final ExecutableConstraintLocation location;
+		private final ExecutableElement executable;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private boolean isConstrained = false;
 
@@ -310,7 +309,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 			this.executableHelper = executableHelper;
 			kind = constrainedExecutable.getKind();
-			location = constrainedExecutable.getLocation();
+			executable = constrainedExecutable.getExecutable();
 			add( constrainedExecutable );
 		}
 
@@ -320,15 +319,14 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				return false;
 			}
 
-			ExecutableElement executableElement = ( (ConstrainedExecutable) constrainedElement ).getLocation()
-					.getExecutableElement();
+			ExecutableElement executableElement = ( (ConstrainedExecutable) constrainedElement ).getExecutable();
 
 			//are the locations equal (created by different builders) or
 			//does one of the executables override the other one?
 			return
-					location.getExecutableElement().equals( executableElement ) ||
-							executableHelper.overrides( location.getExecutableElement(), executableElement ) ||
-							executableHelper.overrides( executableElement, location.getExecutableElement() );
+					executable.equals( executableElement ) ||
+							executableHelper.overrides( executable, executableElement ) ||
+							executableHelper.overrides( executableElement, executable );
 		}
 
 		@Override
@@ -367,12 +365,10 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		public ExecutableMetaData build() {
 			assertCorrectnessOfConfiguration();
 
-			ExecutableElement executableElement = location.getExecutableElement();
-
 			return new ExecutableMetaData(
-					executableElement.getSimpleName(),
-					executableElement.getReturnType(),
-					executableElement.getParameterTypes(),
+					executable.getSimpleName(),
+					executable.getReturnType(),
+					executable.getParameterTypes(),
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
@@ -380,7 +376,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					getGroupConversions(),
 					isCascading(),
 					isConstrained,
-					executableElement.isGetterMethod(),
+					executable.isGetterMethod(),
 					requiresUnwrapping()
 			);
 		}
@@ -396,14 +392,13 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			List<ParameterMetaData.Builder> parameterBuilders = null;
 
 			for ( ConstrainedExecutable oneExecutable : constrainedExecutables ) {
-
 				if ( parameterBuilders == null ) {
 					parameterBuilders = newArrayList();
 
 					for ( ConstrainedParameter oneParameter : oneExecutable.getAllParameterMetaData() ) {
 						parameterBuilders.add(
 								new ParameterMetaData.Builder(
-										location.getBeanClass(),
+										executable.getMember().getDeclaringClass(),
 										oneParameter,
 										constraintHelper
 								)

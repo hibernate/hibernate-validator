@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -44,7 +44,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param requiresUnwrapping Whether the value of the field must be unwrapped prior to validation or not
 	 */
 	public ConstrainedField(ConfigurationSource source,
-							BeanConstraintLocation location,
+							ConstraintLocation location,
 							Set<MetaConstraint<?>> constraints,
 							Map<Class<?>, Class<?>> groupConversions,
 							boolean isCascading,
@@ -59,7 +59,33 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	}
 
 	@Override
-	public BeanConstraintLocation getLocation() {
-		return (BeanConstraintLocation) super.getLocation();
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ( ( getLocation().getMember() == null ) ? 0 : getLocation().getMember().hashCode() );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( !super.equals( obj ) ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ConstrainedField other = (ConstrainedField) obj;
+		if ( getLocation().getMember() == null ) {
+			if ( other.getLocation().getMember() != null ) {
+				return false;
+			}
+		}
+		else if ( !getLocation().getMember().equals( other.getLocation().getMember() ) ) {
+			return false;
+		}
+		return true;
 	}
 }

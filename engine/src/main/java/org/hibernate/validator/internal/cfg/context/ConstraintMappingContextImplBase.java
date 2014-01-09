@@ -37,7 +37,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public abstract class ConstraintMappingContextImplBase {
 
 	protected final DefaultConstraintMapping mapping;
-	private final Set<ConfiguredConstraint<?, ?>> constraints;
+	private final Set<ConfiguredConstraint<?>> constraints;
 
 	public ConstraintMappingContextImplBase(DefaultConstraintMapping mapping) {
 		this.mapping = mapping;
@@ -64,7 +64,7 @@ public abstract class ConstraintMappingContextImplBase {
 	 *
 	 * @param constraint the constraint to add
 	 */
-	protected void addConstraint(ConfiguredConstraint<?, ?> constraint) {
+	protected void addConstraint(ConfiguredConstraint<?> constraint) {
 		constraints.add( constraint );
 	}
 
@@ -82,14 +82,14 @@ public abstract class ConstraintMappingContextImplBase {
 
 		Set<MetaConstraint<?>> metaConstraints = newHashSet();
 
-		for ( ConfiguredConstraint<?, ?> configuredConstraint : constraints ) {
+		for ( ConfiguredConstraint<?> configuredConstraint : constraints ) {
 			metaConstraints.add( asMetaConstraint( configuredConstraint, constraintHelper ) );
 		}
 
 		return metaConstraints;
 	}
 
-	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A, ?> config, ConstraintHelper constraintHelper) {
+	private <A extends Annotation> MetaConstraint<A> asMetaConstraint(ConfiguredConstraint<A> config, ConstraintHelper constraintHelper) {
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
 				constraintHelper,
 				config.getLocation().getMember(),
