@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
+
 import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 
@@ -25,6 +26,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
+import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -71,6 +73,8 @@ public class ValueContext<T, V> {
 	 */
 	private Type typeOfAnnotatedElement;
 
+	private ValidationValueUnwrapper<V> validationValueUnwrapper;
+
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) value.getClass();
@@ -108,8 +112,14 @@ public class ValueContext<T, V> {
 		return currentValidatable;
 	}
 
-	public final V getCurrentValidatedValue() {
-		return currentValue;
+	/**
+	 * Returns the current value to be validated. If a {@link ValidationValueUnwrapper} has been set, the value will be
+	 * retrieved from that unwrapper.
+	 *
+	 * @return the current value to be validated
+	 */
+	public final Object getCurrentValidatedValue() {
+		return validationValueUnwrapper != null ? validationValueUnwrapper.unwrapValidationValue( currentValue ) : currentValue;
 	}
 
 	public final void setPropertyPath(PathImpl propertyPath) {
@@ -172,8 +182,14 @@ public class ValueContext<T, V> {
 		this.elementType = elementType;
 	}
 
+	/**
+	 * Returns the declared (static) type of the currently validated element. If a {@link ValidationValueUnwrapper} has
+	 * been set, the type will be retrieved via that unwrapper.
+	 *
+	 * @return the declared type of the currently validated element
+	 */
 	public final Type getTypeOfAnnotatedElement() {
-		return typeOfAnnotatedElement;
+		return validationValueUnwrapper != null ? validationValueUnwrapper.getValueType( typeOfAnnotatedElement ) : typeOfAnnotatedElement;
 	}
 
 	public final void setTypeOfAnnotatedElement(Type typeOfAnnotatedElement) {
@@ -193,5 +209,9 @@ public class ValueContext<T, V> {
 		sb.append( ", typeOfAnnotatedElement=" ).append( typeOfAnnotatedElement );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	public void setValidationValueUnwrapper(ValidationValueUnwrapper<?> unwrapper) {
+		this.validationValueUnwrapper = (ValidationValueUnwrapper<V>) unwrapper;
 	}
 }

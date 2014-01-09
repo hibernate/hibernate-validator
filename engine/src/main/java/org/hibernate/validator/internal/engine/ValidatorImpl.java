@@ -49,6 +49,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.CachingTraversableResolverForSingleValidation;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
@@ -62,6 +63,9 @@ import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -490,11 +494,12 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		boolean validationSuccessful = true;
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
-			valueContext.appendNode(
-					beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() ).getMetaDataFor(
-							ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() )
-					)
+			PropertyMetaData propertyMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() ).getMetaDataFor(
+					ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() )
 			);
+
+			valueContext.appendNode( propertyMetaData );
+			setValueUnwrapperToValueContextIfPresent( validationContext, valueContext, propertyMetaData );
 		}
 		else {
 			valueContext.appendBeanNode();
@@ -1046,7 +1051,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					}
 				}
 
-				valueContext.appendNode( executableMetaData.getParameterMetaData( i ) );
+				valueContext.appendNode( parameterMetaData );
+				setValueUnwrapperToValueContextIfPresent( validationContext, valueContext, parameterMetaData );
 				valueContext.setCurrentValidatedValue( value );
 
 				numberOfViolationsOfCurrentGroup += validateConstraintsForGroup(
@@ -1201,6 +1207,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			valueContext.setCurrentValidatedValue( value );
 			valueContext.appendNode( executableMetaData.getReturnValueMetaData() );
+			setValueUnwrapperToValueContextIfPresent( validationContext, valueContext, executableMetaData.getReturnValueMetaData() );
 
 			numberOfViolationsOfCurrentGroup +=
 					validateConstraintsForGroup(
@@ -1408,5 +1415,43 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private boolean shouldFailFast(ValidationContext<?> context) {
 		return context.isFailFastModeEnabled() && !context.getFailingConstraints().isEmpty();
+	}
+
+	/**
+	 * Returns the first unwrapper found which supports the given type.
+	 * <p>
+	 * If required this could be enhanced to search for the most-specific unwrapper and raise an exception in case more
+	 * than one matching unwrapper is found.
+	 *
+	 * @param type the type to be unwrapped
+	 *
+	 * @return the unwrapper for the given type or {@code null} if no matching unwrapper was found
+	 */
+	public ValidationValueUnwrapper<?> getValidationValueUnwrapper(Type type) {
+		//TODO re-use shared instance
+		TypeResolver typeResolver = new TypeResolver();
+
+		for ( ValidationValueUnwrapper<?> unwrapper : validationValueUnwrappers ) {
+			ResolvedType unwrapperType = typeResolver.resolve( unwrapper.getClass() );
+			List<ResolvedType> typeParameters = unwrapperType.typeParametersFor( ValidationValueUnwrapper.class );
+
+			if ( TypeHelper.isAssignable( typeParameters.get( 0 ).getErasedType(), type ) ) {
+				return unwrapper;
+			}
+		}
+
+		return null;
+	}
+
+	private void setValueUnwrapperToValueContextIfPresent(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, ConstraintMetaData metaData) {
+		if ( metaData.requiresUnwrapping() ) {
+			ValidationValueUnwrapper<?> unwrapper = getValidationValueUnwrapper( metaData.getType() );
+
+			if ( unwrapper == null ) {
+				throw log.getNoUnwrapperFoundForTypeException( metaData.getType().toString() );
+			}
+
+			valueContext.setValidationValueUnwrapper( unwrapper );
+		}
 	}
 }
