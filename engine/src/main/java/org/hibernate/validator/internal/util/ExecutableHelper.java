@@ -31,7 +31,7 @@ import com.fasterxml.classmate.members.ResolvedMethod;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 /**
- * Provides shared functionalities dealing with executables.
+ * Provides shared functionality dealing with executables.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling

@@ -1439,7 +1439,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 *
 	 * @return the handler for the given type or {@code null} if no matching handler was found
 	 */
-	public ValidatedValueUnwrapper<?> getValidatedValueHandler(Type type) {
+	private ValidatedValueUnwrapper<?> getValidatedValueHandler(Type type) {
 		TypeResolver typeResolver = typeResolutionHelper.getTypeResolver();
 
 		for ( ValidatedValueUnwrapper<?> handler : validatedValueHandlers ) {
