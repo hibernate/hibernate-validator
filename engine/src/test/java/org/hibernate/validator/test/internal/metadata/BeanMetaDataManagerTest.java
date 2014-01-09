@@ -21,16 +21,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
@@ -41,10 +45,15 @@ public class BeanMetaDataManagerTest {
 	// high enough to force a OutOfMemoryError in case references are not freed
 	private static final int MAX_ENTITY_COUNT = 100000;
 
+	private BeanMetaDataManager metaDataManager;
+
+	@BeforeMethod
+	public void setUpBeanMetaDataManager() {
+		metaDataManager = new BeanMetaDataManager( new ConstraintHelper(), new ExecutableHelper() );
+	}
+
 	@Test
 	public void testBeanMetaDataCanBeGarbageCollected() throws Exception {
-		BeanMetaDataManager metaDataManager = new BeanMetaDataManager( new ConstraintHelper(), new ExecutableHelper() );
-
 		Class<?> lastIterationsBean = null;
 		int totalCreatedMetaDataInstances = 0;
 		int cachedBeanMetaDataInstances = 0;
@@ -67,6 +76,35 @@ public class BeanMetaDataManagerTest {
 		if ( cachedBeanMetaDataInstances >= totalCreatedMetaDataInstances ) {
 			fail( "Metadata instances should be garbage collectible" );
 		}
+	}
+
+	@Test
+	public void testIsConstrainedForConstrainedEntity() {
+		assertTrue( metaDataManager.isConstrained( Engine.class ) );
+	}
+
+	@Test
+	public void testIsConstrainedForUnConstrainedEntity() {
+		assertFalse( metaDataManager.isConstrained( UnconstrainedEntity.class ) );
+	}
+
+	@Test
+	public void testGetMetaDataForConstrainedEntity() {
+		BeanMetaData beanMetaData = metaDataManager.getBeanMetaData( Engine.class );
+		assertTrue( beanMetaData instanceof BeanMetaDataImpl );
+		assertTrue( beanMetaData.hasConstraints() );
+	}
+
+	@Test
+	public void testGetMetaDataForUnConstrainedEntity() {
+		assertFalse( metaDataManager.isConstrained( UnconstrainedEntity.class ) );
+
+		BeanMetaData beanMetaData = metaDataManager.getBeanMetaData( UnconstrainedEntity.class );
+		assertTrue(
+				beanMetaData instanceof BeanMetaDataImpl,
+				"#getBeanMetaData should always return a valid BeanMetaData instance. Returned class: " + beanMetaData.getClass()
+		);
+		assertFalse( beanMetaData.hasConstraints() );
 	}
 
 	public class CustomClassLoader extends ClassLoader {
@@ -129,5 +167,9 @@ public class BeanMetaDataManagerTest {
 			dis.close();
 			return buff;
 		}
+	}
+
+	public static class UnconstrainedEntity {
+		private String foo;
 	}
 }

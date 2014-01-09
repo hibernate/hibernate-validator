@@ -28,6 +28,7 @@ import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
+import javax.validation.metadata.MethodType;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -195,6 +196,17 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public Class<T> getBeanClass() {
 		return beanClass;
+	}
+
+	@Override
+	public boolean hasConstraints() {
+		if ( beanDescriptor.isBeanConstrained()
+				|| !beanDescriptor.getConstrainedConstructors().isEmpty()
+				|| !beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER ).isEmpty() ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override

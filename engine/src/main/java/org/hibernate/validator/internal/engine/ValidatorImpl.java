@@ -146,6 +146,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 
+		if ( !beanMetaDataManager.isConstrained( object.getClass() ) ) {
+			return Collections.emptySet();
+		}
+
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 		ValidationContext<T> validationContext = getValidationContext().forValidate( object );
 
@@ -166,6 +170,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 		ValidationContext<T> context = getValidationContext().forValidateProperty( object );
 
+		if ( !beanMetaDataManager.isConstrained( context.getRootBeanClass() ) ) {
+			return Collections.emptySet();
+		}
+
 		return validatePropertyInContext(
 				context,
 				PathImpl.createPathFromString( propertyName ),
@@ -176,6 +184,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	@Override
 	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
 		Contracts.assertNotNull( beanType, MESSAGES.beanTypeCannotBeNull() );
+
+		if ( !beanMetaDataManager.isConstrained( beanType ) ) {
+			return Collections.emptySet();
+		}
 
 		sanityCheckPropertyPath( propertyName );
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
@@ -237,6 +249,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				parameterValues
 		);
 
+		if ( !beanMetaDataManager.isConstrained( context.getRootBeanClass() ) ) {
+			return Collections.emptySet();
+		}
+
 		validateParametersInContext( context, parameterValues, validationOrder );
 
 		return context.getFailingConstraints();
@@ -250,6 +266,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				executable,
 				returnValue
 		);
+
+		if ( !beanMetaDataManager.isConstrained( context.getRootBeanClass() ) ) {
+			return Collections.emptySet();
+		}
 
 		validateReturnValueInContext( context, object, returnValue, validationOrder );
 

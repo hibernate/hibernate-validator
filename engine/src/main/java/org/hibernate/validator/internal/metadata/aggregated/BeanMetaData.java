@@ -39,6 +39,13 @@ public interface BeanMetaData<T> extends Validatable {
 	Class<T> getBeanClass();
 
 	/**
+	 * Returns {@code true} if the bean class for this bean meta data has any constraints at all, {@code false} otherwise.
+	 *
+	 * @return {@code true} if the bean class for this bean meta data has any constraints at all, {@code false} otherwise.
+	 */
+	boolean hasConstraints();
+
+	/**
 	 * @return an instance of {@code ElementDescriptor} describing the bean this meta data applies for.
 	 */
 	BeanDescriptor getBeanDescriptor();
