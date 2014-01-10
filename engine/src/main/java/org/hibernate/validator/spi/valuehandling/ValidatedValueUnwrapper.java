@@ -29,7 +29,7 @@ import java.lang.reflect.Type;
  *
  * @param <T> the type which can be unwrapped by a specific implementation. The value for this type parameter must
  * either resolve to a non-parameterized type (i.e. because the type is not using generics or because the raw
- * type is used instead of the generic version)</li> or all of its own type parameters must be unbounded
+ * type is used instead of the generic version) or all of its own type parameters must be unbounded
  * wildcard types (i.e. <?>).
  *
  * @author Gunnar Morling
