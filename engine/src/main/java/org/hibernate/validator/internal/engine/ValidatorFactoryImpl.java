@@ -21,6 +21,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -134,7 +135,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
-		this.constraintMappings = newHashSet();
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -150,12 +150,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		boolean tmpFailFast = false;
 		List<ValidatedValueUnwrapper<?>> tmpValidatedValueHandlers = newArrayList( 5 );
+		Set<DefaultConstraintMapping> tmpConstraintMappings = newHashSet();
 
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
 			if ( hibernateSpecificConfig.getProgrammaticMappings().size() > 0 ) {
-				constraintMappings.addAll( hibernateSpecificConfig.getProgrammaticMappings() );
+				tmpConstraintMappings.addAll( hibernateSpecificConfig.getProgrammaticMappings() );
 			}
 			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
@@ -163,6 +164,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
 
 		}
+		this.constraintMappings = Collections.unmodifiableSet( tmpConstraintMappings );
+
 		tmpFailFast = checkPropertiesForFailFast(
 				properties, tmpFailFast
 		);
