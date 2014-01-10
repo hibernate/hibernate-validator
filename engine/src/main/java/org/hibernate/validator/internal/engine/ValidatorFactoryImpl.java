@@ -21,7 +21,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -40,6 +39,7 @@ import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -49,7 +49,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * Factory returning initialized {@code Validator} instances. This is Hibernate Validator default
+ * Factory returning initialized {@code Validator} instances. This is the Hibernate Validator default
  * implementation of the {@code ValidatorFactory} interface.
  *
  * @author Emmanuel Bernard
@@ -124,7 +124,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	/**
 	 * Contains handlers to be applied to the validated value when validating elements.
 	 */
-	private List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
+	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
@@ -149,6 +149,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		Map<String, String> properties = configurationState.getProperties();
 
 		boolean tmpFailFast = false;
+		List<ValidatedValueUnwrapper<?>> tmpValidatedValueHandlers = newArrayList( 5 );
+
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
@@ -158,13 +160,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
 
-			this.validatedValueHandlers = hibernateSpecificConfig.getValidatedValueHandlers();
+			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
 
 		}
 		tmpFailFast = checkPropertiesForFailFast(
 				properties, tmpFailFast
 		);
 		this.failFast = tmpFailFast;
+
+		tmpValidatedValueHandlers.addAll( getPropertyConfiguredValidatedValueHandlers( properties ) );
+		this.validatedValueHandlers = Collections.unmodifiableList( tmpValidatedValueHandlers );
+
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
 	}
 
@@ -293,4 +299,34 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		return failFast;
 	}
+
+	/**
+	 * Returns a list with {@link ValidatedValueUnwrapper}s configured via the
+	 * {@link HibernateValidatorConfiguration#VALIDATED_VALUE_HANDLERS} property.
+	 *
+	 * @param properties the properties used to bootstrap the factory
+	 *
+	 * @return a list with property-configured {@link ValidatedValueUnwrapper}s; May be empty but never {@code null}
+	 */
+	private List<ValidatedValueUnwrapper<?>> getPropertyConfiguredValidatedValueHandlers(
+			Map<String, String> properties) {
+		String propertyValue = properties.get( HibernateValidatorConfiguration.VALIDATED_VALUE_HANDLERS );
+
+		if ( propertyValue == null || propertyValue.isEmpty() ) {
+			return Collections.emptyList();
+		}
+
+		String[] handlerNames = propertyValue.split( "," );
+		List<ValidatedValueUnwrapper<?>> handlers = newArrayList( handlerNames.length );
+
+		for ( String handlerName : handlerNames ) {
+			@SuppressWarnings("unchecked")
+			Class<? extends ValidatedValueUnwrapper<?>> handlerType = (Class<? extends ValidatedValueUnwrapper<?>>) ReflectionHelper
+					.loadClass( handlerName, ValidatorFactoryImpl.class );
+			handlers.add( ReflectionHelper.newInstance( handlerType, "validated value handler class" ) );
+		}
+
+		return handlers;
+	}
+
 }

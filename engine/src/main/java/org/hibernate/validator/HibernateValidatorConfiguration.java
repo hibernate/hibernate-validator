@@ -39,6 +39,12 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	String FAIL_FAST = "hibernate.validator.fail_fast";
 
 	/**
+	 * Property corresponding to the {@link #addValidatedValueHandler(ValidatedValueUnwrapper)} method. Accepts a String
+	 * with the comma-separated fully-qualified names of one or more {@link ValidatedValueUnwrapper} implementations.
+	 */
+	String VALIDATED_VALUE_HANDLERS = "hibernate.validator.validated_value_handlers";
+
+	/**
 	 * <p>
 	 * Returns the {@link ResourceBundleLocator} used by the
 	 * {@link Configuration#getDefaultMessageInterpolator() default message

@@ -164,4 +164,18 @@ public class UnwrapValidatedValueTest {
 
 		assertEquals( violations.size(), 1 );
 	}
+
+	@BeforeMethod
+	public void shouldUnwrapPropertyValuesUsingUnwrapperGivenViaProperty() {
+		Validator validator = ValidatorUtil.getConfiguration()
+				.addProperty(
+						HibernateValidatorConfiguration.VALIDATED_VALUE_HANDLERS,
+						PropertyValueUnwrapper.class.getName() + "," + UiInputValueUnwrapper.class.getName()
+				)
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<Customer>> violations = validator.validate( new Customer() );
+		assertEquals( violations.size(), 3 );
+	}
 }
