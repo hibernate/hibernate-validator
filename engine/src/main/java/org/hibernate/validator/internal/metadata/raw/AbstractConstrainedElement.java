@@ -37,19 +37,22 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	protected final Set<MetaConstraint<?>> constraints;
 	protected final Map<Class<?>, Class<?>> groupConversions;
 	protected final boolean isCascading;
+	protected final boolean requiresUnwrapping;
 
 	public AbstractConstrainedElement(ConfigurationSource source,
 									  ConstrainedElementKind kind,
 									  ConstraintLocation location,
 									  Set<MetaConstraint<?>> constraints,
 									  Map<Class<?>, Class<?>> groupConversions,
-									  boolean isCascading) {
+									  boolean isCascading,
+									  boolean requiresUnwrapping) {
 		this.kind = kind;
 		this.source = source;
 		this.location = location;
 		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
 		this.groupConversions = Collections.unmodifiableMap( groupConversions );
 		this.isCascading = isCascading;
+		this.requiresUnwrapping = requiresUnwrapping;
 	}
 
 	@Override
@@ -88,10 +91,17 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	}
 
 	@Override
+	public boolean requiresUnwrapping() {
+		return requiresUnwrapping;
+	}
+
+	@Override
 	public String toString() {
 		return "AbstractConstrainedElement [kind=" + kind + ", source="
 				+ source + ", location=" + location + ", constraints="
-				+ constraints + ", isCascading=" + isCascading + "]";
+				+ constraints + ", groupConversions=" + groupConversions
+				+ ", isCascading=" + isCascading + ", requiresUnwrapping="
+				+ requiresUnwrapping + "]";
 	}
 
 	@Override

@@ -50,6 +50,7 @@ public abstract class MetaDataBuilder {
 	private final Set<MetaConstraint<?>> constraints = newHashSet();
 	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
+	private boolean requiresUnwrapping = false;
 
 	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper) {
 		this.beanClass = beanClass;
@@ -78,6 +79,7 @@ public abstract class MetaDataBuilder {
 	public void add(ConstrainedElement constrainedElement) {
 		constraints.addAll( constrainedElement.getConstraints() );
 		isCascading = isCascading || constrainedElement.isCascading();
+		requiresUnwrapping = requiresUnwrapping || constrainedElement.requiresUnwrapping();
 
 		addGroupConversions( constrainedElement.getGroupConversions() );
 	}
@@ -118,6 +120,10 @@ public abstract class MetaDataBuilder {
 
 	protected boolean isCascading() {
 		return isCascading;
+	}
+
+	public boolean requiresUnwrapping() {
+		return requiresUnwrapping;
 	}
 
 	/**

@@ -29,6 +29,7 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -49,7 +50,10 @@ public class BeanMetaDataManagerTest {
 
 	@BeforeMethod
 	public void setUpBeanMetaDataManager() {
-		metaDataManager = new BeanMetaDataManager( new ConstraintHelper(), new ExecutableHelper() );
+		metaDataManager = new BeanMetaDataManager(
+				new ConstraintHelper(),
+				new ExecutableHelper( new TypeResolutionHelper() )
+		);
 	}
 
 	@Test
@@ -90,7 +94,7 @@ public class BeanMetaDataManagerTest {
 
 	@Test
 	public void testGetMetaDataForConstrainedEntity() {
-		BeanMetaData beanMetaData = metaDataManager.getBeanMetaData( Engine.class );
+		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( Engine.class );
 		assertTrue( beanMetaData instanceof BeanMetaDataImpl );
 		assertTrue( beanMetaData.hasConstraints() );
 	}
@@ -99,7 +103,7 @@ public class BeanMetaDataManagerTest {
 	public void testGetMetaDataForUnConstrainedEntity() {
 		assertFalse( metaDataManager.isConstrained( UnconstrainedEntity.class ) );
 
-		BeanMetaData beanMetaData = metaDataManager.getBeanMetaData( UnconstrainedEntity.class );
+		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( UnconstrainedEntity.class );
 		assertTrue(
 				beanMetaData instanceof BeanMetaDataImpl,
 				"#getBeanMetaData should always return a valid BeanMetaData instance. Returned class: " + beanMetaData.getClass()

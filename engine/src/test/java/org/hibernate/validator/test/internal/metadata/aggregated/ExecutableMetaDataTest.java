@@ -34,6 +34,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.test.internal.metadata.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
@@ -55,9 +56,12 @@ public class ExecutableMetaDataTest {
 
 	@BeforeMethod
 	public void setupBeanMetaData() {
-		beanMetaData = new BeanMetaDataManager( new ConstraintHelper(), new ExecutableHelper() ).getBeanMetaData(
-				CustomerRepositoryExt.class
+		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+				new ConstraintHelper(),
+				new ExecutableHelper( new TypeResolutionHelper() )
 		);
+
+		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepositoryExt.class );
 	}
 
 	@Test
@@ -205,6 +209,30 @@ public class ExecutableMetaDataTest {
 		);
 
 		assertThat( constructorMetaData.getIdentifier() ).isEqualTo( "CustomerRepositoryExt[class java.lang.String]" );
+	}
+
+	@Test
+	public void requiresUnwrappingForMethod() throws Exception {
+		Method method = CustomerRepositoryExt.class.getMethod( "methodRequiringUnwrapping" );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
+				ExecutableElement.forMethod(
+						method
+				)
+		);
+
+		assertTrue( methodMetaData.requiresUnwrapping() );
+	}
+
+	@Test
+	public void requiresUnwrappingForConstructor() throws Exception {
+		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( long.class );
+		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor(
+				ExecutableElement.forConstructor(
+						constructor
+				)
+		);
+
+		assertTrue( constructorMetaData.requiresUnwrapping() );
 	}
 
 	@Test
@@ -386,6 +414,7 @@ public class ExecutableMetaDataTest {
 		assertFalse( methodMetaData.isConstrained() );
 		assertThat( methodMetaData ).isEmpty();
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
+		assertFalse( methodMetaData.requiresUnwrapping() );
 
 		assertThat( methodMetaData.getParameterMetaData( 0 ).isConstrained() ).isFalse();
 		assertThat( methodMetaData.getParameterMetaData( 0 ).isCascading() ).isFalse();

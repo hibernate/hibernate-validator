@@ -72,7 +72,6 @@ public class ExecutableConstraintMappingContextImpl
 		this.parameterContexts = new ParameterConstraintMappingContextImpl[executable.getParameterTypes().length];
 	}
 
-
 	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
 		if ( index < 0 || index >= executable.getParameterTypes().length ) {
@@ -136,7 +135,8 @@ public class ExecutableConstraintMappingContextImpl
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
-				returnValueContext != null ? returnValueContext.isCascading() : false
+				returnValueContext != null ? returnValueContext.isCascading() : false,
+				returnValueContext != null ? returnValueContext.isUnwrapValidatedValue() : false
 		);
 	}
 

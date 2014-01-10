@@ -629,4 +629,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 181,
 			value = "Wrong number of parameters. Method or constructor %1$s expects %2$d parameters, but got %3$d.")
 	IllegalArgumentException getInvalidParameterCountForExecutableException(String executable, int expectedParameterCount, int actualParameterCount);
+
+	@Message(id = 182, value = "No validation value unwrapper is registered for type %1$s.")
+	ValidationException getNoUnwrapperFoundForTypeException(String typeName);
 }

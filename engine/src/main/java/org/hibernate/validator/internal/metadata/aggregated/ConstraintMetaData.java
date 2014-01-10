@@ -83,4 +83,11 @@ public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 	 */
 	ElementDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence);
 
+	/**
+	 * Whether the value to be validated needs to be unwrapped (which is the case if this element is annotated with
+	 * {@code @UnwrapValidatedValue}) or not.
+	 *
+	 * @return {@code true} if the value to be validated needs to unwrapped, {@code false} otherwise.
+	 */
+	boolean requiresUnwrapping();
 }

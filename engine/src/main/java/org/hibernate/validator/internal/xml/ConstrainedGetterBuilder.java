@@ -83,7 +83,8 @@ public class ConstrainedGetterBuilder {
 					Collections.<MetaConstraint<?>>emptySet(),
 					metaConstraints,
 					groupConversions,
-					getterType.getValid() != null
+					getterType.getValid() != null,
+					false
 			);
 			constrainedExecutables.add( constrainedGetter );
 

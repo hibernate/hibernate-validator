@@ -20,6 +20,7 @@ import javax.validation.Configuration;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * Uniquely identifies Hibernate Validator in the Bean Validation bootstrap
@@ -36,6 +37,12 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * Accepts {@code true} or {@code false}. Defaults to {@code false}.
 	 */
 	String FAIL_FAST = "hibernate.validator.fail_fast";
+
+	/**
+	 * Property corresponding to the {@link #addValidatedValueHandler(ValidatedValueUnwrapper)} method. Accepts a String
+	 * with the comma-separated fully-qualified names of one or more {@link ValidatedValueUnwrapper} implementations.
+	 */
+	String VALIDATED_VALUE_HANDLERS = "hibernate.validator.validated_value_handlers";
 
 	/**
 	 * <p>
@@ -98,4 +105,18 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @return {@code this} following the chaining method pattern
 	 */
 	HibernateValidatorConfiguration failFast(boolean failFast);
+
+	/**
+	 * Registers the given validated value unwrapper with the bootstrapped validator factory. When validating an element
+	 * which is of a type supported by the unwrapper and which is annotated with
+	 * {@link org.hibernate.validator.valuehandling.UnwrapValidatedValue}, the unwrapper will be applied to retrieve the
+	 * value to validate.
+	 *
+	 * @param handler the unwrapper to register
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @hv.experimental This API is considered experimental and may change in future revisions
+	 */
+	HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler);
 }

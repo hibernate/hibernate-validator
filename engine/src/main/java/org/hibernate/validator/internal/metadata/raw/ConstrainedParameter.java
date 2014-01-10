@@ -43,6 +43,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				name,
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
+				false,
 				false
 		);
 	}
@@ -58,20 +59,23 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param groupConversions The group conversions of the represented method parameter, if any.
 	 * @param isCascading Whether a cascaded validation of the represented method
 	 * parameter shall be performed or not.
+	 * @param requiresUnwrapping Whether the value of the parameter must be unwrapped prior to validation or not
 	 */
 	public ConstrainedParameter(ConfigurationSource source,
 								ExecutableConstraintLocation location,
 								String name,
 								Set<MetaConstraint<?>> constraints,
 								Map<Class<?>, Class<?>> groupConversions,
-								boolean isCascading) {
+								boolean isCascading,
+								boolean requiresUnwrapping) {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,
 				location,
 				constraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				requiresUnwrapping
 		);
 
 		this.name = name;
@@ -118,7 +122,8 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				mergedName,
 				mergedConstraints,
 				mergedGroupConversions,
-				isCascading || other.isCascading
+				isCascading || other.isCascading,
+				requiresUnwrapping || other.requiresUnwrapping
 		);
 	}
 

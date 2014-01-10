@@ -100,7 +100,8 @@ public final class ParameterConstraintMappingContextImpl
 				executableContext.getExecutable().getParameterNames( parameterNameProvider ).get( parameterIndex ),
 				getConstraints( constraintHelper ),
 				groupConversions,
-				isCascading
+				isCascading,
+				isUnwrapValidatedValue()
 		);
 	}
 
