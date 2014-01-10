@@ -14,34 +14,34 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valueunwrapping;
+package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.test.internal.engine.valueunwrapping.model.Account;
-import org.hibernate.validator.test.internal.engine.valueunwrapping.model.Customer;
-import org.hibernate.validator.test.internal.engine.valueunwrapping.model.Order;
-import org.hibernate.validator.test.internal.engine.valueunwrapping.model.OrderLine;
-import org.hibernate.validator.test.internal.engine.valueunwrapping.model.Property;
-import org.hibernate.validator.test.internal.engine.valueunwrapping.model.PropertyValueUnwrapper;
-import org.hibernate.validator.test.internal.engine.valueunwrapping.model.UiInputValueUnwrapper;
+import org.hibernate.validator.test.internal.engine.valuehandling.model.Account;
+import org.hibernate.validator.test.internal.engine.valuehandling.model.Customer;
+import org.hibernate.validator.test.internal.engine.valuehandling.model.Order;
+import org.hibernate.validator.test.internal.engine.valuehandling.model.OrderLine;
+import org.hibernate.validator.test.internal.engine.valuehandling.model.Property;
+import org.hibernate.validator.test.internal.engine.valuehandling.model.PropertyValueUnwrapper;
+import org.hibernate.validator.test.internal.engine.valuehandling.model.UiInputValueUnwrapper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.testng.Assert.assertEquals;
 
 /**
- * Test for unwrapping validated values via {@link org.hibernate.validator.unwrapping.UnwrapValidatedValue}.
+ * Test for unwrapping validated values via {@link org.hibernate.validator.valuehandling.UnwrapValidatedValue}.
  *
  * @author Gunnar Morling
  */
@@ -53,8 +53,8 @@ public class UnwrapValidatedValueTest {
 	@BeforeMethod
 	public void setupValidator() {
 		validator = ValidatorUtil.getConfiguration()
-				.addValidationValueUnwrapper( new PropertyValueUnwrapper() )
-				.addValidationValueUnwrapper( new UiInputValueUnwrapper() )
+				.addValidatedValueHandler( new PropertyValueUnwrapper() )
+				.addValidatedValueHandler( new UiInputValueUnwrapper() )
 				.buildValidatorFactory()
 				.getValidator();
 	}
@@ -109,7 +109,7 @@ public class UnwrapValidatedValueTest {
 					.unwrapValidatedValue();
 
 		Validator validator = configuration.addMapping( mapping )
-				.addValidationValueUnwrapper( new PropertyValueUnwrapper() )
+				.addValidatedValueHandler( new PropertyValueUnwrapper() )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -127,7 +127,7 @@ public class UnwrapValidatedValueTest {
 						.unwrapValidatedValue();
 
 		Validator validator = configuration.addMapping( mapping )
-				.addValidationValueUnwrapper( new PropertyValueUnwrapper() )
+				.addValidatedValueHandler( new PropertyValueUnwrapper() )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -151,7 +151,7 @@ public class UnwrapValidatedValueTest {
 						.unwrapValidatedValue();
 
 		Validator validator = configuration.addMapping( mapping )
-				.addValidationValueUnwrapper( new PropertyValueUnwrapper() )
+				.addValidatedValueHandler( new PropertyValueUnwrapper() )
 				.buildValidatorFactory()
 				.getValidator();
 

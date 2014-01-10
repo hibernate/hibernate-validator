@@ -63,7 +63,7 @@ import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
@@ -137,9 +137,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final TypeResolutionHelper typeResolutionHelper;
 
 	/**
-	 * Contains unwrappers to be applied when validating elements annotated with {@code UnwrapValidationValue}.
+	 * Contains handlers to be applied prior to validation when validating elements.
 	 */
-	private final List<ValidationValueUnwrapper<?>> validationValueUnwrappers;
+	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 						 MessageInterpolator messageInterpolator,
@@ -147,7 +147,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						 BeanMetaDataManager beanMetaDataManager,
 						 ParameterNameProvider parameterNameProvider,
 						 TypeResolutionHelper typeResolutionHelper,
-						 List<ValidationValueUnwrapper<?>> validationValueUnwrappers,
+						 List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 						 ConstraintValidatorManager constraintValidatorManager,
 						 boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -156,7 +156,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.parameterNameProvider = parameterNameProvider;
 		this.typeResolutionHelper = typeResolutionHelper;
-		this.validationValueUnwrappers = validationValueUnwrappers;
+		this.validatedValueHandlers = validatedValueHandlers;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
 
@@ -507,7 +507,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 
 			valueContext.appendNode( propertyMetaData );
-			setValueUnwrapperToValueContextIfPresent( validationContext, valueContext, propertyMetaData );
+			setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, propertyMetaData );
 		}
 		else {
 			valueContext.appendBeanNode();
@@ -1060,7 +1060,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				}
 
 				valueContext.appendNode( parameterMetaData );
-				setValueUnwrapperToValueContextIfPresent( validationContext, valueContext, parameterMetaData );
+				setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, parameterMetaData );
 				valueContext.setCurrentValidatedValue( value );
 
 				numberOfViolationsOfCurrentGroup += validateConstraintsForGroup(
@@ -1215,7 +1215,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			valueContext.setCurrentValidatedValue( value );
 			valueContext.appendNode( executableMetaData.getReturnValueMetaData() );
-			setValueUnwrapperToValueContextIfPresent( validationContext, valueContext, executableMetaData.getReturnValueMetaData() );
+			setValidatedValueHandlerToValueContextIfPresent(
+					validationContext,
+					valueContext,
+					executableMetaData.getReturnValueMetaData()
+			);
 
 			numberOfViolationsOfCurrentGroup +=
 					validateConstraintsForGroup(
@@ -1426,39 +1430,43 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	/**
-	 * Returns the first unwrapper found which supports the given type.
+	 * Returns the first validated value handler found which supports the given type.
 	 * <p>
-	 * If required this could be enhanced to search for the most-specific unwrapper and raise an exception in case more
-	 * than one matching unwrapper is found.
+	 * If required this could be enhanced to search for the most-specific handler and raise an exception in case more
+	 * than one matching handler is found (or a scheme of prioritizing handlers to process several handlers in order.
 	 *
-	 * @param type the type to be unwrapped
+	 * @param type the type to be handled
 	 *
-	 * @return the unwrapper for the given type or {@code null} if no matching unwrapper was found
+	 * @return the handler for the given type or {@code null} if no matching handler was found
 	 */
-	public ValidationValueUnwrapper<?> getValidationValueUnwrapper(Type type) {
+	public ValidatedValueUnwrapper<?> getValidatedValueHandler(Type type) {
 		TypeResolver typeResolver = typeResolutionHelper.getTypeResolver();
 
-		for ( ValidationValueUnwrapper<?> unwrapper : validationValueUnwrappers ) {
-			ResolvedType unwrapperType = typeResolver.resolve( unwrapper.getClass() );
-			List<ResolvedType> typeParameters = unwrapperType.typeParametersFor( ValidationValueUnwrapper.class );
+		for ( ValidatedValueUnwrapper<?> handler : validatedValueHandlers ) {
+			ResolvedType handlerType = typeResolver.resolve( handler.getClass() );
+			List<ResolvedType> typeParameters = handlerType.typeParametersFor( ValidatedValueUnwrapper.class );
 
 			if ( TypeHelper.isAssignable( typeParameters.get( 0 ).getErasedType(), type ) ) {
-				return unwrapper;
+				return handler;
 			}
 		}
 
 		return null;
 	}
 
-	private void setValueUnwrapperToValueContextIfPresent(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, ConstraintMetaData metaData) {
+	private <T> void setValidatedValueHandlerToValueContextIfPresent(ValidationContext<?> validationContext,
+			ValueContext<?, T> valueContext, ConstraintMetaData metaData) {
 		if ( metaData.requiresUnwrapping() ) {
-			ValidationValueUnwrapper<?> unwrapper = getValidationValueUnwrapper( metaData.getType() );
+			@SuppressWarnings("unchecked") //we know the handler matches the value type
+					ValidatedValueUnwrapper<? super T> handler = (ValidatedValueUnwrapper<T>) getValidatedValueHandler(
+					metaData.getType()
+			);
 
-			if ( unwrapper == null ) {
+			if ( handler == null ) {
 				throw log.getNoUnwrapperFoundForTypeException( metaData.getType().toString() );
 			}
 
-			valueContext.setValidationValueUnwrapper( unwrapper );
+			valueContext.setValidatedValueHandler( handler );
 		}
 	}
 }

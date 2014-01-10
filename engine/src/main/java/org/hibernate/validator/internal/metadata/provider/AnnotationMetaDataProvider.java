@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.GroupSequence;
 import javax.validation.ParameterNameProvider;
 import javax.validation.Valid;
@@ -59,7 +60,7 @@ import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.unwrapping.UnwrapValidatedValue;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;

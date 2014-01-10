@@ -14,14 +14,18 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valueunwrapping.model;
+package org.hibernate.validator.test.internal.engine.valuehandling.model;
+
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 /**
  * @author Gunnar Morling
  */
-class StringProperty extends Property<String> {
+public class Order {
 
-	public StringProperty(String value) {
-		super( value );
-	}
+	@Size(min = 4)
+	@UnwrapValidatedValue
+	private final Wrapper<Long> id = new Wrapper<Long>( 42L );
 }

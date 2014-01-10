@@ -14,20 +14,36 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valueunwrapping.model;
+package org.hibernate.validator.test.internal.engine.valuehandling.model;
+
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 /**
  * @author Gunnar Morling
  */
-public class Property<T> {
+public class Customer {
 
-	private final T value;
+	@Size(min = 4)
+	@UnwrapValidatedValue
+	private Property<String> name = new Property<String>( "Bob" );
 
-	public Property(T value) {
-		this.value = value;
+	@Size(min = 4)
+	@UnwrapValidatedValue
+	private final StringProperty lastName = new StringProperty( "Foo" );
+
+	@Size(min = 4)
+	@UnwrapValidatedValue
+	private final UiInput<String> nameInput = new UiInput<String>( "Bob" );
+
+	public void setName(@Size(min = 4) @UnwrapValidatedValue Property<String> name) {
+		this.name = name;
 	}
 
-	public T getValue() {
-		return value;
+	@Size(min = 4)
+	@UnwrapValidatedValue
+	public Property<String> retrieveName() {
+		return name;
 	}
 }

@@ -26,7 +26,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
-import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -73,7 +73,7 @@ public class ValueContext<T, V> {
 	 */
 	private Type typeOfAnnotatedElement;
 
-	private ValidationValueUnwrapper<V> validationValueUnwrapper;
+	private ValidatedValueUnwrapper<? super V> validatedValueHandler;
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
@@ -113,13 +113,13 @@ public class ValueContext<T, V> {
 	}
 
 	/**
-	 * Returns the current value to be validated. If a {@link ValidationValueUnwrapper} has been set, the value will be
-	 * retrieved from that unwrapper.
+	 * Returns the current value to be validated. If a {@link ValidatedValueUnwrapper} has been set, the value will be
+	 * retrieved via that handler.
 	 *
 	 * @return the current value to be validated
 	 */
 	public final Object getCurrentValidatedValue() {
-		return validationValueUnwrapper != null ? validationValueUnwrapper.unwrapValidationValue( currentValue ) : currentValue;
+		return validatedValueHandler != null ? validatedValueHandler.handleValidatedValue( currentValue ) : currentValue;
 	}
 
 	public final void setPropertyPath(PathImpl propertyPath) {
@@ -183,13 +183,13 @@ public class ValueContext<T, V> {
 	}
 
 	/**
-	 * Returns the declared (static) type of the currently validated element. If a {@link ValidationValueUnwrapper} has
-	 * been set, the type will be retrieved via that unwrapper.
+	 * Returns the declared (static) type of the currently validated element. If a {@link ValidatedValueUnwrapper} has
+	 * been set, the type will be retrieved via that handler.
 	 *
 	 * @return the declared type of the currently validated element
 	 */
 	public final Type getTypeOfAnnotatedElement() {
-		return validationValueUnwrapper != null ? validationValueUnwrapper.getValueType( typeOfAnnotatedElement ) : typeOfAnnotatedElement;
+		return validatedValueHandler != null ? validatedValueHandler.getValidatedValueType( typeOfAnnotatedElement ) : typeOfAnnotatedElement;
 	}
 
 	public final void setTypeOfAnnotatedElement(Type typeOfAnnotatedElement) {
@@ -211,7 +211,7 @@ public class ValueContext<T, V> {
 		return sb.toString();
 	}
 
-	public void setValidationValueUnwrapper(ValidationValueUnwrapper<?> unwrapper) {
-		this.validationValueUnwrapper = (ValidationValueUnwrapper<V>) unwrapper;
+	public void setValidatedValueHandler(ValidatedValueUnwrapper<? super V> handler) {
+		this.validatedValueHandler = handler;
 	}
 }

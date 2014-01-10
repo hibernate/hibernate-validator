@@ -14,36 +14,30 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valueunwrapping.model;
+package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
-import javax.validation.constraints.Size;
+import java.lang.reflect.Type;
 
-import org.hibernate.validator.unwrapping.UnwrapValidatedValue;
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
+
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * @author Gunnar Morling
  */
-public class Customer {
+public class PropertyValueUnwrapper extends ValidatedValueUnwrapper<Property<?>> {
 
-	@Size(min = 4)
-	@UnwrapValidatedValue
-	private Property<String> name = new Property<String>( "Bob" );
+	private final TypeResolver typeResolver = new TypeResolver();
 
-	@Size(min = 4)
-	@UnwrapValidatedValue
-	private final StringProperty lastName = new StringProperty( "Foo" );
-
-	@Size(min = 4)
-	@UnwrapValidatedValue
-	private final UiInput<String> nameInput = new UiInput<String>( "Bob" );
-
-	public void setName(@Size(min = 4) @UnwrapValidatedValue Property<String> name) {
-		this.name = name;
+	@Override
+	public Object handleValidatedValue(Property<?> source) {
+		return source.getValue();
 	}
 
-	@Size(min = 4)
-	@UnwrapValidatedValue
-	public Property<String> retrieveName() {
-		return name;
+	@Override
+	public Type getValidatedValueType(Type sourceType) {
+		ResolvedType resolvedType = typeResolver.resolve( sourceType );
+		return resolvedType.typeParametersFor( Property.class ).get( 0 ).getErasedType();
 	}
 }

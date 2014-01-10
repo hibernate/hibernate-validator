@@ -17,6 +17,7 @@
 package org.hibernate.validator.test.internal.metadata;
 
 import java.util.Set;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
@@ -24,9 +25,8 @@ import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 import org.joda.time.DateMidnight;
-
 import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.unwrapping.UnwrapValidatedValue;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 /**
  * @author Gunnar Morling

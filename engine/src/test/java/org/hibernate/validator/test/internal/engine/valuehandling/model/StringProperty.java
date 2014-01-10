@@ -14,23 +14,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valueunwrapping.model;
-
-import javax.validation.constraints.Min;
+package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
 /**
  * @author Gunnar Morling
  */
-public class OrderLine {
+class StringProperty extends Property<String> {
 
-	private Property<Long> id = new Property<Long>( 0L );
-
-	@Min(1)
-	public Property<Long> getId() {
-		return id;
-	}
-
-	public void setId(@Min(1) Property<Long> id) {
-		this.id = id;
+	public StringProperty(String value) {
+		super( value );
 	}
 }

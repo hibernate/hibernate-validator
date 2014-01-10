@@ -21,6 +21,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -42,7 +43,7 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -121,9 +122,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final Map<ParameterNameProvider, BeanMetaDataManager> beanMetaDataManagerMap;
 
 	/**
-	 * Contains unwrappers to be applied when validating elements annotated with {@code UnwrapValidationValue}.
+	 * Contains handlers to be applied to the validated value when validating elements.
 	 */
-	private List<ValidationValueUnwrapper<?>> validationValueUnwrappers;
+	private List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
@@ -157,7 +158,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
 
-			this.validationValueUnwrappers = hibernateSpecificConfig.getValidationValueUnwrappers();
+			this.validatedValueHandlers = hibernateSpecificConfig.getValidatedValueHandlers();
 
 		}
 		tmpFailFast = checkPropertiesForFailFast(
@@ -175,7 +176,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
-				validationValueUnwrappers
+				validatedValueHandlers
 		);
 	}
 
@@ -203,8 +204,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return failFast;
 	}
 
-	public List<ValidationValueUnwrapper<?>> getValidationValueUnwrappers() {
-		return validationValueUnwrappers;
+	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
+		return validatedValueHandlers;
 	}
 
 	@Override
@@ -234,7 +235,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			TraversableResolver traversableResolver,
 			ParameterNameProvider parameterNameProvider,
 			boolean failFast,
-			List<ValidationValueUnwrapper<?>> validationValueUnwrappers) {
+			List<ValidatedValueUnwrapper<?>> validatedValueHandlers) {
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
 			beanMetaDataManager = new BeanMetaDataManager(
@@ -256,7 +257,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				beanMetaDataManager,
 				parameterNameProvider,
 				typeResolutionHelper,
-				validationValueUnwrappers,
+				validatedValueHandlers,
 				constraintValidatorManager,
 				failFast
 		);

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.unwrapping;
+package org.hibernate.validator.valuehandling;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -27,10 +27,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Can be specified on validated on properties (as represented by fields or property getters), parameters and
- * executables if the value of the annotated element must be unwrapped from a container type prior to validation. This
- * is useful when working with wrapper types such as {@code JAXBElement} or an {@code Optional} type where constraints
- * should not apply to the container but to the wrapped element:
+ * When specified on properties (as represented by fields or property getters), parameters or executables, the value of
+ * the annotated element will be unwrapped from a container type prior to validation. This is useful when working with
+ * wrapper types such as {@code JAXBElement} or an {@code Optional} type where constraints should not apply to the
+ * container but to the wrapped element:
  *
  * <pre>
  * &#064;Size(max = 10)
@@ -38,7 +38,11 @@ import java.lang.annotation.Target;
  * private JAXBElement&lt;String&gt; name;
  * </pre>
  *
+ * For each type to be unwrapped, a corresponding
+ * {@link org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper} implementation must be registered.
+ *
  * @author Gunnar Morling
+ * @hv.experimental This API is considered experimental and may change in future revisions
  */
 @Documented
 @Target({ METHOD, FIELD, CONSTRUCTOR, PARAMETER })

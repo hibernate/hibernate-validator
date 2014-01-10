@@ -14,15 +14,20 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valueunwrapping.model;
-
-import javax.validation.Valid;
+package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
 /**
  * @author Gunnar Morling
  */
-public class Account {
+class UiInput<T> {
 
-	@Valid
-	private final Customer customer = new Customer();
+	private final T value;
+
+	public UiInput(T value) {
+		this.value = value;
+	}
+
+	public T getValue() {
+		return value;
+	}
 }

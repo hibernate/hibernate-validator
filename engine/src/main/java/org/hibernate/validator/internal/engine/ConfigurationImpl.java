@@ -48,7 +48,7 @@ import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
-import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -202,9 +202,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
-	public HibernateValidatorConfiguration addValidationValueUnwrapper(ValidationValueUnwrapper<?> unwrapper) {
-		Contracts.assertNotNull( unwrapper, MESSAGES.parameterMustNotBeNull( "unwrapper" ) );
-		validationBootstrapParameters.addValidationValueUnwrapper( unwrapper );
+	public HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler) {
+		Contracts.assertNotNull( handler, MESSAGES.parameterMustNotBeNull( "handler" ) );
+		validationBootstrapParameters.addValidatedValueHandler( handler );
 
 		return this;
 	}
@@ -294,8 +294,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return validationBootstrapParameters.getParameterNameProvider();
 	}
 
-	public List<ValidationValueUnwrapper<?>> getValidationValueUnwrappers() {
-		return validationBootstrapParameters.getValidationValueUnwrappers();
+	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
+		return validationBootstrapParameters.getValidatedValueHandlers();
 	}
 
 	@Override

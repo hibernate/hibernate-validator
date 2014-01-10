@@ -20,7 +20,7 @@ import javax.validation.Configuration;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
-import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * Uniquely identifies Hibernate Validator in the Bean Validation bootstrap
@@ -101,13 +101,16 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	HibernateValidatorConfiguration failFast(boolean failFast);
 
 	/**
-	 * Registers the given validation value unwrapper. When validating an element annotated with
-	 * {@link org.hibernate.validator.unwrapping.UnwrapValidatedValue} the registered unwrapper(s) will be applied to
-	 * retrieve the value to validate.
+	 * Registers the given validated value unwrapper with the bootstrapped validator factory. When validating an element
+	 * which is of a type supported by the unwrapper and which is annotated with
+	 * {@link org.hibernate.validator.valuehandling.UnwrapValidatedValue}, the unwrapper will be applied to retrieve the
+	 * value to validate.
 	 *
-	 * @param unwrapper the unwrapper to register.
+	 * @param handler the unwrapper to register
 	 *
 	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @hv.experimental This API is considered experimental and may change in future revisions
 	 */
-	HibernateValidatorConfiguration addValidationValueUnwrapper(ValidationValueUnwrapper<?> unwrapper);
+	HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler);
 }

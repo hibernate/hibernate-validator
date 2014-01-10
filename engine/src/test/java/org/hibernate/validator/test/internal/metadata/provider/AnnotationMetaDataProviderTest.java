@@ -24,6 +24,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Map;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Payload;
@@ -36,7 +37,6 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -52,7 +52,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.unwrapping.UnwrapValidatedValue;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.spi.unwrapping;
+package org.hibernate.validator.spi.valuehandling;
 
 import java.lang.reflect.Type;
 
@@ -24,6 +24,8 @@ import java.lang.reflect.Type;
  * Unwrapper implementations can be registered when bootstrapping a validator or validator factory. Note that when more
  * than one unwrapper implementation is suitable to unwrap a given element, it is not specified which of the
  * implementations is chosen.
+ * <p>
+ * Implementations must be thread-safe.
  *
  * @param <T> the type which can be unwrapped by a specific implementation. The value for this type parameter must
  * either resolve to a non-parameterized type (i.e. because the type is not using generics or because the raw
@@ -31,24 +33,25 @@ import java.lang.reflect.Type;
  * wildcard types (i.e. <?>).
  *
  * @author Gunnar Morling
+ * @hv.experimental This SPI is considered experimental and may change in future revisions
  */
-public abstract class ValidationValueUnwrapper<T> {
+public abstract class ValidatedValueUnwrapper<T> {
 
 	/**
 	 * Retrieves the value to be validated from the given wrapper object.
 	 *
-	 * @param source the wrapper object to retrieve the value from
+	 * @param value the wrapper object to retrieve the value from
 	 *
 	 * @return the unwrapped value to be validated
 	 */
-	public abstract Object unwrapValidationValue(T source);
+	public abstract Object handleValidatedValue(T value);
 
 	/**
 	 * Retrieves the declared (static) type of the unwrapped object as to be used for constraint validator resolution.
 	 *
-	 * @param sourceType the declared type of the wrapper object
+	 * @param valueType the declared type of the wrapper object
 	 *
 	 * @return the declared type of the unwrapped object
 	 */
-	public abstract Type getValueType(Type sourceType);
+	public abstract Type getValidatedValueType(Type valueType);
 }

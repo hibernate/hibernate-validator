@@ -14,30 +14,15 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valueunwrapping.model;
+package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
-import java.lang.reflect.Type;
-
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.TypeResolver;
-
-import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+import javax.validation.Valid;
 
 /**
  * @author Gunnar Morling
  */
-public class PropertyValueUnwrapper extends ValidationValueUnwrapper<Property<?>> {
+public class Account {
 
-	private final TypeResolver typeResolver = new TypeResolver();
-
-	@Override
-	public Object unwrapValidationValue(Property<?> source) {
-		return source.getValue();
-	}
-
-	@Override
-	public Type getValueType(Type sourceType) {
-		ResolvedType resolvedType = typeResolver.resolve( sourceType );
-		return resolvedType.typeParametersFor( Property.class ).get( 0 ).getErasedType();
-	}
+	@Valid
+	private final Customer customer = new Customer();
 }

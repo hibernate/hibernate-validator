@@ -14,23 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.hibernate.validator.cfg.context;
 
 /**
- * Facet of a constraint mapping creational context which allows to mark the underlying element as to be unwrapped prior
- * to validation.
- *
- * @author Gunnar Morling
- *
- * @hv.experimental This API is considered experimental and may change in future revisions
+ * Contains annotations dealing with the handling of values of validated elements prior to validation.
+ * <p>This package is part of the public Hibernate Validator API.
  */
-public interface Unwrapable<U extends Unwrapable<U>> {
-
-	/**
-	 * Marks the current element (property, parameter etc.) as unwrapable. Equivalent to annotating this element with
-	 * {@link org.hibernate.validator.valuehandling.UnwrapValidatedValue}.
-	 *
-	 * @return The current creational context following the method chaining pattern.
-	 */
-	U unwrapValidatedValue();
-}
+package org.hibernate.validator.valuehandling;

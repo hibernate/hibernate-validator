@@ -14,20 +14,30 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valueunwrapping.model;
+package org.hibernate.validator.test.internal.engine.valuehandling.model;
+
+import java.lang.reflect.Type;
+
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
+
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * @author Gunnar Morling
  */
-class UiInput<T> {
+public class UiInputValueUnwrapper extends ValidatedValueUnwrapper<UiInput<?>> {
 
-	private final T value;
+	private final TypeResolver typeResolver = new TypeResolver();
 
-	public UiInput(T value) {
-		this.value = value;
+	@Override
+	public Object handleValidatedValue(UiInput<?> source) {
+		return source.getValue();
 	}
 
-	public T getValue() {
-		return value;
+	@Override
+	public Type getValidatedValueType(Type sourceType) {
+		ResolvedType resolvedType = typeResolver.resolve( sourceType );
+		return resolvedType.typeParametersFor( UiInput.class ).get( 0 ).getErasedType();
 	}
 }

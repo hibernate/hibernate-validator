@@ -14,18 +14,23 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valueunwrapping.model;
+package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
-import javax.validation.constraints.Size;
-
-import org.hibernate.validator.unwrapping.UnwrapValidatedValue;
+import javax.validation.constraints.Min;
 
 /**
  * @author Gunnar Morling
  */
-public class Order {
+public class OrderLine {
 
-	@Size(min = 4)
-	@UnwrapValidatedValue
-	private final Wrapper<Long> id = new Wrapper<Long>( 42L );
+	private Property<Long> id = new Property<Long>( 0L );
+
+	@Min(1)
+	public Property<Long> getId() {
+		return id;
+	}
+
+	public void setId(@Min(1) Property<Long> id) {
+		this.id = id;
+	}
 }

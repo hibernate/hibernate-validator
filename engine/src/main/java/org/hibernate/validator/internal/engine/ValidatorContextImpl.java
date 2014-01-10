@@ -25,7 +25,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
-import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * @author Emmanuel Bernard
@@ -43,7 +43,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ParameterNameProvider parameterNameProvider;
 
 	private boolean failFast;
-	private final List<ValidationValueUnwrapper<?>> validationValueUnwrappers;
+	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
 		this.validatorFactory = validatorFactory;
@@ -52,7 +52,9 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		this.parameterNameProvider = validatorFactory.getParameterNameProvider();
 		this.failFast = validatorFactory.isFailFast();
-		this.validationValueUnwrappers = new ArrayList<ValidationValueUnwrapper<?>>( validatorFactory.getValidationValueUnwrappers() );
+		this.validatedValueHandlers = new ArrayList<ValidatedValueUnwrapper<?>>(
+				validatorFactory.getValidatedValueHandlers()
+		);
 	}
 
 	@Override
@@ -106,8 +108,8 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
-	public HibernateValidatorContext addValidationValueUnwrapper(ValidationValueUnwrapper<?> unwrapper) {
-		this.validationValueUnwrappers.add( unwrapper );
+	public HibernateValidatorContext addValidationValueHandler(ValidatedValueUnwrapper<?> handler) {
+		this.validatedValueHandlers.add( handler );
 		return this;
 	}
 
@@ -119,7 +121,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
-				validationValueUnwrappers
+				validatedValueHandlers
 		);
 	}
 }

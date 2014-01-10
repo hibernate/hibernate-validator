@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -33,7 +34,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.ResourceLoaderHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.unwrapping.ValidationValueUnwrapper;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -49,7 +50,7 @@ public class ValidationBootstrapParameters {
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
 	private ParameterNameProvider parameterNameProvider;
-	private final List<ValidationValueUnwrapper<?>> validationValueUnwrappers = newArrayList();
+	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = newHashMap();
@@ -234,11 +235,11 @@ public class ValidationBootstrapParameters {
 		}
 	}
 
-	public void addValidationValueUnwrapper(ValidationValueUnwrapper<?> unwrapper) {
-		validationValueUnwrappers.add( unwrapper );
+	public void addValidatedValueHandler(ValidatedValueUnwrapper<?> handler) {
+		validatedValueHandlers.add( handler );
 	}
 
-	public List<ValidationValueUnwrapper<?>> getValidationValueUnwrappers() {
-		return validationValueUnwrappers;
+	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
+		return validatedValueHandlers;
 	}
 }

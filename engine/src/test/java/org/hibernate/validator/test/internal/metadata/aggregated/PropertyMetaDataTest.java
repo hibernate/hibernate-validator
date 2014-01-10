@@ -17,6 +17,7 @@
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import java.util.Set;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
@@ -24,12 +25,11 @@ import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.unwrapping.UnwrapValidatedValue;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 import static org.fest.assertions.Assertions.assertThat;

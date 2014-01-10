@@ -14,16 +14,16 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valueunwrapping.model;
+package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
 /**
  * @author Gunnar Morling
  */
-class Wrapper<T> {
+public class Property<T> {
 
 	private final T value;
 
-	public Wrapper(T value) {
+	public Property(T value) {
 		this.value = value;
 	}
 
