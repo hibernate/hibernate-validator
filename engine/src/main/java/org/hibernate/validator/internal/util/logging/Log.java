@@ -46,7 +46,6 @@ import org.jboss.logging.MessageLogger;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
@@ -247,8 +246,8 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToRetrieveAnnotationParameterValueException(@Cause Exception e);
 
 	@Message(id = 62,
-			value = "Method %1$s has %2$s parameters, but the passed list of parameter meta data has a size of %3$s.")
-	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(ExecutableElement executableElement, int nbParameters, int listSize);
+			value = "Method or constructor %1$s has %2$s parameters, but the passed list of parameter meta data has a size of %3$s.")
+	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(String executableName, int nbParameters, int listSize);
 
 	@Message(id = 63, value = "Unable to instantiate %s.")
 	ValidationException getUnableToInstantiateException(String className, @Cause Exception e);
@@ -629,4 +628,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 181,
 			value = "Wrong number of parameters. Method or constructor %1$s expects %2$d parameters, but got %3$d.")
 	IllegalArgumentException getInvalidParameterCountForExecutableException(String executable, int expectedParameterCount, int actualParameterCount);
+
+	@Message(id = 182, value = "No validation value unwrapper is registered for type %1$s.")
+	ValidationException getNoUnwrapperFoundForTypeException(String typeName);
 }

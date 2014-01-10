@@ -50,6 +50,7 @@ public abstract class MetaDataBuilder {
 	private final Set<MetaConstraint<?>> constraints = newHashSet();
 	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
+	private boolean requiresUnwrapping = false;
 
 	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper) {
 		this.beanClass = beanClass;
@@ -78,6 +79,7 @@ public abstract class MetaDataBuilder {
 	public void add(ConstrainedElement constrainedElement) {
 		constraints.addAll( constrainedElement.getConstraints() );
 		isCascading = isCascading || constrainedElement.isCascading();
+		requiresUnwrapping = requiresUnwrapping || constrainedElement.requiresUnwrapping();
 
 		addGroupConversions( constrainedElement.getGroupConversions() );
 	}
@@ -120,6 +122,10 @@ public abstract class MetaDataBuilder {
 		return isCascading;
 	}
 
+	public boolean requiresUnwrapping() {
+		return requiresUnwrapping;
+	}
+
 	/**
 	 * Adapts the given constraints to the given bean type. In case a constraint
 	 * is defined locally at the bean class the original constraint will be
@@ -144,13 +150,13 @@ public abstract class MetaDataBuilder {
 	}
 
 	private <A extends Annotation> MetaConstraint<A> adaptOriginAndImplicitGroup(MetaConstraint<A> constraint) {
-		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getBeanClass() );
+		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getDeclaringClass() );
 
 		if ( definedIn == ConstraintOrigin.DEFINED_LOCALLY ) {
 			return constraint;
 		}
 
-		Class<?> constraintClass = constraint.getLocation().getBeanClass();
+		Class<?> constraintClass = constraint.getLocation().getDeclaringClass();
 
 		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
 				constraintHelper,

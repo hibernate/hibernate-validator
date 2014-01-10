@@ -23,7 +23,7 @@ import java.util.Set;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -58,7 +58,7 @@ public class ConstrainedTypeBuilder {
 		}
 
 		// constraints
-		BeanConstraintLocation constraintLocation = new BeanConstraintLocation( beanClass );
+		ConstraintLocation constraintLocation = ConstraintLocation.forClass( beanClass );
 		Set<MetaConstraint<?>> metaConstraints = newHashSet();
 		for ( ConstraintType constraint : classType.getConstraint() ) {
 			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(

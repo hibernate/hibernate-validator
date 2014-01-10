@@ -362,7 +362,14 @@ public final class ReflectionHelper {
 	 * @return The erased type.
 	 */
 	public static Type typeOf(ExecutableElement executable, int parameterIndex) {
-		Type type = executable.getGenericParameterTypes()[parameterIndex];
+		Type[] genericParameterTypes = executable.getGenericParameterTypes();
+
+		// getGenericParameterTypes() doesn't return synthetic parameters; in this case fall back to getParameterTypes()
+		if ( parameterIndex >= genericParameterTypes.length ) {
+			genericParameterTypes = executable.getParameterTypes();
+		}
+
+		Type type = genericParameterTypes[parameterIndex];
 
 		if ( type instanceof TypeVariable ) {
 			type = TypeHelper.getErasedType( type );

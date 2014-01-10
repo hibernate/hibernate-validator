@@ -37,19 +37,22 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	protected final Set<MetaConstraint<?>> constraints;
 	protected final Map<Class<?>, Class<?>> groupConversions;
 	protected final boolean isCascading;
+	protected final boolean requiresUnwrapping;
 
 	public AbstractConstrainedElement(ConfigurationSource source,
 									  ConstrainedElementKind kind,
 									  ConstraintLocation location,
 									  Set<MetaConstraint<?>> constraints,
 									  Map<Class<?>, Class<?>> groupConversions,
-									  boolean isCascading) {
+									  boolean isCascading,
+									  boolean requiresUnwrapping) {
 		this.kind = kind;
 		this.source = source;
 		this.location = location;
 		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
 		this.groupConversions = Collections.unmodifiableMap( groupConversions );
 		this.isCascading = isCascading;
+		this.requiresUnwrapping = requiresUnwrapping;
 	}
 
 	@Override
@@ -88,17 +91,23 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	}
 
 	@Override
+	public boolean requiresUnwrapping() {
+		return requiresUnwrapping;
+	}
+
+	@Override
 	public String toString() {
 		return "AbstractConstrainedElement [kind=" + kind + ", source="
 				+ source + ", location=" + location + ", constraints="
-				+ constraints + ", isCascading=" + isCascading + "]";
+				+ constraints + ", groupConversions=" + groupConversions
+				+ ", isCascading=" + isCascading + ", requiresUnwrapping="
+				+ requiresUnwrapping + "]";
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ( ( location == null ) ? 0 : location.hashCode() );
 		result = prime * result + ( ( source == null ) ? 0 : source.hashCode() );
 		return result;
 	}
@@ -115,20 +124,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 			return false;
 		}
 		AbstractConstrainedElement other = (AbstractConstrainedElement) obj;
-		if ( location == null ) {
-			if ( other.location != null ) {
-				return false;
-			}
-		}
-		else if ( !location.equals( other.location ) ) {
-			return false;
-		}
-		if ( source == null ) {
-			if ( other.source != null ) {
-				return false;
-			}
-		}
-		else if ( !source.equals( other.source ) ) {
+		if ( source != other.source ) {
 			return false;
 		}
 		return true;

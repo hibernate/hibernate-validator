@@ -16,7 +16,8 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
-import java.lang.annotation.ElementType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ import java.util.Set;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -43,6 +44,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 	private static final Log log = LoggerFactory.make();
+
+	private final ExecutableElement executable;
 
 	/**
 	 * Constrained-related meta data for this executable's parameters.
@@ -66,10 +69,11 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
-			ExecutableConstraintLocation location,
+			ConstraintLocation location,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
-			boolean isCascading) {
+			boolean isCascading,
+			boolean requiresUnwrapping) {
 		this(
 				source,
 				location,
@@ -77,7 +81,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				requiresUnwrapping
 		);
 	}
 
@@ -95,29 +100,35 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
 	 * return value shall be performed or not.
+	 * @param requiresUnwrapping Whether the value of the executable's return value must be unwrapped prior to
+	 * validation or not
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
-			ExecutableConstraintLocation location,
+			ConstraintLocation location,
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
-			boolean isCascading) {
+			boolean isCascading,
+			boolean requiresUnwrapping) {
 		super(
 				source,
-				location.getElementType() == ElementType.CONSTRUCTOR ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
+				( location.getMember() instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				location,
 				returnValueConstraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				requiresUnwrapping
 		);
 
-		ExecutableElement executable = location.getExecutableElement();
+		this.executable = ( location.getMember() instanceof Method ) ?
+				ExecutableElement.forMethod( (Method) location.getMember() ) :
+				ExecutableElement.forConstructor( (Constructor<?>) location.getMember() );
 
 		if ( parameterMetaData.size() != executable.getParameterTypes().length ) {
 			throw log.getInvalidLengthOfParameterMetaDataListException(
-					executable,
+					executable.getAsString(),
 					executable.getParameterTypes().length,
 					parameterMetaData.size()
 			);
@@ -128,13 +139,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
 
 		if ( isConstrained() ) {
-			ReflectionHelper.setAccessibility( executable.getMember() );
+			ReflectionHelper.setAccessibility( location.getMember() );
 		}
-	}
-
-	@Override
-	public ExecutableConstraintLocation getLocation() {
-		return (ExecutableConstraintLocation) super.getLocation();
 	}
 
 	/**
@@ -151,7 +157,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
 			throw log.getInvalidExecutableParameterIndexException(
-					getLocation().getExecutableElement().getAsString(),
+					executable.getAsString(),
 					parameterIndex
 			);
 		}
@@ -208,7 +214,11 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 *         otherwise.
 	 */
 	public boolean isGetterMethod() {
-		return getLocation().getExecutableElement().isGetterMethod();
+		return executable.isGetterMethod();
+	}
+
+	public ExecutableElement getExecutable() {
+		return executable;
 	}
 
 	@Override
@@ -291,7 +301,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				mergedCrossParameterConstraints,
 				mergedReturnValueConstraints,
 				mergedGroupConversions,
-				isCascading || other.isCascading
+				isCascading || other.isCascading,
+				requiresUnwrapping || other.requiresUnwrapping
 		);
 	}
 
@@ -303,5 +314,37 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		}
 
 		return descriptors;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result
+				+ ( ( executable == null ) ? 0 : executable.hashCode() );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( !super.equals( obj ) ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ConstrainedExecutable other = (ConstrainedExecutable) obj;
+		if ( executable == null ) {
+			if ( other.executable != null ) {
+				return false;
+			}
+		}
+		else if ( !executable.equals( other.executable ) ) {
+			return false;
+		}
+		return true;
 	}
 }

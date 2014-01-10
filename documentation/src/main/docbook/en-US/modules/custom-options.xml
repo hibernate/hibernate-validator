@@ -130,6 +130,15 @@
             ParaNamer library, see <xref
             linkend="section-paranamer-parameternameprovider"/>.</entry>
           </row>
+
+          <row>
+            <entry><package>org.hibernate.validator.valuehandling</package>,
+            <package>org.hibernate.validator.spi.valuehandling</package></entry>
+
+            <entry>Classes related to the processing of values prior to their
+            validation, see <xref
+            linkend="section-value-handling"/>.</entry>
+          </row>
         </tbody>
       </tgroup>
     </table>
@@ -601,5 +610,92 @@ public @interface PatternOrSize {
     specify a <classname>Paranamer</classname> implementation of your choice
     when creating a <classname>ParanamerParameterNameProvider</classname>
     instance. </para>
+  </section>
+
+  <section id="section-value-handling">
+    <title>Unwrapping values prior to validation</title>
+
+    <para>Sometimes it is required to unwrap values prior to the validation.
+    E.g. in <xref linkend="example-using-unwrapvalidatedvalue"/> property types
+    as specified by <ulink url="http://docs.oracle.com/javafx/"> JavaFX</ulink>
+    are used to define an element of some domain model.</para>
+
+    <example id="example-using-unwrapvalidatedvalue">
+      <title>Using<classname>@UnwrapValidatedValue</classname></title>
+
+      <programlisting language="JAVA" role="JAVA">@Size(min = 3)
+@UnwrapValidatedValue
+private Property&lt;String&gt; name = new SimpleStringProperty( "Bob" );</programlisting>
+    </example>
+
+    <note>
+      <para>The concept of value unwrapping is considered experimental at this
+      time and may evolve into more general means of value handling in future
+      releases. Please let us know about your use cases for such functionality.
+      </para>
+    </note>
+
+    <para>In JavaFX, bean properties are typically not of simple data types
+    like <classname>String</classname> or <classname>int</classname>, but are
+    wrapped in <classname>Property</classname> types which allows to make them
+    observable, use them for data binding etc. When applying a constraint such
+    as <classname>@Size</classname> to an element of type
+    <classname>Property&lt;String&gt;</classname> without further preparation,
+    an exception would be raised, indicating that no suitable validator for
+    that constraint and data type can be found. Thus the validated value must
+    be unwrapped from the containing property object before looking up a
+    validator and invoking it.</para>
+
+    <para>To do so, put the <classname>@UnwrapValidatedValue</classname>
+    annotation to the element in question. This will advice the validation
+    engine to look for an unwrapper implementation which returns the data type
+    to be used for constraint validator resolution and unwraps the validated
+    value. Unwrapper types must extend the SPI class
+    <classname>ValidatedValueUnwrapper</classname> as shown in
+    <xref linkend="example-implementation-of-validatedvalueunwrapper"/>.</para>
+
+    <example id="example-implementation-of-validatedvalueunwrapper">
+      <title>Implementing the <classname>ValidatedValueUnwrapper</classname>
+      interface</title>
+
+      <programlisting language="JAVA" role="JAVA">public class PropertyValueUnwrapper extends ValidatedValueUnwrapper&lt;Property&lt;?&gt;&gt; {
+
+	@Override
+	public Object handleValidatedValue(Property&lt;?&gt; value) {
+		//...
+	}
+
+	@Override
+	public Type getValidatedValueType(Type valueType) {
+		//...
+	}
+}</programlisting>
+    </example>
+
+    <para>Value unwrappers must be registered when obtaining a <classname>Validator</classname>
+    instance as follows:</para>
+
+    <example id="example-registering-validatedvalueunwrapper">
+      <title>Registering a <classname>ValidatedValueUnwrapper</classname></title>
+
+      <programlisting language="JAVA" role="JAVA">Validator validator = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.addValidatedValueHandler( new PropertyValueUnwrapper() )
+		.buildValidatorFactory()
+		.getValidator();</programlisting>
+    </example>
+
+    <para>Several unwrapper implementations can be registered when working
+    with different kinds of wrapper types in one application. Note that it is
+    not specified which of the unwrapper implementations is chosen when more
+    than one implementation is suitable to unwrap a given element.</para>
+
+    <para>Alternatively, the fully-qualified names of one ore more unwrapper
+    implementations can be specified via the configuration property
+    <property>hibernate.validator.validated_value_handlers</property> which
+    can be useful when configuring the default validator factory using the
+    descriptor <filename>META-INF/validation.xml</filename> (see <xref
+    linkend="chapter-xml-configuration"/>).</para>
+
   </section>
 </chapter>

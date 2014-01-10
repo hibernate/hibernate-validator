@@ -16,12 +16,13 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -32,17 +33,25 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public class ConstrainedParameter extends AbstractConstrainedElement {
+
+	private final Type type;
 	private final String name;
+	private final int index;
 
 	public ConstrainedParameter(ConfigurationSource source,
-								ExecutableConstraintLocation location,
+								ConstraintLocation location,
+								Type type,
+								int index,
 								String name) {
 		this(
 				source,
 				location,
+				type,
+				index,
 				name,
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
+				false,
 				false
 		);
 	}
@@ -58,32 +67,42 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param groupConversions The group conversions of the represented method parameter, if any.
 	 * @param isCascading Whether a cascaded validation of the represented method
 	 * parameter shall be performed or not.
+	 * @param requiresUnwrapping Whether the value of the parameter must be unwrapped prior to validation or not
 	 */
 	public ConstrainedParameter(ConfigurationSource source,
-								ExecutableConstraintLocation location,
+								ConstraintLocation location,
+								Type type,
+								int index,
 								String name,
 								Set<MetaConstraint<?>> constraints,
 								Map<Class<?>, Class<?>> groupConversions,
-								boolean isCascading) {
+								boolean isCascading,
+								boolean requiresUnwrapping) {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,
 				location,
 				constraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				requiresUnwrapping
 		);
 
+		this.type = type;
 		this.name = name;
+		this.index = index;
 	}
 
-	@Override
-	public ExecutableConstraintLocation getLocation() {
-		return (ExecutableConstraintLocation) super.getLocation();
+	public Type getType() {
+		return type;
 	}
 
-	public String getParameterName() {
+	public String getName() {
 		return name;
+	}
+
+	public int getIndex() {
+		return index;
 	}
 
 	/**
@@ -115,10 +134,13 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		return new ConstrainedParameter(
 				mergedSource,
 				getLocation(),
+				type,
+				index,
 				mergedName,
 				mergedConstraints,
 				mergedGroupConversions,
-				isCascading || other.isCascading
+				isCascading || other.isCascading,
+				requiresUnwrapping || other.requiresUnwrapping
 		);
 	}
 
@@ -136,5 +158,40 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 		return "ParameterMetaData [location=" + getLocation() + "], name=" + name + "], constraints=["
 				+ constraintsAsString + "], isCascading=" + isCascading() + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + index;
+		result = prime * result + ( ( getLocation().getMember() == null ) ? 0 : getLocation().getMember().hashCode() );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( !super.equals( obj ) ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ConstrainedParameter other = (ConstrainedParameter) obj;
+		if ( index != other.index ) {
+			return false;
+		}
+		if ( getLocation().getMember() == null ) {
+			if ( other.getLocation().getMember() != null ) {
+				return false;
+			}
+		}
+		else if ( !getLocation().getMember().equals( other.getLocation().getMember() ) ) {
+			return false;
+		}
+		return true;
 	}
 }

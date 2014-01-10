@@ -69,14 +69,16 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 							 Type type,
 							 Set<MetaConstraint<?>> constraints,
 							 Map<Class<?>, Class<?>> groupConversions,
-							 Member cascadingMember) {
+							 Member cascadingMember,
+							 boolean requiresUnwrapping) {
 		super(
 				propertyName,
 				type,
 				constraints,
 				ElementKind.PROPERTY,
 				cascadingMember != null,
-				cascadingMember != null || !constraints.isEmpty()
+				cascadingMember != null || !constraints.isEmpty(),
+				requiresUnwrapping
 		);
 
 		if ( cascadingMember != null ) {
@@ -167,7 +169,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			super( beanClass, constraintHelper );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedField.getLocation().getMember() );
-			this.propertyType = ( (Field) constrainedField.getLocation().getMember() ).getGenericType();
+			this.propertyType = ReflectionHelper.typeOf( constrainedField.getLocation().getMember() );
 			add( constrainedField );
 		}
 
@@ -183,7 +185,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			super( beanClass, constraintHelper );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getLocation().getMember() );
-			this.propertyType = constrainedMethod.getLocation().typeOfAnnotatedElement();
+			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getLocation().getMember() );
 			add( constrainedMethod );
 		}
 
@@ -221,7 +223,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 					propertyType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					getGroupConversions(),
-					cascadingMember
+					cascadingMember,
+					requiresUnwrapping()
 			);
 		}
 

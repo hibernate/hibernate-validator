@@ -34,6 +34,7 @@ import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
@@ -189,9 +190,13 @@ public class PathImplTest {
 						Item.class
 				)
 		);
-		ExecutableMetaData executableMetaData = new BeanMetaDataManager( new ConstraintHelper(), new ExecutableHelper() ).getBeanMetaData(
-				Container.class
-		).getMetaDataFor( executable );
+		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+				new ConstraintHelper(),
+				new ExecutableHelper( new TypeResolutionHelper() )
+		);
+
+		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )
+				.getMetaDataFor( executable );
 
 		PathImpl methodParameterPath = PathImpl.createPathForExecutable( executableMetaData );
 

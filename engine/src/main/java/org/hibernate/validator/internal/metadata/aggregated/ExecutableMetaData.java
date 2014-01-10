@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -35,13 +36,13 @@ import org.hibernate.validator.internal.metadata.aggregated.rule.VoidMethodsMust
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -84,7 +85,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 	private ExecutableMetaData(
 			String name,
-			Class<?> returnType,
+			Type returnType,
 			Class<?>[] parameterTypes,
 			ElementKind kind,
 			Set<MetaConstraint<?>> returnValueConstraints,
@@ -93,14 +94,16 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Map<Class<?>, Class<?>> returnValueGroupConversions,
 			boolean isCascading,
 			boolean isConstrained,
-			boolean isGetter) {
+			boolean isGetter,
+			boolean requiresUnwrapping) {
 		super(
 				name,
 				returnType,
 				returnValueConstraints,
 				kind,
 				isCascading,
-				isConstrained
+				isConstrained,
+				requiresUnwrapping
 		);
 
 		this.parameterTypes = parameterTypes;
@@ -111,7 +114,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				returnType,
 				returnValueConstraints,
 				isCascading,
-				returnValueGroupConversions
+				returnValueGroupConversions,
+				requiresUnwrapping
 		);
 		this.isGetter = isGetter;
 	}
@@ -280,7 +284,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 */
 		private final ConstrainedElement.ConstrainedElementKind kind;
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
-		private final ExecutableConstraintLocation location;
+		private final ExecutableElement executable;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private boolean isConstrained = false;
 
@@ -307,7 +311,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 			this.executableHelper = executableHelper;
 			kind = constrainedExecutable.getKind();
-			location = constrainedExecutable.getLocation();
+			executable = constrainedExecutable.getExecutable();
 			add( constrainedExecutable );
 		}
 
@@ -317,15 +321,14 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				return false;
 			}
 
-			ExecutableElement executableElement = ( (ConstrainedExecutable) constrainedElement ).getLocation()
-					.getExecutableElement();
+			ExecutableElement executableElement = ( (ConstrainedExecutable) constrainedElement ).getExecutable();
 
 			//are the locations equal (created by different builders) or
 			//does one of the executables override the other one?
 			return
-					location.getExecutableElement().equals( executableElement ) ||
-							executableHelper.overrides( location.getExecutableElement(), executableElement ) ||
-							executableHelper.overrides( executableElement, location.getExecutableElement() );
+					executable.equals( executableElement ) ||
+							executableHelper.overrides( executable, executableElement ) ||
+							executableHelper.overrides( executableElement, executable );
 		}
 
 		@Override
@@ -347,7 +350,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * @param executable The executable to merge.
 		 */
 		private void addToExecutablesByDeclaringType(ConstrainedExecutable executable) {
-			Class<?> beanClass = executable.getLocation().getBeanClass();
+			Class<?> beanClass = executable.getLocation().getDeclaringClass();
 			ConstrainedExecutable mergedExecutable = executablesByDeclaringType.get( beanClass );
 
 			if ( mergedExecutable != null ) {
@@ -364,12 +367,10 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		public ExecutableMetaData build() {
 			assertCorrectnessOfConfiguration();
 
-			ExecutableElement executableElement = location.getExecutableElement();
-
 			return new ExecutableMetaData(
-					executableElement.getSimpleName(),
-					executableElement.getReturnType(),
-					executableElement.getParameterTypes(),
+					executable.getSimpleName(),
+					ReflectionHelper.typeOf( executable.getMember() ),
+					executable.getParameterTypes(),
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
@@ -377,7 +378,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					getGroupConversions(),
 					isCascading(),
 					isConstrained,
-					executableElement.isGetterMethod()
+					executable.isGetterMethod(),
+					requiresUnwrapping()
 			);
 		}
 
@@ -392,14 +394,13 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			List<ParameterMetaData.Builder> parameterBuilders = null;
 
 			for ( ConstrainedExecutable oneExecutable : constrainedExecutables ) {
-
 				if ( parameterBuilders == null ) {
 					parameterBuilders = newArrayList();
 
 					for ( ConstrainedParameter oneParameter : oneExecutable.getAllParameterMetaData() ) {
 						parameterBuilders.add(
 								new ParameterMetaData.Builder(
-										location.getBeanClass(),
+										executable.getMember().getDeclaringClass(),
 										oneParameter,
 										constraintHelper
 								)

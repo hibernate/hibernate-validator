@@ -360,7 +360,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		for ( Class<?> clazz : classAndInterfaces ) {
 			for ( MetaConstraint<?> metaConstraint : allMetaConstraints ) {
-				if ( metaConstraint.getLocation().getBeanClass().equals( clazz ) ) {
+				if ( metaConstraint.getLocation().getDeclaringClass().equals( clazz ) ) {
 					constraints.add( metaConstraint );
 				}
 			}

@@ -25,7 +25,7 @@ import java.util.Set;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
@@ -57,7 +57,7 @@ public class ConstrainedGetterBuilder {
 		for ( GetterType getterType : getterList ) {
 			String getterName = getterType.getName();
 			Method getter = findGetter( beanClass, getterName, alreadyProcessedGetterNames );
-			ExecutableConstraintLocation constraintLocation = new ExecutableConstraintLocation( getter );
+			ConstraintLocation constraintLocation = ConstraintLocation.forProperty( getter );
 
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : getterType.getConstraint() ) {
@@ -83,7 +83,8 @@ public class ConstrainedGetterBuilder {
 					Collections.<MetaConstraint<?>>emptySet(),
 					metaConstraints,
 					groupConversions,
-					getterType.getValid() != null
+					getterType.getValid() != null,
+					false
 			);
 			constrainedExecutables.add( constrainedGetter );
 

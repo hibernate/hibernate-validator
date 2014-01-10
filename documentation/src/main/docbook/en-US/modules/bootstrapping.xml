@@ -435,8 +435,8 @@ Validator validator = validatorFactory.getValidator();</programlisting>
       <methodname>Validation#byProvider()</methodname> provider specific
       options can be configured.</para>
 
-      <para>In case of Hibernate Validator this allows you to enable the fail
-      fast mode and pass one or more programmatic constraint mappings as
+      <para>In case of Hibernate Validator this e.g. allows you to enable the
+      fail fast mode and pass one or more programmatic constraint mappings as
       demonstrated in <xref
       linkend="example-hibernate-validator-specific-options"/>.</para>
 

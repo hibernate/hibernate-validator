@@ -26,9 +26,10 @@ import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
@@ -96,11 +97,14 @@ public final class ParameterConstraintMappingContextImpl
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
 		return new ConstrainedParameter(
 				ConfigurationSource.API,
-				new ExecutableConstraintLocation( executableContext.getExecutable(), parameterIndex ),
+				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex ),
+				ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex ),
+				parameterIndex,
 				executableContext.getExecutable().getParameterNames( parameterNameProvider ).get( parameterIndex ),
 				getConstraints( constraintHelper ),
 				groupConversions,
-				isCascading
+				isCascading,
+				isUnwrapValidatedValue()
 		);
 	}
 

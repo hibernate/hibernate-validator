@@ -20,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
@@ -29,12 +30,13 @@ import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -71,7 +73,6 @@ public class ExecutableConstraintMappingContextImpl
 		this.executable = executable;
 		this.parameterContexts = new ParameterConstraintMappingContextImpl[executable.getParameterTypes().length];
 	}
-
 
 	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
@@ -131,12 +132,13 @@ public class ExecutableConstraintMappingContextImpl
 	public ConstrainedElement build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
 		return new ConstrainedExecutable(
 				ConfigurationSource.API,
-				new ExecutableConstraintLocation( executable ),
+				ConstraintLocation.forReturnValue( executable ),
 				getParameters( constraintHelper, parameterNameProvider ),
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
-				returnValueContext != null ? returnValueContext.isCascading() : false
+				returnValueContext != null ? returnValueContext.isCascading() : false,
+				returnValueContext != null ? returnValueContext.isUnwrapValidatedValue() : false
 		);
 	}
 
@@ -152,7 +154,9 @@ public class ExecutableConstraintMappingContextImpl
 				constrainedParameters.add(
 						new ConstrainedParameter(
 								ConfigurationSource.API,
-								new ExecutableConstraintLocation( executable, i ),
+								ConstraintLocation.forParameter( executable, i ),
+								ReflectionHelper.typeOf( executable, i ),
+								i,
 								executable.getParameterNames( parameterNameProvider ).get( i )
 						)
 				);

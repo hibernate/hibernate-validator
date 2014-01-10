@@ -33,7 +33,7 @@ import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -208,7 +208,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		elements.add(
 				new ConstrainedType(
 						ConfigurationSource.API,
-						new BeanConstraintLocation( beanClass ),
+						ConstraintLocation.forClass( beanClass ),
 						getConstraints( constraintHelper )
 				)
 		);

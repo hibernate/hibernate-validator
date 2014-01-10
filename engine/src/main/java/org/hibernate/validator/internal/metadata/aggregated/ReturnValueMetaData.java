@@ -49,14 +49,16 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	public ReturnValueMetaData(Type type,
 							   Set<MetaConstraint<?>> constraints,
 							   boolean isCascading,
-							   Map<Class<?>, Class<?>> groupConversions) {
+							   Map<Class<?>, Class<?>> groupConversions,
+							   boolean requiresUnwrapping) {
 		super(
 				RETURN_VALUE_NODE_NAME,
 				type,
 				constraints,
 				ElementKind.RETURN_VALUE,
 				isCascading,
-				!constraints.isEmpty() || isCascading
+				!constraints.isEmpty() || isCascading,
+				requiresUnwrapping
 		);
 
 		this.cascadables = Collections.unmodifiableList( isCascading ? Arrays.asList( this ) : Collections.<Cascadable>emptyList() );

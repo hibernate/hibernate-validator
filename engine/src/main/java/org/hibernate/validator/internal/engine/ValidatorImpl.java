@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
@@ -48,6 +49,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.CachingTraversableResolverForSingleValidation;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
@@ -58,8 +60,13 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -124,11 +131,23 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final boolean failFast;
 
+	/**
+	 * Used for resolving generic type information.
+	 */
+	private final TypeResolutionHelper typeResolutionHelper;
+
+	/**
+	 * Contains handlers to be applied prior to validation when validating elements.
+	 */
+	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
+
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 						 MessageInterpolator messageInterpolator,
 						 TraversableResolver traversableResolver,
 						 BeanMetaDataManager beanMetaDataManager,
 						 ParameterNameProvider parameterNameProvider,
+						 TypeResolutionHelper typeResolutionHelper,
+						 List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 						 ConstraintValidatorManager constraintValidatorManager,
 						 boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -136,6 +155,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.parameterNameProvider = parameterNameProvider;
+		this.typeResolutionHelper = typeResolutionHelper;
+		this.validatedValueHandlers = validatedValueHandlers;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
 
@@ -431,7 +452,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
 					// time. An interface can define more than one constraint, we have to check the class we are validating.
-					final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
+					final Class<?> declaringClass = metaConstraint.getLocation().getDeclaringClass();
 					if ( declaringClass.isInterface() ) {
 						Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
 						if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
@@ -481,11 +502,12 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		boolean validationSuccessful = true;
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
-			valueContext.appendNode(
-					beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() ).getMetaDataFor(
-							ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() )
-					)
+			PropertyMetaData propertyMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() ).getMetaDataFor(
+					ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() )
 			);
+
+			valueContext.appendNode( propertyMetaData );
+			setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, propertyMetaData );
 		}
 		else {
 			valueContext.appendBeanNode();
@@ -855,7 +877,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
 					// time. An interface can define more than one constraint, we have to check the class we are validating.
-					final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
+					final Class<?> declaringClass = metaConstraint.getLocation().getDeclaringClass();
 					if ( declaringClass.isInterface() ) {
 						Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
 						if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
@@ -1027,7 +1049,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					if ( parameterMetaData.getType() instanceof Class && ( (Class<?>) parameterMetaData.getType() ).isPrimitive() ) {
 						valueType = ReflectionHelper.unBoxedType( valueType );
 					}
-					if ( !TypeHelper.isAssignable( parameterMetaData.getType(), valueType ) ) {
+					if ( !TypeHelper.isAssignable( TypeHelper.getErasedType( parameterMetaData.getType() ), valueType ) ) {
 						throw log.getParameterTypesDoNotMatchException(
 								valueType.getName(),
 								parameterMetaData.getType().toString(),
@@ -1037,7 +1059,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					}
 				}
 
-				valueContext.appendNode( executableMetaData.getParameterMetaData( i ) );
+				valueContext.appendNode( parameterMetaData );
+				setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, parameterMetaData );
 				valueContext.setCurrentValidatedValue( value );
 
 				numberOfViolationsOfCurrentGroup += validateConstraintsForGroup(
@@ -1192,6 +1215,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			valueContext.setCurrentValidatedValue( value );
 			valueContext.appendNode( executableMetaData.getReturnValueMetaData() );
+			setValidatedValueHandlerToValueContextIfPresent(
+					validationContext,
+					valueContext,
+					executableMetaData.getReturnValueMetaData()
+			);
 
 			numberOfViolationsOfCurrentGroup +=
 					validateConstraintsForGroup(
@@ -1399,5 +1427,46 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private boolean shouldFailFast(ValidationContext<?> context) {
 		return context.isFailFastModeEnabled() && !context.getFailingConstraints().isEmpty();
+	}
+
+	/**
+	 * Returns the first validated value handler found which supports the given type.
+	 * <p>
+	 * If required this could be enhanced to search for the most-specific handler and raise an exception in case more
+	 * than one matching handler is found (or a scheme of prioritizing handlers to process several handlers in order.
+	 *
+	 * @param type the type to be handled
+	 *
+	 * @return the handler for the given type or {@code null} if no matching handler was found
+	 */
+	private ValidatedValueUnwrapper<?> getValidatedValueHandler(Type type) {
+		TypeResolver typeResolver = typeResolutionHelper.getTypeResolver();
+
+		for ( ValidatedValueUnwrapper<?> handler : validatedValueHandlers ) {
+			ResolvedType handlerType = typeResolver.resolve( handler.getClass() );
+			List<ResolvedType> typeParameters = handlerType.typeParametersFor( ValidatedValueUnwrapper.class );
+
+			if ( TypeHelper.isAssignable( typeParameters.get( 0 ).getErasedType(), type ) ) {
+				return handler;
+			}
+		}
+
+		return null;
+	}
+
+	private <T> void setValidatedValueHandlerToValueContextIfPresent(ValidationContext<?> validationContext,
+			ValueContext<?, T> valueContext, ConstraintMetaData metaData) {
+		if ( metaData.requiresUnwrapping() ) {
+			@SuppressWarnings("unchecked") //we know the handler matches the value type
+					ValidatedValueUnwrapper<? super T> handler = (ValidatedValueUnwrapper<T>) getValidatedValueHandler(
+					metaData.getType()
+			);
+
+			if ( handler == null ) {
+				throw log.getNoUnwrapperFoundForTypeException( metaData.getType().toString() );
+			}
+
+			valueContext.setValidatedValueHandler( handler );
+		}
 	}
 }

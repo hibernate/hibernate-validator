@@ -241,7 +241,8 @@
                             org.hibernate.validator.messageinterpolation;version="${project.version}",
                             org.hibernate.validator.parameternameprovider;version="${project.version}",
                             org.hibernate.validator.resourceloading;version="${project.version}",
-                            org.hibernate.validator.spi.*;version="${project.version}"
+                            org.hibernate.validator.spi.*;version="${project.version}",
+                            org.hibernate.validator.valuehandling;version="${project.version}",
                         </Export-Package>
                     </instructions>
                 </configuration>

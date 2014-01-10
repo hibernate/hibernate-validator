@@ -24,7 +24,7 @@ import java.util.Set;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -54,7 +54,7 @@ public class ConstrainedFieldBuilder {
 		List<String> alreadyProcessedFieldNames = newArrayList();
 		for ( FieldType fieldType : fields ) {
 			Field field = findField( beanClass, fieldType.getName(), alreadyProcessedFieldNames );
-			BeanConstraintLocation constraintLocation = new BeanConstraintLocation( field );
+			ConstraintLocation constraintLocation = ConstraintLocation.forProperty( field );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : fieldType.getConstraint() ) {
 				MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
@@ -77,7 +77,8 @@ public class ConstrainedFieldBuilder {
 					constraintLocation,
 					metaConstraints,
 					groupConversions,
-					fieldType.getValid() != null
+					fieldType.getValid() != null,
+					false
 			);
 			constrainedFields.add( constrainedField );
 

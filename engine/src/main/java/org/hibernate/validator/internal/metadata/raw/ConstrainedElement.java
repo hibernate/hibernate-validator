@@ -108,4 +108,11 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 *         <code>false</code> otherwise.
 	 */
 	boolean isConstrained();
+
+	/**
+	 * Whether this element is marked for unwrapping prior to validation or not.
+	 *
+	 * @return {@code true} if the value to be validated needs to unwrapped, {@code false} otherwise.
+	 */
+	boolean requiresUnwrapping();
 }

@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
 
@@ -272,12 +273,14 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private <T, V> Set<ConstraintViolation<T>> validateSingleConstraint(ValidationContext<T> executionContext,
-																		ValueContext<?, V> valueContext,
+																		ValueContext<?, ?> valueContext,
 																		ConstraintValidatorContextImpl constraintValidatorContext,
 																		ConstraintValidator<A, V> validator) {
 		boolean isValid;
 		try {
-			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );
+			@SuppressWarnings("unchecked")
+			V validatedValue = (V) valueContext.getCurrentValidatedValue();
+			isValid = validator.isValid( validatedValue, constraintValidatorContext );
 		}
 		catch ( RuntimeException e ) {
 			throw log.getExceptionDuringIsValidCallException( e );

@@ -22,6 +22,8 @@ import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidatorContext;
 
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
 /**
  * Represents a Hibernate Validator specific context that is used to create
  * {@link javax.validation.Validator} instances. Adds additional configuration options to those
@@ -32,10 +34,13 @@ import javax.validation.ValidatorContext;
  */
 public interface HibernateValidatorContext extends ValidatorContext {
 
+	@Override
 	HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator);
 
+	@Override
 	HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver);
 
+	@Override
 	HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory);
 
 	/**
@@ -48,4 +53,17 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 */
 	HibernateValidatorContext failFast(boolean failFast);
 
+	/**
+	 * Registers the given validated value unwrapper with the bootstrapped validator. When validating an element which
+	 * is of a type supported by the unwrapper and which is annotated with
+	 * {@link org.hibernate.validator.valuehandling.UnwrapValidatedValue}, the unwrapper will be applied to retrieve the
+	 * value to validate.
+	 *
+	 * @param handler the unwrapper to register
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @hv.experimental This API is considered experimental and may change in future revisions
+	 */
+	HibernateValidatorContext addValidationValueHandler(ValidatedValueUnwrapper<?> handler);
 }
