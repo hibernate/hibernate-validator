@@ -55,9 +55,33 @@ public @interface SafeHtml {
 
 	/**
 	 * @return Additional whitelist tags which are allowed on top of the tags specified by the
-	 *         {@link #whitelistType()}.
+	 * {@link #whitelistType()}.
 	 */
 	String[] additionalTags() default { };
+
+	/**
+	 * @return Allows to specify additional whitelist tags with optional attributes.
+	 */
+	Tag[] additionalTagsWithAttributes() default { };
+
+	/**
+	 * Allows to specified whitelist tags with specified optional attributes. Adding a tag with a given attribute also
+	 * whitelists the tag itself without any attribute.
+	 */
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+	@Retention(RUNTIME)
+	@Documented
+	public @interface Tag {
+		/**
+		 * @return the tag name to whitelist.
+		 */
+		String name();
+
+		/**
+		 * @return list of tag attributes which are whitelisted.
+		 */
+		String[] attributes() default { };
+	}
 
 	/**
 	 * Defines several {@code @SafeHtml} annotations on the same element.
@@ -70,7 +94,7 @@ public @interface SafeHtml {
 	}
 
 	/**
-	 * Defines default whitelist implementations
+	 * Defines default whitelist implementations.
 	 */
 	public enum WhiteListType {
 		/**
