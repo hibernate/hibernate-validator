@@ -30,12 +30,13 @@ import org.hibernate.validator.constraints.SafeHtml;
  * It uses <a href="http://www.jsoup.org">JSoup</a> as the underlying parser/sanitizer library.
  *
  * @author George Gastaldi
+ * @author Hardy Ferentschik
  */
 public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequence> {
 	private Whitelist whitelist;
 
-	public void initialize(SafeHtml constraintAnn) {
-		switch ( constraintAnn.whitelistType() ) {
+	public void initialize(SafeHtml safeHtmlAnnotation) {
+		switch ( safeHtmlAnnotation.whitelistType() ) {
 			case BASIC:
 				whitelist = Whitelist.basic();
 				break;
@@ -52,7 +53,11 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 				whitelist = Whitelist.simpleText();
 				break;
 		}
-		whitelist.addTags( constraintAnn.additionalTags() );
+		whitelist.addTags( safeHtmlAnnotation.additionalTags() );
+
+		for ( SafeHtml.Tag tag : safeHtmlAnnotation.additionalTagsWithAttributes() ) {
+			whitelist.addAttributes( tag.name(), tag.attributes() );
+		}
 	}
 
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
