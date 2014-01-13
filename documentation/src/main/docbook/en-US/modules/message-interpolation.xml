@@ -202,7 +202,7 @@ public class Car {
 	@Size(
 			min = 2,
 			max = 14,
-			message = "The license plate must be between {min} and {max} characters long"
+			message = "The license plate '${validatedValue}' must be between {min} and {max} characters long"
 	)
 	private String licensePlate;
 
@@ -256,7 +256,9 @@ public class Car {
           <para>the <classname>@Size</classname> constraint on the
           <varname>licensePlate</varname> field shows the interpolation of
           message parameters (<literal>{min}</literal>,
-          <literal>{max}</literal>)</para>
+          <literal>{max}</literal>) and how to add the validated value to the
+          error message using the EL expression <literal>${validatedValue}</literal>
+          </para>
         </listitem>
 
         <listitem>
@@ -269,9 +271,8 @@ public class Car {
 
         <listitem>
           <para>the message for the <classname>@DecimalMax</classname>
-          constraint on <varname>topSpeed</varname> shows how to refer to the
-          validated object in the error message and format it using the
-          <varname>formatter</varname> object</para>
+          constraint on <varname>topSpeed</varname> shows how to format the
+          validated value using the <varname>formatter</varname> object</para>
         </listitem>
 
         <listitem>
@@ -282,6 +283,16 @@ public class Car {
           price</para>
         </listitem>
       </itemizedlist>
+
+      <tip>
+        <para>Only actual constraint attributes can be interpolated using
+        message parameters in the form <literal>{attributeName}</literal>. When
+        referring to the validated value or custom expression variables added
+        to the interpolation context (see <xref
+        linkend="section-hibernateconstraintvalidatorcontext"/>), an EL
+        expression in the form <literal>${attributeName}</literal> must be
+        used.</para>
+      </tip>
 
       <example id="example-expected-error-messages">
         <title>Expected error messages</title>
