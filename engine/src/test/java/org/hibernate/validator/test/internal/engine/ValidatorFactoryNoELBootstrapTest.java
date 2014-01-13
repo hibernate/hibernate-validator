@@ -51,8 +51,8 @@ public class ValidatorFactoryNoELBootstrapTest {
 		catch ( InvocationTargetException e ) {
 			Exception exceptionInValidation = (Exception) e.getTargetException();
 			assertEquals(
-					"Unable to instantiate Configuration.",
 					exceptionInValidation.getMessage(),
+					"Unable to instantiate Configuration.",
 					"Bootstrapping in Validation should throw an exception "
 			);
 			Throwable rootCause = exceptionInValidation.getCause();
@@ -90,7 +90,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 			// for all other classes we have to jump through some hoops
 			else {
 				// load the class via the parent class loader
-				Class clazz = super.loadClass( className );
+				Class<?> clazz = super.loadClass( className );
 				// if we have a class from the java name space we need to return it, since the security manager
 				// won't allow to redefine it
 				for ( String prefix : PASS_THROUGH_PACKAGE_PREFIXES ) {
