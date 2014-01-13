@@ -65,7 +65,7 @@ public @interface SafeHtml {
 	Tag[] additionalTagsWithAttributes() default { };
 
 	/**
-	 * Allows to specified whitelist tags with specified optional attributes. Adding a tag with a given attribute also
+	 * Allows to specify whitelist tags with specified optional attributes. Adding a tag with a given attribute also
 	 * whitelists the tag itself without any attribute.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })

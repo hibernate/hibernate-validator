@@ -123,7 +123,7 @@ public class SafeHtmlValidatorTest {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( "<div style='foo'>test</div>" ) );
 		assertNumberOfViolations( constraintViolations, 0 );
 
-		// the attributes are optional - allowing <div class> also allows jsut <div>
+		// the attributes are optional - allowing <div class> also allows just <div>
 		constraintViolations = validator.validate( new Foo( "<div>test</div>" ) );
 		assertNumberOfViolations( constraintViolations, 0 );
 
