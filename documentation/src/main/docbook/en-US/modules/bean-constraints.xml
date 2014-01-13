@@ -1109,7 +1109,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
               <methodname>additionalTags</methodname> or
               <methodname>additionalTagsWithAttributes</methodname>. The
               former allows to add tags without any attributes, whereas the
-              latter allows to specify tags and optinally allowed attributes
+              latter allows to specify tags and optionally allowed attributes
               using the annotation
               <classname>@SafeHtml.Tag</classname>.</para></entry>
 
