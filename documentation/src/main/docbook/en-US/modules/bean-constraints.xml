@@ -1094,18 +1094,24 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
 
             <row>
               <entry><classname>@SafeHtml(whitelistType=,</classname>
-              <classname>additionalTags=)</classname></entry>
+              <classname>additionalTags=,
+              additionalTagsWithAttributes=)</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
 
-              <entry>Checks whether the annotated value contains potentially
-              malicious fragments such as <code>&lt;script/&gt;</code>. In
-              order to use this constraint, the <ulink
-              url="http://jsoup.org/">jsoup</ulink> library must be part of
-              the class path. With the <parameter>whitelistType</parameter>
-              attribute predefined whitelist types can be chosen. You can also
-              specify additional html tags for the whitelist with the
-              <parameter>additionalTags</parameter> attribute.</entry>
+              <entry><para>Checks whether the annotated value contains
+              potentially malicious fragments such as
+              <code>&lt;script/&gt;</code>. In order to use this constraint,
+              the <ulink url="http://jsoup.org/">jsoup</ulink> library must be
+              part of the class path. </para><para>With the
+              <parameter>whitelistType</parameter> attribute a predefined
+              whitelist type can be chosen which can be refined via
+              <methodname>additionalTags</methodname> or
+              <methodname>additionalTagsWithAttributes</methodname>. The
+              former allows to add tags without any attributes, whereas the
+              latter allows to specify tags and optinally allowed attributes
+              using the annotation
+              <classname>@SafeHtml.Tag</classname>.</para></entry>
 
               <entry>None</entry>
             </row>
