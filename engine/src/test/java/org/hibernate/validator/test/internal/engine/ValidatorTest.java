@@ -18,6 +18,7 @@ package org.hibernate.validator.test.internal.engine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
@@ -213,6 +214,15 @@ public class ValidatorTest {
 		assertSame( asObject, validator );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-596")
+	public void testValidateValueWithNestedPath() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<X>> constraintViolations = validator.validateValue( X.class, "list[0].foo", null );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "list[0].foo" );
+	}
+
 	class A {
 		@NotNull
 		String b;
@@ -323,5 +333,19 @@ public class ValidatorTest {
 		public String getFoo() {
 			return m_foo;
 		}
+	}
+
+	class X {
+		@Valid
+		List<Z> list = new ArrayList<Z>();
+
+		public void addZ(Z z) {
+			list.add( z );
+		}
+	}
+
+	class Z {
+		@NotNull
+		String foo;
 	}
 }

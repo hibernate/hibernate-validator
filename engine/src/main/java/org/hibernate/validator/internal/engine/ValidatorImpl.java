@@ -45,6 +45,7 @@ import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.CachingTraversableResolverForSingleValidation;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -1272,13 +1273,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to the given property path.
 	 */
 	private <V> ValueContext<?, V> collectMetaConstraintsForPath(Class<?> clazz, Object value, Iterator<Path.Node> propertyIter, PathImpl propertyPath, List<MetaConstraint<?>> metaConstraintsList) {
-		Path.Node elem = propertyIter.next();
+		// cast is ok, since we are dealing with engine internal classes
+		NodeImpl elem = (NodeImpl) propertyIter.next();
 		Object newValue = value;
 
 		BeanMetaData<?> metaData = beanMetaDataManager.getBeanMetaData( clazz );
 		PropertyMetaData property = metaData.getMetaDataFor( elem.getName() );
 
-		//use precomputed method list as ReflectionHelper#containsMember is slow
+		// use precomputed method list as ReflectionHelper#containsMember is slow
 		if ( property == null ) {
 			throw log.getInvalidPropertyPathException( elem.getName(), metaData.getBeanClass().getName() );
 		}
@@ -1291,7 +1293,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				newValue = newValue == null ? null : property.getValue(
 						newValue
 				);
-				if ( elem.isInIterable() ) {
+				if ( elem.isIterable() ) {
 					if ( newValue != null && elem.getIndex() != null ) {
 						newValue = ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
 					}
