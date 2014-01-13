@@ -14,7 +14,7 @@ public class Car {
 	@Size(
 			min = 2,
 			max = 14,
-			message = "The license plate must be between {min} and {max} characters long"
+			message = "The license plate '${validatedValue}' must be between {min} and {max} characters long"
 	)
 	private String licensePlate;
 
