@@ -59,7 +59,6 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 				.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses( User.class )
 				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
-				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )

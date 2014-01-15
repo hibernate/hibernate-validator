@@ -35,8 +35,6 @@ import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.hibernate.validator.integration.util.IntegrationTestUtil;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -57,7 +55,6 @@ public class DefaultValidatorFactoryInPersistenceUnitIT {
 		return ShrinkWrap
 				.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses( User.class )
-				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );

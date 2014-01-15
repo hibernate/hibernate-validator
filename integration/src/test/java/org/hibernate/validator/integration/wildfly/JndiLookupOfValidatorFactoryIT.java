@@ -30,8 +30,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.hibernate.validator.integration.util.IntegrationTestUtil;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -51,7 +49,6 @@ public class JndiLookupOfValidatorFactoryIT {
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap
 				.create( WebArchive.class, WAR_FILE_NAME )
-				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
 				.addAsResource( "log4j.properties" );
 	}
 
