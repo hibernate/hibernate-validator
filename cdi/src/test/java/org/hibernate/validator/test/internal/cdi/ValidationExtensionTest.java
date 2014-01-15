@@ -19,6 +19,7 @@ package org.hibernate.validator.test.internal.cdi;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -28,11 +29,11 @@ import javax.validation.ValidatorFactory;
 
 import org.junit.Before;
 import org.junit.Test;
-
 import org.hibernate.validator.internal.cdi.ValidationExtension;
 import org.hibernate.validator.internal.cdi.ValidationProviderHelper;
 import org.hibernate.validator.internal.cdi.ValidatorBean;
 import org.hibernate.validator.internal.cdi.ValidatorFactoryBean;
+import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptorBean;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -108,6 +109,8 @@ public class ValidationExtensionTest {
 		);
 		expect( processBeanMock.getBean() ).andReturn( new ValidatorBean( beanManagerMock, validationProviderHelper ) );
 
+		afterBeanDiscoveryMock.addBean( isA( ValidationInterceptorBean.class ) );
+
 		// get the mocks ready
 		replay( processBeanMock, afterBeanDiscoveryMock, beanManagerMock );
 
@@ -124,6 +127,7 @@ public class ValidationExtensionTest {
 	public void testRegisterBeanWithCustomQualifier() {
 		afterBeanDiscoveryMock.addBean( isA( ValidatorFactoryBean.class ) );
 		afterBeanDiscoveryMock.addBean( isA( ValidatorBean.class ) );
+		afterBeanDiscoveryMock.addBean( isA( ValidationInterceptorBean.class ) );
 
 		// get the mocks ready
 		replay( afterBeanDiscoveryMock, beanManagerMock );
@@ -150,6 +154,8 @@ public class ValidationExtensionTest {
 		expect( processBeanMock.getBean() ).andReturn( validatorBeanMock );
 		expect( validatorBeanMock.getTypes() ).andReturn( validatorBeanTypes );
 		expect( validatorBeanMock.getTypes() ).andReturn( validatorBeanTypes );
+
+		afterBeanDiscoveryMock.addBean( isA( ValidationInterceptorBean.class ) );
 
 		// get the mocks ready
 		replay( processBeanMock, validatorFactoryBeanMock, validatorBeanMock, afterBeanDiscoveryMock, beanManagerMock );

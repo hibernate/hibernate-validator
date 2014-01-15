@@ -21,11 +21,7 @@ import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
-import javax.annotation.Priority;
-import javax.inject.Inject;
-import javax.interceptor.AroundConstruct;
-import javax.interceptor.AroundInvoke;
-import javax.interceptor.Interceptor;
+
 import javax.interceptor.InvocationContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -41,9 +37,6 @@ import javax.validation.executable.ExecutableValidator;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-@MethodValidated
-@Interceptor
-@Priority(Interceptor.Priority.PLATFORM_AFTER + 800)
 public class ValidationInterceptor implements Serializable {
 
 	private static final long serialVersionUID = 604440259030722151L;
@@ -55,8 +48,11 @@ public class ValidationInterceptor implements Serializable {
 	 * alright to have it as non-transient field here. Upon passivation not the validator itself will be serialized, but the
 	 * proxy injected here, which in turn is serializable.
 	 */
-	@Inject
-	private Validator validator;
+	private final Validator validator;
+
+	public ValidationInterceptor(Validator validator) {
+		this.validator = validator;
+	}
 
 	/**
 	 * Validates the Bean Validation constraints specified at the parameters and/or return value of the intercepted method.
@@ -68,7 +64,6 @@ public class ValidationInterceptor implements Serializable {
 	 * @throws Exception Any exception caused by the intercepted method invocation. A {@link ConstraintViolationException}
 	 * in case at least one constraint violation occurred either during parameter or return value validation.
 	 */
-	@AroundInvoke
 	public Object validateMethodInvocation(InvocationContext ctx) throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
 		Set<ConstraintViolation<Object>> violations = executableValidator.validateParameters(
@@ -110,8 +105,6 @@ public class ValidationInterceptor implements Serializable {
 	 * @throws Exception Any exception caused by the intercepted constructor invocation. A {@link ConstraintViolationException}
 	 * in case at least one constraint violation occurred either during parameter or return value validation.
 	 */
-	@AroundConstruct
-	@SuppressWarnings("unchecked")
 	public void validateConstructorInvocation(InvocationContext ctx) throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
 		Set<ConstraintViolation<Object>> violations = executableValidator.validateConstructorParameters(

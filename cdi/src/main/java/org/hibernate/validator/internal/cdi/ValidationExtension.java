@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedCallable;
@@ -51,7 +52,7 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotatedType;
-import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
+import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptorBean;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -71,7 +72,14 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * the {@code HibernateValidator} qualifier if Hibernate Validator is the default validation provider.</li>
  * <li>In case Hibernate Validator is <em>not</em> the default provider, another pair of beans will be registered in
  * addition which are qualified with the {@code HibernateValidator} qualifier.</li>
+ * <li>A bean representing the interceptor used for method validation</li>
  * </ul>
+ *
+ * Implementation note: The types represented by the validator factory and validator beans may be defined in archives
+ * where they are not "visible" to the bean manager used to inject references to these beans. Therefore the beans for
+ * validator (which needs a reference to the validator factory) and validation interceptor (which needs a reference to
+ * the validator) are implemented in form of custom CDI beans which gives us control over their instantiation and thus
+ * allows to pass in a bean manager which then can be used to manually look up these references.
  *
  * @author Gunnar Morling
  * @author Hardy Ferentschik
@@ -117,10 +125,6 @@ public class ValidationExtension implements Extension {
 	public void beforeBeanDiscovery(@Observes BeforeBeanDiscovery beforeBeanDiscoveryEvent, final BeanManager beanManager) {
 		Contracts.assertNotNull( beforeBeanDiscoveryEvent, "The BeforeBeanDiscovery event cannot be null" );
 		Contracts.assertNotNull( beanManager, "The BeanManager cannot be null" );
-
-		// Register the interceptor explicitly. This way, no beans.xml is needed
-		AnnotatedType<ValidationInterceptor> annotatedType = beanManager.createAnnotatedType( ValidationInterceptor.class );
-		beforeBeanDiscoveryEvent.addAnnotatedType( annotatedType );
 	}
 
 	/**
@@ -162,6 +166,8 @@ public class ValidationExtension implements Extension {
 				);
 			}
 		}
+
+		afterBeanDiscoveryEvent.addBean( new ValidationInterceptorBean( beanManager ) );
 	}
 
 	/**
