@@ -25,7 +25,6 @@ Hibernate Validator Changelog
     * [HV-821] - Improve reference documentation for EL interpolation
     * [HV-835] - Update to Classmate 1.0.0
     * [HV-841] - Add "UnusedImports" check to checkstyle.xml
-    * [HV-844] - Make the Validator version used to run the TCK against configurable
     * [HV-845] - ValidationMessage for Korean
     * [HV-850] - Add checkstyle IllegalImport configuration for junit.framework
 

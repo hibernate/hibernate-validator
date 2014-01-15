@@ -32,7 +32,6 @@
     <name>Hibernate Validator TCK Runner</name>
     <description>Aggregates dependencies and runs the JSR-349 TCK</description>
     <properties>
-        <hv.version>${project.version}</hv.version>
         <tck.version>1.1.2.Final</tck.version>
         <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
         <arquillian.version>1.0.0.Final</arquillian.version>
@@ -49,12 +48,10 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>${hv.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator-cdi</artifactId>
-            <version>${hv.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.el</groupId>
