@@ -1,6 +1,41 @@
 Hibernate Validator Changelog
 =============================
 
+5.1.0.Alpha1 (15.01.2014)
+-------------------------
+
+** Bug
+    * [HV-596] - Improve error message for unsupported validateValue() invocations
+    * [HV-808] - Brazilian CPF and ModCheck Validator are returning false positives
+    * [HV-809] - Create Dedicated Mod10 and Mod11 constraints
+    * [HV-810] - @Email constraint accepts addresses with trailing @ characters
+    * [HV-818] - ArrayIndexOutOfBoundsException in ReflectionHelper#parametersResolveToSameTypes()
+    * [HV-838] - ReflectionHelper leaks deployment classes in wildfly integration
+    * [HV-842] - XmlParserHelper can leak deployment classloader in wildfly integration
+    * [HV-843] - Make members of non-public constraint types accessible
+    * [HV-848] - ValidationContext$BeanAndPath shouldn't access hashCode() of validated beans
+
+** Improvement
+    * [HV-589] - Keep a constant metadata placeholder for unconstrained entities
+    * [HV-789] - Update dependencies for CDI, Weld etc.
+    * [HV-793] - Fail during building of validator factory in case EL dependencies are missing
+    * [HV-805] - Raise descriptive exception in case parameter array passed to validation engine has wrong length
+    * [HV-815] - German translation of @Length message is incorrect
+    * [HV-817] - Rethink Validator SafeHtml design to support custom "WhiteListType"
+    * [HV-821] - Improve reference documentation for EL interpolation
+    * [HV-835] - Update to Classmate 1.0.0
+    * [HV-841] - Add "UnusedImports" check to checkstyle.xml
+    * [HV-844] - Make the Validator version used to run the TCK against configurable
+    * [HV-845] - ValidationMessage for Korean
+    * [HV-850] - Add checkstyle IllegalImport configuration for junit.framework
+
+** New Feature
+    * [HV-565] - @Valid for custom composite types
+    * [HV-813] - Make @Mod10 check constraint more generic
+    * [HV-819] - Add an API/SPI which allows to make the process of value retrieval customizable
+    * [HV-824] - Use WildFly for integration tests
+
+
 5.1.0.Alpha1 (09.08.2013)
 -------------------------
 
