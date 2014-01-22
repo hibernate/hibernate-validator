@@ -462,7 +462,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						validatedInterfaces.put( declaringClass, clazz );
 					}
 
-					boolean tmp = validateConstraint( validationContext, valueContext, metaConstraint );
+					boolean tmp = validateConstraint( validationContext, valueContext, false, metaConstraint );
 					if ( shouldFailFast( validationContext ) ) {
 						return;
 					}
@@ -486,7 +486,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( MetaConstraint<?> metaConstraint : beanMetaData.getMetaConstraints() ) {
-			validateConstraint( validationContext, valueContext, metaConstraint );
+			validateConstraint( validationContext, valueContext, false, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
@@ -498,6 +498,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private boolean validateConstraint(ValidationContext<?> validationContext,
 									   ValueContext<?, Object> valueContext,
+									   boolean propertyPathComplete,
 									   MetaConstraint<?> metaConstraint) {
 
 		boolean validationSuccessful = true;
@@ -507,7 +508,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() )
 			);
 
-			valueContext.appendNode( propertyMetaData );
+			if ( !propertyPathComplete ) {
+				valueContext.appendNode( propertyMetaData );
+			}
 			setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, propertyMetaData );
 		}
 		else {
@@ -515,8 +518,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-			Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
-			valueContext.setCurrentValidatedValue( valueToValidate );
+			if ( valueContext.getCurrentBean() != null ) {
+				Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
+				valueContext.setCurrentValidatedValue( valueToValidate );
+			}
 			validationSuccessful = metaConstraint.validateConstraint( validationContext, valueContext );
 		}
 
@@ -824,18 +829,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private int validatePropertyForNonDefaultGroup(ValueContext<?, Object> valueContext, ValidationContext<?> validationContext, List<MetaConstraint<?>> metaConstraints) {
 		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
-
 		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
-			if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-				if ( valueContext.getCurrentBean() != null ) {
-					Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
-					valueContext.setCurrentValidatedValue( valueToValidate );
-				}
-				metaConstraint.validateConstraint( validationContext, valueContext );
-				if ( shouldFailFast( validationContext ) ) {
-					return validationContext.getFailingConstraints()
-							.size() - numberOfConstraintViolationsBefore;
-				}
+			validateConstraint( validationContext, valueContext, true, metaConstraint );
+			if ( shouldFailFast( validationContext ) ) {
+				return validationContext.getFailingConstraints()
+						.size() - numberOfConstraintViolationsBefore;
 			}
 		}
 		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
@@ -887,14 +885,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						validatedInterfaces.put( declaringClass, clazz );
 					}
 
-					if ( constraintList.contains( metaConstraint )
-							&& isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
+					if ( constraintList.contains( metaConstraint ) ) {
+						boolean tmp = validateConstraint( validationContext, valueContext, true, metaConstraint );
 
-						if ( valueContext.getCurrentBean() != null ) {
-							Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
-							valueContext.setCurrentValidatedValue( valueToValidate );
-						}
-						boolean tmp = metaConstraint.validateConstraint( validationContext, valueContext );
 						validationSuccessful = validationSuccessful && tmp;
 						if ( shouldFailFast( validationContext ) ) {
 							return validationContext.getFailingConstraints()

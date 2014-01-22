@@ -19,13 +19,13 @@ package org.hibernate.validator.test.internal.engine.valuehandling;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.util.Set;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.test.internal.engine.valuehandling.model.Account;
@@ -34,6 +34,7 @@ import org.hibernate.validator.test.internal.engine.valuehandling.model.Order;
 import org.hibernate.validator.test.internal.engine.valuehandling.model.OrderLine;
 import org.hibernate.validator.test.internal.engine.valuehandling.model.Property;
 import org.hibernate.validator.test.internal.engine.valuehandling.model.PropertyValueUnwrapper;
+import org.hibernate.validator.test.internal.engine.valuehandling.model.StringProperty;
 import org.hibernate.validator.test.internal.engine.valuehandling.model.UiInputValueUnwrapper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
@@ -92,6 +93,32 @@ public class UnwrapValidatedValueTest {
 		Set<ConstraintViolation<Customer>> violations = validator.forExecutables()
 				.validateReturnValue( customer, method, returnValue );
 
+		assertEquals( violations.size(), 1 );
+	}
+
+	@Test
+	public void shouldUnwrapPropertyValuesDuringPropertyValidation() {
+		Set<ConstraintViolation<Customer>> violations = validator.validateProperty( new Customer(), "name" );
+		assertEquals( violations.size(), 1 );
+	}
+
+	@Test
+	public void shouldUnwrapPropertyValuesDuringPropertyValidationWithGroup() {
+		Set<ConstraintViolation<Customer>> violations = validator.validateProperty(
+				new Customer(),
+				"middleName",
+				Customer.CustomValidationGroup.class
+		);
+		assertEquals( violations.size(), 1 );
+	}
+
+	@Test
+	public void shouldUnwrapPropertyValuesDuringValueValidation() {
+		Set<ConstraintViolation<Customer>> violations = validator.validateValue(
+				Customer.class,
+				"name",
+				new StringProperty( "Bob" )
+		);
 		assertEquals( violations.size(), 1 );
 	}
 
@@ -165,7 +192,7 @@ public class UnwrapValidatedValueTest {
 		assertEquals( violations.size(), 1 );
 	}
 
-	@BeforeMethod
+	@Test
 	public void shouldUnwrapPropertyValuesUsingUnwrapperGivenViaProperty() {
 		Validator validator = ValidatorUtil.getConfiguration()
 				.addProperty(

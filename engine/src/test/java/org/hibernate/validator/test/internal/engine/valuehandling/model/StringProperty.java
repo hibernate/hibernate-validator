@@ -19,7 +19,7 @@ package org.hibernate.validator.test.internal.engine.valuehandling.model;
 /**
  * @author Gunnar Morling
  */
-class StringProperty extends Property<String> {
+public class StringProperty extends Property<String> {
 
 	public StringProperty(String value) {
 		super( value );

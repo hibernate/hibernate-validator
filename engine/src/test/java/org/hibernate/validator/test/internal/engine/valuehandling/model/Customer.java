@@ -33,6 +33,10 @@ public class Customer {
 	@UnwrapValidatedValue
 	private final StringProperty lastName = new StringProperty( "Foo" );
 
+	@Size(min = 4, groups = CustomValidationGroup.class)
+	@UnwrapValidatedValue
+	private final StringProperty middleName = new StringProperty( "Foo" );
+
 	@Size(min = 4)
 	@UnwrapValidatedValue
 	private final UiInput<String> nameInput = new UiInput<String>( "Bob" );
@@ -45,5 +49,8 @@ public class Customer {
 	@UnwrapValidatedValue
 	public Property<String> retrieveName() {
 		return name;
+	}
+
+	public interface CustomValidationGroup {
 	}
 }
