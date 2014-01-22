@@ -22,12 +22,10 @@ import java.util.Collections;
 import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.Any;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
-import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.BootstrapConfiguration;
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
@@ -37,32 +35,41 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
-import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
+ * A {@link Bean} representing a {@link ValidatorFactory}. There is one instance of this type representing the default
+ * validator factory and optionally another instance representing the HV validator factory in case the default provider
+ * is not HV.
+ *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ValidatorFactoryBean implements Bean<ValidatorFactory>, PassivationCapable {
-	private final BeanManager beanManager;
-	private final Set<Annotation> qualifiers;
-	private final Set<DestructibleBeanInstance<?>> destructibleResources;
 
-	public ValidatorFactoryBean(BeanManager beanManager, Set<Annotation> qualifiers) {
+	private final BeanManager beanManager;
+	private final Set<DestructibleBeanInstance<?>> destructibleResources;
+	private final ValidationProviderHelper validationProviderHelper;
+	private final Set<Type> types;
+
+	public ValidatorFactoryBean(BeanManager beanManager, ValidationProviderHelper validationProviderHelper) {
 		this.beanManager = beanManager;
-		this.destructibleResources = CollectionHelper.newHashSet();
-		this.qualifiers = CollectionHelper.newHashSet();
-		this.qualifiers.addAll( qualifiers );
-		this.qualifiers.add(
-				new AnnotationLiteral<Any>() {
-				}
+		this.destructibleResources = newHashSet( 4 );
+		this.validationProviderHelper = validationProviderHelper;
+		this.types = Collections.unmodifiableSet(
+				CollectionHelper.<Type>newHashSet(
+						ClassHierarchyHelper.getHierarchy( validationProviderHelper.getValidatorFactoryBeanClass() )
+				)
 		);
 	}
 
 	@Override
 	public Class<?> getBeanClass() {
-		return ValidatorFactoryImpl.class;
+		return validationProviderHelper.getValidatorFactoryBeanClass();
 	}
 
 	@Override
@@ -77,7 +84,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	@Override
 	public Set<Annotation> getQualifiers() {
-		return qualifiers;
+		return validationProviderHelper.getQualifiers();
 	}
 
 	@Override
@@ -92,11 +99,6 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	@Override
 	public Set<Type> getTypes() {
-		Set<Type> types = CollectionHelper.newHashSet();
-
-		types.add( ValidatorFactory.class );
-		types.add( Object.class );
-
 		return types;
 	}
 
@@ -112,8 +114,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	@Override
 	public ValidatorFactory create(CreationalContext<ValidatorFactory> ctx) {
-		Configuration<?> config = Validation.byProvider( org.hibernate.validator.HibernateValidator.class )
-				.configure();
+		Configuration<?> config = getConfiguration();
 
 		config.constraintValidatorFactory( createConstraintValidatorFactory( config ) );
 		config.messageInterpolator( createMessageInterpolator( config ) );
@@ -207,8 +208,14 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		return destructibleInstance.getInstance();
 	}
 
-    @Override
-    public String getId() {
-        return ValidatorFactoryBean.class.getName();
-    }
+	private Configuration<?> getConfiguration() {
+		return validationProviderHelper.isDefaultProvider() ?
+				Validation.byDefaultProvider().configure() :
+				Validation.byProvider( org.hibernate.validator.HibernateValidator.class ).configure();
+	}
+
+	@Override
+	public String getId() {
+		return ValidatorFactoryBean.class.getName() + "_" + validationProviderHelper.isDefaultProvider();
+	}
 }

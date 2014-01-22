@@ -16,26 +16,24 @@
  */
 package org.hibernate.validator.test.internal.cdi;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
-import javax.enterprise.inject.Default;
+
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.ProcessBean;
-import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.cdi.ValidationExtension;
+import org.hibernate.validator.internal.cdi.ValidationProviderHelper;
 import org.hibernate.validator.internal.cdi.ValidatorBean;
 import org.hibernate.validator.internal.cdi.ValidatorFactoryBean;
+import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptorBean;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -102,17 +100,16 @@ public class ValidationExtensionTest {
 	@Test
 	public void testRegisterBeanWithDefaultQualifier() {
 		// setup the mocks
-		Set<Annotation> qualifiers = new HashSet<Annotation>();
-		qualifiers.add(
-				new AnnotationLiteral<HibernateValidator>() {
-				}
+		ValidationProviderHelper validationProviderHelper = ValidationProviderHelper.forHibernateValidator();
+		expect( processBeanMock.getBean() ).andReturn(
+				new ValidatorFactoryBean(
+						beanManagerMock,
+						validationProviderHelper
+				)
 		);
+		expect( processBeanMock.getBean() ).andReturn( new ValidatorBean( beanManagerMock, validationProviderHelper ) );
 
-		expect( processBeanMock.getBean() ).andReturn( new ValidatorFactoryBean( beanManagerMock, qualifiers ) );
-		expect( processBeanMock.getBean() ).andReturn( new ValidatorBean( beanManagerMock, qualifiers ) );
-
-		afterBeanDiscoveryMock.addBean( isA( ValidatorFactoryBean.class ) );
-		afterBeanDiscoveryMock.addBean( isA( ValidatorBean.class ) );
+		afterBeanDiscoveryMock.addBean( isA( ValidationInterceptorBean.class ) );
 
 		// get the mocks ready
 		replay( processBeanMock, afterBeanDiscoveryMock, beanManagerMock );
@@ -130,6 +127,7 @@ public class ValidationExtensionTest {
 	public void testRegisterBeanWithCustomQualifier() {
 		afterBeanDiscoveryMock.addBean( isA( ValidatorFactoryBean.class ) );
 		afterBeanDiscoveryMock.addBean( isA( ValidatorBean.class ) );
+		afterBeanDiscoveryMock.addBean( isA( ValidationInterceptorBean.class ) );
 
 		// get the mocks ready
 		replay( afterBeanDiscoveryMock, beanManagerMock );
@@ -144,16 +142,6 @@ public class ValidationExtensionTest {
 	@Test
 	public void testNoRegistrationRequired() {
 		// setup the mocks
-		Set<Annotation> qualifiers = new HashSet<Annotation>();
-		qualifiers.add(
-				new AnnotationLiteral<HibernateValidator>() {
-				}
-		);
-		qualifiers.add(
-				new AnnotationLiteral<Default>() {
-				}
-		);
-
 		Set<Type> validatorFactoryBeanTypes = new HashSet<Type>();
 		validatorFactoryBeanTypes.add( ValidatorFactory.class );
 
@@ -162,12 +150,12 @@ public class ValidationExtensionTest {
 
 		expect( processBeanMock.getBean() ).andReturn( validatorFactoryBeanMock );
 		expect( validatorFactoryBeanMock.getTypes() ).andReturn( validatorFactoryBeanTypes );
-		expect( validatorFactoryBeanMock.getQualifiers() ).andReturn( qualifiers );
 
 		expect( processBeanMock.getBean() ).andReturn( validatorBeanMock );
 		expect( validatorBeanMock.getTypes() ).andReturn( validatorBeanTypes );
 		expect( validatorBeanMock.getTypes() ).andReturn( validatorBeanTypes );
-		expect( validatorBeanMock.getQualifiers() ).andReturn( qualifiers );
+
+		afterBeanDiscoveryMock.addBean( isA( ValidationInterceptorBean.class ) );
 
 		// get the mocks ready
 		replay( processBeanMock, validatorFactoryBeanMock, validatorBeanMock, afterBeanDiscoveryMock, beanManagerMock );

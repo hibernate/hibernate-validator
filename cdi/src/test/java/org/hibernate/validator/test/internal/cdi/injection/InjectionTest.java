@@ -29,10 +29,11 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cdi.HibernateValidator;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
@@ -60,12 +61,15 @@ public class InjectionTest {
 	@Inject
 	Validator defaultValidator;
 
+	@Inject
+	HibernateValidatorFactory hibernateValidatorFactory;
+
 	@Test
 	public void testInjectionOfQualifiedBeans() throws Exception {
 		assertNotNull( validatorFactory );
 		assertNotNull( validator );
 
-		assertTrue( validator.validate( new TestEntity() ).size() == 1 );
+		assertEquals( 1, validator.validate( new TestEntity() ).size() );
 	}
 
 	@Test
@@ -73,7 +77,13 @@ public class InjectionTest {
 		assertNotNull( defaultValidatorFactory );
 		assertNotNull( defaultValidator );
 
-		assertTrue( defaultValidator.validate( new TestEntity() ).size() == 1 );
+		assertEquals( 1, defaultValidator.validate( new TestEntity() ).size() );
+	}
+
+	@Test
+	public void testInjectionOfHibernateValidatorFactory() throws Exception {
+		assertNotNull( hibernateValidatorFactory );
+		assertEquals( 1, hibernateValidatorFactory.getValidator().validate( new TestEntity() ).size() );
 	}
 
 	public static class TestEntity {
