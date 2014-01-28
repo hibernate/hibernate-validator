@@ -17,8 +17,10 @@
 package org.hibernate.validator.integration.wildfly;
 
 import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.apache.log4j.Logger;
@@ -34,9 +36,10 @@ import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
+import org.hibernate.validator.integration.util.MyValidator;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -46,6 +49,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(Arquillian.class)
 public class CustomValidatorFactoryInPersistenceUnitIT {
+
 	private static final String WAR_FILE_NAME = CustomValidatorFactoryInPersistenceUnitIT.class.getSimpleName() + ".war";
 	private static final Logger log = Logger.getLogger( CustomValidatorFactoryInPersistenceUnitIT.class );
 
@@ -55,7 +59,6 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 				.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses( User.class )
 				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
-				.addAsLibraries( IntegrationTestUtil.bundleLoggingDependencies() )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )
@@ -66,11 +69,12 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 		String persistenceXml = Descriptors.create( PersistenceDescriptor.class )
 				.version( "2.0" )
 				.createPersistenceUnit()
-				.name( "default" )
-				.jtaDataSource( "java:jboss/datasources/ExampleDS" )
-				.getOrCreateProperties()
-				.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
-				.up()
+					.name( "default" )
+					.jtaDataSource( "java:jboss/datasources/ExampleDS" )
+					.getOrCreateProperties()
+						.createProperty().name( "hibernate.hbm2ddl.auto" ).value( "create-drop" ).up()
+						.createProperty().name( "hibernate.validator.apply_to_ddl" ).value( "false" ).up()
+					.up()
 				.up()
 				.exportAsString();
 		return new StringAsset( persistenceXml );
@@ -80,20 +84,22 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 	EntityManager em;
 
 	@Test
-	// TODO see HV-837
 	public void testValidatorFactoryPassedToPersistenceUnit() throws Exception {
 		log.debug( "Running testValidatorFactoryPassedToPersistenceUnit..." );
 		Map<String, Object> properties = em.getEntityManagerFactory().getProperties();
 
-		// TODO the test should also execute an actual validation. It is not guaranteed that one can access the validator factory
-		// under javax.persistence.validation.factory. This works for the JBoss AS purposes, but not generically
-		Object obj = properties.get( "javax.persistence.validation.factory" );
-		assertTrue( "There should be an object under this property", obj != null );
-		ValidatorFactory factory = (ValidatorFactory) obj;
-//		assertTrue(
-//				"The Custom Validator implementation should be used",
-//				factory instanceof MyValidationProvider.DummyValidatorFactory
-//		);
+		ValidatorFactory factory = (ValidatorFactory) properties.get( "javax.persistence.validation.factory" );
+		assertNotNull( "The validator factory should be contained in the EM properties", factory );
+
+		Validator validator = factory.getValidator();
+
+		// Asserting the validator type as the VF is the wrapper type used within WildFly (LazyValidatorFactory)
+		assertTrue(
+				"The custom validator implementation as retrieved from the default provider configured in META-INF/validation.xml should be used but actually "
+						+ validator + " is used",
+				validator instanceof MyValidator
+		);
+
 		log.debug( "testValidatorFactoryPassedToPersistenceUnit completed" );
 	}
 }

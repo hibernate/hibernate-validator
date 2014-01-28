@@ -33,50 +33,60 @@ import javax.validation.spi.ValidationProvider;
  */
 public class MyValidationProvider implements ValidationProvider<MyValidatorConfiguration> {
 
+	@Override
 	public MyValidatorConfiguration createSpecializedConfiguration(BootstrapState state) {
 		return MyValidatorConfiguration.class.cast( new MyValidatorConfiguration( this ) );
 	}
 
+	@Override
 	public Configuration<?> createGenericConfiguration(BootstrapState state) {
 		return new MyValidatorConfiguration( this );
 	}
 
+	@Override
 	public ValidatorFactory buildValidatorFactory(ConfigurationState configurationState) {
 		return new DummyValidatorFactory();
 	}
 
 	public static class DummyValidatorFactory implements ValidatorFactory {
 
+		@Override
 		public Validator getValidator() {
 			return new MyValidator();
 		}
 
+		@Override
 		public ValidatorContext usingContext() {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public MessageInterpolator getMessageInterpolator() {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public TraversableResolver getTraversableResolver() {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public ConstraintValidatorFactory getConstraintValidatorFactory() {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public <T> T unwrap(Class<T> type) {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public ParameterNameProvider getParameterNameProvider() {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public void close() {
-			throw new UnsupportedOperationException();
 		}
 	}
 }
