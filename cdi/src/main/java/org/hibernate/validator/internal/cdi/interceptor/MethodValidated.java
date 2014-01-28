@@ -29,7 +29,7 @@ import javax.interceptor.InterceptorBinding;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-@Target({ ElementType.METHOD, ElementType.TYPE, ElementType.CONSTRUCTOR })
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @InterceptorBinding
 public @interface MethodValidated {
