@@ -1,6 +1,14 @@
 Hibernate Validator Changelog
 =============================
 
+
+5.0.3.Final (28.01.2014)
+------------------------
+
+** Bug
+    * [HV-842] - XmlParserHelper can leak deployment classloader in wildfly integration
+
+
 5.0.2.Final (12.12.2013)
 ------------------------
 
