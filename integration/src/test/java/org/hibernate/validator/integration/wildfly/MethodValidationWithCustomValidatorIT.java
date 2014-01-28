@@ -25,6 +25,7 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,6 +38,8 @@ import static org.junit.Assert.assertEquals;
  * @author Gunnar Morling
  */
 @RunWith(Arquillian.class)
+@Ignore
+// TODO HV-837 Enable once WF 8.0.0.Final can be used for testing (requires WFLY-2762)
 public class MethodValidationWithCustomValidatorIT {
 
 	private static final String WAR_FILE_NAME = MethodValidationWithCustomValidatorIT.class

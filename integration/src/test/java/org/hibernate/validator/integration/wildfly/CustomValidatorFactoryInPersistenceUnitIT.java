@@ -34,6 +34,7 @@ import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
@@ -48,6 +49,8 @@ import static org.junit.Assert.assertTrue;
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
+@Ignore
+// TODO HV-858 Enable once WF 8.0.0.Final can be used for testing (requires WFLY-2762)
 public class CustomValidatorFactoryInPersistenceUnitIT {
 
 	private static final String WAR_FILE_NAME = CustomValidatorFactoryInPersistenceUnitIT.class.getSimpleName() + ".war";
