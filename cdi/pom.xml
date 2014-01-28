@@ -112,6 +112,12 @@
             <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <classifier>testing</classifier>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
