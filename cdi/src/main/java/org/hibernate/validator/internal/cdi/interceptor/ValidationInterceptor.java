@@ -86,7 +86,7 @@ public class ValidationInterceptor implements Serializable {
 
 		Object result = ctx.proceed();
 
-		violations = validator.forExecutables().validateReturnValue(
+		violations = executableValidator.validateReturnValue(
 				ctx.getTarget(),
 				ctx.getMethod(),
 				result
@@ -111,7 +111,6 @@ public class ValidationInterceptor implements Serializable {
 	 * in case at least one constraint violation occurred either during parameter or return value validation.
 	 */
 	@AroundConstruct
-	@SuppressWarnings("unchecked")
 	public void validateConstructorInvocation(InvocationContext ctx) throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
 		Set<ConstraintViolation<Object>> violations = executableValidator.validateConstructorParameters(
