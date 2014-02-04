@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2012-2014, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -44,9 +44,12 @@ public class ValidatorBean implements Bean<Validator>, PassivationCapable {
 	private final BeanManager beanManager;
 	private final ValidationProviderHelper validationProviderHelper;
 	private final Set<Type> types;
+	private final Bean<?> validatorFactoryBean;
 
-	public ValidatorBean(BeanManager beanManager, ValidationProviderHelper validationProviderHelper) {
+	public ValidatorBean(BeanManager beanManager, Bean<?> validatorFactoryBean,
+			ValidationProviderHelper validationProviderHelper) {
 		this.beanManager = beanManager;
+		this.validatorFactoryBean = validatorFactoryBean;
 		this.validationProviderHelper = validationProviderHelper;
 		this.types = Collections.unmodifiableSet(
 				CollectionHelper.<Type>newHashSet(
@@ -102,29 +105,26 @@ public class ValidatorBean implements Bean<Validator>, PassivationCapable {
 
 	@Override
 	public Validator create(CreationalContext<Validator> ctx) {
-		ValidatorFactory validatorFactory = getReference( beanManager, ValidatorFactory.class );
+		ValidatorFactory validatorFactory = createValidatorFactory();
 		return validatorFactory.getValidator();
+	}
+
+	private ValidatorFactory createValidatorFactory() {
+		CreationalContext<?> context = beanManager.createCreationalContext( validatorFactoryBean );
+		return (ValidatorFactory) beanManager.getReference( validatorFactoryBean, ValidatorFactory.class, context );
 	}
 
 	@Override
 	public void destroy(Validator instance, CreationalContext<Validator> ctx) {
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> T getReference(BeanManager beanManager, Class<T> clazz) {
-		Set<Bean<?>> beans = beanManager.getBeans(
-				clazz,
-				getQualifiers().toArray( new Annotation[getQualifiers().size()] )
-		);
-		for ( Bean<?> bean : beans ) {
-			CreationalContext<?> context = beanManager.createCreationalContext( bean );
-			return (T) beanManager.getReference( bean, clazz, context );
-		}
-		return null;
+	@Override
+	public String getId() {
+		return ValidatorBean.class.getName() + "_" + ( validationProviderHelper.isDefaultProvider() ? "default" : "hv" );
 	}
 
 	@Override
-	public String getId() {
-		return ValidatorBean.class.getName() + "_" + validationProviderHelper.isDefaultProvider();
+	public String toString() {
+		return "ValidatorBean [id=" + getId() + "]";
 	}
 }
