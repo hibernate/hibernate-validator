@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Default;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
@@ -117,7 +118,7 @@ public class ValidationProviderHelper {
 	@SuppressWarnings("serial")
 	private static Set<Annotation> determineRequiredQualifiers(boolean isDefaultProvider,
 			boolean isHibernateValidator) {
-		HashSet<Annotation> qualifiers = newHashSet( 2 );
+		HashSet<Annotation> qualifiers = newHashSet( 3 );
 
 		if ( isDefaultProvider ) {
 			qualifiers.add(
@@ -132,6 +133,11 @@ public class ValidationProviderHelper {
 					}
 			);
 		}
+
+		qualifiers.add(
+				new AnnotationLiteral<Any>() {
+				}
+		);
 
 		return qualifiers;
 	}

@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2012-2014, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -216,6 +216,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	@Override
 	public String getId() {
-		return ValidatorFactoryBean.class.getName() + "_" + validationProviderHelper.isDefaultProvider();
+		return ValidatorFactoryBean.class.getName() + "_" + ( validationProviderHelper.isDefaultProvider() ? "default" : "hv" );
+	}
+
+	@Override
+	public String toString() {
+		return "ValidatorFactoryBean [id=" + getId() + "]";
 	}
 }

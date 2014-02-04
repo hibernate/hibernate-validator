@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2012-2014, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,16 +16,23 @@
  */
 package org.hibernate.validator.test.internal.cdi;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.ProcessBean;
+import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,6 +43,7 @@ import org.hibernate.validator.internal.cdi.ValidatorFactoryBean;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
@@ -106,7 +114,19 @@ public class ValidationExtensionTest {
 						validationProviderHelper
 				)
 		);
-		expect( processBeanMock.getBean() ).andReturn( new ValidatorBean( beanManagerMock, validationProviderHelper ) );
+		expect( processBeanMock.getBean() ).andReturn(
+				new ValidatorBean(
+						beanManagerMock,
+						validatorFactoryBeanMock,
+						validationProviderHelper
+				)
+		);
+
+		afterBeanDiscoveryMock.addBean( isA( ValidatorFactoryBean.class ) );
+		expectLastCall();
+
+		afterBeanDiscoveryMock.addBean( isA( ValidatorBean.class ) );
+		expectLastCall();
 
 		// get the mocks ready
 		replay( processBeanMock, afterBeanDiscoveryMock, beanManagerMock );
@@ -123,7 +143,30 @@ public class ValidationExtensionTest {
 	@Test
 	public void testRegisterBeanWithCustomQualifier() {
 		afterBeanDiscoveryMock.addBean( isA( ValidatorFactoryBean.class ) );
+		expectLastCall().andAnswer(
+				new IAnswer<Object>() {
+
+					@Override
+					public Object answer() throws Throwable {
+						ProcessBean<?> event = getProcessBeanEvent( (Bean<ValidatorFactory>) EasyMock.getCurrentArguments()[0] );
+						extension.processBean( event );
+						return null;
+					}
+				}
+		);
+
 		afterBeanDiscoveryMock.addBean( isA( ValidatorBean.class ) );
+		expectLastCall().andAnswer(
+				new IAnswer<Object>() {
+
+					@Override
+					public Object answer() throws Throwable {
+						ProcessBean<?> event = getProcessBeanEvent( (Bean<ValidatorBean>) EasyMock.getCurrentArguments()[0] );
+						extension.processBean( event );
+						return null;
+					}
+				}
+		);
 
 		// get the mocks ready
 		replay( afterBeanDiscoveryMock, beanManagerMock );
@@ -144,12 +187,28 @@ public class ValidationExtensionTest {
 		Set<Type> validatorBeanTypes = new HashSet<Type>();
 		validatorBeanTypes.add( Validator.class );
 
+		Set<Annotation> qualifiers = Collections.<Annotation>singleton(
+				new AnnotationLiteral<Default>() {
+				}
+		);
+
 		expect( processBeanMock.getBean() ).andReturn( validatorFactoryBeanMock );
 		expect( validatorFactoryBeanMock.getTypes() ).andReturn( validatorFactoryBeanTypes );
+		expect( validatorFactoryBeanMock.getQualifiers() ).andReturn( qualifiers );
+		expect( validatorFactoryBeanMock.getQualifiers() ).andReturn( qualifiers );
+
+		afterBeanDiscoveryMock.addBean( isA( ValidatorFactoryBean.class ) );
+		expectLastCall();
 
 		expect( processBeanMock.getBean() ).andReturn( validatorBeanMock );
 		expect( validatorBeanMock.getTypes() ).andReturn( validatorBeanTypes );
 		expect( validatorBeanMock.getTypes() ).andReturn( validatorBeanTypes );
+		expect( validatorBeanMock.getQualifiers() ).andReturn( qualifiers );
+		expect( validatorBeanMock.getQualifiers() ).andReturn( qualifiers );
+
+		afterBeanDiscoveryMock.addBean( isA( ValidatorBean.class ) );
+		expectLastCall();
+
 
 		// get the mocks ready
 		replay( processBeanMock, validatorFactoryBeanMock, validatorBeanMock, afterBeanDiscoveryMock, beanManagerMock );
@@ -172,6 +231,25 @@ public class ValidationExtensionTest {
 		catch ( IllegalArgumentException e ) {
 			// success
 		}
+	}
+
+	private <T> ProcessBean<T> getProcessBeanEvent(final Bean<T> bean) {
+		return new ProcessBean<T>() {
+
+			@Override
+			public Annotated getAnnotated() {
+				return null;
+			}
+
+			@Override
+			public Bean<T> getBean() {
+				return bean;
+			}
+
+			@Override
+			public void addDefinitionError(Throwable t) {
+			}
+		};
 	}
 }
 
