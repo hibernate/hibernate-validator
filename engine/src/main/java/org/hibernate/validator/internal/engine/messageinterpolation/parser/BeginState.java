@@ -45,6 +45,9 @@ public class BeginState implements ParserState {
 
 	@Override
 	public void handleBeginTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException {
+		// terminate a potential current token prior to the beginning of a new term
+		tokenCollector.terminateToken();
+
 		tokenCollector.appendToToken( character );
 		if ( tokenCollector.getInterpolationType().equals( InterpolationTermType.PARAMETER ) ) {
 			tokenCollector.makeParameterToken();

@@ -52,7 +52,7 @@ public class ELState implements ParserState {
 
 		tokenCollector.appendToToken( TokenCollector.EL_DESIGNATOR );
 		tokenCollector.appendToToken( character );
-		tokenCollector.makeParameterToken();
+		tokenCollector.makeELToken();
 		tokenCollector.transitionState( new InterpolationTermState() );
 		tokenCollector.next();
 	}

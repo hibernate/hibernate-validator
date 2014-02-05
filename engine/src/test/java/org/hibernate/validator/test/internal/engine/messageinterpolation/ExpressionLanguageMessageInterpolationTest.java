@@ -28,6 +28,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -251,6 +252,60 @@ public class ExpressionLanguageMessageInterpolationTest {
 				actual,
 				expected,
 				"Wrong substitution, no formatting should occur, because the wrong method name is used"
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-834")
+	public void testOpeningCurlyBraceInELExpression() {
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
+		String expected = "{";
+		String actual = interpolatorUnderTest.interpolate( "${1 > 0 ? '\\{' : '\\}'}", context );
+		assertEquals( actual, expected, "Curly braces are allowed in EL expressions, but need to be escaped" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-834")
+	public void testClosingCurlyBraceInELExpression() {
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
+		String expected = "}";
+		String actual = interpolatorUnderTest.interpolate( "${1 < 0 ? '\\{' : '\\}'}", context );
+		assertEquals( actual, expected, "Curly braces are allowed in EL expressions, but need to be escaped" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-834")
+	public void testCurlyBracesInELExpression() {
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
+		String expected = "a{b}d";
+		String actual = interpolatorUnderTest.interpolate( "${1 < 0 ? 'foo' : 'a\\{b\\}d'}", context );
+		assertEquals( actual, expected, "Curly braces are allowed in EL expressions, but need to be escaped" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-834")
+	public void testEscapedQuoteInELExpression() {
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
+		String expected = "\"";
+		String actual = interpolatorUnderTest.interpolate( "${ true ? \"\\\"\" : \"foo\"}", context );
+		assertEquals( actual, expected, "If quotes are used in EL expression literal quotes need to be escaped" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-834")
+	public void testSingleEscapedQuoteInELExpression() {
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
+		String expected = "'";
+		String actual = interpolatorUnderTest.interpolate( "${ false ? 'foo' : '\\''}", context );
+		assertEquals(
+				actual,
+				expected,
+				"If single quotes are used in EL expression literal single quotes need to be escaped"
 		);
 	}
 

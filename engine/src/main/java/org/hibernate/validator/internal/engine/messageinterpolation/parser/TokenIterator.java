@@ -78,6 +78,7 @@ public class TokenIterator {
 	 */
 	public void replaceCurrentInterpolationTerm(String replacement) {
 		Token token = new Token( replacement );
+		token.terminate();
 		tokenList.set( currentPosition - 1, token );
 	}
 
