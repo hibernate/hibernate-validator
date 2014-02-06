@@ -58,6 +58,37 @@ public abstract class ModCheckBase {
 
 	private boolean ignoreNonDigitCharacters;
 
+	public boolean isValid(final CharSequence value, final ConstraintValidatorContext context) {
+		if ( value == null ) {
+			return true;
+		}
+
+		String valueAsString = stripNonDigitsIfRequired( value.toString() );
+
+		String digitsAsString;
+		char checkDigit;
+		try {
+			digitsAsString = extractVerificationString( valueAsString );
+			checkDigit = extractCheckDigit( valueAsString );
+		}
+		catch (IndexOutOfBoundsException e) {
+			return false;
+		}
+
+		List<Integer> digits;
+
+		try {
+			digits = extractDigits( digitsAsString );
+		}
+		catch (NumberFormatException e) {
+			return false;
+		}
+
+		return this.isCheckDigitValid( digits, checkDigit );
+	}
+
+	public abstract boolean isCheckDigitValid(List<Integer> digits, char checkDigit);
+
 	protected void initialize(int startIndex, int endIndex, int checkDigitIndex, boolean ignoreNonDigitCharacters) {
 		this.startIndex = startIndex;
 		this.endIndex = endIndex;
@@ -65,24 +96,6 @@ public abstract class ModCheckBase {
 		this.ignoreNonDigitCharacters = ignoreNonDigitCharacters;
 
 		this.validateOptions();
-	}
-
-	/**
-	 * Parses the {@link String} value as a {@link List} of {@link Integer} objects
-	 *
-	 * @param value the input string to be parsed
-	 *
-	 * @return List of {@code Integer} objects.
-	 *
-	 * @throws NumberFormatException in case any of the characters is not a digit
-	 */
-	private List<Integer> extractDigits(final String value) throws NumberFormatException {
-		List<Integer> digits = new ArrayList<Integer>( value.length() );
-		char[] chars = value.toCharArray();
-		for ( char c : chars ) {
-			digits.add( extractDigit( c ) );
-		}
-		return digits;
 	}
 
 	/**
@@ -103,38 +116,25 @@ public abstract class ModCheckBase {
 		}
 	}
 
-	public abstract boolean isCheckDigitValid(List<Integer> digits, char checkDigit);
-
-	public boolean isValid(final CharSequence value, final ConstraintValidatorContext context) {
-		if ( value == null ) {
-			return true;
+	/**
+	 * Parses the {@link String} value as a {@link List} of {@link Integer} objects
+	 *
+	 * @param value the input string to be parsed
+	 *
+	 * @return List of {@code Integer} objects.
+	 *
+	 * @throws NumberFormatException in case any of the characters is not a digit
+	 */
+	private List<Integer> extractDigits(final String value) throws NumberFormatException {
+		List<Integer> digits = new ArrayList<Integer>( value.length() );
+		char[] chars = value.toCharArray();
+		for ( char c : chars ) {
+			digits.add( extractDigit( c ) );
 		}
-
-		String valueAsString = this.stripNonDigitsIfRequired( value.toString() );
-
-		String digitsAsString;
-		char checkDigit;
-		try {
-			digitsAsString = this.extractVerificationString( valueAsString );
-			checkDigit = this.extractCheckDigit( valueAsString );
-		}
-		catch ( IndexOutOfBoundsException e ) {
-			return false;
-		}
-
-		List<Integer> digits;
-
-		try {
-			digits = extractDigits( digitsAsString );
-		}
-		catch ( NumberFormatException e ) {
-			return false;
-		}
-
-		return this.isCheckDigitValid( digits, checkDigit );
+		return digits;
 	}
 
-	public boolean validateOptions() {
+	private boolean validateOptions() {
 		if ( this.startIndex < 0 ) {
 			throw log.getStartIndexCannotBeNegativeException( this.startIndex );
 		}

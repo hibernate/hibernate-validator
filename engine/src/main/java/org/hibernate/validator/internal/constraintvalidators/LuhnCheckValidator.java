@@ -21,8 +21,6 @@ import javax.validation.ConstraintValidator;
 
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.internal.util.ModUtil;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Luhn algorithm checksum validator
@@ -36,9 +34,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class LuhnCheckValidator extends ModCheckBase
 		implements ConstraintValidator<LuhnCheck, CharSequence> {
-
-	private static final Log log = LoggerFactory.make();
-
 	@Override
 	public void initialize(LuhnCheck constraintAnnotation) {
 		super.initialize(
