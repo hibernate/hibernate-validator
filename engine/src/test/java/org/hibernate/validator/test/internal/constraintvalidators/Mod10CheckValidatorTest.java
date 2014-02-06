@@ -16,13 +16,12 @@
 */
 package org.hibernate.validator.test.internal.constraintvalidators;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.internal.constraintvalidators.Mod10CheckValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
@@ -183,9 +182,5 @@ public class Mod10CheckValidatorTest {
 
 	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
 		return this.createMod10CheckAnnotation( start, end, checkDigitIndex, ignoreNonDigits, 3, 1 );
-	}
-
-	private Mod10Check createMod10CheckAnnotation(boolean ignoreNonDigits, int multiplier, int weight) {
-		return this.createMod10CheckAnnotation( 0, Integer.MAX_VALUE, -1, ignoreNonDigits, multiplier, weight );
 	}
 }
