@@ -16,13 +16,25 @@
 */
 package org.hibernate.validator.test.internal.constraintvalidators;
 
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.Mod11CheckDef;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Mod11Check.ProcessingDirection;
 import org.hibernate.validator.internal.constraintvalidators.Mod11CheckValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
@@ -255,6 +267,32 @@ public class Mod11CheckValidatorTest {
 		assertFalse( validator.isValid( "1234557X", null ) );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-812")
+	public void testProgrammaticMod11Constraint() {
+		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Product.class )
+				.property( "productNumber", FIELD )
+				.constraint(
+						new Mod11CheckDef()
+								.threshold( Integer.MAX_VALUE )
+								.startIndex( 0 )
+								.endIndex( 12 )
+								.ignoreNonDigitCharacters( true )
+								.treatCheck10As( 'X' )
+								.treatCheck11As( 'P' )
+								.processingDirection( ProcessingDirection.LEFT_TO_RIGHT )
+				);
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Product product = new Product( "123-456-789-P" );
+
+		Set<ConstraintViolation<Product>> constraintViolations = validator.validate( product );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
 	private Mod11Check createMod11CheckAnnotation(
 			int start,
 			int end,
@@ -273,5 +311,13 @@ public class Mod11CheckValidatorTest {
 		descriptor.setValue( "processingDirection", processingDirection );
 
 		return AnnotationFactory.create( descriptor );
+	}
+
+	private static class Product {
+		private final String productNumber;
+
+		private Product(String productNumber) {
+			this.productNumber = productNumber;
+		}
 	}
 }

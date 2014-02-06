@@ -16,6 +16,14 @@
 */
 package org.hibernate.validator.test.internal.constraintvalidators;
 
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.Mod10CheckDef;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.internal.constraintvalidators.Mod10CheckValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
@@ -23,6 +31,9 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
@@ -177,6 +188,31 @@ public class Mod10CheckValidatorTest {
 		assertTrue( validator.isValid( new MyCustomStringImpl( "56.310 243.031 3" ), null ) );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-812")
+	public void testProgrammaticMod11Constraint() {
+		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Product.class )
+				.property( "productNumber", FIELD )
+				.constraint(
+						new Mod10CheckDef()
+								.multiplier( 3 )
+								.weight( 1 )
+								.startIndex( 0 )
+								.endIndex( 12 )
+								.checkDigitPosition( -1 )
+								.ignoreNonDigitCharacters( true )
+				);
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Product product = new Product( "P-79927398712" );
+
+		Set<ConstraintViolation<Product>> constraintViolations = validator.validate( product );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
 	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits, int multiplier, int weight) {
 		AnnotationDescriptor<Mod10Check> descriptor = new AnnotationDescriptor<Mod10Check>( Mod10Check.class );
 		descriptor.setValue( "startIndex", start );
@@ -191,5 +227,13 @@ public class Mod10CheckValidatorTest {
 
 	private Mod10Check createMod10CheckAnnotation(int start, int end, int checkDigitIndex, boolean ignoreNonDigits) {
 		return this.createMod10CheckAnnotation( start, end, checkDigitIndex, ignoreNonDigits, 3, 1 );
+	}
+
+	private static class Product {
+		private final String productNumber;
+
+		private Product(String productNumber) {
+			this.productNumber = productNumber;
+		}
 	}
 }
