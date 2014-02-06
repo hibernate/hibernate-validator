@@ -42,11 +42,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Pattern(regexp = "[0-9]{12}")
 @List({
 		@Mod11Check(threshold = 9,
-				endIndex = 8,
+				endIndex = 7,
 				checkDigitPosition = 10),
 		@Mod11Check(threshold = 9,
 				startIndex = 8,
-				endIndex = 11,
+				endIndex = 10,
 				checkDigitPosition = 11)
 })
 @ReportAsSingleViolation
