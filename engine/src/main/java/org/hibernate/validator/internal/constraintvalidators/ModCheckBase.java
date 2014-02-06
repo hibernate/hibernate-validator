@@ -63,8 +63,7 @@ public abstract class ModCheckBase {
 			return true;
 		}
 
-		String valueAsString = stripNonDigitsIfRequired( value.toString() );
-
+		String valueAsString = value.toString();
 		String digitsAsString;
 		char checkDigit;
 		try {
@@ -74,9 +73,9 @@ public abstract class ModCheckBase {
 		catch (IndexOutOfBoundsException e) {
 			return false;
 		}
+		digitsAsString = stripNonDigitsIfRequired( digitsAsString );
 
 		List<Integer> digits;
-
 		try {
 			digits = extractDigits( digitsAsString );
 		}
@@ -169,17 +168,22 @@ public abstract class ModCheckBase {
 			return value.substring( 0, value.length() - 1 );
 		}
 		else if ( checkDigitIndex == -1 ) {
-			return value.substring( startIndex, endIndex - 1 );
+			return value.substring( startIndex, endIndex );
 		}
 		else {
-			return value.substring( startIndex, endIndex );
+			return value.substring( startIndex, endIndex + 1 );
 		}
 	}
 
 	private char extractCheckDigit(String value) throws IndexOutOfBoundsException {
 		// take last character of string to be validated unless the index is given explicitly
 		if ( checkDigitIndex == -1 ) {
-			return value.charAt( value.length() - 1 );
+			if ( endIndex == Integer.MAX_VALUE ) {
+				return value.charAt( value.length() - 1 );
+			}
+			else {
+				return value.charAt( endIndex );
+			}
 		}
 		else {
 			return value.charAt( checkDigitIndex );

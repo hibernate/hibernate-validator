@@ -92,7 +92,7 @@ public class LuhnCheckValidatorTest {
 	@Test
 	public void testValidMod10WithGivenRange() throws Exception {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
-		LuhnCheck modCheck = createLuhnCheckAnnotation( 3, 14, -1, true );
+		LuhnCheck modCheck = createLuhnCheckAnnotation( 3, 15, -1, true );
 		validator.initialize( modCheck );
 
 		assertTrue( validator.isValid( "123-7992739871-3", null ) );
@@ -101,7 +101,7 @@ public class LuhnCheckValidatorTest {
 	@Test
 	public void testValidMod10WithGivenRangeAndCheckDigitIndex() throws Exception {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
-		LuhnCheck modCheck = createLuhnCheckAnnotation( 3, 13, 13, true );
+		LuhnCheck modCheck = createLuhnCheckAnnotation( 3, 13, 15, true );
 		validator.initialize( modCheck );
 
 		assertTrue( validator.isValid( "123-7992739871-3-456", null ) );

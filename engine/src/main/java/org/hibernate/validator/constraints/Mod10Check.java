@@ -30,7 +30,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Modulo 10 check constraint.
+ * <a href="http://en.wikipedia.org/wiki/Luhn_algorithm">@Modulo 10</a> check constraint.
  * <p>
  * Allows to validate that a series of digits pass the Mod10 checksum
  * algorithm. The classic Mod10 is calculated by summing up the digits, with every odd
@@ -78,23 +78,21 @@ public @interface Mod10Check {
 	int startIndex() default 0;
 
 	/**
-	 * @return the end index (exclusive) for calculating the checksum. If not specified the whole value is considered.
+	 * @return the end index (inclusive) for calculating the checksum. If not specified the whole value is considered.
 	 */
 	int endIndex() default Integer.MAX_VALUE;
 
 	/**
 	 * @return The position of the check digit in the input. Per default it is assumed that the check digit is the last
-	 *         digit of the specified range. If set, the digit at the specified position is used as check digit. If set
-	 *         the following must hold true:
-	 *         {@code checkDigitPosition > 0 && (checkDigitPosition < startIndex || checkDigitPosition >= endIndex}.
+	 * digit of the specified range. If set, the digit at the specified position is used as check digit. If set
+	 * the following must hold true:<br/>
+	 * {@code checkDigitPosition > 0 && (checkDigitPosition < startIndex || checkDigitPosition >= endIndex}.
 	 */
 	int checkDigitPosition() default -1;
 
 	/**
 	 * @return Whether non-digit characters in the validated input should be ignored ({@code true}) or result in a
-	 *         validation error ({@code false}). Note that the values given for {@code startIndex}, {@code endIndex}
-	 *         and {@code checkDigitPosition} need to take into account either digits only or all characters depending
-	 *         on the setting of this option.
+	 * validation error ({@code false}).
 	 */
 	boolean ignoreNonDigitCharacters() default true;
 

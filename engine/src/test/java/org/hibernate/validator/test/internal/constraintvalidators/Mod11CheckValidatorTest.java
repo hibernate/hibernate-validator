@@ -129,6 +129,23 @@ public class Mod11CheckValidatorTest {
 	}
 
 	@Test
+	public void testIgnoreNonNumericWithCharCheckDigit() throws Exception {
+		Mod11CheckValidator validator = new Mod11CheckValidator();
+		Mod11Check modCheck = createMod11CheckAnnotation(
+				0,
+				12,
+				-1,
+				true,
+				'0',
+				'X',
+				ProcessingDirection.LEFT_TO_RIGHT
+		);
+		validator.initialize( modCheck );
+
+		assertTrue( validator.isValid( "123-456-789-X", null ) );
+	}
+
+	@Test
 	public void testValidMod11() throws Exception {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
@@ -238,7 +255,8 @@ public class Mod11CheckValidatorTest {
 		assertFalse( validator.isValid( "1234557X", null ) );
 	}
 
-	private Mod11Check createMod11CheckAnnotation(int start,
+	private Mod11Check createMod11CheckAnnotation(
+			int start,
 			int end,
 			int checkDigitIndex,
 			boolean ignoreNonDigits,

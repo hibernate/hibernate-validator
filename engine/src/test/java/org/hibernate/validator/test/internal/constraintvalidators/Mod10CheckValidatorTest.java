@@ -92,16 +92,25 @@ public class Mod10CheckValidatorTest {
 	@Test
 	public void testValidMod10WithGivenRange() throws Exception {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
-		Mod10Check modCheck = createMod10CheckAnnotation( 3, 14, -1, true );
+		Mod10Check modCheck = createMod10CheckAnnotation( 3, 13, -1, true );
 		validator.initialize( modCheck );
 
-		assertTrue( validator.isValid( "123-7992739871-2", null ) );
+		assertTrue( validator.isValid( "xxx-7992739871-x", null ) );
+	}
+
+	@Test
+	public void testValidMod10WithGivenRangeAndExplicitCheckDigit() throws Exception {
+		Mod10CheckValidator validator = new Mod10CheckValidator();
+		Mod10Check modCheck = createMod10CheckAnnotation( 3, 13, 15, true );
+		validator.initialize( modCheck );
+
+		assertTrue( validator.isValid( "xxx-799273987-x1x", null ) );
 	}
 
 	@Test
 	public void testValidMod10WithGivenRangeAndCheckDigitIndex() throws Exception {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
-		Mod10Check modCheck = createMod10CheckAnnotation( 3, 13, 13, true );
+		Mod10Check modCheck = createMod10CheckAnnotation( 3, 12, 13, true );
 		validator.initialize( modCheck );
 
 		assertTrue( validator.isValid( "123-7992739871-2-456", null ) );
@@ -142,7 +151,7 @@ public class Mod10CheckValidatorTest {
 	@TestForIssue(jiraKey = "HV-813")
 	public void testValidEAN_14WithEAN_128() throws Exception {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
-		Mod10Check modCheck = createMod10CheckAnnotation( 2, 16, -1, true );
+		Mod10Check modCheck = createMod10CheckAnnotation( 5, 22, -1, true );
 		validator.initialize( modCheck );
 		assertTrue( validator.isValid( new MyCustomStringImpl( "(01) 1 23 45678 90123 1" ), null ) );
 	}
