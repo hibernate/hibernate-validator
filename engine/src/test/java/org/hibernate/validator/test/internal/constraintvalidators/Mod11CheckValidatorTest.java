@@ -92,7 +92,7 @@ public class Mod11CheckValidatorTest {
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testInvalidCheckDigitPosition() {
+	public void testInvalidcheckDigitIndex() {
 		Mod11CheckValidator validator = new Mod11CheckValidator();
 		Mod11Check modCheck = createMod11CheckAnnotation(
 				0,
@@ -304,7 +304,7 @@ public class Mod11CheckValidatorTest {
 		AnnotationDescriptor<Mod11Check> descriptor = new AnnotationDescriptor<Mod11Check>( Mod11Check.class );
 		descriptor.setValue( "startIndex", start );
 		descriptor.setValue( "endIndex", end );
-		descriptor.setValue( "checkDigitPosition", checkDigitIndex );
+		descriptor.setValue( "checkDigitIndex", checkDigitIndex );
 		descriptor.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
 		descriptor.setValue( "treatCheck10As", treatCheck10As );
 		descriptor.setValue( "treatCheck11As", treatCheck11As );

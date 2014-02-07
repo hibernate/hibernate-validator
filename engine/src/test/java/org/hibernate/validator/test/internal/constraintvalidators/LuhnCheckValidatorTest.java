@@ -56,7 +56,7 @@ public class LuhnCheckValidatorTest {
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testInvalidCheckDigitPosition() {
+	public void testInvalidcheckDigitIndex() {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
 		LuhnCheck modCheck = createLuhnCheckAnnotation( 0, 10, 5, false );
 		validator.initialize( modCheck );
@@ -120,7 +120,7 @@ public class LuhnCheckValidatorTest {
 		AnnotationDescriptor<LuhnCheck> descriptor = new AnnotationDescriptor<LuhnCheck>( LuhnCheck.class );
 		descriptor.setValue( "startIndex", start );
 		descriptor.setValue( "endIndex", end );
-		descriptor.setValue( "checkDigitPosition", checkDigitIndex );
+		descriptor.setValue( "checkDigitIndex", checkDigitIndex );
 		descriptor.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
 
 		return AnnotationFactory.create( descriptor );

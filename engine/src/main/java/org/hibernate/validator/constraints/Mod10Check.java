@@ -83,12 +83,12 @@ public @interface Mod10Check {
 	int endIndex() default Integer.MAX_VALUE;
 
 	/**
-	 * @return The position of the check digit in the input. Per default it is assumed that the check digit is the last
-	 * digit of the specified range. If set, the digit at the specified position is used as check digit. If set
+	 * @return The index of the check digit in the input. Per default it is assumed that the check digit is the last
+	 * digit of the specified range. If set, the digit at the specified index is used. If set
 	 * the following must hold true:<br/>
-	 * {@code checkDigitPosition > 0 && (checkDigitPosition < startIndex || checkDigitPosition >= endIndex}.
+	 * {@code checkDigitIndex > 0 && (checkDigitIndex < startIndex || checkDigitIndex >= endIndex}.
 	 */
-	int checkDigitPosition() default -1;
+	int checkDigitIndex() default -1;
 
 	/**
 	 * @return Whether non-digit characters in the validated input should be ignored ({@code true}) or result in a

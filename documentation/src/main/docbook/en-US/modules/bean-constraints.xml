@@ -975,7 +975,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
             <row>
               <entry><classname>@LuhnCheck(</classname><classname>startIndex=,</classname>
               <classname>endIndex=,</classname>
-              <classname>checkDigitPosition=,</classname>
+              <classname>checkDigitIndex=,</classname>
               <classname>ignoreNonDigitCharacters=)</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
@@ -986,7 +986,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
               algorithm</ulink>). <constant>startIndex</constant> and
               <constant>endIndex</constant> allow to only run the algorithm on
               the specified sub-string.
-              <constant>checkDigitPosition</constant> allows to use an
+              <constant>checkDigitIndex</constant> allows to use an
               arbitrary digit within the character sequence as the check
               digit. If not specified it is assumed that the check digit is
               part of the specified range. Last but not least,
@@ -1000,7 +1000,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
               <entry><classname>@Mod10Check(multiplier=,</classname>
               <classname>weight=, startIndex=,</classname>
               <classname>endIndex=,</classname>
-              <classname>checkDigitPosition=,</classname>
+              <classname>checkDigitIndex=,</classname>
               <classname>ignoreNonDigitCharacters=)</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
@@ -1013,7 +1013,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
               <constant>startIndex</constant> and
               <constant>endIndex</constant> allow to only run the algorithm on
               the specified sub-string.
-              <constant>checkDigitPosition</constant> allows to use an
+              <constant>checkDigitIndex</constant> allows to use an
               arbitrary digit within the character sequence as the check
               digit. If not specified it is assumed that the check digit is
               part of the specified range. Last but not least,
@@ -1026,7 +1026,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
             <row>
               <entry><classname>@Mod11Check(threshold=,</classname>
               <classname>startIndex=, endIndex=,</classname>
-              <classname>checkDigitPosition=,</classname>
+              <classname>checkDigitIndex=,</classname>
               <classname>ignoreNonDigitCharacters=,</classname>
               <classname>treatCheck10As=,</classname>
               <classname>treatCheck11As=)</classname></entry>
@@ -1042,7 +1042,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
               digits to be used when the mod 11 checksum equals 10 or 11,
               respectively. Default to X and 0, respectively.
               <constant>startIndex</constant>, <constant>endIndex</constant>
-              a<constant>checkDigitPosition</constant> and
+              a<constant>checkDigitIndex</constant> and
               <constant>ignoreNonDigitCharacters</constant> carry the same
               semantics as in <classname>@Mod10Check</classname>.</entry>
 
