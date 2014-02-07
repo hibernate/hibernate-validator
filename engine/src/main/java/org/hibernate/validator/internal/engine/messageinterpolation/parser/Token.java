@@ -16,6 +16,9 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Parsing a message descriptor results in multiple {@code Token}s. Each token
  * keeps track of its token value and whether the token is a parameter which can
@@ -28,12 +31,19 @@ package org.hibernate.validator.internal.engine.messageinterpolation.parser;
  * @author Hardy Ferentschik
  */
 public class Token {
+	private static final Pattern ESCAPED_OPENING_CURLY_BRACE = Pattern.compile( "\\\\\\{" );
+	private static final Pattern ESCAPED_CLOSING_CURLY_BRACE = Pattern.compile( "\\\\\\}" );
+
 	private boolean isParameter;
-	private StringBuilder tokenValue;
+	private boolean isEL;
+	private boolean terminated;
+	private String value;
+
+	private StringBuilder builder;
 
 	public Token(String tokenStart) {
-		tokenValue = new StringBuilder();
-		tokenValue.append( tokenStart );
+		builder = new StringBuilder();
+		builder.append( tokenStart );
 	}
 
 	public Token(char tokenStart) {
@@ -41,11 +51,30 @@ public class Token {
 	}
 
 	public void append(char character) {
-		tokenValue.append( character );
+		builder.append( character );
 	}
 
-	public void makeParameterToken(boolean parameter) {
-		isParameter = parameter;
+	public void makeParameterToken() {
+		isParameter = true;
+	}
+
+	public void makeELToken() {
+		makeParameterToken();
+		isEL = true;
+	}
+
+	public void terminate() {
+		value = builder.toString();
+		if ( isEL ) {
+			// HSEARCH-834 curly braces need to be un-escaped prior to be passed to the EL engine
+			Matcher matcher = ESCAPED_OPENING_CURLY_BRACE.matcher( value );
+			value = matcher.replaceAll( "{" );
+
+			matcher = ESCAPED_CLOSING_CURLY_BRACE.matcher( value );
+			value = matcher.replaceAll( "}" );
+		}
+		builder = null;
+		terminated = true;
 	}
 
 	public boolean isParameter() {
@@ -53,15 +82,20 @@ public class Token {
 	}
 
 	public String getTokenValue() {
-		return tokenValue.toString();
+		if ( !terminated ) {
+			throw new IllegalStateException( "Trying to retrieve token value for unterminated token" );
+		}
+		return value;
 	}
 
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "Token{" );
-		sb.append( "isParameter=" ).append( isParameter );
-		sb.append( ", tokenValue='" ).append( tokenValue.toString() );
-		sb.append( "'}" );
+		sb.append( "value='" ).append( value ).append( '\'' );
+		sb.append( ", terminated=" ).append( terminated );
+		sb.append( ", isEL=" ).append( isEL );
+		sb.append( ", isParameter=" ).append( isParameter );
+		sb.append( '}' );
 		return sb.toString();
 	}
 }

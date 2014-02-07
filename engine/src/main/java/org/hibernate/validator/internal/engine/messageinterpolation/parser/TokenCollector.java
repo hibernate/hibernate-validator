@@ -57,6 +57,7 @@ public class TokenCollector {
 		if ( currentToken == null ) {
 			return;
 		}
+		currentToken.terminate();
 		tokenList.add( currentToken );
 		currentToken = null;
 	}
@@ -71,7 +72,11 @@ public class TokenCollector {
 	}
 
 	public void makeParameterToken() {
-		currentToken.makeParameterToken( true );
+		currentToken.makeParameterToken();
+	}
+
+	public void makeELToken() {
+		currentToken.makeELToken();
 	}
 
 	public void next() throws MessageDescriptorFormatException {
@@ -103,6 +108,8 @@ public class TokenCollector {
 				currentParserState.handleNonMetaCharacter( currentCharacter, this );
 			}
 		}
+		// make sure the last token is terminated
+		terminateToken();
 	}
 
 	public void parse() throws MessageDescriptorFormatException {

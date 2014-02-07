@@ -67,7 +67,6 @@ public class EscapedState implements ParserState {
 	private void handleEscapedCharacter(char character, TokenCollector tokenCollector)
 			throws MessageDescriptorFormatException {
 		tokenCollector.appendToToken( character );
-		tokenCollector.terminateToken();
 		tokenCollector.transitionState( previousState );
 		tokenCollector.next();
 	}
