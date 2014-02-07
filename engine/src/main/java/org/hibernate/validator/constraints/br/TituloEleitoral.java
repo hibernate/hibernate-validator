@@ -43,11 +43,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @List({
 		@Mod11Check(threshold = 9,
 				endIndex = 7,
-				checkDigitPosition = 10),
+				checkDigitIndex = 10),
 		@Mod11Check(threshold = 9,
 				startIndex = 8,
 				endIndex = 10,
-				checkDigitPosition = 11)
+				checkDigitIndex = 11)
 })
 @ReportAsSingleViolation
 @Documented

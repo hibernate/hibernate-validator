@@ -39,7 +39,7 @@ public class LuhnCheckValidator extends ModCheckBase
 		super.initialize(
 				constraintAnnotation.startIndex(),
 				constraintAnnotation.endIndex(),
-				constraintAnnotation.checkDigitPosition(),
+				constraintAnnotation.checkDigitIndex(),
 				constraintAnnotation.ignoreNonDigitCharacters()
 		);
 	}

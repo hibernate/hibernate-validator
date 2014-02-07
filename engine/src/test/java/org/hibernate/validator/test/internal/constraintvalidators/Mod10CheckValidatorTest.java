@@ -67,7 +67,7 @@ public class Mod10CheckValidatorTest {
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testInvalidCheckDigitPosition() {
+	public void testInvalidcheckDigitIndex() {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, 10, 5, false );
 		validator.initialize( modCheck );
@@ -201,7 +201,7 @@ public class Mod10CheckValidatorTest {
 								.weight( 1 )
 								.startIndex( 0 )
 								.endIndex( 12 )
-								.checkDigitPosition( -1 )
+								.checkDigitIndex( -1 )
 								.ignoreNonDigitCharacters( true )
 				);
 		config.addMapping( mapping );
@@ -217,7 +217,7 @@ public class Mod10CheckValidatorTest {
 		AnnotationDescriptor<Mod10Check> descriptor = new AnnotationDescriptor<Mod10Check>( Mod10Check.class );
 		descriptor.setValue( "startIndex", start );
 		descriptor.setValue( "endIndex", end );
-		descriptor.setValue( "checkDigitPosition", checkDigitIndex );
+		descriptor.setValue( "checkDigitIndex", checkDigitIndex );
 		descriptor.setValue( "ignoreNonDigitCharacters", ignoreNonDigits );
 		descriptor.setValue( "multiplier", multiplier );
 		descriptor.setValue( "weight", weight );

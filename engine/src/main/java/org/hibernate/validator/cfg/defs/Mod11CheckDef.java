@@ -44,8 +44,8 @@ public class Mod11CheckDef extends ConstraintDef<Mod11CheckDef, Mod11Check> {
 		return this;
 	}
 
-	public Mod11CheckDef checkDigitPosition(int checkDigitPosition) {
-		addParameter( "checkDigitPosition", checkDigitPosition );
+	public Mod11CheckDef checkDigitIndex(int checkDigitIndex) {
+		addParameter( "checkDigitIndex", checkDigitIndex );
 		return this;
 	}
 
