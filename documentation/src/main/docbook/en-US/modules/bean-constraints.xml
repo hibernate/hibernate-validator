@@ -946,6 +946,20 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
             </row>
 
             <row>
+              <entry><classname>@EAN</classname></entry>
+
+              <entry><classname>CharSequence</classname></entry>
+
+              <entry>Checks that the annotated character sequence is a valid
+              <ulink
+              url="http://en.wikipedia.org/wiki/International_Article_Number_%28EAN%29">EAN</ulink>
+              barcode. <constant>type</constant> determines the type of
+              barcode. The default is EAN-13.</entry>
+
+              <entry>None</entry>
+            </row>
+
+            <row>
               <entry><classname>@Email</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
@@ -985,11 +999,10 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
               url="http://en.wikipedia.org/wiki/Luhn_algorithm">Luhn
               algorithm</ulink>). <constant>startIndex</constant> and
               <constant>endIndex</constant> allow to only run the algorithm on
-              the specified sub-string.
-              <constant>checkDigitIndex</constant> allows to use an
-              arbitrary digit within the character sequence as the check
-              digit. If not specified it is assumed that the check digit is
-              part of the specified range. Last but not least,
+              the specified sub-string. <constant>checkDigitIndex</constant>
+              allows to use an arbitrary digit within the character sequence
+              as the check digit. If not specified it is assumed that the
+              check digit is part of the specified range. Last but not least,
               <constant>ignoreNonDigitCharacters</constant> allows to ignore
               non digit characters.</entry>
 
@@ -1012,11 +1025,10 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
               weight for even numbers (defaults to 1).
               <constant>startIndex</constant> and
               <constant>endIndex</constant> allow to only run the algorithm on
-              the specified sub-string.
-              <constant>checkDigitIndex</constant> allows to use an
-              arbitrary digit within the character sequence as the check
-              digit. If not specified it is assumed that the check digit is
-              part of the specified range. Last but not least,
+              the specified sub-string. <constant>checkDigitIndex</constant>
+              allows to use an arbitrary digit within the character sequence
+              as the check digit. If not specified it is assumed that the
+              check digit is part of the specified range. Last but not least,
               <constant>ignoreNonDigitCharacters</constant> allows to ignore
               non digit characters.</entry>
 
