@@ -43,6 +43,7 @@ import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.constraints.ConstraintComposition;
+import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
@@ -62,6 +63,7 @@ import org.hibernate.validator.internal.constraintvalidators.DecimalMinValidator
 import org.hibernate.validator.internal.constraintvalidators.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.DigitsValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.DigitsValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.EmailValidator;
 import org.hibernate.validator.internal.constraintvalidators.FutureValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.FutureValidatorForDate;
@@ -204,6 +206,10 @@ public class ConstraintHelper {
 		constraintList.add( SizeValidatorForArraysOfInt.class );
 		constraintList.add( SizeValidatorForArraysOfLong.class );
 		builtinConstraints.put( Size.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( EANValidator.class );
+		builtinConstraints.put( EAN.class, constraintList );
 
 		constraintList = newArrayList();
 		constraintList.add( EmailValidator.class );

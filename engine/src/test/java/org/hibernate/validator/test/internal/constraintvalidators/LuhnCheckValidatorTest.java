@@ -56,7 +56,7 @@ public class LuhnCheckValidatorTest {
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testInvalidcheckDigitIndex() {
+	public void testInvalidCheckDigitIndex() {
 		LuhnCheckValidator validator = new LuhnCheckValidator();
 		LuhnCheck modCheck = createLuhnCheckAnnotation( 0, 10, 5, false );
 		validator.initialize( modCheck );
