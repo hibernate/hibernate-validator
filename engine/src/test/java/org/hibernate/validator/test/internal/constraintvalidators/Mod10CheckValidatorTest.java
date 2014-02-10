@@ -67,7 +67,7 @@ public class Mod10CheckValidatorTest {
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testInvalidcheckDigitIndex() {
+	public void testInvalidCheckDigitIndex() {
 		Mod10CheckValidator validator = new Mod10CheckValidator();
 		Mod10Check modCheck = createMod10CheckAnnotation( 0, 10, 5, false );
 		validator.initialize( modCheck );
