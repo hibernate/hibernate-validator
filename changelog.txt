@@ -1,8 +1,30 @@
 Hibernate Validator Changelog
 =============================
 
-5.1.0.Alpha1 (15.01.2014)
--------------------------
+5.1.0.CR1 (17.02.2014)
+----------------------
+
+** Bug
+    * [HV-834] - Support curly braces within EL expressions
+    * [HV-858] - ValidatorFactoryBean should use default BV provider
+    * [HV-860] - Leverage validated value unwrapper for validateProperty() and validateValue()
+
+** Improvement
+    * [HV-859] - Allow to upload to  /docs_htdocs/hibernate/stable/validator for final releases
+
+** New Feature
+    * [HV-814] - Re-consider semantics of options of mod check constraints
+
+** Remove Feature
+    * [HV-799] - EANValidator removed from the latest versions
+
+** Task
+    * [HV-812] - Make @Mod10Check and @Mod11Check constraints usable via API
+    * [HV-837] - Re-enable CustomValidatorFactoryInPersistenceUnitIT#testValidatorFactoryPassedToPersistenceUnit
+
+
+5.1.0.Beta1 (15.01.2014)
+------------------------
 
 ** Bug
     * [HV-596] - Improve error message for unsupported validateValue() invocations
