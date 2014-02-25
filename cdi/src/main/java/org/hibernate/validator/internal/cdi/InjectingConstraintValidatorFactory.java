@@ -56,6 +56,9 @@ public class InjectingConstraintValidatorFactory implements ConstraintValidatorF
 	@Override
 	public void releaseInstance(ConstraintValidator<?, ?> instance) {
 		DestructibleBeanInstance<?> destructibleBeanInstance = constraintValidatorMap.remove( instance );
-		destructibleBeanInstance.destroy();
+		// HV-865 (Cleanup is multi threaded and instances can be removed by multiple threads. Explicit null check is needed)
+		if ( destructibleBeanInstance != null ) {
+			destructibleBeanInstance.destroy();
+		}
 	}
 }
