@@ -1,6 +1,6 @@
 # Hibernate Validator
 
-*Version: 5.1.0.CR1, 17.02.2014*
+*Version: 5.1.0.Final, 02.03.2014*
 
 
 ## What is it?
@@ -35,7 +35,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>5.1.0.CR1</version>
+            <version>5.1.0.Final</version>
         </dependency>
 
       You also need an API and implementation of the Unified Expression Language. These dependencies must be explicitly added in an SE environment.
@@ -59,7 +59,7 @@ extension by adding the following dependency:
         <dependency>
            <groupId>org.hibernate</groupId>
            <artifactId>hibernate-validator-cdi</artifactId>
-           <version>5.1.0.CR1</version>
+           <version>5.1.0.Final</version>
         </dependency>
 
 * _hibernate-validator-annotation-processor-&lt;version&gt;.jar_ is an optional jar which can be integrated with your build
@@ -93,4 +93,4 @@ There are more build options available as well. For more information refer to [C
 * [Mailing Lists](http://www.hibernate.org/community/mailinglists.html)
 * [Source Code](git://github.com/hibernate/hibernate-validator.git)
 * [Issue Tracking](http://opensource.atlassian.com/projects/hibernate/browse/HV)
-* [Continous Integration](https://hibernate-validator.ci.cloudbees.com/) [![Build Status](https://hibernate-validator.ci.cloudbees.com/view/Hibernate%20Validator%205/job/HV-5-SNAPSHOT/badge/icon)](https://hibernate-validator.ci.cloudbees.com/view/Hibernate%20Validator%205/job/HV-5-SNAPSHOT/)
+* [Continuous Integration](https://hibernate-validator.ci.cloudbees.com/) [![Build Status](https://hibernate-validator.ci.cloudbees.com/buildStatus/icon?job=HV-5-MASTER)](https://hibernate-validator.ci.cloudbees.com/view/Hibernate%20Validator%205/job/HV-5-MASTER/)

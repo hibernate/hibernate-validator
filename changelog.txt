@@ -1,6 +1,13 @@
 Hibernate Validator Changelog
 =============================
 
+5.1.0.Final (02.03.2014)
+------------------------
+
+** Bug
+    * [HV-865] - java.lang.NullPointerException at org.hibernate.validator.internal.cdi.InjectingConstraintValidatorFactory.releaseInstance
+
+
 5.1.0.CR1 (17.02.2014)
 ----------------------
 
