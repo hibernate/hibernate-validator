@@ -19,11 +19,15 @@ package org.hibernate.validator.test.internal.util;
 
 import java.io.Serializable;
 import java.lang.reflect.GenericDeclaration;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -904,27 +908,75 @@ public class TypeHelperTest {
 		};
 	}
 
-	private static TypeVariable typeVariable(final GenericDeclaration declaration,
-											 final String name,
-											 final Type... bounds) {
-		return new TypeVariable() {
-			@Override
-			public Type[] getBounds() {
-				if ( bounds == null || bounds.length == 0 ) {
-					return new Type[] { Object.class };
-				}
-				return bounds;
-			}
+	private static TypeVariable<GenericDeclaration> typeVariable(final GenericDeclaration declaration,
+			final String name,
+			final Type... bounds) {
 
-			@Override
-			public GenericDeclaration getGenericDeclaration() {
-				return declaration;
-			}
+		Class<?>[] interfaces = { TypeVariable.class };
 
-			@Override
-			public String getName() {
-				return name;
+		// HV-871 Implementing TypeVariable via a dynamic proxy to ensure this code can be compiled with Java 7 and 8;
+		// New methods have been added to the TypeVariable interface in Java 8; To ensure compatibility with Java 7, we
+		// don't directly implement these as they use types which themselves have been added in Java 8
+		@SuppressWarnings("unchecked")
+		TypeVariable<GenericDeclaration> typeVariable = (TypeVariable<GenericDeclaration>) Proxy.newProxyInstance(
+				TypeHelperTest.class.getClassLoader(),
+				interfaces,
+				new TypeVariableImpl( bounds, declaration, name )
+		);
+
+		return typeVariable;
+	}
+
+	private static class TypeVariableImpl implements InvocationHandler {
+
+		private final Type[] bounds;
+		GenericDeclaration declaration;
+		String name;
+
+		public TypeVariableImpl(Type[] bounds, GenericDeclaration declaration, String name) {
+			this.bounds = bounds;
+			this.declaration = declaration;
+			this.name = name;
+		}
+
+		public Type[] getBounds() {
+			if ( bounds == null || bounds.length == 0 ) {
+				return new Type[] { Object.class };
 			}
-		};
+			return bounds;
+		}
+
+		public GenericDeclaration getGenericDeclaration() {
+			return declaration;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public String toString() {
+			return "TypeVariableImpl [bounds=" + Arrays.toString( bounds )
+					+ ", declaration=" + declaration + ", name=" + name + "]";
+		}
+
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			if ( method.getName().equals( "getBounds" ) ) {
+				return getBounds();
+			}
+			else if ( method.getName().equals( "getGenericDeclaration" ) ) {
+				return getGenericDeclaration();
+			}
+			else if ( method.getName().equals( "getName" ) ) {
+				return getName();
+			}
+			else if ( method.getName().equals( "toString" ) ) {
+				return toString();
+			}
+			else {
+				throw new UnsupportedOperationException( "Method " + method + " is not implemented." );
+			}
+		}
 	}
 }
