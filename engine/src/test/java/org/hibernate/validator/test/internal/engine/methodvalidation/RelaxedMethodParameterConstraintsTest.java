@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2014, JBoss, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -16,79 +16,81 @@
 */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import junit.framework.TestCase;
 
-import org.joda.time.DateMidnight;
-import org.testng.annotations.Test;
+import org.apache.log4j.Logger;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
-
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import org.joda.time.DateMidnight;
+import org.testng.annotations.Test;
 
 /**
- * Integration test for {@link ValidatorImpl} and {@link org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl} which
- * tests that illegal method parameter constraints are handled properly.
+ * Integration test for {@link ValidatorImpl} which tests that illegal method parameter constraints are properly allowed
+ * when relaxed constraint properties are in effect.
  *
- * @author Gunnar Morling
+ * @author Chris Beckey <cbeckey@paypal.com>
  */
-@Test
-public class IllegalMethodParameterConstraintsTest {
-
-	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testNullParameterArrayThrowsException() {
-		getValidator().forExecutables().validateParameters(
-				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }, (Class<?>) null
-		);
-	}
-
-	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void testNullGroupsVarargThrowsException() {
-		getValidator().forExecutables().validateParameters(
-				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], null
-		);
-	}
-
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
-	public void parameterConstraintsAddedInSubTypeCausesDeclarationException() {
-		getValidator().forExecutables().validateParameters(
+public class RelaxedMethodParameterConstraintsTest {
+	private Logger logger = Logger.getLogger(RelaxedMethodParameterConstraintsTest.class);
+	
+	/**
+	 * The converse of parameterConstraintsAddedInSubTypeCausesDeclarationException,
+	 * relaxes constraint.
+	 */
+	@Test
+	public void allowParameterConstraintsAddedInSubType() {
+		HibernateValidatorConfiguration configure = Validation.byProvider( HibernateValidator.class ).configure();
+		TestCase.assertNotNull("HibernateValidatorConfiguration is null, unable to continue", configure);
+		
+		configure.allowOverridingMethodAlterParameterConstraint(true);
+		configure.allowParallelMethodsDefineGroupConversion(true);
+		configure.allowParallelMethodsDefineParameterConstraints(true);
+		
+		ValidatorFactory factory = configure.buildValidatorFactory();
+		TestCase.assertNotNull("ValidatorFactory is null, unable to continue", factory);
+		Validator validator = factory.getValidator();
+		TestCase.assertNotNull("Validator is null, unable to continue", validator);
+		
+		TestCase.assertNotNull("Validator is null, unable to continue", validator);
+		TestCase.assertNotNull("Validator.forExecutables() is null, unable to continue", validator.forExecutables());
+		
+		validator.forExecutables().validateParameters(
 				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }
 		);
 	}
-
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
-	public void atValidAddedInSubTypeCausesDeclarationException() {
-		getValidator().forExecutables().validateParameters(
-				new ZapImpl(), ZapImpl.class.getDeclaredMethods()[0], new Object[] { }
-		);
-	}
-
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
+	
+	/**
+	 * The converse of constraintStrengtheningInSubTypeCausesDeclarationException,
+	 * relaxes constraint.
+	 */
+	@Test
 	public void constraintStrengtheningInSubTypeCausesDeclarationException() {
-		getValidator().forExecutables().validateParameters(
+		HibernateValidatorConfiguration configure = Validation.byProvider( HibernateValidator.class ).configure();
+		TestCase.assertNotNull("HibernateValidatorConfiguration is null, unable to continue", configure);
+		
+		configure.allowOverridingMethodAlterParameterConstraint(true);
+		configure.allowParallelMethodsDefineGroupConversion(true);
+		configure.allowParallelMethodsDefineParameterConstraints(true);
+		
+		ValidatorFactory factory = configure.buildValidatorFactory();
+		TestCase.assertNotNull("ValidatorFactory is null, unable to continue", factory);
+		Validator validator = factory.getValidator();
+		TestCase.assertNotNull("Validator is null, unable to continue", validator);
+		
+		TestCase.assertNotNull("Validator is null, unable to continue", validator);
+		TestCase.assertNotNull("Validator.forExecutables() is null, unable to continue", validator.forExecutables());
+		
+		validator.forExecutables().validateParameters(
 				new BarImpl(), BarImpl.class.getDeclaredMethods()[0], new Object[] { }
-		);
-	}
-
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000152.*")
-	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDeclarationException() {
-		getValidator().forExecutables().validateParameters(
-				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] { }
-		);
-	}
-
-	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
-	//TODO HV-632: Add more tests
-	public void crossParameterConstraintStrengtheningInSubTypeCausesDeclarationException() {
-		getValidator().forExecutables().validateParameters(
-				new ZipImpl(), ZipImpl.class.getDeclaredMethods()[0], new Object[2]
 		);
 	}
 

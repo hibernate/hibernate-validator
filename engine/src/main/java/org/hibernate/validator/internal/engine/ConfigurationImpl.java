@@ -16,12 +16,15 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -49,8 +52,6 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
-
 /**
  * Hibernate specific {@code Configuration} implementation.
  *
@@ -58,6 +59,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Chris Beckey <cbeckey@paypal.com> (C) 2014 ebay, Inc.
  */
 public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
 
@@ -79,6 +81,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
 	private Set<ConstraintMapping> programmaticMappings = CollectionHelper.newHashSet();
 	private boolean failFast;
+	private boolean allowOverridingMethodAlterParameterConstraint = false;
+	private boolean allowParallelMethodsDefineGroupConversion = false;
+	private boolean allowParallelMethodsDefineParameterConstraints = false;
 	private BootstrapConfiguration bootstrapConfiguration;
 
 	public ConfigurationImpl(BootstrapState state) {
@@ -173,6 +178,24 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	@Override
+	public HibernateValidatorConfiguration allowOverridingMethodAlterParameterConstraint(boolean allow) {
+		this.allowOverridingMethodAlterParameterConstraint = allow;
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorConfiguration allowParallelMethodsDefineGroupConversion(boolean allow) {
+		this.allowParallelMethodsDefineGroupConversion = allow;
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorConfiguration allowParallelMethodsDefineParameterConstraints(boolean allow) {
+		this.allowParallelMethodsDefineParameterConstraints = allow;
+		return this;
+	}
+
 	public final ConstraintMapping createConstraintMapping() {
 		return new DefaultConstraintMapping();
 	}
@@ -247,6 +270,18 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public final boolean getFailFast() {
 		return failFast;
+	}
+
+	public boolean isAllowOverridingMethodAlterParameterConstraint() {
+		return allowOverridingMethodAlterParameterConstraint;
+	}
+
+	public boolean isAllowParallelMethodsDefineGroupConversion() {
+		return allowParallelMethodsDefineGroupConversion;
+	}
+
+	public boolean isAllowParallelMethodsDefineParameterConstraints() {
+		return allowParallelMethodsDefineParameterConstraints;
 	}
 
 	public final ConstraintValidatorFactory getConstraintValidatorFactory() {

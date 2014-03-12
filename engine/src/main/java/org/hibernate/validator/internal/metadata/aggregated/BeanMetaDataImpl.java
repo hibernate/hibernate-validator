@@ -64,6 +64,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Chris Beckey <cbeckey@paypal.com> (C) 2014 ebay, Inc.
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
@@ -449,14 +450,39 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		private DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
 
-		private BeanMetaDataBuilder(ConstraintHelper constraintHelper, ExecutableHelper executableHelper, Class<T> beanClass) {
+		private final boolean allowOverridingMethodAlterParameterConstraint;
+		private final boolean allowParallelMethodsDefineGroupConversion;
+		private final boolean allowParallelMethodsDefineParameterConstraints;
+		
+		private BeanMetaDataBuilder(
+				ConstraintHelper constraintHelper, 
+				ExecutableHelper executableHelper, 
+				Class<T> beanClass,
+				boolean allowOverridingMethodAlterParameterConstraint,
+				boolean allowParallelMethodsDefineGroupConversion,
+				boolean allowParallelMethodsDefineParameterConstraints) {
 			this.beanClass = beanClass;
 			this.constraintHelper = constraintHelper;
 			this.executableHelper = executableHelper;
+			this.allowOverridingMethodAlterParameterConstraint = allowOverridingMethodAlterParameterConstraint;
+			this.allowParallelMethodsDefineGroupConversion = allowParallelMethodsDefineGroupConversion;
+			this.allowParallelMethodsDefineParameterConstraints = allowParallelMethodsDefineParameterConstraints;
 		}
 
-		public static <T> BeanMetaDataBuilder<T> getInstance(ConstraintHelper constraintHelper, ExecutableHelper executableHelper, Class<T> beanClass) {
-			return new BeanMetaDataBuilder<T>( constraintHelper, executableHelper, beanClass );
+		public static <T> BeanMetaDataBuilder<T> getInstance(
+				ConstraintHelper constraintHelper, 
+				ExecutableHelper executableHelper, 
+				Class<T> beanClass,
+				boolean allowOverridingMethodAlterParameterConstraint,
+				boolean allowParallelMethodsDefineGroupConversion,
+				boolean allowParallelMethodsDefineParameterConstraints) {
+			return new BeanMetaDataBuilder<T>( 
+					constraintHelper, 
+					executableHelper, 
+					beanClass,
+					allowOverridingMethodAlterParameterConstraint, 
+					allowParallelMethodsDefineGroupConversion, 
+					allowParallelMethodsDefineParameterConstraints);
 		}
 
 		public void add(BeanConfiguration<? super T> configuration) {
@@ -497,7 +523,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							beanClass,
 							constrainableElement,
 							constraintHelper,
-							executableHelper
+							executableHelper,
+							this.allowOverridingMethodAlterParameterConstraint,
+							this.allowParallelMethodsDefineGroupConversion,
+							this.allowParallelMethodsDefineParameterConstraints
 					)
 			);
 		}
@@ -524,11 +553,26 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		private final ExecutableHelper executableHelper;
 		private MetaDataBuilder propertyBuilder;
 		private ExecutableMetaData.Builder methodBuilder;
+		private final boolean allowOverridingMethodAlterParameterConstraint;
+		private final boolean allowParallelMethodsDefineGroupConversion;
+		private final boolean allowParallelMethodsDefineParameterConstraints;
+		
 
-		public BuilderDelegate(Class<?> beanClass, ConstrainedElement constrainedElement, ConstraintHelper constraintHelper, ExecutableHelper executableHelper) {
+		public BuilderDelegate(
+				Class<?> beanClass, 
+				ConstrainedElement constrainedElement, 
+				ConstraintHelper constraintHelper, 
+				ExecutableHelper executableHelper,
+				boolean allowOverridingMethodAlterParameterConstraint,
+				boolean allowParallelMethodsDefineGroupConversion,
+				boolean allowParallelMethodsDefineParameterConstraints
+				) {
 			this.beanClass = beanClass;
 			this.constraintHelper = constraintHelper;
 			this.executableHelper = executableHelper;
+			this.allowOverridingMethodAlterParameterConstraint = allowOverridingMethodAlterParameterConstraint;
+			this.allowParallelMethodsDefineGroupConversion = allowParallelMethodsDefineGroupConversion;
+			this.allowParallelMethodsDefineParameterConstraints = allowParallelMethodsDefineParameterConstraints;
 
 			switch ( constrainedElement.getKind() ) {
 				case FIELD:
@@ -546,7 +590,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							beanClass,
 							constrainedExecutable,
 							constraintHelper,
-							executableHelper
+							executableHelper,
+							allowOverridingMethodAlterParameterConstraint,
+							allowParallelMethodsDefineGroupConversion,
+							allowParallelMethodsDefineParameterConstraints
 					);
 
 					if ( constrainedExecutable.isGetterMethod() ) {
@@ -585,7 +632,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							beanClass,
 							constrainedMethod,
 							constraintHelper,
-							executableHelper
+							executableHelper,
+							allowOverridingMethodAlterParameterConstraint,
+							allowParallelMethodsDefineGroupConversion,
+							allowParallelMethodsDefineParameterConstraints
 					);
 				}
 

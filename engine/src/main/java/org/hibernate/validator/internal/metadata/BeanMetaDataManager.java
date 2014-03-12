@@ -56,7 +56,8 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * </p>
  *
  * @author Gunnar Morling
- */
+ * @author Chris Beckey <cbeckey@paypal.com> (C) 2014 ebay, Inc.
+*/
 public class BeanMetaDataManager {
 	/**
 	 * The default initial capacity for this cache.
@@ -95,6 +96,15 @@ public class BeanMetaDataManager {
 	private final ExecutableHelper executableHelper;
 
 	/**
+	 * These three fields affect the invocation of rules associated to section 4.5.5
+	 * of the V1.1 specification.  By default they are all false, if true they allow
+	 * for relaxation of the Liskov Substitution Principal.
+	 */
+	private final boolean allowOverridingMethodAlterParameterConstraint; 
+	private final boolean allowParallelMethodsDefineGroupConversion;
+	private final boolean allowParallelMethodsDefineParameterConstraints;
+	
+	/**
 	 * Creates a new {@code BeanMetaDataManager}. {@link DefaultParameterNameProvider} is used as parameter name
 	 * provider, no meta data providers besides the annotation-based providers are used.
 	 *
@@ -114,14 +124,28 @@ public class BeanMetaDataManager {
 	 * @param optionalMetaDataProviders optional meta data provider used on top of the annotation based provider
 	 */
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
-							   ExecutableHelper executableHelper,
-							   ParameterNameProvider parameterNameProvider,
-							   List<MetaDataProvider> optionalMetaDataProviders) {
+			   ExecutableHelper executableHelper,
+			   ParameterNameProvider parameterNameProvider,
+			   List<MetaDataProvider> optionalMetaDataProviders) {
+		this(constraintHelper, executableHelper, parameterNameProvider, optionalMetaDataProviders, false, false, false);
+	}
+	
+	public BeanMetaDataManager(ConstraintHelper constraintHelper,
+			ExecutableHelper executableHelper,
+			ParameterNameProvider parameterNameProvider,
+			List<MetaDataProvider> optionalMetaDataProviders,
+			boolean allowOverridingMethodAlterParameterConstraint, 
+			boolean allowParallelMethodsDefineGroupConversion,
+			boolean allowParallelMethodsDefineParameterConstraints) {
 		this.constraintHelper = constraintHelper;
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
 		this.executableHelper = executableHelper;
 
+		this.allowOverridingMethodAlterParameterConstraint = allowOverridingMethodAlterParameterConstraint;
+		this.allowParallelMethodsDefineGroupConversion = allowParallelMethodsDefineGroupConversion;
+		this.allowParallelMethodsDefineParameterConstraints = allowParallelMethodsDefineParameterConstraints;
+		
 		this.beanMetaDataCache = new ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>>(
 				DEFAULT_INITIAL_CAPACITY,
 				DEFAULT_LOAD_FACTOR,
@@ -181,7 +205,11 @@ public class BeanMetaDataManager {
 	 * @return A bean meta data object for the given type.
 	 */
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
-		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, executableHelper, clazz );
+		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( 
+				constraintHelper, executableHelper, clazz, 
+				allowOverridingMethodAlterParameterConstraint,
+				allowParallelMethodsDefineGroupConversion,
+				allowParallelMethodsDefineParameterConstraints);
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {

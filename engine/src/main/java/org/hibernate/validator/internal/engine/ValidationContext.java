@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
@@ -142,7 +143,12 @@ public class ValidationContext<T> {
 	 * Whether or not validation should fail on the first constraint violation.
 	 */
 	private final boolean failFast;
+	
 
+	/**
+	 * The constructor for all ValidationContext
+	 * 
+	 */
 	private ValidationContext(BeanMetaDataManager beanMetaDataManager,
 							  ConstraintValidatorManager constraintValidatorManager,
 							  MessageInterpolator messageInterpolator,
@@ -180,7 +186,8 @@ public class ValidationContext<T> {
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
-			boolean failFast) {
+			boolean failFast
+			) {
 
 		return new ValidationContextBuilder(
 				beanMetaDataManager,

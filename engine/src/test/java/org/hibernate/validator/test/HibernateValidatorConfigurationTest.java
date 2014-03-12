@@ -18,8 +18,9 @@ package org.hibernate.validator.test;
 
 import javax.validation.Validation;
 
-import org.testng.annotations.Test;
+import junit.framework.TestCase;
 
+import org.testng.annotations.Test;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
@@ -39,5 +40,13 @@ public class HibernateValidatorConfigurationTest {
 		ResourceBundleLocator defaultResourceBundleLocator = configure.getDefaultResourceBundleLocator();
 
 		assertNotNull( defaultResourceBundleLocator );
+	}
+	
+	@Test
+	public void relaxationPropertiesAreProperDefault() {
+		HibernateValidatorConfiguration configure = Validation.byProvider( HibernateValidator.class ).configure();
+		TestCase.assertFalse( configure.isAllowOverridingMethodAlterParameterConstraint() );
+		TestCase.assertFalse( configure.isAllowParallelMethodsDefineGroupConversion() );
+		TestCase.assertFalse( configure.isAllowParallelMethodsDefineParameterConstraints() );
 	}
 }

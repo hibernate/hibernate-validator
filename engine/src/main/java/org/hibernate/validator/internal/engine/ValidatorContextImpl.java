@@ -29,6 +29,7 @@ import org.hibernate.validator.HibernateValidatorContext;
  * @author Hardy Ferentschik
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Gunnar Morling
+ * @author Chris Beckey <cbeckey@paypal.com> (C) 2014 ebay, Inc.
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
 
@@ -40,6 +41,9 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ParameterNameProvider parameterNameProvider;
 
 	private boolean failFast;
+	private boolean allowOverridingMethodAlterParameterConstraint;
+	private boolean allowParallelMethodsDefineGroupConversion;
+	private boolean allowParallelMethodsDefineParameterConstraints;
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
 		this.validatorFactory = validatorFactory;
@@ -100,13 +104,35 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext allowOverridingMethodAlterParameterConstraint(boolean allow) {
+		this.allowOverridingMethodAlterParameterConstraint = allow;
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorContext allowParallelMethodsDefineGroupConversion(boolean allow) {
+		this.allowParallelMethodsDefineGroupConversion = allow;
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorContext allowParallelMethodsDefineParameterConstraints(boolean allow) {
+		this.allowParallelMethodsDefineParameterConstraints = allow;
+		return this;
+	}
+
+	@Override
 	public Validator getValidator() {
 		return validatorFactory.createValidator(
 				constraintValidatorFactory,
 				messageInterpolator,
 				traversableResolver,
 				parameterNameProvider,
-				failFast
+				failFast,
+				allowOverridingMethodAlterParameterConstraint,
+				allowParallelMethodsDefineGroupConversion,
+				allowParallelMethodsDefineParameterConstraints
+
 		);
 	}
 }

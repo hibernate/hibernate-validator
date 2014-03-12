@@ -98,7 +98,7 @@ public class ValidatorTest {
 	public void testValidatePropertyWithCurrencySymbol() {
 		Validator validator = getValidator();
 		Ticket testInstance = new Ticket();
-		Set<ConstraintViolation<Ticket>> constraintViolations = validator.validateProperty( testInstance, "€price" );
+		Set<ConstraintViolation<Ticket>> constraintViolations = validator.validateProperty( testInstance, "price" );
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
@@ -108,7 +108,7 @@ public class ValidatorTest {
 		Validator validator = getValidator();
 		Ticket testInstance = new Ticket();
 		Set<ConstraintViolation<Ticket>> constraintViolations = validator.validateValue(
-				Ticket.class, "€price", testInstance.€price
+				Ticket.class, "price", testInstance.price
 		);
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
@@ -272,7 +272,7 @@ public class ValidatorTest {
 
 	class Ticket {
 		@NotNull
-		Float €price;
+		Float price;
 	}
 
 	interface TestGroup {
