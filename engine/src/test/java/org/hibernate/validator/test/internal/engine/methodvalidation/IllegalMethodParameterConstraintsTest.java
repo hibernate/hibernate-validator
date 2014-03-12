@@ -31,7 +31,7 @@ public class IllegalMethodParameterConstraintsTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNullParameterArrayThrowsException() {
 		getValidator().forExecutables().validateParameters(
-				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }, (Class<?>) null
+				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] {}, (Class<?>) null
 		);
 	}
 
@@ -45,28 +45,28 @@ public class IllegalMethodParameterConstraintsTest {
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	public void parameterConstraintsAddedInSubTypeCausesDeclarationException() {
 		getValidator().forExecutables().validateParameters(
-				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] { }
+				new FooImpl(), FooImpl.class.getDeclaredMethods()[0], new Object[] {}
 		);
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	public void atValidAddedInSubTypeCausesDeclarationException() {
 		getValidator().forExecutables().validateParameters(
-				new ZapImpl(), ZapImpl.class.getDeclaredMethods()[0], new Object[] { }
+				new ZapImpl(), ZapImpl.class.getDeclaredMethods()[0], new Object[] {}
 		);
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000151.*")
 	public void constraintStrengtheningInSubTypeCausesDeclarationException() {
 		getValidator().forExecutables().validateParameters(
-				new BarImpl(), BarImpl.class.getDeclaredMethods()[0], new Object[] { }
+				new BarImpl(), BarImpl.class.getDeclaredMethods()[0], new Object[] {}
 		);
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000152.*")
 	public void parameterConstraintsInHierarchyWithMultipleRootMethodsCausesDeclarationException() {
 		getValidator().forExecutables().validateParameters(
-				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] { }
+				new BazImpl(), BazImpl.class.getDeclaredMethods()[0], new Object[] {}
 		);
 	}
 

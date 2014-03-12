@@ -22,6 +22,7 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Hardy Ferentschik
+ * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
  */
 public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {
 	/**
@@ -29,6 +30,27 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * Accepts {@code true} or {@code false}. Defaults to {@code false}.
 	 */
 	String FAIL_FAST = "hibernate.validator.fail_fast";
+
+	/**
+	 * Property corresponding to the {@link #allowOverridingMethodAlterParameterConstraint} method.
+	 * Accepts {@code true} or {@code false}.
+	 * Defaults to {@code false}.
+	 */
+	String ALLOW_PARAMETER_CONSTRAINT_OVERRIDE = "hibernate.validator.allow_parameter_constraint_override";
+
+	/**
+	 * Property corresponding to the {@link #allowMultipleCascadedValidationOnReturnValues} method.
+	 * Accepts {@code true} or {@code false}.
+	 * Defaults to {@code false}.
+	 */
+	String ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT = "hibernate.validator.allow_multiple_cascaded_validation_on_result";
+
+	/**
+	 * Property corresponding to the {@link #allowParallelMethodsDefineParameterConstraints} method.
+	 * Accepts {@code true} or {@code false}.
+	 * Defaults to {@code false}.
+	 */
+	String ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS = "hibernate.validator.allow_parallel_method_parameter_constraint";
 
 	/**
 	 * Property corresponding to the {@link #addValidatedValueHandler(ValidatedValueUnwrapper)} method. Accepts a String
@@ -139,6 +161,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 
 	/**
 	 * @return the default {@link org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor}. Never {@code null}.
+	 *
 	 * @since 5.2
 	 */
 	ConstraintDefinitionContributor getDefaultConstraintDefinitionContributor();
@@ -165,10 +188,10 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * If no class loader is given, these resources will be obtained through the thread context class loader and as a
 	 * last fallback through Hibernate Validator's own class loader.
 	 *
-	 * @param externalClassLoader
-	 *            The class loader for loading user-provided resources.
+	 * @param externalClassLoader The class loader for loading user-provided resources.
 	 *
 	 * @return {@code this} following the chaining method pattern
+	 *
 	 * @since 5.2
 	 */
 	HibernateValidatorConfiguration externalClassLoader(ClassLoader externalClassLoader);
@@ -186,4 +209,58 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @since 5.2
 	 */
 	HibernateValidatorConfiguration timeProvider(TimeProvider timeProvider);
+
+	/**
+	 * Define whether overriding methods that override constraints should throw a {@code ConstraintDefinitionException}.
+	 * The default value is {@code false}, i.e. do not allow.
+	 *
+	 * See Section 4.5.5 of JSR-349 Specification, specifically
+	 * <pre>
+	 * "In sub types (be it sub classes/interfaces or interface implementations), no parameter constraints may
+	 * be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation.
+	 * This would pose a strengthening of preconditions to be fulfilled by the caller."
+	 * </pre>
+	 *
+	 * @param allow flag determining whether validation will allow overriding to alter parameter constraints.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 5.3
+	 */
+	HibernateValidatorConfiguration allowOverridingMethodAlterParameterConstraint(boolean allow);
+
+	/**
+	 * Define whether more than one constraint on a return value may be marked for cascading validation are allowed.
+	 * The default value is {@code false}, i.e. do not allow.
+	 *
+	 * "One must not mark a method return value for cascaded validation more than once in a line of a class hierarchy.
+	 * In other words, overriding methods on sub types (be it sub classes/interfaces or interface implementations)
+	 * cannot mark the return value for cascaded validation if the return value has already been marked on the
+	 * overridden method of the super type or interface."
+	 *
+	 * @param allow flag determining whether validation will allow multiple cascaded validation on return values.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 5.3
+	 */
+	HibernateValidatorConfiguration allowMultipleCascadedValidationOnReturnValues(boolean allow);
+
+	/**
+	 * Define whether parallel methods that define constraints should throw a {@code ConstraintDefinitionException}. The
+	 * default value is {@code false}, i.e. do not allow.
+	 *
+	 * See Section 4.5.5 of JSR-349 Specification, specifically
+	 * "If a sub type overrides/implements a method originally defined in several parallel types of the hierarchy
+	 * (e.g. two interfaces not extending each other, or a class and an interface not implemented by said class),
+	 * no parameter constraints may be declared for that method at all nor parameters be marked for cascaded validation.
+	 * This again is to avoid an unexpected strengthening of preconditions to be fulfilled by the caller."
+	 *
+	 * @param allow flag determining whether validation will allow parameter constraints in parallel hierarchies
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 5.3
+	 */
+	HibernateValidatorConfiguration allowParallelMethodsDefineParameterConstraints(boolean allow);
 }

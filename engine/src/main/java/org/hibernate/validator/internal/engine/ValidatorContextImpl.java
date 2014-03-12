@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.engine;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -24,6 +23,7 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  * @author Hardy Ferentschik
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
+ * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
 
@@ -36,6 +36,8 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private boolean failFast;
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 	private TimeProvider timeProvider;
+	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
+
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
 		this.validatorFactory = validatorFactory;
@@ -118,6 +120,24 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext allowOverridingMethodAlterParameterConstraint(boolean allow) {
+		this.methodValidationConfiguration.allowOverridingMethodAlterParameterConstraint( allow );
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorContext allowMultipleCascadedValidationOnReturnValues(boolean allow) {
+		this.methodValidationConfiguration.allowMultipleCascadedValidationOnReturnValues( allow );
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorContext allowParallelMethodsDefineParameterConstraints(boolean allow) {
+		this.methodValidationConfiguration.allowParallelMethodsDefineParameterConstraints( allow );
+		return this;
+	}
+
+	@Override
 	public Validator getValidator() {
 		return validatorFactory.createValidator(
 				constraintValidatorFactory,
@@ -126,7 +146,8 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				parameterNameProvider,
 				failFast,
 				validatedValueHandlers,
-				timeProvider
+				timeProvider,
+				methodValidationConfiguration
 		);
 	}
 }

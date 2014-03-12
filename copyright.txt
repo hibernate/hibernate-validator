@@ -6,6 +6,7 @@ Carlos Vara
 Dag Hovland
 Davide Marchignoli
 Carlo de Wolf
+Chris Beckey
 Christian Ivan
 Denis Tiago
 Doug Lea

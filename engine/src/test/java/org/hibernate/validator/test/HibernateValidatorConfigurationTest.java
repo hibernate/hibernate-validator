@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.test;
 
-import javax.validation.Validation;
-
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertNotNull;
 
 /**
@@ -25,9 +25,17 @@ public class HibernateValidatorConfigurationTest {
 
 	@Test
 	public void defaultResourceBundleLocatorCanBeRetrieved() {
-		HibernateValidatorConfiguration configure = Validation.byProvider( HibernateValidator.class ).configure();
+		HibernateValidatorConfiguration configure = getConfiguration();
 		ResourceBundleLocator defaultResourceBundleLocator = configure.getDefaultResourceBundleLocator();
 
 		assertNotNull( defaultResourceBundleLocator );
+	}
+
+	@Test
+	public void relaxationPropertiesAreProperDefault() {
+		ConfigurationImpl configuration = (ConfigurationImpl) getConfiguration();
+		Assert.assertFalse( configuration.isAllowOverridingMethodAlterParameterConstraint() );
+		Assert.assertFalse( configuration.isAllowMultipleCascadedValidationOnReturnValues() );
+		Assert.assertFalse( configuration.isAllowParallelMethodsDefineParameterConstraints() );
 	}
 }

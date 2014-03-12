@@ -14,7 +14,6 @@ import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -33,7 +32,6 @@ import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validator.internal.engine.valuehandling.OptionalValueUnwrapper;
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.Version;
@@ -60,6 +58,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
  */
 public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
 
@@ -81,16 +80,17 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ValidationProviderResolver providerResolver;
 	private final ValidationBootstrapParameters validationBootstrapParameters;
 	private boolean ignoreXmlConfiguration = false;
-	private final Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
+	private final Set<InputStream> configurationStreams = newHashSet();
 	private BootstrapConfiguration bootstrapConfiguration;
 
 	// HV-specific options
-	private final Set<DefaultConstraintMapping> programmaticMappings = CollectionHelper.newHashSet();
+	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private boolean failFast;
 	private final Set<ConstraintDefinitionContributor> constraintDefinitionContributors = newHashSet();
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
 	private ClassLoader externalClassLoader;
 	private TimeProvider timeProvider;
+	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -136,9 +136,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ValidatedValueUnwrapper<?> createJavaFXUnwrapperClass(TypeResolutionHelper typeResolutionHelper) {
 		try {
 			Class<?> jfxUnwrapperClass = run( LoadClass.action( JFX_UNWRAPPER_CLASS, getClass().getClassLoader() ) );
-			return (ValidatedValueUnwrapper<?>) ( jfxUnwrapperClass.getConstructor( TypeResolutionHelper.class ).newInstance( typeResolutionHelper ) );
+			return (ValidatedValueUnwrapper<?>) ( jfxUnwrapperClass.getConstructor( TypeResolutionHelper.class )
+					.newInstance( typeResolutionHelper ) );
 		}
-		catch (Exception e) {
+		catch ( Exception e ) {
 			throw log.validatedValueUnwrapperCannotBeCreated( JFX_UNWRAPPER_CLASS, e );
 		}
 	}
@@ -214,6 +215,39 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
+	public HibernateValidatorConfiguration allowOverridingMethodAlterParameterConstraint(boolean allow) {
+		this.methodValidationConfiguration.allowOverridingMethodAlterParameterConstraint( allow );
+		return this;
+	}
+
+	public boolean isAllowOverridingMethodAlterParameterConstraint() {
+		return this.methodValidationConfiguration.isAllowOverridingMethodAlterParameterConstraint();
+	}
+
+	@Override
+	public HibernateValidatorConfiguration allowMultipleCascadedValidationOnReturnValues(boolean allow) {
+		this.methodValidationConfiguration.allowMultipleCascadedValidationOnReturnValues( allow );
+		return this;
+	}
+
+	public boolean isAllowMultipleCascadedValidationOnReturnValues() {
+		return this.methodValidationConfiguration.isAllowMultipleCascadedValidationOnReturnValues();
+	}
+
+	public HibernateValidatorConfiguration allowParallelMethodsDefineParameterConstraints(boolean allow) {
+		this.methodValidationConfiguration.allowParallelMethodsDefineParameterConstraints( allow );
+		return this;
+	}
+
+	public boolean isAllowParallelMethodsDefineParameterConstraints() {
+		return this.methodValidationConfiguration.isAllowParallelMethodsDefineParameterConstraints();
+	}
+
+	public MethodValidationConfiguration getMethodValidationConfiguration() {
+		return this.methodValidationConfiguration;
+	}
+
+	@Override
 	public final ConstraintMapping createConstraintMapping() {
 		return new DefaultConstraintMapping();
 	}
@@ -233,6 +267,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 		return this;
 	}
+
 
 	@Override
 	public HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler) {

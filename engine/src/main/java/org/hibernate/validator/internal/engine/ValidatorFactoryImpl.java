@@ -59,6 +59,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
  */
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
@@ -118,6 +119,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final boolean failFast;
 
 	/**
+	 * Hibernate validator specific flags to relax constraints on parameters.
+	 */
+	private final MethodValidationConfiguration methodValidationConfiguration;
+
+	/**
 	 * Metadata provider for XML configuration.
 	 */
 	private XmlMetaDataProvider xmlMetaDataProvider;
@@ -162,6 +168,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		Map<String, String> properties = configurationState.getProperties();
 
 		boolean tmpFailFast = false;
+		boolean tmpAllowOverridingMethodAlterParameterConstraint = false;
+		boolean tmpAllowMultipleCascadedValidationOnReturnValues = false;
+		boolean tmpAllowParallelMethodsDefineParameterConstraints = false;
+
 		List<ValidatedValueUnwrapper<?>> tmpValidatedValueHandlers = newArrayList( 5 );
 
 		if ( configurationState instanceof ConfigurationImpl ) {
@@ -170,20 +180,71 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
 
+			tmpAllowOverridingMethodAlterParameterConstraint =
+					hibernateSpecificConfig.getMethodValidationConfiguration()
+							.isAllowOverridingMethodAlterParameterConstraint();
+			tmpAllowMultipleCascadedValidationOnReturnValues =
+					hibernateSpecificConfig.getMethodValidationConfiguration()
+							.isAllowMultipleCascadedValidationOnReturnValues();
+			tmpAllowParallelMethodsDefineParameterConstraints =
+					hibernateSpecificConfig.getMethodValidationConfiguration()
+							.isAllowParallelMethodsDefineParameterConstraints();
+
 			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
 
-			registerCustomConstraintValidators( hibernateSpecificConfig, properties, externalClassLoader, constraintHelper );
+			registerCustomConstraintValidators(
+					hibernateSpecificConfig,
+					properties,
+					externalClassLoader, constraintHelper
+			);
 		}
 
-		this.constraintMappings = Collections.unmodifiableSet( getConstraintMappings( configurationState, externalClassLoader ) );
-
-		tmpFailFast = checkPropertiesForFailFast(
-				properties, tmpFailFast
+		this.constraintMappings = Collections.unmodifiableSet(
+				getConstraintMappings(
+						configurationState,
+						externalClassLoader
+				)
 		);
+
+		tmpValidatedValueHandlers.addAll(
+				getPropertyConfiguredValidatedValueHandlers(
+						properties,
+						externalClassLoader
+				)
+		);
+		this.validatedValueHandlers = Collections.unmodifiableList( tmpValidatedValueHandlers );
+
+		tmpFailFast = checkPropertiesForBoolean( properties, HibernateValidatorConfiguration.FAIL_FAST, tmpFailFast );
 		this.failFast = tmpFailFast;
 
-		tmpValidatedValueHandlers.addAll( getPropertyConfiguredValidatedValueHandlers( properties, externalClassLoader ) );
-		this.validatedValueHandlers = Collections.unmodifiableList( tmpValidatedValueHandlers );
+		this.methodValidationConfiguration = new MethodValidationConfiguration();
+
+		tmpAllowOverridingMethodAlterParameterConstraint = checkPropertiesForBoolean(
+				properties,
+				HibernateValidatorConfiguration.ALLOW_PARAMETER_CONSTRAINT_OVERRIDE,
+				tmpAllowOverridingMethodAlterParameterConstraint
+		);
+		this.methodValidationConfiguration.allowOverridingMethodAlterParameterConstraint(
+				tmpAllowOverridingMethodAlterParameterConstraint
+		);
+
+		tmpAllowMultipleCascadedValidationOnReturnValues = checkPropertiesForBoolean(
+				properties,
+				HibernateValidatorConfiguration.ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT,
+				tmpAllowMultipleCascadedValidationOnReturnValues
+		);
+		this.methodValidationConfiguration.allowMultipleCascadedValidationOnReturnValues(
+				tmpAllowMultipleCascadedValidationOnReturnValues
+		);
+
+		tmpAllowParallelMethodsDefineParameterConstraints = checkPropertiesForBoolean(
+				properties,
+				HibernateValidatorConfiguration.ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS,
+				tmpAllowParallelMethodsDefineParameterConstraints
+		);
+		this.methodValidationConfiguration.allowParallelMethodsDefineParameterConstraints(
+				tmpAllowParallelMethodsDefineParameterConstraints
+		);
 
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
 	}
@@ -240,12 +301,15 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		// XML config
 		if ( timeProvider == null ) {
-			String timeProviderClassName = configurationState.getProperties().get( HibernateValidatorConfiguration.TIME_PROVIDER );
+			String timeProviderClassName = configurationState.getProperties()
+					.get( HibernateValidatorConfiguration.TIME_PROVIDER );
 
 			if ( timeProviderClassName != null ) {
 				@SuppressWarnings("unchecked")
-				Class<? extends TimeProvider> handlerType = (Class<? extends TimeProvider>) run( LoadClass
-						.action( timeProviderClassName, externalClassLoader ) );
+				Class<? extends TimeProvider> handlerType = (Class<? extends TimeProvider>) run(
+						LoadClass
+								.action( timeProviderClassName, externalClassLoader )
+				);
 				timeProvider = run( NewInstance.action( handlerType, "time provider class" ) );
 			}
 		}
@@ -262,7 +326,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				parameterNameProvider,
 				failFast,
 				validatedValueHandlers,
-				timeProvider
+				timeProvider,
+				methodValidationConfiguration
 		);
 	}
 
@@ -298,6 +363,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return timeProvider;
 	}
 
+	public MethodValidationConfiguration getMethodValidationConfiguration() {
+		return this.methodValidationConfiguration;
+	}
+
 	@Override
 	public <T> T unwrap(Class<T> type) {
 		//allow unwrapping into public super types
@@ -329,11 +398,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ParameterNameProvider parameterNameProvider,
 			boolean failFast,
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
-			TimeProvider timeProvider) {
+			TimeProvider timeProvider,
+			MethodValidationConfiguration methodValidationConfiguration) {
 
 		// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
 		// factory
-		if( messageInterpolator instanceof ResourceBundleMessageInterpolator ) {
+		if ( messageInterpolator instanceof ResourceBundleMessageInterpolator ) {
 			if ( missingElDependencies == null ) {
 				try {
 					run(
@@ -353,14 +423,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				throw log.getMissingELDependenciesException();
 			}
 		}
-
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
 			beanMetaDataManager = new BeanMetaDataManager(
 					constraintHelper,
 					executableHelper,
 					parameterNameProvider,
-					buildDataProviders( parameterNameProvider )
+					buildDataProviders( parameterNameProvider ),
+					methodValidationConfiguration
 			);
 			beanMetaDataManagerMap.put( parameterNameProvider, beanMetaDataManager );
 		}
@@ -400,17 +470,18 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return metaDataProviders;
 	}
 
-	private boolean checkPropertiesForFailFast(Map<String, String> properties, boolean programmaticConfiguredFailFast) {
-		boolean failFast = programmaticConfiguredFailFast;
-		String failFastPropValue = properties.get( HibernateValidatorConfiguration.FAIL_FAST );
-		if ( failFastPropValue != null ) {
-			boolean tmpFailFast = Boolean.valueOf( failFastPropValue );
-			if ( programmaticConfiguredFailFast && !tmpFailFast ) {
+	private boolean checkPropertiesForBoolean(Map<String, String> properties, String propertyKey, boolean programmaticValue) {
+		boolean value = programmaticValue;
+		String propertyStringValue = properties.get( propertyKey );
+		if ( propertyStringValue != null ) {
+			boolean configurationValue = Boolean.valueOf( propertyStringValue );
+			// throw an exception if the programmatic value is true and it overrides a false configured value
+			if ( programmaticValue && !configurationValue ) {
 				throw log.getInconsistentFailFastConfigurationException();
 			}
-			failFast = tmpFailFast;
+			value = configurationValue;
 		}
-		return failFast;
+		return value;
 	}
 
 	/**
@@ -518,7 +589,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	/**
 	 * The one and only {@link ConstraintMappingContributor.ConstraintMappingBuilder} implementation.
 	 */
-	private static class DefaultConstraintMappingBuilder implements ConstraintMappingContributor.ConstraintMappingBuilder {
+	private static class DefaultConstraintMappingBuilder
+			implements ConstraintMappingContributor.ConstraintMappingBuilder {
 
 		private final Set<DefaultConstraintMapping> mappings = newHashSet();
 
