@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
@@ -124,6 +125,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final boolean failFast;
 
+	/**
+	 * 
+	 * @param constraintValidatorFactory
+	 * @param messageInterpolator
+	 * @param traversableResolver
+	 * @param beanMetaDataManager
+	 * @param parameterNameProvider
+	 * @param constraintValidatorManager
+	 * @param failFast
+	 */
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 						 MessageInterpolator messageInterpolator,
 						 TraversableResolver traversableResolver,
@@ -138,7 +149,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.parameterNameProvider = parameterNameProvider;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
-
+		
 		validationOrderGenerator = new ValidationOrderGenerator();
 	}
 

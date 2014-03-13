@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,6 +28,7 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
 import org.hibernate.validator.internal.metadata.aggregated.rule.OverridingMethodMustNotAlterParameterConstraints;
 import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue;
@@ -257,20 +259,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
 	 */
 	public static class Builder extends MetaDataBuilder {
-
-		/**
-		 * The rules applying for the definition of executable constraints.
-		 */
-		private static final Set<MethodConfigurationRule> rules = Collections.unmodifiableSet(
-				CollectionHelper.<MethodConfigurationRule>asSet(
-						new OverridingMethodMustNotAlterParameterConstraints(),
-						new ParallelMethodsMustNotDefineParameterConstraints(),
-						new VoidMethodsMustNotBeReturnValueConstrained(),
-						new ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine(),
-						new ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue()
-				)
-		);
-
 		/**
 		 * Either CONSTRUCTOR or METHOD.
 		 */
@@ -278,7 +266,9 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		private final ExecutableConstraintLocation location;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
+		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
+		private final MethodValidationConfiguration methodValidationConfiguration;
 
 		/**
 		 * Holds a merged representation of the configurations for one method
@@ -298,13 +288,34 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * @param constraintHelper the constraint helper
 		 * @param executableHelper the executable helper
 		 */
-		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedExecutable, ConstraintHelper constraintHelper, ExecutableHelper executableHelper) {
+		public Builder(
+				Class<?> beanClass, 
+				ConstrainedExecutable constrainedExecutable, 
+				ConstraintHelper constraintHelper, 
+				ExecutableHelper executableHelper,
+				MethodValidationConfiguration methodValidationConfiguration) {
 			super( beanClass, constraintHelper );
 
 			this.executableHelper = executableHelper;
 			kind = constrainedExecutable.getKind();
 			location = constrainedExecutable.getLocation();
 			add( constrainedExecutable );
+			
+			this.methodValidationConfiguration = methodValidationConfiguration;
+			
+			this.rules = new HashSet<MethodConfigurationRule>();
+			// Build the rules that will be enforced through the metadata created here
+			for(Class<? extends MethodConfigurationRule> ruleClass : this.methodValidationConfiguration.getConfiguredRuleSet() ) {
+				try {
+					this.rules.add(ruleClass.newInstance());
+				} 
+				catch (InstantiationException e) {
+					throw new IllegalArgumentException("Failed to create " + ruleClass.getName() + " with error " + e.toString());
+				} 
+				catch (IllegalAccessException e) {
+					throw new IllegalArgumentException("Failed to create " + ruleClass.getName() + " with error " + e.toString());
+				}
+			}
 		}
 
 		@Override

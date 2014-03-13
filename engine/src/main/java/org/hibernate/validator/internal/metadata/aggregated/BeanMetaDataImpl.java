@@ -24,12 +24,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
@@ -64,6 +66,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Chris Beckey cbeckey@paypal.com
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
@@ -449,14 +452,29 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		private DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
 
-		private BeanMetaDataBuilder(ConstraintHelper constraintHelper, ExecutableHelper executableHelper, Class<T> beanClass) {
+		private final MethodValidationConfiguration methodValidationConfiguration;
+		
+		private BeanMetaDataBuilder(
+				ConstraintHelper constraintHelper, 
+				ExecutableHelper executableHelper, 
+				Class<T> beanClass,
+				MethodValidationConfiguration methodValidationConfiguration) {
 			this.beanClass = beanClass;
 			this.constraintHelper = constraintHelper;
 			this.executableHelper = executableHelper;
+			this.methodValidationConfiguration = methodValidationConfiguration;
 		}
 
-		public static <T> BeanMetaDataBuilder<T> getInstance(ConstraintHelper constraintHelper, ExecutableHelper executableHelper, Class<T> beanClass) {
-			return new BeanMetaDataBuilder<T>( constraintHelper, executableHelper, beanClass );
+		public static <T> BeanMetaDataBuilder<T> getInstance(
+				ConstraintHelper constraintHelper, 
+				ExecutableHelper executableHelper, 
+				Class<T> beanClass,
+				MethodValidationConfiguration methodValidationConfiguration) {
+			return new BeanMetaDataBuilder<T>( 
+					constraintHelper, 
+					executableHelper, 
+					beanClass,
+					methodValidationConfiguration);
 		}
 
 		public void add(BeanConfiguration<? super T> configuration) {
@@ -497,7 +515,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							beanClass,
 							constrainableElement,
 							constraintHelper,
-							executableHelper
+							executableHelper,
+							methodValidationConfiguration
 					)
 			);
 		}
@@ -524,11 +543,20 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		private final ExecutableHelper executableHelper;
 		private MetaDataBuilder propertyBuilder;
 		private ExecutableMetaData.Builder methodBuilder;
+		private final MethodValidationConfiguration methodValidationConfiguration;
+		
 
-		public BuilderDelegate(Class<?> beanClass, ConstrainedElement constrainedElement, ConstraintHelper constraintHelper, ExecutableHelper executableHelper) {
+		public BuilderDelegate(
+				Class<?> beanClass, 
+				ConstrainedElement constrainedElement, 
+				ConstraintHelper constraintHelper, 
+				ExecutableHelper executableHelper,
+				MethodValidationConfiguration methodValidationConfiguration
+		) {
 			this.beanClass = beanClass;
 			this.constraintHelper = constraintHelper;
 			this.executableHelper = executableHelper;
+			this.methodValidationConfiguration = methodValidationConfiguration;
 
 			switch ( constrainedElement.getKind() ) {
 				case FIELD:
@@ -546,7 +574,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							beanClass,
 							constrainedExecutable,
 							constraintHelper,
-							executableHelper
+							executableHelper,
+							methodValidationConfiguration
 					);
 
 					if ( constrainedExecutable.isGetterMethod() ) {
@@ -585,7 +614,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							beanClass,
 							constrainedMethod,
 							constraintHelper,
-							executableHelper
+							executableHelper,
+							methodValidationConfiguration
 					);
 				}
 

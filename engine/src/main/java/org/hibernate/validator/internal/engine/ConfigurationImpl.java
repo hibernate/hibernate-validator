@@ -16,12 +16,15 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -34,6 +37,7 @@ import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
@@ -49,8 +53,6 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
-
 /**
  * Hibernate specific {@code Configuration} implementation.
  *
@@ -58,6 +60,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Chris Beckey cbeckey@paypal.com
  */
 public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
 
@@ -79,6 +82,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
 	private Set<ConstraintMapping> programmaticMappings = CollectionHelper.newHashSet();
 	private boolean failFast;
+	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfigurationImpl();
 	private BootstrapConfiguration bootstrapConfiguration;
 
 	public ConfigurationImpl(BootstrapState state) {
@@ -171,6 +175,24 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public final HibernateValidatorConfiguration failFast(boolean failFast) {
 		this.failFast = failFast;
 		return this;
+	}
+
+	
+	@Override
+	public HibernateValidatorConfiguration setMethodValidationConfiguration(MethodValidationConfiguration mvc) {
+		// the MethodValidationConfiguration cannot be null, it will cause NPE later if it is
+		if(mvc != null)
+			this.methodValidationConfiguration = mvc;
+		else if ( log.isDebugEnabled() ) {
+			log.warn( "Attempt to set the MethodValidationConfiguration to null is being ignored." );
+		}
+
+		return this;
+	}
+
+	@Override
+	public MethodValidationConfiguration getMethodValidationConfiguration() {
+		return this.methodValidationConfiguration;
 	}
 
 	public final ConstraintMapping createConstraintMapping() {

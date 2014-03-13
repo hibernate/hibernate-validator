@@ -23,12 +23,14 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.MethodValidationConfiguration;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Gunnar Morling
+ * @author Chris Beckey cbeckey@paypal.com
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
 
@@ -40,6 +42,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ParameterNameProvider parameterNameProvider;
 
 	private boolean failFast;
+	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfigurationImpl();
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
 		this.validatorFactory = validatorFactory;
@@ -100,13 +103,21 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext setMethodValidationConfiguration(
+			MethodValidationConfiguration methodValidationConfiguration) {
+		this.methodValidationConfiguration = methodValidationConfiguration;
+		return this;
+	}
+
+	@Override
 	public Validator getValidator() {
 		return validatorFactory.createValidator(
 				constraintValidatorFactory,
 				messageInterpolator,
 				traversableResolver,
 				parameterNameProvider,
-				failFast
+				failFast,
+				methodValidationConfiguration
 		);
 	}
 }

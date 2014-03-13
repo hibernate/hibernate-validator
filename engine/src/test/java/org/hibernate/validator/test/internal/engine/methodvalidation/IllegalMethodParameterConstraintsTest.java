@@ -18,12 +18,16 @@ package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
+import javax.validation.Validation;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import junit.framework.TestCase;
+
 import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
-
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
 
