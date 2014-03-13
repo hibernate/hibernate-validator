@@ -37,6 +37,7 @@ import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
@@ -59,7 +60,7 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
- * @author Chris Beckey <cbeckey@paypal.com> (C) 2014 ebay, Inc.
+ * @author Chris Beckey cbeckey@paypal.com
  */
 public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
 
@@ -81,9 +82,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
 	private Set<ConstraintMapping> programmaticMappings = CollectionHelper.newHashSet();
 	private boolean failFast;
-	private boolean allowOverridingMethodAlterParameterConstraint = false;
-	private boolean allowParallelMethodsDefineGroupConversion = false;
-	private boolean allowParallelMethodsDefineParameterConstraints = false;
+	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfigurationImpl();
 	private BootstrapConfiguration bootstrapConfiguration;
 
 	public ConfigurationImpl(BootstrapState state) {
@@ -178,22 +177,22 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	
 	@Override
-	public HibernateValidatorConfiguration allowOverridingMethodAlterParameterConstraint(boolean allow) {
-		this.allowOverridingMethodAlterParameterConstraint = allow;
+	public HibernateValidatorConfiguration setMethodValidationConfiguration(MethodValidationConfiguration mvc) {
+		// the MethodValidationConfiguration cannot be null, it will cause NPE later if it is
+		if(mvc != null)
+			this.methodValidationConfiguration = mvc;
+		else if ( log.isDebugEnabled() ) {
+			log.warn( "Attempt to set the MethodValidationConfiguration to null is being ignored." );
+		}
+
 		return this;
 	}
 
 	@Override
-	public HibernateValidatorConfiguration allowParallelMethodsDefineGroupConversion(boolean allow) {
-		this.allowParallelMethodsDefineGroupConversion = allow;
-		return this;
-	}
-
-	@Override
-	public HibernateValidatorConfiguration allowParallelMethodsDefineParameterConstraints(boolean allow) {
-		this.allowParallelMethodsDefineParameterConstraints = allow;
-		return this;
+	public MethodValidationConfiguration getMethodValidationConfiguration() {
+		return this.methodValidationConfiguration;
 	}
 
 	public final ConstraintMapping createConstraintMapping() {
@@ -270,18 +269,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public final boolean getFailFast() {
 		return failFast;
-	}
-
-	public boolean isAllowOverridingMethodAlterParameterConstraint() {
-		return allowOverridingMethodAlterParameterConstraint;
-	}
-
-	public boolean isAllowParallelMethodsDefineGroupConversion() {
-		return allowParallelMethodsDefineGroupConversion;
-	}
-
-	public boolean isAllowParallelMethodsDefineParameterConstraints() {
-		return allowParallelMethodsDefineParameterConstraints;
 	}
 
 	public final ConstraintValidatorFactory getConstraintValidatorFactory() {

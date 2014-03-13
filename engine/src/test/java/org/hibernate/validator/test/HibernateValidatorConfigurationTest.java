@@ -18,9 +18,8 @@ package org.hibernate.validator.test;
 
 import javax.validation.Validation;
 
-import junit.framework.TestCase;
-
 import org.testng.annotations.Test;
+import org.testng.Assert;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
@@ -45,8 +44,8 @@ public class HibernateValidatorConfigurationTest {
 	@Test
 	public void relaxationPropertiesAreProperDefault() {
 		HibernateValidatorConfiguration configure = Validation.byProvider( HibernateValidator.class ).configure();
-		TestCase.assertFalse( configure.isAllowOverridingMethodAlterParameterConstraint() );
-		TestCase.assertFalse( configure.isAllowParallelMethodsDefineGroupConversion() );
-		TestCase.assertFalse( configure.isAllowParallelMethodsDefineParameterConstraints() );
+		Assert.assertFalse( configure.getMethodValidationConfiguration().isAllowOverridingMethodAlterParameterConstraint() );
+		Assert.assertFalse( configure.getMethodValidationConfiguration().isAllowMultipleCascadedValidationOnReturnValues() );
+		Assert.assertFalse( configure.getMethodValidationConfiguration().isAllowParallelMethodsDefineParameterConstraints() );
 	}
 }

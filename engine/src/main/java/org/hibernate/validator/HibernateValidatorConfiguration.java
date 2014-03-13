@@ -29,7 +29,7 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  * @author Hardy Ferentschik
- * @author Chris Beckey <cbeckey@paypal.com> (C) 2014 ebay, Inc.
+ * @author Chris Beckey cbeckey@paypal.com
  */
 public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {
 	/**
@@ -39,7 +39,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	String FAIL_FAST = "hibernate.validator.fail_fast";
 
 	String ALLOW_PARAMETER_CONSTRAINT_OVERRIDE = "hibernate.validator.allow_parameter_constraint_override";
-	String ALLOW_PARALLEL_METHODS_DEFINE_GROUPS = "hibernate.validator.allow_parallel_methods_define_group";
+	String ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT = "hibernate.validator.allow_multiple_cascaded_validation_on_result";
 	String ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS = "hibernate.validator.allow_parallel_method_parameter_constraint";
 	
 	/**
@@ -105,7 +105,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	HibernateValidatorConfiguration failFast(boolean failFast);
 	
 	/**
-	 * The following three properties modify the behavior of the Validator with respect to 
+	 * The properties contained in this property modify the behavior of the Validator with respect to 
 	 * Specification section 4.5.5.
 	 * In particular: "Out of the box, a conforming Bean Validation provider must throw a 
 	 * ConstraintDeclarationException when discovering that any of these rules are violated. 
@@ -114,15 +114,10 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * such alternative behavior include provider-specific configuration properties or annotations. 
 	 * Note that client code relying on such alternative behavior is not portable between Bean 
 	 * Validation providers."
+	 * The getter method is not required for operation but it is available for convenience in
+	 * testing.
 	 */
-	HibernateValidatorConfiguration allowOverridingMethodAlterParameterConstraint(boolean allow);
-	HibernateValidatorConfiguration allowParallelMethodsDefineGroupConversion(boolean allow);
-	HibernateValidatorConfiguration allowParallelMethodsDefineParameterConstraints(boolean allow);
+	HibernateValidatorConfiguration setMethodValidationConfiguration(MethodValidationConfiguration mvc);
+	MethodValidationConfiguration getMethodValidationConfiguration();
 
-	/**
-	 * These are not required for operation, but are here to validate default values in testing.
-	 */
-	boolean isAllowOverridingMethodAlterParameterConstraint();
-	boolean isAllowParallelMethodsDefineGroupConversion();
-	boolean isAllowParallelMethodsDefineParameterConstraints();
 }

@@ -29,7 +29,7 @@ import javax.validation.ValidatorContext;
  *
  * @author Emmanuel Bernard
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
- * @author Chris Beckey <cbeckey@paypal.com> (C) 2014 ebay, Inc.
+ * @author Chris Beckey cbeckey@paypal.com
  */
 public interface HibernateValidatorContext extends ValidatorContext {
 
@@ -50,11 +50,8 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	HibernateValidatorContext failFast(boolean failFast);
 
 	/**
-	 * Sets the behavior of the Validator when a parameter constraint
-	 * overrides a constraint on an overridden method. 
+	 * Sets the behavior of the Validator with respect to parameter constraints
 	 * See Sec 4.5.5 of validation spec V 1.1
 	 */
-	HibernateValidatorContext allowOverridingMethodAlterParameterConstraint(boolean allow);
-	HibernateValidatorContext allowParallelMethodsDefineGroupConversion(boolean allow);
-	HibernateValidatorContext allowParallelMethodsDefineParameterConstraints(boolean allow);
+	HibernateValidatorContext setMethodValidationConfiguration(MethodValidationConfiguration methodValidationConfiguration);
 }

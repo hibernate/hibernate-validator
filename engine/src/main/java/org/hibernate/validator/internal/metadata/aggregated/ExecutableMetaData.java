@@ -28,6 +28,7 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
 import org.hibernate.validator.internal.metadata.aggregated.rule.OverridingMethodMustNotAlterParameterConstraints;
 import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue;
@@ -258,21 +259,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
 	 */
 	public static class Builder extends MetaDataBuilder {
-
-		/**
-		 * The rules applying for the definition of executable constraints.
-		 */
-		@SuppressWarnings("unchecked")
-		private static final Set<Class<? extends MethodConfigurationRule>> DEFAULT_RULES = Collections.unmodifiableSet(
-				CollectionHelper.<Class<? extends MethodConfigurationRule>>asSet(
-						OverridingMethodMustNotAlterParameterConstraints.class,
-						ParallelMethodsMustNotDefineParameterConstraints.class,
-						VoidMethodsMustNotBeReturnValueConstrained.class,
-						ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine.class,
-						ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue.class
-				)
-		);
-
 		/**
 		 * Either CONSTRUCTOR or METHOD.
 		 */
@@ -282,9 +268,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
-		private final boolean allowOverridingMethodAlterParameterConstraint;
-		private final boolean allowParallelMethodsDefineGroupConversion;
-		private final boolean allowParallelMethodsDefineParameterConstraints;
+		private final MethodValidationConfiguration methodValidationConfiguration;
 
 		/**
 		 * Holds a merged representation of the configurations for one method
@@ -309,9 +293,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				ConstrainedExecutable constrainedExecutable, 
 				ConstraintHelper constraintHelper, 
 				ExecutableHelper executableHelper,
-				boolean allowOverridingMethodAlterParameterConstraint,
-				boolean allowParallelMethodsDefineGroupConversion,
-				boolean allowParallelMethodsDefineParameterConstraints) {
+				MethodValidationConfiguration methodValidationConfiguration) {
 			super( beanClass, constraintHelper );
 
 			this.executableHelper = executableHelper;
@@ -319,25 +301,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			location = constrainedExecutable.getLocation();
 			add( constrainedExecutable );
 			
-			this.allowOverridingMethodAlterParameterConstraint = allowOverridingMethodAlterParameterConstraint;
-			this.allowParallelMethodsDefineGroupConversion = allowParallelMethodsDefineGroupConversion;
-			this.allowParallelMethodsDefineParameterConstraints = allowParallelMethodsDefineParameterConstraints;
+			this.methodValidationConfiguration = methodValidationConfiguration;
 			
-			// Build the rules that will be enforced through the metadata created here
 			this.rules = new HashSet<MethodConfigurationRule>();
-			for(Class<? extends MethodConfigurationRule> ruleClass : DEFAULT_RULES)
+			// Build the rules that will be enforced through the metadata created here
+			for(Class<? extends MethodConfigurationRule> ruleClass : this.methodValidationConfiguration.getConfiguredRuleSet() ) {
 				try {
-					// optional and permissible relaxation of the Liskov Substitution Principal
-					// according to Section 4.5.5 of the V1.1 Specification.
-					// By default these properties must be FALSE to assure specification
-					// compliance.
-					if(allowOverridingMethodAlterParameterConstraint && ruleClass.equals(OverridingMethodMustNotAlterParameterConstraints.class))
-						continue;
-					if(allowParallelMethodsDefineGroupConversion && ruleClass.equals(ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue.class))
-						continue;
-					if(allowParallelMethodsDefineParameterConstraints && ruleClass.equals(ParallelMethodsMustNotDefineParameterConstraints.class))
-						continue;
-					
 					this.rules.add(ruleClass.newInstance());
 				} 
 				catch (InstantiationException e) {
@@ -346,6 +315,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				catch (IllegalAccessException e) {
 					throw new IllegalArgumentException("Failed to create " + ruleClass.getName() + " with error " + e.toString());
 				}
+			}
 		}
 
 		@Override

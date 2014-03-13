@@ -35,6 +35,7 @@ import javax.validation.spi.ConfigurationState;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -54,7 +55,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
- * @author Chris Beckey <cbeckey@paypal.com> (C) 2014 ebay, Inc.
+ * @author Chris Beckey cbeckey@paypal.com
  */
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
@@ -104,9 +105,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	/**
 	 * Hibernate validator specific flags to relax constraints on parameters.
 	 */
-	private final boolean allowOverridingMethodAlterParameterConstraint;
-	private final boolean allowParallelMethodsDefineGroupConversion;
-	private final boolean allowParallelMethodsDefineParameterConstraints;
+	private final MethodValidationConfiguration methodValidationConfiguration;
 	
 	/**
 	 * Metadata provider for XML configuration.
@@ -145,7 +144,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		boolean tmpFailFast = false;
 		boolean tmpAllowOverridingMethodAlterParameterConstraint = false;
-		boolean tmpAllowParallelMethodsDefineGroupConversion = false;
+		boolean tmpAllowMultipleCascadedValidationOnReturnValues = false;
 		boolean tmpAllowParallelMethodsDefineParameterConstraints = false;
 		
 		if ( configurationState instanceof ConfigurationImpl ) {
@@ -157,22 +156,27 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
 
-			tmpAllowOverridingMethodAlterParameterConstraint = hibernateSpecificConfig.isAllowOverridingMethodAlterParameterConstraint();
-			tmpAllowParallelMethodsDefineGroupConversion = hibernateSpecificConfig.isAllowParallelMethodsDefineGroupConversion();
-			tmpAllowParallelMethodsDefineParameterConstraints = hibernateSpecificConfig.isAllowParallelMethodsDefineParameterConstraints();
+			tmpAllowOverridingMethodAlterParameterConstraint = 
+					hibernateSpecificConfig.getMethodValidationConfiguration().isAllowOverridingMethodAlterParameterConstraint();
+			tmpAllowMultipleCascadedValidationOnReturnValues =
+					hibernateSpecificConfig.getMethodValidationConfiguration().isAllowMultipleCascadedValidationOnReturnValues();
+			tmpAllowParallelMethodsDefineParameterConstraints = 
+					hibernateSpecificConfig.getMethodValidationConfiguration().isAllowParallelMethodsDefineParameterConstraints();
 		}
 		
 		tmpFailFast = checkPropertiesForBoolean(properties, HibernateValidatorConfiguration.FAIL_FAST, tmpFailFast);
 		this.failFast = tmpFailFast;
 		
-		tmpAllowOverridingMethodAlterParameterConstraint = checkPropertiesForBoolean(properties, HibernateValidatorConfiguration.ALLOW_PARAMETER_CONSTRAINT_OVERRIDE, tmpAllowOverridingMethodAlterParameterConstraint);
-		this.allowOverridingMethodAlterParameterConstraint = tmpAllowOverridingMethodAlterParameterConstraint;
+		this.methodValidationConfiguration = new MethodValidationConfigurationImpl();
 		
-		tmpAllowParallelMethodsDefineGroupConversion = checkPropertiesForBoolean(properties, HibernateValidatorConfiguration.ALLOW_PARALLEL_METHODS_DEFINE_GROUPS, tmpAllowParallelMethodsDefineGroupConversion);
-		this.allowParallelMethodsDefineGroupConversion = tmpAllowParallelMethodsDefineGroupConversion;
+		tmpAllowOverridingMethodAlterParameterConstraint = checkPropertiesForBoolean(properties, HibernateValidatorConfiguration.ALLOW_PARAMETER_CONSTRAINT_OVERRIDE, tmpAllowOverridingMethodAlterParameterConstraint);
+		this.methodValidationConfiguration.allowOverridingMethodAlterParameterConstraint(tmpAllowOverridingMethodAlterParameterConstraint);
+		
+		tmpAllowMultipleCascadedValidationOnReturnValues = checkPropertiesForBoolean(properties, HibernateValidatorConfiguration.ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT, tmpAllowMultipleCascadedValidationOnReturnValues);
+		this.methodValidationConfiguration.allowMultipleCascadedValidationOnReturnValues(tmpAllowMultipleCascadedValidationOnReturnValues);
 		
 		tmpAllowParallelMethodsDefineParameterConstraints = checkPropertiesForBoolean(properties, HibernateValidatorConfiguration.ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS, tmpAllowParallelMethodsDefineParameterConstraints);
-		this.allowParallelMethodsDefineParameterConstraints = tmpAllowParallelMethodsDefineParameterConstraints;
+		this.methodValidationConfiguration.allowParallelMethodsDefineParameterConstraints(tmpAllowParallelMethodsDefineParameterConstraints);
 		
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
 	}
@@ -185,9 +189,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
-				allowOverridingMethodAlterParameterConstraint,
-				allowParallelMethodsDefineGroupConversion,
-				allowParallelMethodsDefineParameterConstraints
+				methodValidationConfiguration
 		);
 	}
 
@@ -237,10 +239,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 							  MessageInterpolator messageInterpolator,
 							  TraversableResolver traversableResolver,
 							  ParameterNameProvider parameterNameProvider,
-							  boolean failFast, 
-							  boolean allowOverridingMethodAlterParameterConstraint, 
-							  boolean allowParallelMethodsDefineGroupConversion, 
-							  boolean allowParallelMethodsDefineParameterConstraints) {
+							  boolean failFast,
+							  MethodValidationConfiguration methodValidationConfiguration) {
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
 			beanMetaDataManager = new BeanMetaDataManager(
@@ -248,9 +248,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 					executableHelper,
 					parameterNameProvider,
 					buildDataProviders( parameterNameProvider ),
-					allowOverridingMethodAlterParameterConstraint, 
-					allowParallelMethodsDefineGroupConversion, 
-					allowParallelMethodsDefineParameterConstraints
+					methodValidationConfiguration
 			);
 			beanMetaDataManagerMap.put( parameterNameProvider, beanMetaDataManager );
 		}

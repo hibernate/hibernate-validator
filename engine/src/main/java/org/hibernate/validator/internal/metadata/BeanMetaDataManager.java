@@ -19,9 +19,12 @@ package org.hibernate.validator.internal.metadata;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+
 import javax.validation.ParameterNameProvider;
 
+import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.MethodValidationConfigurationImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
@@ -56,7 +59,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * </p>
  *
  * @author Gunnar Morling
- * @author Chris Beckey <cbeckey@paypal.com> (C) 2014 ebay, Inc.
+ * @author Chris Beckey cbeckey@paypal.com
 */
 public class BeanMetaDataManager {
 	/**
@@ -96,13 +99,11 @@ public class BeanMetaDataManager {
 	private final ExecutableHelper executableHelper;
 
 	/**
-	 * These three fields affect the invocation of rules associated to section 4.5.5
+	 * the three properties in this field affect the invocation of rules associated to section 4.5.5
 	 * of the V1.1 specification.  By default they are all false, if true they allow
 	 * for relaxation of the Liskov Substitution Principal.
 	 */
-	private final boolean allowOverridingMethodAlterParameterConstraint; 
-	private final boolean allowParallelMethodsDefineGroupConversion;
-	private final boolean allowParallelMethodsDefineParameterConstraints;
+	private final MethodValidationConfiguration methodValidationConfiguration;
 	
 	/**
 	 * Creates a new {@code BeanMetaDataManager}. {@link DefaultParameterNameProvider} is used as parameter name
@@ -127,24 +128,22 @@ public class BeanMetaDataManager {
 			   ExecutableHelper executableHelper,
 			   ParameterNameProvider parameterNameProvider,
 			   List<MetaDataProvider> optionalMetaDataProviders) {
-		this(constraintHelper, executableHelper, parameterNameProvider, optionalMetaDataProviders, false, false, false);
+		this(constraintHelper, executableHelper, 
+				parameterNameProvider, optionalMetaDataProviders, 
+				new MethodValidationConfigurationImpl());
 	}
 	
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
 			ExecutableHelper executableHelper,
 			ParameterNameProvider parameterNameProvider,
 			List<MetaDataProvider> optionalMetaDataProviders,
-			boolean allowOverridingMethodAlterParameterConstraint, 
-			boolean allowParallelMethodsDefineGroupConversion,
-			boolean allowParallelMethodsDefineParameterConstraints) {
+			MethodValidationConfiguration methodValidationConfiguration) {
 		this.constraintHelper = constraintHelper;
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
 		this.executableHelper = executableHelper;
 
-		this.allowOverridingMethodAlterParameterConstraint = allowOverridingMethodAlterParameterConstraint;
-		this.allowParallelMethodsDefineGroupConversion = allowParallelMethodsDefineGroupConversion;
-		this.allowParallelMethodsDefineParameterConstraints = allowParallelMethodsDefineParameterConstraints;
+		this.methodValidationConfiguration = methodValidationConfiguration;
 		
 		this.beanMetaDataCache = new ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>>(
 				DEFAULT_INITIAL_CAPACITY,
@@ -206,10 +205,7 @@ public class BeanMetaDataManager {
 	 */
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( 
-				constraintHelper, executableHelper, clazz, 
-				allowOverridingMethodAlterParameterConstraint,
-				allowParallelMethodsDefineGroupConversion,
-				allowParallelMethodsDefineParameterConstraints);
+				constraintHelper, executableHelper, clazz, methodValidationConfiguration);
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {
