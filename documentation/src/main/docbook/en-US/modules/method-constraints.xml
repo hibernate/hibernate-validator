@@ -1,74 +1,63 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!--
-	~ JBoss, Home of Professional Open Source
-	~ Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
-	~ by the @authors tag. See the copyright.txt in the distribution for a
-	~ full listing of individual contributors.
-	~
-	~ Licensed under the Apache License, Version 2.0 (the "License");
-	~ you may not use this file except in compliance with the License.
-	~ You may obtain a copy of the License at
-	~ http://www.apache.org/licenses/LICENSE-2.0
-	~ Unless required by applicable law or agreed to in writing, software
-	~ distributed under the License is distributed on an "AS IS" BASIS,
-	~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	~ See the License for the specific language governing permissions and
-	~ limitations under the License.
--->
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+ ~ JBoss, Home of Professional Open Source
+ ~ Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
+ ~ by the @authors tag. See the copyright.txt in the distribution for a
+ ~ full listing of individual contributors.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~ http://www.apache.org/licenses/LICENSE-2.0
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+--><!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY % BOOK_ENTITIES SYSTEM "../hv.ent">
 %BOOK_ENTITIES;
 ]>
 <chapter id="chapter-method-constraints">
   <title>Declaring and validating method constraints</title>
-
   <para>As of Bean Validation 1.1, constraints can not only be applied to
   JavaBeans and their properties, but also to the parameters and return values
   of the methods and constructors of any Java type. That way Bean Validation
   constraints can be used to specify</para>
-
   <itemizedlist>
     <listitem>
       <para>the preconditions that must be satisfied by the caller before a
       method or constructor may be invoked (by applying constraints to the
       parameters of an executable)</para>
     </listitem>
-
     <listitem>
       <para>the postconditions that are guaranteed to the caller after a
       method or constructor invocation returns (by applying constraints to the
       return value of an executable)</para>
     </listitem>
   </itemizedlist>
-
   <note>
-    <para>For the purpose of this reference guide, the term <emphasis>method
-    constraint</emphasis> refers to both, method and constructor constraints,
+    <para>For the purpose of this reference guide, the term <emphasis>method constraint</emphasis> refers to both, method and constructor constraints,
     if not stated otherwise. Ocassionally, the term
     <emphasis>executable</emphasis> is used when referering to methods and
     constructors.</para>
   </note>
-
   <para>This approach has several advantages over traditional ways of checking
   the correctness of parameters and return values:</para>
-
   <itemizedlist>
     <listitem>
-      <para>the checks don't have to be performed manually (e.g. by throwing
+      <para>the checks don&apos;t have to be performed manually (e.g. by throwing
       <classname>IllegalArgumentExceptions</classname> or similar), resulting
       in less code to write and maintain</para>
     </listitem>
-
     <listitem>
-      <para>an executable's pre- and postconditions don't have to be expressed
+      <para>an executable&apos;s pre- and postconditions don&apos;t have to be expressed
       again in its documentation, since the constraint annotations will
       automatically be included in the generated JavaDoc. This avoids
       redundancies and reduces the chance of inconsistencies between
       implementation and documentation</para>
     </listitem>
   </itemizedlist>
-
   <tip>
     <para>In order to make annotations show up in the JavaDoc of annoted
     elements, the annotation types themselves must be annotated with the meta
@@ -76,64 +65,51 @@
     built-in constraints and is considered a best practice for any custom
     constraints.</para>
   </tip>
-
   <para>In the remainder of this chapter you will learn how to declare
   parameter and return value constraints and how to validate them using the
   <classname>ExecutableValidator</classname> API.</para>
-
   <section id="section-declaring-method-constraints">
     <title>Declaring method constraints</title>
-
     <section>
       <title>Parameter constraints</title>
-
       <para>You specify the preconditions of a method or constructor by adding
-      constraint annotations to its parameters as demonstrated in <xref
-      linkend="example-declaring-parameter-constraints"/>.</para>
-
+      constraint annotations to its parameters as demonstrated in <xref linkend="example-declaring-parameter-constraints"/>.</para>
       <example id="example-declaring-parameter-constraints">
         <title>Declaring method and constructor parameter constraints</title>
-
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.parameter;
 
 public class RentalStation {
 
-	public RentalStation(@NotNull String name) {
-		//...
-	}
+ public RentalStation(@NotNull String name) {
+  //...
+ }
 
-	public void rentCar(
-			@NotNull Customer customer,
-			@NotNull @Future Date startDate,
-			@Min(1) int durationInDays) {
-		//...
-	}
+ public void rentCar(
+   @NotNull Customer customer,
+   @NotNull @Future Date startDate,
+   @Min(1) int durationInDays) {
+  //...
+ }
 }</programlisting>
       </example>
-
       <para>The following preconditions are declared here:</para>
-
       <itemizedlist>
         <listitem>
           <para>The name passed to the <classname>RentalCar</classname>
           constructor must not be <literal>null</literal></para>
         </listitem>
-
         <listitem>
           <para>When invoking the <methodname>rentCar()</methodname> method,
-          the given customer must not be <literal>null</literal>, the rental's
+          the given customer must not be <literal>null</literal>, the rental&apos;s
           start date must not be <literal>null</literal> and must be in the
           future and the rental duration must be at least one day</para>
         </listitem>
       </itemizedlist>
-
       <para>Note that declaring method or constructor constraints itself does
       not automatically cause their validation upon invocation of the
-      executable. Instead, the ExecutableValidator API (see <xref
-      linkend="section-validating-executable-constraints"/>) must be used to
+      executable. Instead, the ExecutableValidator API (see <xref linkend="section-validating-executable-constraints"/>) must be used to
       perform the validation, which is often done using a method interception
       facility such as AOP, proxy objects etc.</para>
-
       <para>Constraints may only be applied to instance methods, i.e.
       declaring constraints on static methods is not supported. Depending on
       the interception facility you use for triggering method validation,
@@ -141,22 +117,18 @@ public class RentalStation {
       of methods supported as target of interception. Refer to the
       documentation of the interception technology to find out whether any
       such limitations exist.</para>
-
       <section>
         <title>Cross-parameter constraints</title>
-
         <para>Sometimes validation does not only depend on a single parameter
         but on several or even all parameters of a method or constructor. This
         kind of requirement can be fulfilled with help of a cross-parameter
         constraint.</para>
-
         <para>Cross-parameter constraints can be considered as the method
         validation equivalent to class-level constraints. Both can be used to
         implement validation requirements which are based on several elements.
         While class-level constraints apply to several properties of a bean,
         cross-parameter constraints apply to several parameters of an
         executable.</para>
-
         <para>In contrast to single-parameter constraints, cross-parameter
         constraints are declared on the method or constructor as you can see
         in <xref linkend="example-using-cross-parameter-constraint"/>. Here
@@ -164,134 +136,111 @@ public class RentalStation {
         <classname>@LuggageCountMatchesPassengerCount</classname> declared on
         the <methodname>load()</methodname> method is used to ensure that no
         passenger has more than two pieces of luggage.</para>
-
         <example id="example-using-cross-parameter-constraint">
           <title>Declaring a cross-parameter constraint</title>
-
           <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.crossparameter;
 
 public class Car {
 
-	@LuggageCountMatchesPassengerCount(piecesOfLuggagePerPassenger = 2)
-	public void load(List&lt;Person&gt; passengers, List&lt;PieceOfLuggage&gt; luggage) {
-		//...
-	}
+ @LuggageCountMatchesPassengerCount(piecesOfLuggagePerPassenger = 2)
+ public void load(List&lt;Person&gt; passengers, List&lt;PieceOfLuggage&gt; luggage) {
+  //...
+ }
 }</programlisting>
         </example>
-
         <para>As you will learn in the next section, return value constraints
         are also declared on the method level. In order to distinguish
         cross-parameter constraints from return value constraints, the
         constraint target is configured in the
         <classname>ConstraintValidator</classname> implementation using the
         <classname>@SupportedValidationTarget</classname> annotation. You can
-        find out about the details in <xref
-        linkend="section-cross-parameter-constraints"/> which shows how to
+        find out about the details in <xref linkend="section-cross-parameter-constraints"/> which shows how to
         implement your own cross-parameter constraint.</para>
-
-        <para>In some cases a constraint can be applied to an executable's
+        <para>In some cases a constraint can be applied to an executable&apos;s
         parameters (i.e. it is a cross-parameter constraint), but also to the
         return value. One example for this are custom constraints which allow
         to specify validation rules using expression or script
         languages.</para>
-
         <para>Such constraints must define a member
         <methodname>validationAppliesTo()</methodname> which can be used at
-        declaration time to specify the constraint target. As shown in <xref
-        linkend="example-specifying-constraint-target"/> you apply the
-        constraint to an executable's parameters by specifying
+        declaration time to specify the constraint target. As shown in <xref linkend="example-specifying-constraint-target"/> you apply the
+        constraint to an executable&apos;s parameters by specifying
         <literal>validationAppliesTo = ConstraintTarget.PARAMETERS</literal>,
         while <classname>ConstraintTarget.RETURN_VALUE</classname> is used to
         apply the constraint to the executable return value.</para>
-
         <example id="example-specifying-constraint-target">
-          <title>Specifying a constraint's target</title>
-
+          <title>Specifying a constraint&apos;s target</title>
           <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.crossparameter.constrainttarget;
 
 public class Garage {
 
-	@ELAssert(expression = "...", validationAppliesTo = ConstraintTarget.PARAMETERS)
-	public Car buildCar(List&lt;Part&gt; parts) {
-		//...
-	}
+ @ELAssert(expression = &quot;...&quot;, validationAppliesTo = ConstraintTarget.PARAMETERS)
+ public Car buildCar(List&lt;Part&gt; parts) {
+  //...
+ }
 
-	@ELAssert(expression = "...", validationAppliesTo = ConstraintTarget.RETURN_VALUE)
-	public Car paintCar(int color) {
-		//...
-	}
+ @ELAssert(expression = &quot;...&quot;, validationAppliesTo = ConstraintTarget.RETURN_VALUE)
+ public Car paintCar(int color) {
+  //...
+ }
 }</programlisting>
         </example>
-
         <para>Although such a constraint is applicable to the parameters and
         return value of an executable, the target can often be inferred
         automatically. This is the case, if the constraint is declared
         on</para>
-
         <itemizedlist>
           <listitem>
             <para>a void method with parameters (the constraint applies to the
             parameters)</para>
           </listitem>
-
           <listitem>
             <para>an executable with return value but no parameters (the
             constraint applies to the return value)</para>
           </listitem>
-
           <listitem>
             <para>neither a method nor a constructor, but a field, parameter
             etc. (the constraint applies to the annotated element)</para>
           </listitem>
         </itemizedlist>
-
-        <para>In these situations you don't have to specify the constraint
+        <para>In these situations you don&apos;t have to specify the constraint
         target. It is still recommended to do so if it increases readability
         of the source code. If the constraint target is not specified in
-        situations where it can't be determined automatically, a
+        situations where it can&apos;t be determined automatically, a
         <classname>ConstraintDeclarationException</classname> is
         raised.</para>
       </section>
     </section>
-
     <section>
       <title>Return value constraints</title>
-
       <para>The postconditions of a method or constructor are declared by
-      adding constraint annotations to the executable as shown in <xref
-      linkend="example-declaring-return-value-constraints"/>.</para>
-
+      adding constraint annotations to the executable as shown in <xref linkend="example-declaring-return-value-constraints"/>.</para>
       <example id="example-declaring-return-value-constraints">
-        <title>Declaring method and constructor return value
-        constraints</title>
-
+        <title>Declaring method and constructor return value constraints</title>
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.returnvalue;
 
 public class RentalStation {
 
-	@ValidRentalStation
-	public RentalStation() {
-		//...
-	}
+ @ValidRentalStation
+ public RentalStation() {
+  //...
+ }
 
-	@NotNull
-	@Size(min = 1)
-	public List&lt;Customer&gt; getCustomers() {
-		//...
-	}
+ @NotNull
+ @Size(min = 1)
+ public List&lt;Customer&gt; getCustomers() {
+  //...
+ }
 }</programlisting>
       </example>
-
       <para>The following constraints apply to the executables of
       <classname>RentalStation</classname>:</para>
-
       <itemizedlist>
         <listitem>
           <para>Any newly created <classname>RentalStation</classname> object
           must satisfy the <classname>@ValidRentalStation</classname>
           constraint</para>
         </listitem>
-
         <listitem>
           <para>The customer list returned by
           <methodname>getCustomers()</methodname> must not be
@@ -299,11 +248,8 @@ public class RentalStation {
         </listitem>
       </itemizedlist>
     </section>
-
     <section>
-      <title id="section-cascaded-executable-validation">Cascaded
-      validation</title>
-
+      <title id="section-cascaded-executable-validation">Cascaded validation</title>
       <para>Similar to the cascaded validation of JavaBeans properties (see
       <xref linkend="section-object-graph-validation"/>), the
       <classname>@Valid</classname> annotation can be used to mark executable
@@ -311,54 +257,48 @@ public class RentalStation {
       parameter or return value annotated with <classname>@Valid</classname>,
       the constraints declared on the parameter or return value object are
       validated as well.</para>
-
       <para>In <xref linkend="example-cascaded-executable-validation"/>, the
       <varname>car</varname> parameter of the method
       <methodname>Garage#checkCar()</methodname> as well as the return value
       of the <classname>Garage</classname> constructor are marked for cascaded
       validation.</para>
-
       <example id="example-cascaded-executable-validation">
-        <title>Marking executable parameters and return values for cascaded
-        validation</title>
-
+        <title>Marking executable parameters and return values for cascaded validation</title>
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.cascaded;
 
 public class Garage {
 
-	@NotNull
-	private String name;
+ @NotNull
+ private String name;
 
-	@Valid
-	public Garage(String name) {
-		this.name = name;
-	}
+ @Valid
+ public Garage(String name) {
+  this.name = name;
+ }
 
-	public boolean checkCar(@Valid @NotNull Car car) {
-		//...
-	}
+ public boolean checkCar(@Valid @NotNull Car car) {
+  //...
+ }
 }</programlisting>
-
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.cascaded;
 
 public class Car {
 
-	@NotNull
-	private String manufacturer;
+ @NotNull
+ private String manufacturer;
 
-	@NotNull
-	@Size(min = 2, max = 14)
-	private String licensePlate;
+ @NotNull
+ @Size(min = 2, max = 14)
+ private String licensePlate;
 
-	public Car(String manufacturer, String licencePlate) {
-		this.manufacturer = manufacturer;
-		this.licensePlate = licencePlate;
-	}
+ public Car(String manufacturer, String licencePlate) {
+  this.manufacturer = manufacturer;
+  this.licensePlate = licencePlate;
+ }
 
-	//getters and setters ...
+ //getters and setters ...
 }</programlisting>
       </example>
-
       <para>When validating the arguments of the
       <methodname>checkCar()</methodname> method, the constraints on the
       properties of the passed <classname>Car</classname> object are evaluated
@@ -366,216 +306,173 @@ public class Car {
       the <varname>name</varname> field of <classname>Garage</classname> is
       checked when validating the return value of the
       <classname>Garage</classname> constructor.</para>
-
       <para>Generally, the cascaded validation works for executables in
       exactly the same way as it does for JavaBeans properties.</para>
-
       <para>In particular, <literal>null</literal> values are ignored during
-      cascaded validation (naturally this can't happen during constructor
+      cascaded validation (naturally this can&apos;t happen during constructor
       return value validation) and cascaded validation is performed
       recursively, i.e. if a parameter or return value object which is marked
       for cascaded validation itself has properties marked with
       <classname>@Valid</classname>, the constraints declared on the
       referenced elements will be validated as well.</para>
-
       <para>Cascaded validation can not only be applied to simple object
       references but also to collection-typed parameters and return values.
       This means when putting the <classname>@Valid</classname> annotation to
       a parameter or return value which</para>
-
       <itemizedlist>
         <listitem>
           <para>is an array</para>
         </listitem>
-
         <listitem>
           <para>implements <classname>java.lang.Iterable</classname></para>
         </listitem>
-
         <listitem>
           <para>or implements <classname>java.util.Map</classname></para>
         </listitem>
       </itemizedlist>
-
       <para>each contained element gets validated. So when validating the
-      arguments of the <methodname>checkCars()</methodname> method in <xref
-      linkend="example-cascaded-executable-validation-listtyped"/>, each
+      arguments of the <methodname>checkCars()</methodname> method in <xref linkend="example-cascaded-executable-validation-listtyped"/>, each
       element instance of the passed list will be validated and a
       <classname>ConstraintViolation</classname> created when any of the
       contained <classname>Car</classname> objects is invalid.</para>
-
       <example id="example-cascaded-executable-validation-listtyped">
-        <title>List-typed method parameter marked for cascaded
-        validation</title>
-
+        <title>List-typed method parameter marked for cascaded validation</title>
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.cascaded.collection;
 
 public class Garage {
 
-	public boolean checkCars(@Valid @NotNull List&lt;Car&gt; cars) {
-		//...
-	}
+ public boolean checkCars(@Valid @NotNull List&lt;Car&gt; cars) {
+  //...
+ }
 }</programlisting>
       </example>
     </section>
-
     <section>
-      <title id="section-method-validation-hierarchies">Method constraints in
-      inheritance hierarchies</title>
-
+      <title id="section-method-validation-hierarchies">Method constraints in inheritance hierarchies</title>
       <para>When declaring method constraints in inheritance hierarchies, it
       is important to be aware of the following rules:</para>
-
       <itemizedlist>
         <listitem>
           <para>The preconditions to be satisified by the caller of a method
           may not be strengthened in subtypes</para>
         </listitem>
-
         <listitem>
           <para>The postconditions guaranteed to the caller of a method may
           not be weakened in subtypes</para>
         </listitem>
       </itemizedlist>
-
-      <para>These rules are motivated by the concept of <emphasis>behavioral
-      subtyping</emphasis> which requires that wherever a type
+      <para>These rules are motivated by the concept of <emphasis>behavioral subtyping</emphasis> which requires that wherever a type
       <classname>T</classname> is used, also a subtype
       <classname>S</classname> of <classname>T</classname> may be used without
-      altering the program's behavior.</para>
-
+      altering the program&apos;s behavior.</para>
       <para>As an example, consider a class invoking a method on an object
       with the static type <classname>T</classname>. If the runtime type of
       that object was <classname>S</classname> and <classname>S</classname>
       imposed additional preconditions, the client class might fail to satisfy
       these preconditions as is not aware of them. The rules of behavioral
-      subtyping are also known as the <ulink
-      url="http://en.wikipedia.org/wiki/Liskov_substitution_principle">Liskov
-      substitution principle</ulink>.</para>
-
+      subtyping are also known as the <ulink url="http://en.wikipedia.org/wiki/Liskov_substitution_principle">Liskov substitution principle</ulink>.</para>
+      <para>The Bean Validation specification allows compliant implementations to, optionally, relax the rules that enforce the  Liskov substitution principle. Hibernate Validator supports  configuration parameters to relax each of the rules.  The configuration parameters are collected into a Method Validation Configuration object. Note that these parameters are part of the Configuration and apply to all Validator instances created from the Configuration.</para>
       <para>The Bean Validation specification implements the first rule by
       disallowing parameter constraints on methods which override or implement
-      a method declared in a supertype (superclass or interface). <xref
-      linkend="example-illegal-parameter-constraints"/> shows a violation of
+      a method declared in a supertype (superclass or interface). <xref linkend="example-illegal-parameter-constraints"/> shows a violation of
       this rule.</para>
-
       <example id="example-illegal-parameter-constraints">
         <title>Illegal method parameter constraint in subtype</title>
-
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.inheritance.parameter;
 
 public interface Vehicle {
 
     void drive(@Max(75) int speedInMph);
 }</programlisting>
-
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.inheritance.parameter;
 
 public class Car implements Vehicle {
 
-	@Override
-	public void drive(@Max(55) int speedInMph) {
-		//...
-	}
+ @Override
+ public void drive(@Max(55) int speedInMph) {
+  //...
+ }
 }</programlisting>
       </example>
-
       <para>The <classname>@Max</classname> constraint on
       <methodname>Car#drive()</methodname> is illegal since this method
       implements the interface method
       <methodname>Vehicle#drive()</methodname>. Note that parameter
       constraints on overriding methods are also disallowed, if the supertype
-      method itself doesn't declare any parameter constraints.</para>
-
+      method itself doesn&apos;t declare any parameter constraints.</para>
       <para>Furthermore, if a method overrides or implements a method declared
       in several parallel supertypes (e.g. two interfaces not extending each
       other or a class and an interface not implemented by that class), no
       parameter constraints may be specified for the method in any of the
-      involved types. The types in <xref
-      linkend="example-illegal-parameter-constraints-parallel-types"/>
+      involved types. The types in <xref linkend="example-illegal-parameter-constraints-parallel-types"/>
       demonstrate a violation of that rule. The method
       <methodname>RacingCar#drive()</methodname> overrides
       <methodname>Vehicle#drive()</methodname> as well as
       <methodname>Car#drive()</methodname>. Therefore the constraint on
       <methodname>Vehicle#drive()</methodname> is illegal.</para>
-
       <example id="example-illegal-parameter-constraints-parallel-types">
-        <title>Illegal method parameter constraint in parallel types of a
-        hierarchy</title>
-
+        <title>Illegal method parameter constraint in parallel types of a hierarchy</title>
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.inheritance.parallel;
 
 public interface Vehicle {
 
-	void drive(@Max(75) int speedInMph);
+ void drive(@Max(75) int speedInMph);
 }</programlisting>
-
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.inheritance.parallel;
 
 public interface Car {
 
-	public void drive(int speedInMph);
+ public void drive(int speedInMph);
 }</programlisting>
-
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.inheritance.parallel;
 
 public class RacingCar implements Car, Vehicle {
 
-	@Override
-	public void drive(int speedInMph) {
-		//...
-	}
+ @Override
+ public void drive(int speedInMph) {
+  //...
+ }
 }</programlisting>
       </example>
-
       <para>The previously described restrictions only apply to parameter
       constraints. In contrast, return value constraints may be added in
       methods overriding or implementing any supertype methods.</para>
-
-      <para>In this case, all the method's return value constraints apply for
+      <para>In this case, all the method&apos;s return value constraints apply for
       the subtype method, i.e. the constraints declared on the subtype method
       itself as well as any return value constraints on overridden/implemented
       supertype methods. This is legal as putting additional return value
       constraints in place may never represent a weakening of the
       postconditions guaranteed to the caller of a method.</para>
-
       <para>So when validating the return value of the method
-      <methodname>Car#getPassengers()</methodname> shown in <xref
-      linkend="example-return-value-constraints-in-hierarchy"/>, the
+      <methodname>Car#getPassengers()</methodname> shown in <xref linkend="example-return-value-constraints-in-hierarchy"/>, the
       <classname>@Size</classname> constraint on the method itself as well as
       the <classname>@NotNull</classname> constraint on the implemented
       interface method <methodname>Vehicle#getPassengers()</methodname>
       apply.</para>
-
       <example id="example-return-value-constraints-in-hierarchy">
-        <title>Return value constraints on supertype and subtype
-        method</title>
-
+        <title>Return value constraints on supertype and subtype method</title>
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.inheritance.returnvalue;
 
 public interface Vehicle {
 
-	@NotNull
-	List&lt;Person&gt; getPassengers();
+ @NotNull
+ List&lt;Person&gt; getPassengers();
 }</programlisting>
-
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.inheritance.returnvalue;
 
 public class Car implements Vehicle {
 
-	@Override
-	@Size(min = 1)
-	public List&lt;Person&gt; getPassengers() {
-		//...
-	}
+ @Override
+ @Size(min = 1)
+ public List&lt;Person&gt; getPassengers() {
+  //...
+ }
 }</programlisting>
       </example>
-
       <para>If the validation engine detects a violation of any of the
       aforementioned rules, a
       <classname>ConstraintDeclarationException</classname> will be
       raised.</para>
-
       <note>
         <para>The rules described in this section only apply to methods but
         not constructors. By definition, constructors never override supertype
@@ -584,20 +481,25 @@ public class Car implements Vehicle {
         constructor itself apply, but never any constraints declared on
         supertype constructors.</para>
       </note>
+      <para><para>Enforcement of these rules may be relaxed by setting the configuration parameters contained in the <property>MethodValidationConfiguration</property> property of the <classname>HibernateValidatorConfiguration</classname> before creating <classname>Validator</classname> instances. By default, all of these properties are false, implementing the default behavior as defined in the specification.</para><para><programlisting>HibernateValidatorConfiguration configure =
+  Validation.byProvider(HibernateValidator.class)
+    .configure();
+MethodValidationConfiguration mvc = new
+  MethodValidationConfigurationImpl();
+mvc.allowMultipleCascadedValidationOnReturnValues(true);
+mvc.allowOverridingMethodAlterParameterConstraint(true);
+mvc.allowParallelMethodsDefineParameterConstraints(true);
+configure.setMethodValidationConfiguration(mvc);</programlisting></para></para>
     </section>
   </section>
-
   <section id="section-validating-executable-constraints">
     <title>Validating method constraints</title>
-
     <para>The validation of method constraints is done using the
     <classname>ExecutableValidator</classname> interface.</para>
-
     <para>In <xref linkend="section-obtaining-executable-validator"/> you will
     learn how to obtain an <classname>ExecutableValidator</classname> instance
     while <xref linkend="section-executable-validator-methods"/> shows how to
     use the different methods offered by this interface.</para>
-
     <para>Instead of calling the ExecutableValidator methods directly from
     within application code, they are usually invoked via a method
     interception technology such as AOP, proxy objects, etc. This causes
@@ -605,50 +507,37 @@ public class Car implements Vehicle {
     upon method or constructor invocation. Typically a
     <classname>ConstraintViolationException</classname> is raised by the
     integration layer in case any of the constraints is violated.</para>
-
     <section id="section-obtaining-executable-validator">
-      <title>Obtaining an <classname>ExecutableValidator</classname>
-      instance</title>
-
+      <title>Obtaining an <classname>ExecutableValidator</classname> instance</title>
       <para>You can retrieve an <classname>ExecutableValidator</classname>
       instance via <classname>Validator#forExecutables()</classname> as shown
       in <xref linkend="example-obtaining-executable-validator"/>.</para>
-
       <example id="example-obtaining-executable-validator">
         <title>Obtaining an ExecutableValidator</title>
-
         <programlisting language="JAVA" role="JAVA">ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 executableValidator = factory.getValidator().forExecutables();</programlisting>
       </example>
-
       <para>In the example the executable validator is retrieved from the
       default validator factory, but if required you could also bootstrap a
-      specifically configured factory as described in <xref
-      linkend="chapter-bootstrapping"/>, for instance in order to use a
-      specific parameter name provider (see <xref
-      linkend="section-parameter-name-provider"/>).</para>
+      specifically configured factory as described in <xref linkend="chapter-bootstrapping"/>, for instance in order to use a
+      specific parameter name provider (see <xref linkend="section-parameter-name-provider"/>).</para>
     </section>
-
     <section id="section-executable-validator-methods">
       <title><classname>ExecutableValidator</classname> methods</title>
-
       <para>The <classname>ExecutableValidator</classname> interface offers
       altogether four methods:</para>
-
       <itemizedlist>
         <listitem>
           <para><methodname>validateParameters()</methodname> and
           <methodname>validateReturnValue()</methodname> for method
           validation</para>
         </listitem>
-
         <listitem>
           <para><methodname>validateConstructorParameters()</methodname> and
           <methodname>validateConstructorReturnValue()</methodname> for
           constructor validation</para>
         </listitem>
       </itemizedlist>
-
       <para>Just as the methods on <classname>Validator</classname>, all these
       methods return a <classname>Set&lt;ConstraintViolation&gt;</classname>
       which contains a <classname>ConstraintViolation</classname> instance for
@@ -656,239 +545,204 @@ executableValidator = factory.getValidator().forExecutables();</programlisting>
       Also all the methods have a var-args <varname>groups</varname> parameter
       by which you can pass the validation groups to be considered for
       validation.</para>
-
       <para>The examples in the following sections are based on the methods on
-      constructors of the <classname>Car</classname> class shown in <xref
-      linkend="example-executable-validator-class-car"/>.</para>
-
+      constructors of the <classname>Car</classname> class shown in <xref linkend="example-executable-validator-class-car"/>.</para>
       <example id="example-executable-validator-class-car">
-        <title>Class <classname>Car</classname> with constrained methods and
-        constructors</title>
-
+        <title>Class <classname>Car</classname> with constrained methods and constructors</title>
         <programlisting language="JAVA" role="JAVA">package org.hibernate.validator.referenceguide.chapter03.validation;
 
 public class Car {
 
-	public Car(@NotNull String manufacturer) {
-		//...
-	}
+ public Car(@NotNull String manufacturer) {
+  //...
+ }
 
-	@ValidRacingCar
-	public Car(String manufacturer, String team) {
-		//...
-	}
+ @ValidRacingCar
+ public Car(String manufacturer, String team) {
+  //...
+ }
 
-	public void drive(@Max(75) int speedInMph) {
-		//...
-	}
+ public void drive(@Max(75) int speedInMph) {
+  //...
+ }
 
-	@Size(min = 1)
-	public List&lt;Passenger&gt; getPassengers() {
-		//...
-	}
+ @Size(min = 1)
+ public List&lt;Passenger&gt; getPassengers() {
+  //...
+ }
 }</programlisting>
       </example>
-
       <section>
-        <title><methodname>ExecutableValidator#validateParameters()</methodname></title>
-
+        <title>
+          <methodname>ExecutableValidator#validateParameters()</methodname>
+        </title>
         <para>The method <methodname>validateParameters()</methodname> is used
-        to validate the arguments of a method invocation. <xref
-        linkend="example-executable-validator-validate-parameters"/> shows an
+        to validate the arguments of a method invocation. <xref linkend="example-executable-validator-validate-parameters"/> shows an
         example. The validation results in a violation of the
         <classname>@Max</classname> constraint on the parameter of the
         <methodname>drive()</methodname> method.</para>
-
         <example id="example-executable-validator-validate-parameters">
-          <title>Using
-          <methodname>ExecutableValidator#validateParameters()</methodname></title>
-
-          <programlisting language="JAVA" role="JAVA">Car object = new Car( "Morris" );
-Method method = Car.class.getMethod( "drive", int.class );
+          <title>Using <methodname>ExecutableValidator#validateParameters()</methodname></title>
+          <programlisting language="JAVA" role="JAVA">Car object = new Car( &quot;Morris&quot; );
+Method method = Car.class.getMethod( &quot;drive&quot;, int.class );
 Object[] parameterValues = { 80 };
 Set&lt;ConstraintViolation&lt;Car&gt;&gt; violations = executableValidator.validateParameters(
-		object,
-		method,
-		parameterValues
+  object,
+  method,
+  parameterValues
 );
 
 assertEquals( 1, violations.size() );
 Class&lt;? extends Annotation&gt; constraintType = violations.iterator()
-		.next()
-		.getConstraintDescriptor()
-		.getAnnotation()
-		.annotationType();
+  .next()
+  .getConstraintDescriptor()
+  .getAnnotation()
+  .annotationType();
 assertEquals( Max.class, constraintType );</programlisting>
         </example>
-
         <para>Note that <methodname>validateParameters()</methodname>
         validates all the parameter constraints of a method, i.e. constraints
         on individual parameters as well as cross-parameter
         constraints.</para>
       </section>
-
       <section>
-        <title><methodname>ExecutableValidator#validateReturnValue()</methodname></title>
-
+        <title>
+          <methodname>ExecutableValidator#validateReturnValue()</methodname>
+        </title>
         <para>Using <methodname>validateReturnValue()</methodname> the return
-        value of a method can can be validated. The validation in <xref
-        linkend="example-executable-validator-validate-return-value"/> yields
+        value of a method can can be validated. The validation in <xref linkend="example-executable-validator-validate-return-value"/> yields
         one constraint violation since the
         <methodname>getPassengers()</methodname> method is expect to return at
         least one <classname>Passenger</classname> object.</para>
-
         <example id="example-executable-validator-validate-return-value">
-          <title>Using
-          <methodname>ExecutableValidator#validateReturnValue()</methodname></title>
-
-          <programlisting language="JAVA" role="JAVA">Car object = new Car( "Morris" );
-Method method = Car.class.getMethod( "getPassengers" );
+          <title>Using <methodname>ExecutableValidator#validateReturnValue()</methodname></title>
+          <programlisting language="JAVA" role="JAVA">Car object = new Car( &quot;Morris&quot; );
+Method method = Car.class.getMethod( &quot;getPassengers&quot; );
 Object returnValue = Collections.&lt;Passenger&gt;emptyList();
 Set&lt;ConstraintViolation&lt;Car&gt;&gt; violations = executableValidator.validateReturnValue(
-		object,
-		method,
-		returnValue
+  object,
+  method,
+  returnValue
 );
 
 assertEquals( 1, violations.size() );
 Class&lt;? extends Annotation&gt; constraintType = violations.iterator()
-		.next()
-		.getConstraintDescriptor()
-		.getAnnotation()
-		.annotationType();
+  .next()
+  .getConstraintDescriptor()
+  .getAnnotation()
+  .annotationType();
 assertEquals( Size.class, constraintType );</programlisting>
         </example>
       </section>
-
       <section>
-        <title><methodname>ExecutableValidator#validateConstructorParameters()</methodname></title>
-
+        <title>
+          <methodname>ExecutableValidator#validateConstructorParameters()</methodname>
+        </title>
         <para>The arguments of constructor invocations can be validated with
         <methodname>validateConstructorParameters()</methodname> as shown in
-        method <xref
-        linkend="example-executable-validator-validate-constructor-parameters"/>.
+        method <xref linkend="example-executable-validator-validate-constructor-parameters"/>.
         Due to the <classname>@NotNull</classname> constraint on the
         <varname>manufacturer</varname> parameter, the validation call returns
         one constraint violation.</para>
-
         <example id="example-executable-validator-validate-constructor-parameters">
-          <title>Using
-          <methodname>ExecutableValidator#validateConstructorParameters()</methodname></title>
-
+          <title>Using <methodname>ExecutableValidator#validateConstructorParameters()</methodname></title>
           <programlisting language="JAVA" role="JAVA">Constructor&lt;Car&gt; constructor = Car.class.getConstructor( String.class );
 Object[] parameterValues = { null };
 Set&lt;ConstraintViolation&lt;Car&gt;&gt; violations = executableValidator.validateConstructorParameters(
-		constructor,
-		parameterValues
+  constructor,
+  parameterValues
 );
 
 assertEquals( 1, violations.size() );
 Class&lt;? extends Annotation&gt; constraintType = violations.iterator()
-		.next()
-		.getConstraintDescriptor()
-		.getAnnotation()
-		.annotationType();
+  .next()
+  .getConstraintDescriptor()
+  .getAnnotation()
+  .annotationType();
 assertEquals( NotNull.class, constraintType );</programlisting>
         </example>
       </section>
-
       <section>
-        <title><methodname>ExecutableValidator#validateConstructorReturnValue()</methodname></title>
-
+        <title>
+          <methodname>ExecutableValidator#validateConstructorReturnValue()</methodname>
+        </title>
         <para>Finally, by using
         <methodname>validateConstructorReturnValue()</methodname> you can
-        valide a constructor's return value. In <xref
-        linkend="example-executable-validator-validate-constructor-return-value"/>,
+        valide a constructor&apos;s return value. In <xref linkend="example-executable-validator-validate-constructor-return-value"/>,
         <methodname>validateConstructorReturnValue()</methodname> returns one
         constraint violation, since the <classname>Car</classname> object
-        returned by the constructor doesn't satisfy the
+        returned by the constructor doesn&apos;t satisfy the
         <classname>@ValidRacingCar</classname> constraint (not shown).</para>
-
         <example id="example-executable-validator-validate-constructor-return-value">
-          <title>Using
-          <methodname>ExecutableValidator#validateConstructorReturnValue()</methodname></title>
-
+          <title>Using <methodname>ExecutableValidator#validateConstructorReturnValue()</methodname></title>
           <programlisting language="JAVA" role="JAVA">//constructor for creating racing cars
 Constructor&lt;Car&gt; constructor = Car.class.getConstructor( String.class, String.class );
-Car createdObject = new Car( "Morris", null );
+Car createdObject = new Car( &quot;Morris&quot;, null );
 Set&lt;ConstraintViolation&lt;Car&gt;&gt; violations = executableValidator.validateConstructorReturnValue(
-		constructor,
-		createdObject
+  constructor,
+  createdObject
 );
 
 assertEquals( 1, violations.size() );
 Class&lt;? extends Annotation&gt; constraintType = violations.iterator()
-		.next()
-		.getConstraintDescriptor()
-		.getAnnotation()
-		.annotationType();
+  .next()
+  .getConstraintDescriptor()
+  .getAnnotation()
+  .annotationType();
 assertEquals( ValidRacingCar.class, constraintType );          </programlisting>
         </example>
       </section>
     </section>
-
     <section>
-      <title><classname>ConstraintViolation</classname> methods for method
-      validation</title>
-
-      <para>In addition to the methods introduced in <xref
-      linkend="section-constraint-violation-methods"/>,
+      <title><classname>ConstraintViolation</classname> methods for method validation</title>
+      <para>In addition to the methods introduced in <xref linkend="section-constraint-violation-methods"/>,
       <classname>ConstraintViolation</classname> provides two more methods
       specific to the validation of executable parameters and return
       values.</para>
-
       <para><methodname>ConstraintViolation#getExecutableParameters()</methodname>
       returns the validated parameter array in case of method or constructor
       parameter validation, while
       <methodname>ConstraintViolation#getExecutableReturnValue()</methodname>
       provides access to the validated object in case of return value
       validation.</para>
-
       <para>All the other <classname>ConstraintViolation</classname> methods
       generally work for method validation in the same way as for validation
-      of beans. Refer to the <ulink
-      url="http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/BeanDescriptor.html">JavaDoc</ulink>
+      of beans. Refer to the <ulink url="http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/BeanDescriptor.html">JavaDoc</ulink>
       to learn more about the behavior of the individual methods and their
       return values during bean and method validation.</para>
-
       <para>Note that <methodname>getPropertyPath()</methodname> can be very
       useful in order to obtain detailed information about the validated
       parameter or return value, e.g. for logging purposes. In particular, you
       can retrieve name and argument types of the concerned method as well as
       the index of the concerned parameter from the path nodes. How this can
-      be done is shown in <xref
-      linkend="example-executable-validation-property-path"/>.</para>
-
+      be done is shown in <xref linkend="example-executable-validation-property-path"/>.</para>
       <example id="example-executable-validation-property-path">
         <title>Retrieving method and parameter information</title>
-
-        <programlisting language="JAVA" role="JAVA">Car object = new Car( "Morris" );
-Method method = Car.class.getMethod( "drive", int.class );
+        <programlisting language="JAVA" role="JAVA">Car object = new Car( &quot;Morris&quot; );
+Method method = Car.class.getMethod( &quot;drive&quot;, int.class );
 Object[] parameterValues = { 80 };
 Set&lt;ConstraintViolation&lt;Car&gt;&gt; violations = executableValidator.validateParameters(
-		object,
-		method,
-		parameterValues
+  object,
+  method,
+  parameterValues
 );
 
 assertEquals( 1, violations.size() );
 Iterator&lt;Node&gt; propertyPath = violations.iterator()
-		.next()
-		.getPropertyPath()
-		.iterator();
+  .next()
+  .getPropertyPath()
+  .iterator();
 
 MethodNode methodNode = propertyPath.next().as( MethodNode.class );
-assertEquals( "drive", methodNode.getName() );
+assertEquals( &quot;drive&quot;, methodNode.getName() );
 assertEquals( Arrays.&lt;Class&lt;?&gt;&gt;asList( int.class ), methodNode.getParameterTypes() );
 
 ParameterNode parameterNode = propertyPath.next().as( ParameterNode.class );
-assertEquals( "arg0", parameterNode.getName() );
+assertEquals( &quot;arg0&quot;, parameterNode.getName() );
 assertEquals( 0, parameterNode.getParameterIndex() );         </programlisting>
       </example>
-
       <para>The parameter name is determined using the current
-      <classname>ParameterNameProvider</classname> (see <xref
-      linkend="section-parameter-name-provider"/>) and defaults to
+      <classname>ParameterNameProvider</classname> (see <xref linkend="section-parameter-name-provider"/>) and defaults to
       <literal>arg0</literal>, <literal>arg1</literal> etc.</para>
     </section>
   </section>
