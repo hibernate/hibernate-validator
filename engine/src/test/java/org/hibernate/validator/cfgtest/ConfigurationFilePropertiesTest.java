@@ -73,8 +73,6 @@ public class ConfigurationFilePropertiesTest {
 		MethodValidationConfiguration methodConfig = findPropertyOfType(bmdm, MethodValidationConfiguration.class);
 		
 		Assert.assertTrue( methodConfig.isAllowMultipleCascadedValidationOnReturnValues() );
-		Assert.assertTrue( methodConfig.isAllowOverridingMethodAlterParameterConstraint() );
-		Assert.assertTrue( methodConfig.isAllowParallelMethodsDefineParameterConstraints() );
 	}
 
 	@Test
