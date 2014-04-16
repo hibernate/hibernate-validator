@@ -213,6 +213,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return parameterNameProvider;
 	}
 
+	public MethodValidationConfiguration getMethodValidationConfiguration() {
+		return this.methodValidationConfiguration;
+	}
+	
 	@Override
 	public <T> T unwrap(Class<T> type) {
 		//allow unwrapping into public super types

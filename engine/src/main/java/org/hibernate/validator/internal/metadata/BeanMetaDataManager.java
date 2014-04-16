@@ -21,6 +21,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import javax.validation.ParameterNameProvider;
+import javax.validation.Validator;
 
 import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;

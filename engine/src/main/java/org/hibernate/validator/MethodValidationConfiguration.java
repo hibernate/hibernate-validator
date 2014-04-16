@@ -37,27 +37,6 @@ import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigura
  */
 public interface MethodValidationConfiguration {
 	/**
-	 * Property corresponding to the {@link #allowOverridingMethodAlterParameterConstraint} method.
-	 * Accepts {@code true} or {@code false}. 
-	 * Defaults to {@code false}.
-	 */
-	String ALLOW_PARAMETER_CONSTRAINT_OVERRIDE = "hibernate.validator.allow_parameter_constraint_override";
-	
-	/**
-	 * Property corresponding to the {@link #allowParallelMethodsDefineGroupConversion} method.
-	 * Accepts {@code true} or {@code false}. 
-	 * Defaults to {@code false}.
-	 */
-	String ALLOW_PARALLEL_METHODS_DEFINE_GROUPS = "hibernate.validator.allow_parallel_methods_define_group";
-	
-	/**
-	 * Property corresponding to the {@link #allowParallelMethodsDefineParameterConstraints} method.
-	 * Accepts {@code true} or {@code false}. 
-	 * Defaults to {@code false}.
-	 */
-	String ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS = "hibernate.validator.allow_parallel_method_parameter_constraint";
-
-	/**
 	 * Define whether overriding methods that override constraints should throw a ConstraintDefinitionException. The
 	 * default value is FALSE, i.e. do not allow.
 	 * 

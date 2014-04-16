@@ -39,6 +39,7 @@ import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
+import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -280,6 +281,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( type.isAssignableFrom( Validator.class ) ) {
 			return type.cast( this );
 		}
+		
 		throw log.getTypeNotSupportedForUnwrappingException( type );
 	}
 

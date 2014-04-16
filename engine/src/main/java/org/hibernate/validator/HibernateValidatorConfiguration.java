@@ -38,8 +38,25 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 */
 	String FAIL_FAST = "hibernate.validator.fail_fast";
 
+	/**
+	 * Property corresponding to the {@link #MethodValidationConfiguration.allowOverridingMethodAlterParameterConstraint} method.
+	 * Accepts {@code true} or {@code false}. 
+	 * Defaults to {@code false}.
+	 */
 	String ALLOW_PARAMETER_CONSTRAINT_OVERRIDE = "hibernate.validator.allow_parameter_constraint_override";
+	
+	/**
+	 * Property corresponding to the {@link #MethodValidationConfiguration.allowMultipleCascadedValidationOnReturnValues} method.
+	 * Accepts {@code true} or {@code false}. 
+	 * Defaults to {@code false}.
+	 */
 	String ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT = "hibernate.validator.allow_multiple_cascaded_validation_on_result";
+
+	/**
+	 * Property corresponding to the {@link #MethodValidationConfiguration.allowParallelMethodsDefineParameterConstraints} method.
+	 * Accepts {@code true} or {@code false}. 
+	 * Defaults to {@code false}.
+	 */
 	String ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS = "hibernate.validator.allow_parallel_method_parameter_constraint";
 	
 	/**
@@ -103,6 +120,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @return {@code this} following the chaining method pattern
 	 */
 	HibernateValidatorConfiguration failFast(boolean failFast);
+	boolean getFailFast();
 	
 	/**
 	 * The properties contained in this property modify the behavior of the Validator with respect to 

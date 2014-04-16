@@ -481,15 +481,6 @@ public class Car implements Vehicle {
         constructor itself apply, but never any constraints declared on
         supertype constructors.</para>
       </note>
-      <para><para>Enforcement of these rules may be relaxed by setting the configuration parameters contained in the <property>MethodValidationConfiguration</property> property of the <classname>HibernateValidatorConfiguration</classname> before creating <classname>Validator</classname> instances. By default, all of these properties are false, implementing the default behavior as defined in the specification.</para><para><programlisting>HibernateValidatorConfiguration configure =
-  Validation.byProvider(HibernateValidator.class)
-    .configure();
-MethodValidationConfiguration mvc = new
-  MethodValidationConfigurationImpl();
-mvc.allowMultipleCascadedValidationOnReturnValues(true);
-mvc.allowOverridingMethodAlterParameterConstraint(true);
-mvc.allowParallelMethodsDefineParameterConstraints(true);
-configure.setMethodValidationConfiguration(mvc);</programlisting></para></para>
     </section>
   </section>
   <section id="section-validating-executable-constraints">

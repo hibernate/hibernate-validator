@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="Hibernate Validator Configuration Tests" verbose="1">
+    <test name="Configuration">
+        <packages>
+            <package name="org.hibernate.validator.cfgtest.*"/>
+        </packages>
+    </test>
+</suite>
