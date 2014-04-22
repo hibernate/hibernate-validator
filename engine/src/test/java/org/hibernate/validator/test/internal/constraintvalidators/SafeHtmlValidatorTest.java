@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat Middleware LLC, and individual contributors
+ * Copyright 2011-2014, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -129,6 +129,30 @@ public class SafeHtmlValidatorTest {
 
 		constraintViolations = validator.validate( new Foo( "<div class='foo'>test</div>" ) );
 		assertNumberOfViolations( constraintViolations, 1 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-873")
+	public void testValidationOfInvalidFragment() throws Exception {
+		descriptor.setValue( "whitelistType", WhiteListType.NONE );
+
+		assertFalse( getSafeHtmlValidator().isValid( "<td>1234qwer</td>", null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-873")
+	public void testValidationOfValidFragment() throws Exception {
+		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
+
+		assertTrue( getSafeHtmlValidator().isValid( "<td>1234qwer</td>", null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-873")
+	public void testValidationOfTextFragment() throws Exception {
+		descriptor.setValue( "whitelistType", WhiteListType.NONE );
+
+		assertTrue( getSafeHtmlValidator().isValid( "Foobar", null ) );
 	}
 
 	private SafeHtmlValidator getSafeHtmlValidator() {
