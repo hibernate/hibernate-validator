@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat Middleware LLC, and individual contributors
+ * Copyright 2011-2014, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,10 +16,15 @@
  */
 package org.hibernate.validator.internal.constraintvalidators;
 
+import java.util.Iterator;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
+import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
 
 import org.hibernate.validator.constraints.SafeHtml;
@@ -35,6 +40,7 @@ import org.hibernate.validator.constraints.SafeHtml;
 public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequence> {
 	private Whitelist whitelist;
 
+	@Override
 	public void initialize(SafeHtml safeHtmlAnnotation) {
 		switch ( safeHtmlAnnotation.whitelistType() ) {
 			case BASIC:
@@ -60,10 +66,31 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 		}
 	}
 
+	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
 		if ( value == null ) {
 			return true;
 		}
-		return Jsoup.isValid( value.toString(), whitelist );
+
+		return new Cleaner( whitelist ).isValid( getFragmentAsDocument( value ) );
+	}
+
+	/**
+	 * Returns a document whose {@code <body>} element contains the given HTML fragment.
+	 */
+	private Document getFragmentAsDocument(CharSequence value) {
+		// using the XML parser ensures that all elements in the input are retained, also if they actually are not allowed at the given
+		// location; E.g. a <td> element isn't allowed directly within the <body> element, so it would be used by the default HTML parser.
+		// we need to retain it though to apply the given white list properly; See HV-873
+		Document fragment = Jsoup.parse( value.toString(), "", Parser.xmlParser() );
+		Document document = Document.createShell( "" );
+
+		// add the fragment's nodes to the body of resulting document
+		Iterator<Element> nodes = fragment.children().iterator();
+		while ( nodes.hasNext() ) {
+			document.body().appendChild( nodes.next() );
+		}
+
+		return document;
 	}
 }
