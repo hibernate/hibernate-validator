@@ -16,8 +16,6 @@
 */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
-
 import java.util.Set;
 
 import javax.validation.ConstraintDeclarationException;
@@ -29,11 +27,11 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.apache.log4j.Logger;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.testutil.ConstraintViolationAssert;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -43,7 +41,6 @@ import org.testng.annotations.Test;
  * @author Chris Beckey <cbeckey@paypal.com>
  */
 public class RelaxedMethodParameterConstraintsTest {
-	private Logger logger = Logger.getLogger(RelaxedMethodParameterConstraintsTest.class);
 	
 	/**
 	 * This is the default behavior, make sure that it works before checking that options work.
@@ -56,9 +53,12 @@ public class RelaxedMethodParameterConstraintsTest {
 		ValidatorFactory factory = configure.buildValidatorFactory();
 		Validator validator = factory.getValidator();
 
+		@SuppressWarnings("unused")
 		Set<? extends ConstraintViolation<?>> violations = validator.forExecutables().validateParameters(
 				new RealizationWithMethodParameterConstraint(), RealizationWithMethodParameterConstraint.class.getDeclaredMethods()[0], new Object[] { }
 		);
+		
+		Assert.fail("Expected ConstraintDeclarationException was not caught.");
 	}
 	
 	/**
@@ -94,6 +94,7 @@ public class RelaxedMethodParameterConstraintsTest {
 		ValidatorFactory factory = configure.buildValidatorFactory();
 		Validator validator = factory.getValidator();
 		
+		@SuppressWarnings("unused")
 		Set<ConstraintViolation<RealizationWithAdditionalMethodParameterConstraint>> violations = validator.forExecutables().validateParameters(
 				new RealizationWithAdditionalMethodParameterConstraint(), RealizationWithAdditionalMethodParameterConstraint.class.getDeclaredMethods()[0], new Object[] { }
 		);
@@ -205,17 +206,6 @@ public class RelaxedMethodParameterConstraintsTest {
 		}
 	}
 
-	private static class AnotherRealizationWithMethodParameterConstraint 
-	implements InterfaceWithNoConstraints {
-		/**
-		 * Adds constraints to an un-constrained method from a super-type, which is not allowed.
-		 */
-		@Override
-		public String foo(@Size(min=1, max=16) String s) {
-			return "Hello World, again";
-		}
-	}
-	
 	private static class RealizationWithValidConstraintOnMethodParameter 
 	implements InterfaceWithNoConstraints {
 		/**
@@ -237,18 +227,6 @@ public class RelaxedMethodParameterConstraintsTest {
 		@Valid
 		public String foo(String s) {
 			return "Hello Valid World";
-		}
-	}
-
-	private static class RealizationWithResultConstraint 
-	implements InterfaceWithNoConstraints {
-		/**
-		 * Adds constraints to an un-constrained method from a super-type, which is not allowed.
-		 */
-		@Override
-		@NotNull
-		public String foo(String s) {
-			return "Whatever";
 		}
 	}
 
