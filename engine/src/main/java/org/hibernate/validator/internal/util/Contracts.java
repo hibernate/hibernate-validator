@@ -24,7 +24,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 /**
  * @author Gunnar Morling
  * @author Hardy Ferentschik
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2012 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2012 SERLI
  */
 public final class Contracts {
 

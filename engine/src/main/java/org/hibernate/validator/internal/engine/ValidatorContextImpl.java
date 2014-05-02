@@ -30,7 +30,7 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {

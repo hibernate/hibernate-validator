@@ -43,8 +43,10 @@ public class ConstraintCheckError {
 	 * @param element The element at which the error occurred.
 	 * @param annotationMirror The annotation that causes the error.
 	 * @param messageKey A key for retrieving an error message template from the bundle
-	 * <p/>
+	 * <p>
 	 * <code>org.hibernate.validator.ap.ValidationProcessorMessages.</code>
+	 * </p>
+	 *
 	 * @param messageParameters An array with values to put into the error message template
 	 * using {@link java.text.MessageFormat}. The number of elements must match
 	 * the number of place holders in the message template.

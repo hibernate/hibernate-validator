@@ -25,7 +25,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  *
  * @param <C> The type represented by this creational context.
  *
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
  */
 public interface TypeConstraintMappingContext<C> extends Constrainable<TypeConstraintMappingContext<C>>,

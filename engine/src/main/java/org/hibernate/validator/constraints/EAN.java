@@ -34,7 +34,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Checks that the annotated character sequence is a valid
  * <a href="http://en.wikipedia.org/wiki/International_Article_Number_%28EAN%29">EAN 13</a> number. The length of the
  * number and the check digit are verified
- * </p>
+ *
  * <p>
  * The supported type is {@code CharSequence}. {@code null} is considered valid.
  * </p>

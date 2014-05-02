@@ -102,7 +102,6 @@
                 <configuration>
                     <sourcepath>
                         ${basedir}/../engine/src/main/java;
-                        ${basedir}/../engine/target/generated-sources;
                         ${basedir}/../cdi/src/main/java;
                         ${basedir}/../annotation-processor/src/main/java
                     </sourcepath>

@@ -46,7 +46,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  * A constraint mapping creational context which allows to select the parameter or
  * return value to which the next operations shall apply.
  *
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
  */
 public class ExecutableConstraintMappingContextImpl

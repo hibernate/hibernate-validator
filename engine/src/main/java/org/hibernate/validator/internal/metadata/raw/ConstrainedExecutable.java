@@ -66,6 +66,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
 	 * return value shall be performed or not.
+	 * @param requiresUnwrapping Whether the value of the executable's return value must be unwrapped prior to
+	 * validation or not
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
@@ -95,6 +97,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * with the number of parameters of the represented executable. So
 	 * this list may be empty (in case of a parameterless executable),
 	 * but never {@code null}.
+	 * @param crossParameterConstraints the cross parameter constraints
 	 * @param returnValueConstraints The return value constraints of the represented executable, if
 	 * any.
 	 * @param groupConversions The group conversions of the represented executable, if any.

@@ -66,6 +66,8 @@ public class Configuration {
 
 	/**
 	 * Returns the diagnosticKind to be used when reporting failing constraint checks.
+	 *
+	 * @return the diagnosticKind to be used when reporting failing constraint checks
 	 */
 	public Kind getDiagnosticKind() {
 		return diagnosticKind;
@@ -73,6 +75,8 @@ public class Configuration {
 
 	/**
 	 * Whether logging information shall be put out in a verbose way or not.
+	 *
+	 * @return {@code true} if logging information shall be put out in a verbose, {@code false} otherwise
 	 */
 	public boolean isVerbose() {
 		return verbose;
@@ -81,6 +85,8 @@ public class Configuration {
 	/**
 	 * Whether method constraints are allowed at any method (<code>true</code>) or only
 	 * getter methods (<code>false</code>).
+	 *
+	 * @return {@code true} if method constraints are allowed on any method, {code false} if only on getter methods
 	 */
 	public boolean methodConstraintsSupported() {
 		return methodConstraintsSupported;

@@ -35,7 +35,7 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public final class ExecutableHelper {
 
@@ -48,6 +48,7 @@ public final class ExecutableHelper {
 	/**
 	 * Checks, whether the represented method overrides the given method.
 	 *
+	 * @param executableElement the method to test against
 	 * @param other The method to test.
 	 *
 	 * @return {@code true} If this methods overrides the passed method,

@@ -286,6 +286,7 @@ public class ConstraintHelper {
 	 * The result is cached internally.
 	 *
 	 * @param annotationType The constraint annotation type.
+	 * @param <A> the type of the annotation
 	 *
 	 * @return The validator classes for the given type.
 	 */
@@ -316,6 +317,7 @@ public class ConstraintHelper {
 	 *
 	 * @param annotationType The annotation of interest.
 	 * @param validationTarget The target, either annotated element or parameters.
+	 * @param <A> the type of the annotation
 	 *
 	 * @return A list with matching validator classes.
 	 */
@@ -352,6 +354,7 @@ public class ConstraintHelper {
 	 * @param annotationType The constraint annotation type
 	 * @param definitionClasses The validators to register
 	 * @param keepDefaultClasses Whether any default validators should be kept or not
+	 * @param <A> the type of the annotation
 	 */
 	public <A extends Annotation> void putValidatorClasses(Class<A> annotationType,
 														   List<Class<? extends ConstraintValidator<A, ?>>> definitionClasses,
@@ -402,6 +405,7 @@ public class ConstraintHelper {
 	 * actually is a multi-value constraint.
 	 *
 	 * @param multiValueConstraint the multi-value constraint annotation from which to retrieve the contained constraints
+	 * @param <A> the type of the annotation
 	 *
 	 * @return A list of constraint annotations, may be empty but never {@code null}.
 	 */

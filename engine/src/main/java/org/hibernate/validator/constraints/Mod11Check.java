@@ -40,8 +40,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * calculate the check digit using {@code 11 - ( sum % 11 )}.
  * </p>
  * <p>
- * Example: The check digit for 24187 is 3<br />
- * Sum = 7x2 + 8x3 + 1x4 + 4x5 + 2x6 = 74 <br />
+ * Example: The check digit for 24187 is 3<br>
+ * Sum = 7x2 + 8x3 + 1x4 + 4x5 + 2x6 = 74 <br>
  * 11 - (74 % 11) = 11 - 8 = 3, so "24187-3" is a valid character sequence.
  * </p>
  * <p>
@@ -91,7 +91,7 @@ public @interface Mod11Check {
 	/**
 	 * @return The index of the check digit in the input. Per default it is assumed that the check digit is the last
 	 * digit of the specified range. If set, the digit at the specified index is used. If set
-	 * the following must hold true:<br/>
+	 * the following must hold true:<br>
 	 * {@code checkDigitIndex > 0 && (checkDigitIndex < startIndex || checkDigitIndex >= endIndex}.
 	 */
 	int checkDigitIndex() default -1;

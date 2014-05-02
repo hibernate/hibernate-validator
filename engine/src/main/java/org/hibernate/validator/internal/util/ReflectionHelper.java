@@ -63,7 +63,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public final class ReflectionHelper {
 
@@ -212,7 +212,7 @@ public final class ReflectionHelper {
 
 	/**
 	 * Returns the JavaBeans property name of the given member.
-	 * </p>
+	 * <p>
 	 * For fields, the field name will be returned. For getter methods, the
 	 * decapitalized property name will be returned, with the "get", "is" or "has"
 	 * prefix stripped off. Getter methods are methods
@@ -496,7 +496,7 @@ public final class ReflectionHelper {
 	/**
 	 * Tries to retrieve the indexed value from the specified object.
 	 *
-	 * @param value The object from which to retrieve the indexed value. The object has to be non <code>null</null> and
+	 * @param value The object from which to retrieve the indexed value. The object has to be non <code>null</code> and
 	 * either a collection or array.
 	 * @param index The index. The index does not have to be numerical. <code>value</code> could also be a map in which
 	 * case the index could also be a string key.
@@ -654,6 +654,7 @@ public final class ReflectionHelper {
 	 *
 	 * @param clazz The class to check.
 	 * @param params The constructor parameter types.
+	 * @param <T> The type of class to get the constructor for.
 	 *
 	 * @return Returns the declared constructor with the specified name or {@code null} if it does not exist.
 	 */

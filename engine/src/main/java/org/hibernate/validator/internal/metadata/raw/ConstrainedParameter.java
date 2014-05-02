@@ -61,6 +61,8 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 *
 	 * @param source The source of meta data.
 	 * @param location The location of the represented method parameter.
+	 * @param type the parameter type
+	 * @param index the index of the parameter
 	 * @param name The name of the represented parameter.
 	 * @param constraints The constraints of the represented method parameter, if
 	 * any.

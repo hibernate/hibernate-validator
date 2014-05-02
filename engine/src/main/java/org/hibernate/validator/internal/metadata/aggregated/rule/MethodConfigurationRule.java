@@ -42,6 +42,10 @@ public abstract class MethodConfigurationRule {
 
 	/**
 	 * Whether {@code otherClazz} is a strict subtype of {@code clazz} or not.
+	 * @param clazz the super type to check against
+	 * @param otherClazz the subtype to check
+	 *
+	 * @return {@code true} if {@code otherClazz} is a strict subtype of {@code clazz}, {@code false} otherwise
 	 */
 	protected boolean isStrictSubType(Class<?> clazz, Class<?> otherClazz) {
 		return clazz.isAssignableFrom( otherClazz ) && !clazz.equals( otherClazz );
@@ -50,6 +54,12 @@ public abstract class MethodConfigurationRule {
 	/**
 	 * Whether {@code otherExecutable} is defined on a subtype of the declaring
 	 * type of {@code executable} or not.
+	 *
+	 * @param executable the executable to check against
+	 * @param otherExecutable the executable to check
+	 *
+	 * @return {@code true} if {@code otherExecutable} is defined on a subtype of the declaring type of
+	 * {@code otherExecutable}, {@code false} otherwise
 	 */
 	protected boolean isDefinedOnSubType(ConstrainedExecutable executable, ConstrainedExecutable otherExecutable) {
 		Class<?> clazz = executable.getLocation().getDeclaringClass();
@@ -61,6 +71,12 @@ public abstract class MethodConfigurationRule {
 	/**
 	 * Whether {@code otherExecutable} is defined on a parallel of the declaring
 	 * type of {@code executable} or not.
+	 *
+	 * @param executable the executable to check against
+	 * @param otherExecutable the executable to check
+	 *
+	 * @return {@code true} if {@code otherExecutable} is defined on a parallel of the declaring type of
+	 * {@code otherExecutable}, {@code false} otherwise
 	 */
 	protected boolean isDefinedOnParallelType(ConstrainedExecutable executable, ConstrainedExecutable otherExecutable) {
 		Class<?> clazz = executable.getLocation().getDeclaringClass();

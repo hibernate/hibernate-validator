@@ -40,7 +40,7 @@ import org.hibernate.validator.ap.util.TypeNames.HibernateValidatorTypes;
 /**
  * Checks that the {@link org.hibernate.validator.group.GroupSequenceProvider}
  * annotation definition is valid.
- * <p>
+ * <br>
  * This check ensure that :
  * <ul>
  * <li>The annotation is not defined on an interface.</li>
@@ -53,9 +53,8 @@ import org.hibernate.validator.ap.util.TypeNames.HibernateValidatorTypes;
  * <li>The class hosting the annotation is not already annotated with
  * {@link javax.validation.GroupSequence}.</li>
  * </ul>
- * </p>
  *
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 

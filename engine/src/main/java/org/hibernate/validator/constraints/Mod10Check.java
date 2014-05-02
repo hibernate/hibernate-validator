@@ -85,7 +85,7 @@ public @interface Mod10Check {
 	/**
 	 * @return The index of the check digit in the input. Per default it is assumed that the check digit is the last
 	 * digit of the specified range. If set, the digit at the specified index is used. If set
-	 * the following must hold true:<br/>
+	 * the following must hold true:<br>
 	 * {@code checkDigitIndex > 0 && (checkDigitIndex < startIndex || checkDigitIndex >= endIndex}.
 	 */
 	int checkDigitIndex() default -1;

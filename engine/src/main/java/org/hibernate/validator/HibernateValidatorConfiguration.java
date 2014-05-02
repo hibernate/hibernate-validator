@@ -28,7 +28,7 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  *
  * @author Emmanuel Bernard
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Hardy Ferentschik
  */
 public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {
@@ -56,7 +56,6 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * This locator can be used as delegate for custom locators when setting a
 	 * customized {@link org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator}:
 	 * </p>
-	 * <p/>
 	 * <pre>
 	 * {@code
 	 * 	HibernateValidatorConfiguration configure =

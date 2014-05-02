@@ -20,7 +20,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class CountValidationCallsValidator implements ConstraintValidator<CountValidationCalls, Object> {
 	private static final ThreadLocal<Integer> NUMBER_OF_VALIDATION_CALLS = new ThreadLocal<Integer>() {

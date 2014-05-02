@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
 
 /**
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public final class GetDeclaredMethod implements PrivilegedAction<Method> {
 	private final Class<?> clazz;

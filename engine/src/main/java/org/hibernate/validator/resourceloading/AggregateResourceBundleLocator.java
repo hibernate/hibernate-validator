@@ -100,9 +100,9 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 
 	/**
 	 * A {@link ResourceBundle} whose content is aggregated from multiple source bundles.
-	 * <p/>
+	 * <p>
 	 * This class is package-private for the sake of testability.
-	 *
+	 * </p>
 	 * @author Gunnar Morling
 	 */
 	public static class AggregateBundle extends ResourceBundle {

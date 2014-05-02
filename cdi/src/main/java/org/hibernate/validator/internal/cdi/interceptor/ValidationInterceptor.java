@@ -50,10 +50,11 @@ public class ValidationInterceptor implements Serializable {
 
 	/**
 	 * The validator to be used for method validation.
-	 * <p/>
+	 * <p>
 	 * Although the concrete validator is not necessarily serializable (and HV's implementation indeed isn't) it is still
 	 * alright to have it as non-transient field here. Upon passivation not the validator itself will be serialized, but the
 	 * proxy injected here, which in turn is serializable.
+	 * </p>
 	 */
 	@Inject
 	private Validator validator;
