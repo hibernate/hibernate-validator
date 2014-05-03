@@ -71,8 +71,15 @@ public class ValidationOrderGenerator {
 		return order;
 	}
 
-	private boolean isGroupSequence(Class<?> clazz) {
-		return clazz.getAnnotation( GroupSequence.class ) != null;
+	private boolean isGroupSequence(final Class<?> clazz) {
+		//Optimize for the most common use case: this highly reduces the
+		//likelihood on contention on getAnnotation method [HV-885]
+		if ( clazz.equals( javax.validation.groups.Default.class ) ) {
+			return false;
+		}
+		else {
+			return clazz.getAnnotation( GroupSequence.class ) != null;
+		}
 	}
 
 	/**
