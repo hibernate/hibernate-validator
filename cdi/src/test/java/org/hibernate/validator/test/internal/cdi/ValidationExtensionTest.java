@@ -197,29 +197,21 @@ public class ValidationExtensionTest {
 		expect( validatorFactoryBeanMock.getQualifiers() ).andReturn( qualifiers );
 		expect( validatorFactoryBeanMock.getQualifiers() ).andReturn( qualifiers );
 
-		afterBeanDiscoveryMock.addBean( isA( ValidatorFactoryBean.class ) );
-		expectLastCall();
-
 		expect( processBeanMock.getBean() ).andReturn( validatorBeanMock );
 		expect( validatorBeanMock.getTypes() ).andReturn( validatorBeanTypes );
 		expect( validatorBeanMock.getTypes() ).andReturn( validatorBeanTypes );
 		expect( validatorBeanMock.getQualifiers() ).andReturn( qualifiers );
 		expect( validatorBeanMock.getQualifiers() ).andReturn( qualifiers );
 
-		afterBeanDiscoveryMock.addBean( isA( ValidatorBean.class ) );
-		expectLastCall();
-
-
 		// get the mocks ready
-		replay( processBeanMock, validatorFactoryBeanMock, validatorBeanMock, afterBeanDiscoveryMock, beanManagerMock );
+		replay( processBeanMock, validatorFactoryBeanMock, validatorBeanMock, beanManagerMock );
 
 		// run the code
 		extension.processBean( processBeanMock );
 		extension.processBean( processBeanMock );
-		extension.afterBeanDiscovery( afterBeanDiscoveryMock, beanManagerMock );
 
 		// verify the mocks
-		verify( processBeanMock, validatorFactoryBeanMock, validatorBeanMock, afterBeanDiscoveryMock, beanManagerMock );
+		verify( processBeanMock, validatorFactoryBeanMock, validatorBeanMock, beanManagerMock );
 	}
 
 	@Test
