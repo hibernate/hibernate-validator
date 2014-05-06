@@ -112,9 +112,8 @@ public class ValidationExtension implements Extension {
 	private Bean<?> defaultValidatorFactoryBean;
 	private Bean<?> hibernateValidatorFactoryBean;
 
-	private boolean defaultValidatorAlreadyRegistered = false;
-	private boolean hibernateValidatorAlreadyRegistered = false;
-
+	private Bean<?> defaultValidatorBean;
+	private Bean<?> hibernateValidatorBean;
 
 	public ValidationExtension() {
 		Configuration<?> config = Validation.byDefaultProvider().configure();
@@ -156,35 +155,35 @@ public class ValidationExtension implements Extension {
 		ValidationProviderHelper defaultProviderHelper = ValidationProviderHelper.forDefaultProvider( validatorFactory );
 		ValidationProviderHelper hvProviderHelper = ValidationProviderHelper.forHibernateValidator();
 
-		// register a @Default VF; note that this will fire a ProcessBean event, so when coming to the next if-block,
-		// hibernateValidatorFactoryBean will already have been set to that newly registered bean, causing not
-		// another bean for HV to be set
+		// register default VF if none has been provided by the application or another PE
 		if ( defaultValidatorFactoryBean == null ) {
-			afterBeanDiscoveryEvent.addBean( new ValidatorFactoryBean( beanManager, defaultProviderHelper ) );
+			defaultValidatorFactoryBean = new ValidatorFactoryBean( beanManager, defaultProviderHelper );
+			if ( hibernateValidatorFactoryBean == null && defaultProviderHelper.isHibernateValidator() ) {
+				hibernateValidatorFactoryBean = defaultValidatorFactoryBean;
+			}
+			afterBeanDiscoveryEvent.addBean( defaultValidatorFactoryBean );
 		}
 
+		// register VF with @HibernateValidator qualifier in case it hasn't been contributed by the application and the
+		// default VF registered by ourselves isn't for Hibernate Validator
 		if ( hibernateValidatorFactoryBean == null ) {
-			afterBeanDiscoveryEvent.addBean( new ValidatorFactoryBean( beanManager, hvProviderHelper ) );
+			hibernateValidatorFactoryBean = new ValidatorFactoryBean( beanManager, hvProviderHelper );
+			afterBeanDiscoveryEvent.addBean( hibernateValidatorFactoryBean );
 		}
 
-		if ( !defaultValidatorAlreadyRegistered ) {
-			afterBeanDiscoveryEvent.addBean(
-					new ValidatorBean(
-							beanManager,
-							defaultValidatorFactoryBean,
-							defaultProviderHelper
-					)
-			);
+		// register default validator if required
+		if ( defaultValidatorBean == null ) {
+			defaultValidatorBean = new ValidatorBean( beanManager, defaultValidatorFactoryBean, defaultProviderHelper );
+			if ( hibernateValidatorBean == null && defaultProviderHelper.isHibernateValidator() ) {
+				hibernateValidatorBean = defaultValidatorBean;
+			}
+			afterBeanDiscoveryEvent.addBean( defaultValidatorBean );
 		}
 
-		if ( !hibernateValidatorAlreadyRegistered ) {
-			afterBeanDiscoveryEvent.addBean(
-					new ValidatorBean(
-							beanManager,
-							hibernateValidatorFactoryBean,
-							hvProviderHelper
-					)
-			);
+		// register validator with @HibernateValidator if required
+		if ( hibernateValidatorBean == null ) {
+			hibernateValidatorBean = new ValidatorBean( beanManager, hibernateValidatorFactoryBean, hvProviderHelper );
+			afterBeanDiscoveryEvent.addBean( hibernateValidatorBean );
 		}
 	}
 
@@ -209,10 +208,10 @@ public class ValidationExtension implements Extension {
 		}
 		else if ( bean.getTypes().contains( Validator.class ) || bean instanceof ValidatorBean ) {
 			if ( bean.getQualifiers().contains( defaultQualifier ) ) {
-				defaultValidatorAlreadyRegistered = true;
+				defaultValidatorBean = bean;
 			}
 			if ( bean.getQualifiers().contains( hibernateValidatorQualifier ) ) {
-				hibernateValidatorAlreadyRegistered = true;
+				hibernateValidatorBean = bean;
 			}
 		}
 	}
