@@ -1,6 +1,15 @@
 Hibernate Validator Changelog
 =============================
 
+5.1.1.Final (06.05.2014)
+------------------------
+
+** Bug
+    * [HV-871] - hv test suite isn't compatible with java 8
+    * [HV-873] - @SafeHtml(whitelistType = WhiteListType.NONE) allow <td>, <tr>
+    * [HV-882] - ValidationExtension must not expect a ProcessBean event to be fired right after AfterBeanDiscovery.addBean() is called
+
+
 5.1.0.Final (02.03.2014)
 ------------------------
 
