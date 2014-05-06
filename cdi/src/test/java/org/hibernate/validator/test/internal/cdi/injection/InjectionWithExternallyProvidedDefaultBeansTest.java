@@ -40,7 +40,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Tests the case where {@code @Default}-scoped beans for validator and validator factory have already beenr registered
+ * Tests the case where {@code @Default}-scoped beans for validator and validator factory have already been registered
  * by another component and only the {@code @HibernateValidator}-scoped beans must be registered.
  *
  * @author Hardy Ferentschik
