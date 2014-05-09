@@ -1,0 +1,254 @@
+[[validator-gettingstarted]]
+== Getting started
+
+This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Bean Validation. For the following quick-start you need:
+
+* A JDK >= 6
+* http://maven.apache.org/[Apache Maven]
+* An Internet connection (Maven has to download all required libraries)
+
+[[validator-gettingstarted-createproject]]
+=== Project set up
+
+In order to use Hibernate Validator within a Maven project, simply add the following dependency to
+your __pom.xml__:
+
+.Hibernate Validator Maven dependency
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-validator</artifactId>
+    <version>{hvVersion}</version>
+</dependency>
+----
+====
+
+This transitively pulls in the dependency to the Bean Validation API
+(++javax.validation:validation-api:{bvVersion}++).
+
+[[validator-gettingstarted-uel]]
+==== Unified EL
+
+Hibernate Validator requires an implementation of the Unified Expression Language
+(http://jcp.org/en/jsr/detail?id=341[JSR 341]) for evaluating dynamic expressions in constraint
+violation messages (see <<section-message-interpolation>>). When your application runs in a Java EE
+container such as JBoss AS, an EL implementation is already provided by the container. In a Java SE
+environment, however, you have to add an implementation as dependency to your POM file. For instance
+you can add the following two dependencies to use the JSR 341 http://uel.java.net/[reference
+implementation]:
+
+.Maven dependencies for Unified EL reference implementation
+====
+[source, XML]
+----
+<dependency>
+    <groupId>javax.el</groupId>
+    <artifactId>javax.el-api</artifactId>
+    <version>2.2.4</version>
+</dependency>
+<dependency>
+    <groupId>org.glassfish.web</groupId>
+    <artifactId>javax.el</artifactId>
+    <version>2.2.4</version>
+</dependency>
+----
+====
+
+[[section-getting-started-cdi]]
+==== CDI
+
+Bean Validation defines integration points with CDI (Contexts and Dependency Injection for Java ^TM^
+EE, http://jcp.org/en/jsr/detail?id=346[JSR 346]). If your application runs in an
+environment which does not provide this integration out of the box, you may use the Hibernate
+Validator CDI portable extension by adding the following Maven dependency to your POM:
+
+.Hibernate Validator CDI portable extension Maven dependency
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-validator-cdi</artifactId>
+    <version>{hvVersion}</version>
+</dependency>
+----
+====
+
+Note that adding this dependency is usually not required for applications running on a Java EE
+application server. You can learn more about the integration of Bean Validation and CDI in
+<<section-integration-with-cdi>>.
+
+[[validator-gettingstarted-createmodel]]
+=== Applying constraints
+
+Lets dive directly into an example to see how to apply constraints.
+
+[[example-class-car]]
+.Class Car annotated with constraints
+====
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter01;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+public class Car {
+
+    @NotNull
+    private String manufacturer;
+
+    @NotNull
+    @Size(min = 2, max = 14)
+    private String licensePlate;
+
+    @Min(2)
+    private int seatCount;
+
+    public Car(String manufacturer, String licencePlate, int seatCount) {
+        this.manufacturer = manufacturer;
+        this.licensePlate = licencePlate;
+        this.seatCount = seatCount;
+    }
+
+    //getters and setters ...
+}
+----
+====
+
+The@NotNull, @Size and @Min annotations are used to declare the constraints which should be applied
+to the fields of a Car instance:
+
+
+*  manufacturer must never be +null+
+*  licensePlate must never be +null+ and must be between 2 and 14 characters long
+*  seatCount must be at least 2
+
+[TIP]
+====
+You can find the complete source code of all examples used in this reference guide in the Hibernate
+Validator
+https://github.com/hibernate/hibernate-validator/tree/master/documentation/src/test[source repository]
+on GitHub.
+====
+
+=== Validating constraints
+
+To perform a validation of these constraints, you use a Validator instance. Let's have a look at a
+unit test forCar:
+
+.Class CarTest showing validation examples
+====
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter01;
+
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class CarTest {
+
+    private static Validator validator;
+
+    @BeforeClass
+    public static void setUpValidator() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+    @Test
+    public void manufacturerIsNull() {
+        Car car = new Car( null, "DD-AB-123", 4 );
+
+        Set<ConstraintViolation<Car>> constraintViolations =
+                validator.validate( car );
+
+        assertEquals( 1, constraintViolations.size() );
+        assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );
+    }
+
+    @Test
+    public void licensePlateTooShort() {
+        Car car = new Car( "Morris", "D", 4 );
+
+        Set<ConstraintViolation<Car>> constraintViolations =
+                validator.validate( car );
+
+        assertEquals( 1, constraintViolations.size() );
+        assertEquals(
+                "size must be between 2 and 14",
+                constraintViolations.iterator().next().getMessage()
+        );
+    }
+
+    @Test
+    public void seatCountTooLow() {
+        Car car = new Car( "Morris", "DD-AB-123", 1 );
+
+        Set<ConstraintViolation<Car>> constraintViolations =
+                validator.validate( car );
+
+        assertEquals( 1, constraintViolations.size() );
+        assertEquals(
+                "must be greater than or equal to 2",
+                constraintViolations.iterator().next().getMessage()
+        );
+    }
+
+    @Test
+    public void carIsValid() {
+        Car car = new Car( "Morris", "DD-AB-123", 2 );
+
+        Set<ConstraintViolation<Car>> constraintViolations =
+                validator.validate( car );
+
+        assertEquals( 0, constraintViolations.size() );
+    }
+}
+----
+====
+
+In the setUp() method a Validator object is retrieved from the ValidatorFactory. A Validator
+instance is thread-safe and may be reused multiple times. It thus can safely be stored in a static
+field and be used in the test methods to validate the different Car instances.
+
+The validate() method returns a set of ConstraintViolation instances, which you can iterate over in
+order to see which validation errors occurred. The first three test methods show some expected
+constraint violations:
+
+
+* The @NotNull constraint on manufacturer is violated in manufacturerIsNull()
+* The @Size constraint on licensePlate is violated in licensePlateTooShort()
+* The @Min constraint on seatCount is violated in seatCountTooLow()
+
+If the object validates successfully, validate() returns an empty set as you can see in carIsValid().
+
+Note that only classes from the package javax.validation are used. These are provided from the Bean
+Validation API. No classes from Hibernate Validator are directly referenced, resulting in portable
+code.
+
+[[validator-gettingstarted-whatsnext]]
+=== Where to go next?
+
+That concludes the 5 minute tour through the world of Hibernate Validator and Bean Validation.
+Continue exploring the code examples or look at further examples referenced in
+<<validator-further-reading>>.
+
+To learn more about the validation of beans and properties, just continue reading
+<<chapter-bean-constraints>>. If you are interested in using Bean Validation for the validation of
+method pre- and postcondition refer to <<chapter-method-constraints>>. In case your application has
+specific validation requirements have a look at <<validator-customconstraints>>.
+

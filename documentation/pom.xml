@@ -26,13 +26,12 @@
     </parent>
 
     <artifactId>hibernate-validator-documentation</artifactId>
-    <packaging>jdocbook</packaging>
+    <packaging>jar</packaging>
 
     <name>Hibernate Validator Manual</name>
     <description>The Hibernate Validator reference manual</description>
 
     <properties>
-        <jdocbookSourceDirectory>${basedir}/src/main/docbook</jdocbookSourceDirectory>
         <jdocbook.ignoreTranslations>false</jdocbook.ignoreTranslations>
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
@@ -73,159 +72,140 @@
 
     <build>
         <plugins>
-            <!--
-            Explicitly configuring executions of the compiler, surefire and resource
-            plug-ins (which are disabled due to the jdocbook packaging) in order to
-            compile and test the examples used in the reference guide
-            -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>default-testCompile</id>
-                        <phase>test-compile</phase>
+                        <id>output-html</id>
+                        <phase>generate-resources</phase>
                         <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-testResources</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>testResources</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jboss.maven.plugins</groupId>
-                <artifactId>maven-jdocbook-plugin</artifactId>
-                <configuration>
-                    <sourceDirectory>${jdocbookSourceDirectory}</sourceDirectory>
-                    <sourceDocumentName>master.xml</sourceDocumentName>
-                    <masterTranslation>en-US</masterTranslation>
-                    <translations>
-                        <translation>zh-CN</translation>
-                    </translations>
-                    <!--
-                    The jdookbook plug-in doesn't define an expression for this property, therefore
-                    it can't be passed on the command line. To address this issue the value is retrieved
-                    from a custom property, which itself can be set using -DignoreTranslations=...
-                    -->
-                    <ignoreTranslations>${jdocbook.ignoreTranslations}</ignoreTranslations>
-                    <imageResource>
-                        <directory>${basedir}/src/main/docbook/en-US/images</directory>
-                    </imageResource>
-                    <formats>
-                        <format>
-                            <formatName>pdf</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl
-                            </stylesheetResource>
-                            <finalName>hibernate_validator_reference.pdf</finalName>
-                        </format>
-                        <format>
-                            <formatName>html_single</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl
-                            </stylesheetResource>
-                            <finalName>index.html</finalName>
-                        </format>
-                        <format>
-                            <formatName>html</formatName>
-                            <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl
-                            </stylesheetResource>
-                            <finalName>index.html</finalName>
-                        </format>
-                    </formats>
-                    <options>
-                        <xincludeSupported>true</xincludeSupported>
-                        <xmlTransformerType>saxon</xmlTransformerType>
-                        <docbookVersion>1.72.0</docbookVersion>
-                        <localeSeparator>-</localeSeparator>
-                        <injectionDateFormat>yyyy-MM-dd</injectionDateFormat>
-                    </options>
-                    <injections>
-                        <injection>
-                            <name>bvVersion</name>
-                            <value>${bv.api.version}</value>
-                        </injection>
-                    </injections>
-                    <profiling>
-                        <enabled>true</enabled>
-                    </profiling>
-                </configuration>
-                <executions>
-                    <execution>
-                        <!--
-                            here we are attaching the translate goal so that the translations are processed
-                            before compilation so that the translated XML is also transformed during
-                            generation
-                        -->
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>translate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>execute</goal>
+                            <goal>process-asciidoc</goal>
                         </goals>
                         <configuration>
-                            <source>
-                                println "[INFO] ------------------------------------------------------------------------";
-                                println "[INFO] DOCUMENTATION BUILD INFO                                                ";
-                                println "[INFO] ------------------------------------------------------------------------";
-                                println "[INFO] The documentation build requires the external tool po2xml for processing";
-                                println "[INFO] translations. You can skip the whole documentation build via specifying ";
-                                println "[INFO] the property 'disableDocumentationBuild':                               ";
-                                println "[INFO]                                                                         ";
-                                println "[INFO] mvn install -DdisableDocumentationBuild=true                            ";
-                                println "[INFO]                                                                         ";
-                                println "[INFO] Or you can just skip the translations:                                  ";
-                                println "[INFO]                                                                         ";
-                                println "[INFO] mvn install -Djdocbook.ignoreTranslations=true                          ";
-                                println "[INFO]                                                                         ";
-                                println "[INFO] See http://community.jboss.org/wiki/ContributingtoHibernateValidator    ";
-                                println "[INFO] ------------------------------------------------------------------------";
-                            </source>
+                            <backend>html</backend>
+                            <outputDirectory>${basedir}/target/asciidoc-html</outputDirectory>
+                            <sourceHighlighter>coderay</sourceHighlighter>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.zanata</groupId>
-                <artifactId>zanata-maven-plugin</artifactId>
-                <configuration>
-                    <srcDir>${basedir}/src/main/docbook</srcDir>
-                    <srcDirPot>${basedir}/src/main/docbook/pot</srcDirPot>
-                </configuration>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-resources-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>copy-asciidoc-images</id>
+                  <phase>generate-resources</phase>
+                  <goals>
+                    <goal>copy-resources</goal>
+                  </goals>
+                  <configuration>
+                    <outputDirectory>${basedir}/target/asciidoc-html/images</outputDirectory>
+                    <resources>
+                      <resource>
+                        <directory>${basedir}/src/main/asciidoc/images</directory>
+                      </resource>
+                    </resources>
+                  </configuration>
+                </execution>
+              </executions>
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>docbook</id>
+            <build>
+              <plugins>
+                  <plugin>
+                      <groupId>org.asciidoctor</groupId>
+                      <artifactId>asciidoctor-maven-plugin</artifactId>
+                      <executions>
+                          <execution>
+                              <id>output-docbook</id>
+                              <phase>generate-resources</phase>
+                              <goals>
+                                  <goal>process-asciidoc</goal>
+                              </goals>
+                              <configuration>
+                                  <backend>docbook</backend>
+                                  <outputDirectory>target/asciidoc-docbook/en-US</outputDirectory>
+                              </configuration>
+                          </execution>
+                      </executions>
+                  </plugin>
+                  <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <executions>
+                      <execution>
+                        <id>copy-docbook-images-to-staging</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                          <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                          <outputDirectory>${basedir}/target/docbook/staging/images/images</outputDirectory>
+                          <resources>
+                            <resource>
+                              <directory>${basedir}/src/main/asciidoc/images</directory>
+                            </resource>
+                          </resources>
+                        </configuration>
+                      </execution>
+                    </executions>
+                  </plugin>
+                  <plugin>
+                      <groupId>org.jboss.maven.plugins</groupId>
+                      <artifactId>maven-jdocbook-plugin</artifactId>
+                      <configuration>
+                          <sourceDirectory>${basedir}/target/asciidoc-docbook</sourceDirectory>
+                          <sourceDocumentName>index.xml</sourceDocumentName>
+                          <masterTranslation>en-US</masterTranslation>
+                          <formats>
+                              <format>
+                                  <formatName>pdf</formatName>
+                                  <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl
+                                  </stylesheetResource>
+                                  <finalName>hibernate_validator_reference.pdf</finalName>
+                              </format>
+                              <format>
+                                  <formatName>html_single</formatName>
+                                  <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl
+                                  </stylesheetResource>
+                                  <finalName>index.html</finalName>
+                              </format>
+                              <format>
+                                  <formatName>html</formatName>
+                                  <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl
+                                  </stylesheetResource>
+                                  <finalName>index.html</finalName>
+                              </format>
+                          </formats>
+                          <options>
+                              <xincludeSupported>true</xincludeSupported>
+                              <xmlTransformerType>saxon</xmlTransformerType>
+                              <!-- needed for uri-resolvers; can be ommitted if using 'current' uri scheme -->
+                              <!--     could also locate the docbook dependency and inspect its version... -->
+                              <docbookVersion>1.72.0</docbookVersion>
+                              <localeSeparator>-</localeSeparator>
+                              <injectionDateFormat>yyyy-MM-dd</injectionDateFormat>
+                          </options>
+                      </configuration>
+                      <executions>
+                          <execution>
+                              <id>docbook-processing</id>
+                              <phase>generate-resources</phase>
+                              <goals>
+                                  <goal>resources</goal>
+                                  <goal>generate</goal>
+                              </goals>
+                          </execution>
+                      </executions>
+                  </plugin>
+            </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

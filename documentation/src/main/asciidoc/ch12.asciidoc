@@ -1,0 +1,270 @@
+[[validator-annotation-processor]]
+== Annotation Processor
+
+Have you ever caught yourself by unintentionally doing things like
+
+* specifying constraint annotations at unsupported data types (e.g. by annotating a String with @Past)
+* annotating the setter of a JavaBeans property (instead of the getter method)
+* annotating static fields/methods with constraint annotations (which is not supported)?
+
+Then the Hibernate Validator Annotation Processor is the right thing for you. It helps preventing
+such mistakes by plugging into the build process and raising compilation errors whenever constraint
+annotations are incorrectly used.
+
+[TIP]
+====
+You can find the Hibernate Validator Annotation Processor as part of the distribution bundle on
+http://sourceforge.net/projects/hibernate/files/hibernate-validator[Sourceforge] or in the
+usual Maven repositories such as Maven Central under the GAV org.hibernate:hibernate-validator-
+annotation-processor:{hvVersion}.
+====
+
+[[validator-annotationprocessor-prerequisites]]
+=== Prerequisites
+
+The Hibernate Validator Annotation Processor is based on the "Pluggable Annotation Processing API"
+as defined by http://jcp.org/en/jsr/detail?id=269[JSR 269] which is part of the Java
+Platform since Java 6.
+
+[[validator-annotationprocessor-features]]
+=== Features
+
+As of Hibernate Validator {hvVersion} the Hibernate Validator Annotation Processor checks that:
+
+* constraint annotations are allowed for the type of the annotated element
+* only non-static fields or methods are annotated with constraint annotations
+* only non-primitive fields or methods are annotated with @Valid
+* only such methods are annotated with constraint annotations which are valid JavaBeans
+getter methods (optionally, see below)
+* only such annotation types are annotated with constraint annotations which are constraint
+annotations themselves
+* definition of dynamic default group sequence with @GroupSequenceProvider is valid
+
+[[validator-annotationprocessor-options]]
+=== Options
+
+The behavior of the Hibernate Validator Annotation Processor can be controlled using the
+http://java.sun.com/javase/6/docs/technotes/tools/windows/javac.html#options[processor options]
+listed in table <<table_processor_options>>:
+
+[[table_processor_options]]
+.Hibernate Validator Annotation Processor options
+[options="header"]
+|===============
+|Option|Explanation
+|diagnosticKind|Controls how constraint problems are reported. Must be the
+            string representation of one of the values from the enum
+            javax.tools.Diagnostic.Kind, e.g.
+            WARNING. A value of
+            ERROR will cause compilation to halt
+            whenever the AP detects a constraint problem. Defaults to
+            ERROR.
+|methodConstraintsSupported|Controls whether constraints are allowed at methods of any
+            kind. Must be set to true when working with
+            method level constraints as supported by Hibernate Validator. Can
+            be set to false to allow constraints only at
+            JavaBeans getter methods as defined by the Bean Validation API.
+            Defaults to true.
+|verbose|Controls whether detailed processing information shall be
+            displayed or not, useful for debugging purposes. Must be either
+            true or false. Defaults to
+            false.
+
+|===============
+
+
+[[validator-annotationprocessor-usage]]
+=== Using the Annotation Processor
+
+This section shows in detail how to integrate the Hibernate Validator Annotation Processor into
+command line builds (javac, Ant, Maven) as well as IDE-based builds (Eclipse, IntelliJ IDEA,
+NetBeans).
+
+[[validator-annotationprocessor-commandline]]
+
+
+==== Command line builds
+
+[[validator-annotationprocessor-javac]]
+===== javac
+
+When compiling on the command line using
+http://java.sun.com/javase/6/docs/technotes/guides/javac/index.html[javac], specify the JAR
+hibernate-validator-annotation-processor-{hvVersion}.jar using the "processorpath" option as shown in
+the following listing. The processor will be detected automatically by the compiler and invoked
+during compilation.
+
+.Using the annotation processor with javac
+====
+[subs="verbatim,attributes"]
+----
+javac src/main/java/org/hibernate/validator/ap/demo/Car.java \
+   -cp /path/to/validation-api-{bvVersion}.jar \
+   -processorpath /path/to/hibernate-validator-annotation-processor-{hvVersion}.jar
+----
+====
+
+[[validator-annotationprocessor-ant]]
+===== Apache Ant
+
+Similar to directly working with javac, the annotation processor can be added as as compiler
+argument when invoking the http://ant.apache.org/manual/CoreTasks/javac.html[javac task]
+for http://ant.apache.org/[Apache Ant]:
+
+.Using the annotation processor with An
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<javac srcdir="src/main"
+       destdir="build/classes"
+       classpath="/path/to/validation-api-{bvVersion}.jar">
+       <compilerarg value="-processorpath" />
+       <compilerarg value="/path/to/hibernate-validator-annotation-processor-{hvVersion}.jar"/>
+</javac>
+----
+====
+
+===== Maven
+
+There are several options for integrating the annotation processor with
+http://maven.apache.org/[Apache Maven]. Generally it is sufficient to add the Hibernate
+Validator Annotation Processor as dependency to your project:
+
+.Adding the HV Annotation Processor as dependency
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+...
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-validator-annotation-processor</artifactId>
+    <version>{hvVersion}</version>
+</dependency>
+...
+----
+====
+
+The processor will then be executed automatically by the compiler. This basically works, but comes
+with the disadavantage that in some cases messages from the annotation processor are not displayed
+(see http://jira.codehaus.org/browse/MCOMPILER-66[MCOMPILER-66]).
+
+Another option is using the http://code.google.com/p/maven-annotation-plugin[Maven Annotation Plugin].
+To work with this plugin, disable the standard annotation processing performed
+by the compiler plugin and configure the annotation plugin by specifying an execution and adding the
+Hibernate Validator Annotation Processor as plugin dependency (that way the processor is not visible
+on the project's actual classpath):
+
+.Configuring the Maven Annotation Plugin
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+...
+<plugin>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <configuration>
+        <source>1.6</source>
+        <target>1.6</target>
+        <compilerArgument>-proc:none</compilerArgument>
+    </configuration>
+</plugin>
+<plugin>
+    <groupId>org.bsc.maven</groupId>
+    <artifactId>maven-processor-plugin</artifactId>
+    <version>2.2.1</version>
+    <executions>
+        <execution>
+            <id>process</id>
+            <goals>
+                <goal>process</goal>
+            </goals>
+            <phase>process-sources</phase>
+        </execution>
+    </executions>
+    <dependencies>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator-annotation-processor</artifactId>
+            <version>{hvVersion}</version>
+        </dependency>
+    </dependencies>
+</plugin>
+...
+----
+====
+
+[[validator-annotationprocessor-ide]]
+==== IDE builds
+
+===== Eclipse
+
+Do the following to use the annotation processor within the http://www.eclipse.org/[Eclipse] IDE:
+
+* Right-click your project, choose "Properties"
+* Go to "Java Compiler" and make sure, that "Compiler compliance level" is set to "1.6".
+Otherwise the processor won't be activated
+* Go to "Java Compiler - Annotation Processing" and choose "Enable annotation processing"
+* Go to "Java Compiler - Annotation Processing - Factory Path" and add the JAR
+hibernate-validator-annotation-processor-{hvVersion}.jar
+* Confirm the workspace rebuild
+
+You now should see any annotation problems as regular error markers within the editor and in the
+"Problem" view:
+
+image::annotation_processor_eclipse.png[]
+
+[[validator-annotationprocessor-idea]]
+===== IntelliJ IDEA
+
+The following steps must be followed to use the annotation processor within
+http://www.jetbrains.com/idea/[IntelliJ IDEA] (version 9 and above):
+
+* Go to "File", then "Settings",
+* Expand the node "Compiler", then "Annotation Processors"
+* Choose "Enable annotation processing" and enter the following as "Processor path":
+/path/to/hibernate-validator-annotation-processor-{hvVersion}.jar
+* Add the processor's fully qualified name org.hibernate.validator.ap.ConstraintValidationProcessor
+to the "Annotation Processors" list
+* If applicable add you module to the "Processed Modules" list
+
+Rebuilding your project then should show any erronous constraint annotations:
+
+image::annotation_processor_intellij.png[]
+
+[[validator-annotationprocessor-netbeans]]
+===== NetBeans
+
+Starting with version 6.9, also the http://www.netbeans.org/[NetBeans] IDE supports using
+annotation processors within the IDE build. To do so, do the following:
+
+* Right-click your project, choose "Properties"
+* Go to "Libraries", tab "Processor", and add the JAR hibernate-validator-annotation-processor-{hvVersion}.jar
+* Go to "Build - Compiling", select "Enable Annotation Processing" and "Enable Annotation Processing
+in Editor". Add the annotation processor by specifying its fully qualified name
+org.hibernate.validator.ap.ConstraintValidationProcessor
+
+Any constraint annotation problems will then be marked directly within the editor:
+
+image::annotation_processor_netbeans.png[]
+
+[[validator-annotationprocessor-known-issues]]
+=== Known issues
+
+The following known issues exist as of May 2010:
+
+* http://opensource.atlassian.com/projects/hibernate/browse/HV-308[HV-308]: Additional validators
+registered for a constraint
+http://docs.jboss.org/hibernate/stable/validator/reference/en/html_single/#d0e1957[using XML] are
+not evaluated by the annotation processor.
+
+* Sometimes custom constraints can't be
+http://opensource.atlassian.com/projects/hibernate/browse/HV-293[properly evaluated] when
+using the processor within Eclipse. Cleaning the project can help in these situations. This seems to
+be an issue with the Eclipse JSR 269 API implementation, but further investigation is required here.
+
+* When using the processor within Eclipse, the check of dynamic default group sequence definitions
+doesn't work. After further investigation, it seems to be an issue with the Eclipse JSR 269 API
+implementation.
+
