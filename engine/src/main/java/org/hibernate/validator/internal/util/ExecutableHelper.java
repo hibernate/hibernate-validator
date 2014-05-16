@@ -140,9 +140,10 @@ public final class ExecutableHelper {
 					return false;
 				}
 			}
-		} catch (ArrayIndexOutOfBoundsException e) {
+		} 
+		catch (ArrayIndexOutOfBoundsException e) {
 			throw new RuntimeException(
-				"resolvedMethods could not be processed. subTypeMethod: " + subTypeMethod + ", superTypeMethod: " + superTypeMethod, 
+				"resolvedMethods could not be processed. subTypeMethod: " + subTypeMethod + ", superTypeMethod: " + superTypeMethod,
 				e
 			);
 		}
