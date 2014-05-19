@@ -132,12 +132,20 @@ public final class ExecutableHelper {
 
 		// For methods with generic parameters I have to compare the argument
 		// types (which are resolved) of the two filtered member methods.
-		for ( int i = 0; i < resolvedMethods[0].getArgumentCount(); i++ ) {
+		try {
+			for ( int i = 0; i < resolvedMethods[0].getArgumentCount(); i++ ) {
 
-			if ( !resolvedMethods[0].getArgumentType( i )
-					.equals( resolvedMethods[1].getArgumentType( i ) ) ) {
-				return false;
+				if ( !resolvedMethods[0].getArgumentType( i )
+						.equals( resolvedMethods[1].getArgumentType( i ) ) ) {
+					return false;
+				}
 			}
+		} 
+		catch (ArrayIndexOutOfBoundsException e) {
+			throw new RuntimeException(
+				"resolvedMethods could not be processed. subTypeMethod: " + subTypeMethod + ", superTypeMethod: " + superTypeMethod,
+				e
+			);
 		}
 
 		return true;

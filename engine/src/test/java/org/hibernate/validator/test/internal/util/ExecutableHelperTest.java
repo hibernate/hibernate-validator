@@ -79,6 +79,30 @@ public class ExecutableHelperTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-861")
+	public void getMethodFromSubTypeOverridesAspectInterfieldMethod() {
+		Method booGetSomeFieldMethod = Boo.class.getMethods()[0];
+		assertTrue(booGetSomeFieldMethod.getName().endsWith("someField"));
+
+		Method booInterfaceGetSomeFieldMethod = BooInterface.class.getMethods()[0];
+		assertTrue(booInterfaceGetSomeFieldMethod.getName().endsWith("someField"));
+
+		assertTrue( executableHelper.overrides( booGetSomeFieldMethod, booInterfaceGetSomeFieldMethod ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-861")
+	public void setMethodFromSubTypeOverridesAspectInterfieldMethod() {
+		Method booSetSomeFieldMethod = Boo.class.getMethods()[1];
+		assertTrue(booSetSomeFieldMethod.getName().endsWith("someField"));
+
+		Method booInterfaceSetSomeFieldMethod = BooInterface.class.getMethods()[1];
+		assertTrue(booInterfaceSetSomeFieldMethod.getName().endsWith("someField"));
+
+		assertTrue( executableHelper.overrides( booSetSomeFieldMethod, booInterfaceSetSomeFieldMethod ) );
+	}
+
+	@Test
 	public void methodFromSubTypeOverridesSuperTypeMethod() throws Exception {
 		Method methodFromBase = Foo.class.getDeclaredMethod( "zap" );
 		Method methodFromImpl = Bar.class.getDeclaredMethod( "zap" );
@@ -94,6 +118,18 @@ public class ExecutableHelperTest {
 	public void methodFromSubTypeOverridesInterfaceTypeMethod() throws Exception {
 		Method methodFromBase = IBaz.class.getDeclaredMethod( "zap" );
 		Method methodFromImpl = Baz.class.getDeclaredMethod( "zap" );
+
+		assertThat(
+				executableHelper.overrides(
+						ExecutableElement.forMethod( methodFromImpl ), ExecutableElement.forMethod( methodFromBase )
+				)
+		).isTrue();
+	}
+
+	@Test
+	public void methodWithParameterFromSubTypeOverridesInterfaceTypeMethod() throws Exception {
+		Method methodFromBase = IBaz.class.getDeclaredMethod( "paz", Object.class );
+		Method methodFromImpl = Baz.class.getDeclaredMethod( "paz", Object.class );
 
 		assertThat(
 				executableHelper.overrides(
@@ -511,12 +547,18 @@ public class ExecutableHelperTest {
 
 	public interface IBaz {
 		void zap();
+
+		void paz(Object value);
 	}
 
 	public static class Baz implements IBaz {
 
 		@Override
 		public void zap() {
+		}
+
+		@Override
+		public void paz(Object value) {
 		}
 	}
 
@@ -566,5 +608,33 @@ public class ExecutableHelperTest {
 		public static String getFoo(String param) {
 			return null;
 		}
+	}
+
+	private interface BooInterface {
+	}
+
+	@SuppressWarnings("unused")
+	private class Boo implements BooInterface {
+
+		private Object anotherField;
+
+		public void setAnotherField(Object value) {
+			this.anotherField = value;
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private static aspect BooAspect {
+
+		private Object BooInterface.someField;
+
+	    protected pointcut fieldSet(BooInterface entity, Object newVal) :
+	            set(* BooInterface+.*) &&
+	            this(entity) &&
+	            args(newVal);
+
+	    Object around(BooInterface entity, Object newVal) : fieldSet(entity, newVal) {
+	        return null;
+	    }
 	}
 }

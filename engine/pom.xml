@@ -30,6 +30,11 @@
     <name>Hibernate Validator Engine</name>
     <description>Hibernate's Bean Validation (JSR-303) reference implementation.</description>
 
+    <properties>
+        <aspectj.version>1.8.0</aspectj.version>
+        <aspectj.maven.plugin.version>1.6</aspectj.maven.plugin.version>
+    </properties>
+
     <distributionManagement>
         <site>
             <id>site</id>
@@ -52,6 +57,11 @@
         <dependency>
             <groupId>com.fasterxml</groupId>
             <artifactId>classmate</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
         </dependency>
 
         <!--
@@ -313,6 +323,36 @@
                     </bytecodeInjections>
                 </configuration>
             </plugin>
+            <plugin>
+            	<groupId>org.codehaus.mojo</groupId>
+            	<artifactId>aspectj-maven-plugin</artifactId>
+            </plugin>
         </plugins>
+        <pluginManagement>
+        	<plugins>
+        		<plugin>
+		          <groupId>org.codehaus.mojo</groupId>
+		          <artifactId>aspectj-maven-plugin</artifactId>
+		          <version>${aspectj.maven.plugin.version}</version>
+		          <configuration>
+					<complianceLevel>1.6</complianceLevel>
+		            <source>1.6</source>
+		            <target>1.6</target>
+					<outxml>true</outxml>
+					<verbose>true</verbose>
+					<showWeaveInfo>true</showWeaveInfo>
+		          </configuration>
+		          <executions>
+		            <execution>
+		              <phase>process-sources</phase>
+		              <goals>
+		                <goal>compile</goal>
+		                <goal>test-compile</goal>
+		              </goals>
+		            </execution>
+		          </executions>
+        		</plugin>
+        	</plugins>
+        </pluginManagement>
     </build>
 </project>
