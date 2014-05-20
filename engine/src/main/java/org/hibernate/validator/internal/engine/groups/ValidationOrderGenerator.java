@@ -32,7 +32,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * Helper class used to order groups and sequences into the right order for validation.
  *
  * @author Hardy Ferentschik
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class ValidationOrderGenerator {
 

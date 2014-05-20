@@ -46,6 +46,7 @@ public class ClassHierarchyHelper {
 	 *
 	 * @param clazz the class for which to retrieve the hierarchy
 	 * @param filters filters applying for the search
+	 * @param <T> the type of the class
 	 *
 	 * @return List of hierarchy classes. Will only contain those types matching
 	 *         the given filters. The list contains the given class itself, if
@@ -107,6 +108,7 @@ public class ClassHierarchyHelper {
 	 * are not contained.
 	 *
 	 * @param clazz the class for which to retrieve the implemented interfaces
+	 * @param <T> the type of the class
 	 *
 	 * @return Set of all interfaces implemented by the class represented by
 	 *         this hierarchy. The empty list is returned if it does not

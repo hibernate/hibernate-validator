@@ -1673,6 +1673,8 @@ final public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
 	 * the key (Object) and value (Object)
 	 * for each key-value mapping, followed by a null pair.
 	 * The key-value mappings are emitted in no particular order.
+	 *
+	 * @throws IOException if an I/O error occurs
 	 */
 	private void writeObject(java.io.ObjectOutputStream s) throws IOException  {
 		s.defaultWriteObject();
@@ -1704,6 +1706,9 @@ final public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
 	 * Reconstitute the <tt>ConcurrentReferenceHashMap</tt> instance from a
 	 * stream (i.e., deserialize it).
 	 * @param s the stream
+	 *
+	 * @throws IOException if an I/O error occurs
+	 * @throws ClassNotFoundException if the class of a serialized object could not be found
 	 */
 	@SuppressWarnings("unchecked")
 	private void readObject(java.io.ObjectInputStream s)

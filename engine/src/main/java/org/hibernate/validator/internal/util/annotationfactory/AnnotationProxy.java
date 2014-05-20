@@ -38,7 +38,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 /**
  * A concrete implementation of <code>Annotation</code> that pretends it is a
  * "real" source code annotation. It's also an <code>InvocationHandler</code>.
- * <p/>
+ * <p>
  * When you create an <code>AnnotationProxy</code>, you must initialize it
  * with an <code>AnnotationDescriptor</code>.
  * The adapter checks that the provided elements are the same elements defined
@@ -46,7 +46,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  * values are the right type. If you omit an element, the adapter will use the
  * default value for that element from the annotation interface, if it exists.
  * If no default exists, it will throw an exception.
- * <p/>
+ * </p>
  *
  * @author Paolo Perrotta
  * @author Davide Marchignoli

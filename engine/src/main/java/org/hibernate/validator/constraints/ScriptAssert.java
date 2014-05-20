@@ -38,8 +38,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * found on the classpath. The following listing shows an example using the
  * JavaScript engine, which comes with the JDK:
  * </p>
- * <p/>
- *
  * <pre>
  * {@code @ScriptAssert(lang = "javascript", script = "_this.startDate.before(_this.endDate)")
  * public class CalendarEvent {

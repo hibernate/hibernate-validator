@@ -40,6 +40,7 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 	/**
 	 * @param constraintHelper the constraint helper
+	 * @param parameterNameProvider the name provider
 	 * @param mappingStreams the input stream for the xml configuration
 	 */
 	public XmlMetaDataProvider(ConstraintHelper constraintHelper,

@@ -64,6 +64,8 @@ public class ConstraintValidatorManager {
 
 	/**
 	 * Creates a new {@code ConstraintValidatorManager}.
+	 *
+	 * @param constraintValidatorFactory the validator factory
 	 */
 	public ConstraintValidatorManager(ConstraintValidatorFactory constraintValidatorFactory) {
 		this.defaultConstraintValidatorFactory = constraintValidatorFactory;
@@ -74,8 +76,10 @@ public class ConstraintValidatorManager {
 	 * @param validatedValueType the type of the value to be validated. Cannot be {@code null}
 	 * @param descriptor the constraint descriptor for which to get an initalized constraint validator. Cannot be {@code null}
 	 * @param constraintFactory constraint factory used to instantiate the constraint validator. Cannot be {@code null}.
+	 * @param <V> the type of the value to be validated
+	 * @param <A> the annotation type
 	 *
-	 * @return A initialized constraint validator for the given type and annotation of the value to be validated.
+	 * @return an initialized constraint validator for the given type and annotation of the value to be validated.
 	 */
 	public <V, A extends Annotation> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType,
 			ConstraintDescriptorImpl<A> descriptor,

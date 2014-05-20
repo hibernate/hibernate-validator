@@ -82,6 +82,8 @@ public class ValidationProviderHelper {
 
 	/**
 	 * Whether the given provider is the default provider or not.
+	 *
+	 * @return {@code true} if the given provider is the default provider, {@code false} otherwise
 	 */
 	public boolean isDefaultProvider() {
 		return isDefaultProvider;

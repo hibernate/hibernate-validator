@@ -53,12 +53,12 @@ import static org.jboss.logging.Logger.Level.WARN;
 /**
  * The logger interface for JBoss Logging.
  * <p>
- * <b>Note</b>:<br/>
+ * <b>Note</b>:<br>
  * New log messages must always use a new (incremented) message id. Don't re-use of existing message ids, even
  * if a given log method is not used anymore. Unused messages can be deleted.
  * </p>
  *
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2012 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2012 SERLI
  */
 @SuppressWarnings("deprecation")
 @MessageLogger(projectCode = "HV")

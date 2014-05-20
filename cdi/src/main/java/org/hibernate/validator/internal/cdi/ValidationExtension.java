@@ -220,6 +220,7 @@ public class ValidationExtension implements Extension {
 	 * Used to register the method validation interceptor bindings.
 	 *
 	 * @param processAnnotatedTypeEvent event fired for each annotated type
+	 * @param <T> the annotated type
 	 */
 	public <T> void processAnnotatedType(@Observes @WithAnnotations({
 			Constraint.class,

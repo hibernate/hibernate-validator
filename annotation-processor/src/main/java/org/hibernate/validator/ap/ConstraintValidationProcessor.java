@@ -52,6 +52,7 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
  * set to <code>false</code> in order to allow only getter based property
  * constraints but not method level constraints as supported by Hibernate
  * Validator. Default is <code>true</code>.</li>
+ * </ul>
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling

@@ -32,7 +32,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * class is thread-safe.
  *
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class ScriptEvaluatorFactory {
 

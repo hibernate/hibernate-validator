@@ -46,7 +46,7 @@ import org.hibernate.validator.ap.util.TypeNames.JodaTypes;
  * whether a given annotation is allowed to be declared at a given element.
  *
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class ConstraintHelper {
 
@@ -79,7 +79,7 @@ public class ConstraintHelper {
 	 * The type of an annotation with respect to the BV API.
 	 *
 	 * @author Gunnar Morling
-	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+	 * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
 	 */
 	public enum AnnotationType {
 

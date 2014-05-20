@@ -289,6 +289,8 @@ public final class TypeHelper {
 
 	/**
 	 * @param validators List of constraint validator classes (for a given constraint).
+	 * @param annotationType The annotation type.
+	 * @param <A> the type of the annotation
 	 *
 	 * @return Return a Map&lt;Class, Class&lt;? extends ConstraintValidator&gt;&gt; where the map
 	 *         key is the type the validator accepts and value the validator class itself.

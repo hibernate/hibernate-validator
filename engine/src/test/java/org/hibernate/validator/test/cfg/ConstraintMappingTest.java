@@ -72,7 +72,7 @@ import static org.testng.Assert.assertNotNull;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class ConstraintMappingTest {
 	private HibernateValidatorConfiguration config;

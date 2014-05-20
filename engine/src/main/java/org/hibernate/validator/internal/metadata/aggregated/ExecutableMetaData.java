@@ -262,7 +262,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * Creates new {@link ExecutableMetaData} instances.
 	 *
 	 * @author Gunnar Morling
-	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+	 * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
 	 */
 	public static class Builder extends MetaDataBuilder {
 
@@ -305,6 +305,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * executable with a given signature within a type hierarchy.
 		 * @param constraintHelper the constraint helper
 		 * @param executableHelper the executable helper
+		 * @param beanClass the bean class
 		 */
 		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedExecutable, ConstraintHelper constraintHelper, ExecutableHelper executableHelper) {
 			super( beanClass, constraintHelper );

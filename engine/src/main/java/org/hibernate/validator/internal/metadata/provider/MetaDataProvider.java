@@ -49,6 +49,7 @@ public interface MetaDataProvider {
 	 * specified type.
 	 *
 	 * @param beanClass The type of interest.
+	 * @param <T> The type of the class to get the configurations for.
 	 *
 	 * @return A set with the configurations for the complete hierarchy of the
 	 *         given type. May be empty, but never {@code null}.
