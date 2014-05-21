@@ -1,0 +1,25 @@
+[[preface]]
+
+[preface]
+== Preface
+
+Validating data is a common task that occurs throughout all application layers, from the
+presentation to the persistence layer. Often the same validation logic is implemented in each layer
+which is time consuming and error-prone. To avoid duplication of these validations, developers often
+bundle validation logic directly into the domain model, cluttering domain classes with validation
+code which is really metadata about the class itself.
+
+image::application-layers.png[]
+
+JSR 349 - Bean Validation 1.1 - defines a metadata model and API for entity and method validation.
+The default metadata source are annotations, with the ability to override and extend the meta-data
+through the use of XML. The API is not tied to a specific application tier nor programming model. It
+is specifically not tied to either web or persistence tier, and is available for both server-side
+application programming, as well as rich client Swing application developers.
+
+image::application-layers2.png[]
+
+Hibernate Validator is the reference implementation of this JSR 349. The implementation itself as
+well as the Bean Validation API and TCK are all provided and distributed under the
+http://www.apache.org/licenses/LICENSE-2.0[Apache Software License 2.0].
+

@@ -1,0 +1,565 @@
+[[validator-specifics]]
+== Hibernate Validator Specifics
+
+In this chapter you will learn how to make use of several features provided by Hibernate Validator
+in addition to the functionality defined by the Bean Validation specification. This includes the
+fail fast mode, the API for programmatic constraint configuration and the boolean composition of
+constraints.
+
+[NOTE]
+====
+Using the features described in the following sections may result in application code which is not
+portable between Bean Validation providers.
+====
+
+=== Public API
+
+Let's start, however, with a look at the public API of Hibernate Validator. <<validator-public-api>>
+lists all packages belonging to this API and describes their purpose. Note that when a package is
+part of the public this is not necessarily true for its sub-packages.
+
+[[validator-public-api]]
+.Hibernate Validator public API
+[options="header"]
+|===============
+|Packages|Description
+|org.hibernate.validator|Classes used by the Bean Validation bootstrap mechanism
+            (eg. validation provider, configuration class); For more details
+            see <<chapter-bootstrapping>>.
+|org.hibernate.validator.cfg,
+            org.hibernate.validator.cfg.context,
+            org.hibernate.validator.cfg.defs|Hibernate Validator's fluent API for constraint
+            declaration; In org.hibernate.validator.cfg you
+            will find the ConstraintMapping interface
+            and in org.hibernate.validator.cfg.defs all
+            constraint definitions. Refer to <<section-programmatic-api>> for the details.
+|org.hibernate.validator.constraints,
+            org.hibernate.validator.constraints.br|Some useful custom constraints provided by Hibernate
+            Validator in addition to the built-in constraints defined by the
+            Bean Validation specification; The constraints are described in
+            detail in <<validator-defineconstraints-hv-constraints>>.
+|org.hibernate.validator.constraintvalidation|Extended constraint validator context which allows to set
+            custom attributes for message interpolation. <<section-hibernateconstraintvalidatorcontext>> describes
+            how to make use of that feature.
+|org.hibernate.validator.group,
+            org.hibernate.validator.spi.group|The group sequence provider feature which allows you to
+            define dynamic default group sequences in function of the
+            validated object state; The specifics can be found in <<section-default-group-class>>.
+|org.hibernate.validator.messageinterpolation,
+            org.hibernate.validator.resourceloading,
+            org.hibernate.validator.spi.resourceloading|Classes related to constraint message interpolation; The
+            first package contains Hibernate Validator's default message
+            interpolator,
+            ResourceBundleMessageInterpolator. The
+            latter two packages provide the
+            ResourceBundleLocator SPI for the loading of resource
+            bundles (see <<section-resource-bundle-locator>>)
+            and its default implementation.
+|org.hibernate.validator.parameternameprovider|A ParameterNameProvider based on the
+            ParaNamer library, see <<section-paranamer-parameternameprovider>>.
+|org.hibernate.validator.valuehandling,
+            org.hibernate.validator.spi.valuehandling|Classes related to the processing of values prior to their
+            validation, see <<section-value-handling>>.
+
+|===============
+
+[NOTE]
+====
+The public packages of Hibernate Validator fall into two categories: while the actual API parts are
+intended to be _invoked_ or _used_ by clients (e.g. the API for programmatic constraint declaration
+or the custom constraints), the SPI (service provider interface) packages contain interfaces which
+are intended to be _implemented_ by clients (e.g. ResourceBundleLocator).
+====
+
+Any packages not listed in that table are internal packages of Hibernate Validator and are not
+intended to be accessed by clients. The contents of these internal packages can change from release
+to release without notice, thus possibly breaking any client code relying on it.
+
+[[section-fail-fast]]
+=== Fail fast mode
+
+Using the fail fast mode, Hibernate Validator allows to return from the current validation as soon
+as the first constraint violation occurs. This can be useful for the validation of large object
+graphs where you are only interested in a quick check whether there is any constraint violation at
+all.
+
+<<example-using-fail-fast>> shows how to bootstrap and use a fail fast enabled validator.
+
+[[example-using-fail-fast]]
+.Using the fail fast validation mode
+====
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter11.failfast;
+
+public class Car {
+
+	@NotNull
+	private String manufacturer;
+
+	@AssertTrue
+	private boolean isRegistered;
+
+	public Car(String manufacturer, boolean isRegistered) {
+		this.manufacturer = manufacturer;
+		this.isRegistered = isRegistered;
+	}
+
+	//getters and setters...
+}
+----
+
+[source, JAVA]
+----
+Validator validator = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.failFast( true )
+		.buildValidatorFactory()
+		.getValidator();
+
+Car car = new Car( null, false );
+
+Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+
+assertEquals( 1, constraintViolations.size() );
+----
+====
+
+Here the validated object actually fails to satisfy both the constraints declared on the Car class,
+yet the validation call yields only one ConstraintViolation since the fail fast mode is enabled.
+
+
+[NOTE]
+====
+There is no guarantee in which order the constraints are evaluated, i.e. it is not deterministic
+whether the returned violation originates from the @NotNull or the @AssertTrue constraint. If
+required, a deterministic evaluation order can be enforced using group sequences as described in
+<<section-defining-group-sequences>>.
+====
+
+Refer to <<section-provider-specific-settings>> to learn about the different ways of enabling the
+fail fast mode when bootstrapping a validator.
+
+[[section-programmatic-api]]
+=== Programmatic constraint declaration
+
+As per the Bean Validation specification, you can declare constraints using Java annotations and XML
+based constraint mappings.
+
+In addition, Hibernate Validator provides a fluent API which allows for the programmatic
+configuration of constraints. Use cases include the dynamic addition of constraints at runtime
+depending on some application state or tests where you need entities with different constraints in
+different scenarios but don't want to implement actual Java classes for each test case.
+
+By default, constraints added via the fluent API are additive to constraints configured via the
+standard configuration capabilities. But it is also possible to ignore annotation and XML configured
+constraints where required.
+
+The API is centered around the ConstraintMapping interface. You obtain a new mapping via
+HibernateValidatorConfiguration#createConstraintMapping() which you then can configure in a fluent
+manner as shown in <<example-constraint-mapping>>.
+
+[[example-constraint-mapping]]
+.Programmatic constraint declaration
+====
+[source, JAVA]
+----
+HibernateValidatorConfiguration configuration = Validation
+		.byProvider( HibernateValidator.class )
+		.configure();
+
+ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+
+constraintMapping
+	.type( Car.class )
+		.property( "manufacturer", FIELD )
+			.constraint( new NotNullDef() )
+		.property( "licensePlate", FIELD )
+			.ignoreAnnotations()
+			.constraint( new NotNullDef() )
+			.constraint( new SizeDef().min( 2 ).max( 14 ) )
+	.type( RentalCar.class )
+		.property( "rentalStation", METHOD )
+			.constraint( new NotNullDef() );
+
+Validator validator = configuration.addMapping( constraintMapping )
+		.buildValidatorFactory()
+		.getValidator()
+----
+====
+
+Constraints can be configured on multiple classes and properties using method chaining. The
+constraint definition classes NotNullDef and SizeDef are helper classes which allow to configure
+constraint parameters in a type-safe fashion. Definition classes exist for all built-in constraints
+in the org.hibernate.validator.cfg.defs package. By calling ignoreAnnotations() any constraints
+configured via annotations or XML are ignored for the given element.
+
+
+[NOTE]
+====
+Each element (type, property, method etc.) may only be configured once within all the constraint
+mappings used to set up one validator factory. Otherwise a ValidationException is raised.
+====
+
+[NOTE]
+====
+It is not supported to add constraints to non-overridden supertype properties and methods by
+configuring a subtype. Instead you need to configure the supertype in this case.
+====
+
+Having configured the mapping, you must add it back to the configuration object from which you then
+can obtain a validator factory.
+
+For custom constraints you can either create your own definition classes extending ConstraintDef or
+you can use GenericConstraintDef as seen in <<example-generic-constraint-mapping>>.
+
+[[example-generic-constraint-mapping]]
+.Programmatic declaration of a custom constraint
+====
+[source, JAVA]
+----
+ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+
+constraintMapping
+	.type( Car.class )
+		.property( "licensePlate", FIELD )
+			.constraint( new GenericConstraintDef<CheckCase>( CheckCase.class )
+				.param( "value", CaseMode.UPPER )
+			);
+----
+====
+
+By invoking valid() you can mark a member for cascaded validation which is equivalent to annotating
+it with @Valid. Configure any group conversions to be applied during cascaded validation using the
+convertGroup() method (equivalent to @ConvertGroup). An example can be seen in
+<<example-cascading-constraints>>.
+
+[[example-cascading-constraints]]
+.Marking a property for cascaded validation
+====
+[source, JAVA]
+----
+ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+
+constraintMapping
+	.type( Car.class )
+		.property( "driver", FIELD )
+			.constraint( new NotNullDef() )
+			.valid()
+			.convertGroup( Default.class ).to( PersonDefault.class )
+	.type( Person.class )
+		.property( "name", FIELD )
+			.constraint( new NotNullDef().groups( PersonDefault.class ) );
+----
+====
+
+You can not only configure bean constraints using the fluent API but also method and constructor
+constraints. As shown in <<example-method-constraint-mapping>> constructors are identified by their
+parameter types and methods by their name and parameter types. Having selected a method or
+constructor, you can mark its parameters and/or return value for cascaded validation and add
+constraints as well as cross-parameter constraints.
+
+[[example-method-constraint-mapping]]
+.Programmatic declaration of method and constructor constraints
+====
+[source, JAVA]
+----
+ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+
+constraintMapping
+	.type( Car.class )
+		.constructor( String.class )
+			.parameter( 0 )
+				.constraint( new SizeDef().min( 3 ).max( 50 ) )
+			.returnValue()
+				.valid()
+		.method( "drive", int.class )
+			.parameter( 0 )
+				.constraint( new MaxDef().value ( 75 ) )
+		.method( "load", List.class, List.class )
+			.crossParameter()
+				.constraint( new GenericConstraintDef<LuggageCountMatchesPassengerCount>(
+						LuggageCountMatchesPassengerCount.class ).param(
+							"piecesOfLuggagePerPassenger", 2
+						)
+				)
+		.method( "getDriver" )
+			.returnValue()
+				.constraint( new NotNullDef() )
+				.valid();
+----
+====
+
+Last but not least you can configure the default group sequence or the default group sequence
+provider of a type as shown in the following example.
+
+[[example-sequences]]
+.Configuration of default group sequence and default group sequence provider
+====
+[source, JAVA]
+----
+ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+
+constraintMapping
+	.type( Car.class )
+		.defaultGroupSequence( Car.class, CarChecks.class )
+	.type( RentalCar.class )
+		.defaultGroupSequenceProviderClass( RentalCarGroupSequenceProvider.class );
+----
+====
+
+[[section-boolean-constraint-composition]]
+=== Boolean composition of constraints
+
+Bean Validation specifies that the constraints of a composed constraint (see
+<<section-constraint-composition>>) are all combined via a logical _AND_. This means all of the
+composing constraints need to return true in order for an overall successful validation.
+
+Hibernate Validator offers an extension to this and allows you to compose constraints via a logical
+_OR_ or _NOT_. To do so you have to use the ConstraintComposition annotation and the enum
+CompositionType with its values _AND_, _OR_ and _$$ALL_FALSE$$_.
+
+<<example-boolean-constraint-composition>> shows how to build a composed constraint @PatternOrSize
+where only one of the composing constraints needs to be valid in order to pass the validation.
+Either the validated string is all lower-cased or it is between two and three characters long.
+
+[[example-boolean-constraint-composition]]
+.OR composition of constraints
+====
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter11.booleancomposition;
+
+@ConstraintComposition(OR)
+@Pattern(regexp = "[a-z]")
+@Size(min = 2, max = 3)
+@ReportAsSingleViolation
+@Target({ METHOD, FIELD })
+@Retention(RUNTIME)
+@Constraint(validatedBy = { })
+public @interface PatternOrSize {
+	String message() default "{org.hibernate.validator.referenceguide.chapter11." +
+			"booleancomposition.PatternOrSize.message}";
+
+	Class<?>[] groups() default { };
+
+	Class<? extends Payload>[] payload() default { };
+}
+----
+====
+
+[TIP]
+====
+Using _$$ALL_FALSE$$_ as composition type implicitly enforces that only a single violation will get
+reported in case validation of the constraint composition fails.
+====
+
+=== ResourceBundleLocator
+
+As described in <<section-custom-message-interpolation>>, Bean Validation allows to plug in custom
+message interpolator implementations.
+
+With ResourceBundleLocator, Hibernate Validator provides an additional SPI which allows to retrieve
+error messages from other resource bundles than _ValidationMessages_ while still using the actual
+interpolation algorithm as defined by the specification. Refer to
+<<section-resource-bundle-locator>> to learn how to make use of that SPI.
+
+=== Custom contexts
+
+The Bean Validation specification offers at several points in its API the possibility to unwrap a
+given interface to a implementor specific subtype. In the case of constraint violation creation in
+ConstraintValidator implementations as well as message interpolation in Messageinterpolator
+instances, there exist unwrap() methods for the provided context instances -
+ConstraintValidatorContext respectively MessageInterpolatorContext. Hibernate Validator provides
+custom extensions for both of these interfaces.
+
+[[section-hibernateconstraintvalidatorcontext]]
+==== HibernateConstraintValidatorContext
+
+[[section-custom-constraint-validator-context]]
+HibernateConstraintValidatorContext is a subtype of ConstraintValidatorContext which allows you to
+set arbitrary parameters for interpolation via the Expression Language message interpolation
+facility (see <<section-interpolation-with-message-expressions>>). For example the default error
+message for the @Future constraint is "must be in the future". What if you would like to include the
+current date to make the message more explicit? <<example-custom-message-parameter>> shows how this
+could be achieved.
+
+[[example-custom-message-parameter]]
+.Custom @Future validator with message parameters
+====
+[source, JAVA]
+----
+public class MyFutureValidator implements ConstraintValidator<Future, Date> {
+
+	public void initialize(Future constraintAnnotation) {
+	}
+
+	public boolean isValid(Date value, ConstraintValidatorContext context) {
+		Date now = GregorianCalendar.getInstance().getTime();
+
+		if ( value.before( now ) ) {
+			HibernateConstraintValidatorContext hibernateContext =
+					context.unwrap( HibernateConstraintValidatorContext.class );
+
+			hibernateContext.disableDefaultConstraintViolation();
+			hibernateContext.addExpressionVariable( "now", now )
+					.buildConstraintViolationWithTemplate( "Must be after ${now}" )
+					.addConstraintViolation();
+
+			return false;
+		}
+
+		return true;
+	}
+}
+----
+====
+
+[NOTE]
+====
+Note that the parameters specified via addExpressionVariable(String, Object) are global and apply
+for all constraint violations created by this isValid() invocation. This includes the default
+constraint violation, but also all violations created by the ConstraintViolationBuilder. You can,
+however, update the parameters between invocations of
+ConstraintViolationBuilder#addConstraintViolation().
+====
+
+[WARNING]
+====
+This functionality is currently experimental and might change in future versions.
+====
+
+==== HibernateMessageInterpolatorContext
+
+Hibernate Validator also offers a custom extension of MessageInterpolatorContext, namely
+HibernateMessageInterpolatorContext (see <<example-custom-message-interpolator-context>>). This
+subtype was introduced to allow a better integration of Hibernate Validator into the Glassfish. The
+root bean type was in this case needed to determine the right classloader for the message resource
+bundle. If you have any other usecases, let us know.
+
+[[example-custom-message-interpolator-context]]
+.HibernateMessageInterpolatorContext
+====
+[source, JAVA]
+----
+public interface HibernateMessageInterpolatorContext extends MessageInterpolator.Context {
+
+	/**
+	 * Returns the currently validated root bean type.
+	 *
+	 * @return The currently validated root bean type.
+	 */
+	Class<?> getRootBeanType();
+}
+----
+====
+
+[[section-paranamer-parameternameprovider]]
+=== ParaNamer based ParameterNameProvider
+
+Hibernate Validator comes with a ParameterNameProvider implementation which leverages the
+link:$$http://paranamer.codehaus.org/$$[ParaNamer] library.
+
+This library provides several ways for obtaining parameter names at runtime, e.g. based on debug
+symbols created by the Java compiler, constants with the parameter names woven into the bytecode in
+a post-compile step or annotations such as the @Named annotation from JSR 330.
+
+In order to use ParanamerParameterNameProvider, either pass an instance when bootstrapping a
+validator as shown in <<example-using-custom-parameter-name-provider>> or specify
+org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider as value for the &lt
+;parameter-name-provider&gt; element in the _META-INF/validation.xml_ file.
+
+
+[TIP]
+====
+When using this parameter name provider, you need to add the ParaNamer library to your classpath. It
+is available in the Maven Central repository with the group id +com.thoughtworks.paranamer+ and the
+artifact id +paranamer+.
+====
+
+By default ParanamerParameterNameProvider retrieves parameter names from constants added to the byte
+code at build time (via DefaultParanamer) and debug symbols (via BytecodeReadingParanamer).
+Alternatively you can specify a Paranamer implementation of your choice when creating a
+ParanamerParameterNameProvider instance.
+
+[[section-value-handling]]
+=== Unwrapping values prior to validation
+
+Sometimes it is required to unwrap values prior to the validation. E.g. in
+<<example-using-unwrapvalidatedvalue>> property types as specified by
+link:$$http://docs.oracle.com/javafx/$$[JavaFX] are used to define an element of some domain model.
+
+[[example-using-unwrapvalidatedvalue]]
+.Using@UnwrapValidatedValue
+====
+[source, JAVA]
+----
+@Size(min = 3)
+@UnwrapValidatedValue
+private Property<String> name = new SimpleStringProperty( "Bob" );
+----
+====
+
+[NOTE]
+====
+The concept of value unwrapping is considered experimental at this time and may evolve into more
+general means of value handling in future releases. Please let us know about your use cases for such
+functionality.
+====
+
+In JavaFX, bean properties are typically not of simple data types like String or int, but are
+wrapped in Property types which allows to make them observable, use them for data binding etc. When
+applying a constraint such as @Size to an element of type Property<String> without further
+preparation, an exception would be raised, indicating that no suitable validator for that constraint
+and data type can be found. Thus the validated value must be unwrapped from the containing property
+object before looking up a validator and invoking it.
+
+To do so, put the @UnwrapValidatedValue annotation to the element in question. This will advice the
+validation engine to look for an unwrapper implementation which returns the data type to be used for
+constraint validator resolution and unwraps the validated value. Unwrapper types must extend the SPI
+class ValidatedValueUnwrapper as shown in <<example-implementation-of-validatedvalueunwrapper>>.
+
+[[example-implementation-of-validatedvalueunwrapper]]
+.Implementing the ValidatedValueUnwrapper interface
+====
+[source, JAVA]
+----
+public class PropertyValueUnwrapper extends ValidatedValueUnwrapper<Property<?>> {
+
+	@Override
+	public Object handleValidatedValue(Property<?> value) {
+		//...
+	}
+
+	@Override
+	public Type getValidatedValueType(Type valueType) {
+		//...
+	}
+}
+----
+====
+
+Value unwrappers must be registered when obtaining a Validator instance as follows:
+
+[[example-registering-validatedvalueunwrapper]]
+.Registering a ValidatedValueUnwrapper
+====
+[source, JAVA]
+----
+Validator validator = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.addValidatedValueHandler( new PropertyValueUnwrapper() )
+		.buildValidatorFactory()
+		.getValidator();
+----
+====
+
+Several unwrapper implementations can be registered when working with different kinds of wrapper
+types in one application. Note that it is not specified which of the unwrapper implementations is
+chosen when more than one implementation is suitable to unwrap a given element.
+
+Alternatively, the fully-qualified names of one ore more unwrapper implementations can be specified
+via the configuration property hibernate.validator.validated_value_handlers which can be useful when
+configuring the default validator factory using the descriptor _META-INF/validation.xml_ (see
+<<chapter-xml-configuration>>).
+

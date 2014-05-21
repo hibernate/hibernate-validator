@@ -404,6 +404,7 @@
                         <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
                         <tagNameFormat>@{project.version}</tagNameFormat>
+                        <releaseProfiles>docbook</releaseProfiles>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -419,7 +420,7 @@
                 <plugin>
                     <groupId>org.jboss.maven.plugins</groupId>
                     <artifactId>maven-jdocbook-plugin</artifactId>
-                    <version>2.3.6</version>
+                    <version>2.3.8</version>
                     <extensions>true</extensions>
                     <dependencies>
                         <dependency>
@@ -429,6 +430,19 @@
                             <type>jdocbook-style</type>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.asciidoctor</groupId>
+                    <artifactId>asciidoctor-maven-plugin</artifactId>
+                    <version>0.1.4</version>
+                    <configuration>
+                        <sourceDocumentName>index.asciidoc</sourceDocumentName>
+                        <doctype>book</doctype>
+                        <attributes>
+                            <hvVersion>${project.version}</hvVersion>
+                            <bvVersion>${bv.api.version}</bvVersion>
+                        </attributes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

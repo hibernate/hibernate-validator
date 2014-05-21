@@ -78,11 +78,6 @@ You will also need a JDK 8 and Maven 3 (>= 3.0.3). With these prerequisites in p
 
     mvn clean install -s settings-example.xml
 
-The documentation module requires an additional tool called po2xml. If you don't have po2xml installed you can
-skip the building of the documentation via:
-
-    mvn clean install -DdisableDocumentationBuild=true -s settings-example.xml
-
 There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://community.jboss.org/wiki/ContributingtoHibernateValidator).
 
 ## Hibernate Validator URLs
