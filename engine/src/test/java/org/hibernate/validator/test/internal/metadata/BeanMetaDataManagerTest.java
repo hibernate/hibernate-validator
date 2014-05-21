@@ -20,6 +20,8 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -43,8 +45,8 @@ import static org.testng.Assert.fail;
  */
 public class BeanMetaDataManagerTest {
 	private static final Log log = LoggerFactory.make();
-	// high enough to force a OutOfMemoryError in case references are not freed
-	private static final int MAX_ENTITY_COUNT = 100000;
+	private static final int LOOP_COUNT = 100000;
+	private static final int ARRAY_ALLOCATION_SIZE = 100000;
 
 	private BeanMetaDataManager metaDataManager;
 
@@ -61,23 +63,36 @@ public class BeanMetaDataManagerTest {
 		Class<?> lastIterationsBean = null;
 		int totalCreatedMetaDataInstances = 0;
 		int cachedBeanMetaDataInstances = 0;
-		for ( int i = 0; i < MAX_ENTITY_COUNT; i++ ) {
-			Class<?> c = new CustomClassLoader().loadClass( Engine.class.getName() );
-			BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );
-			assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
-			lastIterationsBean = meta.getBeanClass();
-			totalCreatedMetaDataInstances++;
-			cachedBeanMetaDataInstances = metaDataManager.numberOfCachedBeanMetaDataInstances();
 
-			if ( cachedBeanMetaDataInstances < totalCreatedMetaDataInstances ) {
-				log.debug( "Garbage collection occurred and some metadata instances got garbage collected!" );
-				log.debug( "totalCreatedMetaDataInstances:" + totalCreatedMetaDataInstances );
-				log.debug( "cachedBeanMetaDataInstances:" + cachedBeanMetaDataInstances );
-				break;
+		try {
+			// help along the OutOfMemoryError by allocating extra memory and holding on to it in this list
+			List<Object> memoryConsumer = new ArrayList<Object>();
+			for ( int i = 0; i < LOOP_COUNT; i++ ) {
+				Class<?> c = new CustomClassLoader().loadClass( Engine.class.getName() );
+				BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );
+				assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
+				lastIterationsBean = meta.getBeanClass();
+				totalCreatedMetaDataInstances++;
+				cachedBeanMetaDataInstances = metaDataManager.numberOfCachedBeanMetaDataInstances();
+
+				if ( cachedBeanMetaDataInstances < totalCreatedMetaDataInstances ) {
+					log.debug( "Garbage collection occurred and some metadata instances got garbage collected!" );
+					log.debug( "totalCreatedMetaDataInstances:" + totalCreatedMetaDataInstances );
+					log.debug( "cachedBeanMetaDataInstances:" + cachedBeanMetaDataInstances );
+					break;
+				}
+				memoryConsumer.add( new long[ARRAY_ALLOCATION_SIZE] );
 			}
 		}
+		catch ( OutOfMemoryError e ) {
+			log.debug( "Out of memory error occurred." );
+			log.debug( "totalCreatedMetaDataInstances:" + totalCreatedMetaDataInstances );
+			log.debug( "cachedBeanMetaDataInstances:" + cachedBeanMetaDataInstances );
+		}
 
-		if ( cachedBeanMetaDataInstances >= totalCreatedMetaDataInstances ) {
+		// Before an OutOfMemoryError occurs soft references should be collected. If not all, at least some
+		// of the cached instances should have been released.
+		if ( !( cachedBeanMetaDataInstances < totalCreatedMetaDataInstances ) ) {
 			fail( "Metadata instances should be garbage collectible" );
 		}
 	}
