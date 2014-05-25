@@ -16,20 +16,9 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation;
 
-import java.util.Arrays;
 import java.util.Locale;
-import java.util.Map;
-import javax.el.ELException;
-import javax.el.ExpressionFactory;
-import javax.el.PropertyNotFoundException;
-import javax.el.ValueExpression;
-import javax.validation.MessageInterpolator;
 
-import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
-import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver;
-import org.hibernate.validator.internal.engine.messageinterpolation.el.SimpleELContext;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import javax.validation.MessageInterpolator;
 
 /**
  * Helper class dealing with the interpolation of a single message parameter or expression extracted from a message
@@ -38,26 +27,10 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class InterpolationTerm {
-	private static final Log log = LoggerFactory.make();
-
-	/**
-	 * Name under which the currently validate value is bound to the EL context.
-	 */
-	private static final String VALIDATED_VALUE_NAME = "validatedValue";
-
 	/**
 	 * Meta character to designate an EL expression.
 	 */
 	private static final String EL_DESIGNATION_CHARACTER = "$";
-
-	/**
-	 * Factory for creating EL expressions
-	 */
-	private static final ExpressionFactory expressionFactory;
-
-	static {
-		expressionFactory = ExpressionFactory.newInstance();
-	}
 
 	/**
 	 * The actual expression (parameter or EL expression).
@@ -70,28 +43,28 @@ public class InterpolationTerm {
 	private final InterpolationTermType type;
 
 	/**
-	 * The locale for which to interpolate the expression.
+	 * The resolver for the expression.
 	 */
-	private final Locale locale;
+	private final TermResolver resolver;
 
 	public InterpolationTerm(String expression, Locale locale) {
-		this.locale = locale;
 		this.expression = expression;
-		if ( expression.startsWith( EL_DESIGNATION_CHARACTER ) ) {
+		if ( isElExpression(expression) ) {
 			this.type = InterpolationTermType.EL;
+			this.resolver = new ElTermResolver(locale);
 		}
 		else {
 			this.type = InterpolationTermType.PARAMETER;
+			this.resolver = new ParameterTermResolver();
 		}
 	}
 
+	public static boolean isElExpression(String expression) {
+		return expression.startsWith( EL_DESIGNATION_CHARACTER );
+	}
+
 	public String interpolate(MessageInterpolator.Context context) {
-		if ( InterpolationTermType.EL.equals( type ) ) {
-			return interpolateExpressionLanguageTerm( context );
-		}
-		else {
-			return interpolateConstraintAnnotationValue( context );
-		}
+		return resolver.interpolate( context, expression );
 	}
 
 	@Override
@@ -102,84 +75,6 @@ public class InterpolationTerm {
 		sb.append( ", type=" ).append( type );
 		sb.append( '}' );
 		return sb.toString();
-	}
-
-	private String interpolateExpressionLanguageTerm(MessageInterpolator.Context context) {
-		String resolvedExpression = expression;
-		SimpleELContext elContext = new SimpleELContext();
-		try {
-			ValueExpression valueExpression = bindContextValues( expression, context, elContext );
-			resolvedExpression = (String) valueExpression.getValue( elContext );
-		}
-		catch ( PropertyNotFoundException pnfe ) {
-			log.unknownPropertyInExpressionLanguage( expression, pnfe );
-		}
-		catch ( ELException e ) {
-			log.errorInExpressionLanguage( expression, e );
-		}
-		catch ( Exception e ) {
-			log.evaluatingExpressionLanguageExpressionCausedException( expression, e );
-		}
-
-		return resolvedExpression;
-	}
-
-	private String interpolateConstraintAnnotationValue(MessageInterpolator.Context context) {
-		String resolvedExpression;
-		Object variable = context.getConstraintDescriptor()
-				.getAttributes()
-				.get( removeCurlyBraces( expression ) );
-		if ( variable != null ) {
-			if ( variable.getClass().isArray() ) {
-				resolvedExpression = Arrays.toString( (Object[]) variable );
-			}
-			else {
-				resolvedExpression = variable.toString();
-			}
-		}
-		else {
-			resolvedExpression = expression;
-		}
-		return resolvedExpression;
-	}
-
-	private String removeCurlyBraces(String parameter) {
-		return parameter.substring( 1, parameter.length() - 1 );
-	}
-
-	private ValueExpression bindContextValues(String messageTemplate, MessageInterpolator.Context messageInterpolatorContext, SimpleELContext elContext) {
-		// bind the validated value
-		ValueExpression valueExpression = expressionFactory.createValueExpression(
-				messageInterpolatorContext.getValidatedValue(),
-				Object.class
-		);
-		elContext.setVariable( VALIDATED_VALUE_NAME, valueExpression );
-
-		// bind a formatter instantiated with proper locale
-		valueExpression = expressionFactory.createValueExpression(
-				new FormatterWrapper( locale ),
-				FormatterWrapper.class
-		);
-		elContext.setVariable( RootResolver.FORMATTER, valueExpression );
-
-		// map the annotation values
-		for ( Map.Entry<String, Object> entry : messageInterpolatorContext.getConstraintDescriptor()
-				.getAttributes()
-				.entrySet() ) {
-			valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
-			elContext.setVariable( entry.getKey(), valueExpression );
-		}
-
-		// check for custom parameters provided by HibernateConstraintValidatorContext
-		if ( messageInterpolatorContext instanceof MessageInterpolatorContext ) {
-			MessageInterpolatorContext internalContext = (MessageInterpolatorContext) messageInterpolatorContext;
-			for ( Map.Entry<String, Object> entry : internalContext.getMessageParameters().entrySet() ) {
-				valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
-				elContext.setVariable( entry.getKey(), valueExpression );
-			}
-		}
-
-		return expressionFactory.createValueExpression( elContext, messageTemplate, String.class );
 	}
 }
 

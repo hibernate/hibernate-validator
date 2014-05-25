@@ -22,11 +22,13 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.BootstrapState;
@@ -45,6 +47,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
+import org.hibernate.validator.messageinterpolation.NonElMessageInterpolator;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
@@ -107,7 +110,19 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultTraversableResolver = new DefaultTraversableResolver();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
-		this.defaultMessageInterpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
+		MessageInterpolator interpolator;
+		try {
+			 interpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
+		}
+		catch(ValidationException ve) {
+			if(!log.getMissingELDependenciesException().getMessage().equals(ve.getMessage())) {
+				interpolator = new NonElMessageInterpolator();
+			}
+			else {
+				throw ve;
+			}
+		}
+		this.defaultMessageInterpolator =  interpolator;
 	}
 
 	@Override
