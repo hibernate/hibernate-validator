@@ -30,7 +30,7 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
