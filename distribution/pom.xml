@@ -32,6 +32,7 @@
     <properties>
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.javadoc.skip>false</maven.javadoc.skip>
     </properties>
 
     <dependencies>
