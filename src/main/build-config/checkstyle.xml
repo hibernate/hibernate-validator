@@ -45,4 +45,7 @@
         <module name="DefaultComesLast"/>
     </module>
 
+    <!-- Checks that a file ends with a new line  -->
+    <module name="NewlineAtEndOfFile"/>
+
 </module>
