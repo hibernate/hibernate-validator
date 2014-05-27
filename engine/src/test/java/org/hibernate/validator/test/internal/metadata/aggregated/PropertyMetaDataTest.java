@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
+import java.util.Collections;
 import java.util.Set;
 
 import javax.validation.ConstraintDeclarationException;
@@ -25,9 +26,12 @@ import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -47,7 +51,9 @@ public class PropertyMetaDataTest {
 	public void setupBeanMetaDataManager() {
 		beanMetaDataManager = new BeanMetaDataManager(
 				new ConstraintHelper(),
-				new ExecutableHelper( new TypeResolutionHelper() )
+				new ExecutableHelper( new TypeResolutionHelper() ),
+				new DefaultParameterNameProvider(),
+				Collections.<MetaDataProvider>emptyList()
 		);
 	}
 

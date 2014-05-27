@@ -466,8 +466,8 @@ a post-compile step or annotations such as the @Named annotation from JSR 330.
 
 In order to use ParanamerParameterNameProvider, either pass an instance when bootstrapping a
 validator as shown in <<example-using-custom-parameter-name-provider>> or specify
-org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider as value for the &lt
-;parameter-name-provider&gt; element in the _META-INF/validation.xml_ file.
+org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider as value for the
+&lt;parameter-name-provider&gt; element in the _META-INF/validation.xml_ file.
 
 
 [TIP]
@@ -490,7 +490,7 @@ Sometimes it is required to unwrap values prior to the validation. E.g. in
 link:$$http://docs.oracle.com/javafx/$$[JavaFX] are used to define an element of some domain model.
 
 [[example-using-unwrapvalidatedvalue]]
-.Using@UnwrapValidatedValue
+.Using +@UnwrapValidatedValue+
 ====
 [source, JAVA]
 ----

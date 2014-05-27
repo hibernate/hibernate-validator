@@ -19,6 +19,7 @@ package org.hibernate.validator.test.internal.metadata.aggregated;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import javax.validation.ElementKind;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
@@ -27,11 +28,13 @@ import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -58,7 +61,9 @@ public class ExecutableMetaDataTest {
 	public void setupBeanMetaData() {
 		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
 				new ConstraintHelper(),
-				new ExecutableHelper( new TypeResolutionHelper() )
+				new ExecutableHelper( new TypeResolutionHelper() ),
+				new DefaultParameterNameProvider(),
+				Collections.<MetaDataProvider>emptyList()
 		);
 
 		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepositoryExt.class );

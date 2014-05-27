@@ -16,7 +16,7 @@
  */
 
 /**
- * <p>A custom parameter name provider based on the <a href="http://paranamer.codehaus.org/">ParaNamer</a> library.</p>
+ * <p>Custom Hibernate Validator {@code javax.validation.ParameterNameProvider} implementations.</p>
  * <p>This package is part of the public Hibernate Validator API.</p>
  */
 package org.hibernate.validator.parameternameprovider;
