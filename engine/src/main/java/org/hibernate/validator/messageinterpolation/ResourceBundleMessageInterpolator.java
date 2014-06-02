@@ -18,7 +18,9 @@ package org.hibernate.validator.messageinterpolation;
 
 import java.util.Locale;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.ElInterpolationTerm;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
+import org.hibernate.validator.internal.engine.messageinterpolation.ParameterInterpolationTerm;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
@@ -57,8 +59,14 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	}
 
 	@Override
-	public String interpolate(Context context, Locale locale, String term) {
-		InterpolationTerm expression = new InterpolationTerm( term, locale );
+	public String interpolateExpressionLanguageTerm(Context context, String term, Locale locale) {
+		InterpolationTerm expression = new ElInterpolationTerm( term, locale );
+		return expression.interpolate( context );
+	}
+
+	@Override
+	public String interpolateConstraintAnnotationValue(Context context, String term) {
+		InterpolationTerm expression = new ParameterInterpolationTerm( term );
 		return expression.interpolate( context );
 	}
 	

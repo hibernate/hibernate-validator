@@ -16,8 +16,6 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation;
 
-import java.util.Locale;
-
 import javax.validation.MessageInterpolator;
 
 /**
@@ -26,7 +24,7 @@ import javax.validation.MessageInterpolator;
  *
  * @author Hardy Ferentschik
  */
-public class InterpolationTerm {
+public abstract class InterpolationTerm {
 	/**
 	 * Meta character to designate an EL expression.
 	 */
@@ -35,37 +33,35 @@ public class InterpolationTerm {
 	/**
 	 * The actual expression (parameter or EL expression).
 	 */
-	private final String expression;
+	protected final String expression;
 
 	/**
 	 * The type of the expression.
 	 */
 	private final InterpolationTermType type;
 
-	/**
-	 * The resolver for the expression.
-	 */
-	private final TermResolver resolver;
-
-	public InterpolationTerm(String expression, Locale locale) {
+	public InterpolationTerm(String expression) {
 		this.expression = expression;
 		if ( isElExpression(expression) ) {
 			this.type = InterpolationTermType.EL;
-			this.resolver = new ElTermResolver(locale);
 		}
 		else {
 			this.type = InterpolationTermType.PARAMETER;
-			this.resolver = new ParameterTermResolver();
 		}
 	}
 
 	public static boolean isElExpression(String expression) {
 		return expression.startsWith( EL_DESIGNATION_CHARACTER );
 	}
-
-	public String interpolate(MessageInterpolator.Context context) {
-		return resolver.interpolate( context, expression );
-	}
+	
+	/**
+	 * Interpolates given term based on the constraint validation context.
+	 * 
+	 * @param context contextual information related to the interpolation
+	 * 
+	 * @return interpolated message
+	 */
+	public abstract String interpolate(MessageInterpolator.Context context);
 
 	@Override
 	public String toString() {

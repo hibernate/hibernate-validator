@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2014, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -27,6 +27,7 @@ import java.util.ResourceBundle;
 import javax.validation.MessageInterpolator;
 import javax.xml.bind.ValidationException;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
@@ -335,7 +336,18 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		return tokenIterator.getInterpolatedMessage();
 	}
 
-	public abstract String interpolate(Context context, Locale locale, String term);
+	public String interpolate(Context context, Locale locale, String term) {
+		if(InterpolationTerm.isElExpression( term )) {
+			return interpolateExpressionLanguageTerm( context, term, locale );
+		}
+		else {
+			return interpolateConstraintAnnotationValue( context, term );
+		}
+	}
+	
+	public abstract String interpolateExpressionLanguageTerm(Context context, String term, Locale locale);
+	
+	public abstract String interpolateConstraintAnnotationValue(Context context, String term);
 
 	private String resolveParameter(String parameterName, ResourceBundle bundle, Locale locale, boolean recursive)
 			throws MessageDescriptorFormatException {

@@ -39,6 +39,8 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 	@Test
 	public void testMissingELDependencyThrowsExceptionDuringFactoryBootstrap() throws Exception {
+		System.out.println("yo");
+//		fail("ttt");
 		ClassLoader classLoader = new ELIgnoringClassLoader();
 		Class<?> clazz = classLoader.loadClass( Validation.class.getName() );
 

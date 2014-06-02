@@ -640,7 +640,7 @@ public interface Log extends BasicLogger {
 	void getNonElMessageInterpolator();
 
 	@LogMessage(level = WARN)
-	@Message(id = 185, value = "Message contains EL expression: %1s, which is unsupported with chosen Interpolator")
-	void getElUnsupported(String expression);
+	@Message(id = 185, value = "Message for contstraint %1s contains EL expression: %1s, which is unsupported with chosen Interpolator")
+	void getElUnsupported(String className, String expression);
 
 }
