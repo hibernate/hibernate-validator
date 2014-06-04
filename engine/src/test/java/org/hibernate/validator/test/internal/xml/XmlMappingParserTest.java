@@ -27,8 +27,8 @@ import javax.validation.constraints.DecimalMin;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.constraintvalidators.DecimalMinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.DecimalMinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.xml.XmlMappingParser;

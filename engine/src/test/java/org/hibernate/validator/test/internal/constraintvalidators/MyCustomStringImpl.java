@@ -22,7 +22,7 @@ package org.hibernate.validator.test.internal.constraintvalidators;
 public class MyCustomStringImpl implements CharSequence {
 	private final String myString;
 
-	MyCustomStringImpl(String s) {
+	public MyCustomStringImpl(String s) {
 		this.myString = s;
 	}
 

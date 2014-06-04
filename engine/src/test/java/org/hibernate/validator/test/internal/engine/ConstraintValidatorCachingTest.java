@@ -37,9 +37,9 @@ import javax.validation.constraints.Size;
 
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.constraintvalidators.MinValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCollection;
+import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 
