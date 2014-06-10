@@ -306,9 +306,19 @@ In case a method or constructor parameter constraint is violated, the ParameterN
 interface is used to retrieve the parameter's name and make it available to the user via the
 constraint violation's property path.
 
-The default implementation returns parameter names in the form +arg0+, +arg1+ etc., while custom
-implementations could e.g. be based on parameter annotations, debug symbols or a feature for
-retrieving parameter names at runtime possibly provided by future Java versions.
+The default implementation returns parameters' names in the form of +arg0+, +arg1+ etc, while custom
+implementations can retrieve the parameters' names using methods such as parameter annotations, debug symbols,
+or Java 8 reflection.
+
+An implementation for retrieving the parameters’ names using reflection in Java 8 is provided in
+ReflectionParameterNameProvider. To retrieve the parameters' names, the source must be compiled using the
++–parameters+ argument. Otherwise, the source code will be compiled with the defaults +arg0+, +arg1+, etc.
+which is what this provider will return.
+
+To use ReflectionParameterNameProvider, either pass an instance when bootstrapping a
+validator as shown in <<example-using-custom-parameter-name-provider>>, or specify
+org.hibernate.validator.parameternameprovider.ReflectionParameterNameProvider as value for the &lt;parameter-name-provider&gt;
+element in the _META-INF/validation.xml_ file (see <<section-configuration-validation-xml>>.)
 
 Custom ParameterNameProvider implementations are used as demonstrated in
 <<example-using-custom-parameter-name-provider>>.

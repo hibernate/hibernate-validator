@@ -307,6 +307,7 @@
                     <configuration>
                         <source>1.6</source>
                         <target>1.6</target>
+                        <testCompilerArgument>-parameters</testCompilerArgument>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -491,7 +492,7 @@
                 <plugin>
                     <groupId>org.bsc.maven</groupId>
                     <artifactId>maven-processor-plugin</artifactId>
-                    <version>2.0.2</version>
+                    <version>2.2.4</version>
                     <configuration>
                         <defaultOutputDirectory>${project.build.directory}/generated-sources/logging
                         </defaultOutputDirectory>

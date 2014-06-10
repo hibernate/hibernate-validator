@@ -16,12 +16,10 @@
 */
 package org.hibernate.validator.internal.metadata;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import javax.validation.ParameterNameProvider;
 
-import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
@@ -94,22 +92,6 @@ public class BeanMetaDataManager {
 	 * Used for resolving type parameters. Thread-safe.
 	 */
 	private final ExecutableHelper executableHelper;
-
-	/**
-	 * Creates a new {@code BeanMetaDataManager}. {@link DefaultParameterNameProvider} is used as parameter name
-	 * provider, no meta data providers besides the annotation-based providers are used.
-	 *
-	 * @param constraintHelper the constraint helper
-	 * @param executableHelper the executable helper
-	 */
-	public BeanMetaDataManager(ConstraintHelper constraintHelper, ExecutableHelper executableHelper) {
-		this(
-				constraintHelper,
-				executableHelper,
-				new DefaultParameterNameProvider(),
-				Collections.<MetaDataProvider>emptyList()
-		);
-	}
 
 	/**
 	 * Creates a new {@code BeanMetaDataManager}.
