@@ -580,3 +580,74 @@ via the configuration property hibernate.validator.validated_value_handlers whic
 configuring the default validator factory using the descriptor _META-INF/validation.xml_ (see
 <<chapter-xml-configuration>>).
 
+==== Optional unwrapper
+
+Hibernate Validator provides built-in unwrapping for Java 8 +Optional+. The unwrapper is registered
+automatically for Java 8 environments, and no further configuration is required. An example of unwrapping
+an +Optional+ is shown in <<example-using-unwrapvalidatedvalue-and-optional>>.
+
+[[example-using-unwrapvalidatedvalue-and-optional]]
+.+@UnwrapValidatedValue+ with +Optional+
+====
+[source, JAVA]
+----
+@Size(min = 3)
+@UnwrapValidatedValue
+private Optional<String> name = Optional.of( "Bob" );
+----
+====
+
+[NOTE]
+====
++Optional.empty()+ is treated as +null+ during validation. This means that for constraints where +null+ is considered
+valid, +Optional.empty()+ is similarly valid.
+====
+
+==== JavaFX unwrapper
+
+Additionally, Hibernate Validator provides built-in unwrapping for JavaFX property values. The unwrapper is registered
+automatically for environments where JavaFX is present, and no further configuration is required. An
+example of some of the different ways in which +JavaFX+ property values can be unwrapped is shown
+in <<example-using-unwrapvalidatedvalue-and-javafx>>.
+
+[[example-using-unwrapvalidatedvalue-and-javafx]]
+.+@UnwrapValidatedValue+ with +JavaFX+
+====
+[source, JAVA]
+----
+@Min(value = 3)
+@UnwrapValidatedValue
+IntegerProperty integerProperty1 = new SimpleIntegerProperty( 4 );
+
+@Min(value = 3)
+@UnwrapValidatedValue
+Property<Number> integerProperty2 = new SimpleIntegerProperty( 4 );
+
+@Min(value = 3)
+@UnwrapValidatedValue
+ObservableValue<Number> integerProperty3 = new SimpleIntegerProperty( 4 );
+----
+====
+
+==== Unwrapping object graphs
+
+Unwrapping can also be used with object graphs (cascaded validation) as shown in
+ <<example-using-unwrapvalidatedvalue-and-optional-with-valid>>.
+
+[[example-using-unwrapvalidatedvalue-and-optional-with-valid]]
+.+@UnwrapValidatedValue+ with +Optional+ and +@Valid+
+====
+[source, JAVA]
+----
+@Valid
+@UnwrapValidatedValue
+private Optional<Person> person = Optional.of( new Person() );
+----
+[source, JAVA]
+----
+public class Person {
+	@Size(min =3)
+	private String name = "Bob";
+}
+----
+====
