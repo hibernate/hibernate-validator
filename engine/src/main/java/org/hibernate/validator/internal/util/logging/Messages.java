@@ -94,6 +94,9 @@ public interface Messages {
 	@Message(value = "Custom parameterized types with more than one type argument are not supported and " +
 			"will not be checked for type use constraints.")
 	String parameterizedTypesWithMoreThanOneTypeArgument();
+
+	@Message(value = "ConstraintDefinitionContributor#getConstraintDefinitionContributions cannot return null.")
+	String constraintDefinitionContributionsCannotBeNull();
 }
 
 
