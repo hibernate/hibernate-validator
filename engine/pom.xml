@@ -138,6 +138,7 @@
                 <filtering>true</filtering>
                 <directory>src/test/resources</directory>
                 <includes>
+                    <include>META-INF/services/*</include>
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
                 </includes>
