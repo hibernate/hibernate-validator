@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -36,6 +35,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.spi.constraintvalidator.ConstraintValidatorLocator;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -57,6 +57,7 @@ public class ValidationBootstrapParameters {
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = newHashMap();
 	private final Set<InputStream> mappings = newHashSet();
+	private final Set<ConstraintValidatorLocator> constraintValidatorLocators = newHashSet();
 
 	public ValidationBootstrapParameters() {
 	}
@@ -252,5 +253,13 @@ public class ValidationBootstrapParameters {
 
 	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
 		return validatedValueHandlers;
+	}
+
+	public void addConstraintValidatorLocator(ConstraintValidatorLocator locator) {
+		constraintValidatorLocators.add( locator );
+	}
+
+	public Set<ConstraintValidatorLocator> getConstraintValidatorLocators() {
+		return constraintValidatorLocators;
 	}
 }

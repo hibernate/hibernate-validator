@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import java.lang.annotation.Annotation;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
@@ -23,7 +24,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -41,6 +42,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -48,10 +50,13 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.spi.constraintvalidator.ConstraintValidatorContribution;
+import org.hibernate.validator.spi.constraintvalidator.ConstraintValidatorLocator;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is the Hibernate Validator default
@@ -167,6 +172,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
 
+			registerCustomConstraintValidators( hibernateSpecificConfig );
 		}
 		this.constraintMappings = Collections.unmodifiableSet( tmpConstraintMappings );
 
@@ -346,6 +352,28 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 
 		return handlers;
+	}
+
+	private <A extends Annotation> void registerCustomConstraintValidators(ConfigurationImpl hibernateSpecificConfig) {
+		for ( ConstraintValidatorLocator locator : hibernateSpecificConfig.getConstraintValidatorLocator() ) {
+			List<ConstraintValidatorContribution<?>> constraintValidatorContributions = locator.getConstraintValidatorContributions();
+			Contracts.assertNotNull(
+					constraintValidatorContributions,
+					MESSAGES.constraintValidatorContributionsCannotBeNull()
+			);
+			for ( ConstraintValidatorContribution<?> constraintValidatorContribution : constraintValidatorContributions ) {
+				@SuppressWarnings("unchecked")
+				Class<A> constraintType = (Class<A>) constraintValidatorContribution.getConstraintType();
+				@SuppressWarnings("unchecked")
+				List<Class<? extends ConstraintValidator<A, ?>>> constraintValidatorTypes = (List) constraintValidatorContribution
+						.getConstraintValidators();
+				constraintHelper.putValidatorClasses(
+						constraintType,
+						constraintValidatorTypes,
+						constraintValidatorContribution.keepDefaults()
+				);
+			}
+		}
 	}
 
 	/**
