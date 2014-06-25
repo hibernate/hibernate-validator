@@ -57,7 +57,7 @@ public class LuhnCheckValidator extends ModCheckBase
 		int modResult = ModUtil.calculateLuhnMod10Check( digits );
 		int checkValue = extractDigit( checkDigit );
 
-		return modResult == checkValue;
+		return checkValue == modResult;
 	}
 
 }

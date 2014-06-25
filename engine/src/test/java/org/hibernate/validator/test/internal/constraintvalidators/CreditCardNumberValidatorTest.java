@@ -75,6 +75,15 @@ public class CreditCardNumberValidatorTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-901")
+	public void testValidCreditCardNumberWithZeroCheckDigit() throws Exception {
+		CreditCard card = new CreditCard();
+		card.setCreditCardNumber( "5105105105105100" );
+		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	@Test
 	public void testNullValue() throws Exception {
 		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( new CreditCard() );
 		assertNumberOfViolations( constraintViolations, 0 );
