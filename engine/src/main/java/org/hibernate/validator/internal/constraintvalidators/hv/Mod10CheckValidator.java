@@ -81,7 +81,7 @@ public class Mod10CheckValidator extends ModCheckBase
 		int modResult = ModUtil.calculateMod10Check( digits, this.multiplier, this.weight );
 		int checkValue = extractDigit( checkDigit );
 
-		return modResult < 10 ? checkValue == modResult : checkValue == 0;
+		return checkValue == modResult;
 	}
 
 }
