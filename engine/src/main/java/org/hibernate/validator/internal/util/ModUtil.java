@@ -49,7 +49,7 @@ public final class ModUtil {
 			sum += digit;
 			even = !even;
 		}
-		return 10 - ( sum % 10 );
+		return ( 10 - ( sum % 10 ) ) % 10;
 	}
 
 	/**
@@ -77,19 +77,7 @@ public final class ModUtil {
 			sum += digit;
 			even = !even;
 		}
-		return 10 - ( sum % 10 );
-	}
-
-	/**
-	 * Calculate Generic Modulo 10 checksum
-	 *
-	 * @param digits The digits over which to calculate the checksum
-	 * @param multiplier Multiplier used in the algorithm
-	 *
-	 * @return the result of the mod10 checksum calculation assuming weight = 1
-	 */
-	public static int calculateMod10Check(final List<Integer> digits, int multiplier) {
-		return calculateMod10Check( digits, multiplier, 1 );
+		return ( 10 - ( sum % 10 ) ) % 10;
 	}
 
 	/**
