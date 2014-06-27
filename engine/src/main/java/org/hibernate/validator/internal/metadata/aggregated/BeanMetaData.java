@@ -60,6 +60,16 @@ public interface BeanMetaData<T> extends Validatable {
 	PropertyMetaData getMetaDataFor(String propertyName);
 
 	/**
+	 * Returns constraint-related meta data for the type argument of a property.
+	 *
+	 * @param propertyName The property name.
+	 *
+	 * @return Constraint-related meta data or {@code null} if no property with the given name exists or the
+	 * property has no type argument.
+	 */
+	TypeArgumentMetaData getMetaDataForTypeArgument(String propertyName);
+
+	/**
 	 * Get the composition of the default group sequence.
 	 * <p>
 	 * If the bean state is given in parameter and the bean metadata has a default group sequence provider then the

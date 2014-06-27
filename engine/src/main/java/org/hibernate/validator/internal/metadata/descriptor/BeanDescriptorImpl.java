@@ -43,12 +43,14 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  */
 public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDescriptor {
 	private final Map<String, PropertyDescriptor> constrainedProperties;
+	private final Map<String, TypeArgumentDescriptorImpl> constrainedTypeArguments;
 	private final Map<String, ExecutableDescriptorImpl> constrainedMethods;
 	private final Map<String, ConstructorDescriptor> constrainedConstructors;
 
 	public BeanDescriptorImpl(Type beanClass,
 							  Set<ConstraintDescriptorImpl<?>> classLevelConstraints,
 							  Map<String, PropertyDescriptor> constrainedProperties,
+							  Map<String, TypeArgumentDescriptorImpl> constrainedTypeArguments,
 							  Map<String, ExecutableDescriptorImpl> constrainedMethods,
 							  Map<String, ConstructorDescriptor> constrainedConstructors,
 							  boolean defaultGroupSequenceRedefined,
@@ -56,13 +58,14 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 		super( beanClass, classLevelConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
 		this.constrainedProperties = Collections.unmodifiableMap( constrainedProperties );
+		this.constrainedTypeArguments = Collections.unmodifiableMap( constrainedTypeArguments );
 		this.constrainedMethods = Collections.unmodifiableMap( constrainedMethods );
 		this.constrainedConstructors = Collections.unmodifiableMap( constrainedConstructors );
 	}
 
 	@Override
 	public final boolean isBeanConstrained() {
-		return hasConstraints() || !constrainedProperties.isEmpty();
+		return hasConstraints() || !constrainedProperties.isEmpty() || !constrainedTypeArguments.isEmpty();
 	}
 
 	@Override
@@ -74,6 +77,10 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 	@Override
 	public final Set<PropertyDescriptor> getConstrainedProperties() {
 		return newHashSet( constrainedProperties.values() );
+	}
+
+	public final Set<TypeArgumentDescriptorImpl> getConstrainedTypeArguments() {
+		return newHashSet( constrainedTypeArguments.values() );
 	}
 
 	@Override

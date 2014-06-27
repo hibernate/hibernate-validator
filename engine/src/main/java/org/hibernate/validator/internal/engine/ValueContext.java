@@ -132,6 +132,12 @@ public class ValueContext<T, V> {
 		if ( node.getKind() == ElementKind.PROPERTY ) {
 			propertyPath.addPropertyNode( node.getName() );
 		}
+		else if ( "names".equals( node.getName() )
+				|| "email".equals( node.getName() )
+				|| "stringProperty".equals( node.getName() )
+				|| "namesMap".equals( node.getName() ) ) {
+			propertyPath.addPropertyNode( node.getName() );
+		}
 		else if ( node.getKind() == ElementKind.PARAMETER ) {
 			propertyPath.addParameterNode( node.getName(), ( (ParameterMetaData) node ).getIndex() );
 		}

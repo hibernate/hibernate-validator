@@ -62,6 +62,11 @@ public final class UnconstrainedEntityMetaDataSingleton<T> implements BeanMetaDa
 	}
 
 	@Override
+	public TypeArgumentMetaData getMetaDataForTypeArgument(String propertyName) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public List<Class<?>> getDefaultGroupSequence(T beanState) {
 		throw new UnsupportedOperationException();
 	}
