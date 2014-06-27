@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2014, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -18,48 +18,39 @@ package org.hibernate.validator.messageinterpolation;
 
 import java.util.Locale;
 
-import org.hibernate.validator.internal.engine.messageinterpolation.ElInterpolationTerm;
+import javax.validation.MessageInterpolator.Context;
+
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.engine.messageinterpolation.ParameterInterpolationTerm;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
- * Resource bundle backed message interpolator.
+ * Resource bundle message interpolator, it does not support EL expression
+ * and does support parameter value expression 
  *
- * @author Emmanuel Bernard
- * @author Hardy Ferentschik
- * @author Gunnar Morling
- * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Adam Stawicki
+ * @since 5.2
  */
-public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolator {
-	private static final Log log = LoggerFactory.make();
+public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
 	
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator defaultResourceBundleLocator) {
-		this(defaultResourceBundleLocator, true);
-	}
+	private static final Log log = LoggerFactory.make();
 
-	public ResourceBundleMessageInterpolator() {
-		super();
-	}
-
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator testResourceBundleLocator, boolean cachingEnabled) {
-		super(testResourceBundleLocator, cachingEnabled);
+	public ParameterMessageInterpolator() {
+		log.getNonElMessageInterpolator();
 	}
 
 	@Override
 	public String interpolateExpressionLanguageTerm(Context context, String term, Locale locale) {
-		InterpolationTerm expression = new ElInterpolationTerm( term, locale );
-		return expression.interpolate( context );
+		String className = context.getConstraintDescriptor().getAnnotation().annotationType().getName();
+		log.getElUnsupported( className, term );
+		return term;
 	}
 
 	@Override
 	public String interpolateConstraintAnnotationValue(Context context, String term) {
-		InterpolationTerm expression = new ParameterInterpolationTerm( term );
-		return expression.interpolate( context );
+		InterpolationTerm parameterTermResolver = new ParameterInterpolationTerm( term );
+		return parameterTermResolver.interpolate( context );
 	}
-	
-	
+
 }
