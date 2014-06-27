@@ -16,6 +16,9 @@
 */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,13 +26,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.validation.Validation;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -39,28 +37,24 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 	@Test
 	public void testMissingELDependencyThrowsExceptionDuringFactoryBootstrap() throws Exception {
-		System.out.println("yo");
-//		fail("ttt");
 		ClassLoader classLoader = new ELIgnoringClassLoader();
 		Class<?> clazz = classLoader.loadClass( Validation.class.getName() );
 
 		Object validation = clazz.newInstance();
 		Method m = clazz.getMethod( "buildDefaultValidatorFactory" );
+		
+		Object validatorFactory = m.invoke( validation );
+		Method getValidatorMethod = validatorFactory.getClass().getMethod( "getValidator" );
 		try {
-			m.invoke( validation );
+			getValidatorMethod.invoke( validatorFactory );
 			fail( "An exception should have been thrown" );
 		}
 		catch ( InvocationTargetException e ) {
 			Exception exceptionInValidation = (Exception) e.getTargetException();
 			assertEquals(
 					exceptionInValidation.getMessage(),
-					"Unable to instantiate Configuration.",
+					"HV000183: Unable to load 'javax.el.ExpressionFactory'. Check that you have the EL dependencies on the classpath, or use ParameterMessageInterpolator instead",
 					"Bootstrapping in Validation should throw an exception "
-			);
-			Throwable rootCause = exceptionInValidation.getCause();
-			assertTrue(
-					rootCause.getMessage().startsWith( "HV000183" ),
-					"The root cause of the failure should be missing EL dependencies"
 			);
 		}
 	}

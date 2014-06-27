@@ -47,15 +47,6 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator testResourceBundleLocator, boolean cachingEnabled) {
 		super(testResourceBundleLocator, cachingEnabled);
-
-		// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
-		// factory
-		try {
-			ResourceBundleMessageInterpolator.class.getClassLoader().loadClass( "javax.el.ExpressionFactory" );
-		}
-		catch ( ClassNotFoundException e ) {
-			throw log.getMissingELDependenciesException();
-		}
 	}
 
 	@Override
