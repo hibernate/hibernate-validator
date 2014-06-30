@@ -535,7 +535,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @param validationContext The execution context
 	 * @param valueContext Collected information for single validation
 	 */
-	private void validateCascadedConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext) {
+	private void validateCascadedConstraints(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		Validatable validatable = valueContext.getCurrentValidatable();
 		PathImpl originalPath = valueContext.getPropertyPath();
 		Class<?> originalGroup = valueContext.getCurrentGroup();
@@ -555,6 +555,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				Object value = cascadable.getValue(
 						valueContext.getCurrentBean()
 				);
+
+				// Value can be wrapped (e.g. Optional<Address>). Try to unwrap it
+				ConstraintMetaData metaData = (ConstraintMetaData) cascadable;
+				if ( metaData.requiresUnwrapping() ) {
+					setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, metaData );
+					valueContext.setCurrentValidatedValue( value );
+					value = valueContext.getCurrentValidatedValue();
+				}
+
 				if ( value != null ) {
 					Type type = value.getClass();
 					Iterator<?> iter = createIteratorForCascadedValue( type, value, valueContext );
@@ -938,7 +947,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 		}
 
-		ValueContext<Object[], ?> cascadingValueContext = ValueContext.getLocalExecutionContext(
+		ValueContext<Object[], Object> cascadingValueContext = ValueContext.getLocalExecutionContext(
 				parameterValues,
 				executableMetaData.getValidatableParametersMetaData(),
 				PathImpl.createPathForExecutable( executableMetaData )
