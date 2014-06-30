@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valuehandling.wrapper;
+package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -56,7 +56,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
- * Tests for {@link org.hibernate.validator.spi.valuehandling.wrapper.JavaFXPropertyValueUnwrapper}.
+ * Tests for {@link org.hibernate.validator.internal.engine.valuehandling.JavaFXPropertyValueUnwrapper}.
  *
  * @author Khalid Alqinyah
  */

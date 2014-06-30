@@ -14,8 +14,28 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+package org.hibernate.validator.internal.engine.valuehandling;
+
+import javafx.beans.value.ObservableValue;
+
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
- * Implementations for {@link org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper}
+ * Unwraps a JavaFX {@code ObservableValue} and returns the wrapped value and type.
+ *
+ * @author Khalid Alqinyah
  */
-package org.hibernate.validator.spi.valuehandling.wrapper;
+public class JavaFXPropertyValueUnwrapper extends TypeResolverBasedValueUnwrapper<ObservableValue<?>> {
+
+	public JavaFXPropertyValueUnwrapper(TypeResolutionHelper typeResolutionHelper) {
+		super( typeResolutionHelper );
+	}
+
+	@Override
+	public Object handleValidatedValue(ObservableValue<?> value) {
+		if ( value != null ) {
+			return value.getValue();
+		}
+		return value;
+	}
+}

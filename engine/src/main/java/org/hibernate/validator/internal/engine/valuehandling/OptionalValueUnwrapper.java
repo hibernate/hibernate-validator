@@ -14,15 +14,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.spi.valuehandling.wrapper;
+package org.hibernate.validator.internal.engine.valuehandling;
 
-import java.lang.reflect.Type;
 import java.util.Optional;
 
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.TypeResolver;
-
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * Unwraps an {@code Optional} and returns the wrapped value and type. Empty {@code Optional} value is returned as
@@ -30,9 +26,11 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  *
  * @author Khalid Alqinyah
  */
-public class OptionalValueUnwrapper extends ValidatedValueUnwrapper<Optional<?>> {
+public class OptionalValueUnwrapper extends TypeResolverBasedValueUnwrapper<Optional<?>> {
 
-	private final TypeResolver typeResolver = new TypeResolver();
+	public OptionalValueUnwrapper(TypeResolutionHelper typeResolutionHelper) {
+		super( typeResolutionHelper );
+	}
 
 	@Override
 	public Object handleValidatedValue(Optional<?> value) {
@@ -41,11 +39,5 @@ public class OptionalValueUnwrapper extends ValidatedValueUnwrapper<Optional<?>>
 		}
 
 		return null;
-	}
-
-	@Override
-	public Type getValidatedValueType(Type valueType) {
-		ResolvedType resolvedType = typeResolver.resolve( valueType );
-		return resolvedType.typeParametersFor( Optional.class ).get( 0 ).getErasedType();
 	}
 }

@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.valuehandling.wrapper;
+package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -39,7 +39,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
- * Tests for {@link org.hibernate.validator.spi.valuehandling.wrapper.OptionalValueUnwrapper}.
+ * Tests for {@link org.hibernate.validator.internal.engine.valuehandling.OptionalValueUnwrapper}.
  *
  * @author Khalid Alqinyah
  */
@@ -56,7 +56,13 @@ public class OptionalValueUnwrapperTest {
 	public void testOptionalUnwrappedValueViolations() {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
 		assertNumberOfViolations( constraintViolations, 4 );
-		assertCorrectPropertyPaths( constraintViolations, "integerOptional", "stringOptional", "barOptional.number", "optionalLong" );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"integerOptional",
+				"stringOptional",
+				"barOptional.number",
+				"optionalLong"
+		);
 		assertCorrectConstraintTypes( constraintViolations, Min.class, NotBlank.class, Min.class, Max.class );
 	}
 
@@ -78,8 +84,12 @@ public class OptionalValueUnwrapperTest {
 	public void testOptionalUnwrappedExecutableParameter() throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
 		Method method = Foo.class.getMethod( "setOptionalLong", Optional.class );
-		Object [] values = {Optional.of( 2L )};
-		Set<ConstraintViolation<Foo>> constraintViolations = executableValidator.validateParameters( new Foo(), method, values );
+		Object[] values = { Optional.of( 2L ) };
+		Set<ConstraintViolation<Foo>> constraintViolations = executableValidator.validateParameters(
+				new Foo(),
+				method,
+				values
+		);
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "setOptionalLong.arg0" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class );
@@ -103,8 +113,12 @@ public class OptionalValueUnwrapperTest {
 	public void testOptionalUnwrappedCascadableExecutableParameter() throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
 		Method method = Foo.class.getMethod( "setBar", Optional.class );
-		Object [] values = {Optional.of( new Bar() )};
-		Set<ConstraintViolation<Foo>> constraintViolations = executableValidator.validateParameters( new Foo(), method, values );
+		Object[] values = { Optional.of( new Bar() ) };
+		Set<ConstraintViolation<Foo>> constraintViolations = executableValidator.validateParameters(
+				new Foo(),
+				method,
+				values
+		);
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "setBar.arg0.number" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class );
@@ -153,7 +167,6 @@ public class OptionalValueUnwrapperTest {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private class Bar {
 		@Min(value = 5)
 		int number = 3;

@@ -28,7 +28,6 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.BootstrapState;
@@ -40,9 +39,12 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
+import org.hibernate.validator.internal.engine.valuehandling.JavaFXPropertyValueUnwrapper;
+import org.hibernate.validator.internal.engine.valuehandling.OptionalValueUnwrapper;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -52,8 +54,6 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
-import org.hibernate.validator.spi.valuehandling.wrapper.JavaFXPropertyValueUnwrapper;
-import org.hibernate.validator.spi.valuehandling.wrapper.OptionalValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -108,11 +108,20 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private ConfigurationImpl() {
 		this.validationBootstrapParameters = new ValidationBootstrapParameters();
-		if (isJavaFxInClasspath()) {
-			this.validationBootstrapParameters.addValidatedValueHandler( new JavaFXPropertyValueUnwrapper() );
+		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
+		if ( isJavaFxInClasspath() ) {
+			this.validationBootstrapParameters.addValidatedValueHandler(
+					new JavaFXPropertyValueUnwrapper(
+							typeResolutionHelper
+					)
+			);
 		}
-		if (Version.getJavaRelease() >= 8) {
-			this.validationBootstrapParameters.addValidatedValueHandler( new OptionalValueUnwrapper() );
+		if ( Version.getJavaRelease() >= 8 ) {
+			this.validationBootstrapParameters.addValidatedValueHandler(
+					new OptionalValueUnwrapper(
+							typeResolutionHelper
+					)
+			);
 		}
 		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES );
 		this.defaultTraversableResolver = new DefaultTraversableResolver();
