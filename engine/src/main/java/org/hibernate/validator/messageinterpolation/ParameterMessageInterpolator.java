@@ -25,28 +25,28 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Resource bundle message interpolator, it does not support EL expression
- * and does support parameter value expression 
+ * and does support parameter value expression
  *
  * @author Adam Stawicki
  * @since 5.2
  */
-public class NonElMessageInterpolator extends AbstractMessageInterpolator {
-	
+public class ParameterMessageInterpolator extends AbstractMessageInterpolator {
+
 	private static final Log log = LoggerFactory.make();
 
-	public NonElMessageInterpolator() {
-		log.getNonElMessageInterpolator();
+	public ParameterMessageInterpolator() {
+		log.creationOfParameterMessageInterpolation();
 	}
 
 	@Override
 	public String interpolate(Context context, Locale locale, String term) {
-		if( InterpolationTerm.isElExpression(term) ) {
-			log.getElUnsupported(term);
+		if ( InterpolationTerm.isElExpression( term ) ) {
+			log.getElUnsupported( term );
 			return term;
 		}
 		else {
 			ParameterTermResolver parameterTermResolver = new ParameterTermResolver();
-			return parameterTermResolver.interpolate(context, term);
+			return parameterTermResolver.interpolate( context, term );
 		}
 	}
 

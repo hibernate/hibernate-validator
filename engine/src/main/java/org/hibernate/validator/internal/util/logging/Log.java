@@ -637,7 +637,7 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = 184, value = "ParameterMessageInterpolator has been chosen, EL interpolation will not be supported")
-	void getNonElMessageInterpolator();
+	void creationOfParameterMessageInterpolation();
 
 	@LogMessage(level = WARN)
 	@Message(id = 185, value = "Message contains EL expression: %1s, which is unsupported with chosen Interpolator")
