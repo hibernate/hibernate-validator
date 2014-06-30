@@ -582,7 +582,7 @@ configuring the default validator factory using the descriptor _META-INF/validat
 
 ==== Optional unwrapper
 
-Hibernate Validator provides built-in unwrapping for Java 8 +Optional+. The unwrapper is registered
+Hibernate Validator provides built-in unwrapping for the +Optional+ introduced in Java 8. The unwrapper is registered
 automatically for Java 8 environments, and no further configuration is required. An example of unwrapping
 an +Optional+ is shown in <<example-using-unwrapvalidatedvalue-and-optional>>.
 
@@ -606,9 +606,9 @@ valid, +Optional.empty()+ is similarly valid.
 ==== JavaFX unwrapper
 
 Additionally, Hibernate Validator provides built-in unwrapping for JavaFX property values. The unwrapper is registered
-automatically for environments where JavaFX is present, and no further configuration is required. An
-example of some of the different ways in which +JavaFX+ property values can be unwrapped is shown
-in <<example-using-unwrapvalidatedvalue-and-javafx>>.
+automatically for environments where JavaFX is present, and no further configuration is required.
++ObservableValue+ and its sub-types are supported.
+An example of some of the different ways in which +JavaFX+ property values can be unwrapped is shown in <<example-using-unwrapvalidatedvalue-and-javafx>>.
 
 [[example-using-unwrapvalidatedvalue-and-javafx]]
 .+@UnwrapValidatedValue+ with +JavaFX+
@@ -631,8 +631,8 @@ ObservableValue<Number> integerProperty3 = new SimpleIntegerProperty( 4 );
 
 ==== Unwrapping object graphs
 
-Unwrapping can also be used with object graphs (cascaded validation) as shown in
- <<example-using-unwrapvalidatedvalue-and-optional-with-valid>>.
+Unwrapping can also be used with object graphs (cascaded validation) as shown in <<example-using-unwrapvalidatedvalue-and-optional-with-valid>>.
+When validating the object holding the +Optional<Person>+, a cascaded validation of the +Person+ object would be performed.
 
 [[example-using-unwrapvalidatedvalue-and-optional-with-valid]]
 .+@UnwrapValidatedValue+ with +Optional+ and +@Valid+
