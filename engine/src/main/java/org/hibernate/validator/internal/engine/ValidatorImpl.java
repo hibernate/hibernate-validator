@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
@@ -54,6 +53,7 @@ import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.TypeArgumentMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
@@ -522,8 +522,71 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
 				valueContext.setCurrentValidatedValue( valueToValidate );
 			}
+
+			// Use String "TYPE_USE" to avoid any incompatibility with < Java 8 environments
+			if ( "TYPE_USE".equals( metaConstraint.getElementType().toString() ) ) {
+				return validateTypeArgument( validationContext, valueContext, metaConstraint );
+			}
+
 			validationSuccessful = metaConstraint.validateConstraint( validationContext, valueContext );
 		}
+
+		return validationSuccessful;
+	}
+
+	private boolean validateTypeArgument(ValidationContext<?> validationContext,
+										 ValueContext<?, Object> valueContext,
+										 MetaConstraint<?> metaConstraint) {
+		boolean validationSuccessful = true;
+		boolean allElementsSucceeded = true;
+
+		// The property value. If it is wrapped, the unwrapped value will be returned
+		Object propertyValue = valueContext.getCurrentValidatedValue();
+		boolean isIndexable = isIndexable( propertyValue.getClass() );
+
+		TypeArgumentMetaData typeArgumentMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() )
+				.getMetaDataForTypeArgument(
+						ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() )
+				);
+
+		// Clear the property value handler
+		valueContext.setValidatedValueHandler( null );
+
+		// The type argument itself can be wrapped, set the handler if present
+		setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, typeArgumentMetaData );
+
+		if ( propertyValue != null ) {
+			Iterator itr = createIteratorForCascadedValue( propertyValue.getClass(), propertyValue, valueContext );
+			int i = 0;
+			while ( itr.hasNext() ) {
+				Object value = itr.next();
+				if ( value instanceof Map.Entry ) {
+					Object mapKey = ( (Map.Entry<?, ?>) value ).getKey();
+					valueContext.setKey( mapKey );
+					value = ( (Map.Entry<?, ?>) value ).getValue();
+				}
+				else if ( isIndexable ) {
+					valueContext.setIndex( i++ );
+				}
+				valueContext.setCurrentValidatedValue( value );
+				validationSuccessful = metaConstraint.validateConstraint( validationContext, valueContext );
+				if ( shouldFailFast( validationContext ) ) {
+					// Stop processing the rest of the elements
+					return false;
+				}
+				if ( !validationSuccessful ) {
+					// If one element fails validation, set false for all
+					allElementsSucceeded = false;
+				}
+
+				// Create a new path copy to avoid interferences between iterations paths
+				valueContext.setPropertyPath( PathImpl.createCopy( valueContext.getPropertyPath() ) );
+			}
+			validationSuccessful = allElementsSucceeded;
+		}
+
+		// Clear the type argument value handler
+		valueContext.setValidatedValueHandler( null );
 
 		return validationSuccessful;
 	}
@@ -535,7 +598,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @param validationContext The execution context
 	 * @param valueContext Collected information for single validation
 	 */
-	private void validateCascadedConstraints(ValidationContext<?> validationContext, ValueContext<?, ?> valueContext) {
+	private void validateCascadedConstraints(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		Validatable validatable = valueContext.getCurrentValidatable();
 		PathImpl originalPath = valueContext.getPropertyPath();
 		Class<?> originalGroup = valueContext.getCurrentGroup();
@@ -555,6 +618,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				Object value = cascadable.getValue(
 						valueContext.getCurrentBean()
 				);
+
+				// Value can be wrapped (e.g. Optional<Address>). Try to unwrap it
+				ConstraintMetaData metaData = (ConstraintMetaData) cascadable;
+				if ( metaData.requiresUnwrapping() ) {
+					setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, metaData );
+					valueContext.setCurrentValidatedValue( value );
+					value = valueContext.getCurrentValidatedValue();
+				}
+
 				if ( value != null ) {
 					Type type = value.getClass();
 					Iterator<?> iter = createIteratorForCascadedValue( type, value, valueContext );
@@ -938,7 +1010,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 		}
 
-		ValueContext<Object[], ?> cascadingValueContext = ValueContext.getLocalExecutionContext(
+		ValueContext<Object[], Object> cascadingValueContext = ValueContext.getLocalExecutionContext(
 				parameterValues,
 				executableMetaData.getValidatableParametersMetaData(),
 				PathImpl.createPathForExecutable( executableMetaData )

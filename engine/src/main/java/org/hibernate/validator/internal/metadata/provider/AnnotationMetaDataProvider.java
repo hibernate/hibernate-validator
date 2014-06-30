@@ -81,10 +81,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	static final int DEFAULT_INITIAL_CAPACITY = 16;
 
-	private final ConstraintHelper constraintHelper;
-	private final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
-	private final AnnotationProcessingOptions annotationProcessingOptions;
-	private final ParameterNameProvider parameterNameProvider;
+	protected final ConstraintHelper constraintHelper;
+	protected final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
+	protected final AnnotationProcessingOptions annotationProcessingOptions;
+	protected final ParameterNameProvider parameterNameProvider;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			ParameterNameProvider parameterNameProvider,
@@ -512,7 +512,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
 	 *         single nor multi-valued annotation.
 	 */
-	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
+	protected <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
 			A annotation,
 			ElementType type) {
 		List<ConstraintDescriptorImpl<?>> constraintDescriptors = newArrayList();
@@ -535,7 +535,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraintDescriptors;
 	}
 
-	private Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {
+	protected Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {
 		Map<Class<?>, Class<?>> groupConversions = newHashMap();
 
 		if ( groupConversion != null ) {

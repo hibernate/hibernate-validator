@@ -36,6 +36,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
+import org.hibernate.validator.internal.metadata.descriptor.TypeArgumentDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -44,6 +45,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedTypeArgument;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ExecutableHelper;
@@ -86,10 +88,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<MetaConstraint<?>> directMetaConstraints;
 
 	/**
-	 * Contains constrained related meta data for all methods and constructors
-	 * of the type represented by this bean meta data. Keyed by executable,
-	 * values are an aggregated view on each executable together with all the
-	 * executables from the inheritance hierarchy with the same signature.
+	 * Contains constrained related meta data for all methods and constructors of the type represented by this bean meta
+	 * data. Keyed by executable, values are an aggregated view on each executable together with all the executables
+	 * from the inheritance hierarchy with the same signature.
 	 */
 	private final Map<String, ExecutableMetaData> executableMetaDataMap;
 
@@ -97,6 +98,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * Property meta data keyed against the property name
 	 */
 	private final Map<String, PropertyMetaData> propertyMetaDataMap;
+
+	/**
+	 * Type argument meta data keyed against the property name
+	 */
+	private final Map<String, TypeArgumentMetaData> typeArgumentMetaDataMap;
 
 	/**
 	 * The cascaded properties of this bean.
@@ -122,8 +128,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
 
 	/**
-	 * The class hierarchy for this class starting with the class itself going up the inheritance chain. Interfaces
-	 * are not included.
+	 * The class hierarchy for this class starting with the class itself going up the inheritance chain. Interfaces are
+	 * not included.
 	 */
 	private final List<Class<? super T>> classHierarchyWithoutInterfaces;
 
@@ -142,13 +148,21 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		this.beanClass = beanClass;
 		this.propertyMetaDataMap = newHashMap();
+		this.typeArgumentMetaDataMap = newHashMap();
 
 		Set<PropertyMetaData> propertyMetaDataSet = newHashSet();
 		Set<ExecutableMetaData> executableMetaDataSet = newHashSet();
+		Set<TypeArgumentMetaData> typeArgumentMetaDataSet = newHashSet();
 
 		for ( ConstraintMetaData constraintMetaData : constraintMetaDataSet ) {
 			if ( constraintMetaData.getKind() == ElementKind.PROPERTY ) {
 				propertyMetaDataSet.add( (PropertyMetaData) constraintMetaData );
+			}
+			else if ( "names".equals( constraintMetaData.getName() )
+					|| "email".equals( constraintMetaData.getName() )
+					|| "stringProperty".equals( constraintMetaData.getName() )
+					|| "namesMap".equals( constraintMetaData.getName() ) ) {
+				typeArgumentMetaDataSet.add( (TypeArgumentMetaData) constraintMetaData );
 			}
 			else {
 				executableMetaDataSet.add( (ExecutableMetaData) constraintMetaData );
@@ -166,6 +180,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 			allMetaConstraints.addAll( propertyMetaData.getConstraints() );
+		}
+
+		for ( TypeArgumentMetaData typeArgumentMetaData : typeArgumentMetaDataSet ) {
+			typeArgumentMetaDataMap.put( typeArgumentMetaData.getName(), typeArgumentMetaData );
+
+			if ( typeArgumentMetaData.isCascading() ) {
+				cascadedProperties.add( typeArgumentMetaData );
+			}
+
+			allMetaConstraints.addAll( typeArgumentMetaData.getConstraints() );
 		}
 
 		this.cascadedProperties = Collections.unmodifiableSet( cascadedProperties );
@@ -186,6 +210,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				beanClass,
 				getClassLevelConstraintsAsDescriptors(),
 				getConstrainedPropertiesAsDescriptors(),
+				getConstrainedTypeArgumentsAsDescriptors(),
 				getConstrainedMethodsAsDescriptors(),
 				getConstrainedConstructorsAsDescriptors(),
 				defaultGroupSequenceIsRedefined(),
@@ -222,6 +247,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public PropertyMetaData getMetaDataFor(String propertyName) {
 		return propertyMetaDataMap.get( propertyName );
+	}
+
+	@Override
+	public TypeArgumentMetaData getMetaDataForTypeArgument(String propertyName) {
+		return typeArgumentMetaDataMap.get( propertyName );
 	}
 
 	@Override
@@ -275,6 +305,24 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		Map<String, PropertyDescriptor> theValue = newHashMap();
 
 		for ( Entry<String, PropertyMetaData> entry : propertyMetaDataMap.entrySet() ) {
+			if ( entry.getValue().isConstrained() && entry.getValue().getName() != null ) {
+				theValue.put(
+						entry.getKey(),
+						entry.getValue().asDescriptor(
+								defaultGroupSequenceIsRedefined(),
+								getDefaultGroupSequence( null )
+						)
+				);
+			}
+		}
+
+		return theValue;
+	}
+
+	private Map<String, TypeArgumentDescriptorImpl> getConstrainedTypeArgumentsAsDescriptors() {
+		Map<String, TypeArgumentDescriptorImpl> theValue = newHashMap();
+
+		for ( Entry<String, TypeArgumentMetaData> entry : typeArgumentMetaDataMap.entrySet() ) {
 			if ( entry.getValue().isConstrained() && entry.getValue().getName() != null ) {
 				theValue.put(
 						entry.getKey(),
@@ -548,6 +596,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					propertyBuilder = new PropertyMetaData.Builder(
 							beanClass,
 							constrainedField,
+							constraintHelper
+					);
+					break;
+				case TYPE_USE:
+					ConstrainedTypeArgument constrainedTypeArgument = (ConstrainedTypeArgument) constrainedElement;
+					propertyBuilder = new TypeArgumentMetaData.Builder(
+							beanClass,
+							constrainedTypeArgument,
 							constraintHelper
 					);
 					break;

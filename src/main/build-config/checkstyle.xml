@@ -45,7 +45,10 @@
         <module name="DefaultComesLast"/>
     </module>
 
+    <module name="SuppressionFilter">
+        <property name="file" value="src/main/build-config/suppressions.xml" />
+    </module>
+
     <!-- Checks that a file ends with a new line  -->
     <module name="NewlineAtEndOfFile"/>
-
 </module>
