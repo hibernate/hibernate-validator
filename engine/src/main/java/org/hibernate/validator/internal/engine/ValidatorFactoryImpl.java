@@ -44,6 +44,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -245,6 +246,18 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ParameterNameProvider parameterNameProvider,
 			boolean failFast,
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers) {
+
+		// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
+		// factory
+		if( messageInterpolator instanceof ResourceBundleMessageInterpolator ) {
+			try {
+				ResourceBundleMessageInterpolator.class.getClassLoader().loadClass( "javax.el.ExpressionFactory" );
+			}
+			catch ( ClassNotFoundException e ) {
+				throw log.getMissingELDependenciesException();
+			}
+		}
+		
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
 			beanMetaDataManager = new BeanMetaDataManager(

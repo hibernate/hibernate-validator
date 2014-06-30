@@ -354,12 +354,29 @@ Using _$$ALL_FALSE$$_ as composition type implicitly enforces that only a single
 reported in case validation of the constraint composition fails.
 ====
 
+[[non-el-message-interpolator]]
+=== NonElMessageInterpolator
+
+Hibernate Validator requires per default an implementation of the Unified EL (see
+<<validator-gettingstarted-uel>>) to be available. This is needed to allow the interpolation
+of constraint error messages using EL expressions as defined by Bean Validation 1.1.
+
+For environments where you cannot or do not want to provide an EL implementation, Hibernate Validators
+offers a non EL based message interpolator - +org.hibernate.validator.messageinterpolation.NonElMessageInterpolator+.
+
+Refer to <<section-custom-message-interpolation>> to see how to plug in custom message interpolator
+implementations.
+
+[WARNING]
+====
+Constraint messages containing EL expressions will be returned un-inerpolated by
++org.hibernate.validator.messageinterpolation.NonElMessageInterpolator+. This also affects potentially
+built-in default constraint messages, for example the ones from +DecimalMin+ or +DecimalMax+.
+====
+
 === ResourceBundleLocator
 
-As described in <<section-custom-message-interpolation>>, Bean Validation allows to plug in custom
-message interpolator implementations.
-
-With ResourceBundleLocator, Hibernate Validator provides an additional SPI which allows to retrieve
+With +ResourceBundleLocator+, Hibernate Validator provides an additional SPI which allows to retrieve
 error messages from other resource bundles than _ValidationMessages_ while still using the actual
 interpolation algorithm as defined by the specification. Refer to
 <<section-resource-bundle-locator>> to learn how to make use of that SPI.

@@ -27,7 +27,6 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -44,21 +43,18 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 		Object validation = clazz.newInstance();
 		Method m = clazz.getMethod( "buildDefaultValidatorFactory" );
+		
+		Object validatorFactory = m.invoke( validation );
+		Method getValidatorMethod = validatorFactory.getClass().getMethod( "getValidator" );
 		try {
-			m.invoke( validation );
+			getValidatorMethod.invoke( validatorFactory );
 			fail( "An exception should have been thrown" );
 		}
 		catch ( InvocationTargetException e ) {
 			Exception exceptionInValidation = (Exception) e.getTargetException();
-			assertEquals(
-					exceptionInValidation.getMessage(),
-					"Unable to instantiate Configuration.",
-					"Bootstrapping in Validation should throw an exception "
-			);
-			Throwable rootCause = exceptionInValidation.getCause();
 			assertTrue(
-					rootCause.getMessage().startsWith( "HV000183" ),
-					"The root cause of the failure should be missing EL dependencies"
+					exceptionInValidation.getMessage().startsWith( "HV000183" ),
+					"Bootstrapping in Validation should threw an unexpected exception: " + exceptionInValidation.getMessage()
 			);
 		}
 	}

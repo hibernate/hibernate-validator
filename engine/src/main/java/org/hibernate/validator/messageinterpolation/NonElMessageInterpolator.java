@@ -19,39 +19,35 @@ package org.hibernate.validator.messageinterpolation;
 import java.util.Locale;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
+import org.hibernate.validator.internal.engine.messageinterpolation.ParameterTermResolver;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
- * Resource bundle backed message interpolator.
+ * Resource bundle message interpolator, it does not support EL expression
+ * and does support parameter value expression 
  *
- * @author Emmanuel Bernard
- * @author Hardy Ferentschik
- * @author Gunnar Morling
- * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Adam Stawicki
+ * @since 5.2
  */
-public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolator {
-	private static final Log log = LoggerFactory.make();
+public class NonElMessageInterpolator extends AbstractMessageInterpolator {
 	
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator defaultResourceBundleLocator) {
-		this(defaultResourceBundleLocator, true);
-	}
+	private static final Log log = LoggerFactory.make();
 
-	public ResourceBundleMessageInterpolator() {
-		super();
-	}
-
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator testResourceBundleLocator, boolean cachingEnabled) {
-		super(testResourceBundleLocator, cachingEnabled);
+	public NonElMessageInterpolator() {
+		log.getNonElMessageInterpolator();
 	}
 
 	@Override
 	public String interpolate(Context context, Locale locale, String term) {
-		InterpolationTerm expression = new InterpolationTerm( term, locale );
-		return expression.interpolate( context );
+		if( InterpolationTerm.isElExpression(term) ) {
+			log.getElUnsupported(term);
+			return term;
+		}
+		else {
+			ParameterTermResolver parameterTermResolver = new ParameterTermResolver();
+			return parameterTermResolver.interpolate(context, term);
+		}
 	}
-	
-	
+
 }

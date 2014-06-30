@@ -632,6 +632,15 @@ public interface Log extends BasicLogger {
 	@Message(id = 182, value = "No validation value unwrapper is registered for type %1$s.")
 	ValidationException getNoUnwrapperFoundForTypeException(String typeName);
 
-	@Message(id = 183, value = "Unable to load 'javax.el.ExpressionFactory'. Check that you have the EL dependencies on the classpath")
+	@Message(id = 183, value = "Unable to load 'javax.el.ExpressionFactory'. Check that you have the EL dependencies on the classpath, or use ParameterMessageInterpolator instead")
 	ValidationException getMissingELDependenciesException();
+
+	@LogMessage(level = WARN)
+	@Message(id = 184, value = "ParameterMessageInterpolator has been chosen, EL interpolation will not be supported")
+	void getNonElMessageInterpolator();
+
+	@LogMessage(level = WARN)
+	@Message(id = 185, value = "Message contains EL expression: %1s, which is unsupported with chosen Interpolator")
+	void getElUnsupported(String expression);
+
 }

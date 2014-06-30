@@ -57,6 +57,13 @@ implementation]:
 ----
 ====
 
+[TIP]
+====
+For environments where one cannot provide a EL implementation Hibernate Validator is offering a
+<<non-el-message-interpolator>>. However, the use of this interpolator
+is not Bean Validation specification compliant.
+====
+
 [[section-getting-started-cdi]]
 ==== CDI
 
