@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentMap;
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
-import javax.validation.ValidationException;
 import javax.validation.constraints.AssertFalse;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.DecimalMax;
@@ -569,15 +568,7 @@ public class ConstraintHelper {
 	}
 
 	private boolean isJodaTimeInClasspath() {
-		boolean isInClasspath;
-		try {
-			ReflectionHelper.loadClass( JODA_TIME_CLASS_NAME, this.getClass() );
-			isInClasspath = true;
-		}
-		catch ( ValidationException e ) {
-			isInClasspath = false;
-		}
-		return isInClasspath;
+		return ReflectionHelper.isClassPresent( JODA_TIME_CLASS_NAME, this.getClass() );
 	}
 
 	/**

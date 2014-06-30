@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -423,14 +424,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	private boolean isJavaFxInClasspath() {
-		boolean isInClasspath;
-		try {
-			ReflectionHelper.loadClass( "javafx.application.Application", this.getClass() );
-			isInClasspath = true;
-		}
-		catch ( ValidationException e ) {
-			isInClasspath = false;
-		}
-		return isInClasspath;
+		return ReflectionHelper.isClassPresent( "javafx.application.Application", this.getClass() );
 	}
 }

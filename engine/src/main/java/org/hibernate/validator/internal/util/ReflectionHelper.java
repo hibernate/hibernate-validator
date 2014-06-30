@@ -35,6 +35,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.ValidationException;
+
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -156,6 +158,16 @@ public final class ReflectionHelper {
 
 	public static Class<?> loadClass(String className, String defaultPackage) {
 		return loadClass( className, defaultPackage, ReflectionHelper.class );
+	}
+
+	public static boolean isClassPresent(String className, Class<?> caller) {
+		try {
+			ReflectionHelper.loadClass( className, caller );
+			return true;
+		}
+		catch ( ValidationException e ) {
+			return false;
+		}
 	}
 
 	public static Class<?> loadClass(String className, String defaultPackage, Class<?> caller) {
