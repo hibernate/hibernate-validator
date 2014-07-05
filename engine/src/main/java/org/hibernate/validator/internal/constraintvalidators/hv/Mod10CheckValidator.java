@@ -79,9 +79,12 @@ public class Mod10CheckValidator extends ModCheckBase
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {
 		int modResult = ModUtil.calculateMod10Check( digits, this.multiplier, this.weight );
-		int checkValue = extractDigit( checkDigit );
 
+		if ( !Character.isDigit( checkDigit ) ) {
+			return false;
+		}
+
+		int checkValue = extractDigit( checkDigit );
 		return checkValue == modResult;
 	}
-
 }

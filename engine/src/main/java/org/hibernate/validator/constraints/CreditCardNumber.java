@@ -20,6 +20,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
+import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 
@@ -50,6 +51,13 @@ public @interface CreditCardNumber {
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
+
+	/**
+	 * @return Whether non-digit characters in the validated input should be ignored ({@code true}) or result in a
+	 * validation error ({@code false}). Default is {@code false}
+	 */
+	@OverridesAttribute(constraint = LuhnCheck.class, name = "ignoreNonDigitCharacters")
+	boolean ignoreNonDigitCharacters() default false;
 
 	/**
 	 * Defines several {@code @CreditCardNumber} annotations on the same element.
