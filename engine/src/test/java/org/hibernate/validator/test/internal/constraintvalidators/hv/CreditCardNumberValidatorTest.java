@@ -90,9 +90,39 @@ public class CreditCardNumberValidatorTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-906")
+	public void testCharactersAreNotAllowedTest() {
+		CreditCard card = new CreditCard();
+		card.setCreditCardNumber( "text not numbers" );
+		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
+		assertNumberOfViolations( constraintViolations, 1 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-906")
+	public void testValidCreditCardNumberWithSpaces() throws Exception {
+		CreditCard card = new CreditCard();
+		card.setCreditCardNumberWithNonDigits( "5412 3456 7890 125" );
+		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-906")
+	public void testValidCreditCardNumberWithDashes() throws Exception {
+		CreditCard card = new CreditCard();
+		card.setCreditCardNumberWithNonDigits( "5412-3456-7890-125" );
+		Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate( card );
+		assertNumberOfViolations( constraintViolations, 0 );
+	}
+
 	public static class CreditCard {
 		@CreditCardNumber
 		String creditCardNumber;
+
+		@CreditCardNumber(ignoreNonDigitCharacters = true)
+		String creditCardNumberWithNonDigits;
 
 		@CreditCardNumber
 		CharSequence creditCardNumberAsCharSequence;
@@ -103,6 +133,10 @@ public class CreditCardNumberValidatorTest {
 
 		public void setCreditCardNumberAsCharSequence(CharSequence creditCardNumberAsCharSequence) {
 			this.creditCardNumberAsCharSequence = creditCardNumberAsCharSequence;
+		}
+
+		public void setCreditCardNumberWithNonDigits(String creditCardNumberWithNonDigits) {
+			this.creditCardNumberWithNonDigits = creditCardNumberWithNonDigits;
 		}
 	}
 }
