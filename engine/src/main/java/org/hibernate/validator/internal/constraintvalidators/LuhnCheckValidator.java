@@ -55,9 +55,12 @@ public class LuhnCheckValidator extends ModCheckBase
 	@Override
 	public boolean isCheckDigitValid(List<Integer> digits, char checkDigit) {
 		int modResult = ModUtil.calculateLuhnMod10Check( digits );
-		int checkValue = extractDigit( checkDigit );
 
+		if ( !Character.isDigit( checkDigit ) ) {
+			return false;
+		}
+
+		int checkValue = extractDigit( checkDigit );
 		return checkValue == modResult;
 	}
-
 }

@@ -932,7 +932,7 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
 
           <tbody valign="top">
             <row>
-              <entry><classname>@CreditCardNumber</classname></entry>
+              <entry><classname>@CreditCardNumber(ignoreNonDigitCharacters=)</classname></entry>
 
               <entry><classname>CharSequence</classname></entry>
 
@@ -940,7 +940,8 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
               Luhn checksum test. Note, this validation aims to check for user
               mistakes, not credit card validity! See also <ulink
               url="http://www.merriampark.com/anatomycc.htm">Anatomy of Credit
-              Card Numbers</ulink>.</entry>
+              Card Numbers</ulink>. <parameter>ignoreNonDigitCharacters</parameter> allows to ignore
+              non digit characters. The default is <constant>false</constant>.</entry>
 
               <entry>None</entry>
             </row>
