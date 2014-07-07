@@ -556,9 +556,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						valueContext.getCurrentBean()
 				);
 				if ( value != null ) {
-					Type type = value.getClass();
-					Iterator<?> iter = createIteratorForCascadedValue( type, value, valueContext );
-					boolean isIndexable = isIndexable( type );
 
 					// expand the group only if was created by group conversion;
 					// otherwise we're looping through the right validation order
@@ -568,9 +565,24 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							group != originalGroup
 					);
 
+					// HV-902: First, validate the value itself
+					Iterator<?> valueIter = Arrays.asList( value ).iterator();
 					validateCascadedConstraint(
 							validationContext,
-							iter,
+							valueIter,
+							false,
+							valueContext,
+							validationOrder
+					);
+
+					// Second, validate elements contained in the value if it is Iterable, Map, or an Array
+					Type type = value.getClass();
+					Iterator<?> elementsIter = createIteratorForCascadedValue( type, value, valueContext );
+					boolean isIndexable = isIndexable( type );
+
+					validateCascadedConstraint(
+							validationContext,
+							elementsIter,
 							isIndexable,
 							valueContext,
 							validationOrder
@@ -598,7 +610,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @return An iterator over the value of a cascaded property.
 	 */
 	private Iterator<?> createIteratorForCascadedValue(Type type, Object value, ValueContext<?, ?> valueContext) {
-		Iterator<?> iter;
+		Iterator<?> iter = Collections.emptyIterator();
 		if ( ReflectionHelper.isIterable( type ) ) {
 			iter = ( (Iterable<?>) value ).iterator();
 			valueContext.markCurrentPropertyAsIterable();
@@ -612,11 +624,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			List<?> arrayList = Arrays.asList( (Object[]) value );
 			iter = arrayList.iterator();
 			valueContext.markCurrentPropertyAsIterable();
-		}
-		else {
-			List<Object> list = newArrayList();
-			list.add( value );
-			iter = list.iterator();
 		}
 		return iter;
 	}
