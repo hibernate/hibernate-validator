@@ -16,10 +16,12 @@
 */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
@@ -27,40 +29,64 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
 
 /**
+ * Test for cascaded validation of custom iterable types for which the contained elements but also constraints on the
+ * type themselves should be validated.
+ *
  * @author Khalid Alqinyah
+ * @author Gunnar Morling
  */
 public class CascadedIterableMapPropertiesTest {
 
 	@Test
-	@TestForIssue( jiraKey = "HV-902")
-	public void testValidateCascadingIterableAndMapProperties() {
+	@TestForIssue(jiraKey = "HV-902")
+	public void testValidateCustomIterableType() {
 		Validator validator = getValidator();
-		Set<ConstraintViolation<CascadingIterMap>> constraintViolations = validator.validate( new CascadingIterMap() );
-		assertEquals( constraintViolations.size(), 4 );
-		assertCorrectPropertyPaths( constraintViolations,
+		Set<ConstraintViolation<IterableExtHolder>> constraintViolations = validator.validate( new IterableExtHolder() );
+		assertCorrectPropertyPaths(
+				constraintViolations,
 				"iterableExt.value",
-				"iterableExt[].number",
-				"mapExt.value",
-				"mapExt[second].number" );
+				"iterableExt[].number"
+		);
 	}
 
-	class CascadingIterMap {
-		@Valid
-		IterableExt iterableExt = new IterableExt();
+	@Test
+	@TestForIssue(jiraKey = "HV-902")
+	public void testValidateCustomListType() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<ListExtHolder>> constraintViolations = validator.validate( new ListExtHolder() );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"listExt.value",
+				"listExt[1].number"
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-902")
+	public void testValidateCustomMapType() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<MapExtHolder>> constraintViolations = validator.validate( new MapExtHolder() );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"mapExt.value",
+				"mapExt[second].number"
+		);
+	}
+
+	class IterableExtHolder {
 
 		@Valid
-		MapExt mapExt = new MapExt();
+		IterableExt iterableExt = new IterableExt();
 	}
 
 	class IterableExt implements Iterable<IntWrapper> {
+
 		@NotNull
 		Integer value = null;
 
@@ -70,7 +96,32 @@ public class CascadedIterableMapPropertiesTest {
 		}
 	}
 
+	class ListExtHolder {
+
+		@Valid
+		ListExt listExt = new ListExt();
+	}
+
+	@SuppressWarnings("serial")
+	class ListExt extends ArrayList<IntWrapper> {
+
+		@NotNull
+		Integer value = null;
+
+		public ListExt() {
+			super( Arrays.asList( new IntWrapper( 2 ), new IntWrapper( 1 ), new IntWrapper( 5 ) ) );
+		}
+	}
+
+	class MapExtHolder {
+
+		@Valid
+		MapExt mapExt = new MapExt();
+	}
+
+	@SuppressWarnings("serial")
 	class MapExt extends HashMap<String, IntWrapper> {
+
 		@NotNull
 		Integer value = null;
 
@@ -82,6 +133,7 @@ public class CascadedIterableMapPropertiesTest {
 	}
 
 	class IntWrapper {
+
 		@Min(value = 2)
 		Integer number;
 
