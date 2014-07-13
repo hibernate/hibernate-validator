@@ -575,7 +575,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					);
 
 					// HV-902: First, validate the value itself
-					Iterator<?> valueIter = Arrays.asList( value ).iterator();
+					Iterator<?> valueIter = Collections.singletonList( value ).iterator();
 					validateCascadedConstraint(
 							validationContext,
 							valueIter,
@@ -583,6 +583,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							valueContext,
 							validationOrder
 					);
+					if ( shouldFailFast( validationContext ) ) {
+						return;
+					}
 
 					// Second, validate elements contained in the value if it is Iterable, Map, or an Array
 					Type type = value.getClass();
