@@ -35,8 +35,8 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertC
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
- * Test for cascaded validation of custom iterable types for which the contained elements but also constraints on the
- * type themselves should be validated.
+ * Test for cascaded validation of custom iterable and map types. For those, property-level and class-level constraints
+ * on the validated types themselves must be validated, but also constraints on the contained elements.
  *
  * @author Khalid Alqinyah
  * @author Gunnar Morling
