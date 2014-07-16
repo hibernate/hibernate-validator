@@ -341,10 +341,27 @@ public final class ReflectionHelper {
 	 * @param member The <code>Member</code> instance for which to retrieve the type.
 	 *
 	 * @return Returns the <code>Type</code> of the given <code>Field</code> or <code>Method</code>.
+	 * If the type is a {@code TypeVariable}, the erased type will be returned.
 	 *
 	 * @throws IllegalArgumentException in case <code>member</code> is not a <code>Field</code> or <code>Method</code>.
 	 */
 	public static Type typeOf(Member member) {
+		Type type = genericTypeOf( member );
+		if ( type instanceof TypeVariable ) {
+			type = TypeHelper.getErasedType( type );
+		}
+		return type;
+	}
+
+	/**
+	 * @param member The {@code Member} instance for which to retrieve the type.
+	 *
+	 * @return returns the generic type of the given {@code Field} or {@code Method}.
+	 * If the type is a {@code TypeVariable}, it will be returned as is.
+	 *
+	 * @throws IllegalArgumentException in case {@code member} is not a {@code Field} or {@code Method}.
+	 */
+	public static Type genericTypeOf(Member member) {
 		Type type;
 		if ( member instanceof Field ) {
 			type = ( (Field) member ).getGenericType();
@@ -359,14 +376,12 @@ public final class ReflectionHelper {
 		else {
 			throw log.getMemberIsNeitherAFieldNorAMethodException( member );
 		}
-		if ( type instanceof TypeVariable ) {
-			type = TypeHelper.getErasedType( type );
-		}
 		return type;
 	}
 
 	/**
-	 * Returns the type of the parameter of the given method with the given parameter index.
+	 * Returns the type of the parameter of the given method with the given parameter index. If the type is a
+	 * {@code TypeVariable}, the erased type will be returned.
 	 *
 	 * @param executable The executable of interest.
 	 * @param parameterIndex The index of the parameter for which the type should be returned.
@@ -374,6 +389,25 @@ public final class ReflectionHelper {
 	 * @return The erased type.
 	 */
 	public static Type typeOf(ExecutableElement executable, int parameterIndex) {
+		Type type = genericTypeOf( executable, parameterIndex );
+
+		if ( type instanceof TypeVariable ) {
+			type = TypeHelper.getErasedType( type );
+		}
+		return type;
+	}
+
+
+	/**
+	 * Returns the type of the parameter of the given method with the given parameter index. If the type is a
+	 * {@code TypeVariable}, it will be returned as is.
+	 *
+	 * @param executable The executable of interest.
+	 * @param parameterIndex The index of the parameter for which the type should be returned.
+	 *
+	 * @return the generic type
+	 */
+	public static Type genericTypeOf(ExecutableElement executable, int parameterIndex) {
 		Type[] genericParameterTypes = executable.getGenericParameterTypes();
 
 		// getGenericParameterTypes() doesn't return synthetic parameters; in this case fall back to getParameterTypes()
@@ -383,9 +417,6 @@ public final class ReflectionHelper {
 
 		Type type = genericParameterTypes[parameterIndex];
 
-		if ( type instanceof TypeVariable ) {
-			type = TypeHelper.getErasedType( type );
-		}
 		return type;
 	}
 

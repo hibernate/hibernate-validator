@@ -81,10 +81,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	static final int DEFAULT_INITIAL_CAPACITY = 16;
 
-	private final ConstraintHelper constraintHelper;
-	private final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
-	private final AnnotationProcessingOptions annotationProcessingOptions;
-	private final ParameterNameProvider parameterNameProvider;
+	protected final ConstraintHelper constraintHelper;
+	protected final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
+	protected final AnnotationProcessingOptions annotationProcessingOptions;
+	protected final ParameterNameProvider parameterNameProvider;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			ParameterNameProvider parameterNameProvider,
@@ -257,7 +257,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
-	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
+	protected Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
@@ -365,7 +365,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
-	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, ExecutableElement executable) {
+	protected Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, ExecutableElement executable) {
 		if ( constraintsDescriptors == null ) {
 			return Collections.emptySet();
 		}
@@ -422,6 +422,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
+			List<ConstraintDescriptorImpl<?>> constraints = newArrayList();
+
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
 				//1. mark parameter as cascading if this annotation is the @Valid annotation
 				if ( parameterAnnotation.annotationType().equals( Valid.class ) ) {
@@ -440,16 +442,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				}
 
 				//4. collect constraints if this annotation is a constraint annotation
-				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						executable.getMember(), parameterAnnotation, ElementType.PARAMETER
+				constraints.addAll(
+						findConstraintAnnotations(
+								executable.getMember(), parameterAnnotation, ElementType.PARAMETER
+						)
 				);
-				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
-					parameterConstraints.add(
-							createParameterMetaConstraint( executable, i, constraintDescriptorImpl )
-					);
-				}
-			}
 
+			}
+			parameterConstraints.addAll( convertToMetaConstraints( constraints, executable, i ) );
 			metaData.add(
 					new ConstrainedParameter(
 							ConfigurationSource.ANNOTATION,
@@ -469,6 +469,16 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return metaData;
 	}
 
+	protected Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, ExecutableElement executable, int i) {
+		Set<MetaConstraint<?>> metaConstraints = newHashSet();
+		for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraintDescriptors ) {
+			metaConstraints.add(
+					createParameterMetaConstraint( executable, i, constraintDescriptorImpl )
+			);
+		}
+		return metaConstraints;
+	}
+
 	/**
 	 * Finds all constraint annotations defined for the given member and returns them in a list of
 	 * constraint descriptors.
@@ -478,7 +488,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return A list of constraint descriptors for all constraint specified for the given member.
 	 */
-	private List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type) {
+	protected List<ConstraintDescriptorImpl<?>> findConstraints(Member member, ElementType type) {
 		List<ConstraintDescriptorImpl<?>> metaData = newArrayList();
 		for ( Annotation annotation : ( (AccessibleObject) member ).getDeclaredAnnotations() ) {
 			metaData.addAll( findConstraintAnnotations( member, annotation, type ) );
@@ -512,7 +522,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
 	 *         single nor multi-valued annotation.
 	 */
-	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
+	protected <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
 			A annotation,
 			ElementType type) {
 		List<ConstraintDescriptorImpl<?>> constraintDescriptors = newArrayList();

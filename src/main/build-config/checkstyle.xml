@@ -45,7 +45,13 @@
         <module name="DefaultComesLast"/>
     </module>
 
+    <!-- Currently, CheckStyle fails on Java 8 syntax. This prevents the testing of new Java 8 features such as type
+    annotations. suppressions.xml contains a list of test files with Java 8 syntax which should not be checked
+    by CheckStyle -->
+    <module name="SuppressionFilter">
+        <property name="file" value="src/main/build-config/suppressions.xml"/>
+    </module>
+
     <!-- Checks that a file ends with a new line  -->
     <module name="NewlineAtEndOfFile"/>
-
 </module>
