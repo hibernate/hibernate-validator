@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import java.security.AccessControlContext;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -62,6 +63,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	/**
 	 * The default message interpolator for this factory.
@@ -257,7 +259,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				throw log.getMissingELDependenciesException();
 			}
 		}
-		
+
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
 			beanMetaDataManager = new BeanMetaDataManager(
@@ -334,15 +336,15 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		String[] handlerNames = propertyValue.split( "," );
 		List<ValidatedValueUnwrapper<?>> handlers = newArrayList( handlerNames.length );
+		AccessControlContext accessControlContext = ACCESS_CONTROL_CONTEXT;
 
 		for ( String handlerName : handlerNames ) {
 			@SuppressWarnings("unchecked")
 			Class<? extends ValidatedValueUnwrapper<?>> handlerType = (Class<? extends ValidatedValueUnwrapper<?>>) ReflectionHelper
-					.loadClass( handlerName, ValidatorFactoryImpl.class );
-			handlers.add( ReflectionHelper.newInstance( handlerType, "validated value handler class" ) );
+					.loadClass( accessControlContext, handlerName, ValidatorFactoryImpl.class );
+			handlers.add( ReflectionHelper.newInstance( accessControlContext, handlerType, "validated value handler class" ) );
 		}
 
 		return handlers;
 	}
-
 }

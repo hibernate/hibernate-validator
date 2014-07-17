@@ -21,6 +21,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
+import java.security.AccessControlContext;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
@@ -34,10 +35,12 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  */
 public class AnnotationFactory {
 
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
+
 	public static <T extends Annotation> T create(AnnotationDescriptor<T> descriptor) {
 		@SuppressWarnings("unchecked")
 		Class<T> proxyClass = (Class<T>) Proxy.getProxyClass(
-				ReflectionHelper.getClassLoaderFromClass( descriptor.type() ),
+				ReflectionHelper.getClassLoaderFromClass( ACCESS_CONTROL_CONTEXT, descriptor.type() ),
 				descriptor.type()
 		);
 		InvocationHandler handler = new AnnotationProxy( descriptor );
@@ -56,9 +59,10 @@ public class AnnotationFactory {
 			SecurityException, NoSuchMethodException, IllegalArgumentException, InstantiationException,
 			IllegalAccessException, InvocationTargetException {
 		final Constructor<T> constructor = ReflectionHelper.getDeclaredConstructor(
+				ACCESS_CONTROL_CONTEXT,
 				proxyClass,
 				InvocationHandler.class
 		);
-		return ReflectionHelper.newConstructorInstance( constructor, handler );
+		return ReflectionHelper.newConstructorInstance( ACCESS_CONTROL_CONTEXT, constructor, handler );
 	}
 }

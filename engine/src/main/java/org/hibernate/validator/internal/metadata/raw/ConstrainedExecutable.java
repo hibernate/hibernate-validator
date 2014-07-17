@@ -18,10 +18,12 @@ package org.hibernate.validator.internal.metadata.raw;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -44,6 +46,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private final ExecutableElement executable;
 
@@ -142,7 +145,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
 
 		if ( isConstrained() ) {
-			ReflectionHelper.setAccessibility( location.getMember() );
+			ReflectionHelper.setAccessibility( ACCESS_CONTROL_CONTEXT, location.getMember() );
 		}
 	}
 

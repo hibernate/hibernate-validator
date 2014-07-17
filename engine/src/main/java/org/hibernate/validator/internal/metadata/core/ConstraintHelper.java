@@ -18,10 +18,12 @@ package org.hibernate.validator.internal.metadata.core;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
@@ -138,6 +140,8 @@ public class ConstraintHelper {
 	public static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
 
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
+
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 
 	private final ConcurrentMap<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints = newConcurrentHashMap();
@@ -415,7 +419,7 @@ public class ConstraintHelper {
 	 */
 	public boolean isMultiValueConstraint(Class<? extends Annotation> annotationType) {
 		boolean isMultiValueConstraint = false;
-		final Method method = ReflectionHelper.getMethod( annotationType, "value" );
+		final Method method = ReflectionHelper.getMethod( ACCESS_CONTROL_CONTEXT, annotationType, "value" );
 		if ( method != null ) {
 			Class<?> returnType = method.getReturnType();
 			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
@@ -445,6 +449,7 @@ public class ConstraintHelper {
 	 */
 	public <A extends Annotation> List<Annotation> getConstraintsFromMultiValueConstraint(A multiValueConstraint) {
 		Annotation[] annotations = ReflectionHelper.getAnnotationParameter(
+				ACCESS_CONTROL_CONTEXT,
 				multiValueConstraint,
 				"value",
 				Annotation[].class
@@ -481,7 +486,7 @@ public class ConstraintHelper {
 	}
 
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
-		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
+		final Method[] methods = ReflectionHelper.getDeclaredMethods( ACCESS_CONTROL_CONTEXT, annotationType );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) && !m.getName().equals( VALIDATION_APPLIES_TO ) ) {
 				throw log.getConstraintParametersCannotStartWithValidException();
@@ -491,7 +496,7 @@ public class ConstraintHelper {
 
 	private void assertPayloadParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotationType, PAYLOAD );
+			final Method method = ReflectionHelper.getMethod( ACCESS_CONTROL_CONTEXT, annotationType, PAYLOAD );
 			if ( method == null ) {
 				throw log.getConstraintWithoutMandatoryParameterException( PAYLOAD, annotationType.getName() );
 			}
@@ -507,7 +512,7 @@ public class ConstraintHelper {
 
 	private void assertGroupsParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotationType, GROUPS );
+			final Method method = ReflectionHelper.getMethod( ACCESS_CONTROL_CONTEXT, annotationType, GROUPS );
 			if ( method == null ) {
 				throw log.getConstraintWithoutMandatoryParameterException( GROUPS, annotationType.getName() );
 			}
@@ -522,7 +527,7 @@ public class ConstraintHelper {
 	}
 
 	private void assertMessageParameterExists(Class<? extends Annotation> annotationType) {
-		final Method method = ReflectionHelper.getMethod( annotationType, MESSAGE );
+		final Method method = ReflectionHelper.getMethod( ACCESS_CONTROL_CONTEXT, annotationType, MESSAGE );
 		if ( method == null ) {
 			throw log.getConstraintWithoutMandatoryParameterException( MESSAGE, annotationType.getName() );
 		}
@@ -540,7 +545,7 @@ public class ConstraintHelper {
 				annotationType,
 				ValidationTarget.PARAMETERS
 		).isEmpty();
-		final Method method = ReflectionHelper.getMethod( annotationType, VALIDATION_APPLIES_TO );
+		final Method method = ReflectionHelper.getMethod( ACCESS_CONTROL_CONTEXT, annotationType, VALIDATION_APPLIES_TO );
 
 		if ( hasGenericValidators && hasCrossParameterValidator ) {
 			if ( method == null ) {
@@ -568,7 +573,7 @@ public class ConstraintHelper {
 	}
 
 	private boolean isJodaTimeInClasspath() {
-		return ReflectionHelper.isClassPresent( JODA_TIME_CLASS_NAME, this.getClass() );
+		return ReflectionHelper.isClassPresent( ACCESS_CONTROL_CONTEXT, JODA_TIME_CLASS_NAME, this.getClass() );
 	}
 
 	/**

@@ -19,6 +19,7 @@ package org.hibernate.validator.internal.engine;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.AccessControlContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,6 +73,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private final ResourceBundleLocator defaultResourceBundleLocator;
 	private final MessageInterpolator defaultMessageInterpolator;
@@ -433,6 +435,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	private boolean isJavaFxInClasspath() {
-		return ReflectionHelper.isClassPresent( "javafx.application.Application", this.getClass() );
+		return ReflectionHelper.isClassPresent( ACCESS_CONTROL_CONTEXT, "javafx.application.Application", this.getClass() );
 	}
 }
