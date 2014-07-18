@@ -20,9 +20,11 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -62,6 +64,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		implements TypeConstraintMappingContext<C> {
 
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private final Class<C> beanClass;
 
@@ -115,7 +118,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Contracts.assertNotEmpty( property, MESSAGES.propertyNameMustNotBeEmpty() );
 
 		Member member = ReflectionHelper.getMember(
-				beanClass, property, elementType
+				ACCESS_CONTROL_CONTEXT, beanClass, property, elementType
 		);
 
 		if ( member == null || member.getDeclaringClass() != beanClass ) {
@@ -140,7 +143,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
 		Contracts.assertNotNull( name, MESSAGES.methodNameMustNotBeNull() );
 
-		Method method = ReflectionHelper.getDeclaredMethod( beanClass, name, parameterTypes );
+		Method method = ReflectionHelper.getDeclaredMethod( ACCESS_CONTROL_CONTEXT, beanClass, name, parameterTypes );
 
 		if ( method == null || method.getDeclaringClass() != beanClass ) {
 			throw log.getUnableToFindMethodException(
@@ -165,7 +168,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	@Override
 	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
-		Constructor<C> constructor = ReflectionHelper.getDeclaredConstructor( beanClass, parameterTypes );
+		Constructor<C> constructor = ReflectionHelper.getDeclaredConstructor( ACCESS_CONTROL_CONTEXT, beanClass, parameterTypes );
 
 		if ( constructor == null || constructor.getDeclaringClass() != beanClass ) {
 			throw log.getBeanDoesNotContainConstructorException(
@@ -228,6 +231,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	private DefaultGroupSequenceProvider<? super C> getDefaultGroupSequenceProvider() {
 		return defaultGroupSequenceProviderClass != null ? ReflectionHelper.newInstance(
+				ACCESS_CONTROL_CONTEXT,
 				defaultGroupSequenceProviderClass,
 				"default group sequence provider"
 		) : null;

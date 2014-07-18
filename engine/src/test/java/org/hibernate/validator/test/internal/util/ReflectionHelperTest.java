@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeSet;
+
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 
@@ -151,14 +151,14 @@ public class ReflectionHelperTest {
 				return this.getClass();
 			}
 		};
-		String message = ReflectionHelper.getAnnotationParameter( testAnnotation, "message", String.class );
+		String message = ReflectionHelper.getAnnotationParameter( null, testAnnotation, "message", String.class );
 		assertEquals( "test", message, "Wrong message" );
 
-		Class<?>[] group = ReflectionHelper.getAnnotationParameter( testAnnotation, "groups", Class[].class );
+		Class<?>[] group = ReflectionHelper.getAnnotationParameter( null, testAnnotation, "groups", Class[].class );
 		assertEquals( group[0], Default.class, "Wrong message" );
 
 		try {
-			ReflectionHelper.getAnnotationParameter( testAnnotation, "message", Integer.class );
+			ReflectionHelper.getAnnotationParameter( null, testAnnotation, "message", Integer.class );
 			fail();
 		}
 		catch ( ValidationException e ) {
@@ -166,7 +166,7 @@ public class ReflectionHelperTest {
 		}
 
 		try {
-			ReflectionHelper.getAnnotationParameter( testAnnotation, "foo", Integer.class );
+			ReflectionHelper.getAnnotationParameter( null, testAnnotation, "foo", Integer.class );
 			fail();
 		}
 		catch ( ValidationException e ) {

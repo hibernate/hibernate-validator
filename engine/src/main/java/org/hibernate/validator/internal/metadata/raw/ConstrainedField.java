@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.metadata.raw;
 
 import java.lang.reflect.Member;
+import java.security.AccessControlContext;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,6 +32,8 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  * @author Gunnar Morling
  */
 public class ConstrainedField extends AbstractConstrainedElement {
+
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	/**
 	 * Creates a new field meta data object.
@@ -54,7 +57,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 
 		Member member = location.getMember();
 		if ( member != null && isConstrained() ) {
-			ReflectionHelper.setAccessibility( member );
+			ReflectionHelper.setAccessibility( ACCESS_CONTROL_CONTEXT, member );
 		}
 	}
 

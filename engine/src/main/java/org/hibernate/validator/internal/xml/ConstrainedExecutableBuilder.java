@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.xml;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +52,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public class ConstrainedExecutableBuilder {
 
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private ConstrainedExecutableBuilder() {
 	}
@@ -74,6 +76,7 @@ public class ConstrainedExecutableBuilder {
 			String methodName = methodType.getName();
 
 			final Method method = ReflectionHelper.getDeclaredMethod(
+					ACCESS_CONTROL_CONTEXT,
 					beanClass,
 					methodName,
 					parameterTypes.toArray( new Class[parameterTypes.size()] )
@@ -137,6 +140,7 @@ public class ConstrainedExecutableBuilder {
 			);
 
 			final Constructor<?> constructor = ReflectionHelper.getDeclaredConstructor(
+					ACCESS_CONTROL_CONTEXT,
 					beanClass,
 					constructorParameterTypes.toArray( new Class[constructorParameterTypes.size()] )
 			);
@@ -317,7 +321,7 @@ public class ConstrainedExecutableBuilder {
 			String type = null;
 			try {
 				type = parameterType.getType();
-				Class<?> parameterClass = ReflectionHelper.loadClass( type, defaultPackage );
+				Class<?> parameterClass = ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, type, defaultPackage );
 				parameterTypes.add( parameterClass );
 			}
 			catch ( ValidationException e ) {

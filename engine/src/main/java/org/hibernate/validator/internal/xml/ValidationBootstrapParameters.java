@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.xml;
 
 import java.io.InputStream;
+import java.security.AccessControlContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class ValidationBootstrapParameters {
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private MessageInterpolator messageInterpolator;
@@ -142,6 +144,7 @@ public class ValidationBootstrapParameters {
 		if ( providerFqcn != null ) {
 			try {
 				providerClass = (Class<? extends ValidationProvider<?>>) ReflectionHelper.loadClass(
+						ACCESS_CONTROL_CONTEXT,
 						providerFqcn,
 						this.getClass()
 				);
@@ -158,9 +161,9 @@ public class ValidationBootstrapParameters {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) ReflectionHelper.loadClass(
-						messageInterpolatorFqcn, this.getClass()
+						ACCESS_CONTROL_CONTEXT, messageInterpolatorFqcn, this.getClass()
 				);
-				messageInterpolator = ReflectionHelper.newInstance( messageInterpolatorClass, "message interpolator" );
+				messageInterpolator = ReflectionHelper.newInstance( ACCESS_CONTROL_CONTEXT, messageInterpolatorClass, "message interpolator" );
 				log.usingMessageInterpolator( messageInterpolatorFqcn );
 			}
 			catch ( ValidationException e ) {
@@ -174,9 +177,9 @@ public class ValidationBootstrapParameters {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<TraversableResolver> clazz = (Class<TraversableResolver>) ReflectionHelper.loadClass(
-						traversableResolverFqcn, this.getClass()
+						ACCESS_CONTROL_CONTEXT, traversableResolverFqcn, this.getClass()
 				);
-				traversableResolver = ReflectionHelper.newInstance( clazz, "traversable resolver" );
+				traversableResolver = ReflectionHelper.newInstance( ACCESS_CONTROL_CONTEXT, clazz, "traversable resolver" );
 				log.usingTraversableResolver( traversableResolverFqcn );
 			}
 			catch ( ValidationException e ) {
@@ -190,9 +193,9 @@ public class ValidationBootstrapParameters {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) ReflectionHelper.loadClass(
-						constraintFactoryFqcn, this.getClass()
+						ACCESS_CONTROL_CONTEXT, constraintFactoryFqcn, this.getClass()
 				);
-				constraintValidatorFactory = ReflectionHelper.newInstance( clazz, "constraint factory class" );
+				constraintValidatorFactory = ReflectionHelper.newInstance( ACCESS_CONTROL_CONTEXT, clazz, "constraint factory class" );
 				log.usingConstraintFactory( constraintFactoryFqcn );
 			}
 			catch ( ValidationException e ) {
@@ -206,9 +209,9 @@ public class ValidationBootstrapParameters {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<ParameterNameProvider> clazz = (Class<ParameterNameProvider>) ReflectionHelper.loadClass(
-						parameterNameProviderFqcn, this.getClass()
+						ACCESS_CONTROL_CONTEXT, parameterNameProviderFqcn, this.getClass()
 				);
-				parameterNameProvider = ReflectionHelper.newInstance( clazz, "parameter name provider class" );
+				parameterNameProvider = ReflectionHelper.newInstance( ACCESS_CONTROL_CONTEXT, clazz, "parameter name provider class" );
 				log.usingParameterNameProvider( parameterNameProviderFqcn );
 			}
 			catch ( ValidationException e ) {

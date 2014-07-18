@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.xml;
 
+import java.security.AccessControlContext;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  */
 public class GroupConversionBuilder {
 
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
+
 	private GroupConversionBuilder() {
 	}
 
@@ -37,8 +40,8 @@ public class GroupConversionBuilder {
 																  String defaultPackage) {
 		Map<Class<?>, Class<?>> groupConversionMap = newHashMap();
 		for ( GroupConversionType groupConversionType : groupConversionTypes ) {
-			Class<?> fromClass = ReflectionHelper.loadClass( groupConversionType.getFrom(), defaultPackage );
-			Class<?> toClass = ReflectionHelper.loadClass( groupConversionType.getTo(), defaultPackage );
+			Class<?> fromClass = ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, groupConversionType.getFrom(), defaultPackage );
+			Class<?> toClass = ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, groupConversionType.getTo(), defaultPackage );
 			groupConversionMap.put( fromClass, toClass );
 		}
 

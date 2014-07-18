@@ -18,8 +18,10 @@ package org.hibernate.validator.internal.cdi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.security.AccessControlContext;
 import java.util.Collections;
 import java.util.Set;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
@@ -50,6 +52,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public class ValidatorFactoryBean implements Bean<ValidatorFactory>, PassivationCapable {
+
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private final BeanManager beanManager;
 	private final Set<DestructibleBeanInstance<?>> destructibleResources;
@@ -142,6 +146,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 		@SuppressWarnings("unchecked")
 		Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) ReflectionHelper.loadClass(
+				ACCESS_CONTROL_CONTEXT,
 				messageInterpolatorFqcn,
 				this.getClass()
 		);
@@ -159,6 +164,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 		@SuppressWarnings("unchecked")
 		Class<TraversableResolver> traversableResolverClass = (Class<TraversableResolver>) ReflectionHelper.loadClass(
+				ACCESS_CONTROL_CONTEXT,
 				traversableResolverFqcn,
 				this.getClass()
 		);
@@ -176,6 +182,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 		@SuppressWarnings("unchecked")
 		Class<ParameterNameProvider> parameterNameProviderClass = (Class<ParameterNameProvider>) ReflectionHelper.loadClass(
+				ACCESS_CONTROL_CONTEXT,
 				parameterNameProviderFqcn,
 				this.getClass()
 		);
@@ -195,6 +202,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		@SuppressWarnings("unchecked")
 		Class<ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<ConstraintValidatorFactory>) ReflectionHelper
 				.loadClass(
+						ACCESS_CONTROL_CONTEXT,
 						constraintValidatorFactoryFqcn,
 						this.getClass()
 				);

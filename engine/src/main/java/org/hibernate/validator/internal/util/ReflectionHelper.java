@@ -27,8 +27,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
+import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.ProtectionDomain;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -52,6 +54,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
+import org.hibernate.validator.internal.util.privilegedactions.GetProtectionDomainAsArray;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
@@ -60,8 +63,29 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
- * Some reflection utility methods. Where necessary calls will be performed as {@code PrivilegedAction} which is necessary
- * for situations where a security manager is in place.
+ * Some reflection utility methods.
+ * <p>
+ * Many methods of this class require special permissions in case a security manager is in place. In that case, the
+ * operations are wrapped in {@code PrivilegedAction}s. All the affected methods expect an {@link AccessControlContext}
+ * which will be passed to {@link AccessController#doPrivileged(PrivilegedAction, AccessControlContext)} upon execution.
+ * <p>
+ * Callers can obtain a context representing their own {@link ProtectionDomain} via {@link #getAccessControlContext()}.
+ * It is recommended to cache that context but it may <strong>NEVER</strong> be made publicly available as otherwise
+ * untrusted code may invoke security-relevant methods under the protection domain of Hibernate Validator.
+ * <p>
+ * The following shows the recommended usage pattern:
+ *
+ * <pre>
+ * public class MyClass {
+ *
+ *     private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper
+ *             .getAccessControlContext();
+ *
+ *     public void myOperation() {
+ *         Field field = ReflectionHelper.getDeclaredField( ACCESS_CONTROL_CONTEXT, ArrayList.class, &quot;size&quot; ) );
+ *     }
+ * }
+ * </pre>
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
@@ -144,25 +168,51 @@ public final class ReflectionHelper {
 	private ReflectionHelper() {
 	}
 
-	public static ClassLoader getClassLoaderFromContext() {
-		return run( GetClassLoader.fromContext() );
+	/**
+	 * Provides an {@link AccessControlContext} representing the protection domain of the direct caller of this method.
+	 * This context is to be passed to all the methods of this class which need to execute code in a privileged block.
+	 * <p>
+	 * To avoid repeated context instantiations, callers should invoke this method once and keep the context in a
+	 * private constant.
+	 * <p>
+	 * <b>NOTE</b>: Access control contexts created by Hibernate Validator code must <b>NEVER</b> be exposed to client
+	 * code. They must only be used internally. Otherwise client code invoke the methods in this class in the context of
+	 * Hibernate Validator.
+	 *
+	 * @return A {@link AccessControlContext} for the calling class, if a security manager is present, {@code null}
+	 *         otherwise.
+	 */
+	public static AccessControlContext getAccessControlContext() {
+		if ( System.getSecurityManager() == null ) {
+			return null;
+		}
+
+		ProtectionDomain[] protectionDomains = AccessController.doPrivileged(
+				GetProtectionDomainAsArray.action( CallerClassProvider.INSTANCE.getCallerClass() )
+		);
+
+		return new AccessControlContext( protectionDomains );
 	}
 
-	public static ClassLoader getClassLoaderFromClass(Class<?> clazz) {
-		return run( GetClassLoader.fromClass( clazz ) );
+	public static ClassLoader getClassLoaderFromContext(AccessControlContext acc) {
+		return run( GetClassLoader.fromContext(), acc );
 	}
 
-	public static Class<?> loadClass(String className, Class<?> caller) {
-		return run( LoadClass.action( className, caller ) );
+	public static ClassLoader getClassLoaderFromClass(AccessControlContext acc, Class<?> clazz) {
+		return run( GetClassLoader.fromClass( clazz ), acc );
 	}
 
-	public static Class<?> loadClass(String className, String defaultPackage) {
-		return loadClass( className, defaultPackage, ReflectionHelper.class );
+	public static Class<?> loadClass(AccessControlContext acc, String className, Class<?> caller) {
+		return run( LoadClass.action( className, caller ), acc );
 	}
 
-	public static boolean isClassPresent(String className, Class<?> caller) {
+	public static Class<?> loadClass(AccessControlContext acc, String className, String defaultPackage) {
+		return loadClass( acc, className, defaultPackage, ReflectionHelper.class );
+	}
+
+	public static boolean isClassPresent(AccessControlContext acc, String className, Class<?> caller) {
 		try {
-			ReflectionHelper.loadClass( className, caller );
+			ReflectionHelper.loadClass( acc, className, caller );
 			return true;
 		}
 		catch ( ValidationException e ) {
@@ -170,7 +220,7 @@ public final class ReflectionHelper {
 		}
 	}
 
-	public static Class<?> loadClass(String className, String defaultPackage, Class<?> caller) {
+	public static Class<?> loadClass(AccessControlContext acc, String className, String defaultPackage, Class<?> caller) {
 		if ( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className ) ) {
 			return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
 		}
@@ -195,7 +245,7 @@ public final class ReflectionHelper {
 			fullyQualifiedClass.append( ARRAY_CLASS_NAME_SUFFIX );
 		}
 
-		return loadClass( fullyQualifiedClass.toString(), caller );
+		return loadClass( acc, fullyQualifiedClass.toString(), caller );
 	}
 
 	private static boolean isArrayClassName(String className) {
@@ -210,16 +260,16 @@ public final class ReflectionHelper {
 		return clazz.contains( PACKAGE_SEPARATOR );
 	}
 
-	public static <T> T newInstance(Class<T> clazz, String message) {
-		return run( NewInstance.action( clazz, message ) );
+	public static <T> T newInstance(AccessControlContext acc, Class<T> clazz, String message) {
+		return run( NewInstance.action( clazz, message ), acc );
 	}
 
-	public static <T> T newConstructorInstance(Constructor<T> constructor, Object... initArgs) {
-		return run( ConstructorInstance.action( constructor, initArgs ) );
+	public static <T> T newConstructorInstance(AccessControlContext acc, Constructor<T> constructor, Object... initArgs) {
+		return run( ConstructorInstance.action( constructor, initArgs ), acc );
 	}
 
-	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
-		return run( GetAnnotationParameter.action( annotation, parameterName, type ) );
+	public static <T> T getAnnotationParameter(AccessControlContext acc, Annotation annotation, String parameterName, Class<T> type) {
+		return run( GetAnnotationParameter.action( annotation, parameterName, type ), acc );
 	}
 
 	/**
@@ -303,14 +353,13 @@ public final class ReflectionHelper {
 
 	/**
 	 * Returns the member with the given name and type.
-	 *
 	 * @param clazz The class from which to retrieve the member. Cannot be {@code null}.
 	 * @param property The property name without "is", "get" or "has". Cannot be {@code null} or empty.
 	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
 	 *
 	 * @return the member which matching the name and type or {@code null} if no such member exists.
 	 */
-	public static Member getMember(Class<?> clazz, String property, ElementType elementType) {
+	public static Member getMember(AccessControlContext acc, Class<?> clazz, String property, ElementType elementType) {
 		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
 		if ( property == null || property.length() == 0 ) {
@@ -323,12 +372,12 @@ public final class ReflectionHelper {
 
 		Member member = null;
 		if ( ElementType.FIELD.equals( elementType ) ) {
-			member = run( GetDeclaredField.action( clazz, property ) );
+			member = run( GetDeclaredField.action( clazz, property ), acc );
 		}
 		else {
 			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
 			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
-				member = run( GetMethod.action( clazz, prefix + methodName ) );
+				member = run( GetMethod.action( clazz, prefix + methodName ), acc );
 				if ( member != null ) {
 					break;
 				}
@@ -420,8 +469,8 @@ public final class ReflectionHelper {
 		}
 	}
 
-	public static void setAccessibility(Member member) {
-		run( SetAccessibility.action( member ) );
+	public static void setAccessibility(AccessControlContext acc, Member member) {
+		run( SetAccessibility.action( member ), acc );
 	}
 
 	/**
@@ -567,38 +616,35 @@ public final class ReflectionHelper {
 
 	/**
 	 * Returns the declared field with the specified name or {@code null} if it does not exist.
-	 *
 	 * @param clazz The class to check.
 	 * @param fieldName The field name.
 	 *
 	 * @return Returns the declared field with the specified name or {@code null} if it does not exist.
 	 */
-	public static Field getDeclaredField(Class<?> clazz, String fieldName) {
-		return run( GetDeclaredField.action( clazz, fieldName ) );
+	public static Field getDeclaredField(AccessControlContext acc, Class<?> clazz, String fieldName) {
+		return run( GetDeclaredField.action( clazz, fieldName ), acc );
 	}
 
 	/**
 	 * Returns the fields of the specified class.
-	 *
 	 * @param clazz The class for which to retrieve the fields.
 	 *
 	 * @return Returns the fields for this class.
 	 */
-	public static Field[] getDeclaredFields(Class<?> clazz) {
-		return run( GetDeclaredFields.action( clazz ) );
+	public static Field[] getDeclaredFields(AccessControlContext acc, Class<?> clazz) {
+		return run( GetDeclaredFields.action( clazz ), acc );
 	}
 
 	/**
 	 * Returns the method with the specified property name or {@code null} if it does not exist. This method will
 	 * prepend  'is' and 'get' to the property name and capitalize the first letter.
-	 *
 	 * @param clazz The class to check.
 	 * @param methodName The property name.
 	 *
 	 * @return Returns the method with the specified property or {@code null} if it does not exist.
 	 */
-	public static Method getMethodFromPropertyName(Class<?> clazz, String methodName) {
-		return run( GetMethodFromPropertyName.action( clazz, methodName ) );
+	public static Method getMethodFromPropertyName(AccessControlContext acc, Class<?> clazz, String methodName) {
+		return run( GetMethodFromPropertyName.action( clazz, methodName ), acc );
 	}
 
 	/**
@@ -609,8 +655,8 @@ public final class ReflectionHelper {
 	 *
 	 * @return Returns the method with the specified property or {@code null} if it does not exist.
 	 */
-	public static Method getMethod(Class<?> clazz, String methodName) {
-		return run( GetMethod.action( clazz, methodName ) );
+	public static Method getMethod(AccessControlContext acc, Class<?> clazz, String methodName) {
+		return run( GetMethod.action( clazz, methodName ), acc );
 	}
 
 	/**
@@ -623,41 +669,38 @@ public final class ReflectionHelper {
 	 *
 	 * @return Returns the declared method with the specified name or {@code null} if it does not exist.
 	 */
-	public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-		return run( GetDeclaredMethod.action( clazz, methodName, parameterTypes ) );
+	public static Method getDeclaredMethod(AccessControlContext acc, Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+		return run( GetDeclaredMethod.action( clazz, methodName, parameterTypes ), acc );
 	}
 
 	/**
 	 * Returns the declared methods of the specified class.
-	 *
 	 * @param clazz The class for which to retrieve the methods.
 	 *
 	 * @return Returns the declared methods for this class.
 	 */
-	public static Method[] getDeclaredMethods(Class<?> clazz) {
-		return run( GetDeclaredMethods.action( clazz ) );
+	public static Method[] getDeclaredMethods(AccessControlContext acc, Class<?> clazz) {
+		return run( GetDeclaredMethods.action( clazz ), acc );
 	}
 
 	/**
 	 * Returns the methods of the specified class (include inherited methods).
-	 *
 	 * @param clazz The class for which to retrieve the methods.
 	 *
 	 * @return Returns the methods for this class.
 	 */
-	public static Method[] getMethods(Class<?> clazz) {
-		return run( GetMethods.action( clazz ) );
+	public static Method[] getMethods(AccessControlContext acc, Class<?> clazz) {
+		return run( GetMethods.action( clazz ), acc );
 	}
 
 	/**
 	 * Returns the declared constructors of the specified class.
-	 *
 	 * @param clazz The class for which to retrieve the constructors.
 	 *
 	 * @return Returns the declared constructors for this class.
 	 */
-	public static Constructor<?>[] getDeclaredConstructors(Class<?> clazz) {
-		return run( GetDeclaredConstructors.action( clazz ) );
+	public static Constructor<?>[] getDeclaredConstructors(AccessControlContext acc, Class<?> clazz) {
+		return run( GetDeclaredConstructors.action( clazz ), acc );
 	}
 
 	/**
@@ -670,8 +713,8 @@ public final class ReflectionHelper {
 	 *
 	 * @return Returns the declared constructor with the specified name or {@code null} if it does not exist.
 	 */
-	public static <T> Constructor<T> getDeclaredConstructor(Class<T> clazz, Class<?>... params) {
-		return run( GetDeclaredConstructor.action( clazz, params ) );
+	public static <T> Constructor<T> getDeclaredConstructor(AccessControlContext acc, Class<T> clazz, Class<?>... params) {
+		return run( GetDeclaredConstructor.action( clazz, params ), acc );
 	}
 
 	/**
@@ -683,8 +726,14 @@ public final class ReflectionHelper {
 	 *
 	 * @return The result of the privileged action's execution.
 	 */
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	private static <T> T run(PrivilegedAction<T> action, AccessControlContext acc) {
+		if ( System.getSecurityManager() != null ) {
+			Contracts.assertNotNull( acc, "access control context" );
+			return AccessController.doPrivileged( action, acc );
+		}
+		else {
+			return action.run();
+		}
 	}
 
 	/**
@@ -729,5 +778,39 @@ public final class ReflectionHelper {
 		}
 
 		return wrapperType;
+	}
+
+	/**
+	 * Provides the class calling {@link ReflectionHelper#getAccessControlContext()}.
+	 * <p>
+	 * <b>Note:</b> This routine depends on the exact depth of the stack, so care must be taken when changing it. There
+	 * are several ways for obtaining the caller of a method, refer to http://stackoverflow.com/questions/421280/ for a
+	 * discussion of the possible alternatives. We went for the SM-based approach as it doesn't rely on Sun-internal
+	 * APIs and is the fastest of the remaining alternatives.
+	 *
+	 * @author Gunnar Morling
+	 */
+	private static class CallerClassProvider extends SecurityManager {
+
+		private static final CallerClassProvider INSTANCE = System.getSecurityManager() != null ?
+				AccessController.doPrivileged( new InstantiateCallerClassProvider() ) :
+				new CallerClassProvider();
+
+		public Class<?> getCallerClass() {
+			return getClassContext()[2];
+		}
+	}
+
+	/**
+	 * Instantiates {@link CallerClassProvider}. Required due to {@link RuntimePermission} "createSecurityManager".
+	 *
+	 * @author Gunnar Morling
+	 *
+	 */
+	private static class InstantiateCallerClassProvider implements PrivilegedAction<CallerClassProvider> {
+		@Override
+		public CallerClassProvider run() {
+			return new CallerClassProvider();
+		}
 	}
 }
