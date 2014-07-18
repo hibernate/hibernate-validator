@@ -17,11 +17,7 @@
 package org.hibernate.validator.test.security;
 
 import java.io.FilePermission;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.security.AccessControlContext;
 import java.security.CodeSource;
 import java.security.Permission;
@@ -29,8 +25,6 @@ import java.security.Policy;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -54,50 +48,12 @@ import static org.testng.Assert.assertTrue;
 public class SecurityManagerTest {
 	private static final String TEST_CLASSES_DIR = "test-classes/";
 
-	/*
-	 * We need to create an isolated classloader because Hibernate Validator caches AccessControllerContext
-	 * and since other tests run HV without a securityManager, we end up with an assertion violation.
-	 */
 	@Test
 	public void testEnabledSecurityManager() throws Exception {
-		List<URL> urls = new ArrayList<URL>();
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		ClassLoader nonNullCl = cl;
-		while ( cl instanceof URLClassLoader ) {
-			nonNullCl = cl;
-			URLClassLoader ucl = (URLClassLoader) cl;
-			// get all the classpath from the classloader hierarchy
-			urls.addAll( Arrays.asList( ucl.getURLs() ) );
-			cl = cl.getParent();
-		}
-		final ClassLoader finalCl = nonNullCl;
-		// built a fresh classloader from this classpath
-		URLClassLoader isolatedClassLoader = new URLClassLoader(
-				urls.toArray( new URL[] { } ),
-				// I need a parent that delegates to the boot class loader for java.* classes
-				// otherwise the JVM bites back
-				new ClassLoader() {
-					@Override
-					protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-						if ( name.startsWith( "java" ) ) {
-							return finalCl.loadClass( name );
-						}
-						return null;
-					}
-				}
-		);
-		Class<?> securityManagerTestClass = isolatedClassLoader.loadClass( SecurityManagerTest.class.getName() );
-		Method testMethod = securityManagerTestClass.getMethod( "doTestEnabledSecurityManager" );
-		Object securityManagerTest = securityManagerTestClass.newInstance();
-		try {
-			testMethod.invoke( securityManagerTest );
-		}
-		catch ( InvocationTargetException e ) {
-			e.printStackTrace();
-		}
-	}
-
-	public void doTestEnabledSecurityManager() {
+		//before we set the SM, we should be able to access ReflectionHelper
+		AccessControlContext accessControlContext = ReflectionHelper.getAccessControlContext();
+		ReflectionHelper.getDeclaredField( accessControlContext, ArrayList.class, "size" );
+		assertTrue( true, "Without SecurityManager we should be able to access ReflectionHelper" );
 
 		SecurityManager oldSecurityManager = System.getSecurityManager();
 		Policy oldPolicy = Policy.getPolicy();
@@ -120,8 +76,9 @@ public class SecurityManagerTest {
 			}
 
 			// Must not use the helper using an ACC representing ourselves
+			// Also check that setting the SM *after* we had computed the ACC is fine
 			try {
-				AccessControlContext accessControlContext = ReflectionHelper.getAccessControlContext();
+				accessControlContext = ReflectionHelper.getAccessControlContext();
 				ReflectionHelper.getDeclaredField( accessControlContext, ArrayList.class, "size" );
 				assertTrue( false, "Should have raised an exception due to lacking permissions" );
 			}
@@ -131,7 +88,7 @@ public class SecurityManagerTest {
 
 			// Forging an AccessControlContext should fail
 			try {
-				AccessControlContext accessControlContext = getAccessControlContext();
+				 accessControlContext = getAccessControlContext();
 				ReflectionHelper.getDeclaredField( accessControlContext, ArrayList.class, "size" );
 				assertTrue( false, "Should have raised an exception due to lacking permissions" );
 			}
