@@ -63,8 +63,29 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
- * Some reflection utility methods. Where necessary calls will be performed as {@code PrivilegedAction} which is necessary
- * for situations where a security manager is in place.
+ * Some reflection utility methods.
+ * <p>
+ * Many methods of this class require special permissions in case a security manager is in place. In that case, the
+ * operations are wrapped in {@code PrivilegedAction}s. All the affected methods expect an {@link AccessControlContext}
+ * which will be passed to {@link AccessController#doPrivileged(PrivilegedAction, AccessControlContext)} upon execution.
+ * <p>
+ * Callers can obtain a context representing their own {@link ProtectionDomain} via {@link #getAccessControlContext()}.
+ * It is recommended to cache that context but it may <strong>NEVER</strong> be made publicly available as otherwise
+ * untrusted code may invoke security-relevant methods under the protection domain of Hibernate Validator.
+ * <p>
+ * The following shows the recommended usage pattern:
+ *
+ * <pre>
+ * public class MyClass {
+ *
+ *     private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper
+ *             .getAccessControlContext();
+ *
+ *     public void myOperation() {
+ *         Field field = ReflectionHelper.getDeclaredField( ACCESS_CONTROL_CONTEXT, ArrayList.class, &quot;size&quot; ) );
+ *     }
+ * }
+ * </pre>
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
@@ -759,14 +780,15 @@ public final class ReflectionHelper {
 		return wrapperType;
 	}
 
-
 	/**
 	 * Provides the class calling {@link ReflectionHelper#getAccessControlContext()}.
 	 * <p>
-	 * Note: This routine depends on the exact depth of the stack, so care must be taken when changing it.
+	 * <b>Note:</b> This routine depends on the exact depth of the stack, so care must be taken when changing it. There
+	 * are several ways for obtaining the caller of a method, refer to http://stackoverflow.com/questions/421280/ for a
+	 * discussion of the possible alternatives. We went for the SM-based approach as it doesn't rely on Sun-internal
+	 * APIs and is the fastest of the remaining alternatives.
 	 *
 	 * @author Gunnar Morling
-	 *
 	 */
 	private static class CallerClassProvider extends SecurityManager {
 
