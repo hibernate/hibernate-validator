@@ -18,6 +18,8 @@ package org.hibernate.validator.internal.engine.resolver;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
+
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
@@ -35,6 +37,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class DefaultTraversableResolver implements TraversableResolver {
 
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	/**
 	 * Class to load to check whether JPA is on the classpath.
@@ -68,7 +71,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		// check whether we have Persistence on the classpath
 		Class<?> persistenceClass;
 		try {
-			persistenceClass = ReflectionHelper.loadClass( PERSISTENCE_CLASS_NAME, this.getClass() );
+			persistenceClass = ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, PERSISTENCE_CLASS_NAME, this.getClass() );
 		}
 		catch ( ValidationException e ) {
 			log.debugf(
@@ -79,7 +82,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		}
 
 		// check whether Persistence contains getPersistenceUtil
-		Method persistenceUtilGetter = ReflectionHelper.getMethod( persistenceClass, PERSISTENCE_UTIL_METHOD );
+		Method persistenceUtilGetter = ReflectionHelper.getMethod( ACCESS_CONTROL_CONTEXT, persistenceClass, PERSISTENCE_UTIL_METHOD );
 		if ( persistenceUtilGetter == null ) {
 			log.debugf(
 					"Found %s on classpath, but no method '%s'. Assuming JPA 1 environment. All properties will per default be traversable.",
@@ -92,7 +95,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		// try to invoke the method to make sure that we are dealing with a complete JPA2 implementation
 		// unfortunately there are several incomplete implementations out there (see HV-374)
 		try {
-			Object persistence = ReflectionHelper.newInstance( persistenceClass, "persistence provider" );
+			Object persistence = ReflectionHelper.newInstance( ACCESS_CONTROL_CONTEXT, persistenceClass, "persistence provider" );
 			ReflectionHelper.getValue(persistenceUtilGetter, persistence );
 		}
 		catch ( Exception e ) {
@@ -112,8 +115,8 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		try {
 			@SuppressWarnings("unchecked")
 			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
-					ReflectionHelper.loadClass( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
-			jpaTraversableResolver = ReflectionHelper.newInstance( jpaAwareResolverClass, "" );
+					ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
+			jpaTraversableResolver = ReflectionHelper.newInstance( ACCESS_CONTROL_CONTEXT, jpaAwareResolverClass, "" );
 			log.debugf(
 					"Instantiated JPA aware TraversableResolver of type %s.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
@@ -126,12 +129,14 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		}
 	}
 
+	@Override
 	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		return jpaTraversableResolver == null || jpaTraversableResolver.isReachable(
 				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
 		);
 	}
 
+	@Override
 	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		return jpaTraversableResolver == null || jpaTraversableResolver.isCascadable(
 				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType

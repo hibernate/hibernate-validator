@@ -21,6 +21,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -57,6 +58,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 
 	private static final long serialVersionUID = 6907601010599429454L;
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private final Class<? extends Annotation> annotationType;
 	private final Map<String, Object> values;
@@ -154,7 +156,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 	private Map<String, Object> getAnnotationValues(AnnotationDescriptor<?> descriptor) {
 		Map<String, Object> result = newHashMap();
 		int processedValuesFromDescriptor = 0;
-		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotationType );
+		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( ACCESS_CONTROL_CONTEXT, annotationType );
 		for ( Method m : declaredMethods ) {
 			if ( descriptor.containsElement( m.getName() ) ) {
 				result.put( m.getName(), descriptor.valueOf( m.getName() ) );
@@ -252,7 +254,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 
 	private Object getAnnotationMemberValue(Annotation annotation, String name) {
 		try {
-			return ReflectionHelper.getDeclaredMethod( annotation.annotationType(), name )
+			return ReflectionHelper.getDeclaredMethod( ACCESS_CONTROL_CONTEXT, annotation.annotationType(), name )
 					.invoke( annotation );
 		}
 		catch ( IllegalAccessException e ) {

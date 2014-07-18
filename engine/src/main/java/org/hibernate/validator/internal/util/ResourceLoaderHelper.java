@@ -9,7 +9,7 @@
 * You may obtain a copy of the License at
 * http://www.apache.org/licenses/LICENSE-2.0
 * Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,  
+* distributed under the License is distributed on an "AS IS" BASIS,
 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 * See the License for the specific language governing permissions and
 * limitations under the License.
@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.util;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.security.AccessControlContext;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -28,7 +29,9 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public final class ResourceLoaderHelper {
+
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	/**
 	 * Returns an input stream for the given path, which supports the mark/reset
@@ -50,18 +53,18 @@ public final class ResourceLoaderHelper {
 
 		boolean isContextCL = true;
 		// try the context class loader first
-		ClassLoader loader = ReflectionHelper.getClassLoaderFromContext();
+		ClassLoader loader = ReflectionHelper.getClassLoaderFromContext( ACCESS_CONTROL_CONTEXT );
 
 		if ( loader == null ) {
 			log.debug( "No default context class loader, fall back to Bean Validation's loader" );
-			loader = ReflectionHelper.getClassLoaderFromClass( ResourceLoaderHelper.class );
+			loader = ReflectionHelper.getClassLoaderFromClass( ACCESS_CONTROL_CONTEXT, ResourceLoaderHelper.class );
 			isContextCL = false;
 		}
 		InputStream inputStream = loader.getResourceAsStream( inputPath );
 
 		// try the current class loader
 		if ( isContextCL && inputStream == null ) {
-			loader = ReflectionHelper.getClassLoaderFromClass( ResourceLoaderHelper.class );
+			loader = ReflectionHelper.getClassLoaderFromClass( ACCESS_CONTROL_CONTEXT, ResourceLoaderHelper.class );
 			inputStream = loader.getResourceAsStream( inputPath );
 		}
 

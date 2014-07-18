@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.xml;
 
+import java.security.AccessControlContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  */
 public class ConstrainedTypeBuilder {
+
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private ConstrainedTypeBuilder() {
 	}
@@ -91,7 +94,7 @@ public class ConstrainedTypeBuilder {
 		List<Class<?>> groupSequence = newArrayList();
 		if ( groupSequenceType != null ) {
 			for ( String groupName : groupSequenceType.getValue() ) {
-				Class<?> group = ReflectionHelper.loadClass( groupName, defaultPackage );
+				Class<?> group = ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, groupName, defaultPackage );
 				groupSequence.add( group );
 			}
 		}

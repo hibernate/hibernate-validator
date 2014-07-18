@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.xml;
 
 import java.lang.reflect.Field;
+import java.security.AccessControlContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +41,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  */
 public class ConstrainedFieldBuilder {
+
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private ConstrainedFieldBuilder() {
 	}
@@ -103,7 +106,7 @@ public class ConstrainedFieldBuilder {
 			alreadyProcessedFieldNames.add( fieldName );
 		}
 
-		final Field field = ReflectionHelper.getDeclaredField( beanClass, fieldName );
+		final Field field = ReflectionHelper.getDeclaredField( ACCESS_CONTROL_CONTEXT, beanClass, fieldName );
 		if ( field == null ) {
 			throw log.getBeanDoesNotContainTheFieldException( beanClass.getName(), fieldName );
 		}

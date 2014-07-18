@@ -26,11 +26,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
@@ -67,6 +69,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private static final long serialVersionUID = -2563102960314069246L;
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 
 	/**
@@ -506,6 +509,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		try {
 			//TODO be extra safe and make sure this is an array of Payload
 			payloadFromAnnotation = ReflectionHelper.getAnnotationParameter(
+					ACCESS_CONTROL_CONTEXT,
 					annotation,
 					ConstraintHelper.PAYLOAD,
 					Class[].class
@@ -524,7 +528,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private Set<Class<?>> buildGroupSet(Class<?> implicitGroup) {
 		Set<Class<?>> groupSet = newHashSet();
 		final Class<?>[] groupsFromAnnotation = ReflectionHelper.getAnnotationParameter(
-				annotation, ConstraintHelper.GROUPS, Class[].class
+				ACCESS_CONTROL_CONTEXT, annotation, ConstraintHelper.GROUPS, Class[].class
 		);
 		if ( groupsFromAnnotation.length == 0 ) {
 			groupSet.add( Default.class );
@@ -541,10 +545,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
-		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotation.annotationType() );
+		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( ACCESS_CONTROL_CONTEXT, annotation.annotationType() );
 		Map<String, Object> parameters = newHashMap( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
-			Object value = ReflectionHelper.getAnnotationParameter( annotation, m.getName(), Object.class );
+			Object value = ReflectionHelper.getAnnotationParameter( ACCESS_CONTROL_CONTEXT, annotation, m.getName(), Object.class );
 			parameters.put( m.getName(), value );
 		}
 		return Collections.unmodifiableMap( parameters );
@@ -552,7 +556,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = newHashMap();
-		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
+		final Method[] methods = ReflectionHelper.getDeclaredMethods( ACCESS_CONTROL_CONTEXT, annotationType );
 		for ( Method m : methods ) {
 			if ( m.getAnnotation( OverridesAttribute.class ) != null ) {
 				addOverrideAttributes(
@@ -571,7 +575,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void addOverrideAttributes(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Method m, OverridesAttribute... attributes) {
-		Object value = ReflectionHelper.getAnnotationParameter( annotation, m.getName(), Object.class );
+		Object value = ReflectionHelper.getAnnotationParameter( ACCESS_CONTROL_CONTEXT, annotation, m.getName(), Object.class );
 		for ( OverridesAttribute overridesAttribute : attributes ) {
 			ensureAttributeIsOverridable( m, overridesAttribute );
 
@@ -588,7 +592,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute) {
-		final Method method = ReflectionHelper.getMethod( overridesAttribute.constraint(), overridesAttribute.name() );
+		final Method method = ReflectionHelper.getMethod( ACCESS_CONTROL_CONTEXT, overridesAttribute.constraint(), overridesAttribute.name() );
 		if ( method == null ) {
 			throw log.getOverriddenConstraintAttributeNotFoundException( overridesAttribute.name() );
 		}

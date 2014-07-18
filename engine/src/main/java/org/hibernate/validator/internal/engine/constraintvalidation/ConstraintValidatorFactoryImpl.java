@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import java.security.AccessControlContext;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 
@@ -29,9 +31,11 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  */
 public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
 
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
+
 	@Override
 	public final <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-		return ReflectionHelper.newInstance( key, "ConstraintValidator" );
+		return ReflectionHelper.newInstance( ACCESS_CONTROL_CONTEXT, key, "ConstraintValidator" );
 	}
 
 	@Override

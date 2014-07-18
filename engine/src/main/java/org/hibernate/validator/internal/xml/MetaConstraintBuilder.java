@@ -20,7 +20,9 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
 import java.util.List;
+
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBElement;
@@ -43,7 +45,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  * @author Hardy Ferentschik
  */
 public class MetaConstraintBuilder {
+
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private static final String MESSAGE_PARAM = "message";
 	private static final String GROUPS_PARAM = "groups";
@@ -61,7 +65,7 @@ public class MetaConstraintBuilder {
 																			   ConstraintDescriptorImpl.ConstraintType constraintType) {
 		Class<A> annotationClass;
 		try {
-			annotationClass = (Class<A>) ReflectionHelper.loadClass( constraint.getAnnotation(), defaultPackage );
+			annotationClass = (Class<A>) ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, constraint.getAnnotation(), defaultPackage );
 		}
 		catch ( ValidationException e ) {
 			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
@@ -117,7 +121,7 @@ public class MetaConstraintBuilder {
 	}
 
 	private static <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
-		Method m = ReflectionHelper.getMethod( annotationClass, name );
+		Method m = ReflectionHelper.getMethod( ACCESS_CONTROL_CONTEXT, annotationClass, name );
 		if ( m == null ) {
 			throw log.getAnnotationDoesNotContainAParameterException( annotationClass.getName(), name );
 		}
@@ -249,7 +253,7 @@ public class MetaConstraintBuilder {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ReflectionHelper.loadClass( value, defaultPackage, MetaConstraintBuilder.class );
+			returnValue = ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, value, defaultPackage, MetaConstraintBuilder.class );
 		}
 		else {
 			try {
@@ -271,7 +275,7 @@ public class MetaConstraintBuilder {
 
 		List<Class<?>> groupList = newArrayList();
 		for ( String groupClass : groupsType.getValue() ) {
-			groupList.add( ReflectionHelper.loadClass( groupClass, defaultPackage ) );
+			groupList.add( ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, groupClass, defaultPackage ) );
 		}
 		return groupList.toArray( new Class[groupList.size()] );
 	}
@@ -284,7 +288,7 @@ public class MetaConstraintBuilder {
 
 		List<Class<? extends Payload>> payloadList = newArrayList();
 		for ( String groupClass : payloadType.getValue() ) {
-			Class<?> payload = ReflectionHelper.loadClass( groupClass, defaultPackage );
+			Class<?> payload = ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
 				throw log.getWrongPayloadClassException( payload.getName() );
 			}

@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.xml;
 
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  */
 public class ConstrainedGetterBuilder {
+
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private ConstrainedGetterBuilder() {
 	}
@@ -108,7 +111,7 @@ public class ConstrainedGetterBuilder {
 			alreadyProcessedGetterNames.add( getterName );
 		}
 
-		final Method method = ReflectionHelper.getMethodFromPropertyName( beanClass, getterName );
+		final Method method = ReflectionHelper.getMethodFromPropertyName( ACCESS_CONTROL_CONTEXT, beanClass, getterName );
 		if ( method == null ) {
 			throw log.getBeanDoesNotContainThePropertyException( beanClass.getName(), getterName );
 		}
@@ -116,5 +119,3 @@ public class ConstrainedGetterBuilder {
 		return method;
 	}
 }
-
-

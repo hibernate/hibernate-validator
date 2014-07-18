@@ -19,8 +19,10 @@ package org.hibernate.validator.internal.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.AccessControlContext;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -32,7 +34,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
-
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -49,6 +50,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 public class XmlParserHelper {
 
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	/**
 	 * The expected number of XML schemas managed by this class. Used to set the
@@ -148,7 +150,7 @@ public class XmlParserHelper {
 	}
 
 	private Schema loadSchema(String schemaResource) {
-		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( XmlParserHelper.class );
+		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( ACCESS_CONTROL_CONTEXT, XmlParserHelper.class );
 
 		URL schemaUrl = loader.getResource( schemaResource );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );

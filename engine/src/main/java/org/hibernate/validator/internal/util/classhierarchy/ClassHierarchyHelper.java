@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.util.classhierarchy;
 
 import java.lang.reflect.Method;
+import java.security.AccessControlContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +38,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public class ClassHierarchyHelper {
+
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	/**
 	 * Gets the elements of the hierarchy of the given class which match the
@@ -147,7 +150,7 @@ public class ClassHierarchyHelper {
 		List<Method> methods = newArrayList();
 
 		for ( Class<?> hierarchyClass : getHierarchy( clazz ) ) {
-			Collections.addAll( methods, ReflectionHelper.getMethods( hierarchyClass ) );
+			Collections.addAll( methods, ReflectionHelper.getMethods( ACCESS_CONTROL_CONTEXT, hierarchyClass ) );
 		}
 
 		return methods;

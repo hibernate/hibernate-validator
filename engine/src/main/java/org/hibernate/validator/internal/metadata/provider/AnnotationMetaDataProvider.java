@@ -23,6 +23,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessControlContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -75,7 +76,10 @@ import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance
  * @author Hardy Ferentschik
  */
 public class AnnotationMetaDataProvider implements MetaDataProvider {
+
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
+
 	/**
 	 * The default initial capacity for this cache.
 	 */
@@ -184,14 +188,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass,
 			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
-		Method[] providerMethods = getMethods( providerClass );
+		Method[] providerMethods = getMethods( ACCESS_CONTROL_CONTEXT, providerClass );
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
 					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
 
 				return newInstance(
-						providerClass, "the default group sequence provider"
+						ACCESS_CONTROL_CONTEXT, providerClass, "the default group sequence provider"
 				);
 			}
 		}
@@ -219,7 +223,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private Set<ConstrainedElement> getFieldMetaData(Class<?> beanClass) {
 		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
-		for ( Field field : ReflectionHelper.getDeclaredFields( beanClass ) ) {
+		for ( Field field : ReflectionHelper.getDeclaredFields( ACCESS_CONTROL_CONTEXT, beanClass ) ) {
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) ||
 					annotationProcessingOptions.areMemberConstraintsIgnoredFor( field ) ||
@@ -268,7 +272,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
 		List<ExecutableElement> declaredConstructors = ExecutableElement.forConstructors(
-				ReflectionHelper.getDeclaredConstructors( clazz )
+				ReflectionHelper.getDeclaredConstructors( ACCESS_CONTROL_CONTEXT, clazz )
 		);
 
 		return getMetaData( declaredConstructors );
@@ -276,7 +280,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private Set<ConstrainedExecutable> getMethodMetaData(Class<?> clazz) {
 		List<ExecutableElement> declaredMethods = ExecutableElement.forMethods(
-				ReflectionHelper.getDeclaredMethods( clazz )
+				ReflectionHelper.getDeclaredMethods( ACCESS_CONTROL_CONTEXT, clazz )
 		);
 
 		return getMetaData( declaredMethods );

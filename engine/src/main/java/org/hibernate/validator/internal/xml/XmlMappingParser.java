@@ -20,12 +20,14 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.security.AccessControlContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ParameterNameProvider;
 import javax.xml.bind.JAXBContext;
@@ -59,6 +61,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public class XmlMappingParser {
 
 	private static final Log log = LoggerFactory.make();
+	private static final AccessControlContext ACCESS_CONTROL_CONTEXT = ReflectionHelper.getAccessControlContext();
 
 	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
@@ -118,7 +121,7 @@ public class XmlMappingParser {
 				);
 
 				for ( BeanType bean : mapping.getBean() ) {
-					Class<?> beanClass = ReflectionHelper.loadClass( bean.getClazz(), defaultPackage );
+					Class<?> beanClass = ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, bean.getClazz(), defaultPackage );
 					checkClassHasNotBeenProcessed( processedClasses, beanClass );
 
 					// update annotation ignores
@@ -220,7 +223,7 @@ public class XmlMappingParser {
 				alreadyProcessedConstraintDefinitions.add( annotationClassName );
 			}
 
-			Class<?> clazz = ReflectionHelper.loadClass( annotationClassName, defaultPackage );
+			Class<?> clazz = ReflectionHelper.loadClass( ACCESS_CONTROL_CONTEXT, annotationClassName, defaultPackage );
 			if ( !clazz.isAnnotation() ) {
 				throw log.getIsNotAnAnnotationException( annotationClassName );
 			}
@@ -237,6 +240,7 @@ public class XmlMappingParser {
 			@SuppressWarnings("unchecked")
 			Class<? extends ConstraintValidator<A, ?>> validatorClass = (Class<? extends ConstraintValidator<A, ?>>) ReflectionHelper
 					.loadClass(
+							ACCESS_CONTROL_CONTEXT,
 							validatorClassName,
 							this.getClass()
 					);
