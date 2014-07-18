@@ -183,10 +183,6 @@ public final class ReflectionHelper {
 	 *         otherwise.
 	 */
 	public static AccessControlContext getAccessControlContext() {
-		if ( System.getSecurityManager() == null ) {
-			return null;
-		}
-
 		ProtectionDomain[] protectionDomains = AccessController.doPrivileged(
 				GetProtectionDomainAsArray.action( CallerClassProvider.INSTANCE.getCallerClass() )
 		);
