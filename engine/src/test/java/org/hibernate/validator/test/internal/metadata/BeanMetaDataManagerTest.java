@@ -56,7 +56,7 @@ public class BeanMetaDataManagerTest {
 		);
 	}
 
-	@Test
+	@Test(enabled = false, description = "Disabled as it shows false failures too often. Run on demand if required")
 	public void testBeanMetaDataCanBeGarbageCollected() throws Exception {
 		Class<?> lastIterationsBean = null;
 		int totalCreatedMetaDataInstances = 0;
