@@ -84,7 +84,7 @@ public interface Messages {
 	@Message(value = "The created instance must not be null.", format = Message.Format.NO_FORMAT)
 	String validatedConstructorCreatedInstanceMustNotBeNull();
 
-	@Message(value = "The input stream for #addMappging() cannot be null.")
+	@Message(value = "The input stream for #addMapping() cannot be null.")
 	String inputStreamCannotBeNull();
 }
 
