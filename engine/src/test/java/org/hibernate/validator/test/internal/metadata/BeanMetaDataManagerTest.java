@@ -23,7 +23,6 @@ import java.io.IOException;
 import javax.validation.constraints.NotNull;
 
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -41,7 +40,7 @@ public class BeanMetaDataManagerTest {
 	// high enough to force a OutOfMemoryError in case references are not freed
 	private static final int MAX_ENTITY_COUNT = 100000;
 
-	@Test
+	@Test(enabled = false, description = "Disabled as it shows false failures too often. Run on demand if required")
 	public void testBeanMetaDataCanBeGarbageCollected() throws Exception {
 		BeanMetaDataManager metaDataManager = new BeanMetaDataManager( new ConstraintHelper() );
 
