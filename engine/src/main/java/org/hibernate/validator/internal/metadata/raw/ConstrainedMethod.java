@@ -114,10 +114,6 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData );
-
-		if ( isConstrained() ) {
-			run( SetAccessibility.action( method ) );
-		}
 	}
 
 	private boolean hasParameterConstraints(List<ConstrainedParameter> parameterMetaData) {

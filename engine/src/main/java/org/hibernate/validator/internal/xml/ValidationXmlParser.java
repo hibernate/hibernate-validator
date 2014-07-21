@@ -39,6 +39,7 @@ import org.xml.sax.SAXException;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.GetResource;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 
@@ -246,7 +247,7 @@ public class ValidationXmlParser {
 
 	private Schema getValidationConfigurationSchema() {
 		ClassLoader loader = run( GetClassLoader.fromClass( ValidationXmlParser.class ) );
-		URL schemaUrl = loader.getResource( VALIDATION_CONFIGURATION_XSD );
+		URL schemaUrl = run( GetResource.action( loader, VALIDATION_CONFIGURATION_XSD ) );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
 		try {

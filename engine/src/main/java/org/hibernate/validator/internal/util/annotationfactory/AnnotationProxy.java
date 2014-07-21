@@ -134,38 +134,6 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 		return result;
 	}
 
-	private boolean areEqual(Object o1, Object o2) {
-		return
-				!o1.getClass().isArray() ? o1.equals( o2 ) :
-						o1.getClass() == boolean[].class ? Arrays.equals( (boolean[]) o1, (boolean[]) o2 ) :
-								o1.getClass() == byte[].class ? Arrays.equals( (byte[]) o1, (byte[]) o2 ) :
-										o1.getClass() == char[].class ? Arrays.equals( (char[]) o1, (char[]) o2 ) :
-												o1.getClass() == double[].class ? Arrays.equals(
-														(double[]) o1,
-														(double[]) o2
-												) :
-														o1.getClass() == float[].class ? Arrays.equals(
-																(float[]) o1,
-																(float[]) o2
-														) :
-																o1.getClass() == int[].class ? Arrays.equals(
-																		(int[]) o1,
-																		(int[]) o2
-																) :
-																		o1.getClass() == long[].class ? Arrays.equals(
-																				(long[]) o1,
-																				(long[]) o2
-																		) :
-																				o1.getClass() == short[].class ? Arrays.equals(
-																						(short[]) o1,
-																						(short[]) o2
-																				) :
-																						Arrays.equals(
-																								(Object[]) o1,
-																								(Object[]) o2
-																						);
-	}
-
 	/**
 	 * Runs the given privileged action, using a privileged block if required.
 	 * <p>
