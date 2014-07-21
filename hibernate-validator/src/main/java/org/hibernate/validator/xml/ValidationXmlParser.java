@@ -39,6 +39,7 @@ import org.xml.sax.SAXException;
 
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.util.privilegedactions.GetResource;
 import org.hibernate.validator.util.privilegedactions.LoadClass;
 import org.hibernate.validator.util.privilegedactions.NewInstance;
 
@@ -52,7 +53,6 @@ public class ValidationXmlParser {
 	private static final Logger log = LoggerFactory.make();
 	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
 	private static final String VALIDATION_CONFIGURATION_XSD = "META-INF/validation-configuration-1.0.xsd";
-
 
 	/**
 	 * Tries to check whether a validation.xml file exists and parses it using JAXB.
@@ -271,7 +271,7 @@ public class ValidationXmlParser {
 
 	private Schema getValidationConfigurationSchema() {
 		ClassLoader loader = run( GetClassLoader.fromClass( ValidationXmlParser.class ) );
-		URL schemaUrl = loader.getResource( VALIDATION_CONFIGURATION_XSD );
+		URL schemaUrl = run( GetResource.action( loader, VALIDATION_CONFIGURATION_XSD ) );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
 		try {

@@ -56,9 +56,9 @@ import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.util.privilegedactions.GetMethod;
 import org.hibernate.validator.util.privilegedactions.GetMethodFromPropertyName;
+import org.hibernate.validator.util.privilegedactions.GetResource;
 import org.hibernate.validator.util.privilegedactions.LoadClass;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
@@ -611,7 +611,7 @@ public class XmlMappingParser {
 
 	private Schema getMappingSchema() {
 		ClassLoader loader = run( GetClassLoader.fromClass( XmlMappingParser.class ) );
-		URL schemaUrl = loader.getResource( VALIDATION_MAPPING_XSD );
+		URL schemaUrl = run( GetResource.action( loader, VALIDATION_MAPPING_XSD ) );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
 		try {
