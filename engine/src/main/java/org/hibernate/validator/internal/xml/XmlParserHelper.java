@@ -39,6 +39,7 @@ import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.GetResource;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -152,7 +153,7 @@ public class XmlParserHelper {
 	private Schema loadSchema(String schemaResource) {
 		ClassLoader loader = run( GetClassLoader.fromClass( XmlParserHelper.class ) );
 
-		URL schemaUrl = loader.getResource( schemaResource );
+		URL schemaUrl = run( GetResource.action( loader, schemaResource ) );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
 		try {
