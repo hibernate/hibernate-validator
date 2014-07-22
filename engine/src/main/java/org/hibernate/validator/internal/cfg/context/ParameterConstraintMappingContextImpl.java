@@ -32,7 +32,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public final class ParameterConstraintMappingContextImpl
+final class ParameterConstraintMappingContextImpl
 		extends ConstraintMappingContextImplBase
 		implements ParameterConstraintMappingContext {
 

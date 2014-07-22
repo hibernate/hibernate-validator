@@ -57,7 +57,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
  * @author Davide Marchignoli
  * @see java.lang.annotation.Annotation
  */
-public class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
+class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 
 	private static final long serialVersionUID = 6907601010599429454L;
 	private static final Log log = LoggerFactory.make();
@@ -65,7 +65,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 	private final Class<? extends Annotation> annotationType;
 	private final Map<String, Object> values;
 
-	public AnnotationProxy(AnnotationDescriptor<?> descriptor) {
+	AnnotationProxy(AnnotationDescriptor<?> descriptor) {
 		this.annotationType = descriptor.type();
 		values = getAnnotationValues( descriptor );
 	}

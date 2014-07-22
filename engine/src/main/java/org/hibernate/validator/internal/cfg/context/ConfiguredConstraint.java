@@ -49,13 +49,13 @@ public class ConfiguredConstraint<A extends Annotation, L extends ConstraintLoca
 		this.location = location;
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
+	static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
 		return new ConfiguredConstraint<A, BeanConstraintLocation>(
 				constraint, new BeanConstraintLocation( beanType )
 		);
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forProperty(ConstraintDef<?, A> constraint, Member member) {
+	static <A extends Annotation> ConfiguredConstraint<A, BeanConstraintLocation> forProperty(ConstraintDef<?, A> constraint, Member member) {
 
 		return new ConfiguredConstraint<A, BeanConstraintLocation>(
 				constraint, new BeanConstraintLocation( member )

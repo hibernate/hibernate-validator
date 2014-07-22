@@ -35,7 +35,7 @@ import org.jboss.logging.Logger;
 public class PlatformResourceBundleLocator
 		implements ResourceBundleLocator, org.hibernate.validator.spi.resourceloading.ResourceBundleLocator {
 	private static final Logger log = Logger.getLogger( PlatformResourceBundleLocator.class.getName() );
-	private String bundleName;
+	private final String bundleName;
 
 	public PlatformResourceBundleLocator(String bundleName) {
 		this.bundleName = bundleName;
@@ -49,6 +49,7 @@ public class PlatformResourceBundleLocator
 	 *
 	 * @return the resource bundle or <code>null</code> if none is found.
 	 */
+	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
 		ResourceBundle rb = null;
 		ClassLoader classLoader = GetClassLoader.fromContext();
@@ -91,7 +92,7 @@ public class PlatformResourceBundleLocator
 	private static class GetClassLoader implements PrivilegedAction<ClassLoader> {
 		private final Class<?> clazz;
 
-		public static ClassLoader fromContext() {
+		private static ClassLoader fromContext() {
 			final GetClassLoader action = new GetClassLoader( null );
 			if ( System.getSecurityManager() != null ) {
 				return AccessController.doPrivileged( action );
@@ -101,7 +102,7 @@ public class PlatformResourceBundleLocator
 			}
 		}
 
-		public static ClassLoader fromClass(Class<?> clazz) {
+		private static ClassLoader fromClass(Class<?> clazz) {
 			if ( clazz == null ) {
 				throw new IllegalArgumentException( "Class is null" );
 			}
@@ -118,6 +119,7 @@ public class PlatformResourceBundleLocator
 			this.clazz = clazz;
 		}
 
+		@Override
 		public ClassLoader run() {
 			if ( clazz != null ) {
 				return clazz.getClassLoader();

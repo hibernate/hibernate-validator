@@ -30,13 +30,13 @@ import org.hibernate.validator.internal.metadata.location.MethodConstraintLocati
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public final class ReturnValueConstraintMappingContextImpl
+final class ReturnValueConstraintMappingContextImpl
 		extends ConstraintMappingContextImplBase
 		implements ReturnValueConstraintMappingContext {
 
 	private final Method method;
 
-	public ReturnValueConstraintMappingContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
+	ReturnValueConstraintMappingContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
 
 		super( beanClass, mapping );
 

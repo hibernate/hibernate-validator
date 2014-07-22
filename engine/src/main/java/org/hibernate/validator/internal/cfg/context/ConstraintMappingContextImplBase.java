@@ -40,7 +40,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  *
  * @author Gunnar Morling
  */
-public abstract class ConstraintMappingContextImplBase {
+abstract class ConstraintMappingContextImplBase {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -100,7 +100,7 @@ public abstract class ConstraintMappingContextImplBase {
 	 *
 	 * @return the member which matching the name and type or {@code null} if no such member exists.
 	 */
-	public static Member getMember(Class<?> clazz, String property, ElementType elementType) {
+	private Member getMember(Class<?> clazz, String property, ElementType elementType) {
 
 		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
 
