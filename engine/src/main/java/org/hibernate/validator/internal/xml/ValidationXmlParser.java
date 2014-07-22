@@ -29,13 +29,10 @@ import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
-import org.xml.sax.SAXException;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -43,7 +40,9 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetResource;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
 import org.hibernate.validator.internal.util.privilegedactions.NewSchema;
+import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.
@@ -197,17 +196,27 @@ public class ValidationXmlParser {
 
 		log.parsingXMLFile( VALIDATION_XML_FILE );
 
-		ValidationConfigType validationConfig;
 		Schema schema = getValidationConfigurationSchema();
 		try {
-			JAXBContext jc = JAXBContext.newInstance( ValidationConfigType.class );
+			// JAXBContext#newInstance() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBContext jc = run( NewJaxbContext.action( ValidationConfigType.class ) );
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema( schema );
 			StreamSource stream = new StreamSource( inputStream );
-			JAXBElement<ValidationConfigType> root = unmarshaller.unmarshal( stream, ValidationConfigType.class );
-			validationConfig = root.getValue();
+
+			// Unmashaller#unmarshal() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBElement<ValidationConfigType> root = run(
+					Unmarshal.action(
+							unmarshaller,
+							stream,
+							ValidationConfigType.class
+					)
+			);
+			return root.getValue();
 		}
-		catch ( JAXBException e ) {
+		catch ( Exception e ) {
 			throw log.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
 		}
 		finally {
@@ -218,7 +227,6 @@ public class ValidationXmlParser {
 				log.unableToCloseXMLFileInputStream( VALIDATION_XML_FILE );
 			}
 		}
-		return validationConfig;
 	}
 
 	private InputStream getInputStreamForPath(String path) {

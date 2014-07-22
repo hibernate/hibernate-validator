@@ -45,8 +45,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.xml.sax.SAXException;
-
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
@@ -63,7 +61,9 @@ import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.internal.util.privilegedactions.GetResource;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
 import org.hibernate.validator.internal.util.privilegedactions.NewSchema;
+import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -97,11 +97,12 @@ public class XmlMappingParser {
 	}
 
 	public final void parse(Set<InputStream> mappingStreams) {
-
 		Schema schema = getMappingSchema();
 
 		try {
-			JAXBContext jc = JAXBContext.newInstance( ConstraintMappingsType.class );
+			// JAXBContext#newInstance() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBContext jc = run( NewJaxbContext.action( ConstraintMappingsType.class ) );
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema( schema );
 
@@ -628,7 +629,16 @@ public class XmlMappingParser {
 			}
 
 			StreamSource stream = new StreamSource( new CloseIgnoringInputStream( in ) );
-			JAXBElement<ConstraintMappingsType> root = unmarshaller.unmarshal( stream, ConstraintMappingsType.class );
+
+			// Unmashaller#unmarshal() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBElement<ConstraintMappingsType> root = run(
+					Unmarshal.action(
+							unmarshaller,
+							stream,
+							ConstraintMappingsType.class
+					)
+			);
 			constraintMappings = root.getValue();
 
 			if ( markSupported ) {
@@ -640,7 +650,7 @@ public class XmlMappingParser {
 				}
 			}
 		}
-		catch ( JAXBException e ) {
+		catch ( Exception e ) {
 			throw log.getErrorParsingMappingFileException( e );
 		}
 		return constraintMappings;
@@ -656,8 +666,16 @@ public class XmlMappingParser {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
-	private static <T> T run(PrivilegedExceptionAction<T> action) throws Exception {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	private <T> T run(PrivilegedExceptionAction<T> action) throws JAXBException {
+		try {
+			return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+		}
+		catch ( JAXBException e ) {
+			throw e;
+		}
+		catch ( Exception e ) {
+			throw log.getErrorParsingMappingFileException( e );
+		}
 	}
 
 	// JAXB closes the underlying input stream

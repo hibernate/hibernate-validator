@@ -31,7 +31,6 @@ import javax.validation.ConstraintDefinitionException;
 import javax.validation.GroupDefinitionException;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
-import javax.xml.bind.JAXBException;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Cause;
@@ -368,7 +367,7 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToInstantiateValidationProviderClassException(String providerClassName, @Cause Exception e);
 
 	@Message(id = 100, value = "Unable to parse %s.")
-	ValidationException getUnableToParseValidationXmlFileException(String file, @Cause JAXBException e);
+	ValidationException getUnableToParseValidationXmlFileException(String file, @Cause Exception e);
 
 	@Message(id = 101, value = "%s is not an annotation.")
 	ValidationException getIsNotAnAnnotationException(String annotationClassName);
@@ -415,7 +414,7 @@ public interface Log extends BasicLogger {
 	ValidationException getWrongPayloadClassException(String payloadClassName);
 
 	@Message(id = 115, value = "Error parsing mapping file.")
-	ValidationException getErrorParsingMappingFileException(@Cause JAXBException e);
+	ValidationException getErrorParsingMappingFileException(@Cause Exception e);
 
 	@Message(id = 116, value = "%s")
 	IllegalArgumentException getIllegalArgumentException(String message);
