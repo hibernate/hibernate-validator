@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -34,12 +35,12 @@ import javax.xml.stream.events.XMLEvent;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.xml.sax.SAXException;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetResource;
+import org.hibernate.validator.internal.util.privilegedactions.NewSchema;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -137,6 +138,14 @@ public class XmlParserHelper {
 		return xmlInputFactory.createXMLEventReader( xmlStream );
 	}
 
+	/**
+	 * Returns the XML schema identified by the given resource name.
+	 *
+	 * @param schemaResource
+	 *            the resource name identifying the schema.
+	 * @return the schema identified by the given resource name or {@code null} if the resource was not found or could
+	 *         not be loaded.
+	 */
 	public Schema getSchema(String schemaResource) {
 		Schema schema = schemaCache.get( schemaResource );
 
@@ -145,9 +154,14 @@ public class XmlParserHelper {
 		}
 
 		schema = loadSchema( schemaResource );
-		Schema previous = schemaCache.putIfAbsent( schemaResource, schema );
 
-		return previous != null ? previous : schema;
+		if ( schema != null ) {
+			Schema previous = schemaCache.putIfAbsent( schemaResource, schema );
+			return previous != null ? previous : schema;
+		}
+		else {
+			return null;
+		}
 	}
 
 	private Schema loadSchema(String schemaResource) {
@@ -157,9 +171,9 @@ public class XmlParserHelper {
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
 		try {
-			schema = sf.newSchema( schemaUrl );
+			schema = run( NewSchema.action( sf, schemaUrl ) );
 		}
-		catch ( SAXException e ) {
+		catch ( Exception e ) {
 			log.unableToCreateSchema( schemaResource, e.getMessage() );
 		}
 		return schema;
@@ -172,6 +186,10 @@ public class XmlParserHelper {
 	 * privileged actions within HV's protection domain.
 	 */
 	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	private <T> T run(PrivilegedExceptionAction<T> action) throws Exception {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
