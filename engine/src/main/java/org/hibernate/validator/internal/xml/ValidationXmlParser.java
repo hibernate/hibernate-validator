@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -42,6 +43,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetResource;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.internal.util.privilegedactions.NewSchema;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.
@@ -251,9 +253,9 @@ public class ValidationXmlParser {
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
 		try {
-			schema = sf.newSchema( schemaUrl );
+			schema = run( NewSchema.action( sf, schemaUrl ) );
 		}
-		catch ( SAXException e ) {
+		catch ( Exception e ) {
 			log.unableToCreateSchema( VALIDATION_CONFIGURATION_XSD, e.getMessage() );
 		}
 		return schema;
@@ -266,6 +268,10 @@ public class ValidationXmlParser {
 	 * privileged actions within HV's protection domain.
 	 */
 	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	private static <T> T run(PrivilegedExceptionAction<T> action) throws Exception {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
