@@ -49,7 +49,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
  */
-public class ExecutableConstraintMappingContextImpl
+class ExecutableConstraintMappingContextImpl
 		implements ConstructorConstraintMappingContext, MethodConstraintMappingContext {
 
 	private static final Log log = LoggerFactory.make();
@@ -60,11 +60,11 @@ public class ExecutableConstraintMappingContextImpl
 	private ReturnValueConstraintMappingContextImpl returnValueContext;
 	private CrossParameterConstraintMappingContextImpl crossParameterContext;
 
-	public ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Constructor<?> constructor) {
+	ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Constructor<?> constructor) {
 		this( typeContext, ExecutableElement.forConstructor( constructor ) );
 	}
 
-	public ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Method method) {
+	ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Method method) {
 		this( typeContext, ExecutableElement.forMethod( method ) );
 	}
 

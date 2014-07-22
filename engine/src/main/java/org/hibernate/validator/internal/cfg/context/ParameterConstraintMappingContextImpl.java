@@ -38,14 +38,14 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public final class ParameterConstraintMappingContextImpl
+final class ParameterConstraintMappingContextImpl
 		extends CascadableConstraintMappingContextImplBase<ParameterConstraintMappingContext>
 		implements ParameterConstraintMappingContext {
 
 	private final ExecutableConstraintMappingContextImpl executableContext;
 	private final int parameterIndex;
 
-	public ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
+	ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
 		super( executableContext.getTypeContext().getConstraintMapping() );
 
 		this.executableContext = executableContext;

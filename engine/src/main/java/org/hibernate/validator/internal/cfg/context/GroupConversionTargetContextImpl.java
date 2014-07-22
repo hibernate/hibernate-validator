@@ -23,13 +23,13 @@ import org.hibernate.validator.cfg.context.GroupConversionTargetContext;
  *
  * @author Gunnar Morling
  */
-public class GroupConversionTargetContextImpl<C> implements GroupConversionTargetContext<C> {
+class GroupConversionTargetContextImpl<C> implements GroupConversionTargetContext<C> {
 
 	private final C cascadableContext;
 	private final Class<?> from;
 	private final CascadableConstraintMappingContextImplBase<?> target;
 
-	public GroupConversionTargetContextImpl(Class<?> from, C cascadableContext, CascadableConstraintMappingContextImplBase<?> target) {
+	GroupConversionTargetContextImpl(Class<?> from, C cascadableContext, CascadableConstraintMappingContextImplBase<?> target) {
 		this.from = from;
 		this.cascadableContext = cascadableContext;
 		this.target = target;

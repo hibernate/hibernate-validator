@@ -29,13 +29,13 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
  *
  * @author Gunnar Morling
  */
-public final class CrossParameterConstraintMappingContextImpl
+final class CrossParameterConstraintMappingContextImpl
 		extends ConstraintMappingContextImplBase
 		implements CrossParameterConstraintMappingContext {
 
 	private final ExecutableConstraintMappingContextImpl executableContext;
 
-	public CrossParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
+	CrossParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
 		super( executableContext.getTypeContext().getConstraintMapping() );
 		this.executableContext = executableContext;
 	}

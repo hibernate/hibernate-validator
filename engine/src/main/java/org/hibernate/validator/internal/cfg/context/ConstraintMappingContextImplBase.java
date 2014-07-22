@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
-import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -34,12 +33,12 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Gunnar Morling
  */
-public abstract class ConstraintMappingContextImplBase {
+abstract class ConstraintMappingContextImplBase {
 
 	protected final DefaultConstraintMapping mapping;
 	private final Set<ConfiguredConstraint<?>> constraints;
 
-	public ConstraintMappingContextImplBase(DefaultConstraintMapping mapping) {
+	ConstraintMappingContextImplBase(DefaultConstraintMapping mapping) {
 		this.mapping = mapping;
 		this.constraints = newHashSet();
 	}

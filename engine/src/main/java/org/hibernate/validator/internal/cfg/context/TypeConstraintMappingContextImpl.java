@@ -33,7 +33,6 @@ import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
-import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -80,7 +79,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	private List<Class<?>> defaultGroupSequence;
 	private Class<? extends DefaultGroupSequenceProvider<? super C>> defaultGroupSequenceProviderClass;
 
-	public TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass) {
+	TypeConstraintMappingContextImpl(DefaultConstraintMapping mapping, Class<C> beanClass) {
 		super( mapping );
 		this.beanClass = beanClass;
 		mapping.getAnnotationProcessingOptions().ignoreAnnotationConstraintForClass( beanClass, Boolean.FALSE );
@@ -199,7 +198,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		return context;
 	}
 
-	public BeanConfiguration<C> build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+	BeanConfiguration<C> build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
 		return new BeanConfiguration<C>(
 				ConfigurationSource.API,
 				beanClass,
@@ -243,7 +242,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		) : null;
 	}
 
-	public Class<?> getBeanClass() {
+	Class<?> getBeanClass() {
 		return beanClass;
 	}
 

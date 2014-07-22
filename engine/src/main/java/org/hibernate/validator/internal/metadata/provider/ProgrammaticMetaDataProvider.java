@@ -17,9 +17,10 @@
 package org.hibernate.validator.internal.metadata.provider;
 
 import java.util.Set;
+
 import javax.validation.ParameterNameProvider;
 
-import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
+import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;

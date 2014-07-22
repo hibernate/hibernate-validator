@@ -36,7 +36,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  *
  * @author Gunnar Morling
  */
-public class ConfiguredConstraint<A extends Annotation> {
+class ConfiguredConstraint<A extends Annotation> {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -51,11 +51,11 @@ public class ConfiguredConstraint<A extends Annotation> {
 		this.elementType = elementType;
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
+	static <A extends Annotation> ConfiguredConstraint<A> forType(ConstraintDef<?, A> constraint, Class<?> beanType) {
 		return new ConfiguredConstraint<A>( constraint, ConstraintLocation.forClass( beanType ), ElementType.TYPE );
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A> forProperty(ConstraintDef<?, A> constraint, Member member) {
+	static <A extends Annotation> ConfiguredConstraint<A> forProperty(ConstraintDef<?, A> constraint, Member member) {
 		return new ConfiguredConstraint<A>(
 				constraint,
 				ConstraintLocation.forProperty( member ),

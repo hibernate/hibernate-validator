@@ -26,12 +26,12 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  *
  * @author Hardy Ferentschik
  */
-public class GroupConversionBuilder {
+class GroupConversionBuilder {
 
 	private GroupConversionBuilder() {
 	}
 
-	public static Map<Class<?>, Class<?>> buildGroupConversionMap(List<GroupConversionType> groupConversionTypes,
+	static Map<Class<?>, Class<?>> buildGroupConversionMap(List<GroupConversionType> groupConversionTypes,
 																  String defaultPackage) {
 		Map<Class<?>, Class<?>> groupConversionMap = newHashMap();
 		for ( GroupConversionType groupConversionType : groupConversionTypes ) {

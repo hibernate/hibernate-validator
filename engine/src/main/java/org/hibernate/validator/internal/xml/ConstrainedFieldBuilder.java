@@ -41,13 +41,13 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  */
-public class ConstrainedFieldBuilder {
+class ConstrainedFieldBuilder {
 	private static final Log log = LoggerFactory.make();
 
 	private ConstrainedFieldBuilder() {
 	}
 
-	public static Set<ConstrainedField> buildConstrainedFields(List<FieldType> fields,
+	static Set<ConstrainedField> buildConstrainedFields(List<FieldType> fields,
 															   Class<?> beanClass,
 															   String defaultPackage,
 															   ConstraintHelper constraintHelper,

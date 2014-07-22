@@ -31,13 +31,13 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public final class ReturnValueConstraintMappingContextImpl
+final class ReturnValueConstraintMappingContextImpl
 		extends CascadableConstraintMappingContextImplBase<ReturnValueConstraintMappingContext>
 		implements ReturnValueConstraintMappingContext {
 
 	private final ExecutableConstraintMappingContextImpl executableContext;
 
-	public ReturnValueConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
+	ReturnValueConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
 		super( executableContext.getTypeContext().getConstraintMapping() );
 		this.executableContext = executableContext;
 	}

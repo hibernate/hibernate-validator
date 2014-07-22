@@ -40,12 +40,12 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  */
-public class ConstrainedParameterBuilder {
+class ConstrainedParameterBuilder {
 
 	private ConstrainedParameterBuilder() {
 	}
 
-	public static List<ConstrainedParameter> buildConstrainedParameters(List<ParameterType> parameterList,
+	static List<ConstrainedParameter> buildConstrainedParameters(List<ParameterType> parameterList,
 																		ExecutableElement executableElement,
 																		String defaultPackage,
 																		ConstraintHelper constraintHelper,

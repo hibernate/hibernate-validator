@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.util;
+package org.hibernate.validator.internal.xml;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
  *
  * @author Hardy Ferentschik
  */
-public final class ResourceLoaderHelper {
+final class ResourceLoaderHelper {
 	private static final Log log = LoggerFactory.make();
 
 	/**
@@ -44,7 +44,7 @@ public final class ResourceLoaderHelper {
 	 *
 	 * @see InputStream#markSupported()
 	 */
-	public static InputStream getResettableInputStreamForPath(String path) {
+	static InputStream getResettableInputStreamForPath(String path) {
 		//TODO not sure if it's the right thing to removing '/'
 		String inputPath = path;
 		if ( inputPath.startsWith( "/" ) ) {
