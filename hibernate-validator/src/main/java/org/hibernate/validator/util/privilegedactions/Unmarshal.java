@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2014, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,34 +16,35 @@
  */
 package org.hibernate.validator.util.privilegedactions;
 
-import java.net.URL;
 import java.security.PrivilegedExceptionAction;
 
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
-import org.xml.sax.SAXException;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.Source;
 
 /**
- * Loads a given XML schema.
+ * Unmarshals the given source.
  *
  * @author Gunnar Morling
  */
-public final class NewSchema implements PrivilegedExceptionAction<Schema> {
+public final class Unmarshal<T> implements PrivilegedExceptionAction<JAXBElement<T>> {
 
-	private final SchemaFactory schemaFactory;
-	private final URL url;
+	private final Unmarshaller unmarshaller;
+	private final Source source;
+	private final Class<T> clazz;
 
-	public static NewSchema action(SchemaFactory schemaFactory, URL url) {
-		return new NewSchema( schemaFactory, url );
+	public static <T> Unmarshal<T> action(Unmarshaller unmarshaller, Source source, Class<T> clazz) {
+		return new Unmarshal<T>( unmarshaller, source, clazz );
 	}
 
-	public NewSchema(SchemaFactory schemaFactory, URL url) {
-		this.schemaFactory = schemaFactory;
-		this.url = url;
+	private Unmarshal(Unmarshaller unmarshaller, Source source, Class<T> clazz) {
+		this.unmarshaller = unmarshaller;
+		this.source = source;
+		this.clazz = clazz;
 	}
 
-	public Schema run() throws SAXException {
-		return schemaFactory.newSchema( url );
+	public JAXBElement<T> run() throws JAXBException {
+		return unmarshaller.unmarshal( source, clazz );
 	}
 }

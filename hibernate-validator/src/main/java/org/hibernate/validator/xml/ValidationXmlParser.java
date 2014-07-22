@@ -29,7 +29,6 @@ import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -42,7 +41,9 @@ import org.hibernate.validator.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.util.privilegedactions.GetResource;
 import org.hibernate.validator.util.privilegedactions.LoadClass;
 import org.hibernate.validator.util.privilegedactions.NewInstance;
+import org.hibernate.validator.util.privilegedactions.NewJaxbContext;
 import org.hibernate.validator.util.privilegedactions.NewSchema;
+import org.hibernate.validator.util.privilegedactions.Unmarshal;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.
@@ -219,17 +220,27 @@ public class ValidationXmlParser {
 
 		log.info( "{} found. Parsing XML based configuration.", VALIDATION_XML_FILE );
 
-		ValidationConfigType validationConfig;
 		Schema schema = getValidationConfigurationSchema();
 		try {
-			JAXBContext jc = JAXBContext.newInstance( ValidationConfigType.class );
+			// JAXBContext#newInstance() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBContext jc = run( NewJaxbContext.action( ValidationConfigType.class ) );
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema( schema );
 			StreamSource stream = new StreamSource( inputStream );
-			JAXBElement<ValidationConfigType> root = unmarshaller.unmarshal( stream, ValidationConfigType.class );
-			validationConfig = root.getValue();
+
+			// Unmashaller#unmarshal() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBElement<ValidationConfigType> root = run(
+					Unmarshal.action(
+							unmarshaller,
+							stream,
+							ValidationConfigType.class
+					)
+			);
+			return root.getValue();
 		}
-		catch ( JAXBException e ) {
+		catch ( Exception e ) {
 			log.error( "Error parsing {}: {}", VALIDATION_XML_FILE, e.getMessage() );
 			throw new ValidationException( "Unable to parse " + VALIDATION_XML_FILE, e );
 		}
@@ -241,7 +252,6 @@ public class ValidationXmlParser {
 				log.warn( "Unable to close input stream for " + VALIDATION_XML_FILE );
 			}
 		}
-		return validationConfig;
 	}
 
 	private InputStream getInputStreamForPath(String path) {

@@ -38,7 +38,6 @@ import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -60,7 +59,9 @@ import org.hibernate.validator.util.privilegedactions.GetMethod;
 import org.hibernate.validator.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.util.privilegedactions.GetResource;
 import org.hibernate.validator.util.privilegedactions.LoadClass;
+import org.hibernate.validator.util.privilegedactions.NewJaxbContext;
 import org.hibernate.validator.util.privilegedactions.NewSchema;
+import org.hibernate.validator.util.privilegedactions.Unmarshal;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
@@ -596,14 +597,26 @@ public class XmlMappingParser {
 		ConstraintMappingsType constraintMappings;
 		Schema schema = getMappingSchema();
 		try {
-			JAXBContext jc = JAXBContext.newInstance( ConstraintMappingsType.class );
+			// JAXBContext#newInstance() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBContext jc = run( NewJaxbContext.action( ConstraintMappingsType.class ) );
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema( schema );
 			StreamSource stream = new StreamSource( in );
-			JAXBElement<ConstraintMappingsType> root = unmarshaller.unmarshal( stream, ConstraintMappingsType.class );
+
+			// Unmashaller#unmarshal() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBElement<ConstraintMappingsType> root = run(
+					Unmarshal.action(
+							unmarshaller,
+							stream,
+							ConstraintMappingsType.class
+					)
+			);
+
 			constraintMappings = root.getValue();
 		}
-		catch ( JAXBException e ) {
+		catch ( Exception e ) {
 			String msg = "Error parsing mapping file.";
 			log.error( msg );
 			throw new ValidationException( msg, e );

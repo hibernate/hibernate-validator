@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
+ * Copyright 2014, Red Hat, Inc. and/or its affiliates, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -16,34 +16,29 @@
  */
 package org.hibernate.validator.util.privilegedactions;
 
-import java.net.URL;
 import java.security.PrivilegedExceptionAction;
 
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-
-import org.xml.sax.SAXException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 
 /**
- * Loads a given XML schema.
+ * Returns a new {@link JAXBContext} for the given class.
  *
  * @author Gunnar Morling
  */
-public final class NewSchema implements PrivilegedExceptionAction<Schema> {
+public final class NewJaxbContext implements PrivilegedExceptionAction<JAXBContext> {
 
-	private final SchemaFactory schemaFactory;
-	private final URL url;
+	private final Class<?> clazz;
 
-	public static NewSchema action(SchemaFactory schemaFactory, URL url) {
-		return new NewSchema( schemaFactory, url );
+	public static NewJaxbContext action(Class<?> clazz) {
+		return new NewJaxbContext( clazz );
 	}
 
-	public NewSchema(SchemaFactory schemaFactory, URL url) {
-		this.schemaFactory = schemaFactory;
-		this.url = url;
+	private NewJaxbContext(Class<?> clazz) {
+		this.clazz = clazz;
 	}
 
-	public Schema run() throws SAXException {
-		return schemaFactory.newSchema( url );
+	public JAXBContext run() throws JAXBException {
+		return JAXBContext.newInstance( clazz );
 	}
 }

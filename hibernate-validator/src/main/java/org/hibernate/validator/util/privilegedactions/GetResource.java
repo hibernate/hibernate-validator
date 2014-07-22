@@ -40,7 +40,6 @@ public final class GetResource implements PrivilegedAction<URL> {
 		this.resourceName = resourceName;
 	}
 
-	@Override
 	public URL run() {
 		return classLoader.getResource( resourceName );
 	}
