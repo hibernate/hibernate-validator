@@ -18,17 +18,19 @@ package org.hibernate.validator.internal.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -36,6 +38,8 @@ import javax.xml.validation.Schema;
 import org.hibernate.validator.internal.util.ResourceLoaderHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
+import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.
@@ -111,14 +115,19 @@ public class ValidationXmlParser {
 		log.parsingXMLFile( VALIDATION_XML_FILE );
 
 		try {
-			JAXBContext jc = JAXBContext.newInstance( ValidationConfigType.class );
+			// JAXBContext#newInstance() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBContext jc = run( NewJaxbContext.action( ValidationConfigType.class ) );
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema( schema );
 			StreamSource stream = new StreamSource( inputStream );
-			JAXBElement<ValidationConfigType> root = unmarshaller.unmarshal( stream, ValidationConfigType.class );
+
+			// Unmashaller#unmarshal() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBElement<ValidationConfigType> root = run( Unmarshal.action( unmarshaller, stream, ValidationConfigType.class ) );
 			return root.getValue();
 		}
-		catch ( JAXBException e ) {
+		catch ( Exception e ) {
 			throw log.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
 		}
 	}
@@ -182,5 +191,15 @@ public class ValidationXmlParser {
 		executableTypes.addAll( validatedExecutables.getExecutableType() );
 
 		return executableTypes;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedExceptionAction<T> action) throws Exception {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
