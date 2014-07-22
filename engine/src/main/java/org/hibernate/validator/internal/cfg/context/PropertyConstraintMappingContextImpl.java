@@ -41,14 +41,14 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
  * @author Gunnar Morling
  * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
  */
-public final class PropertyConstraintMappingContextImpl
+final class PropertyConstraintMappingContextImpl
 		extends CascadableConstraintMappingContextImplBase<PropertyConstraintMappingContext>
 		implements PropertyConstraintMappingContext {
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
 	private final Member member;
 
-	public PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Member member) {
+	PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Member member) {
 		super( typeContext.getConstraintMapping() );
 		this.typeContext = typeContext;
 		this.member = member;
@@ -99,7 +99,7 @@ public final class PropertyConstraintMappingContextImpl
 		return typeContext.method( name, parameterTypes );
 	}
 
-	public ConstrainedElement build(ConstraintHelper constraintHelper) {
+	ConstrainedElement build(ConstraintHelper constraintHelper) {
 		if ( member instanceof Field ) {
 			return new ConstrainedField(
 					ConfigurationSource.API,

@@ -43,13 +43,13 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  */
-public class ConstrainedGetterBuilder {
+class ConstrainedGetterBuilder {
 	private static final Log log = LoggerFactory.make();
 
 	private ConstrainedGetterBuilder() {
 	}
 
-	public static Set<ConstrainedExecutable> buildConstrainedGetters(List<GetterType> getterList,
+	static Set<ConstrainedExecutable> buildConstrainedGetters(List<GetterType> getterList,
 																	 Class<?> beanClass,
 																	 String defaultPackage,
 																	 ConstraintHelper constraintHelper,

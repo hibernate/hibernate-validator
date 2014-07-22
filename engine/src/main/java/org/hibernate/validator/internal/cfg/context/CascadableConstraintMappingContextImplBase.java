@@ -21,7 +21,6 @@ import java.util.Map;
 import org.hibernate.validator.cfg.context.Cascadable;
 import org.hibernate.validator.cfg.context.GroupConversionTargetContext;
 import org.hibernate.validator.cfg.context.Unwrapable;
-import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
@@ -30,14 +29,14 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  *
  * @author Gunnar Morling
  */
-public abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C> & Unwrapable<C>>
+abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C> & Unwrapable<C>>
 		extends ConstraintMappingContextImplBase implements Cascadable<C>, Unwrapable<C> {
 
 	protected boolean isCascading;
 	protected Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean unwrapValidatedValue;
 
-	public CascadableConstraintMappingContextImplBase(DefaultConstraintMapping mapping) {
+	CascadableConstraintMappingContextImplBase(DefaultConstraintMapping mapping) {
 		super( mapping );
 	}
 

@@ -56,7 +56,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  * @author Gunnar Morling
  * @see java.lang.annotation.Annotation
  */
-public class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
+class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 
 	private static final long serialVersionUID = 6907601010599429454L;
 	private static final Log log = LoggerFactory.make();
@@ -65,7 +65,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 	private final Map<String, Object> values;
 	private final int hashCode;
 
-	public AnnotationProxy(AnnotationDescriptor<?> descriptor) {
+	AnnotationProxy(AnnotationDescriptor<?> descriptor) {
 		this.annotationType = descriptor.type();
 		values = Collections.unmodifiableMap( getAnnotationValues( descriptor ) );
 		this.hashCode = calculateHashCode();

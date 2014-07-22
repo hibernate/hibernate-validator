@@ -35,12 +35,12 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  */
-public class ConstrainedTypeBuilder {
+class ConstrainedTypeBuilder {
 
 	private ConstrainedTypeBuilder() {
 	}
 
-	public static ConstrainedType buildConstrainedType(ClassType classType,
+	static ConstrainedType buildConstrainedType(ClassType classType,
 													   Class<?> beanClass,
 													   String defaultPackage,
 													   ConstraintHelper constraintHelper,

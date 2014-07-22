@@ -45,7 +45,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  *
  * @author Hardy Ferentschik
  */
-public class MetaConstraintBuilder {
+class MetaConstraintBuilder {
 	private static final Log log = LoggerFactory.make();
 
 	private static final String MESSAGE_PARAM = "message";
@@ -56,7 +56,7 @@ public class MetaConstraintBuilder {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <A extends Annotation> MetaConstraint<A> buildMetaConstraint(ConstraintLocation constraintLocation,
+	static <A extends Annotation> MetaConstraint<A> buildMetaConstraint(ConstraintLocation constraintLocation,
 																			   ConstraintType constraint,
 																			   java.lang.annotation.ElementType type,
 																			   String defaultPackage,

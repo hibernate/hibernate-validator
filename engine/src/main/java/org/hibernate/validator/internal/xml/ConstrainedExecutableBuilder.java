@@ -51,14 +51,14 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  */
-public class ConstrainedExecutableBuilder {
+class ConstrainedExecutableBuilder {
 
 	private static final Log log = LoggerFactory.make();
 
 	private ConstrainedExecutableBuilder() {
 	}
 
-	public static Set<ConstrainedExecutable> buildMethodConstrainedExecutable(List<MethodType> methods,
+	static Set<ConstrainedExecutable> buildMethodConstrainedExecutable(List<MethodType> methods,
 																			  Class<?> beanClass,
 																			  String defaultPackage,
 																			  ParameterNameProvider parameterNameProvider,
@@ -125,7 +125,7 @@ public class ConstrainedExecutableBuilder {
 		return constrainedExecutables;
 	}
 
-	public static Set<ConstrainedExecutable> buildConstructorConstrainedExecutable(List<ConstructorType> constructors,
+	static Set<ConstrainedExecutable> buildConstructorConstrainedExecutable(List<ConstructorType> constructors,
 																				   Class<?> beanClass,
 																				   String defaultPackage,
 																				   ParameterNameProvider parameterNameProvider,
