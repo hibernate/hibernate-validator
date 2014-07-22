@@ -34,8 +34,7 @@ public final class PropertyConstraintMappingContextImpl extends ConstraintMappin
 
 	private final Member member;
 
-	public PropertyConstraintMappingContextImpl(Class<?> beanClass, Member member, ConstraintMappingContext mapping) {
-
+	PropertyConstraintMappingContextImpl(Class<?> beanClass, Member member, ConstraintMappingContext mapping) {
 		super( beanClass, mapping );
 
 		this.member = member;

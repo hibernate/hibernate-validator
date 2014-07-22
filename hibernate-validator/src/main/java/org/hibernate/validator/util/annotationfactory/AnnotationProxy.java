@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -55,14 +54,13 @@ import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
  * @author Davide Marchignoli
  * @see java.lang.annotation.Annotation
  */
-public class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
+class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 
 	private static final long serialVersionUID = 6907601010599429454L;
 	private final Class<? extends Annotation> annotationType;
 	private final Map<String, Object> values;
 
-
-	public AnnotationProxy(AnnotationDescriptor<?> descriptor) {
+	AnnotationProxy(AnnotationDescriptor<?> descriptor) {
 		this.annotationType = descriptor.type();
 		values = getAnnotationValues( descriptor );
 	}

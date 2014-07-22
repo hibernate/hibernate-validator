@@ -29,13 +29,13 @@ import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  * @author Gunnar Morling
  */
-public class MethodConstraintMappingContextImpl implements MethodConstraintMappingContext {
+class MethodConstraintMappingContextImpl implements MethodConstraintMappingContext {
 
 	private final Class<?> beanClass;
 	private final Method method;
 	private final ConstraintMappingContext mapping;
 
-	public MethodConstraintMappingContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
+	MethodConstraintMappingContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
 
 		this.beanClass = beanClass;
 		this.method = method;

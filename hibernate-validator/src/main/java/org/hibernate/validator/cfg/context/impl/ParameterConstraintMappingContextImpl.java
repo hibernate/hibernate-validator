@@ -30,7 +30,7 @@ import org.hibernate.validator.metadata.location.MethodConstraintLocation;
  * @author Gunnar Morling
  * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
  */
-public final class ParameterConstraintMappingContextImpl
+final class ParameterConstraintMappingContextImpl
 		extends ConstraintMappingContextImplBase
 		implements ParameterConstraintMappingContext {
 

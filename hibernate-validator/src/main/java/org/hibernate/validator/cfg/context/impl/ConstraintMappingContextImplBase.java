@@ -37,7 +37,7 @@ import org.hibernate.validator.util.privilegedactions.GetMethod;
  *
  * @author Gunnar Morling
  */
-public abstract class ConstraintMappingContextImplBase {
+abstract class ConstraintMappingContextImplBase {
 
 	protected final Class<?> beanClass;
 
