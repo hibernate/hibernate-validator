@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +45,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
-import org.xml.sax.SAXException;
 
 import org.hibernate.validator.metadata.AnnotationIgnores;
 import org.hibernate.validator.metadata.BeanMetaConstraint;
@@ -60,6 +60,7 @@ import org.hibernate.validator.util.privilegedactions.GetMethod;
 import org.hibernate.validator.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.util.privilegedactions.GetResource;
 import org.hibernate.validator.util.privilegedactions.LoadClass;
+import org.hibernate.validator.util.privilegedactions.NewSchema;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
@@ -182,6 +183,7 @@ public class XmlMappingParser {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> findConstraintValidatorClasses(Class<? extends Annotation> annotationType) {
 		List<Class<? extends ConstraintValidator<? extends Annotation, ?>>> constraintValidatorDefinitionClasses = newArrayList();
 		if ( constraintHelper.isBuiltinConstraint( annotationType ) ) {
@@ -615,9 +617,9 @@ public class XmlMappingParser {
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
 		try {
-			schema = sf.newSchema( schemaUrl );
+			schema = run( NewSchema.action( sf, schemaUrl ) );
 		}
-		catch ( SAXException e ) {
+		catch ( Exception e ) {
 			log.warn( "Unable to create schema for {}: {}", VALIDATION_MAPPING_XSD, e.getMessage() );
 		}
 		return schema;
@@ -630,6 +632,10 @@ public class XmlMappingParser {
 	 * privileged actions within HV's protection domain.
 	 */
 	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	private static <T> T run(PrivilegedExceptionAction<T> action) throws Exception {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
