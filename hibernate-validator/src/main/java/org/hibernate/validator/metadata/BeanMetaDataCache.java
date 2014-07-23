@@ -16,9 +16,12 @@
 */
 package org.hibernate.validator.metadata;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.EnumSet;
 
+import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
+
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 
 /**
@@ -29,18 +32,37 @@ import static org.hibernate.validator.util.Contracts.assertNotNull;
  */
 public class BeanMetaDataCache {
 	/**
-	 * A map for the meta data for each entity. The key is the class and the value the bean meta data for this
-	 * entity.
+	 * The default initial capacity for this cache.
 	 */
-	private final ConcurrentMap<Class<?>, BeanMetaDataImpl<?>> metadataProviders = new ConcurrentHashMap<Class<?>, BeanMetaDataImpl<?>>(
-			10
+	private static final int DEFAULT_INITIAL_CAPACITY = 16;
+
+	/**
+	 * The default load factor for this cache.
+	 */
+	private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+
+	/**
+	 * The default concurrency level for this cache.
+	 */
+	private static final int DEFAULT_CONCURRENCY_LEVEL = 16;
+
+	/**
+	 * Used to cache the constraint meta data for validated entities
+	 */
+	private final ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>> beanMetaDataCache = new ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>>(
+			DEFAULT_INITIAL_CAPACITY,
+			DEFAULT_LOAD_FACTOR,
+			DEFAULT_CONCURRENCY_LEVEL,
+			SOFT,
+			SOFT,
+			EnumSet.of( IDENTITY_COMPARISONS )
 	);
 
 	@SuppressWarnings("unchecked")
 	public <T> BeanMetaDataImpl<T> getBeanMetaData(Class<T> beanClass) {
 		assertNotNull( beanClass, "Class cannot be null" );
 
-		return (BeanMetaDataImpl<T>) metadataProviders.get( beanClass );
+		return (BeanMetaDataImpl<T>) beanMetaDataCache.get( beanClass );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -48,6 +70,6 @@ public class BeanMetaDataCache {
 		assertNotNull( beanClass, "Class cannot be null" );
 		assertNotNull( metaData, "MetaData cannot be null" );
 
-		return (BeanMetaDataImpl<T>) metadataProviders.putIfAbsent( beanClass, metaData );
+		return (BeanMetaDataImpl<T>) beanMetaDataCache.putIfAbsent( beanClass, metaData );
 	}
 }

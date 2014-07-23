@@ -49,20 +49,4 @@ public class BeanMetaConstraint<A extends Annotation> extends MetaConstraint<A> 
 	public BeanConstraintLocation getLocation() {
 		return (BeanConstraintLocation) location;
 	}
-
-	/**
-	 * @param o the object from which to retrieve the value.
-	 *
-	 * @return Returns the value for this constraint from the specified object. Depending on the type either the value itself
-	 *         is returned of method or field access is used to access the value.
-	 */
-	public Object getValue(Object o) {
-
-		if ( getLocation().getMember() == null ) {
-			return o;
-		}
-		else {
-			return ReflectionHelper.getValue( getLocation().getMember(), o );
-		}
-	}
 }

@@ -470,13 +470,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void addMethodMetaConstraint(Class<?> clazz, MethodMetaData methodMetaData) {
-
 		addToBuilder( methodMetaData );
 
 		if ( ReflectionHelper.isGetterMethod( methodMetaData.getMethod() ) ) {
 
 			addToPropertyNameList( methodMetaData.getMethod() );
-			run( SetAccessibility.action( methodMetaData.getMethod() ) );
 
 			for ( MethodMetaConstraint<?> metaConstraint : methodMetaData ) {
 
@@ -522,7 +520,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void addCascadedMember(Member member) {
-		run( SetAccessibility.action( member ) );
 		cascadedMembers.add( member );
 		addPropertyDescriptorForMember( member, true );
 	}
@@ -616,7 +613,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetaData ) {
-				run( SetAccessibility.action( field ) );
 				BeanMetaConstraint<?> metaConstraint = createBeanMetaConstraint( clazz, field, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}
