@@ -533,7 +533,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			if ( !propertyPathComplete ) {
 				valueContext.appendNode( propertyMetaData );
 			}
-			setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, propertyMetaData );
+			setValidatedValueHandlerToValueContextIfPresent( valueContext, propertyMetaData );
 		}
 		else {
 			valueContext.appendBeanNode();
@@ -580,7 +580,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				// Value can be wrapped (e.g. Optional<Address>). Try to unwrap it
 				ConstraintMetaData metaData = (ConstraintMetaData) cascadable;
 				if ( metaData.requiresUnwrapping() ) {
-					setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, metaData );
+					setValidatedValueHandlerToValueContextIfPresent( valueContext, metaData );
 					valueContext.setCurrentValidatedValue( value );
 					value = valueContext.getCurrentValidatedValue();
 				}
@@ -1094,7 +1094,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				}
 
 				valueContext.appendNode( parameterMetaData );
-				setValidatedValueHandlerToValueContextIfPresent( validationContext, valueContext, parameterMetaData );
+				setValidatedValueHandlerToValueContextIfPresent( valueContext, parameterMetaData );
 				valueContext.setCurrentValidatedValue( value );
 
 				numberOfViolationsOfCurrentGroup += validateConstraintsForGroup(
@@ -1250,7 +1250,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			valueContext.setCurrentValidatedValue( value );
 			valueContext.appendNode( executableMetaData.getReturnValueMetaData() );
 			setValidatedValueHandlerToValueContextIfPresent(
-					validationContext,
 					valueContext,
 					executableMetaData.getReturnValueMetaData()
 			);
@@ -1487,8 +1486,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return null;
 	}
 
-	private <T> void setValidatedValueHandlerToValueContextIfPresent(ValidationContext<?> validationContext,
-			ValueContext<?, T> valueContext, ConstraintMetaData metaData) {
+	private <T> void setValidatedValueHandlerToValueContextIfPresent(ValueContext<?, T> valueContext, ConstraintMetaData metaData) {
 		if ( metaData.requiresUnwrapping() ) {
 			@SuppressWarnings("unchecked") //we know the handler matches the value type
 					ValidatedValueUnwrapper<? super T> handler = (ValidatedValueUnwrapper<T>) getValidatedValueHandler(
