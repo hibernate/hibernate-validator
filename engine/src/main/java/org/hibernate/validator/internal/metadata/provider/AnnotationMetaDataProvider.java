@@ -23,6 +23,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,13 +52,15 @@ import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredFields;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
-import static org.hibernate.validator.internal.util.ReflectionHelper.getMethods;
-import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance;
 
 /**
  * {@code MetaDataProvider} which reads the metadata from annotations which is the default configuration source.
@@ -160,22 +164,25 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		GroupSequenceProvider groupSequenceProviderAnnotation = beanClass.getAnnotation( GroupSequenceProvider.class );
 
 		if ( groupSequenceProviderAnnotation != null ) {
-			return newGroupSequenceProviderClassInstance( beanClass, groupSequenceProviderAnnotation.value() );
+			@SuppressWarnings("unchecked")
+			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass =
+					(Class<? extends DefaultGroupSequenceProvider<? super T>>) groupSequenceProviderAnnotation.value();
+			return newGroupSequenceProviderClassInstance( beanClass, providerClass );
 		}
 
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass, Class<?> providerClass) {
-		Method[] providerMethods = getMethods( providerClass );
+	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass,
+																							  Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
+		Method[] providerMethods = run( GetMethods.action( providerClass ) );
+
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
 					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
-
-				return (DefaultGroupSequenceProvider<? super T>) newInstance(
-						providerClass, "the default group sequence provider"
+				return run(
+						NewInstance.action( providerClass, "the default group sequence provider" )
 				);
 			}
 		}
@@ -203,8 +210,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private Set<ConstrainedElement> getPropertyMetaData(Class<?> beanClass) {
 		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
-		for ( Field field : ReflectionHelper.getDeclaredFields( beanClass ) ) {
-
+		for ( Field field : run( GetDeclaredFields.action( beanClass ) ) ) {
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) ||
 					annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored( field ) ||
@@ -246,10 +252,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private Set<ConstrainedMethod> getMethodMetaData(Class<?> clazz) {
 		Set<ConstrainedMethod> methodMetaData = newHashSet();
 
-		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( clazz );
-
+		final Method[] declaredMethods = run( GetDeclaredMethods.action( clazz ) );
 		for ( Method method : declaredMethods ) {
-
 			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
 			// anyway and possibly hide the actual method with the same signature in the built meta model
 			if ( Modifier.isStatic( method.getModifiers() ) || annotationProcessingOptions.arePropertyLevelConstraintAnnotationsIgnored(
@@ -435,5 +439,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(A annotation, ElementType type) {
 		return new ConstraintDescriptorImpl<A>( annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY );
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

@@ -20,15 +20,18 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 
 /**
  * A concrete implementation of <code>Annotation</code> that pretends it is a
@@ -70,7 +73,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 	private Map<String, Object> getAnnotationValues(AnnotationDescriptor<?> descriptor) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		int processedValuesFromDescriptor = 0;
-		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotationType );
+		final Method[] declaredMethods = run( GetDeclaredMethods.action( annotationType ) );
 		for ( Method m : declaredMethods ) {
 			if ( descriptor.containsElement( m.getName() ) ) {
 				result.put( m.getName(), descriptor.valueOf( m.getName() ) );
@@ -129,5 +132,47 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 		SortedSet<String> result = new TreeSet<String>();
 		result.addAll( values.keySet() );
 		return result;
+	}
+
+	private boolean areEqual(Object o1, Object o2) {
+		return
+				!o1.getClass().isArray() ? o1.equals( o2 ) :
+						o1.getClass() == boolean[].class ? Arrays.equals( (boolean[]) o1, (boolean[]) o2 ) :
+								o1.getClass() == byte[].class ? Arrays.equals( (byte[]) o1, (byte[]) o2 ) :
+										o1.getClass() == char[].class ? Arrays.equals( (char[]) o1, (char[]) o2 ) :
+												o1.getClass() == double[].class ? Arrays.equals(
+														(double[]) o1,
+														(double[]) o2
+												) :
+														o1.getClass() == float[].class ? Arrays.equals(
+																(float[]) o1,
+																(float[]) o2
+														) :
+																o1.getClass() == int[].class ? Arrays.equals(
+																		(int[]) o1,
+																		(int[]) o2
+																) :
+																		o1.getClass() == long[].class ? Arrays.equals(
+																				(long[]) o1,
+																				(long[]) o2
+																		) :
+																				o1.getClass() == short[].class ? Arrays.equals(
+																						(short[]) o1,
+																						(short[]) o2
+																				) :
+																						Arrays.equals(
+																								(Object[]) o1,
+																								(Object[]) o2
+																						);
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

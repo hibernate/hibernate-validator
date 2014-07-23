@@ -1,6 +1,6 @@
 /*
 * JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
 * by the @authors tag. See the copyright.txt in the distribution for a
 * full listing of individual contributors.
 *
@@ -20,27 +20,23 @@ import java.lang.reflect.Constructor;
 import java.security.PrivilegedAction;
 
 /**
- * @author Emmanuel Bernard
+ * Returns the declared constructors of the specified class.
+ *
+ * @author Gunnar Morling
  */
-public final class GetConstructor<T> implements PrivilegedAction<Constructor<T>> {
-	private final Class<T> clazz;
-	private final Class<?>[] params;
+public final class GetDeclaredConstructors implements PrivilegedAction<Constructor<?>[]> {
+	private final Class<?> clazz;
 
-	public static <T> GetConstructor<T> action(Class<T> clazz, Class<?>... params) {
-		return new GetConstructor<T>( clazz, params );
+	public static GetDeclaredConstructors action(Class<?> clazz) {
+		return new GetDeclaredConstructors( clazz );
 	}
 
-	private GetConstructor(Class<T> clazz, Class<?>... params) {
+	private GetDeclaredConstructors(Class<?> clazz) {
 		this.clazz = clazz;
-		this.params = params;
 	}
 
-	public Constructor<T> run() {
-		try {
-			return clazz.getConstructor(params);
-		}
-		catch ( NoSuchMethodException e ) {
-			return null;
-		}
+	@Override
+	public Constructor<?>[] run() {
+		return clazz.getDeclaredConstructors();
 	}
 }

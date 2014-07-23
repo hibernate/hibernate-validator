@@ -16,10 +16,13 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 
 /**
  * Default <code>ConstraintValidatorFactory</code> using a no-arg constructor.
@@ -27,9 +30,20 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
+//TODO Can we make the constructor non-public?
 public class ConstraintValidatorFactoryImpl implements ConstraintValidatorFactory {
 
 	public final <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-		return ReflectionHelper.newInstance( key, "ConstraintValidator" );
+		return run( NewInstance.action( key, "ConstraintValidator" ) );
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

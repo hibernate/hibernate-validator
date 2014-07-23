@@ -17,6 +17,8 @@
 package org.hibernate.validator.internal.metadata.raw;
 
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +28,7 @@ import org.hibernate.validator.internal.metadata.location.MethodConstraintLocati
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * Represents a method of a Java type and all its associated meta-data relevant
@@ -113,7 +116,7 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData );
 
 		if ( isConstrained() ) {
-			ReflectionHelper.setAccessibility( method );
+			run( SetAccessibility.action( method ) );
 		}
 	}
 
@@ -130,27 +133,6 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 
 	public MethodConstraintLocation getLocation() {
 		return (MethodConstraintLocation) super.getLocation();
-	}
-
-	/**
-	 * Constraint meta data for the specified parameter.
-	 *
-	 * @param parameterIndex The index in this method's parameter array of the parameter of
-	 * interest.
-	 *
-	 * @return Meta data for the specified parameter. Will never be
-	 *         <code>null</code>.
-	 *
-	 * @throws IllegalArgumentException In case this method doesn't have a parameter with the
-	 * specified index.
-	 */
-	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
-
-		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw log.getInvalidMethodParameterIndexException( getLocation().getMember().getName(), parameterIndex );
-		}
-
-		return parameterMetaData.get( parameterIndex );
 	}
 
 	/**
@@ -205,6 +187,16 @@ public class ConstrainedMethod extends AbstractConstrainedElement {
 		return "ConstrainedMethod [location=" + getLocation()
 				+ ", parameterMetaData=" + parameterMetaData
 				+ ", hasParameterConstraints=" + hasParameterConstraints + "]";
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 }

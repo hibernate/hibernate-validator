@@ -16,27 +16,37 @@
 */
 package org.hibernate.validator.internal.util.privilegedactions;
 
+import java.lang.reflect.Constructor;
 import java.security.PrivilegedAction;
-import java.lang.reflect.Field;
 
 /**
- * Returns the fields of the specified class.
+ * Returns the declared constructor with the specified parameter types or {@code null} if it does not exist.
  *
  * @author Emmanuel Bernard
  */
-public final class GetDeclaredFields implements PrivilegedAction<Field[]> {
-	private final Class<?> clazz;
+public final class GetDeclaredConstructor<T> implements PrivilegedAction<Constructor<T>> {
+	private final Class<T> clazz;
+	private final Class<?>[] params;
 
-	public static GetDeclaredFields action(Class<?> clazz) {
-		return new GetDeclaredFields( clazz );
+	public static <T> GetDeclaredConstructor<T> action(Class<T> clazz, Class<?>... params) {
+		return new GetDeclaredConstructor<T>( clazz, params );
 	}
 
-	private GetDeclaredFields(Class<?> clazz) {
+	private GetDeclaredConstructor(Class<T> clazz, Class<?>... params) {
 		this.clazz = clazz;
+		this.params = params;
 	}
 
 	@Override
-	public Field[] run() {
-		return clazz.getDeclaredFields();
+	public Constructor<T> run() {
+		try {
+			return clazz.getDeclaredConstructor( params );
+		}
+		catch ( NoSuchMethodException e ) {
+			return null;
+		}
 	}
 }
+
+
+

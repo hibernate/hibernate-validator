@@ -20,6 +20,9 @@ import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
 
 /**
+ * Returns the method with the specified property name or {@code null} if it does not exist. This method will prepend
+ * 'is' and 'get' to the property name and capitalize the first letter.
+ *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
@@ -36,6 +39,7 @@ public final class GetMethodFromPropertyName implements PrivilegedAction<Method>
 		this.property = property;
 	}
 
+	@Override
 	public Method run() {
 		try {
 			char string[] = property.toCharArray();

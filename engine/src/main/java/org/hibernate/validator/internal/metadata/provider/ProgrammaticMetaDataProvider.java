@@ -19,6 +19,8 @@ package org.hibernate.validator.internal.metadata.provider;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -45,9 +47,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -126,11 +128,11 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 		//retrieve provider from new annotation
 		if ( providerClass != null ) {
-			DefaultGroupSequenceProvider<? super T> provider = ReflectionHelper.newInstance(
-					providerClass,
-					"default group sequence provider"
+			return run(
+					NewInstance.action(
+							providerClass, "default group sequence provider"
+					)
 			);
-			return provider;
 		}
 
 		Class<? extends org.hibernate.validator.group.DefaultGroupSequenceProvider<? super T>> deprecatedProviderClass = context
@@ -138,9 +140,8 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 
 		//retrieve provider from deprecated annotation and wrap into adapter
 		if ( deprecatedProviderClass != null ) {
-			org.hibernate.validator.group.DefaultGroupSequenceProvider<? super T> provider = ReflectionHelper.newInstance(
-					deprecatedProviderClass,
-					"default group sequence provider"
+			org.hibernate.validator.group.DefaultGroupSequenceProvider<? super T> provider = run(
+					NewInstance.action( deprecatedProviderClass, "default group sequence provider" )
 			);
 			return DefaultGroupSequenceProviderAdapter.getInstance( provider );
 		}
@@ -393,5 +394,15 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 				return constraint.getLocation();
 			}
 		};
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

@@ -16,10 +16,6 @@
 */
 package org.hibernate.validator.internal.util;
 
-import java.beans.Introspector;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
@@ -28,7 +24,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,23 +35,8 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.ConstructorInstance;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.GetConstructor;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredFields;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
-import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Some reflection utility methods. Where necessary calls will be performed as {@code PrivilegedAction} which is necessary
@@ -70,7 +50,14 @@ public final class ReflectionHelper {
 
 	private static final Log log = LoggerFactory.make();
 
-	private static String[] PROPERTY_ACCESSOR_PREFIXES = { "is", "get", "has" };
+	private static final String PROPERTY_ACCESSOR_PREFIX_GET = "get";
+	private static final String PROPERTY_ACCESSOR_PREFIX_IS = "is";
+	private static final String PROPERTY_ACCESSOR_PREFIX_HAS = "has";
+	public static final String[] PROPERTY_ACCESSOR_PREFIXES = {
+			PROPERTY_ACCESSOR_PREFIX_GET,
+			PROPERTY_ACCESSOR_PREFIX_IS,
+			PROPERTY_ACCESSOR_PREFIX_HAS
+	};
 
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
 
@@ -96,95 +83,27 @@ public final class ReflectionHelper {
 	private ReflectionHelper() {
 	}
 
-	public static ClassLoader getClassLoaderFromContext() {
-		ClassLoader loader;
-		GetClassLoader action = GetClassLoader.fromContext();
-		if ( System.getSecurityManager() != null ) {
-			loader = AccessController.doPrivileged( action );
-		}
-		else {
-			loader = action.run();
-		}
-		return loader;
-	}
-
-	public static ClassLoader getClassLoaderFromClass(Class<?> clazz) {
-		ClassLoader loader;
-		GetClassLoader action = GetClassLoader.fromClass( clazz );
-		if ( System.getSecurityManager() != null ) {
-			loader = AccessController.doPrivileged( action );
-		}
-		else {
-			loader = action.run();
-		}
-		return loader;
-	}
-
-	public static Class<?> loadClass(String className, Class<?> caller) {
-		LoadClass action = LoadClass.action( className, caller );
-		if ( System.getSecurityManager() != null ) {
-			return AccessController.doPrivileged( action );
-		}
-		else {
-			return action.run();
-		}
-	}
-
-	public static <T> Constructor<T> getConstructor(Class<T> clazz, Class<?>... params) {
-		Constructor<T> constructor;
-		GetConstructor<T> action = GetConstructor.action( clazz, params );
-		if ( System.getSecurityManager() != null ) {
-			constructor = AccessController.doPrivileged( action );
-		}
-		else {
-			constructor = action.run();
-		}
-		return constructor;
-	}
-
-	public static <T> T newInstance(Class<T> clazz, String message) {
-		T instance;
-		NewInstance<T> newInstance = NewInstance.action( clazz, message );
-		if ( System.getSecurityManager() != null ) {
-			instance = AccessController.doPrivileged( newInstance );
-		}
-		else {
-			instance = newInstance.run();
-		}
-		return instance;
-	}
-
-	public static <T> T newConstructorInstance(Constructor<T> constructor, Object... initArgs) {
-		T instance;
-		ConstructorInstance<T> newInstance = ConstructorInstance.action( constructor, initArgs );
-		if ( System.getSecurityManager() != null ) {
-			instance = AccessController.doPrivileged( newInstance );
-		}
-		else {
-			instance = newInstance.run();
-		}
-		return instance;
-	}
-
-	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
-		T result;
-		GetAnnotationParameter<T> action = GetAnnotationParameter.action( annotation, parameterName, type );
-		if ( System.getSecurityManager() != null ) {
-			result = AccessController.doPrivileged( action );
-		}
-		else {
-			result = action.run();
-		}
-		return result;
-	}
-
 	/**
-	 * Process bean properties getter by applying the JavaBean naming conventions.
+	 * Returns the JavaBeans property name of the given member.
+	 * <p>
+	 * For fields, the field name will be returned. For getter methods, the
+	 * decapitalized property name will be returned, with the "get", "is" or "has"
+	 * prefix stripped off. Getter methods are methods
+	 * </p>
+	 * <ul>
+	 * <li>whose name start with "get" and who have a return type but no parameter
+	 * or</li>
+	 * <li>whose name starts with "is" and who have no parameter and return
+	 * {@code boolean} or</li>
+	 * <li>whose name starts with "has" and who have no parameter and return
+	 * {@code boolean} (HV-specific, not mandated by JavaBeans spec).</li>
+	 * </ul>
 	 *
-	 * @param member the member for which to get the property name.
+	 * @param member The member for which to get the property name.
 	 *
-	 * @return The bean method name with the "is" or "get" prefix stripped off, <code>null</code>
-	 *         the method name id not according to the JavaBeans standard.
+	 * @return The property name for the given member or {@code null} if the
+	 *         member is neither a field nor a getter method according to the
+	 *         JavaBeans standard.
 	 */
 	public static String getPropertyName(Member member) {
 		String name = null;
@@ -197,7 +116,7 @@ public final class ReflectionHelper {
 			String methodName = member.getName();
 			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
 				if ( methodName.startsWith( prefix ) ) {
-					name = Introspector.decapitalize( methodName.substring( prefix.length() ) );
+					name = StringHelper.decapitalize( methodName.substring( prefix.length() ) );
 				}
 			}
 		}
@@ -215,87 +134,6 @@ public final class ReflectionHelper {
 	 */
 	public static boolean isGetterMethod(Method method) {
 		return getPropertyName( method ) != null && method.getParameterTypes().length == 0;
-	}
-
-	/**
-	 * Checks whether the property with the specified name and type exists on the given class.
-	 *
-	 * @param clazz The class to check for the property. Cannot be {@code null}.
-	 * @param property The property name without 'is', 'get' or 'has'. Cannot be {@code null} or empty.
-	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
-	 *
-	 * @return {@code true} is the property and can be access via the specified type, {@code false} otherwise.
-	 */
-	public static boolean propertyExists(Class<?> clazz, String property, ElementType elementType) {
-		return getMember( clazz, property, elementType ) != null;
-	}
-
-	/**
-	 * Returns the member with the given name and type.
-	 *
-	 * @param clazz The class from which to retrieve the member. Cannot be {@code null}.
-	 * @param property The property name without 'is', 'get' or 'has'. Cannot be {@code null} or empty.
-	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
-	 *
-	 * @return the member which matching the name and type or {@code null} if no such member exists.
-	 */
-	public static Member getMember(Class<?> clazz, String property, ElementType elementType) {
-
-		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
-
-		if ( property == null || property.length() == 0 ) {
-			throw log.getPropertyNameCannotBeNullOrEmptyException();
-		}
-
-		if ( !( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) ) {
-			throw log.getElementTypeHasToBeFieldOrMethodException();
-		}
-
-		Member member = null;
-		if ( ElementType.FIELD.equals( elementType ) ) {
-			GetDeclaredField action = GetDeclaredField.action( clazz, property );
-			if ( System.getSecurityManager() != null ) {
-				member = AccessController.doPrivileged( action );
-			}
-			else {
-				member = action.run();
-			}
-		}
-		else {
-			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
-			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
-				GetMethod action = GetMethod.action( clazz, prefix + methodName );
-				if ( System.getSecurityManager() != null ) {
-					member = AccessController.doPrivileged( action );
-				}
-				else {
-					member = action.run();
-				}
-				if ( member != null ) {
-					break;
-				}
-			}
-		}
-		return member;
-	}
-
-	/**
-	 * Returns the type of the field of return type of a method.
-	 *
-	 * @param member the member for which to get the type.
-	 *
-	 * @return Returns the type of the field of return type of a method.
-	 */
-	public static Class<?> getType(Member member) {
-		Class<?> type = null;
-		if ( member instanceof Field ) {
-			type = ( (Field) member ).getType();
-		}
-
-		if ( member instanceof Method ) {
-			type = ( (Method) member ).getReturnType();
-		}
-		return type;
 	}
 
 	/**
@@ -366,16 +204,6 @@ public final class ReflectionHelper {
 			}
 		}
 		return value;
-	}
-
-	public static void setAccessibility(Member member) {
-		SetAccessibility action = SetAccessibility.action( member );
-		if ( System.getSecurityManager() != null ) {
-			AccessController.doPrivileged( action );
-		}
-		else {
-			action.run();
-		}
 	}
 
 	/**
@@ -517,170 +345,6 @@ public final class ReflectionHelper {
 		Map<?, ?> map = (Map<?, ?>) value;
 		//noinspection SuspiciousMethodCalls
 		return map.get( key );
-	}
-
-	/**
-	 * Returns the declared field with the specified name or {@code null} if it does not exist.
-	 *
-	 * @param clazz The class to check.
-	 * @param fieldName The field name.
-	 *
-	 * @return Returns the declared field with the specified name or {@code null} if it does not exist.
-	 */
-	public static Field getDeclaredField(Class<?> clazz, String fieldName) {
-		GetDeclaredField action = GetDeclaredField.action( clazz, fieldName );
-		final Field field;
-		if ( System.getSecurityManager() != null ) {
-			field = AccessController.doPrivileged( action );
-		}
-		else {
-			field = action.run();
-		}
-		return field;
-	}
-
-	/**
-	 * Checks whether the specified class contains a declared field with the given name.
-	 *
-	 * @param clazz The class to check.
-	 * @param fieldName The field name.
-	 *
-	 * @return Returns {@code true} if the field exists, {@code false} otherwise.
-	 */
-	public static boolean containsDeclaredField(Class<?> clazz, String fieldName) {
-		return getDeclaredField( clazz, fieldName ) != null;
-	}
-
-	/**
-	 * Returns the fields of the specified class.
-	 *
-	 * @param clazz The class for which to retrieve the fields.
-	 *
-	 * @return Returns the fields for this class.
-	 */
-	public static Field[] getDeclaredFields(Class<?> clazz) {
-		GetDeclaredFields action = GetDeclaredFields.action( clazz );
-		final Field[] fields;
-		if ( System.getSecurityManager() != null ) {
-			fields = AccessController.doPrivileged( action );
-		}
-		else {
-			fields = action.run();
-		}
-		return fields;
-	}
-
-	/**
-	 * Returns the method with the specified property name or {@code null} if it does not exist. This method will
-	 * prepend  'is' and 'get' to the property name and capitalize the first letter.
-	 *
-	 * @param clazz The class to check.
-	 * @param methodName The property name.
-	 *
-	 * @return Returns the method with the specified property or {@code null} if it does not exist.
-	 */
-	public static Method getMethodFromPropertyName(Class<?> clazz, String methodName) {
-		Method method;
-		GetMethodFromPropertyName action = GetMethodFromPropertyName.action( clazz, methodName );
-		if ( System.getSecurityManager() != null ) {
-			method = AccessController.doPrivileged( action );
-		}
-		else {
-			method = action.run();
-		}
-		return method;
-	}
-
-	/**
-	 * Checks whether the specified class contains a method for the specified property.
-	 *
-	 * @param clazz The class to check.
-	 * @param property The property name.
-	 *
-	 * @return Returns {@code true} if the method exists, {@code false} otherwise.
-	 */
-	public static boolean containsMethodWithPropertyName(Class<?> clazz, String property) {
-		return getMethodFromPropertyName( clazz, property ) != null;
-	}
-
-	/**
-	 * Returns the method with the specified name or {@code null} if it does not exist.
-	 *
-	 * @param clazz The class to check.
-	 * @param methodName The method name.
-	 *
-	 * @return Returns the method with the specified property or {@code null} if it does not exist.
-	 */
-	public static Method getMethod(Class<?> clazz, String methodName) {
-		Method method;
-		GetMethod action = GetMethod.action( clazz, methodName );
-		if ( System.getSecurityManager() != null ) {
-			method = AccessController.doPrivileged( action );
-		}
-		else {
-			method = action.run();
-		}
-		return method;
-	}
-
-	/**
-	 * Returns the declared method with the specified name and parameter types or {@code null} if
-	 * it does not exist.
-	 *
-	 * @param clazz The class to check.
-	 * @param methodName The method name.
-	 * @param parameterTypes The method parameter types.
-	 *
-	 * @return Returns the declared method with the specified name or {@code null} if it does not exist.
-	 */
-	public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-		Method method;
-		GetDeclaredMethod action = GetDeclaredMethod.action( clazz, methodName, parameterTypes );
-		if ( System.getSecurityManager() != null ) {
-			method = AccessController.doPrivileged( action );
-		}
-		else {
-			method = action.run();
-		}
-		return method;
-	}
-
-	/**
-	 * Returns the declared methods of the specified class.
-	 *
-	 * @param clazz The class for which to retrieve the methods.
-	 *
-	 * @return Returns the declared methods for this class.
-	 */
-	public static Method[] getDeclaredMethods(Class<?> clazz) {
-		GetDeclaredMethods action = GetDeclaredMethods.action( clazz );
-		final Method[] methods;
-		if ( System.getSecurityManager() != null ) {
-			methods = AccessController.doPrivileged( action );
-		}
-		else {
-			methods = action.run();
-		}
-		return methods;
-	}
-
-	/**
-	 * Returns the methods of the specified class (include inherited methods).
-	 *
-	 * @param clazz The class for which to retrieve the methods.
-	 *
-	 * @return Returns the methods for this class.
-	 */
-	public static Method[] getMethods(Class<?> clazz) {
-		GetMethods action = GetMethods.action( clazz );
-		final Method[] methods;
-		if ( System.getSecurityManager() != null ) {
-			methods = AccessController.doPrivileged( action );
-		}
-		else {
-			methods = action.run();
-		}
-		return methods;
 	}
 
 	/**
