@@ -18,6 +18,8 @@ package org.hibernate.validator.internal.xml;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,10 +36,11 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -73,10 +76,12 @@ public class ConstrainedExecutableBuilder {
 
 			String methodName = methodType.getName();
 
-			final Method method = ReflectionHelper.getDeclaredMethod(
-					beanClass,
-					methodName,
-					parameterTypes.toArray( new Class[parameterTypes.size()] )
+			final Method method = run(
+					GetDeclaredMethod.action(
+							beanClass,
+							methodName,
+							parameterTypes.toArray( new Class[parameterTypes.size()] )
+					)
 			);
 
 			if ( method == null ) {
@@ -136,9 +141,11 @@ public class ConstrainedExecutableBuilder {
 					defaultPackage
 			);
 
-			final Constructor<?> constructor = ReflectionHelper.getDeclaredConstructor(
-					beanClass,
-					constructorParameterTypes.toArray( new Class[constructorParameterTypes.size()] )
+			final Constructor<?> constructor = run(
+					GetDeclaredConstructor.action(
+							beanClass,
+							constructorParameterTypes.toArray( new Class[constructorParameterTypes.size()] )
+					)
 			);
 
 			if ( constructor == null ) {
@@ -317,7 +324,7 @@ public class ConstrainedExecutableBuilder {
 			String type = null;
 			try {
 				type = parameterType.getType();
-				Class<?> parameterClass = ReflectionHelper.loadClass( type, defaultPackage );
+				Class<?> parameterClass = ClassLoadingHelper.loadClass( type, defaultPackage );
 				parameterTypes.add( parameterClass );
 			}
 			catch ( ValidationException e ) {
@@ -326,5 +333,15 @@ public class ConstrainedExecutableBuilder {
 		}
 
 		return parameterTypes;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.test.internal.util;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -27,10 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeSet;
-import javax.validation.Payload;
-import javax.validation.ValidationException;
-import javax.validation.constraints.NotNull;
-import javax.validation.groups.Default;
 
 import org.testng.annotations.Test;
 
@@ -41,7 +36,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 /**
  * Tests for the {@code ReflectionHelper}.
@@ -124,57 +118,6 @@ public class ReflectionHelperTest {
 	public void testGetIndexedValueForNull() {
 		Object value = ReflectionHelper.getIndexedValue( null, 0 );
 		assertNull( value );
-	}
-
-	@Test
-	public void testGetMessageParameter() {
-		NotNull testAnnotation = new NotNull() {
-			@Override
-			public String message() {
-				return "test";
-			}
-
-			@Override
-			public Class<?>[] groups() {
-				return new Class<?>[] { Default.class };
-			}
-
-			@Override
-			public Class<? extends Payload>[] payload() {
-				@SuppressWarnings("unchecked")
-				Class<? extends Payload>[] classes = new Class[] { };
-				return classes;
-			}
-
-			@Override
-			public Class<? extends Annotation> annotationType() {
-				return this.getClass();
-			}
-		};
-		String message = ReflectionHelper.getAnnotationParameter( testAnnotation, "message", String.class );
-		assertEquals( "test", message, "Wrong message" );
-
-		Class<?>[] group = ReflectionHelper.getAnnotationParameter( testAnnotation, "groups", Class[].class );
-		assertEquals( group[0], Default.class, "Wrong message" );
-
-		try {
-			ReflectionHelper.getAnnotationParameter( testAnnotation, "message", Integer.class );
-			fail();
-		}
-		catch ( ValidationException e ) {
-			assertTrue( e.getMessage().contains( "Wrong parameter type." ), "Wrong exception message" );
-		}
-
-		try {
-			ReflectionHelper.getAnnotationParameter( testAnnotation, "foo", Integer.class );
-			fail();
-		}
-		catch ( ValidationException e ) {
-			assertTrue(
-					e.getMessage().contains( "The specified annotation defines no parameter" ),
-					"Wrong exception message"
-			);
-		}
 	}
 
 	@Test

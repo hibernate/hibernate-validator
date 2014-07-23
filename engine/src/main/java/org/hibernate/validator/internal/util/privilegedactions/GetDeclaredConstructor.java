@@ -20,6 +20,8 @@ import java.lang.reflect.Constructor;
 import java.security.PrivilegedAction;
 
 /**
+ * Returns the declared constructor with the specified parameter types or {@code null} if it does not exist.
+ *
  * @author Emmanuel Bernard
  */
 public final class GetDeclaredConstructor<T> implements PrivilegedAction<Constructor<T>> {
@@ -35,6 +37,7 @@ public final class GetDeclaredConstructor<T> implements PrivilegedAction<Constru
 		this.params = params;
 	}
 
+	@Override
 	public Constructor<T> run() {
 		try {
 			return clazz.getDeclaredConstructor( params );

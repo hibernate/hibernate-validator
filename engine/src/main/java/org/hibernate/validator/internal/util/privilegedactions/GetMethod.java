@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
 
 /**
+ * Returns the method with the specified name or {@code null} if it does not exist.
+ *
  * @author Emmanuel Bernard
  */
 public final class GetMethod implements PrivilegedAction<Method> {
@@ -35,6 +37,7 @@ public final class GetMethod implements PrivilegedAction<Method> {
 		this.methodName = methodName;
 	}
 
+	@Override
 	public Method run() {
 		try {
 			return clazz.getMethod(methodName);

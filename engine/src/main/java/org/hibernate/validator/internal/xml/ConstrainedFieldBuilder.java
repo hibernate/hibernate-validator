@@ -17,6 +17,8 @@
 package org.hibernate.validator.internal.xml;
 
 import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,9 +29,9 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -103,12 +105,20 @@ public class ConstrainedFieldBuilder {
 			alreadyProcessedFieldNames.add( fieldName );
 		}
 
-		final Field field = ReflectionHelper.getDeclaredField( beanClass, fieldName );
+		final Field field = run( GetDeclaredField.action( beanClass, fieldName ) );
 		if ( field == null ) {
 			throw log.getBeanDoesNotContainTheFieldException( beanClass.getName(), fieldName );
 		}
 		return field;
 	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
 }
-
-

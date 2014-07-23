@@ -20,6 +20,8 @@ import java.security.PrivilegedAction;
 import java.lang.reflect.Method;
 
 /**
+ * Returns the methods of the specified class (include inherited methods).
+ *
  * @author Emmanuel Bernard
  */
 public final class GetMethods implements PrivilegedAction<Method[]> {
@@ -33,6 +35,7 @@ public final class GetMethods implements PrivilegedAction<Method[]> {
 		this.clazz = clazz;
 	}
 
+	@Override
 	public Method[] run() {
 		return clazz.getMethods();
 	}

@@ -19,8 +19,11 @@ package org.hibernate.validator.internal.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -32,11 +35,10 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.xml.sax.SAXException;
-
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -148,7 +150,7 @@ public class XmlParserHelper {
 	}
 
 	private Schema loadSchema(String schemaResource) {
-		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( XmlParserHelper.class );
+		ClassLoader loader = run( GetClassLoader.fromClass( XmlParserHelper.class ) );
 
 		URL schemaUrl = loader.getResource( schemaResource );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
@@ -160,5 +162,15 @@ public class XmlParserHelper {
 			log.unableToCreateSchema( schemaResource, e.getMessage() );
 		}
 		return schema;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

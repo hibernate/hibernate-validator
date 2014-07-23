@@ -16,7 +16,6 @@
 */
 package org.hibernate.validator.test.internal.util.classhierarchy;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 import org.testng.annotations.Test;
@@ -25,7 +24,6 @@ import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for {@link ClassHierarchyHelper}.
@@ -34,13 +32,6 @@ import static org.testng.Assert.assertTrue;
  * @author Gunnar Morling
  */
 public class ClassHierarchyHelperTest {
-
-	@Test
-	public void testGetAllMethods() throws Exception {
-		List<Method> methods = ClassHierarchyHelper.getAllMethods( Fubar.class );
-		assertTrue( methods.contains( Snafu.class.getMethod( "snafu" ) ) );
-		assertTrue( methods.contains( Susfu.class.getMethod( "susfu" ) ) );
-	}
 
 	@Test
 	public void testGetHierarchy() {

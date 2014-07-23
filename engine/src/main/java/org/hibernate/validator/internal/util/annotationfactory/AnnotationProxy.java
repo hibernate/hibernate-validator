@@ -21,6 +21,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -29,9 +31,10 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
@@ -154,7 +157,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 	private Map<String, Object> getAnnotationValues(AnnotationDescriptor<?> descriptor) {
 		Map<String, Object> result = newHashMap();
 		int processedValuesFromDescriptor = 0;
-		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotationType );
+		final Method[] declaredMethods = run( GetDeclaredMethods.action( annotationType ) );
 		for ( Method m : declaredMethods ) {
 			if ( descriptor.containsElement( m.getName() ) ) {
 				result.put( m.getName(), descriptor.valueOf( m.getName() ) );
@@ -252,8 +255,7 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 
 	private Object getAnnotationMemberValue(Annotation annotation, String name) {
 		try {
-			return ReflectionHelper.getDeclaredMethod( annotation.annotationType(), name )
-					.invoke( annotation );
+			return run( GetDeclaredMethod.action( annotation.annotationType(), name ) ).invoke( annotation );
 		}
 		catch ( IllegalAccessException e ) {
 			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
@@ -264,5 +266,15 @@ public class AnnotationProxy implements Annotation, InvocationHandler, Serializa
 		catch ( InvocationTargetException e ) {
 			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
 		}
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

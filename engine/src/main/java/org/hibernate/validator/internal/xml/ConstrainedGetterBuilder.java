@@ -17,6 +17,8 @@
 package org.hibernate.validator.internal.xml;
 
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +31,9 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -108,13 +110,21 @@ public class ConstrainedGetterBuilder {
 			alreadyProcessedGetterNames.add( getterName );
 		}
 
-		final Method method = ReflectionHelper.getMethodFromPropertyName( beanClass, getterName );
+		final Method method = run( GetMethodFromPropertyName.action( beanClass, getterName ) );
 		if ( method == null ) {
 			throw log.getBeanDoesNotContainThePropertyException( beanClass.getName(), getterName );
 		}
 
 		return method;
 	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
 }
-
-

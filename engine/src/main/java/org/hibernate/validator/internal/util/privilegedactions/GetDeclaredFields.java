@@ -20,6 +20,8 @@ import java.security.PrivilegedAction;
 import java.lang.reflect.Field;
 
 /**
+ * Returns the fields of the specified class.
+ *
  * @author Emmanuel Bernard
  */
 public final class GetDeclaredFields implements PrivilegedAction<Field[]> {
@@ -33,6 +35,7 @@ public final class GetDeclaredFields implements PrivilegedAction<Field[]> {
 		this.clazz = clazz;
 	}
 
+	@Override
 	public Field[] run() {
 		return clazz.getDeclaredFields();
 	}

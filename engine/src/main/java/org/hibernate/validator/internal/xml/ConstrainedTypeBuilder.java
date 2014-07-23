@@ -26,7 +26,6 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -91,7 +90,7 @@ public class ConstrainedTypeBuilder {
 		List<Class<?>> groupSequence = newArrayList();
 		if ( groupSequenceType != null ) {
 			for ( String groupName : groupSequenceType.getValue() ) {
-				Class<?> group = ReflectionHelper.loadClass( groupName, defaultPackage );
+				Class<?> group = ClassLoadingHelper.loadClass( groupName, defaultPackage );
 				groupSequence.add( group );
 			}
 		}
