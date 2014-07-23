@@ -16,14 +16,10 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
-import java.lang.reflect.Member;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * Represents a field of a Java type and all its associated meta-data relevant
@@ -48,41 +44,9 @@ public class ConstrainedField extends AbstractConstrainedElement {
 							boolean isCascading) {
 
 		super( source, ConstrainedElementKind.FIELD, location, constraints, isCascading );
-
-		Member member = location.getMember();
-		if ( member != null && isConstrained() ) {
-			run( SetAccessibility.action( member ) );
-		}
 	}
 
 	public BeanConstraintLocation getLocation() {
 		return (BeanConstraintLocation) super.getLocation();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if ( this == obj ) {
-			return true;
-		}
-		if ( !super.equals( obj ) ) {
-			return false;
-		}
-		if ( getClass() != obj.getClass() ) {
-			return false;
-		}
-		ConstrainedField other = (ConstrainedField) obj;
-		if ( getLocation().getMember() == null ) {
-			if ( other.getLocation().getMember() != null ) {
-				return false;
-			}
-		}
-		else if ( !getLocation().getMember().equals( other.getLocation().getMember() ) ) {
-			return false;
-		}
-		return true;
-	}
-
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

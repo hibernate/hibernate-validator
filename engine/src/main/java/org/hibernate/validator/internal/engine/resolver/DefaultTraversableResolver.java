@@ -99,7 +99,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		// unfortunately there are several incomplete implementations out there (see HV-374)
 		try {
 			Object persistence = run( NewInstance.action( persistenceClass, "persistence provider" ) );
-			ReflectionHelper.getValue(persistenceUtilGetter, persistence );
+			ReflectionHelper.getValue( persistenceUtilGetter, persistence );
 		}
 		catch ( Exception e ) {
 			log.debugf(
