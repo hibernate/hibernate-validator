@@ -23,6 +23,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,13 +49,16 @@ import org.hibernate.validator.metadata.AggregatedMethodMetaData.Builder;
 import org.hibernate.validator.method.metadata.TypeDescriptor;
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredFields;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.util.privilegedactions.GetMethods;
+import org.hibernate.validator.util.privilegedactions.NewInstance;
+import org.hibernate.validator.util.privilegedactions.SetAccessibility;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.util.ReflectionHelper.computeAllImplementedInterfaces;
-import static org.hibernate.validator.util.ReflectionHelper.getMethods;
-import static org.hibernate.validator.util.ReflectionHelper.newInstance;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
@@ -471,7 +476,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		if ( ReflectionHelper.isGetterMethod( methodMetaData.getMethod() ) ) {
 
 			addToPropertyNameList( methodMetaData.getMethod() );
-			ReflectionHelper.setAccessibility( methodMetaData.getMethod() );
+			run( SetAccessibility.action( methodMetaData.getMethod() ) );
 
 			for ( MethodMetaConstraint<?> metaConstraint : methodMetaData ) {
 
@@ -517,7 +522,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void addCascadedMember(Member member) {
-		ReflectionHelper.setAccessibility( member );
+		run( SetAccessibility.action( member ) );
 		cascadedMembers.add( member );
 		addPropertyDescriptorForMember( member, true );
 	}
@@ -576,7 +581,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void initFieldConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		final Field[] fields = ReflectionHelper.getDeclaredFields( clazz );
+		final Field[] fields = run( GetDeclaredFields.action( clazz ) );
 		for ( Field field : fields ) {
 			addToPropertyNameList( field );
 
@@ -611,7 +616,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 
 			for ( ConstraintDescriptorImpl<?> constraintDescription : fieldMetaData ) {
-				ReflectionHelper.setAccessibility( field );
+				run( SetAccessibility.action( field ) );
 				BeanMetaConstraint<?> metaConstraint = createBeanMetaConstraint( clazz, field, constraintDescription );
 				addMetaConstraint( clazz, metaConstraint );
 			}
@@ -633,7 +638,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private void initMethodConstraints(Class<?> clazz, AnnotationIgnores annotationIgnores, BeanMetaDataCache beanMetaDataCache) {
-		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( clazz );
+		final Method[] declaredMethods = run( GetDeclaredMethods.action( clazz ) );
 
 		for ( Method method : declaredMethods ) {
 
@@ -914,14 +919,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@SuppressWarnings("unchecked")
 	private <U extends DefaultGroupSequenceProvider<?>> DefaultGroupSequenceProvider<T> newGroupSequenceProviderInstance(Class<U> providerClass) {
-		Method[] providerMethods = getMethods( providerClass );
+		Method[] providerMethods = run( GetMethods.action( providerClass ) );
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
 					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
 
-				return (DefaultGroupSequenceProvider<T>) newInstance(
-						providerClass, "the default group sequence provider"
+				return (DefaultGroupSequenceProvider<T>) run(
+						NewInstance.action(
+								providerClass, "the default group sequence provider"
+						)
 				);
 			}
 		}
@@ -941,5 +948,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		sb.append( ", defaultGroupSequence=" ).append( getDefaultGroupSequence( null ) );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

@@ -29,7 +29,7 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.method.MethodConstraintViolation;
 import org.hibernate.validator.method.MethodValidator;
 import org.hibernate.validator.testutil.ValidatorUtil;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.util.privilegedactions.GetMethod;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -94,7 +94,7 @@ public class CascadingWithConstraintMappingTest {
 
 		B b = new B();
 		b.c = new C();
-		Method method = ReflectionHelper.getMethod( B.class, "getC" );
+		Method method = GetMethod.action( B.class, "getC" ).run();
 
 		Set<MethodConstraintViolation<B>> violations = methodValidator.validateReturnValue(
 				b, method, b.getC()

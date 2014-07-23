@@ -18,6 +18,8 @@ package org.hibernate.validator.test.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,10 +36,8 @@ import javax.validation.groups.Default;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.util.privilegedactions.GetAnnotationParameter;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNull;
@@ -148,14 +148,14 @@ public class ReflectionHelperTest {
 				return this.getClass();
 			}
 		};
-		String message = ReflectionHelper.getAnnotationParameter( testAnnotation, "message", String.class );
+		String message = run( GetAnnotationParameter.action( testAnnotation, "message", String.class ) );
 		assertEquals( "test", message, "Wrong message" );
 
-		Class<?>[] group = ReflectionHelper.getAnnotationParameter( testAnnotation, "groups", Class[].class );
+		Class<?>[] group = run( GetAnnotationParameter.action( testAnnotation, "groups", Class[].class ) );
 		assertEquals( group[0], Default.class, "Wrong message" );
 
 		try {
-			ReflectionHelper.getAnnotationParameter( testAnnotation, "message", Integer.class );
+			run( GetAnnotationParameter.action( testAnnotation, "message", Integer.class ) );
 			fail();
 		}
 		catch ( ValidationException e ) {
@@ -163,7 +163,7 @@ public class ReflectionHelperTest {
 		}
 
 		try {
-			ReflectionHelper.getAnnotationParameter( testAnnotation, "foo", Integer.class );
+			run( GetAnnotationParameter.action( testAnnotation, "foo", Integer.class ) );
 			fail();
 		}
 		catch ( ValidationException e ) {
@@ -174,20 +174,14 @@ public class ReflectionHelperTest {
 		}
 	}
 
-	@Test
-	public void testPropertyExists() {
-		assertTrue( ReflectionHelper.propertyExists( Foo.class, "foo", FIELD ) );
-		assertFalse( ReflectionHelper.propertyExists( Foo.class, "foo", METHOD ) );
-		assertFalse( ReflectionHelper.propertyExists( Foo.class, "bar", FIELD ) );
-		assertTrue( ReflectionHelper.propertyExists( Foo.class, "bar", METHOD ) );
-
-		try {
-			assertTrue( ReflectionHelper.propertyExists( Foo.class, "bar", TYPE ) );
-			fail();
-		}
-		catch ( IllegalArgumentException e ) {
-			// success
-		}
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	public class TestTypes {

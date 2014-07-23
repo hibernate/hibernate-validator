@@ -20,7 +20,9 @@ import java.lang.reflect.Method;
 import java.security.PrivilegedAction;
 
 /**
- * @author Kevin Pollet - SERLI - (kevin.pollet@serli.com)
+ * Returns the declared method with the specified name and parameter types or {@code null} if it does not exist.
+ *
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public final class GetDeclaredMethod implements PrivilegedAction<Method> {
 	private final Class<?> clazz;

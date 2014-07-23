@@ -24,6 +24,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -50,9 +52,14 @@ import org.hibernate.validator.metadata.ConstraintDescriptorImpl;
 import org.hibernate.validator.metadata.ConstraintHelper;
 import org.hibernate.validator.metadata.ConstraintOrigin;
 import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.ReflectionHelper;
 import org.hibernate.validator.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredField;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredMethod;
+import org.hibernate.validator.util.privilegedactions.GetMethod;
+import org.hibernate.validator.util.privilegedactions.GetMethodFromPropertyName;
+import org.hibernate.validator.util.privilegedactions.LoadClass;
 
 import static org.hibernate.validator.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.util.CollectionHelper.newHashMap;
@@ -155,9 +162,11 @@ public class XmlMappingParser {
 			}
 			for ( String validatorClassName : validatedByType.getValue() ) {
 				Class<? extends ConstraintValidator<?, ?>> validatorClass;
-				validatorClass = (Class<? extends ConstraintValidator<?, ?>>) ReflectionHelper.loadClass(
-						validatorClassName,
-						this.getClass()
+				validatorClass = (Class<? extends ConstraintValidator<?, ?>>) run(
+						LoadClass.action(
+								validatorClassName,
+								this.getClass()
+						)
 				);
 
 
@@ -203,11 +212,11 @@ public class XmlMappingParser {
 			else {
 				fieldNames.add( fieldName );
 			}
-			final boolean containsField = ReflectionHelper.containsDeclaredField( beanClass, fieldName );
-			if ( !containsField ) {
+			final Field field = run( GetDeclaredField.action( beanClass, fieldName ) );
+			if ( field == null ) {
 				throw new ValidationException( beanClass.getName() + " does not contain the fieldType  " + fieldName );
 			}
-			final Field field = ReflectionHelper.getDeclaredField( beanClass, fieldName );
+
 
 			// ignore annotations
 			boolean ignoreFieldAnnotation = fieldType.isIgnoreAnnotations() == null ? false : fieldType.isIgnoreAnnotations();
@@ -240,11 +249,10 @@ public class XmlMappingParser {
 			else {
 				getterNames.add( getterName );
 			}
-			boolean containsMethod = ReflectionHelper.containsMethodWithPropertyName( beanClass, getterName );
-			if ( !containsMethod ) {
+			final Method method = run( GetMethodFromPropertyName.action( beanClass, getterName ) );
+			if ( method == null ) {
 				throw new ValidationException( beanClass.getName() + " does not contain the property  " + getterName );
 			}
-			final Method method = ReflectionHelper.getMethodFromPropertyName( beanClass, getterName );
 
 			// ignore annotations
 			boolean ignoreGetterAnnotation = getterType.isIgnoreAnnotations() == null ? false : getterType.isIgnoreAnnotations();
@@ -370,7 +378,7 @@ public class XmlMappingParser {
 	}
 
 	private <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
-		Method m = ReflectionHelper.getMethod( annotationClass, name );
+		Method m = run( GetMethod.action( annotationClass, name ) );
 		if ( m == null ) {
 			throw new ValidationException( "Annotation of type " + annotationClass.getName() + " does not contain a parameter " + name + "." );
 		}
@@ -513,7 +521,7 @@ public class XmlMappingParser {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ReflectionHelper.loadClass( value, this.getClass() );
+			returnValue = run( LoadClass.action( value, this.getClass() ) );
 		}
 		else {
 			try {
@@ -575,7 +583,7 @@ public class XmlMappingParser {
 		else {
 			fullyQualifiedClass = defaultPackage + PACKAGE_SEPARATOR + clazz;
 		}
-		return ReflectionHelper.loadClass( fullyQualifiedClass, this.getClass() );
+		return run( LoadClass.action( fullyQualifiedClass, this.getClass() ) );
 	}
 
 	private boolean isQualifiedClass(String clazz) {
@@ -602,7 +610,7 @@ public class XmlMappingParser {
 	}
 
 	private Schema getMappingSchema() {
-		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( XmlMappingParser.class );
+		ClassLoader loader = run( GetClassLoader.fromClass( XmlMappingParser.class ) );
 		URL schemaUrl = loader.getResource( VALIDATION_MAPPING_XSD );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
@@ -613,5 +621,15 @@ public class XmlMappingParser {
 			log.warn( "Unable to create schema for {}: {}", VALIDATION_MAPPING_XSD, e.getMessage() );
 		}
 		return schema;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

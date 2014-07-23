@@ -20,6 +20,8 @@ import java.security.PrivilegedAction;
 import java.lang.reflect.Method;
 
 /**
+ * Returns the declared methods of the specified class.
+ *
  * @author Emmanuel Bernard
  */
 public final class GetDeclaredMethods implements PrivilegedAction<Method[]> {

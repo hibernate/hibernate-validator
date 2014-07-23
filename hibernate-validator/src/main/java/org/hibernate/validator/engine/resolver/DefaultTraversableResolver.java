@@ -18,6 +18,8 @@ package org.hibernate.validator.engine.resolver;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
@@ -26,6 +28,10 @@ import org.slf4j.Logger;
 
 import org.hibernate.validator.util.LoggerFactory;
 import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.util.privilegedactions.GetMethod;
+import org.hibernate.validator.util.privilegedactions.LoadClass;
+import org.hibernate.validator.util.privilegedactions.NewInstance;
+
 
 /**
  * A JPA 2 aware {@code TraversableResolver}.
@@ -69,7 +75,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		// check whether we have Persistence on the classpath
 		Class<?> persistenceClass;
 		try {
-			persistenceClass = ReflectionHelper.loadClass( PERSISTENCE_CLASS_NAME, this.getClass() );
+			persistenceClass = run( LoadClass.action( PERSISTENCE_CLASS_NAME, this.getClass() ) );
 		}
 		catch ( ValidationException e ) {
 			log.debug(
@@ -80,7 +86,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		}
 
 		// check whether Persistence contains getPersistenceUtil
-		Method persistenceUtilGetter = ReflectionHelper.getMethod( persistenceClass, PERSISTENCE_UTIL_METHOD );
+		Method persistenceUtilGetter = run( GetMethod.action( persistenceClass, PERSISTENCE_UTIL_METHOD ) );
 		if ( persistenceUtilGetter == null ) {
 			log.debug(
 					"Found {} on classpath, but no method '{}'. Assuming JPA 1 environment. All properties will per default be traversable.",
@@ -93,7 +99,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		// try to invoke the method to make sure that we are dealing with a complete JPA2 implementation
 		// unfortunately there are several incomplete implementations out there (see HV-374)
 		try {
-			Object persistence = ReflectionHelper.newInstance( persistenceClass, "persistence provider" );
+			Object persistence = run( NewInstance.action( persistenceClass, "persistence provider" ) );
 			ReflectionHelper.getValue(persistenceUtilGetter, persistence );
 		}
 		catch ( Exception e ) {
@@ -113,10 +119,11 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		try {
 			@SuppressWarnings("unchecked")
 			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
-					ReflectionHelper.loadClass( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() );
-			jpaTraversableResolver = ReflectionHelper.newInstance( jpaAwareResolverClass, "" );
-			log.debug(
-					"Instantiated JPA aware TraversableResolver of type {}.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
+
+					run( LoadClass.action( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() ) );
+			jpaTraversableResolver = run( NewInstance.action( jpaAwareResolverClass, "" ) );
+			log.trace(
+					"Instantiated JPA aware TraversableResolver of type %s.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}
 		catch ( ValidationException e ) {
@@ -137,5 +144,15 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		return jpaTraversableResolver == null || jpaTraversableResolver.isCascadable(
 				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
 		);
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

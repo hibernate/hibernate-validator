@@ -19,6 +19,8 @@ package org.hibernate.validator.metadata;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,7 +77,9 @@ import org.hibernate.validator.constraints.impl.SizeValidatorForArraysOfLong;
 import org.hibernate.validator.constraints.impl.SizeValidatorForCollection;
 import org.hibernate.validator.constraints.impl.SizeValidatorForMap;
 import org.hibernate.validator.constraints.impl.SizeValidatorForString;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.util.privilegedactions.GetMethod;
+import org.hibernate.validator.util.privilegedactions.LoadClass;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.
@@ -206,7 +210,7 @@ public class ConstraintHelper {
 	 */
 	public boolean isMultiValueConstraint(Class<? extends Annotation> annotationType) {
 		boolean isMultiValueConstraint = false;
-		final Method method = ReflectionHelper.getMethod( annotationType, "value" );
+		final Method method = run( GetMethod.action( annotationType, "value" ) );
 		if ( method != null ) {
 			Class<?> returnType = method.getReturnType();
 			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
@@ -235,7 +239,7 @@ public class ConstraintHelper {
 	public <A extends Annotation> List<Annotation> getMultiValueConstraints(A annotation) {
 		List<Annotation> annotationList = new ArrayList<Annotation>();
 		try {
-			final Method method = ReflectionHelper.getMethod( annotation.getClass(), "value" );
+			final Method method = run( GetMethod.action( annotation.getClass(), "value" ) );
 			if ( method != null ) {
 				Class<?> returnType = method.getReturnType();
 				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
@@ -287,7 +291,7 @@ public class ConstraintHelper {
 	}
 
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
-		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
+		final Method[] methods = run( GetDeclaredMethods.action( annotationType ) );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) ) {
 				String msg = "Parameters starting with 'valid' are not allowed in a constraint.";
@@ -298,7 +302,7 @@ public class ConstraintHelper {
 
 	private void assertPayloadParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotationType, "payload" );
+			final Method method = run( GetMethod.action( annotationType, "payload" ) );
 			if ( method == null ) {
 				String msg = annotationType.getName() + " contains Constraint annotation, but does " +
 						"not contain a payload parameter.";
@@ -321,7 +325,7 @@ public class ConstraintHelper {
 
 	private void assertGroupsParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotationType, "groups" );
+			final Method method = run( GetMethod.action( annotationType, "groups" ) );
 			if ( method == null ) {
 				String msg = annotationType.getName() + " contains Constraint annotation, but does " +
 						"not contain a groups parameter.";
@@ -344,7 +348,7 @@ public class ConstraintHelper {
 
 	private void assertMessageParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotationType, "message" );
+			final Method method = run( GetMethod.action( annotationType, "message" ) );
 			if ( method == null ) {
 				String msg = annotationType.getName() + " contains Constraint annotation, but does " +
 						"not contain a message parameter.";
@@ -400,12 +404,22 @@ public class ConstraintHelper {
 	private boolean isJodaTimeInClasspath() {
 		boolean isInClasspath;
 		try {
-			ReflectionHelper.loadClass( JODA_TIME_CLASS_NAME, this.getClass() );
+			run( LoadClass.action( JODA_TIME_CLASS_NAME, this.getClass() ) );
 			isInClasspath = true;
 		}
 		catch ( ValidationException e ) {
 			isInClasspath = false;
 		}
 		return isInClasspath;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

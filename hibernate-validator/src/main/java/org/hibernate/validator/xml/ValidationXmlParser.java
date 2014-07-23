@@ -19,6 +19,8 @@ package org.hibernate.validator.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.TraversableResolver;
@@ -36,7 +38,9 @@ import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.util.privilegedactions.LoadClass;
+import org.hibernate.validator.util.privilegedactions.NewInstance;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.
@@ -75,12 +79,17 @@ public class ValidationXmlParser {
 		if ( constraintFactoryClass != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) ReflectionHelper.loadClass(
-						constraintFactoryClass, this.getClass()
+				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) run(
+						LoadClass.action(
+								constraintFactoryClass, this.getClass()
+						)
 				);
 				xmlParameters.setConstraintValidatorFactory(
-						ReflectionHelper.newInstance(
-								clazz, "constraint factory class"
+						run(
+								NewInstance.action(
+										clazz,
+										"constraint factory class"
+								)
 						)
 				);
 				log.info( "Using {} as constraint factory.", constraintFactoryClass );
@@ -126,8 +135,8 @@ public class ValidationXmlParser {
 		if ( messageInterpolatorClass != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<MessageInterpolator> clazz = (Class<MessageInterpolator>) ReflectionHelper.loadClass(
-						messageInterpolatorClass, this.getClass()
+				Class<MessageInterpolator> clazz = (Class<MessageInterpolator>) run(
+						LoadClass.action( messageInterpolatorClass, this.getClass() )
 				);
 				xmlParameters.setMessageInterpolator( clazz.newInstance() );
 				log.info( "Using {} as message interpolator.", messageInterpolatorClass );
@@ -155,8 +164,8 @@ public class ValidationXmlParser {
 		if ( traversableResolverClass != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<TraversableResolver> clazz = (Class<TraversableResolver>) ReflectionHelper.loadClass(
-						traversableResolverClass, this.getClass()
+				Class<TraversableResolver> clazz = (Class<TraversableResolver>) run(
+						LoadClass.action( traversableResolverClass, this.getClass() )
 				);
 				xmlParameters.setTraversableResolver( clazz.newInstance() );
 				log.info( "Using {} as traversable resolver.", traversableResolverClass );
@@ -185,8 +194,8 @@ public class ValidationXmlParser {
 		if ( providerClassName != null ) {
 			try {
 				xmlParamters.setProviderClass(
-						(Class<? extends ValidationProvider<?>>) ReflectionHelper.loadClass(
-								providerClassName, this.getClass()
+						(Class<? extends ValidationProvider<?>>) run(
+								LoadClass.action( providerClassName, this.getClass() )
 						)
 				);
 				log.info( "Using {} as validation provider.", providerClassName );
@@ -243,25 +252,25 @@ public class ValidationXmlParser {
 
 		boolean isContextCL = true;
 		// try the context class loader first
-		ClassLoader loader = ReflectionHelper.getClassLoaderFromContext();
+		ClassLoader loader = run( GetClassLoader.fromContext() );
 
 		if ( loader == null ) {
 			log.debug( "No default context class loader, fall back to Bean Validation's loader" );
-			loader = ReflectionHelper.getClassLoaderFromClass( ValidationXmlParser.class );
+			loader = run( GetClassLoader.fromClass( ValidationXmlParser.class ) );
 			isContextCL = false;
 		}
 		InputStream inputStream = loader.getResourceAsStream( inputPath );
 
 		// try the current class loader
 		if ( isContextCL && inputStream == null ) {
-			loader = ReflectionHelper.getClassLoaderFromClass( ValidationXmlParser.class );
+			loader = run( GetClassLoader.fromClass( ValidationXmlParser.class ) );
 			inputStream = loader.getResourceAsStream( inputPath );
 		}
 		return inputStream;
 	}
 
 	private Schema getValidationConfigurationSchema() {
-		ClassLoader loader = ReflectionHelper.getClassLoaderFromClass( ValidationXmlParser.class );
+		ClassLoader loader = run( GetClassLoader.fromClass( ValidationXmlParser.class ) );
 		URL schemaUrl = loader.getResource( VALIDATION_CONFIGURATION_XSD );
 		SchemaFactory sf = SchemaFactory.newInstance( javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI );
 		Schema schema = null;
@@ -272,5 +281,15 @@ public class ValidationXmlParser {
 			log.warn( "Unable to create schema for {}: {}", VALIDATION_CONFIGURATION_XSD, e.getMessage() );
 		}
 		return schema;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

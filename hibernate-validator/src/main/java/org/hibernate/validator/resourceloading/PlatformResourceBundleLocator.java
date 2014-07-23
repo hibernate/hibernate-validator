@@ -16,6 +16,8 @@
  */
 package org.hibernate.validator.resourceloading;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -23,7 +25,7 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 
 import org.hibernate.validator.util.LoggerFactory;
-import org.hibernate.validator.util.ReflectionHelper;
+import org.hibernate.validator.util.privilegedactions.GetClassLoader;
 
 /**
  * A resource bundle locator, that loads resource bundles by simply
@@ -51,7 +53,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 */
 	public ResourceBundle getResourceBundle(Locale locale) {
 		ResourceBundle rb = null;
-		ClassLoader classLoader = ReflectionHelper.getClassLoaderFromContext();
+		ClassLoader classLoader = run( GetClassLoader.fromContext() );
 		if ( classLoader != null ) {
 			rb = loadBundle(
 					classLoader, locale, bundleName
@@ -59,7 +61,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			);
 		}
 		if ( rb == null ) {
-			classLoader = ReflectionHelper.getClassLoaderFromClass( PlatformResourceBundleLocator.class );
+			classLoader = run( GetClassLoader.fromClass( PlatformResourceBundleLocator.class ) );
 			rb = loadBundle(
 					classLoader, locale, bundleName
 							+ " not found by validator classloader"
@@ -88,5 +90,15 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			log.trace( message );
 		}
 		return rb;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
