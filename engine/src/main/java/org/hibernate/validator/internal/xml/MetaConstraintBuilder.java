@@ -20,7 +20,10 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.List;
+
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBElement;
@@ -29,11 +32,11 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
@@ -61,7 +64,7 @@ public class MetaConstraintBuilder {
 																			   ConstraintDescriptorImpl.ConstraintType constraintType) {
 		Class<A> annotationClass;
 		try {
-			annotationClass = (Class<A>) ReflectionHelper.loadClass( constraint.getAnnotation(), defaultPackage );
+			annotationClass = (Class<A>) ClassLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage );
 		}
 		catch ( ValidationException e ) {
 			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
@@ -117,7 +120,7 @@ public class MetaConstraintBuilder {
 	}
 
 	private static <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
-		Method m = ReflectionHelper.getMethod( annotationClass, name );
+		Method m = run( GetMethod.action( annotationClass, name ) );
 		if ( m == null ) {
 			throw log.getAnnotationDoesNotContainAParameterException( annotationClass.getName(), name );
 		}
@@ -249,7 +252,7 @@ public class MetaConstraintBuilder {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ReflectionHelper.loadClass( value, defaultPackage, MetaConstraintBuilder.class );
+			returnValue = ClassLoadingHelper.loadClass( value, defaultPackage, MetaConstraintBuilder.class );
 		}
 		else {
 			try {
@@ -271,7 +274,7 @@ public class MetaConstraintBuilder {
 
 		List<Class<?>> groupList = newArrayList();
 		for ( String groupClass : groupsType.getValue() ) {
-			groupList.add( ReflectionHelper.loadClass( groupClass, defaultPackage ) );
+			groupList.add( ClassLoadingHelper.loadClass( groupClass, defaultPackage ) );
 		}
 		return groupList.toArray( new Class[groupList.size()] );
 	}
@@ -284,7 +287,7 @@ public class MetaConstraintBuilder {
 
 		List<Class<? extends Payload>> payloadList = newArrayList();
 		for ( String groupClass : payloadType.getValue() ) {
-			Class<?> payload = ReflectionHelper.loadClass( groupClass, defaultPackage );
+			Class<?> payload = ClassLoadingHelper.loadClass( groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
 				throw log.getWrongPayloadClassException( payload.getName() );
 			}
@@ -294,6 +297,14 @@ public class MetaConstraintBuilder {
 		}
 		return payloadList.toArray( new Class[payloadList.size()] );
 	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
 }
-
-

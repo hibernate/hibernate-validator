@@ -20,6 +20,8 @@ import java.lang.reflect.Field;
 import java.security.PrivilegedAction;
 
 /**
+ * Returns the declared field with the specified name or {@code null} if it does not exist.
+ *
  * @author Emmanuel Bernard
  */
 public final class GetDeclaredField implements PrivilegedAction<Field> {
@@ -35,6 +37,7 @@ public final class GetDeclaredField implements PrivilegedAction<Field> {
 		this.fieldName = fieldName;
 	}
 
+	@Override
 	public Field run() {
 		try {
 			final Field field = clazz.getDeclaredField( fieldName );

@@ -20,12 +20,15 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ParameterNameProvider;
 import javax.xml.bind.JAXBContext;
@@ -43,9 +46,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -118,7 +121,7 @@ public class XmlMappingParser {
 				);
 
 				for ( BeanType bean : mapping.getBean() ) {
-					Class<?> beanClass = ReflectionHelper.loadClass( bean.getClazz(), defaultPackage );
+					Class<?> beanClass = ClassLoadingHelper.loadClass( bean.getClazz(), defaultPackage );
 					checkClassHasNotBeenProcessed( processedClasses, beanClass );
 
 					// update annotation ignores
@@ -220,7 +223,7 @@ public class XmlMappingParser {
 				alreadyProcessedConstraintDefinitions.add( annotationClassName );
 			}
 
-			Class<?> clazz = ReflectionHelper.loadClass( annotationClassName, defaultPackage );
+			Class<?> clazz = ClassLoadingHelper.loadClass( annotationClassName, defaultPackage );
 			if ( !clazz.isAnnotation() ) {
 				throw log.getIsNotAnAnnotationException( annotationClassName );
 			}
@@ -235,11 +238,9 @@ public class XmlMappingParser {
 
 		for ( String validatorClassName : validatedByType.getValue() ) {
 			@SuppressWarnings("unchecked")
-			Class<? extends ConstraintValidator<A, ?>> validatorClass = (Class<? extends ConstraintValidator<A, ?>>) ReflectionHelper
-					.loadClass(
-							validatorClassName,
-							this.getClass()
-					);
+			Class<? extends ConstraintValidator<A, ?>> validatorClass = (Class<? extends ConstraintValidator<A, ?>>) run(
+					LoadClass.action( validatorClassName, this.getClass() )
+			);
 
 
 			if ( !ConstraintValidator.class.isAssignableFrom( validatorClass ) ) {
@@ -333,6 +334,16 @@ public class XmlMappingParser {
 		}
 
 		return schemaResource;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	// JAXB closes the underlying input stream

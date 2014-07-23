@@ -18,8 +18,11 @@ package org.hibernate.validator.internal.cdi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Set;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
@@ -36,8 +39,8 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -141,9 +144,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) ReflectionHelper.loadClass(
-				messageInterpolatorFqcn,
-				this.getClass()
+		Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) run(
+				LoadClass.action(
+						messageInterpolatorFqcn,
+						this.getClass()
+				)
 		);
 
 		return createInstance( messageInterpolatorClass );
@@ -158,9 +163,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<TraversableResolver> traversableResolverClass = (Class<TraversableResolver>) ReflectionHelper.loadClass(
-				traversableResolverFqcn,
-				this.getClass()
+		Class<TraversableResolver> traversableResolverClass = (Class<TraversableResolver>) run(
+				LoadClass.action(
+						traversableResolverFqcn,
+						this.getClass()
+				)
 		);
 
 		return createInstance( traversableResolverClass );
@@ -175,9 +182,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<ParameterNameProvider> parameterNameProviderClass = (Class<ParameterNameProvider>) ReflectionHelper.loadClass(
-				parameterNameProviderFqcn,
-				this.getClass()
+		Class<ParameterNameProvider> parameterNameProviderClass = (Class<ParameterNameProvider>) run(
+				LoadClass.action(
+						parameterNameProviderFqcn,
+						this.getClass()
+				)
 		);
 
 		return createInstance( parameterNameProviderClass );
@@ -193,11 +202,12 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<ConstraintValidatorFactory>) ReflectionHelper
-				.loadClass(
+		Class<ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<ConstraintValidatorFactory>) run(
+				LoadClass.action(
 						constraintValidatorFactoryFqcn,
 						this.getClass()
-				);
+				)
+		);
 
 		return createInstance( constraintValidatorFactoryClass );
 	}
@@ -212,6 +222,16 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		return validationProviderHelper.isDefaultProvider() ?
 				Validation.byDefaultProvider().configure() :
 				Validation.byProvider( org.hibernate.validator.HibernateValidator.class ).configure();
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	@Override

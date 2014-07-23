@@ -20,6 +20,8 @@ import java.lang.reflect.Constructor;
 import java.security.PrivilegedAction;
 
 /**
+ * Returns the declared constructors of the specified class.
+ *
  * @author Gunnar Morling
  */
 public final class GetDeclaredConstructors implements PrivilegedAction<Constructor<?>[]> {
@@ -33,6 +35,7 @@ public final class GetDeclaredConstructors implements PrivilegedAction<Construct
 		this.clazz = clazz;
 	}
 
+	@Override
 	public Constructor<?>[] run() {
 		return clazz.getDeclaredConstructors();
 	}

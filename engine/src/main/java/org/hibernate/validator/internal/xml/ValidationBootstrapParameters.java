@@ -17,6 +17,8 @@
 package org.hibernate.validator.internal.xml;
 
 import java.io.InputStream;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +32,11 @@ import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
 
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.ResourceLoaderHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -141,9 +144,8 @@ public class ValidationBootstrapParameters {
 	private void setProviderClass(String providerFqcn) {
 		if ( providerFqcn != null ) {
 			try {
-				providerClass = (Class<? extends ValidationProvider<?>>) ReflectionHelper.loadClass(
-						providerFqcn,
-						this.getClass()
+				providerClass = (Class<? extends ValidationProvider<?>>) run(
+						LoadClass.action( providerFqcn, this.getClass() )
 				);
 				log.usingValidationProvider( providerFqcn );
 			}
@@ -157,10 +159,10 @@ public class ValidationBootstrapParameters {
 		if ( messageInterpolatorFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) ReflectionHelper.loadClass(
-						messageInterpolatorFqcn, this.getClass()
+				Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) run(
+						LoadClass.action( messageInterpolatorFqcn, this.getClass() )
 				);
-				messageInterpolator = ReflectionHelper.newInstance( messageInterpolatorClass, "message interpolator" );
+				messageInterpolator = run( NewInstance.action( messageInterpolatorClass, "message interpolator" ) );
 				log.usingMessageInterpolator( messageInterpolatorFqcn );
 			}
 			catch ( ValidationException e ) {
@@ -173,10 +175,10 @@ public class ValidationBootstrapParameters {
 		if ( traversableResolverFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<TraversableResolver> clazz = (Class<TraversableResolver>) ReflectionHelper.loadClass(
-						traversableResolverFqcn, this.getClass()
+				Class<TraversableResolver> clazz = (Class<TraversableResolver>) run(
+						LoadClass.action( traversableResolverFqcn, this.getClass() )
 				);
-				traversableResolver = ReflectionHelper.newInstance( clazz, "traversable resolver" );
+				traversableResolver = run( NewInstance.action( clazz, "traversable resolver" ) );
 				log.usingTraversableResolver( traversableResolverFqcn );
 			}
 			catch ( ValidationException e ) {
@@ -189,10 +191,10 @@ public class ValidationBootstrapParameters {
 		if ( constraintFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) ReflectionHelper.loadClass(
-						constraintFactoryFqcn, this.getClass()
+				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) run (
+						LoadClass.action( constraintFactoryFqcn, this.getClass() )
 				);
-				constraintValidatorFactory = ReflectionHelper.newInstance( clazz, "constraint factory class" );
+				constraintValidatorFactory = run( NewInstance.action( clazz, "constraint factory class" ) );
 				log.usingConstraintFactory( constraintFactoryFqcn );
 			}
 			catch ( ValidationException e ) {
@@ -205,10 +207,10 @@ public class ValidationBootstrapParameters {
 		if ( parameterNameProviderFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<ParameterNameProvider> clazz = (Class<ParameterNameProvider>) ReflectionHelper.loadClass(
-						parameterNameProviderFqcn, this.getClass()
+				Class<ParameterNameProvider> clazz = (Class<ParameterNameProvider>) run(
+						LoadClass.action( parameterNameProviderFqcn, this.getClass() )
 				);
-				parameterNameProvider = ReflectionHelper.newInstance( clazz, "parameter name provider class" );
+				parameterNameProvider = run( NewInstance.action( clazz, "parameter name provider class" ) );
 				log.usingParameterNameProvider( parameterNameProviderFqcn );
 			}
 			catch ( ValidationException e ) {
@@ -233,6 +235,16 @@ public class ValidationBootstrapParameters {
 		for ( Map.Entry<String, String> entry : properties.entrySet() ) {
 			configProperties.put( entry.getKey(), entry.getValue() );
 		}
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	public void addValidatedValueHandler(ValidatedValueUnwrapper<?> handler) {

@@ -19,17 +19,17 @@ package org.hibernate.validator.test.cfg;
 
 import java.lang.reflect.Method;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -108,7 +108,7 @@ public class CascadingWithConstraintMappingTest {
 
 		B b = new B();
 		b.c = new C();
-		Method method = ReflectionHelper.getMethod( B.class, "getC" );
+		Method method = GetMethod.action( B.class, "getC" ).run();
 
 		Set<ConstraintViolation<B>> violations = validator.forExecutables().validateReturnValue(
 				b, method, b.getC()

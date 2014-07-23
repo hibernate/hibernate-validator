@@ -23,6 +23,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +59,11 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructors;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredFields;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
@@ -65,8 +72,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
-import static org.hibernate.validator.internal.util.ReflectionHelper.getMethods;
-import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance;
 
 /**
  * {@code MetaDataProvider} which reads the metadata from annotations which is the default configuration source.
@@ -184,14 +189,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass,
 			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
-		Method[] providerMethods = getMethods( providerClass );
+		Method[] providerMethods = run( GetMethods.action( providerClass ) );
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
 					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
 
-				return newInstance(
-						providerClass, "the default group sequence provider"
+				return run(
+						NewInstance.action( providerClass, "the default group sequence provider" )
 				);
 			}
 		}
@@ -219,7 +224,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private Set<ConstrainedElement> getFieldMetaData(Class<?> beanClass) {
 		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
-		for ( Field field : ReflectionHelper.getDeclaredFields( beanClass ) ) {
+		for ( Field field : run( GetDeclaredFields.action ( beanClass ) ) ) {
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) ||
 					annotationProcessingOptions.areMemberConstraintsIgnoredFor( field ) ||
@@ -268,7 +273,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
 		List<ExecutableElement> declaredConstructors = ExecutableElement.forConstructors(
-				ReflectionHelper.getDeclaredConstructors( clazz )
+				run( GetDeclaredConstructors.action( clazz ) )
 		);
 
 		return getMetaData( declaredConstructors );
@@ -276,7 +281,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private Set<ConstrainedExecutable> getMethodMetaData(Class<?> clazz) {
 		List<ExecutableElement> declaredMethods = ExecutableElement.forMethods(
-				ReflectionHelper.getDeclaredMethods( clazz )
+				run( GetDeclaredMethods.action( clazz ) )
 		);
 
 		return getMetaData( declaredMethods );
@@ -607,5 +612,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				annotation,
 				type
 		);
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

@@ -16,6 +16,8 @@
 */
 package org.hibernate.validator.internal.engine;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -40,10 +42,11 @@ import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
@@ -257,7 +260,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				throw log.getMissingELDependenciesException();
 			}
 		}
-		
+
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
 			beanMetaDataManager = new BeanMetaDataManager(
@@ -337,12 +340,21 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		for ( String handlerName : handlerNames ) {
 			@SuppressWarnings("unchecked")
-			Class<? extends ValidatedValueUnwrapper<?>> handlerType = (Class<? extends ValidatedValueUnwrapper<?>>) ReflectionHelper
-					.loadClass( handlerName, ValidatorFactoryImpl.class );
-			handlers.add( ReflectionHelper.newInstance( handlerType, "validated value handler class" ) );
+			Class<? extends ValidatedValueUnwrapper<?>> handlerType = (Class<? extends ValidatedValueUnwrapper<?>>)
+					run( LoadClass.action( handlerName, ValidatorFactoryImpl.class ) );
+			handlers.add( run( NewInstance.action( handlerType, "validated value handler class" ) ) );
 		}
 
 		return handlers;
 	}
 
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
 }

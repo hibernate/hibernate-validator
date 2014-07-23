@@ -19,8 +19,6 @@ package org.hibernate.validator.internal.xml;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.validator.internal.util.ReflectionHelper;
-
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
@@ -37,13 +35,11 @@ public class GroupConversionBuilder {
 																  String defaultPackage) {
 		Map<Class<?>, Class<?>> groupConversionMap = newHashMap();
 		for ( GroupConversionType groupConversionType : groupConversionTypes ) {
-			Class<?> fromClass = ReflectionHelper.loadClass( groupConversionType.getFrom(), defaultPackage );
-			Class<?> toClass = ReflectionHelper.loadClass( groupConversionType.getTo(), defaultPackage );
+			Class<?> fromClass = ClassLoadingHelper.loadClass( groupConversionType.getFrom(), defaultPackage );
+			Class<?> toClass = ClassLoadingHelper.loadClass( groupConversionType.getTo(), defaultPackage );
 			groupConversionMap.put( fromClass, toClass );
 		}
 
 		return groupConversionMap;
 	}
 }
-
-

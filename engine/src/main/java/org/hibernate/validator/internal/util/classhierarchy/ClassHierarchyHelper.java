@@ -16,14 +16,11 @@
 */
 package org.hibernate.validator.internal.util.classhierarchy;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -129,27 +126,5 @@ public class ClassHierarchyHelper {
 			classes.add( currentInterfaceCasted );
 			getImplementedInterfaces( currentInterfaceCasted, classes );
 		}
-	}
-
-	/**
-	 * Get a list of all methods wich the given class declares, implements,
-	 * overrides or inherits. Methods are added by adding first all methods of
-	 * the class itself and its implemented interfaces, then the super class and
-	 * its interfaces, etc.
-	 *
-	 * @param clazz the class for which to retrieve the methods
-	 *
-	 * @return set of all methods of the given class
-	 */
-	public static List<Method> getAllMethods(Class<?> clazz) {
-		Contracts.assertNotNull( clazz );
-
-		List<Method> methods = newArrayList();
-
-		for ( Class<?> hierarchyClass : getHierarchy( clazz ) ) {
-			Collections.addAll( methods, ReflectionHelper.getMethods( hierarchyClass ) );
-		}
-
-		return methods;
 	}
 }

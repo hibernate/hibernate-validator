@@ -26,11 +26,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
@@ -46,11 +49,13 @@ import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -505,10 +510,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		Class<Payload>[] payloadFromAnnotation;
 		try {
 			//TODO be extra safe and make sure this is an array of Payload
-			payloadFromAnnotation = ReflectionHelper.getAnnotationParameter(
-					annotation,
-					ConstraintHelper.PAYLOAD,
-					Class[].class
+			payloadFromAnnotation = run(
+					GetAnnotationParameter.action( annotation, ConstraintHelper.PAYLOAD, Class[].class )
 			);
 		}
 		catch ( ValidationException e ) {
@@ -523,8 +526,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Set<Class<?>> buildGroupSet(Class<?> implicitGroup) {
 		Set<Class<?>> groupSet = newHashSet();
-		final Class<?>[] groupsFromAnnotation = ReflectionHelper.getAnnotationParameter(
-				annotation, ConstraintHelper.GROUPS, Class[].class
+		final Class<?>[] groupsFromAnnotation = run(
+				GetAnnotationParameter.action( annotation, ConstraintHelper.GROUPS, Class[].class )
 		);
 		if ( groupsFromAnnotation.length == 0 ) {
 			groupSet.add( Default.class );
@@ -541,10 +544,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
-		final Method[] declaredMethods = ReflectionHelper.getDeclaredMethods( annotation.annotationType() );
+		final Method[] declaredMethods = run( GetDeclaredMethods.action( annotation.annotationType() ) );
 		Map<String, Object> parameters = newHashMap( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
-			Object value = ReflectionHelper.getAnnotationParameter( annotation, m.getName(), Object.class );
+			Object value = run( GetAnnotationParameter.action( annotation, m.getName(), Object.class ) );
 			parameters.put( m.getName(), value );
 		}
 		return Collections.unmodifiableMap( parameters );
@@ -552,7 +555,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = newHashMap();
-		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
+		final Method[] methods = run( GetDeclaredMethods.action( annotationType ) );
 		for ( Method m : methods ) {
 			if ( m.getAnnotation( OverridesAttribute.class ) != null ) {
 				addOverrideAttributes(
@@ -571,7 +574,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void addOverrideAttributes(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Method m, OverridesAttribute... attributes) {
-		Object value = ReflectionHelper.getAnnotationParameter( annotation, m.getName(), Object.class );
+		Object value = run( GetAnnotationParameter.action( annotation, m.getName(), Object.class ) );
 		for ( OverridesAttribute overridesAttribute : attributes ) {
 			ensureAttributeIsOverridable( m, overridesAttribute );
 
@@ -588,7 +591,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute) {
-		final Method method = ReflectionHelper.getMethod( overridesAttribute.constraint(), overridesAttribute.name() );
+		final Method method = run( GetMethod.action( overridesAttribute.constraint(), overridesAttribute.name() ) );
 		if ( method == null ) {
 			throw log.getOverriddenConstraintAttributeNotFoundException( overridesAttribute.name() );
 		}
@@ -702,6 +705,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		return new ConstraintDescriptorImpl<U>(
 				constraintHelper, member, annotationProxy, elementType, null, definedOn, externalConstraintType
 		);
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <P> P run(PrivilegedAction<P> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**
