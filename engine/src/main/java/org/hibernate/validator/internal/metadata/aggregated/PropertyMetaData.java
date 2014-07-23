@@ -24,6 +24,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 
@@ -94,9 +95,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}
 
-	@Override
-	public Object getValue(Object parent) {
-		return ReflectionHelper.getValue( cascadingMember, parent );
+	public Member getCascadingMember() {
+		return cascadingMember;
 	}
 
 	@Override

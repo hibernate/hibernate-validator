@@ -89,11 +89,6 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	}
 
 	@Override
-	public Object getValue(Object parent) {
-		return ( (Object[]) parent )[index];
-	}
-
-	@Override
 	public ParameterDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new ParameterDescriptorImpl(
 				getType(),

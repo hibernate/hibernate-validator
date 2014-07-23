@@ -25,7 +25,6 @@ import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to
@@ -89,21 +88,6 @@ public class MetaConstraint<A extends Annotation> {
 
 	public ConstraintLocation getLocation() {
 		return location;
-	}
-
-	/**
-	 * @param o the object from which to retrieve the value.
-	 *
-	 * @return Returns the value for this constraint from the specified object. Depending on the type either the value itself
-	 *         is returned of method or field access is used to access the value.
-	 */
-	public Object getValue(Object o) {
-		if ( location.getMember() == null ) {
-			return o;
-		}
-		else {
-			return ReflectionHelper.getValue( location.getMember(), o );
-		}
 	}
 
 	@Override

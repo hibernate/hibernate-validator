@@ -87,11 +87,6 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	}
 
 	@Override
-	public Object getValue(Object parent) {
-		return parent;
-	}
-
-	@Override
 	public ReturnValueDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new ReturnValueDescriptorImpl(
 				getType(),
