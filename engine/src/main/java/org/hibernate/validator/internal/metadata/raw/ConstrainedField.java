@@ -16,15 +16,11 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
-import java.lang.reflect.Member;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * Represents a field of a Java type and all its associated meta-data relevant
@@ -53,11 +49,6 @@ public class ConstrainedField extends AbstractConstrainedElement {
 							boolean requiresUnwrapping) {
 
 		super( source, ConstrainedElementKind.FIELD, location, constraints, groupConversions, isCascading, requiresUnwrapping );
-
-		Member member = location.getMember();
-		if ( member != null && isConstrained() ) {
-			run( SetAccessibility.action( member ) );
-		}
 	}
 
 	@Override
@@ -89,9 +80,5 @@ public class ConstrainedField extends AbstractConstrainedElement {
 			return false;
 		}
 		return true;
-	}
-
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

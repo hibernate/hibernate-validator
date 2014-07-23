@@ -55,15 +55,6 @@ public interface Cascadable {
 	ElementType getElementType();
 
 	/**
-	 * Retrieves the value of this element from the given object.
-	 *
-	 * @param parent The object to retrieve the value from.
-	 *
-	 * @return This element's value.
-	 */
-	Object getValue(Object parent);
-
-	/**
 	 * Returns the name of this cascadable element.
 	 *
 	 * @return The name of this cascadable element.

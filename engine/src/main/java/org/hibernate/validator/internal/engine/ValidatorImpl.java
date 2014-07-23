@@ -17,15 +17,21 @@
 package org.hibernate.validator.internal.engine;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
@@ -58,12 +64,17 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
+import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
+import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import com.fasterxml.classmate.ResolvedType;
@@ -142,6 +153,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
+	/**
+	 * Keeps an accessible version for each non-accessible member whose value needs to be accessed during validation.
+	 */
+	private final ConcurrentMap<Member, Member> accessibleMembers;
+
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 						 MessageInterpolator messageInterpolator,
 						 TraversableResolver traversableResolver,
@@ -162,6 +178,12 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.failFast = failFast;
 
 		validationOrderGenerator = new ValidationOrderGenerator();
+
+		this.accessibleMembers = new ConcurrentReferenceHashMap<Member, Member>(
+				100,
+				ReferenceType.SOFT,
+				ReferenceType.SOFT
+		);
 	}
 
 	@Override
@@ -519,7 +541,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 			if ( valueContext.getCurrentBean() != null ) {
-				Object valueToValidate = metaConstraint.getValue( valueContext.getCurrentBean() );
+				Object valueToValidate = getValue( metaConstraint.getLocation().getMember(), valueContext.getCurrentBean() );
 				valueContext.setCurrentValidatedValue( valueToValidate );
 			}
 			validationSuccessful = metaConstraint.validateConstraint( validationContext, valueContext );
@@ -552,9 +574,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					valueContext.getPropertyPath(),
 					elementType
 			) ) {
-				Object value = cascadable.getValue(
-						valueContext.getCurrentBean()
-				);
+
+				Object value = getValue( valueContext.getCurrentBean(), cascadable );
 
 				// Value can be wrapped (e.g. Optional<Address>). Try to unwrap it
 				ConstraintMetaData metaData = (ConstraintMetaData) cascadable;
@@ -1302,9 +1323,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		else {
 			if ( property.isCascading() ) {
 				Type type = property.getType();
-				newValue = newValue == null ? null : property.getValue(
-						newValue
-				);
+				newValue = newValue == null ? null : getValue( newValue, property );
 				if ( elem.isIterable() ) {
 					if ( newValue != null && elem.getIndex() != null ) {
 						newValue = ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
@@ -1482,5 +1501,79 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			valueContext.setValidatedValueHandler( handler );
 		}
+	}
+
+	private Object getValue(Object object, Cascadable cascadable) {
+		if ( cascadable instanceof PropertyMetaData ) {
+			Member member = getAccessible( ( (PropertyMetaData) cascadable ).getCascadingMember() );
+			return getValue( member, object );
+		}
+		else if ( cascadable instanceof ParameterMetaData ) {
+			return ( (Object[]) object )[( (ParameterMetaData) cascadable ).getIndex()];
+		}
+		else {
+			return object;
+		}
+	}
+
+	private Object getValue(Member member, Object object) {
+		if ( member == null ) {
+			return object;
+		}
+
+		member = getAccessible( member );
+
+		if ( member instanceof Method ) {
+			return ReflectionHelper.getValue( (Method) member, object );
+		}
+		else if ( member instanceof Field ) {
+			return ReflectionHelper.getValue( (Field) member, object );
+		}
+		return null;
+	}
+
+	/**
+	 * Returns an accessible version of the given member. Will be the given member itself in case it is accessible,
+	 * otherwise a copy which is set accessible. These copies are maintained in the
+	 * {@link ValidatorImpl#accessibleMembers} cache.
+	 */
+	private Member getAccessible(Member original) {
+		if ( ( (AccessibleObject) original ).isAccessible() ) {
+			return original;
+		}
+
+		Member member = accessibleMembers.get( original );
+
+		if ( member != null ) {
+			return member;
+		}
+
+		Class<?> clazz = original.getDeclaringClass();
+
+		if ( original instanceof Field ) {
+			member = run( GetDeclaredField.action( clazz, original.getName() ) );
+		}
+		else {
+			member = run( GetDeclaredMethod.action( clazz, original.getName() ) );
+		}
+
+		run( SetAccessibility.action( member ) );
+
+		Member cached = accessibleMembers.putIfAbsent( original, member );
+		if ( cached != null ) {
+			member = cached;
+		}
+
+		return member;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

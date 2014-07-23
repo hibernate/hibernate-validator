@@ -18,8 +18,6 @@ package org.hibernate.validator.internal.metadata.raw;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +29,6 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -143,10 +140,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		this.crossParameterConstraints = crossParameterConstraints;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
-
-		if ( isConstrained() ) {
-			run( SetAccessibility.action( location.getMember() ) );
-		}
 	}
 
 	/**
@@ -352,9 +345,5 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			return false;
 		}
 		return true;
-	}
-
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
