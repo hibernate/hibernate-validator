@@ -19,6 +19,8 @@ package org.hibernate.validator.internal.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import com.fasterxml.classmate.Filter;
 import com.fasterxml.classmate.MemberResolver;
@@ -29,6 +31,7 @@ import com.fasterxml.classmate.members.RawMethod;
 import com.fasterxml.classmate.members.ResolvedMethod;
 
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.privilegedactions.GetResolvedMemberMethods;
 
 /**
  * Provides shared functionality dealing with executables.
@@ -122,7 +125,10 @@ public final class ExecutableHelper {
 				null
 		);
 
-		ResolvedMethod[] resolvedMethods = typeWithMembers.getMemberMethods();
+		// ClassMate itself doesn't require any special permissions, but it invokes reflection APIs which do.
+		// Wrapping the call into a privileged action to avoid that all calling code bases need to have the required
+		// permission
+		ResolvedMethod[] resolvedMethods = run( GetResolvedMemberMethods.action( typeWithMembers ) );
 
 		// The ClassMate doc says that overridden methods are flattened to one
 		// resolved method. But that is the case only for methods without any
@@ -142,6 +148,16 @@ public final class ExecutableHelper {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**
