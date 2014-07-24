@@ -34,6 +34,10 @@ atlassian-ide-plugin.xml
 # NetBeans specific files/directories
 .nbattrs
 
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
 # Miscellaneous
 *.log
 .clover
