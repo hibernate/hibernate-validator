@@ -409,7 +409,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			constraints.add( annotation );
 		}
 		else if ( constraintHelper.isMultiValueConstraint( annotationType ) ) {
-			constraints.addAll( constraintHelper.getMultiValueConstraints( annotation ) );
+			constraints.addAll( constraintHelper.getConstraintsFromMultiValueConstraint( annotation ) );
 		}
 
 		for ( Annotation constraint : constraints ) {

@@ -47,6 +47,7 @@ import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -56,6 +57,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 
 import static org.hibernate.validator.constraints.CompositionType.AND;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * Describes a single constraint (including it's composing constraints).
@@ -321,34 +323,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
 		final Method[] declaredMethods = run( GetDeclaredMethods.action( annotation.annotationType() ) );
-		Map<String, Object> parameters = new HashMap<String, Object>( declaredMethods.length );
+		Map<String, Object> parameters = newHashMap( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
-			try {
-				parameters.put( m.getName(), m.invoke( annotation ) );
-			}
-			catch ( IllegalAccessException e ) {
-				throw log.getUnableToReadAnnotationAttributesException( annotation.getClass(), e );
-			}
-			catch ( InvocationTargetException e ) {
-				throw log.getUnableToReadAnnotationAttributesException( annotation.getClass(), e );
-			}
+			Object value = run( GetAnnotationParameter.action( annotation, m.getName(), Object.class ) );
+			parameters.put( m.getName(), value );
 		}
 		return Collections.unmodifiableMap( parameters );
-	}
-
-	private Object getMethodValue(Annotation annotation, Method m) {
-		Object value;
-		try {
-			value = m.invoke( annotation );
-		}
-		// should never happen
-		catch ( IllegalAccessException e ) {
-			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
-		}
-		catch ( InvocationTargetException e ) {
-			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
-		}
-		return value;
 	}
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
@@ -372,8 +352,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	private void addOverrideAttributes(Map<ClassIndexWrapper, Map<String, Object>> overrideParameters, Method m, OverridesAttribute... attributes) {
-
-		Object value = getMethodValue( annotation, m );
+		Object value = run( GetAnnotationParameter.action( annotation, m.getName(), Object.class ) );
 		for ( OverridesAttribute overridesAttribute : attributes ) {
 			ensureAttributeIsOverridable( m, overridesAttribute );
 
@@ -432,7 +411,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				log.debugf( "Adding composing constraint: %s.", descriptor );
 			}
 			else if ( constraintHelper.isMultiValueConstraint( declaredAnnotationType ) ) {
-				List<Annotation> multiValueConstraints = constraintHelper.getMultiValueConstraints( declaredAnnotation );
+				List<Annotation> multiValueConstraints = constraintHelper.getConstraintsFromMultiValueConstraint(
+						declaredAnnotation
+				);
 				int index = 0;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
 					ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
