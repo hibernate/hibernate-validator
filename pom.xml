@@ -278,6 +278,9 @@
                         <preparationGoals>clean install</preparationGoals>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
+                        <pushChanges>false</pushChanges>
+                        <localCheckout>true</localCheckout>
+                        <tagNameFormat>@{project.version}</tagNameFormat>
                     </configuration>
                 </plugin>
                 <plugin>

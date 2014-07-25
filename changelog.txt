@@ -1,6 +1,17 @@
 Hibernate Validator Changelog
 =============================
 
+
+4.3.2.Final (25.07.2014)
+------------------------
+
+** Improvement
+    * [HV-885] - Contention generated on runtime lookup for @GroupSequence annotation
+
+** Task
+    * [HV-912] - Improve integration with Java's security manager
+
+
 4.3.1.Final (28.11.2012)
 ------------------------
 
