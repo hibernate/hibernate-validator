@@ -4,7 +4,7 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>4.2.1-SNAPSHOT</version>
+        <version>4.2.1.Final</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>hibernate-validator-tck-runner</artifactId>
