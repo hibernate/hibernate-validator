@@ -1,6 +1,20 @@
 Hibernate Validator Changelog
 =============================
 
+5.1.2.Final (25.07.2014)
+------------------------
+
+** Bug
+    * [HV-889] - Translation error in ValidationMessages_zh_CN.properties
+    * [HV-901] - Luhn Credit Card Validator incorrect return statement
+    * [HV-902] - Cascading validation does not work on classes which implement Iterable.
+    * [HV-906] - org.hibernate.validator.constraints.CreditCardNumber does not fail on a non-numbers string
+    * [HV-908] - Fix Chinese translation file
+
+** Task
+    * [HV-912] - Improve integration with Java's security manager
+
+
 5.1.1.Final (06.05.2014)
 ------------------------
 
