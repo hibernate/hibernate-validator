@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.util.privilegedactions;
+package org.hibernate.validator.util.privilegedactions;
 
 import java.lang.reflect.Constructor;
 import java.security.PrivilegedAction;

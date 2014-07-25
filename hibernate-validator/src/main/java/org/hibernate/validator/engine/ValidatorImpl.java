@@ -47,7 +47,7 @@ import org.hibernate.validator.engine.groups.Group;
 import org.hibernate.validator.engine.groups.GroupChain;
 import org.hibernate.validator.engine.groups.GroupChainGenerator;
 import org.hibernate.validator.engine.resolver.SingleThreadCachedTraversableResolver;
-import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
+import org.hibernate.validator.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.metadata.AggregatedMethodMetaData;
 import org.hibernate.validator.metadata.BeanMetaConstraint;
 import org.hibernate.validator.metadata.BeanMetaData;

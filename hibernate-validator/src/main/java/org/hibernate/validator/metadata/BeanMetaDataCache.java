@@ -18,10 +18,10 @@ package org.hibernate.validator.metadata;
 
 import java.util.EnumSet;
 
-import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
+import org.hibernate.validator.util.ConcurrentReferenceHashMap;
 
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
+import static org.hibernate.validator.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
+import static org.hibernate.validator.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.util.Contracts.assertNotNull;
 
 /**

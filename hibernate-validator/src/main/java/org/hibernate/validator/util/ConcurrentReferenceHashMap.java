@@ -26,7 +26,7 @@
  * http://creativecommons.org/licenses/publicdomain
  */
 
-package org.hibernate.validator.internal.util;
+package org.hibernate.validator.util;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.ref.Reference;

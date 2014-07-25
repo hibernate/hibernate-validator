@@ -24,7 +24,7 @@ import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
+import org.hibernate.validator.util.privilegedactions.GetDeclaredConstructor;
 import org.hibernate.validator.util.privilegedactions.ConstructorInstance;
 import org.hibernate.validator.util.privilegedactions.GetClassLoader;
 
