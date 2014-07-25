@@ -1,6 +1,13 @@
 Hibernate Validator Changelog
 ==========================
 
+4.2.1.Final (25.07.2014)
+------------------------
+
+** Task
+    * [HV-912] - Improve integration with Java's security manager
+
+
 4.2.0.Final (20.06.2011)
 ----------------------
 

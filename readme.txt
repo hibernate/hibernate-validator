@@ -1,22 +1,22 @@
 
   Hibernate Validator
   ==================================================
-  Version: 4.2.0.Final, 20.06.2011
+  Version: 4.2.1.Final, 25.07.2014
 
 
   What is it?
   -----------
 
-  This is the reference implementation of JSR 303 - Bean Validation. 
-  Bean Validation defines a metadata model and API for JavaBean validation. 
-  The default metadata source is annotations, with the ability to override and extend 
+  This is the reference implementation of JSR 303 - Bean Validation.
+  Bean Validation defines a metadata model and API for JavaBean validation.
+  The default metadata source is annotations, with the ability to override and extend
   the meta-data through the use of XML validation descriptors.
 
   History
   -------
 
-  Prior to version 4.x Hibernate Validators was based on a different source base which 
-  is not based on JSR 303. This code can be accessed via 
+  Prior to version 4.x Hibernate Validators was based on a different source base which
+  is not based on JSR 303. This code can be accessed via
   https://github.com/hibernate/hibernate-validator/tree/pre-validator3-removal/hibernate-validator-legacy
 
   Documentation
@@ -47,14 +47,14 @@
     The jar files contain the classes needed for JAXB. If you don't use the xml configuration and XML configuration
     is disabled via Configuration.ignoreXmlConfiguration the jar files from the lib/jdk5 directory don't have to be added.
 
-  or 
+  or
 
   - Add the following to your maven or ivy dependency list:
 
     <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-validator</artifactId>
-        <version>4.2.0.Final</version>
+        <version>4.2.1.Final</version>
     </dependency>
 
     Hibernate Validator can be found in the JBoss Maven repository:
