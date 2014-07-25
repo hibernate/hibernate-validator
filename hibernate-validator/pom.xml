@@ -3,7 +3,7 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>4.2.1.Final</version>
+        <version>4.2.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
