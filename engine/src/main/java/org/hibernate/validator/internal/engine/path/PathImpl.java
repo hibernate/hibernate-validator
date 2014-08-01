@@ -18,7 +18,6 @@ package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -94,10 +93,10 @@ public final class PathImpl implements Path, Serializable {
 		PathImpl path = createRootPath();
 
 		if ( executable.getKind() == ElementKind.CONSTRUCTOR ) {
-			path.addConstructorNode( executable.getName(), Arrays.asList( executable.getParameterTypes() ) );
+			path.addConstructorNode( executable.getName(), executable.getParameterTypes() );
 		}
 		else {
-			path.addMethodNode( executable.getName(), Arrays.asList( executable.getParameterTypes() ) );
+			path.addMethodNode( executable.getName(), executable.getParameterTypes() );
 		}
 
 		return path;
@@ -161,7 +160,7 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	private NodeImpl addConstructorNode(String name, List<Class<?>> parameterTypes) {
+	private NodeImpl addConstructorNode(String name, Class<?>[] parameterTypes) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = NodeImpl.createConstructorNode( name, parent, parameterTypes );
 		nodeList.add( currentLeafNode );
@@ -169,7 +168,7 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	private NodeImpl addMethodNode(String name, List<Class<?>> parameterTypes) {
+	private NodeImpl addMethodNode(String name, Class<?>[] parameterTypes) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
 		currentLeafNode = NodeImpl.createMethodNode( name, parent, parameterTypes );
 		nodeList.add( currentLeafNode );
