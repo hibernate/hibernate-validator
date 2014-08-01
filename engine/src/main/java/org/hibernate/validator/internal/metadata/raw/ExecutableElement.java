@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -88,10 +89,8 @@ public abstract class ExecutableElement {
 	public abstract String getSimpleName();
 
 	public abstract boolean isGetterMethod();
-
-	public String getIdentifier() {
-		return getSimpleName() + Arrays.toString( getParameterTypes() );
-	}
+	
+	public abstract String getIdentifier();
 
 	/**
 	 * Returns a string representation of this executable in the form {@code <name>(<parameterType 0> ...  <parameterType n>)},
@@ -142,9 +141,11 @@ public abstract class ExecutableElement {
 	private static class ConstructorElement extends ExecutableElement {
 
 		private final Constructor<?> constructor;
+		private final String identifier;
 
 		private ConstructorElement(Constructor<?> method) {
 			this.constructor = method;
+			identifier = getSimpleName() + Arrays.toString( getParameterTypes() );
 		}
 
 		@Override
@@ -192,6 +193,11 @@ public abstract class ExecutableElement {
 		@Override
 		public AccessibleObject getAccessibleObject() {
 			return constructor;
+		}
+		
+		@Override
+		public String getIdentifier() {
+			return identifier;
 		}
 
 		@Override
@@ -278,10 +284,12 @@ public abstract class ExecutableElement {
 
 		private final Method method;
 		private final boolean isGetterMethod;
+		private final String identifier;
 
 		public MethodElement(Method method) {
 			this.method = method;
 			isGetterMethod = ReflectionHelper.isGetterMethod( method );
+			identifier = getSimpleName() + Arrays.toString( getParameterTypes() );
 		}
 
 		@Override
@@ -332,6 +340,11 @@ public abstract class ExecutableElement {
 		@Override
 		public boolean isGetterMethod() {
 			return isGetterMethod;
+		}
+		
+		@Override
+		public String getIdentifier() {
+			return identifier;
 		}
 
 		@Override
