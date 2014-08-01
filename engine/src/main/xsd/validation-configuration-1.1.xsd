@@ -15,7 +15,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<xs:schema attributeFormDefault="unqualified" 
+<xs:schema attributeFormDefault="unqualified"
            elementFormDefault="qualified"
            targetNamespace="http://jboss.org/xml/ns/javax/validation/configuration"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
