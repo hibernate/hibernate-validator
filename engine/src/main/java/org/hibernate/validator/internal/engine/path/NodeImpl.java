@@ -17,9 +17,9 @@
 package org.hibernate.validator.internal.engine.path;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.Path.BeanNode;
@@ -43,6 +43,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class NodeImpl
 		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
+	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
 
 	private static final Log log = LoggerFactory.make();
 
@@ -60,12 +61,12 @@ public class NodeImpl
 	private final int hashCode;
 
 	//type-specific attributes
-	private final List<Class<?>> parameterTypes;
+	private final Class<?>[] parameterTypes;
 	private final Integer parameterIndex;
 
 	private String asString;
 
-	private NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementKind kind, List<Class<?>> parameterTypes, Integer parameterIndex) {
+	private NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes, Integer parameterIndex) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
@@ -86,7 +87,7 @@ public class NodeImpl
 				null,
 				null,
 				ElementKind.PROPERTY,
-				Collections.<Class<?>>emptyList(),
+				EMPTY_CLASS_ARRAY,
 				null
 		);
 	}
@@ -99,7 +100,7 @@ public class NodeImpl
 				null,
 				null,
 				ElementKind.PARAMETER,
-				Collections.<Class<?>>emptyList(),
+				EMPTY_CLASS_ARRAY,
 				parameterIndex
 		);
 	}
@@ -112,16 +113,16 @@ public class NodeImpl
 				null,
 				null,
 				ElementKind.CROSS_PARAMETER,
-				Collections.<Class<?>>emptyList(),
+				EMPTY_CLASS_ARRAY,
 				null
 		);
 	}
 
-	public static NodeImpl createMethodNode(String name, NodeImpl parent, List<Class<?>> parameterTypes) {
+	public static NodeImpl createMethodNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
 		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null );
 	}
 
-	public static NodeImpl createConstructorNode(String name, NodeImpl parent, List<Class<?>> parameterTypes) {
+	public static NodeImpl createConstructorNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
 		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null );
 	}
 
@@ -133,7 +134,7 @@ public class NodeImpl
 				null,
 				null,
 				ElementKind.BEAN,
-				Collections.<Class<?>>emptyList(),
+				EMPTY_CLASS_ARRAY,
 				null
 		);
 	}
@@ -146,7 +147,7 @@ public class NodeImpl
 				null,
 				null,
 				ElementKind.RETURN_VALUE,
-				Collections.<Class<?>>emptyList(),
+				EMPTY_CLASS_ARRAY,
 				null
 		);
 	}
@@ -251,7 +252,7 @@ public class NodeImpl
 
 	@Override
 	public List<Class<?>> getParameterTypes() {
-		return new ArrayList<Class<?>>( parameterTypes );
+		return Arrays.asList( parameterTypes );
 	}
 
 	@Override
