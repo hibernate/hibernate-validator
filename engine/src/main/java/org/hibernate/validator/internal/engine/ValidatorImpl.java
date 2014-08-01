@@ -26,6 +26,7 @@ import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -99,7 +100,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	/**
 	 * The default group array used in case any of the validate methods is called without a group.
 	 */
-	private static final Class<?>[] DEFAULT_GROUP_ARRAY = new Class<?>[] { Default.class };
+	private static final Collection<Class<?>> DEFAULT_GROUPS = Arrays.asList(new Class<?>[] { Default.class });
 
 	/**
 	 * Used to resolve the group execution order for a validate call.
@@ -365,13 +366,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 		}
 
-		Class<?>[] tmpGroups = groups;
+		Collection<Class<?>> resultGroups;
 		// if no groups is specified use the default
-		if ( tmpGroups.length == 0 ) {
-			tmpGroups = DEFAULT_GROUP_ARRAY;
+		if( groups.length == 0 ) {
+			resultGroups = DEFAULT_GROUPS;
+		} else {
+			resultGroups = Arrays.asList(groups);
 		}
-
-		return validationOrderGenerator.getValidationOrder( Arrays.asList( tmpGroups ) );
+		return validationOrderGenerator.getValidationOrder( resultGroups );
 	}
 
 	/**
