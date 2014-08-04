@@ -26,6 +26,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
+import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
 import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
 import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
@@ -538,5 +539,17 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 59 ),
 				new DiagnosticExpectation( Kind.ERROR, 60 )
 		);
+	}
+
+	@Test
+	public void timeConstraintsAllowedAtJava8DateTime() {
+
+		File sourceFile = compilerHelper.getSourceFile( ModelWithJava8DateTime.class );
+
+		boolean compilationResult = compilerHelper.compile(
+				new ConstraintValidationProcessor(), diagnostics, sourceFile
+		);
+
+		assertTrue( compilationResult, "Java 8 date/time API types fails at @Future/@Past." );
 	}
 }
