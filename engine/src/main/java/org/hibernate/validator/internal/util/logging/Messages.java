@@ -86,6 +86,14 @@ public interface Messages {
 
 	@Message(value = "The input stream for #addMapping() cannot be null.")
 	String inputStreamCannotBeNull();
+
+	@Message(value = "Constraints on the parameters of constructors of non-static inner classes " +
+			"are not supported if those parameters have a generic type due to JDK bug JDK-5087240.")
+	String constraintOnConstructorOfNonStaticInnerClass();
+
+	@Message(value = "Custom parameterized types with more than one type argument are not supported and " +
+			"will not be checked for type use constraints.")
+	String parameterizedTypesWithMoreThanOneTypeArgument();
 }
 
 

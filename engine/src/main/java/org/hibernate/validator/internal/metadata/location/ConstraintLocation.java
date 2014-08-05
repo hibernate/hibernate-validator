@@ -74,6 +74,14 @@ public class ConstraintLocation {
 		);
 	}
 
+	public static ConstraintLocation forTypeArgument(Member member, Type type) {
+		return new ConstraintLocation(
+				member.getDeclaringClass(),
+				member,
+				type
+		);
+	}
+
 	public static ConstraintLocation forReturnValue(ExecutableElement executable) {
 		return new ConstraintLocation(
 				executable.getMember().getDeclaringClass(),

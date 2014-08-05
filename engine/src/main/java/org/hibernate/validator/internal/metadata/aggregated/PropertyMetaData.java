@@ -20,6 +20,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Represents the constraint related meta data for a JavaBeans property.
@@ -66,9 +69,15 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 	private final GroupConversionHelper groupConversionHelper;
 
+	/**
+	 * Type arguments constraints for this property
+	 */
+	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+
 	private PropertyMetaData(String propertyName,
 							 Type type,
 							 Set<MetaConstraint<?>> constraints,
+							 Set<MetaConstraint<?>> typeArgumentsConstraints,
 							 Map<Class<?>, Class<?>> groupConversions,
 							 Member cascadingMember,
 							 boolean requiresUnwrapping) {
@@ -91,6 +100,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			this.elementType = ElementType.TYPE;
 		}
 
+		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}
@@ -112,6 +122,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 	@Override
 	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
 		return groupConversionHelper.asDescriptors();
+	}
+
+	@Override
+	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
+		return this.typeArgumentsConstraints;
 	}
 
 	@Override
@@ -164,6 +179,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		private final String propertyName;
 		private final Type propertyType;
 		private Member cascadingMember;
+		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 
 		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );
@@ -211,6 +227,13 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 			super.add( constrainedElement );
 
+			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
+				typeArgumentsConstraints.addAll( ( (ConstrainedField) constrainedElement ).getTypeArgumentsConstraints() );
+			}
+			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
+				typeArgumentsConstraints.addAll( ( (ConstrainedExecutable) constrainedElement ).getTypeArgumentsConstraints() );
+			}
+
 			if ( constrainedElement.isCascading() && cascadingMember == null ) {
 				cascadingMember = constrainedElement.getLocation().getMember();
 			}
@@ -222,6 +245,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 					propertyName,
 					propertyType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
+					typeArgumentsConstraints,
 					getGroupConversions(),
 					cascadingMember,
 					requiresUnwrapping()

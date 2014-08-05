@@ -86,10 +86,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	static final int DEFAULT_INITIAL_CAPACITY = 16;
 
-	private final ConstraintHelper constraintHelper;
-	private final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
-	private final AnnotationProcessingOptions annotationProcessingOptions;
-	private final ParameterNameProvider parameterNameProvider;
+	protected final ConstraintHelper constraintHelper;
+	protected final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
+	protected final AnnotationProcessingOptions annotationProcessingOptions;
+	protected final ParameterNameProvider parameterNameProvider;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			ParameterNameProvider parameterNameProvider,
@@ -249,13 +249,19 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				field.getAnnotation( ConvertGroup.List.class )
 		);
 
+		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeArgumentsConstraints( field );
 		boolean isCascading = field.isAnnotationPresent( Valid.class );
 		boolean requiresUnwrapping = field.isAnnotationPresent( UnwrapValidatedValue.class );
+
+		if ( !requiresUnwrapping ) {
+			requiresUnwrapping = unwrapBasedOnType( field.getType(), !typeArgumentsConstraints.isEmpty() );
+		}
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
 				ConstraintLocation.forProperty( field ),
 				constraints,
+				typeArgumentsConstraints,
 				groupConversions,
 				isCascading,
 				requiresUnwrapping
@@ -336,16 +342,23 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		Set<MetaConstraint<?>> returnValueConstraints;
+		Set<MetaConstraint<?>> typeArgumentsConstraints;
 		Map<Class<?>, Class<?>> groupConversions;
 		boolean isCascading;
 		boolean requiresUnwrapping = false;
 		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable.getMember() ) ) {
 			returnValueConstraints = Collections.emptySet();
+			typeArgumentsConstraints = Collections.<MetaConstraint<?>>emptySet();
 			groupConversions = Collections.emptyMap();
 			isCascading = false;
 		}
 		else {
+			typeArgumentsConstraints = findTypeArgumentsConstraints( executable.getMember() );
 			requiresUnwrapping = executable.getAccessibleObject().isAnnotationPresent( UnwrapValidatedValue.class );
+
+			if ( !requiresUnwrapping ) {
+				requiresUnwrapping = unwrapBasedOnType( executable.getReturnType(), !typeArgumentsConstraints.isEmpty() );
+			}
 
 			returnValueConstraints = convertToMetaConstraints(
 					executableConstraints.get( ConstraintType.GENERIC ),
@@ -364,6 +377,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				parameterConstraints,
 				crossParameterConstraints,
 				returnValueConstraints,
+				typeArgumentsConstraints,
 				groupConversions,
 				isCascading,
 				requiresUnwrapping
@@ -405,6 +419,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			boolean parameterIsCascading = false;
 			String parameterName = parameterNames.get( i );
 			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
+			Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 			ConvertGroup groupConversion = null;
 			ConvertGroup.List groupConversionList = null;
 			boolean requiresUnwrapping = false;
@@ -418,6 +433,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 								i,
 								parameterName,
 								parameterConstraints,
+								typeArgumentsConstraints,
 								getGroupConversions( groupConversion, groupConversionList ),
 								false,
 								false
@@ -426,6 +442,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				i++;
 				continue;
 			}
+
+			typeArgumentsConstraints = findTypeArgumentsConstraints( executable.getMember(), i );
 
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
 				//1. mark parameter as cascading if this annotation is the @Valid annotation
@@ -455,6 +473,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				}
 			}
 
+			if ( !requiresUnwrapping ) {
+				requiresUnwrapping = unwrapBasedOnType( executable.getParameterTypes()[i], !typeArgumentsConstraints.isEmpty() );
+			}
+
 			metaData.add(
 					new ConstrainedParameter(
 							ConfigurationSource.ANNOTATION,
@@ -463,6 +485,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 							i,
 							parameterName,
 							parameterConstraints,
+							typeArgumentsConstraints,
 							getGroupConversions( groupConversion, groupConversionList ),
 							parameterIsCascading,
 							requiresUnwrapping
@@ -511,13 +534,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Examines the given annotation to see whether it is a single- or multi-valued constraint annotation.
 	 *
+	 * @param member The member to check for constraints annotations
 	 * @param annotation The annotation to examine
 	 * @param type the element type on which the annotation/constraint is placed on
+	 * @param <A> the annotation type
 	 *
 	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
 	 *         single nor multi-valued annotation.
 	 */
-	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
+	protected <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
 			A annotation,
 			ElementType type) {
 		List<ConstraintDescriptorImpl<?>> constraintDescriptors = newArrayList();
@@ -622,5 +647,45 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	private <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	/**
+	 * Finds type arguments constraints for fields and methods return values.
+	 *
+	 * @param member the field or method
+	 *
+	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
+	 */
+	protected Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member) {
+		// To be extended by subclasses
+		return Collections.<MetaConstraint<?>>emptySet();
+	}
+
+	/**
+	 * Finds type arguments constraints for parameters.
+	 *
+	 * @param member the method
+	 * @param i the parameter index
+	 *
+	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
+	 */
+	protected Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, int i) {
+		// To be extended by subclasses
+		return Collections.emptySet();
+	}
+
+	/**
+	 * Unwrapping should be set to true if the field has constrained type arguments and is not an iterable or a map
+	 * (e.g. {@code Optional<@NotBlank String>})
+	 *
+	 * @param clazz the type of the field, return value, or parameter
+	 * @param hasConstrainedTypeArguments if the field, return value, or parameter has constrained type arguments
+	 *
+	 * @return {@code true} if the field has constrained type arguments and is not an iterable or a map, {@code false}
+	 * otherwise
+	 */
+	protected boolean unwrapBasedOnType(Class<?> clazz, boolean hasConstrainedTypeArguments) {
+		// To be extended by subclasses
+		return false;
 	}
 }

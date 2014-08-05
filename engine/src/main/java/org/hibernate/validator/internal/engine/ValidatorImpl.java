@@ -567,6 +567,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			Class<?> group = cascadable.convertGroup( originalGroup );
 			valueContext.setCurrentGroup( group );
 
+			Set<MetaConstraint<?>> typeArgumentsConstraints = cascadable.getTypeArgumentsConstraints();
+
 			ElementType elementType = cascadable.getElementType();
 			if ( isCascadeRequired(
 					validationContext,
@@ -595,21 +597,25 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							group != originalGroup
 					);
 
-					// HV-902: First, validate the value itself
-					Iterator<?> valueIter = Collections.singletonList( value ).iterator();
-					validateCascadedConstraint(
-							validationContext,
-							valueIter,
-							false,
-							valueContext,
-							validationOrder
-					);
-					if ( shouldFailFast( validationContext ) ) {
-						return;
+					Type type = value.getClass();
+
+					// HV-902: First, validate the properties for beans that implements Iterable and Map
+					if ( ReflectionHelper.isIterable( type ) || ReflectionHelper.isMap( type ) ) {
+						Iterator<?> valueIter = Collections.singletonList( value ).iterator();
+						validateCascadedConstraint(
+								validationContext,
+								valueIter,
+								false,
+								valueContext,
+								validationOrder,
+								Collections.<MetaConstraint<?>>emptySet()
+						);
+						if ( shouldFailFast( validationContext ) ) {
+							return;
+						}
 					}
 
-					// Second, validate elements contained in the value if it is Iterable, Map, or an Array
-					Type type = value.getClass();
+					// Second, validate the content of the value
 					Iterator<?> elementsIter = createIteratorForCascadedValue( type, value, valueContext );
 					boolean isIndexable = isIndexable( type );
 
@@ -618,7 +624,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							elementsIter,
 							isIndexable,
 							valueContext,
-							validationOrder
+							validationOrder,
+							typeArgumentsConstraints
 					);
 					if ( shouldFailFast( validationContext ) ) {
 						return;
@@ -643,7 +650,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @return An iterator over the value of a cascaded property.
 	 */
 	private Iterator<?> createIteratorForCascadedValue(Type type, Object value, ValueContext<?, ?> valueContext) {
-		Iterator<?> iter = Collections.emptyIterator();
+		Iterator<?> iter;
 		if ( ReflectionHelper.isIterable( type ) ) {
 			iter = ( (Iterable<?>) value ).iterator();
 			valueContext.markCurrentPropertyAsIterable();
@@ -657,6 +664,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			List<?> arrayList = Arrays.asList( (Object[]) value );
 			iter = arrayList.iterator();
 			valueContext.markCurrentPropertyAsIterable();
+		}
+		else {
+			iter = Collections.singletonList( value ).iterator();
 		}
 		return iter;
 	}
@@ -683,7 +693,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return isIndexable;
 	}
 
-	private void validateCascadedConstraint(ValidationContext<?> context, Iterator<?> iter, boolean isIndexable, ValueContext<?, ?> valueContext, ValidationOrder validationOrder) {
+	private void validateCascadedConstraint(ValidationContext<?> context, Iterator<?> iter, boolean isIndexable, ValueContext<?,
+			Object> valueContext, ValidationOrder validationOrder, Set<MetaConstraint<?>> typeArgumentsConstraint) {
 		Object value;
 		Object mapKey;
 		int i = 0;
@@ -703,6 +714,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					valueContext.getCurrentGroup(),
 					valueContext.getPropertyPath()
 			) ) {
+				// Validate type arguments constraints
+				validateTypeArgumentConstraints( context, valueContext, value, typeArgumentsConstraint );
+
+				// Cascade validation
 				ValueContext<?, Object> newValueContext;
 				if ( value != null ) {
 					newValueContext = ValueContext.getLocalExecutionContext(
@@ -726,6 +741,20 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 			i++;
 		}
+	}
+
+	private void validateTypeArgumentConstraints(ValidationContext<?> context, ValueContext<?, Object> valueContext, Object value, Set<MetaConstraint<?>> typeArgumentsConstraints) {
+		// A handler might be set to unwrap the outer type, reset when retrieving the type argument value
+		valueContext.setValidatedValueHandler( null );
+		valueContext.setCurrentValidatedValue( value );
+		for ( MetaConstraint<?> metaConstraint : typeArgumentsConstraints ) {
+			metaConstraint.validateConstraint( context, valueContext );
+			if ( shouldFailFast( context ) ) {
+				return;
+			}
+		}
+		// Create a new path copy to prevent interference between iterations and indices
+		valueContext.setPropertyPath( PathImpl.createCopy( valueContext.getPropertyPath() ) );
 	}
 
 	private <T> Set<ConstraintViolation<T>> validatePropertyInContext(ValidationContext<T> context, PathImpl propertyPath, ValidationOrder validationOrder) {

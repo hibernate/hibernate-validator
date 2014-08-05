@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 /**
  * An aggregated view of the constraint related meta data for a single method
  * parameter.
@@ -46,10 +49,16 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	private final GroupConversionHelper groupConversionHelper;
 	private final int index;
 
+	/**
+	 * Type arguments constraints for this parameter
+	 */
+	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+
 	private ParameterMetaData(int index,
 							  String name,
 							  Type type,
 							  Set<MetaConstraint<?>> constraints,
+							  Set<MetaConstraint<?>> typeArgumentsConstraints,
 							  boolean isCascading,
 							  Map<Class<?>, Class<?>> groupConversions,
 							  boolean requiresUnwrapping) {
@@ -65,6 +74,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 		this.index = index;
 
+		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}
@@ -89,6 +99,11 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	}
 
 	@Override
+	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
+		return this.typeArgumentsConstraints;
+	}
+
+	@Override
 	public ParameterDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence) {
 		return new ParameterDescriptorImpl(
 				getType(),
@@ -106,6 +121,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		private final Type parameterType;
 		private final int parameterIndex;
 		private String name;
+		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 
 		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );
@@ -128,7 +144,10 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		@Override
 		public void add(ConstrainedElement constrainedElement) {
 			super.add( constrainedElement );
+
 			ConstrainedParameter constrainedParameter = (ConstrainedParameter) constrainedElement;
+
+			typeArgumentsConstraints.addAll( constrainedParameter.getTypeArgumentsConstraints() );
 
 			if ( name == null ) {
 				name = constrainedParameter.getName();
@@ -142,6 +161,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					name,
 					parameterType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
+					typeArgumentsConstraints,
 					isCascading(),
 					getGroupConversions(),
 					requiresUnwrapping()
