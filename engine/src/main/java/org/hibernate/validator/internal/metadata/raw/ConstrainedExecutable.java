@@ -52,6 +52,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	private final List<ConstrainedParameter> parameterMetaData;
 
+	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+
 	private final boolean hasParameterConstraints;
 
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
@@ -61,8 +63,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 *
 	 * @param source The source of meta data.
 	 * @param location The location of the represented executable.
-	 * @param returnValueConstraints The return value constraints of the represented executable, if
-	 * any.
+	 * @param returnValueConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
 	 * return value shall be performed or not.
@@ -82,6 +83,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
+				Collections.<MetaConstraint<?>>emptySet(),
 				groupConversions,
 				isCascading,
 				requiresUnwrapping
@@ -100,6 +102,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param crossParameterConstraints the cross parameter constraints
 	 * @param returnValueConstraints The return value constraints of the represented executable, if
 	 * any.
+	 * @param typeArgumentsConstraints The return value constraints of the represented executable, if
+	 * any.
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
 	 * return value shall be performed or not.
@@ -112,6 +116,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
+			Set<MetaConstraint<?>> typeArgumentsConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
 			boolean isCascading,
 			boolean requiresUnwrapping) {
@@ -137,6 +142,9 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			);
 		}
 
+		this.typeArgumentsConstraints = typeArgumentsConstraints != null ? Collections.unmodifiableSet(
+				typeArgumentsConstraints
+		) : Collections.<MetaConstraint<?>>emptySet();
 		this.crossParameterConstraints = crossParameterConstraints;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
@@ -220,6 +228,10 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		return executable;
 	}
 
+	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
+		return this.typeArgumentsConstraints;
+	}
+
 	@Override
 	public String toString() {
 		return "ConstrainedExecutable [location=" + getLocation()
@@ -290,6 +302,9 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedReturnValueConstraints = newHashSet( constraints );
 		mergedReturnValueConstraints.addAll( other.constraints );
 
+		Set<MetaConstraint<?>> mergedTypeArgumentsConstraints = newHashSet( typeArgumentsConstraints );
+		mergedTypeArgumentsConstraints.addAll( other.typeArgumentsConstraints );
+
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );
 
@@ -299,6 +314,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				mergedParameterMetaData,
 				mergedCrossParameterConstraints,
 				mergedReturnValueConstraints,
+				mergedTypeArgumentsConstraints,
 				mergedGroupConversions,
 				isCascading || other.isCascading,
 				requiresUnwrapping || other.requiresUnwrapping

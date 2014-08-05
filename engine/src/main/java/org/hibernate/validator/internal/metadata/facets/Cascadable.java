@@ -21,6 +21,8 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
  * of a Java bean, the arguments passed to an executable or the value returned
@@ -67,4 +69,12 @@ public interface Cascadable {
 	 * @return The kind of this cascadable.
 	 */
 	ElementKind getKind();
+
+	/**
+	 * Returns the type arguments constraints for this cascadable.
+	 *
+	 * @return the type arguments constraints for this cascadable, or an empty set if no constrained type arguments are
+	 * found
+	 */
+	Set<MetaConstraint<?>> getTypeArgumentsConstraints();
 }

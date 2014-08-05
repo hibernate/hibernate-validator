@@ -91,6 +91,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
+			Set<MetaConstraint<?>> typeArgumentsConstraints,
 			Map<Class<?>, Class<?>> returnValueGroupConversions,
 			boolean isCascading,
 			boolean isConstrained,
@@ -113,6 +114,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,
 				returnValueConstraints,
+				typeArgumentsConstraints,
 				isCascading,
 				returnValueGroupConversions,
 				requiresUnwrapping
@@ -286,6 +288,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		private final ExecutableElement executable;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
+		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 		private boolean isConstrained = false;
 
 		/**
@@ -340,6 +343,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
+			typeArgumentsConstraints.addAll( constrainedExecutable.getTypeArgumentsConstraints() );
 
 			addToExecutablesByDeclaringType( constrainedExecutable );
 		}
@@ -376,6 +380,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
+					typeArgumentsConstraints,
 					getGroupConversions(),
 					isCascading(),
 					isConstrained,

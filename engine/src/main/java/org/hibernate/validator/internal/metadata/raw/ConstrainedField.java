@@ -16,6 +16,7 @@
 */
 package org.hibernate.validator.internal.metadata.raw;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -30,12 +31,15 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
  */
 public class ConstrainedField extends AbstractConstrainedElement {
 
+	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+
 	/**
 	 * Creates a new field meta data object.
 	 *
 	 * @param source The source of meta data.
 	 * @param location The location of the represented field.
 	 * @param constraints The constraints of the represented field, if any.
+	 * @param typeArgumentsConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented field, if any.
 	 * @param isCascading Whether a cascaded validation of the represented field shall
 	 * be performed or not.
@@ -44,11 +48,20 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	public ConstrainedField(ConfigurationSource source,
 							ConstraintLocation location,
 							Set<MetaConstraint<?>> constraints,
+							Set<MetaConstraint<?>> typeArgumentsConstraints,
 							Map<Class<?>, Class<?>> groupConversions,
 							boolean isCascading,
 							boolean requiresUnwrapping) {
 
 		super( source, ConstrainedElementKind.FIELD, location, constraints, groupConversions, isCascading, requiresUnwrapping );
+
+		this.typeArgumentsConstraints = typeArgumentsConstraints != null ? Collections.unmodifiableSet(
+				typeArgumentsConstraints
+		) : Collections.<MetaConstraint<?>>emptySet();
+	}
+
+	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
+		return this.typeArgumentsConstraints;
 	}
 
 	@Override

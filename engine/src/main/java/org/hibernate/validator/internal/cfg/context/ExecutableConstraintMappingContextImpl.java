@@ -130,12 +130,14 @@ class ExecutableConstraintMappingContextImpl
 	}
 
 	public ConstrainedElement build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedExecutable(
 				ConfigurationSource.API,
 				ConstraintLocation.forReturnValue( executable ),
 				getParameters( constraintHelper, parameterNameProvider ),
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
+				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
 				returnValueContext != null ? returnValueContext.isCascading() : false,
 				returnValueContext != null ? returnValueContext.isUnwrapValidatedValue() : false

@@ -19,6 +19,7 @@ package org.hibernate.validator.internal.xml;
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,10 +75,12 @@ class ConstrainedFieldBuilder {
 					defaultPackage
 			);
 
+			// TODO HV-919 Support specification of type parameter constraints via XML and API
 			ConstrainedField constrainedField = new ConstrainedField(
 					ConfigurationSource.XML,
 					constraintLocation,
 					metaConstraints,
+					Collections.<MetaConstraint<?>>emptySet(),
 					groupConversions,
 					fieldType.getValid() != null,
 					false

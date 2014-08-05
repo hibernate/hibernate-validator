@@ -17,6 +17,7 @@
 package org.hibernate.validator.internal.xml;
 
 import java.lang.annotation.ElementType;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,6 +83,7 @@ class ConstrainedParameterBuilder {
 				);
 			}
 
+			// TODO HV-919 Support specification of type parameter constraints via XML and API
 			ConstrainedParameter constrainedParameter = new ConstrainedParameter(
 					ConfigurationSource.XML,
 					constraintLocation,
@@ -89,6 +91,7 @@ class ConstrainedParameterBuilder {
 					i,
 					parameterNames.get( i ),
 					metaConstraints,
+					Collections.<MetaConstraint<?>>emptySet(),
 					groupConversions,
 					parameterType.getValid() != null,
 					false
