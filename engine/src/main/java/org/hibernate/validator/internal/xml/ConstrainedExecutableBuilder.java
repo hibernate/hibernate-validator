@@ -20,6 +20,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -227,12 +228,14 @@ class ConstrainedExecutableBuilder {
 				annotationProcessingOptions
 		);
 
+		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedExecutable(
 				ConfigurationSource.XML,
 				ConstraintLocation.forReturnValue( executableElement ),
 				parameterMetaData,
 				crossParameterConstraints,
 				returnValueConstraints,
+				Collections.<MetaConstraint<?>>emptySet(),
 				groupConversions,
 				isCascaded,
 				false

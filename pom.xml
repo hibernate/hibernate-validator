@@ -268,7 +268,7 @@
                 <configuration>
                     <rules>
                         <requireJavaVersion>
-                            <version>[1.8,)</version>
+                            <version>[1.8.0-20,)</version>
                         </requireJavaVersion>
                         <requireMavenVersion>
                             <version>3.0.3</version>
@@ -307,6 +307,8 @@
                     <configuration>
                         <source>1.6</source>
                         <target>1.6</target>
+                        <testSource>1.8</testSource>
+                        <testTarget>1.8</testTarget>
                         <testCompilerArgument>-parameters</testCompilerArgument>
                     </configuration>
                 </plugin>
@@ -320,8 +322,9 @@
                         <failsOnError>true</failsOnError>
                         <violationSeverity>error</violationSeverity>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <!-- These classes are imported from other sources and are not re-formatted-->
-                        <excludes>**/ConcurrentReferenceHashMap.java,**/TypeHelper*.java</excludes>
+                        <!-- These classes are imported from other sources and are not re-formatted.
+                        The tests use Java 8 type annotation syntax which is not supported yet by CheckStyle-->
+                        <excludes>**/ConcurrentReferenceHashMap.java,**/TypeHelper*.java,**/TypeAnnotationAwareMetaDataProviderTest.java,**/TypeUseValidationTest.java</excludes>
                     </configuration>
                     <executions>
                         <execution>

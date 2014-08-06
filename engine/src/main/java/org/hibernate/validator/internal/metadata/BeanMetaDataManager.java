@@ -28,11 +28,13 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.Version;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
@@ -121,11 +123,21 @@ public class BeanMetaDataManager {
 
 
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders();
-		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
-				constraintHelper,
-				parameterNameProvider,
-				annotationProcessingOptions
-		);
+		AnnotationMetaDataProvider defaultProvider = null;
+		if ( Version.getJavaRelease() >= 8 ) {
+			defaultProvider = new TypeAnnotationAwareMetaDataProvider(
+					constraintHelper,
+					parameterNameProvider,
+					annotationProcessingOptions
+			);
+		}
+		else {
+			defaultProvider = new AnnotationMetaDataProvider(
+					constraintHelper,
+					parameterNameProvider,
+					annotationProcessingOptions
+			);
+		}
 		this.metaDataProviders.add( defaultProvider );
 	}
 

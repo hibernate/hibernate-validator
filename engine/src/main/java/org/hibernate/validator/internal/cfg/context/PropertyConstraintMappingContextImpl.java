@@ -20,12 +20,14 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.util.Collections;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -100,11 +102,13 @@ final class PropertyConstraintMappingContextImpl
 	}
 
 	ConstrainedElement build(ConstraintHelper constraintHelper) {
+		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		if ( member instanceof Field ) {
 			return new ConstrainedField(
 					ConfigurationSource.API,
 					ConstraintLocation.forProperty( member ),
 					getConstraints( constraintHelper ),
+					Collections.<MetaConstraint<?>>emptySet(),
 					groupConversions,
 					isCascading,
 					isUnwrapValidatedValue()

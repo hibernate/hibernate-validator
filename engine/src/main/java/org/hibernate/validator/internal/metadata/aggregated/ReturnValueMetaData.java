@@ -46,8 +46,14 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	private final List<Cascadable> cascadables;
 	private final GroupConversionHelper groupConversionHelper;
 
+	/**
+	 * Type arguments constraints for this return value
+	 */
+	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+
 	public ReturnValueMetaData(Type type,
 							   Set<MetaConstraint<?>> constraints,
+							   Set<MetaConstraint<?>> typeArgumentsConstraints,
 							   boolean isCascading,
 							   Map<Class<?>, Class<?>> groupConversions,
 							   boolean requiresUnwrapping) {
@@ -61,6 +67,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				requiresUnwrapping
 		);
 
+		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
 		this.cascadables = Collections.unmodifiableList( isCascading ? Arrays.asList( this ) : Collections.<Cascadable>emptyList() );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
@@ -84,6 +91,11 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	@Override
 	public ElementType getElementType() {
 		return ElementType.METHOD;
+	}
+
+	@Override
+	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
+		return this.typeArgumentsConstraints;
 	}
 
 	@Override

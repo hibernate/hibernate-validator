@@ -16,6 +16,7 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
+import java.util.Collections;
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -25,6 +26,7 @@ import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -95,6 +97,7 @@ final class ParameterConstraintMappingContextImpl
 	}
 
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedParameter(
 				ConfigurationSource.API,
 				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex ),
@@ -102,6 +105,7 @@ final class ParameterConstraintMappingContextImpl
 				parameterIndex,
 				executableContext.getExecutable().getParameterNames( parameterNameProvider ).get( parameterIndex ),
 				getConstraints( constraintHelper ),
+				Collections.<MetaConstraint<?>>emptySet(),
 				groupConversions,
 				isCascading,
 				isUnwrapValidatedValue()
