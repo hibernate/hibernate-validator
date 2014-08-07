@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.validation.MessageInterpolator;
@@ -111,10 +112,10 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 */
 	private final boolean cachingEnabled;
 
-	private static final Pattern LEFT_BRACE = Pattern.compile("\\{");
-	private static final Pattern RIGHT_BRACE = Pattern.compile("\\}");
-	private static final Pattern SLASH = Pattern.compile("\\\\");
-	private static final Pattern DOLLAR = Pattern.compile("\\$");
+	private static final Pattern LEFT_BRACE = Pattern.compile("\\{", Pattern.LITERAL);
+	private static final Pattern RIGHT_BRACE = Pattern.compile("\\}", Pattern.LITERAL);
+	private static final Pattern SLASH = Pattern.compile("\\\\", Pattern.LITERAL);
+	private static final Pattern DOLLAR = Pattern.compile("\\$", Pattern.LITERAL);
 
 	public AbstractMessageInterpolator() {
 		this( null );
@@ -307,8 +308,8 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	private String replaceEscapedLiterals(String resolvedMessage) {
 		resolvedMessage = LEFT_BRACE.matcher(resolvedMessage).replaceAll("{");
 		resolvedMessage = RIGHT_BRACE.matcher(resolvedMessage).replaceAll("}");
-		resolvedMessage = SLASH.matcher(resolvedMessage).replaceAll("\\");
-		resolvedMessage = DOLLAR.matcher(resolvedMessage).replaceAll("$");
+		resolvedMessage = SLASH.matcher(resolvedMessage).replaceAll(Matcher.quoteReplacement("\\"));
+		resolvedMessage = DOLLAR.matcher(resolvedMessage).replaceAll(Matcher.quoteReplacement("$"));
 		return resolvedMessage;
 	}
 
