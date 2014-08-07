@@ -81,4 +81,17 @@ public class TypeNames {
 		public static final String READABLE_PARTIAL = ORG_JODA_TIME + ".ReadablePartial";
 		public static final String READABLE_INSTANT = ORG_JODA_TIME + ".ReadableInstant";
 	}
+
+	public static class Java8DateTime {
+
+		private static final String JAVA_TIME = "java.time";
+
+		public static final String CHRONO_LOCAL_DATE = JAVA_TIME + ".chrono.ChronoLocalDate";
+		public static final String CHRONO_LOCAL_DATE_TIME = JAVA_TIME + ".chrono.ChronoLocalDateTime";
+		public static final String CHRONO_ZONED_DATE_TIME = JAVA_TIME + ".chrono.ChronoZonedDateTime";
+		public static final String OFFSET_DATE_TIME = JAVA_TIME + ".OffsetDateTime";
+		public static final String INSTANT = JAVA_TIME + ".Instant";
+		public static final String YEAR = JAVA_TIME + ".Year";
+		public static final String YEAR_MONTH = JAVA_TIME + ".YearMonth";
+	}
 }

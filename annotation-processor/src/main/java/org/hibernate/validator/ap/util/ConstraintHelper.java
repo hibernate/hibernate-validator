@@ -38,6 +38,7 @@ import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
 import org.hibernate.validator.ap.util.TypeNames.HibernateValidatorTypes;
+import org.hibernate.validator.ap.util.TypeNames.Java8DateTime;
 import org.hibernate.validator.ap.util.TypeNames.JodaTypes;
 
 /**
@@ -169,6 +170,16 @@ public class ConstraintHelper {
 				JodaTypes.READABLE_PARTIAL,
 				JodaTypes.READABLE_INSTANT
 		);
+		registerAllowedTypesForBuiltInConstraint(
+				BeanValidationTypes.FUTURE,
+				Java8DateTime.CHRONO_LOCAL_DATE,
+				Java8DateTime.CHRONO_LOCAL_DATE_TIME,
+				Java8DateTime.CHRONO_ZONED_DATE_TIME,
+				Java8DateTime.OFFSET_DATE_TIME,
+				Java8DateTime.INSTANT,
+				Java8DateTime.YEAR,
+				Java8DateTime.YEAR_MONTH
+		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_NULL, Object.class );
@@ -178,6 +189,16 @@ public class ConstraintHelper {
 				BeanValidationTypes.PAST,
 				JodaTypes.READABLE_PARTIAL,
 				JodaTypes.READABLE_INSTANT
+		);
+		registerAllowedTypesForBuiltInConstraint(
+				BeanValidationTypes.PAST,
+				Java8DateTime.CHRONO_LOCAL_DATE,
+				Java8DateTime.CHRONO_LOCAL_DATE_TIME,
+				Java8DateTime.CHRONO_ZONED_DATE_TIME,
+				Java8DateTime.OFFSET_DATE_TIME,
+				Java8DateTime.INSTANT,
+				Java8DateTime.YEAR,
+				Java8DateTime.YEAR_MONTH
 		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PATTERN, String.class );
 		registerAllowedTypesForBuiltInConstraint(
