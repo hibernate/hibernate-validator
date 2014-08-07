@@ -18,6 +18,7 @@ package org.hibernate.validator.ap.testutil;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,6 +41,7 @@ import org.hibernate.validator.ap.util.Configuration;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * Infrastructure for unit tests based on the Java Compiler API.
@@ -78,21 +80,25 @@ public class CompilerTestHelper {
 
 	private final String testLibraryDir;
 
+	private static final File BASE_DIR;
+	private static final File TARGET_DIR;
+	private static final File PROCESSOR_OUT_DIR;
+
+	static {
+		TARGET_DIR = getTargetDir();
+		BASE_DIR = TARGET_DIR.getParentFile();
+		PROCESSOR_OUT_DIR = new File( TARGET_DIR, "processor-generated-test-classes" );
+		if ( !PROCESSOR_OUT_DIR.exists() ) {
+			if ( !PROCESSOR_OUT_DIR.mkdirs() ) {
+				fail( "Unable to create test output directory " + PROCESSOR_OUT_DIR.toString() );
+			}
+		}
+	}
+
 	public CompilerTestHelper(JavaCompiler compiler) {
-
 		this.compiler = compiler;
-
-		String basePath;
-
-		try {
-			basePath = new File( "." ).getCanonicalPath();
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException( e );
-		}
-
-		this.sourceBaseDir = basePath + "/src/test/java";
-		this.testLibraryDir = basePath + "/target/test-dependencies";
+		this.sourceBaseDir = BASE_DIR.getAbsolutePath() + "/src/test/java";
+		this.testLibraryDir = TARGET_DIR.getAbsolutePath() + "/test-dependencies";
 	}
 
 	/**
@@ -103,19 +109,16 @@ public class CompilerTestHelper {
 	 * @return A file with the source of the given class.
 	 */
 	public File getSourceFile(Class<?> clazz) {
-
-		String sourceFileName =
-				File.separator + clazz.getName().replace( ".", File.separator ) + ".java";
-
+		String sourceFileName = File.separator + clazz.getName().replace( ".", File.separator ) + ".java";
 		return new File( sourceBaseDir + sourceFileName );
 	}
 
 	/**
 	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
 	 */
-	public boolean compile(
-			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, File... sourceFiles) {
-
+	public boolean compile(Processor annotationProcessor,
+						   DiagnosticCollector<JavaFileObject> diagnostics,
+						   File... sourceFiles) {
 		return compile(
 				annotationProcessor,
 				diagnostics,
@@ -130,26 +133,11 @@ public class CompilerTestHelper {
 	/**
 	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
 	 */
-	public boolean compile(
-			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, File... sourceFiles) {
-
-		return compile(
-				annotationProcessor,
-				diagnostics,
-				diagnosticKind,
-				null,
-				null,
-				EnumSet.allOf( Library.class ),
-				sourceFiles
-		);
-	}
-
-	/**
-	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
-	 */
-	public boolean compile(
-			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, boolean verbose, boolean allowMethodConstraints, File... sourceFiles) {
-
+	public boolean compile(Processor annotationProcessor,
+						   DiagnosticCollector<JavaFileObject> diagnostics,
+						   boolean verbose,
+						   boolean allowMethodConstraints,
+						   File... sourceFiles) {
 		return compile(
 				annotationProcessor,
 				diagnostics,
@@ -164,9 +152,10 @@ public class CompilerTestHelper {
 	/**
 	 * @see CompilerTestHelper#compile(Processor, DiagnosticCollector, Kind, Boolean, Boolean, EnumSet, File...)
 	 */
-	public boolean compile(
-			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, EnumSet<Library> dependencies, File... sourceFiles) {
-
+	public boolean compile(Processor annotationProcessor,
+						   DiagnosticCollector<JavaFileObject> diagnostics,
+						   EnumSet<Library> dependencies,
+						   File... sourceFiles) {
 		return compile( annotationProcessor, diagnostics, null, null, null, dependencies, sourceFiles );
 	}
 
@@ -187,17 +176,16 @@ public class CompilerTestHelper {
 	 *         in especially, that the given annotation processor didn't raise
 	 *         any errors), false otherwise.
 	 */
-	public boolean compile(
-			Processor annotationProcessor, DiagnosticCollector<JavaFileObject> diagnostics, Kind diagnosticKind, Boolean verbose, Boolean allowMethodConstraints, EnumSet<Library> dependencies, File... sourceFiles) {
-
-		StandardJavaFileManager fileManager =
-				compiler.getStandardFileManager( null, null, null );
-
+	public boolean compile(Processor annotationProcessor,
+						   DiagnosticCollector<JavaFileObject> diagnostics,
+						   Kind diagnosticKind,
+						   Boolean verbose,
+						   Boolean allowMethodConstraints,
+						   EnumSet<Library> dependencies,
+						   File... sourceFiles) {
+		StandardJavaFileManager fileManager = compiler.getStandardFileManager( null, null, null );
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjects( sourceFiles );
-
 		List<String> options = new ArrayList<String>();
-
-		options.addAll( Arrays.asList( "-d", "target" ) );
 
 		if ( diagnosticKind != null ) {
 			options.add( String.format( "-A%s=%s", Configuration.DIAGNOSTIC_KIND_PROCESSOR_OPTION, diagnosticKind ) );
@@ -219,7 +207,7 @@ public class CompilerTestHelper {
 
 		try {
 			fileManager.setLocation( StandardLocation.CLASS_PATH, getDependenciesAsFiles( dependencies ) );
-			fileManager.setLocation( StandardLocation.CLASS_OUTPUT, Arrays.asList( new File( "target" ) ) );
+			fileManager.setLocation( StandardLocation.CLASS_OUTPUT, Arrays.asList( PROCESSOR_OUT_DIR ) );
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException( e );
@@ -246,12 +234,10 @@ public class CompilerTestHelper {
 	 * @param expectations The expectations to compare against.
 	 */
 	public static void assertThatDiagnosticsMatch(DiagnosticCollector<JavaFileObject> diagnostics, DiagnosticExpectation... expectations) {
-
 		assertEquals( asExpectations( diagnostics.getDiagnostics() ), CollectionHelper.asSet( expectations ) );
 	}
 
 	private static Set<DiagnosticExpectation> asExpectations(Collection<Diagnostic<? extends JavaFileObject>> diagnosticsList) {
-
 		Set<DiagnosticExpectation> theValue = CollectionHelper.newHashSet();
 
 		for ( Diagnostic<? extends JavaFileObject> diagnostic : diagnosticsList ) {
@@ -262,7 +248,6 @@ public class CompilerTestHelper {
 	}
 
 	private Set<File> getDependenciesAsFiles(EnumSet<Library> dependencies) {
-
 		Set<File> files = new HashSet<File>();
 
 		for ( Library oneDependency : dependencies ) {
@@ -270,5 +255,28 @@ public class CompilerTestHelper {
 		}
 
 		return files;
+	}
+
+	/**
+	 * Returns the target directory of the build.
+	 *
+	 * @return the target directory of the build
+	 */
+	public static File getTargetDir() {
+		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+		// get a URL reference to something we now is part of the classpath (our own classes)
+		String currentTestClass = CompilerTestHelper.class.getName();
+		// this is the test-classes dir
+		int hopsToCompileDirectory = currentTestClass.split( "\\." ).length;
+		// one more 'hop' to reach the target directory
+		int hopsToTargetDirectory = hopsToCompileDirectory + 1;
+
+		URL classURL = contextClassLoader.getResource( currentTestClass.replace( '.', '/' ) + ".class" );
+		File targetDir = new File( classURL.getFile() );
+		// navigate back to '/target'
+		for ( int i = 0; i < hopsToTargetDirectory; i++ ) {
+			targetDir = targetDir.getParentFile();
+		}
+		return targetDir;
 	}
 }
