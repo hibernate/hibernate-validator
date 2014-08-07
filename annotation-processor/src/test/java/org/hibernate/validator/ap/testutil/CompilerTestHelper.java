@@ -219,6 +219,7 @@ public class CompilerTestHelper {
 
 		try {
 			fileManager.setLocation( StandardLocation.CLASS_PATH, getDependenciesAsFiles( dependencies ) );
+			fileManager.setLocation( StandardLocation.CLASS_OUTPUT, Arrays.asList( new File( "target" ) ) );
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException( e );
