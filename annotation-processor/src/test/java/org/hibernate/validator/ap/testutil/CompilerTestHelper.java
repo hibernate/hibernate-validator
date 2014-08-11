@@ -18,7 +18,6 @@ package org.hibernate.validator.ap.testutil;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,6 +25,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.annotation.processing.Processor;
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
@@ -263,20 +263,8 @@ public class CompilerTestHelper {
 	 * @return the target directory of the build
 	 */
 	public static File getTargetDir() {
-		ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-		// get a URL reference to something we now is part of the classpath (our own classes)
-		String currentTestClass = CompilerTestHelper.class.getName();
-		// this is the test-classes dir
-		int hopsToCompileDirectory = currentTestClass.split( "\\." ).length;
-		// one more 'hop' to reach the target directory
-		int hopsToTargetDirectory = hopsToCompileDirectory + 1;
-
-		URL classURL = contextClassLoader.getResource( currentTestClass.replace( '.', '/' ) + ".class" );
-		File targetDir = new File( classURL.getFile() );
-		// navigate back to '/target'
-		for ( int i = 0; i < hopsToTargetDirectory; i++ ) {
-			targetDir = targetDir.getParentFile();
-		}
-		return targetDir;
+		// target/test-classes
+		String targetClassesDir = CompilerTestHelper.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+		return new File ( targetClassesDir ).getParentFile();
 	}
 }
