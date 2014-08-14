@@ -54,6 +54,7 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.CachingTraversableResolverForSingleValidation;
+import org.hibernate.validator.internal.engine.valuehandling.ValidatedValueHandlersManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ConstraintMetaData;
@@ -69,16 +70,12 @@ import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Referenc
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
-
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.TypeResolver;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -144,14 +141,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private final boolean failFast;
 
 	/**
-	 * Used for resolving generic type information.
+	 * Keeps track of handlers to be applied prior to validation when validating elements.
 	 */
-	private final TypeResolutionHelper typeResolutionHelper;
-
-	/**
-	 * Contains handlers to be applied prior to validation when validating elements.
-	 */
-	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
+	private final ValidatedValueHandlersManager validatedValueHandlersManager;
 
 	/**
 	 * Keeps an accessible version for each non-accessible member whose value needs to be accessed during validation.
@@ -163,8 +155,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						 TraversableResolver traversableResolver,
 						 BeanMetaDataManager beanMetaDataManager,
 						 ParameterNameProvider parameterNameProvider,
-						 TypeResolutionHelper typeResolutionHelper,
-						 List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
+						 ValidatedValueHandlersManager validatedValueHandlersManager,
 						 ConstraintValidatorManager constraintValidatorManager,
 						 boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -172,8 +163,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.parameterNameProvider = parameterNameProvider;
-		this.typeResolutionHelper = typeResolutionHelper;
-		this.validatedValueHandlers = validatedValueHandlers;
+		this.validatedValueHandlersManager = validatedValueHandlersManager;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
 
@@ -1490,37 +1480,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return context.isFailFastModeEnabled() && !context.getFailingConstraints().isEmpty();
 	}
 
-	/**
-	 * Returns the first validated value handler found which supports the given type.
-	 * <p>
-	 * If required this could be enhanced to search for the most-specific handler and raise an exception in case more
-	 * than one matching handler is found (or a scheme of prioritizing handlers to process several handlers in order.
-	 *
-	 * @param type the type to be handled
-	 *
-	 * @return the handler for the given type or {@code null} if no matching handler was found
-	 */
-	private ValidatedValueUnwrapper<?> getValidatedValueHandler(Type type) {
-		TypeResolver typeResolver = typeResolutionHelper.getTypeResolver();
-
-		for ( ValidatedValueUnwrapper<?> handler : validatedValueHandlers ) {
-			ResolvedType handlerType = typeResolver.resolve( handler.getClass() );
-			List<ResolvedType> typeParameters = handlerType.typeParametersFor( ValidatedValueUnwrapper.class );
-
-			if ( TypeHelper.isAssignable( typeParameters.get( 0 ).getErasedType(), type ) ) {
-				return handler;
-			}
-		}
-
-		return null;
-	}
-
 	private <T> void setValidatedValueHandlerToValueContextIfPresent(ValueContext<?, T> valueContext, ConstraintMetaData metaData) {
 		if ( metaData.requiresUnwrapping() ) {
 			@SuppressWarnings("unchecked") //we know the handler matches the value type
-					ValidatedValueUnwrapper<? super T> handler = (ValidatedValueUnwrapper<T>) getValidatedValueHandler(
-					metaData.getType()
-			);
+					ValidatedValueUnwrapper<? super T> handler = (ValidatedValueUnwrapper<T>) validatedValueHandlersManager
+					.getValidatedValueHandler(
+							metaData.getType()
+					);
 
 			if ( handler == null ) {
 				throw log.getNoUnwrapperFoundForTypeException( metaData.getType().toString() );

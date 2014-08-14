@@ -26,6 +26,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.valuehandling.ValidatedValueHandlersManager;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -34,6 +35,7 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.test.internal.util.constraints.NotBlankTypeUse;
 import org.hibernate.validator.test.internal.util.constraints.NotNullTypeUse;
 
@@ -54,7 +56,8 @@ public class TypeAnnotationAwareMetaDataProviderTest extends AnnotationMetaDataP
 		provider = new TypeAnnotationAwareMetaDataProvider(
 				new ConstraintHelper(),
 				new DefaultParameterNameProvider(),
-				new AnnotationProcessingOptionsImpl()
+				new AnnotationProcessingOptionsImpl(),
+				new ValidatedValueHandlersManager( Collections.emptyList(), new TypeResolutionHelper(), false )
 		);
 	}
 

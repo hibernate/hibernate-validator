@@ -20,6 +20,7 @@ import java.util.EnumSet;
 import java.util.List;
 import javax.validation.ParameterNameProvider;
 
+import org.hibernate.validator.internal.engine.valuehandling.ValidatedValueHandlersManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
@@ -102,11 +103,13 @@ public class BeanMetaDataManager {
 	 * @param executableHelper the executable helper
 	 * @param parameterNameProvider the parameter name provider
 	 * @param optionalMetaDataProviders optional meta data provider used on top of the annotation based provider
+	 * @param validatedValueHandlersManager validated value handlers manager
 	 */
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
 							   ExecutableHelper executableHelper,
 							   ParameterNameProvider parameterNameProvider,
-							   List<MetaDataProvider> optionalMetaDataProviders) {
+							   List<MetaDataProvider> optionalMetaDataProviders,
+							   ValidatedValueHandlersManager validatedValueHandlersManager) {
 		this.constraintHelper = constraintHelper;
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
@@ -128,14 +131,16 @@ public class BeanMetaDataManager {
 			defaultProvider = new TypeAnnotationAwareMetaDataProvider(
 					constraintHelper,
 					parameterNameProvider,
-					annotationProcessingOptions
+					annotationProcessingOptions,
+					validatedValueHandlersManager
 			);
 		}
 		else {
 			defaultProvider = new AnnotationMetaDataProvider(
 					constraintHelper,
 					parameterNameProvider,
-					annotationProcessingOptions
+					annotationProcessingOptions,
+					validatedValueHandlersManager
 			);
 		}
 		this.metaDataProviders.add( defaultProvider );

@@ -36,6 +36,7 @@ import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.valuehandling.ValidatedValueHandlersManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
@@ -113,6 +114,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final boolean failFast;
 
 	/**
+	 * Hibernate Validator specific flag to auto unwrap wrapper types by default.
+	 */
+	private final boolean autoUnwrapValidatedValue;
+
+	/**
 	 * Metadata provider for XML configuration.
 	 */
 	private final XmlMetaDataProvider xmlMetaDataProvider;
@@ -153,6 +159,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		Map<String, String> properties = configurationState.getProperties();
 
 		boolean tmpFailFast = false;
+		boolean tmpAutoUnwrapValidatedValue = false;
 		List<ValidatedValueUnwrapper<?>> tmpValidatedValueHandlers = newArrayList( 5 );
 		Set<DefaultConstraintMapping> tmpConstraintMappings = newHashSet();
 
@@ -165,6 +172,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
 
+			tmpAutoUnwrapValidatedValue = hibernateSpecificConfig.getAutoUnwrapValidatedValue();
 			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
 
 		}
@@ -174,6 +182,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				properties, tmpFailFast
 		);
 		this.failFast = tmpFailFast;
+
+		tmpAutoUnwrapValidatedValue = checkPropertiesForAutoUnwrapValidatedValue(
+				properties,
+				tmpAutoUnwrapValidatedValue
+		);
+		this.autoUnwrapValidatedValue = tmpAutoUnwrapValidatedValue;
 
 		tmpValidatedValueHandlers.addAll( getPropertyConfiguredValidatedValueHandlers( properties ) );
 		this.validatedValueHandlers = Collections.unmodifiableList( tmpValidatedValueHandlers );
@@ -189,6 +203,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
+				autoUnwrapValidatedValue,
 				validatedValueHandlers
 		);
 	}
@@ -215,6 +230,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	public boolean isFailFast() {
 		return failFast;
+	}
+
+	public boolean isAutoUnwrapValidatedValue() {
+		return autoUnwrapValidatedValue;
 	}
 
 	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
@@ -248,6 +267,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			TraversableResolver traversableResolver,
 			ParameterNameProvider parameterNameProvider,
 			boolean failFast,
+			boolean autoUnwrapValidatedValue,
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers) {
 
 		// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
@@ -261,13 +281,20 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			}
 		}
 
+		ValidatedValueHandlersManager validatedValueHandlersManager = new ValidatedValueHandlersManager(
+				validatedValueHandlers,
+				typeResolutionHelper,
+				autoUnwrapValidatedValue
+		);
+
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
 			beanMetaDataManager = new BeanMetaDataManager(
 					constraintHelper,
 					executableHelper,
 					parameterNameProvider,
-					buildDataProviders( parameterNameProvider )
+					buildDataProviders( parameterNameProvider ),
+					validatedValueHandlersManager
 			);
 			beanMetaDataManagerMap.put( parameterNameProvider, beanMetaDataManager );
 		}
@@ -281,8 +308,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				beanMetaDataManager,
 				parameterNameProvider,
-				typeResolutionHelper,
-				validatedValueHandlers,
+				validatedValueHandlersManager,
 				constraintValidatorManager,
 				failFast
 		);
@@ -317,6 +343,19 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			failFast = tmpFailFast;
 		}
 		return failFast;
+	}
+
+	private boolean checkPropertiesForAutoUnwrapValidatedValue(Map<String, String> properties, boolean programmaticConfiguredAutoUnwrapValidatedValue) {
+		boolean autoUnwrapValidatedValue = programmaticConfiguredAutoUnwrapValidatedValue;
+		String autoUnwrapValidatedValueProp = properties.get( HibernateValidatorConfiguration.AUTO_UNWRAP_VALIDATED_VALUE );
+		if ( autoUnwrapValidatedValueProp != null ) {
+			boolean tmpAutoUnwrapValidatedValue= Boolean.valueOf( autoUnwrapValidatedValueProp );
+			if ( programmaticConfiguredAutoUnwrapValidatedValue && !tmpAutoUnwrapValidatedValue ) {
+				throw log.getInconsistentAutoUnwrapValidatedValueConfigurationException();
+			}
+			autoUnwrapValidatedValue = tmpAutoUnwrapValidatedValue;
+		}
+		return autoUnwrapValidatedValue;
 	}
 
 	/**

@@ -54,6 +54,17 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	HibernateValidatorContext failFast(boolean failFast);
 
 	/**
+	 * Enable or disable auto validated value unwrapping. When enabled, wrapper types such as {@code Optional} will be
+	 * unwrapped by default without specifying the {@link org.hibernate.validator.valuehandling.UnwrapValidatedValue}
+	 * annotation.
+	 *
+	 * @param autoUnwrapValidatedValue {@code true} to enable, {@code false} to disable
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 */
+	HibernateValidatorContext autoUnwrapValidatedValue(boolean autoUnwrapValidatedValue);
+
+	/**
 	 * Registers the given validated value unwrapper with the bootstrapped validator. When validating an element which
 	 * is of a type supported by the unwrapper and which is annotated with
 	 * {@link org.hibernate.validator.valuehandling.UnwrapValidatedValue}, the unwrapper will be applied to retrieve the

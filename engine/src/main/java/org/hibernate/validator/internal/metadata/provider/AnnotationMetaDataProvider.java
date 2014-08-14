@@ -37,6 +37,7 @@ import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.internal.engine.valuehandling.ValidatedValueHandlersManager;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -90,13 +91,16 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	protected final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
 	protected final AnnotationProcessingOptions annotationProcessingOptions;
 	protected final ParameterNameProvider parameterNameProvider;
+	protected final ValidatedValueHandlersManager validatedValueHandlersManager;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			ParameterNameProvider parameterNameProvider,
-			AnnotationProcessingOptions annotationProcessingOptions) {
+			AnnotationProcessingOptions annotationProcessingOptions,
+			ValidatedValueHandlersManager validatedValueHandlersManager) {
 		this.constraintHelper = constraintHelper;
 		this.parameterNameProvider = parameterNameProvider;
 		this.annotationProcessingOptions = annotationProcessingOptions;
+		this.validatedValueHandlersManager = validatedValueHandlersManager;
 		configuredBeans = new ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>>(
 				DEFAULT_INITIAL_CAPACITY,
 				SOFT,
@@ -675,17 +679,42 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	/**
-	 * Unwrapping should be set to true if the field has constrained type arguments and is not an iterable or a map
-	 * (e.g. {@code Optional<@NotBlank String>})
+	 * Unwrapping should be set to true if any of the following is true:
+	 * <ul>
+	 *     <li>{@code autoUnwrapValidatedValue} is true and the type is a wrapper type.</li>
+	 *     <li>The field has constrained type arguments and is not an iterable or a map
+	 *     (e.g. {@code Optional<@NotBlank String>})</li>
+	 * </ul>
 	 *
 	 * @param clazz the type of the field, return value, or parameter
 	 * @param hasConstrainedTypeArguments if the field, return value, or parameter has constrained type arguments
 	 *
-	 * @return {@code true} if the field has constrained type arguments and is not an iterable or a map, {@code false}
-	 * otherwise
+	 * @return {@code true} if the type should be unwrapped, false otherwise
 	 */
-	protected boolean unwrapBasedOnType(Class<?> clazz, boolean hasConstrainedTypeArguments) {
-		// To be extended by subclasses
+	private boolean unwrapBasedOnType(Class<?> clazz, boolean hasConstrainedTypeArguments) {
+		if ( validatedValueHandlersManager.isAutoUnwrapValidatedValue() && isWrapperType( clazz ) ) {
+			return true;
+		}
+
+		if ( ReflectionHelper.isIterable( clazz ) || ReflectionHelper.isMap( clazz ) ) {
+			return false;
+		}
+
+		if ( hasConstrainedTypeArguments ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns true if {@code clazz} has a registered value unwrapper.
+	 */
+	private boolean isWrapperType(Class<?> clazz) {
+		if ( validatedValueHandlersManager.getValidatedValueHandler( clazz ) != null ) {
+			return true;
+		}
+
 		return false;
 	}
 }

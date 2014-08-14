@@ -651,3 +651,31 @@ public class Person {
 }
 ----
 ====
+
+==== Auto validated value unwrapping
+
+Hibernate Validator can be set to unwrap wrapper types by default, and without having to use the
++@UnwrapValidatedValue+ annotation. This is useful when wrapper types are used extensively as it
+reduces clutter by eliminating the need to specify +@UnwrapValidatedValue+ repeatedly.
+
+<<example-using-auto-unwrap-validated-value>> shows how to set Hibernate Validator to auto unwrap
+validated values.
+
+[[example-using-auto-unwrap-validated-value]]
+.Using auto unwrap validated value
+====
+[source, JAVA]
+----
+Validator validator = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.autoUnwrapValidatedValue( true )
+		.buildValidatorFactory()
+		.getValidator();
+----
+====
+
+Alternatively, the configuration property +hibernate.validator.auto_unwrap_validated_value+ can be
+used to set the property in _META-INF/validation.xml_ (see <<chapter-xml-configuration>>).
+
+Setting +autoUnwrapValidatedValue+ to true will unwrap +Optional+ and JavaFX properties by default,
+in addition to unwrapping types with registered +ValidatedValueUnwrapper+.
