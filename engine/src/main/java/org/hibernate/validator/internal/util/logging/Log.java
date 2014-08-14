@@ -642,4 +642,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 185, value = "Message contains EL expression: %1s, which is unsupported with chosen Interpolator")
 	void getElUnsupported(String expression);
 
+	@Message(id = 186,
+			value = "Inconsistent auto unwrap validated value configuration. Auto unwrap validated value is enabled via programmatic API, but explicitly disabled via properties.")
+	ValidationException getInconsistentAutoUnwrapValidatedValueConfigurationException();
 }

@@ -88,6 +88,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
 	private final Set<DefaultConstraintMapping> programmaticMappings = CollectionHelper.newHashSet();
 	private boolean failFast;
+	private boolean autoUnwrapValidatedValue;
 	private BootstrapConfiguration bootstrapConfiguration;
 
 	public ConfigurationImpl(BootstrapState state) {
@@ -204,6 +205,12 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
+	public final HibernateValidatorConfiguration autoUnwrapValidatedValue(boolean autoUnwrapValidatedValue) {
+		this.autoUnwrapValidatedValue = autoUnwrapValidatedValue;
+		return this;
+	}
+
+	@Override
 	public final ConstraintMapping createConstraintMapping() {
 		return new DefaultConstraintMapping();
 	}
@@ -292,6 +299,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public final boolean getFailFast() {
 		return failFast;
+	}
+
+	public final boolean getAutoUnwrapValidatedValue() {
+		return autoUnwrapValidatedValue;
 	}
 
 	@Override

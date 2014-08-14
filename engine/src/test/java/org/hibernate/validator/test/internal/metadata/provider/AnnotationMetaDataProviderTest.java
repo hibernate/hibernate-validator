@@ -21,6 +21,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.valuehandling.ValidatedValueHandlersManager;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -49,6 +51,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
@@ -72,7 +75,8 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		provider = new AnnotationMetaDataProvider(
 				new ConstraintHelper(),
 				new DefaultParameterNameProvider(),
-				new AnnotationProcessingOptionsImpl()
+				new AnnotationProcessingOptionsImpl(),
+				new ValidatedValueHandlersManager( Collections.emptyList(), new TypeResolutionHelper(), false )
 		);
 	}
 

@@ -43,6 +43,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ParameterNameProvider parameterNameProvider;
 
 	private boolean failFast;
+	private boolean autoUnwrapValidatedValue;
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
@@ -52,6 +53,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		this.parameterNameProvider = validatorFactory.getParameterNameProvider();
 		this.failFast = validatorFactory.isFailFast();
+		this.autoUnwrapValidatedValue = validatorFactory.isAutoUnwrapValidatedValue();
 		this.validatedValueHandlers = new ArrayList<ValidatedValueUnwrapper<?>>(
 				validatorFactory.getValidatedValueHandlers()
 		);
@@ -108,6 +110,13 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext autoUnwrapValidatedValue(boolean autoUnwrapValidatedValue) {
+		this.autoUnwrapValidatedValue = autoUnwrapValidatedValue;
+		return this;
+	}
+
+
+	@Override
 	public HibernateValidatorContext addValidationValueHandler(ValidatedValueUnwrapper<?> handler) {
 		this.validatedValueHandlers.add( handler );
 		return this;
@@ -121,6 +130,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
+				autoUnwrapValidatedValue,
 				validatedValueHandlers
 		);
 	}

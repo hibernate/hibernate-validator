@@ -39,6 +39,12 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	String FAIL_FAST = "hibernate.validator.fail_fast";
 
 	/**
+	 * Property corresponding to the {@link #autoUnwrapValidatedValue} method.
+	 * Accepts {@code true} or {@code false}. Defaults to {@code false}.
+	 */
+	String AUTO_UNWRAP_VALIDATED_VALUE = "hibernate.validator.auto_unwrap_validated_value";
+
+	/**
 	 * Property corresponding to the {@link #addValidatedValueHandler(ValidatedValueUnwrapper)} method. Accepts a String
 	 * with the comma-separated fully-qualified names of one or more {@link ValidatedValueUnwrapper} implementations.
 	 */
@@ -104,6 +110,17 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @return {@code this} following the chaining method pattern
 	 */
 	HibernateValidatorConfiguration failFast(boolean failFast);
+
+	/**
+	 * Enable or disable auto validated value unwrapping. When enabled, wrapper types such as {@code Optional} will be
+	 * unwrapped by default without specifying the {@link org.hibernate.validator.valuehandling.UnwrapValidatedValue}
+	 * annotation.
+	 *
+	 * @param autoUnwrapValidatedValue {@code true} to enable, {@code false} to disable
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 */
+	HibernateValidatorConfiguration autoUnwrapValidatedValue(boolean autoUnwrapValidatedValue);
 
 	/**
 	 * Registers the given validated value unwrapper with the bootstrapped validator factory. When validating an element

@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import javax.validation.ParameterNameProvider;
 
+import org.hibernate.validator.internal.engine.valuehandling.ValidatedValueHandlersManager;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -58,8 +59,9 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 
 	public TypeAnnotationAwareMetaDataProvider(ConstraintHelper constraintHelper,
 											   ParameterNameProvider parameterNameProvider,
-											   AnnotationProcessingOptions annotationProcessingOptions) {
-		super( constraintHelper, parameterNameProvider, annotationProcessingOptions );
+											   AnnotationProcessingOptions annotationProcessingOptions,
+											   ValidatedValueHandlersManager validatedValueHandlersManager) {
+		super( constraintHelper, parameterNameProvider, annotationProcessingOptions, validatedValueHandlersManager );
 	}
 
 	@Override
@@ -172,18 +174,5 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 		}
 
 		return Optional.empty();
-	}
-
-	@Override
-	protected boolean unwrapBasedOnType(Class<?> clazz, boolean hasConstrainedTypeArguments) {
-		if ( ReflectionHelper.isIterable( clazz ) ||  ReflectionHelper.isMap( clazz ) ) {
-			return false;
-		}
-
-		if ( hasConstrainedTypeArguments ) {
-			return true;
-		}
-
-		return false;
 	}
 }
