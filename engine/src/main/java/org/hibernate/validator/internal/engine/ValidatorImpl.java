@@ -100,7 +100,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	/**
 	 * The default group array used in case any of the validate methods is called without a group.
 	 */
-	private static final Collection<Class<?>> DEFAULT_GROUPS = Arrays.asList(new Class<?>[] { Default.class });
+	private static final Collection<Class<?>> DEFAULT_GROUPS = Collections.<Class<?>>singletonList(Default.class);
 
 	/**
 	 * Used to resolve the group execution order for a validate call.
@@ -370,7 +370,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		// if no groups is specified use the default
 		if( groups.length == 0 ) {
 			resultGroups = DEFAULT_GROUPS;
-		} else {
+		} 
+		else {
 			resultGroups = Arrays.asList(groups);
 		}
 		return validationOrderGenerator.getValidationOrder( resultGroups );
