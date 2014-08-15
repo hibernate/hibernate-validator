@@ -519,3 +519,8 @@ factory and thus can be configured using the XML descriptor _META-INF/validation
 When your application is CDI-enabled, the injected objects are CDI-aware as well and e.g. support
 dependency injection in constraint validators.
 
+=== JavaFX
+
+Hibernate Validator provides support for the unwrapping of JavaFX properties. If JavaFX is present
+in the classpath, and the +@UnwrapValidatedValue+ is used, the JavaFX property is unwrapped, and the
+internal value is validated. See <<section-javafx-unwrapper>> for examples and further discussion.
