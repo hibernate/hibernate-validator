@@ -580,6 +580,7 @@ via the configuration property hibernate.validator.validated_value_handlers whic
 configuring the default validator factory using the descriptor _META-INF/validation.xml_ (see
 <<chapter-xml-configuration>>).
 
+[[section-optional-unwrapper]]
 ==== Optional unwrapper
 
 Hibernate Validator provides built-in unwrapping for the +Optional+ introduced in Java 8. The unwrapper is registered
@@ -603,6 +604,7 @@ private Optional<String> name = Optional.of( "Bob" );
 valid, +Optional.empty()+ is similarly valid.
 ====
 
+[[section-javafx-unwrapper]]
 ==== JavaFX unwrapper
 
 Additionally, Hibernate Validator provides built-in unwrapping for JavaFX property values. The unwrapper is registered
