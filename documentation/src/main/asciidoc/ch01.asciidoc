@@ -3,7 +3,7 @@
 
 This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Bean Validation. For the following quick-start you need:
 
-* A JDK >= 8
+* A JDK >= 6
 * http://maven.apache.org/[Apache Maven]
 * An Internet connection (Maven has to download all required libraries)
 
@@ -249,35 +249,36 @@ code.
 
 === Java 8 support
 
-Java 8 introduces several enhancements in annotation processing and reflection, in addition to new
-types and APIs. This section briefly introduces new Java 8 features supported in Hibernate Validator.
-The following features are only available in Hibernate Validator 5.2 and later.
+Java 8 introduces several enhancements which are valuable from a Hibernate Validator point of view.
+This section briefly introduces the Hibernate Validator features based on Java 8.
+They are only available in Hibernate Validator 5.2 and later.
 
 ==== Type arguments constraints
 
-It is now possible in Java 8 to use annotations in any location a type is used. This includes type
-arguments. Hibernate Validator now supports the validation of constraints defined on the type arguments
-of collections, maps, and custom parameterized types. <<type-arguments-constraints>> provides further
-discussion on how to apply and use type arguments constraints.
+In Java 8 it is possible to use annotations in any location a type is used. This includes type
+arguments. Hibernate Validator supports the validation of constraints defined on type arguments
+of collections, maps, and custom parameterized types. The <<type-arguments-constraints>> chapter
+provides further information on how to apply and use type argument constraints.
 
 ==== Actual parameter names
 
-Java 8 Reflection API can retrieve the actual parameter name of a method or a constructor. Hibernate
-Validator uses this ability to report the actual parameter name instead of +arg0+, +arg1+, etc. in
-the violation error message. <<section-parameter-name-provider>> explains how to use the new reflection
+The Java 8 Reflection API can now retrieve the actual parameter names of a method or constructor.
+Hibernate Validator uses this ability to report the actual parameter names instead of +arg0+,
++arg1+, etc. The <<section-parameter-name-provider>> chapter explains how to use the new reflection
 based parameter name provider.
 
 ==== New date/time API
 
 Java 8 introduces a new date/time API. Hibernate Validator provides full support for the new API
-where +@Future+ and +@Past+ constraints can be applied on the new types. <<table-spec-constraints>>
-shows the types supported for +@Future+ and +@Past+, including the types from the new API.
+where +@Future+ and +@Past+ constraints can be applied on the new types. The table
+<<table-spec-constraints>> shows the types supported for +@Future+ and +@Past+, including the types
+from the new API.
 
 ==== Optional type
 
-Hibernate Validator provides built-in support for Java 8 +Optional+. The validator is able to unwrap
-the type and validate the internal value. <<section-optional-unwrapper>> provides examples and further
-discussion.
+Hibernate Validator provides also support for Java 8 +Optional+ type, by unwrapping the `Optional`
+instance and validating the internal value. <<section-optional-unwrapper>> provides examples and a
+further discussion.
 
 [[validator-gettingstarted-whatsnext]]
 === Where to go next?

@@ -134,6 +134,256 @@ recommended to annotate a field _and_ the accompanying getter method as this wou
 to be validated twice.
 ====
 
+[[type-arguments-constraints]]
+==== Type argument constraints
+
+Starting from Java 8, it is possible to specify constraints directly on the type argument of a
+parameterized type. However, this requires that +ElementType.TYPE_USE+ is specified via +@Target+
+in the constraint definition. To maintain backwards compatibility built-in Bean Validation as well as
+Hibernate Validator specific constraints do not yet specify +ElementType.TYPE_USE+. To make use of
+type argument constraints, custom constraints must be used (see <<validator-customconstraints>>).
+
+Hibernate Validator validates type arguments constraints specified on collections, map values,
++java.util.Optional+, and custom parameterized types.
+
+===== With +Iterable+
+
+When applying constraints on an +Iterable+ type argument, Hibernate Validator will validate each
+element. <<example-type-arguments-constraints-collections>> shows an example of a
++List+ with a type argument constraint.
+
+[[example-type-arguments-constraints-collections]]
+.Type argument constraint on +List+
+====
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter02.typeargument;
+
+public class Car {
+
+	@Valid
+	private List<@ValidPart String> parts = new ArrayList<>();
+
+	public void addPart(String part) {
+		parts.add( part );
+	}
+
+	//...
+}
+----
+
+[source, JAVA]
+----
+Car car = Car();
+car.addPart( "Wheel" );
+car.addPart( null );
+
+Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+
+assertEquals( 1, constraintViolations.size() );
+assertEquals(
+		"'null' is not a valid car part.",
+		constraintViolations.iterator().next().getMessage()
+);
+assertEquals( "parts[1]", constraintViolations.iterator().next().getPropertyPath().toString() );
+----
+====
+
+===== With +Map+
+
+Type argument constraints are also validated for map values. Constraints on the key are ignored.
+<<example-type-arguments-constraints-map>> shows an example of a +Map+ value with a type
+argument constraint.
+
+[[example-type-arguments-constraints-map]]
+.Type argument constraint on maps
+====
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter02.typeargument;
+
+public class Car {
+
+	public static enum FuelConsumption {
+		CITY,
+		HIGHWAY
+	}
+
+	@Valid
+	private EnumMap<FuelConsumption, @MaxAllowedFuelConsumption Integer> fuelConsumption = new EnumMap<>( FuelConsumption.class );
+
+	public void setFuelConsumption(FuelConsumption consumption, int value) {
+		fuelConsumption.put( consumption, value );
+	}
+
+    //...
+}
+
+----
+
+[source, JAVA]
+----
+Car car = new Car();
+car.setFuelConsumption( Car.FuelConsumption.HIGHWAY, 20 );
+
+Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+
+assertEquals( 1, constraintViolations.size() );
+assertEquals( "20 is outside the max fuel consumption.", constraintViolations.iterator().next().getMessage() );
+----
+====
+
+
+===== With +java.util.Optional+
+
+When applying a constraint on the type argument of +Optional+, Hibernate Validator will automatically
+unwrap the type and validate the internal value. <<example-type-arguments-constraints-optional>> shows
+an example of an +Optional+ with a type argument constraint.
+
+[[example-type-arguments-constraints-optional]]
+.Type argument constraint on Optional
+====
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter02.typeargument;
+
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Optional;
+import javax.validation.Valid;
+
+public class Car {
+
+	@Valid
+	private Optional<@MinTowingCapacity(1000) Integer> towingCapacity = Optional.empty();
+
+	public void setTowingCapacity(Integer alias) {
+		towingCapacity = Optional.of( alias );
+	}
+
+    //...
+}
+
+----
+
+[source, JAVA]
+----
+Car car = Car();
+car.setTowingCapacity( 100 );
+
+Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+
+assertEquals( 1, constraintViolations.size() );
+assertEquals( "Not enough towing capacity.", constraintViolations.iterator().next().getMessage() );
+assertEquals( "towingCapacity", constraintViolations.iterator().next().getPropertyPath().toString() );
+----
+====
+
+
+===== With custom parameterized types
+
+Type arguments constraints can with two restrictions also be used with custom types. First, a
++ValidatedValueUnwrapper+ must be registered for the custom type allowing to retrieve
+the value to validate (see <<section-value-handling>>). Second, only types with one type arguments
+are supported. Parameterized types with two or more type arguments are not checked for type argument
+constraints. This limitation might change in future versions.
+
+<<example-type-arguments-constraints-custom-parameterized-type>> shows an example of a custom
+parameterized type with a type argument constraint.
+
+[[example-type-arguments-constraints-custom-parameterized-type]]
+.Type argument constraint on custom parameterized type
+====
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter02.typeargument;
+
+public class Car {
+
+	@Valid
+	private GearBox<@MinTorque(100) Gear> gearBox;
+
+	public void setGearBox(GearBox<Gear> gearBox) {
+		this.gearBox = gearBox;
+	}
+
+	//...
+}
+
+----
+
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter02.typeargument;
+
+public class GearBox<T extends Gear> {
+
+	private final T gear;
+
+	public GearBox(T gear) {
+		this.gear = gear;
+	}
+
+	public Gear getGear() {
+		return this.gear;
+	}
+}
+----
+
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter02.typeargument;
+
+public class Gear {
+	private final Integer torque;
+
+	public Gear(Integer torque) {
+		this.torque = torque;
+	}
+
+	public Integer getTorque() {
+		return torque;
+	}
+
+	public static class AcmeGear extends Gear {
+		public AcmeGear() {
+			super( 100 );
+		}
+	}
+}
+----
+
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter02.typeargument;
+
+public class GearBoxUnwrapper extends ValidatedValueUnwrapper<GearBox> {
+	@Override
+	public Object handleValidatedValue(GearBox gearBox) {
+		return gearBox == null ? null : gearBox.getGear();
+	}
+
+	@Override
+	public Type getValidatedValueType(Type valueType) {
+		return Gear.class;
+	}
+}
+----
+
+[source, JAVA]
+----
+Car car = Car();
+car.setGearBox( new GearBox<>( new Gear.AcmeGear() ) );
+
+Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+assertEquals( 1, constraintViolations.size() );
+assertEquals( "Gear is not providing enough torque.", constraintViolations.iterator().next().getMessage() );
+assertEquals( "gearBox", constraintViolations.iterator().next().getPropertyPath().toString() );
+----
+====
+
+
 [[validator-usingvalidator-classlevel]]
 ==== Class-level constraints
 
@@ -303,165 +553,6 @@ public class Car {
 So when validating an instance of the Car class shown in <<example-cascaded-validation-list>>, a
 ConstraintViolation will be created, if any of the Person objects contained in the passengers list
 has a null name.
-
-[[type-arguments-constraints]]
-==== Type arguments constraints
-
-Starting from Java 8, it is possible to specify constraints directly on the type argument of a
-parameterized type. However, this requires that +ElementType.TYPE_USE+ is specified via +@Target+
-in the constraint definition. Due to backwards compatibility reasons the Bean Validation constraints
-and the Hibernate Validator specific ones do not yet specify +ElementType.TYPE_USE+. To make use of
-type arguments constraints, custom constraints must be used for now (see <<validator-customconstraints>>).
-
-Hibernate Validator validates type arguments constraints specified on collections, map values,
-+Optional+, and custom parameterized types.
-
-===== With collections
-
-When applying constraints on an +Iterable+ type argument, Hibernate Validator will iterate through
-and validate each element. <<example-type-arguments-constraints-collections>> shows an example of a
-+List+ with type argument constraint.
-
-[[example-type-arguments-constraints-collections]]
-.Type arguments constraints on collections
-====
-[source, JAVA]
-----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class CountryList {
-	@Valid
-	List<@CustomNotBlank String> cities = Arrays.asList( "First", "", "Third" );
-}
-----
-
-[source, JAVA]
-----
-CountryList country = new CountryList();
-Set<ConstraintViolation<CountryList>> constraintViolations = validator.validate( country );
-assertEquals( 1, constraintViolations.size() );
-assertEquals( "may not be empty", constraintViolations.iterator().next().getMessage() );
-assertEquals( "cities[1]", constraintViolations.iterator().next().getPropertyPath().toString() );
-----
-====
-
-===== With maps
-
-Type arguments constraints are validated for map values. Constraints on the key are ignored by the
-validator. <<example-type-arguments-constraints-map>> shows an example of a +Map+ value with type
-argument constraint.
-
-[[example-type-arguments-constraints-map]]
-.Type arguments constraints on maps
-====
-[source, JAVA]
-----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class CountryMap {
-	@Valid
-	public Map<Integer, @CustomNotBlank String> cities = new HashMap<>();
-}
-----
-
-[source, JAVA]
-----
-CountryMap country = new CountryMap();
-country.cities.put( 100, "First" );
-country.cities.put( 200, "" );
-country.cities.put( 300, "Third" );
-
-Set<ConstraintViolation<CountryMap>> constraintViolations = validator.validate( country );
-assertEquals( 1, constraintViolations.size() );
-assertEquals( "may not be empty", constraintViolations.iterator().next().getMessage() );
-assertEquals( "cities[200]", constraintViolations.iterator().next().getPropertyPath().toString() );
-----
-====
-
-
-===== With Optional
-
-When applying a constraint on the type argument of an +Optional+, Hibernate Validator will automatically
-unwrap the type and validate the internal value. <<example-type-arguments-constraints-optional>> shows
-an example of an +Optional+ with type argument constraint.
-
-[[example-type-arguments-constraints-optional]]
-.Type arguments constraints on Optional
-====
-[source, JAVA]
-----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class CountryOptional {
-	@Valid
-	Optional<@CustomNotBlank String> city = Optional.of( "" );
-}
-----
-
-[source, JAVA]
-----
-Country country = new Country();
-Set<ConstraintViolation<CountryOptional>> constraintViolations = validator.validate( country );
-assertEquals( 1, constraintViolations.size() );
-assertEquals( "may not be empty", constraintViolations.iterator().next().getMessage() );
-assertEquals( "city", constraintViolations.iterator().next().getPropertyPath().toString() );
-----
-====
-
-
-===== With custom parameterized types
-
-There are two restrictions when using type argument constraints on a custom parameterized type.
-First, a +ValidatedValueUnwrapper+ must be provided so that the validator can retrieve the internal
-value (see <<section-value-handling>>). Second, only types with one type arguments are supported.
-A parameterized type with two or more type arguments is not checked for type arguments
-constraints. This limitations might change in future versions.
-
-<<example-type-arguments-constraints-custom-parameterized-type>> shows an example of a custom
-parameterized type with type argument constraint.
-
-[[example-type-arguments-constraints-custom-parameterized-type]]
-.Type arguments constraints on custom parameterized types
-====
-[source, JAVA]
-----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class FooHolder {
-	@Valid
-	Foo<@CustomNotBlank String> foo = new Foo<>( "" );
-}
-----
-
-[source, JAVA]
-----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class Foo<T> {
-	T t;
-
-	public Foo(T t) {
-		this.t = t;
-	}
-
-	T getT() {
-		return t;
-	}
-}
-----
-
-[source, JAVA]
-----
-FooHolder fooHolder = new FooHolder();
-Set<ConstraintViolation<FooHolder>> constraintViolations = validator.validate( fooHolder );
-assertEquals( 1, constraintViolations.size() );
-assertEquals( "may not be empty", constraintViolations.iterator().next().getMessage() );
-assertEquals( "foo", constraintViolations.iterator().next().getPropertyPath().toString() );
-----
-====
-
-In <<example-type-arguments-constraints-custom-parameterized-type>>, a +ValidatedValueUnwrapper+
-would return the value of +T+, allowing the validator to validate the internal value of +Foo+.
 
 [[section-validating-bean-constraints]]
 === Validating bean constraints
@@ -683,9 +774,9 @@ impact portability of your application between Bean Validation providers.
               +fraction+ fractional digits|Defines column precision and scale
 |@Future|java.util.Date,
               java.util.Calendar,
-              java.time.chrono.ChronoLocalDate (including subclasses such as java.time.LocalDate),
-              java.time.chrono.ChronoLocalDateTime (including subclasses such as java.time.LocalDateTime),
-              java.time.chrono.ChronoZonedDateTime (including subclasses such as java.time.ZonedDateTime),
+              java.time.chrono.ChronoLocalDate,
+              java.time.chrono.ChronoLocalDateTime,
+              java.time.chrono.ChronoZonedDateTime,
               java.time.Instant,
               java.time.OffsetDateTime,
               java.time.Year,
@@ -719,9 +810,9 @@ impact portability of your application between Bean Validation providers.
               null|None
 |@Past|java.util.Date,
               java.util.Calendar,
-              java.time.chrono.ChronoLocalDate (including subclasses such as java.time.LocalDate),
-              java.time.chrono.ChronoLocalDateTime (including subclasses such as java.time.LocalDateTime),
-              java.time.chrono.ChronoZonedDateTime (including subclasses such as java.time.ZonedDateTime),
+              java.time.chrono.ChronoLocalDate,
+              java.time.chrono.ChronoLocalDateTime,
+              java.time.chrono.ChronoZonedDateTime,
               java.time.Instant,
               java.time.OffsetDateTime,
               java.time.Year,

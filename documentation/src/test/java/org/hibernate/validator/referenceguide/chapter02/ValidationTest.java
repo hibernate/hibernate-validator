@@ -10,12 +10,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.referenceguide.chapter02.propertylevel.Car;
-import org.hibernate.validator.referenceguide.chapter02.typeargument.CountryList;
-import org.hibernate.validator.referenceguide.chapter02.typeargument.CountryMap;
-import org.hibernate.validator.referenceguide.chapter02.typeargument.CountryOptional;
-import org.hibernate.validator.referenceguide.chapter02.typeargument.FooHolder;
-import org.hibernate.validator.referenceguide.chapter02.typeargument.FooUnwrapper;
+import org.hibernate.validator.referenceguide.chapter02.typeargument.Car;
+import org.hibernate.validator.referenceguide.chapter02.typeargument.GearBoxUnwrapper;
+import org.hibernate.validator.referenceguide.chapter02.typeargument.Gear;
+import org.hibernate.validator.referenceguide.chapter02.typeargument.GearBox;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,15 +23,22 @@ public class ValidationTest {
 
 	@BeforeClass
 	public static void setUpValidator() {
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		ValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.addValidatedValueHandler( new GearBoxUnwrapper() )
+				.buildValidatorFactory();
 		validator = factory.getValidator();
 	}
 
 	@Test
 	public void validate() {
-		Car car = new Car( null, true );
+		org.hibernate.validator.referenceguide.chapter02.propertylevel.Car car = new org.hibernate.validator.referenceguide.chapter02.propertylevel.Car(
+				null,
+				true
+		);
 
-		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+		Set<ConstraintViolation<org.hibernate.validator.referenceguide.chapter02.propertylevel.Car>> constraintViolations = validator
+				.validate( car );
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );
@@ -41,11 +46,15 @@ public class ValidationTest {
 
 	@Test
 	public void validateProperty() {
-		Car car = new Car( null, true );
+		org.hibernate.validator.referenceguide.chapter02.propertylevel.Car car = new org.hibernate.validator.referenceguide.chapter02.propertylevel.Car(
+				null,
+				true
+		);
 
-		Set<ConstraintViolation<Car>> constraintViolations = validator.validateProperty(
-				car,
-				"manufacturer"
+		Set<ConstraintViolation<org.hibernate.validator.referenceguide.chapter02.propertylevel.Car>> constraintViolations = validator
+				.validateProperty(
+						car,
+						"manufacturer"
 		);
 
 		assertEquals( 1, constraintViolations.size() );
@@ -54,10 +63,11 @@ public class ValidationTest {
 
 	@Test
 	public void validateValue() {
-		Set<ConstraintViolation<Car>> constraintViolations = validator.validateValue(
-				Car.class,
-				"manufacturer",
-				null
+		Set<ConstraintViolation<org.hibernate.validator.referenceguide.chapter02.propertylevel.Car>> constraintViolations = validator
+				.validateValue(
+						org.hibernate.validator.referenceguide.chapter02.propertylevel.Car.class,
+						"manufacturer",
+						null
 		);
 
 		assertEquals( 1, constraintViolations.size() );
@@ -66,47 +76,51 @@ public class ValidationTest {
 
 	@Test
 	public void validateListTypeArgumentConstraint() {
-		CountryList country = new CountryList();
-		Set<ConstraintViolation<CountryList>> constraintViolations = validator.validate( country );
+		Car car = new Car();
+		car.addPart( "Wheel" );
+		car.addPart( null );
+
+		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+
 		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "may not be empty", constraintViolations.iterator().next().getMessage() );
-		assertEquals( "cities[1]", constraintViolations.iterator().next().getPropertyPath().toString() );
+		assertEquals(
+				"'null' is not a valid car part.",
+				constraintViolations.iterator().next().getMessage()
+		);
+		assertEquals( "parts[1]", constraintViolations.iterator().next().getPropertyPath().toString() );
 	}
 
 	@Test
 	public void validateMapTypeArgumentConstraint() {
-		CountryMap country = new CountryMap();
-		country.cities.put( 100, "First" );
-		country.cities.put( 200, "" );
-		country.cities.put( 300, "Third" );
+		Car car = new Car();
+		car.setFuelConsumption( Car.FuelConsumption.HIGHWAY, 20 );
 
-		Set<ConstraintViolation<CountryMap>> constraintViolations = validator.validate( country );
+		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+
 		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "may not be empty", constraintViolations.iterator().next().getMessage() );
-		assertEquals( "cities[200]", constraintViolations.iterator().next().getPropertyPath().toString() );
+		assertEquals( "20 is outside the max fuel consumption.", constraintViolations.iterator().next().getMessage() );
 	}
 
 	@Test
 	public void validateOptionalTypeArgumentConstraint() {
-		CountryOptional country = new CountryOptional();
-		Set<ConstraintViolation<CountryOptional>> constraintViolations = validator.validate( country );
+		Car car = new Car();
+		car.setTowingCapacity( 100 );
+
+		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
+
 		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "may not be empty", constraintViolations.iterator().next().getMessage() );
-		assertEquals( "city", constraintViolations.iterator().next().getPropertyPath().toString() );
+		assertEquals( "Not enough towing capacity.", constraintViolations.iterator().next().getMessage() );
+		assertEquals( "towingCapacity", constraintViolations.iterator().next().getPropertyPath().toString() );
 	}
 
 	@Test
 	public void validateCustomTypeArgumentConstraint() {
-		ValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
-				.configure()
-				.addValidatedValueHandler( new FooUnwrapper() )
-				.buildValidatorFactory();
-		validator = factory.getValidator();
+		Car car = new Car();
+		car.setGearBox( new GearBox<>( new Gear.AcmeGear() ) );
 
-		FooHolder fooHolder = new FooHolder();
-		Set<ConstraintViolation<FooHolder>> constraintViolations = validator.validate( fooHolder );
+		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
 		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "may not be empty", constraintViolations.iterator().next().getMessage() );
-		assertEquals( "foo", constraintViolations.iterator().next().getPropertyPath().toString() );
+		assertEquals( "Gear is not providing enough torque.", constraintViolations.iterator().next().getMessage() );
+		assertEquals( "gearBox", constraintViolations.iterator().next().getPropertyPath().toString() );
 	}
 }

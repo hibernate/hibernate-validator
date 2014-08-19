@@ -521,6 +521,6 @@ dependency injection in constraint validators.
 
 === JavaFX
 
-Hibernate Validator provides support for the unwrapping of JavaFX properties. If JavaFX is present
-in the classpath, and the +@UnwrapValidatedValue+ is used, the JavaFX property is unwrapped, and the
+Hibernate Validator also provides support for the unwrapping of JavaFX properties. If JavaFX is present
+on the classpath and the +@UnwrapValidatedValue+ is used, the JavaFX property is unwrapped and the
 internal value is validated. See <<section-javafx-unwrapper>> for examples and further discussion.

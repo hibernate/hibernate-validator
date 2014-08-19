@@ -4,14 +4,14 @@ import java.lang.reflect.Type;
 
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
-public class FooUnwrapper extends ValidatedValueUnwrapper<Foo> {
+public class GearBoxUnwrapper extends ValidatedValueUnwrapper<GearBox> {
 	@Override
-	public Object handleValidatedValue(Foo value) {
-		return value.getT();
+	public Object handleValidatedValue(GearBox gearBox) {
+		return gearBox == null ? null : gearBox.getGear();
 	}
 
 	@Override
 	public Type getValidatedValueType(Type valueType) {
-		return String.class;
+		return Gear.class;
 	}
 }
