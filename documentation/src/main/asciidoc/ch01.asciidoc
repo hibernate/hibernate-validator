@@ -3,7 +3,7 @@
 
 This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Bean Validation. For the following quick-start you need:
 
-* A JDK >= 6
+* A JDK >= 8
 * http://maven.apache.org/[Apache Maven]
 * An Internet connection (Maven has to download all required libraries)
 
@@ -246,6 +246,38 @@ If the object validates successfully, validate() returns an empty set as you can
 Note that only classes from the package javax.validation are used. These are provided from the Bean
 Validation API. No classes from Hibernate Validator are directly referenced, resulting in portable
 code.
+
+=== Java 8 support
+
+Java 8 introduces several enhancements in annotation processing and reflection, in addition to new
+types and APIs. This section briefly introduces new Java 8 features supported in Hibernate Validator.
+The following features are only available in Hibernate Validator 5.2 and later.
+
+==== Type arguments constraints
+
+It is now possible in Java 8 to use annotations in any location a type is used. This includes type
+arguments. Hibernate Validator now supports the validation of constraints defined on the type arguments
+of collections, maps, and custom parameterized types. <<type-arguments-constraints>> provides further
+discussion on how to apply and use type arguments constraints.
+
+==== Actual parameter names
+
+Java 8 Reflection API can retrieve the actual parameter name of a method or a constructor. Hibernate
+Validator uses this ability to report the actual parameter name instead of +arg0+, +arg1+, etc. in
+the violation error message. <<section-parameter-name-provider>> explains how to use the new reflection
+based parameter name provider.
+
+==== New date/time API
+
+Java 8 introduces a new date/time API. Hibernate Validator provides full support for the new API
+where +@Future+ and +@Past+ constraints can be applied on the new types. <<table-spec-constraints>>
+shows the types supported for +@Future+ and +@Past+, including the types from the new API.
+
+==== Optional type
+
+Hibernate Validator provides built-in support for Java 8 +Optional+. The validator is able to unwrap
+the type and validate the internal value. <<section-optional-unwrapper>> provides examples and further
+discussion.
 
 [[validator-gettingstarted-whatsnext]]
 === Where to go next?
