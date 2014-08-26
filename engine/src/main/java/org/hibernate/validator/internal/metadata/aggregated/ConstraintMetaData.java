@@ -57,14 +57,14 @@ public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 	/**
 	 * Whether this meta data object is marked for cascaded validation or not.
 	 *
-	 * @return <code>True</code> if this object is marked for cascaded validation, <code>false</code> otherwise.
+	 * @return {@code true}if this object is marked for cascaded validation, {@code false} otherwise.
 	 */
 	boolean isCascading();
 
 	/**
 	 * Whether this meta data object is constrained by any means or not.
 	 *
-	 * @return <code>True</code> if this object is marked for cascaded validation or has any constraints, <code>false</code> otherwise.
+	 * @return {@code true} if this object is marked for cascaded validation or has any constraints, {@code false} otherwise.
 	 */
 	boolean isConstrained();
 
