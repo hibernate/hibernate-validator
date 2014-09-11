@@ -18,15 +18,19 @@ package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion;
 
 /**
  * Check that the {@code java.time.chrono.ChronoZonedDateTime} passed is in the future.
  *
  * @author Khalid Alqinyah
  */
+@IgnoreJavaBaselineVersion
 public class FutureValidatorForChronoZonedDateTime implements ConstraintValidator<Future, ChronoZonedDateTime<?>> {
 
 	@Override

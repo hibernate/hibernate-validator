@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.engine.valuehandling;
 
 import javafx.beans.value.ObservableValue;
 
+import org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
@@ -25,6 +26,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
  *
  * @author Khalid Alqinyah
  */
+@IgnoreJavaBaselineVersion
 public class JavaFXPropertyValueUnwrapper extends TypeResolverBasedValueUnwrapper<ObservableValue<?>> {
 
 	public JavaFXPropertyValueUnwrapper(TypeResolutionHelper typeResolutionHelper) {

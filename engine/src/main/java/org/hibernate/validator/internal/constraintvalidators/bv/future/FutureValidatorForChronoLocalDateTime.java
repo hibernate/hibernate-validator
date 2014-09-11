@@ -18,15 +18,19 @@ package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDateTime;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion;
 
 /**
  * Check that the {@code java.time.chrono.ChronoLocalDateTime} passed is in the future.
  *
  * @author Khalid Alqinyah
  */
+@IgnoreJavaBaselineVersion
 public class FutureValidatorForChronoLocalDateTime implements ConstraintValidator<Future, ChronoLocalDateTime<?>> {
 
 	@Override

@@ -18,15 +18,19 @@ package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
+
+import org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion;
 
 /**
  * Check that the {@code java.time.chrono.ChronoZonedDateTime} passed is in the past.
  *
  * @author Khalid Alqinyah
  */
+@IgnoreJavaBaselineVersion
 public class PastValidatorForChronoZonedDateTime implements ConstraintValidator<Past, ChronoZonedDateTime<?>> {
 
 	@Override

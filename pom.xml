@@ -369,6 +369,9 @@
                             <artifactId>java16</artifactId>
                             <version>1.0</version>
                         </signature>
+                        <annotations>
+                            <annotation>org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion</annotation>
+                        </annotations>
                     </configuration>
                 </plugin>
                 <plugin>
