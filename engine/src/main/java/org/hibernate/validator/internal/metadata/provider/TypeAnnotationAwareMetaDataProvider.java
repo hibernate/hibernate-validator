@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
@@ -37,6 +38,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -52,6 +54,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  *
  * @author Khalid Alqinyah
  */
+@IgnoreJavaBaselineVersion
 public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvider {
 
 	private static final Log log = LoggerFactory.make();

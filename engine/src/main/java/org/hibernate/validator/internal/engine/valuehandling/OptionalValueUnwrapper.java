@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.engine.valuehandling;
 
 import java.util.Optional;
 
+import org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
@@ -26,6 +27,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
  *
  * @author Khalid Alqinyah
  */
+@IgnoreJavaBaselineVersion
 public class OptionalValueUnwrapper extends TypeResolverBasedValueUnwrapper<Optional<?>> {
 
 	public OptionalValueUnwrapper(TypeResolutionHelper typeResolutionHelper) {

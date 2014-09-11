@@ -20,6 +20,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
+import org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion;
 import org.joda.time.ReadablePartial;
 
 /**
@@ -29,11 +30,14 @@ import org.joda.time.ReadablePartial;
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
+@IgnoreJavaBaselineVersion
 public class PastValidatorForReadablePartial implements ConstraintValidator<Past, ReadablePartial> {
 
+	@Override
 	public void initialize(Past constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(ReadablePartial value, ConstraintValidatorContext context) {
 		//null values are valid
 		if ( value == null ) {

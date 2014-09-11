@@ -17,15 +17,19 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
 import java.time.OffsetDateTime;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion;
 
 /**
  * Check that the {@code java.time.OffsetDateTime} passed is in the future.
  *
  * @author Khalid Alqinyah
  */
+@IgnoreJavaBaselineVersion
 public class FutureValidatorForOffsetDateTime implements ConstraintValidator<Future, OffsetDateTime> {
 
 	@Override

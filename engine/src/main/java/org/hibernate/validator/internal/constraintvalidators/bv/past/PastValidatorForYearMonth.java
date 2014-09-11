@@ -17,15 +17,19 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
 import java.time.YearMonth;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
+
+import org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion;
 
 /**
  * Check that the {@code java.time.YearMonth} passed is in the past.
  *
  * @author Khalid Alqinyah
  */
+@IgnoreJavaBaselineVersion
 public class PastValidatorForYearMonth implements ConstraintValidator<Past, YearMonth> {
 
 	@Override

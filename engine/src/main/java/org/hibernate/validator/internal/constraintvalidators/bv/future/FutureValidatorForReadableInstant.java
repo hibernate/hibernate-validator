@@ -20,6 +20,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
+import org.hibernate.validator.internal.util.IgnoreJavaBaselineVersion;
 import org.joda.time.ReadableInstant;
 
 /**
@@ -29,11 +30,14 @@ import org.joda.time.ReadableInstant;
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
+@IgnoreJavaBaselineVersion
 public class FutureValidatorForReadableInstant implements ConstraintValidator<Future, ReadableInstant> {
 
+	@Override
 	public void initialize(Future constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(ReadableInstant value, ConstraintValidatorContext context) {
 		//null values are valid
 		if ( value == null ) {
