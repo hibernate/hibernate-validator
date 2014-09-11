@@ -644,7 +644,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @return An iterator over the value of a cascaded property.
 	 */
 	private Iterator<?> createIteratorForCascadedValue(Type type, Object value, ValueContext<?, ?> valueContext) {
-		Iterator<?> iter = Collections.emptyIterator();
+		Iterator<?> iter = Collections.emptyList().iterator();
 		if ( ReflectionHelper.isIterable( type ) ) {
 			iter = ( (Iterable<?>) value ).iterator();
 			valueContext.markCurrentPropertyAsIterable();
