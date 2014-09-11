@@ -276,6 +276,19 @@
                     </rules>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>check-java-api-signature</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -340,7 +353,16 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>animal-sniffer-maven-plugin</artifactId>
-                    <version>1.9</version>
+                    <version>1.11</version>
+                    <dependencies>
+                        <!-- Enforcing the newest version of ASM in order to make sure AnimalSniffer can be used on JDK 8 -->
+                        <!-- Also see http://jira.codehaus.org/browse/MANIMALSNIFFER-45 -->
+                        <dependency>
+                            <groupId>org.ow2.asm</groupId>
+                            <artifactId>asm-all</artifactId>
+                            <version>5.0.3</version>
+                        </dependency>
+                    </dependencies>
                     <configuration>
                         <signature>
                             <groupId>org.codehaus.mojo.signature</groupId>
