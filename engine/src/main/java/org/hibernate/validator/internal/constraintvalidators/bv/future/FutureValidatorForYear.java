@@ -17,15 +17,19 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
 import java.time.Year;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
+
+import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 
 /**
  * Check that the {@code java.time.Year} passed is in the future.
  *
  * @author Khalid Alqinyah
  */
+@IgnoreJava6Requirement
 public class FutureValidatorForYear implements ConstraintValidator<Future, Year> {
 
 	@Override

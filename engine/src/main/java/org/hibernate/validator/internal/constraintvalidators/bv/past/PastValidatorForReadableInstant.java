@@ -20,6 +20,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
+import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+
 import org.joda.time.ReadableInstant;
 
 /**
@@ -29,11 +31,14 @@ import org.joda.time.ReadableInstant;
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
+@IgnoreJava6Requirement
 public class PastValidatorForReadableInstant implements ConstraintValidator<Past, ReadableInstant> {
 
+	@Override
 	public void initialize(Past constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(ReadableInstant value, ConstraintValidatorContext context) {
 		//null values are valid
 		if ( value == null ) {

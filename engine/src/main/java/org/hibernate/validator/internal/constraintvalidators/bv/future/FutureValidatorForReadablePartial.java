@@ -20,6 +20,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
+import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+
 import org.joda.time.ReadablePartial;
 
 /**
@@ -29,11 +31,14 @@ import org.joda.time.ReadablePartial;
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
+@IgnoreJava6Requirement
 public class FutureValidatorForReadablePartial implements ConstraintValidator<Future, ReadablePartial> {
 
+	@Override
 	public void initialize(Future constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(ReadablePartial value, ConstraintValidatorContext context) {
 		//null values are valid
 		if ( value == null ) {

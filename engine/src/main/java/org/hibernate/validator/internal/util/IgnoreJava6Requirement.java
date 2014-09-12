@@ -14,30 +14,22 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.internal.engine.valuehandling;
+package org.hibernate.validator.internal.util;
 
-import javafx.beans.value.ObservableValue;
-
-import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Unwraps a JavaFX {@code ObservableValue} and returns the wrapped value and type.
+ * Hint to AnimalSniffer to ignore violations.
+ * <p>
+ * Should be applied with great care in general, i.e. you need to make sure that the violating element is only meant to
+ * be run on the Java version it is based on.
  *
- * @author Khalid Alqinyah
+ * @author Gunnar Morling
+ *
  */
-@IgnoreJava6Requirement
-public class JavaFXPropertyValueUnwrapper extends TypeResolverBasedValueUnwrapper<ObservableValue<?>> {
-
-	public JavaFXPropertyValueUnwrapper(TypeResolutionHelper typeResolutionHelper) {
-		super( typeResolutionHelper );
-	}
-
-	@Override
-	public Object handleValidatedValue(ObservableValue<?> value) {
-		if ( value != null ) {
-			return value.getValue();
-		}
-		return value;
-	}
-}
+@Retention(value=RetentionPolicy.CLASS)
+@Target(value={ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.TYPE})
+public @interface IgnoreJava6Requirement {}

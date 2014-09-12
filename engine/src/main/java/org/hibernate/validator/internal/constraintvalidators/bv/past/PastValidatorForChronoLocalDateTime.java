@@ -18,15 +18,19 @@ package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDateTime;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
+
+import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 
 /**
  * Check that the {@code java.time.chrono.ChronoLocalDateTime} passed is in the past.
  *
  * @author Khalid Alqinyah
  */
+@IgnoreJava6Requirement
 public class PastValidatorForChronoLocalDateTime implements ConstraintValidator<Past, ChronoLocalDateTime<?>> {
 
 	@Override
