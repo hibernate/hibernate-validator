@@ -131,4 +131,3 @@ public class MaxValidatorForNumberTest {
                 assertFalse( constraint.isValid( Float.NaN, null ) );
 	}
 }
-

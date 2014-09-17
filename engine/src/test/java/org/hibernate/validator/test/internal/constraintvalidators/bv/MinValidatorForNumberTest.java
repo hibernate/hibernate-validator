@@ -131,4 +131,3 @@ public class MinValidatorForNumberTest {
                 assertFalse( constraint.isValid( Float.NaN, null ) );
 	}
 }
-

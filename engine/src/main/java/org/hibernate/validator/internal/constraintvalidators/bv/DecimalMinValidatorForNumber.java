@@ -89,4 +89,3 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 		return inclusive ? comparisonResult >= 0 : comparisonResult > 0;
 	}
 }
-
