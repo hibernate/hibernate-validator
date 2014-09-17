@@ -28,6 +28,7 @@ import javax.validation.constraints.Max;
  *
  * @author Alaa Nassef
  * @author Hardy Ferentschik
+ * @author Xavier Sosnovsky
  */
 public class MaxValidatorForNumber implements ConstraintValidator<Max, Number> {
 
@@ -42,6 +43,23 @@ public class MaxValidatorForNumber implements ConstraintValidator<Max, Number> {
 		if ( value == null ) {
 			return true;
 		}
+                //handling of NaN, positive infinity and negative infinity
+                else if ( value instanceof Double ) {
+                        if ( (Double) value == Double.NEGATIVE_INFINITY ) {
+                                return true;
+                        }
+                        else if ( Double.isNaN( (Double) value ) || (Double) value == Double.POSITIVE_INFINITY ) {
+                                return false;
+                        }
+                }
+                else if ( value instanceof Float ) {
+                        if ( (Float) value == Float.NEGATIVE_INFINITY ) {
+                                return true;
+                        }
+                        else if ( Float.isNaN( (Float) value ) || (Float) value == Float.POSITIVE_INFINITY ) {
+                                return false;
+                        }
+                }
 		if ( value instanceof BigDecimal ) {
 			return ( ( BigDecimal ) value ).compareTo( BigDecimal.valueOf( maxValue ) ) != 1;
 		}
