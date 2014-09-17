@@ -37,6 +37,7 @@ import static org.testng.Assert.fail;
 /**
  * @author Alaa Nassef
  * @author Hardy Ferentschik
+ * @author Xavier Sosnovsky
  */
 public class MaxValidatorForNumberTest {
 
@@ -82,7 +83,7 @@ public class MaxValidatorForNumberTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-256")
+	@TestForIssue(jiraKey = "HV-256")
 	public void testIsValidDecimalMaxExclusive() {
 		boolean inclusive = false;
 		AnnotationDescriptor<DecimalMax> descriptor = new AnnotationDescriptor<DecimalMax>( DecimalMax.class );
@@ -118,9 +119,15 @@ public class MaxValidatorForNumberTest {
 		assertTrue( constraint.isValid( 10, null ) );
 		assertTrue( constraint.isValid( 14.99, null ) );
 		assertTrue( constraint.isValid( -14.99, null ) );
+		assertTrue( constraint.isValid( Double.NEGATIVE_INFINITY, null ) );
+		assertTrue( constraint.isValid( Float.NEGATIVE_INFINITY, null ) );
 		assertFalse( constraint.isValid( 20, null ) );
 		assertFalse( constraint.isValid( bWrapper, null ) );
 		assertFalse( constraint.isValid( BigDecimal.valueOf( 156000000000.0 ), null ) );
 		assertFalse( constraint.isValid( BigInteger.valueOf( 10000000L ), null ) );
+		assertFalse( constraint.isValid( Double.POSITIVE_INFINITY, null ) );
+		assertFalse( constraint.isValid( Float.POSITIVE_INFINITY, null ) );
+		assertFalse( constraint.isValid( Double.NaN, null ) );
+		assertFalse( constraint.isValid( Float.NaN, null ) );
 	}
 }

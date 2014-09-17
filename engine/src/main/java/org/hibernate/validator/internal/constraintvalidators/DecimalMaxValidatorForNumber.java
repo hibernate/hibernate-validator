@@ -30,6 +30,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * value specified.
  *
  * @author Hardy Ferentschik
+ * @author Xavier Sosnovsky
  */
 public class DecimalMaxValidatorForNumber implements ConstraintValidator<DecimalMax, Number> {
 
@@ -49,9 +50,27 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 	}
 
 	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
-		//null values are valid
+		// null values are valid
 		if ( value == null ) {
 			return true;
+		}
+
+		// handling of NaN, positive infinity and negative infinity
+		else if ( value instanceof Double ) {
+			if ( (Double) value == Double.NEGATIVE_INFINITY ) {
+				return true;
+			}
+			else if ( Double.isNaN( (Double) value ) || (Double) value == Double.POSITIVE_INFINITY ) {
+				return false;
+			}
+		}
+		else if ( value instanceof Float ) {
+			if ( (Float) value == Float.NEGATIVE_INFINITY ) {
+				return true;
+			}
+			else if ( Float.isNaN( (Float) value ) || (Float) value == Float.POSITIVE_INFINITY ) {
+				return false;
+			}
 		}
 
 		int comparisonResult;
