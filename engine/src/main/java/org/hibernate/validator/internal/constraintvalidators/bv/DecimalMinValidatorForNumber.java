@@ -30,6 +30,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * value specified.
  *
  * @author Hardy Ferentschik
+ * @author Xavier Sosnovsky
  */
 public class DecimalMinValidatorForNumber implements ConstraintValidator<DecimalMin, Number> {
 
@@ -54,6 +55,23 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 		if ( value == null ) {
 			return true;
 		}
+                //handling of NaN, positive infinity and negative infinity
+                else if ( value instanceof Double ) {
+                        if ( (Double) value == Double.POSITIVE_INFINITY ) {
+                                return true;
+                        }
+                        else if ( Double.isNaN( (Double) value ) || (Double) value == Double.NEGATIVE_INFINITY ) {
+                                return false;
+                        }
+                }
+                else if ( value instanceof Float ) {
+                        if ( (Float) value == Float.POSITIVE_INFINITY ) {
+                                return true;
+                        }
+                        else if ( Float.isNaN( (Float) value ) || (Float) value == Float.NEGATIVE_INFINITY ) {
+                                return false;
+                        }
+                }
 
 		int comparisonResult;
 		if ( value instanceof BigDecimal ) {
@@ -62,7 +80,7 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 		else if ( value instanceof BigInteger ) {
 			comparisonResult = ( new BigDecimal( (BigInteger) value ) ).compareTo( minValue );
 		}
-		if ( value instanceof Long ) {
+                else if ( value instanceof Long ) {
 			comparisonResult = ( BigDecimal.valueOf( value.longValue() ).compareTo( minValue ) );
 		}
 		else {
@@ -71,3 +89,4 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 		return inclusive ? comparisonResult >= 0 : comparisonResult > 0;
 	}
 }
+

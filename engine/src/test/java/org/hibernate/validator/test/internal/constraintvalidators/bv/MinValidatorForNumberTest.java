@@ -37,6 +37,7 @@ import static org.testng.Assert.fail;
 /**
  * @author Alaa Nassef
  * @author Hardy Ferentschik
+ * @author Xavier Sosnovsky
  */
 public class MinValidatorForNumberTest {
 
@@ -116,11 +117,18 @@ public class MinValidatorForNumberTest {
 		assertTrue( constraint.isValid( 20, null ) );
 		assertTrue( constraint.isValid( BigDecimal.valueOf( 156000000000.0 ), null ) );
 		assertTrue( constraint.isValid( BigInteger.valueOf( 10000000L ), null ) );
+                assertTrue( constraint.isValid( Double.POSITIVE_INFINITY, null) );
+                assertTrue( constraint.isValid( Float.POSITIVE_INFINITY, null) );
 		assertFalse( constraint.isValid( b, null ) );
 		assertFalse( constraint.isValid( BigDecimal.valueOf( -156000000000.0 ), null ) );
 		assertFalse( constraint.isValid( BigInteger.valueOf( -10000000L ), null ) );
 		assertFalse( constraint.isValid( 10, null ) );
 		assertFalse( constraint.isValid( 14.99, null ) );
 		assertFalse( constraint.isValid( -14.99, null ) );
+                assertFalse( constraint.isValid( Double.NEGATIVE_INFINITY, null ) );
+                assertFalse( constraint.isValid( Float.NEGATIVE_INFINITY, null ) );
+                assertFalse( constraint.isValid( Double.NaN, null ) );
+                assertFalse( constraint.isValid( Float.NaN, null ) );
 	}
 }
+
