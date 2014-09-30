@@ -17,6 +17,8 @@
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -29,6 +31,7 @@ import javax.validation.executable.ExecutableValidator;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
@@ -132,6 +135,19 @@ public class OptionalValueUnwrapperTest {
 		assertCorrectConstraintTypes( constraintViolations, Min.class );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-895")
+	public void cascaded_validation_applies_for_elements_of_list_wrapped_in_optional() {
+		Set<ConstraintViolation<Quux>> constraintViolations = validator.validate( new Quux() );
+		assertNumberOfViolations( constraintViolations, 2 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"bar[0].number",
+				"bar[1].number"
+		);
+		assertCorrectConstraintTypes( constraintViolations, Min.class, Min.class );
+	}
+
 	@SuppressWarnings("unused")
 	private class Foo {
 		@Min(value = 5)
@@ -169,8 +185,17 @@ public class OptionalValueUnwrapperTest {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private class Bar {
 		@Min(value = 5)
 		int number = 3;
+	}
+
+	@SuppressWarnings("unused")
+	private class Quux {
+		@Valid
+		public Optional<List<Bar>> getBar() {
+			return Optional.of( Arrays.asList( new Bar(), new Bar() ) );
+		}
 	}
 }
