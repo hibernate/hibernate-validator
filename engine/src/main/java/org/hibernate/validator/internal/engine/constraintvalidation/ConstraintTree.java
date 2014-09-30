@@ -88,7 +88,8 @@ public class ConstraintTree<A extends Annotation> {
 		return descriptor;
 	}
 
-	public final <T> boolean validateConstraints(ValidationContext<T> executionContext, ValueContext<?, ?> valueContext) {
+	public final <T> boolean validateConstraints(ValidationContext<T> executionContext,
+			ValueContext<?, ?> valueContext) {
 		Set<ConstraintViolation<T>> constraintViolations = newHashSet();
 		validateConstraints( executionContext, valueContext, constraintViolations );
 		if ( !constraintViolations.isEmpty() ) {
@@ -99,8 +100,8 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private <T, V> void validateConstraints(ValidationContext<T> validationContext,
-											ValueContext<?, V> valueContext,
-											Set<ConstraintViolation<T>> constraintViolations) {
+			ValueContext<?, V> valueContext,
+			Set<ConstraintViolation<T>> constraintViolations) {
 		CompositionResult compositionResult = validateComposingConstraints(
 				validationContext, valueContext, constraintViolations
 		);
@@ -124,7 +125,8 @@ public class ConstraintTree<A extends Annotation> {
 			);
 
 			// check for a potential unwrapper
-			Type validatedValueType = valueContext.getTypeOfAnnotatedElement();
+
+			Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
 			ValidatedValueUnwrapper validatedValueUnwrapper = validationContext.getValidatedValueUnwrapper(
 					validatedValueType
 			);
@@ -197,7 +199,10 @@ public class ConstraintTree<A extends Annotation> {
 	 * @param constraintViolations used to accumulate constraint violations
 	 * @param localViolations set of constraint violations of top level constraint
 	 */
-	private <T> void prepareFinalConstraintViolations(ValidationContext<T> executionContext, ValueContext<?, ?> valueContext, Set<ConstraintViolation<T>> constraintViolations, Set<ConstraintViolation<T>> localViolations) {
+	private <T> void prepareFinalConstraintViolations(ValidationContext<T> executionContext,
+			ValueContext<?, ?> valueContext,
+			Set<ConstraintViolation<T>> constraintViolations,
+			Set<ConstraintViolation<T>> localViolations) {
 		if ( reportAsSingleViolation() ) {
 			// We clear the current violations list anyway
 			constraintViolations.clear();
@@ -240,8 +245,8 @@ public class ConstraintTree<A extends Annotation> {
 	 * @return Returns an instance of {@code CompositionResult} relevant for boolean composition of constraints
 	 */
 	private <T> CompositionResult validateComposingConstraints(ValidationContext<T> executionContext,
-															   ValueContext<?, ?> valueContext,
-															   Set<ConstraintViolation<T>> constraintViolations) {
+			ValueContext<?, ?> valueContext,
+			Set<ConstraintViolation<T>> constraintViolations) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
 		for ( ConstraintTree<?> tree : getChildren() ) {
 			Set<ConstraintViolation<T>> tmpViolations = newHashSet();
@@ -288,9 +293,9 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private <T, V> Set<ConstraintViolation<T>> validateSingleConstraint(ValidationContext<T> executionContext,
-																		ValueContext<?, ?> valueContext,
-																		ConstraintValidatorContextImpl constraintValidatorContext,
-																		ConstraintValidator<A, V> validator) {
+			ValueContext<?, ?> valueContext,
+			ConstraintValidatorContextImpl constraintValidatorContext,
+			ConstraintValidator<A, V> validator) {
 		boolean isValid;
 		try {
 			@SuppressWarnings("unchecked")

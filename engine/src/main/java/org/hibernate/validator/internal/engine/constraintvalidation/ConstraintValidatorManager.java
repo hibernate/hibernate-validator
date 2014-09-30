@@ -91,7 +91,7 @@ public class ConstraintValidatorManager {
 																					   ConstraintDescriptorImpl<A> descriptor,
 																					   ConstraintValidatorFactory constraintValidatorFactory) {
 		Contracts.assertNotNull( valueContext );
-		Type typeOfValidatedElement = valueContext.getTypeOfAnnotatedElement();
+		Type typeOfValidatedElement = valueContext.getDeclaredTypeOfValidatedElement();
 		Contracts.assertNotNull( typeOfValidatedElement );
 		Contracts.assertNotNull( descriptor );
 		Contracts.assertNotNull( constraintValidatorFactory );
@@ -208,7 +208,7 @@ public class ConstraintValidatorManager {
 	private <A extends Annotation> Class<? extends ConstraintValidator<A, ?>>
 	findMatchingValidatorClass(ValueContext<?, ?> valueContext, ConstraintDescriptorImpl<A> descriptor) {
 		Map<Type, Class<? extends ConstraintValidator<A, ?>>> availableValidatorTypes = descriptor.getAvailableValidatorTypes();
-		Type typeOfValidatedElement = valueContext.getTypeOfAnnotatedElement();
+		Type typeOfValidatedElement = valueContext.getDeclaredTypeOfValidatedElement();
 
 		// find constraint validator classes which can directly validate the value to validate
 		List<Type> suitableTypesForValidatedValue = findSuitableValidatorTypes(
@@ -243,7 +243,7 @@ public class ConstraintValidatorManager {
 										ConstraintDescriptorImpl<?> descriptor,
 										List<Type> constraintValidatorTypesForValidatedValue,
 										List<Type> constraintValidatorTypesForWrappedValue) {
-		Type typeOfValidatedElement = valueContext.getTypeOfAnnotatedElement();
+		Type typeOfValidatedElement = valueContext.getDeclaredTypeOfValidatedElement();
 		TypeResolutionResult typeResolutionResult = typeResolutionOutcome(
 				constraintValidatorTypesForValidatedValue,
 				constraintValidatorTypesForWrappedValue,
@@ -299,7 +299,7 @@ public class ConstraintValidatorManager {
 	}
 
 	private Type getValidatedValueTypeForErrorReporting(ValueContext<?, ?> valueContext) {
-		Type typeOfValidatedElement = valueContext.getTypeOfAnnotatedElement();
+		Type typeOfValidatedElement = valueContext.getDeclaredTypeOfValidatedElement();
 
 		// for the sake of better reporting we unwrap if there is a unwrapper in the context
 		if ( valueContext.getValidatedValueHandler() != null ) {
@@ -313,7 +313,7 @@ public class ConstraintValidatorManager {
 													   ValueContext<?, ?> valueContext) {
 		if ( UnwrapMode.UNWRAP.equals( valueContext.getUnwrapMode() )
 				&& constraintValidatorTypesForWrappedValue.size() == 0 ) {
-			throw log.getNoUnwrapperFoundForTypeException( valueContext.getTypeOfAnnotatedElement().toString() );
+			throw log.getNoUnwrapperFoundForTypeException( valueContext.getDeclaredTypeOfValidatedElement().toString() );
 		}
 
 		if ( constraintValidatorTypesForValidatedValue.size() > 0 && constraintValidatorTypesForWrappedValue.size() > 0 ) {

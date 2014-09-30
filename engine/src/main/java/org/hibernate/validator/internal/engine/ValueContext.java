@@ -69,9 +69,9 @@ public class ValueContext<T, V> {
 	private ElementType elementType;
 
 	/**
-	 * The type of annotated element.
+	 * The declared type of validated value.
 	 */
-	private Type typeOfAnnotatedElement;
+	private Type declaredTypeOfValidatedElement;
 
 	/**
 	 * An optional value unwrapper for the current value
@@ -197,12 +197,12 @@ public class ValueContext<T, V> {
 	 *
 	 * @return the declared type of the currently validated element
 	 */
-	public final Type getTypeOfAnnotatedElement() {
-		return typeOfAnnotatedElement;
+	public final Type getDeclaredTypeOfValidatedElement() {
+		return declaredTypeOfValidatedElement;
 	}
 
-	public final void setTypeOfAnnotatedElement(Type typeOfAnnotatedElement) {
-		this.typeOfAnnotatedElement = typeOfAnnotatedElement;
+	public final void setDeclaredTypeOfValidatedElement(Type declaredTypeOfValidatedElement) {
+		this.declaredTypeOfValidatedElement = declaredTypeOfValidatedElement;
 	}
 
 	@Override
@@ -215,7 +215,7 @@ public class ValueContext<T, V> {
 		sb.append( ", currentGroup=" ).append( currentGroup );
 		sb.append( ", currentValue=" ).append( currentValue );
 		sb.append( ", elementType=" ).append( elementType );
-		sb.append( ", typeOfAnnotatedElement=" ).append( typeOfAnnotatedElement );
+		sb.append( ", typeOfValidatedValue=" ).append( declaredTypeOfValidatedElement );
 		sb.append( '}' );
 		return sb.toString();
 	}
