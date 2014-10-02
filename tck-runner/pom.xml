@@ -31,9 +31,10 @@
     <description>Aggregates dependencies and runs the JSR-303 TCK</description>
 
     <properties>
-        <jsr303.tck.version>1.0.6.GA</jsr303.tck.version>
+        <jsr303.tck.version>1.0.7.GA</jsr303.tck.version>
         <arquillian.version>1.0.0.CR7</arquillian.version>
         <jbossas.version>7.1.0.Beta1b</jbossas.version>
+        <jboss.home>${project.build.directory}/jboss-as-${jbossas.version}</jboss.home>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
     </properties>
@@ -59,7 +60,7 @@
         <dependency>
             <groupId>org.jboss.jbossas.as7-cdi-tck</groupId>
             <artifactId>jbossas-container</artifactId>
-            <version>1.0.0.CR1</version>
+            <version>1.0.0.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate.jsr303.tck</groupId>
@@ -250,7 +251,7 @@
                                 <validation.provider>${validation.provider}</validation.provider>
                             </systemPropertyVariables>
                             <environmentVariables>
-                                 <JBOSS_HOME>${project.build.directory}/jboss-as-${jbossas.version}</JBOSS_HOME>
+                                 <JBOSS_HOME>${jboss.home}</JBOSS_HOME>
                             </environmentVariables>
                         </configuration>
                     </plugin>
