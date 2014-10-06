@@ -164,6 +164,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( propertyMetaData.isCascading() ) {
 				cascadedProperties.add( propertyMetaData );
 			}
+			else {
+				allMetaConstraints.addAll( propertyMetaData.getTypeArgumentsConstraints() );
+			}
 
 			allMetaConstraints.addAll( propertyMetaData.getConstraints() );
 		}

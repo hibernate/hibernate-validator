@@ -108,7 +108,7 @@ final class ParameterConstraintMappingContextImpl
 				Collections.<MetaConstraint<?>>emptySet(),
 				groupConversions,
 				isCascading,
-				isUnwrapValidatedValue()
+				unwrapMode()
 		);
 	}
 

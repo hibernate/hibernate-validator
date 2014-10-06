@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
@@ -43,7 +44,8 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param groupConversions The group conversions of the represented field, if any.
 	 * @param isCascading Whether a cascaded validation of the represented field shall
 	 * be performed or not.
-	 * @param requiresUnwrapping Whether the value of the field must be unwrapped prior to validation or not
+	 * @param unwrapMode Determines how the value of the field must be handled in regards to
+	 * unwrapping prior to validation.
 	 */
 	public ConstrainedField(ConfigurationSource source,
 							ConstraintLocation location,
@@ -51,9 +53,9 @@ public class ConstrainedField extends AbstractConstrainedElement {
 							Set<MetaConstraint<?>> typeArgumentsConstraints,
 							Map<Class<?>, Class<?>> groupConversions,
 							boolean isCascading,
-							boolean requiresUnwrapping) {
+							UnwrapMode unwrapMode) {
 
-		super( source, ConstrainedElementKind.FIELD, location, constraints, groupConversions, isCascading, requiresUnwrapping );
+		super( source, ConstrainedElementKind.FIELD, location, constraints, groupConversions, isCascading, unwrapMode );
 
 		this.typeArgumentsConstraints = typeArgumentsConstraints != null ? Collections.unmodifiableSet(
 				typeArgumentsConstraints

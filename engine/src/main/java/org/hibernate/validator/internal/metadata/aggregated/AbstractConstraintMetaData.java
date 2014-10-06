@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.Set;
 import javax.validation.ElementKind;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 
@@ -32,6 +33,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * to all type of meta data.
  *
  * @author Gunnar Morling
+ * @author Hardy Ferentschik
  */
 public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	private final String name;
@@ -40,7 +42,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	private final Set<MetaConstraint<?>> constraints;
 	private final boolean isCascading;
 	private final boolean isConstrained;
-	private final boolean requiresUnwrapping;
+	private final UnwrapMode unwrapMode;
 
 	public AbstractConstraintMetaData(String name,
 									  Type type,
@@ -48,14 +50,14 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 									  ElementKind constrainedMetaDataKind,
 									  boolean isCascading,
 									  boolean isConstrained,
-									  boolean requiresUnwrapping) {
+									  UnwrapMode unwrapMode) {
 		this.name = name;
 		this.type = type;
 		this.constraints = Collections.unmodifiableSet( constraints );
 		this.constrainedMetaDataKind = constrainedMetaDataKind;
 		this.isCascading = isCascading;
 		this.isConstrained = isConstrained;
-		this.requiresUnwrapping = requiresUnwrapping;
+		this.unwrapMode = unwrapMode;
 	}
 
 	@Override
@@ -93,8 +95,8 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	}
 
 	@Override
-	public boolean requiresUnwrapping() {
-		return requiresUnwrapping;
+	public UnwrapMode unwrapMode() {
+		return unwrapMode;
 	}
 
 	@Override
@@ -103,7 +105,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 				+ ", constrainedMetaDataKind=" + constrainedMetaDataKind
 				+ ", constraints=" + constraints + ", isCascading="
 				+ isCascading + ", isConstrained=" + isConstrained
-				+ ", requiresUnwrapping=" + requiresUnwrapping + "]";
+				+ ", unwrapMode=" + unwrapMode + "]";
 	}
 
 	@Override

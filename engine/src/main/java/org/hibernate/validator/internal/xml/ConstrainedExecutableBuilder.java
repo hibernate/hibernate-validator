@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.validation.ParameterNameProvider;
 import javax.validation.ValidationException;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -238,7 +239,7 @@ class ConstrainedExecutableBuilder {
 				Collections.<MetaConstraint<?>>emptySet(),
 				groupConversions,
 				isCascaded,
-				false
+				UnwrapMode.AUTOMATIC
 		);
 	}
 

@@ -19,6 +19,7 @@ package org.hibernate.validator.internal.metadata.raw;
 import java.util.Collections;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
@@ -47,7 +48,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 				constraints,
 				Collections.<Class<?>, Class<?>>emptyMap(),
 				false,
-				false
+				UnwrapMode.AUTOMATIC
 		);
 	}
 

@@ -18,6 +18,7 @@ package org.hibernate.validator.internal.metadata.provider;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Executable;
@@ -30,8 +31,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import javax.validation.ParameterNameProvider;
+import javax.validation.Valid;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -49,10 +50,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
- * Extends {@code AnnotationMetaDataProvider} by discovering and registering type use constraints defined on type
- * arguments.
+ * Extends {@code AnnotationMetaDataProvider} by discovering and registering constraints defined via Java 8 type
+ * annotations.
  *
  * @author Khalid Alqinyah
+ * @author Hardy Ferentschik
  */
 @IgnoreJava6Requirement
 public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvider {
@@ -66,7 +68,7 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 	}
 
 	@Override
-	protected Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForMember(Member member) {
 		AnnotatedType annotatedType = null;
 
 		if ( member instanceof Field ) {
@@ -77,14 +79,22 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 			annotatedType = ( (Method) member ).getAnnotatedReturnType();
 		}
 
-		return findTypeArgumentsConstraints( member, annotatedType );
+		return findTypeArgumentsConstraints(
+				member,
+				annotatedType,
+				( (AccessibleObject) member ).isAnnotationPresent( Valid.class )
+		);
 	}
 
 	@Override
-	protected Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, int i) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Member member, int i) {
 		Parameter parameter = ( (Executable) member ).getParameters()[i];
 		try {
-			return findTypeArgumentsConstraints( member, parameter.getAnnotatedType() );
+			return findTypeArgumentsConstraints(
+					member,
+					parameter.getAnnotatedType(),
+					parameter.isAnnotationPresent( Valid.class )
+			);
 		}
 		catch ( ArrayIndexOutOfBoundsException ex ) {
 			log.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
@@ -92,21 +102,38 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 		}
 	}
 
-	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, AnnotatedType annotatedType) {
-		Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
-		Optional<AnnotatedType> typeArgument = getAnnotatedActualTypeArguments( annotatedType );
-		if ( !typeArgument.isPresent() ) {
+	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, AnnotatedType annotatedType, boolean isCascaded) {
+		Optional<AnnotatedType> typeParameter = getTypeParameter( annotatedType );
+		if ( !typeParameter.isPresent() ) {
 			return Collections.emptySet();
 		}
 
-		List<ConstraintDescriptorImpl<?>> metaData = findTypeUseConstraints( member, typeArgument.get() );
-		Set<MetaConstraint<?>> constraints = convertToTypeArgumentMetaConstraints(
-				metaData,
+		List<ConstraintDescriptorImpl<?>> constraintDescriptors = findTypeUseConstraints( member, typeParameter.get() );
+		if ( constraintDescriptors.isEmpty() ) {
+			return Collections.emptySet();
+		}
+
+		// HV-925
+		// We need to determine the validated type used for constraint validator resolution.
+		// Iterables and maps need special treatment at this point, since the validated type is the type of the
+		// specified type parameter. In the other cases the validated type is the parameterized type, eg Optional<String>.
+		// In the latter case a value unwrapping has to occur
+		Type validatedType = annotatedType.getType();
+		if ( ReflectionHelper.isIterable( annotatedType.getType() ) || ReflectionHelper.isMap( annotatedType.getType() ) ) {
+			if ( !isCascaded ) {
+				throw log.getTypeAnnotationConstraintOnIterableRequiresUseOfValidAnnotationException(
+						member.getDeclaringClass().getName(),
+						member.getName()
+				);
+			}
+			validatedType = typeParameter.get().getType();
+		}
+
+		return convertToTypeArgumentMetaConstraints(
+				constraintDescriptors,
 				member,
-				typeArgument.get().getType()
+				validatedType
 		);
-		typeArgumentsConstraints.addAll( constraints );
-		return typeArgumentsConstraints;
 	}
 
 	/**
@@ -146,7 +173,7 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 	 * type argument. If the type has more than one type argument and is not a Map, the method returns an empty {@code
 	 * Optional}.
 	 */
-	private Optional<AnnotatedType> getAnnotatedActualTypeArguments(AnnotatedType annotatedType) {
+	private Optional<AnnotatedType> getTypeParameter(AnnotatedType annotatedType) {
 		if ( annotatedType == null ) {
 			return Optional.empty();
 		}
@@ -171,22 +198,9 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 			}
 
 			// If it is not a Map, log a message and ignore
-			log.info( MESSAGES.parameterizedTypesWithMoreThanOneTypeArgument() );
+			log.parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported();
 		}
 
 		return Optional.empty();
-	}
-
-	@Override
-	protected boolean unwrapBasedOnType(Class<?> clazz, boolean hasConstrainedTypeArguments) {
-		if ( ReflectionHelper.isIterable( clazz ) ||  ReflectionHelper.isMap( clazz ) ) {
-			return false;
-		}
-
-		if ( hasConstrainedTypeArguments ) {
-			return true;
-		}
-
-		return false;
 	}
 }

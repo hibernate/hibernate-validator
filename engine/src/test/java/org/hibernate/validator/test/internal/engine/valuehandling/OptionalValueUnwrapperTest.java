@@ -24,13 +24,11 @@ import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Null;
 import javax.validation.executable.ExecutableValidator;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
@@ -42,6 +40,7 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
  * Tests for {@link org.hibernate.validator.internal.engine.valuehandling.OptionalValueUnwrapper}.
  *
  * @author Khalid Alqinyah
+ * @author Hardy Ferentschik
  */
 public class OptionalValueUnwrapperTest {
 
@@ -55,15 +54,24 @@ public class OptionalValueUnwrapperTest {
 	@Test
 	public void testOptionalUnwrappedValueViolations() {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
-		assertNumberOfViolations( constraintViolations, 4 );
+		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"integerOptional",
-				"stringOptional",
-				"barOptional.number",
 				"optionalLong"
 		);
-		assertCorrectConstraintTypes( constraintViolations, Min.class, NotBlank.class, Min.class, Max.class );
+		assertCorrectConstraintTypes( constraintViolations, Min.class, Max.class );
+	}
+
+	@Test
+	public void testOptionalCascadedValidation() {
+		Set<ConstraintViolation<Snafu>> constraintViolations = validator.validate( new Snafu() );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"barOptional.number"
+		);
+		assertCorrectConstraintTypes( constraintViolations, Min.class );
 	}
 
 	@Test
@@ -83,10 +91,10 @@ public class OptionalValueUnwrapperTest {
 	@Test
 	public void testOptionalUnwrappedExecutableParameter() throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
-		Method method = Foo.class.getMethod( "setOptionalLong", Optional.class );
+		Method method = Baz.class.getMethod( "setOptionalLong", Optional.class );
 		Object[] values = { Optional.of( 2L ) };
-		Set<ConstraintViolation<Foo>> constraintViolations = executableValidator.validateParameters(
-				new Foo(),
+		Set<ConstraintViolation<Baz>> constraintViolations = executableValidator.validateParameters(
+				new Baz(),
 				method,
 				values
 		);
@@ -98,9 +106,9 @@ public class OptionalValueUnwrapperTest {
 	@Test
 	public void testOptionalUnwrappedCascadableExecutableReturnValue() throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
-		Method method = Foo.class.getMethod( "getBar" );
-		Set<ConstraintViolation<Foo>> constraintViolations = executableValidator.validateReturnValue(
-				new Foo(),
+		Method method = Qux.class.getMethod( "getBar" );
+		Set<ConstraintViolation<Qux>> constraintViolations = executableValidator.validateReturnValue(
+				new Qux(),
 				method,
 				Optional.of( new Bar() )
 		);
@@ -112,10 +120,10 @@ public class OptionalValueUnwrapperTest {
 	@Test
 	public void testOptionalUnwrappedCascadableExecutableParameter() throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
-		Method method = Foo.class.getMethod( "setBar", Optional.class );
+		Method method = Fubar.class.getMethod( "setBar", Optional.class );
 		Object[] values = { Optional.of( new Bar() ) };
-		Set<ConstraintViolation<Foo>> constraintViolations = executableValidator.validateParameters(
-				new Foo(),
+		Set<ConstraintViolation<Fubar>> constraintViolations = executableValidator.validateParameters(
+				new Fubar(),
 				method,
 				values
 		);
@@ -126,44 +134,38 @@ public class OptionalValueUnwrapperTest {
 
 	@SuppressWarnings("unused")
 	private class Foo {
-		@UnwrapValidatedValue
 		@Min(value = 5)
 		Optional<Integer> integerOptional = Optional.of( 3 );
 
-		@UnwrapValidatedValue
-		@NotBlank
-		Optional<String> stringOptional = Optional.of( " " );
-
-		@UnwrapValidatedValue
-		@Max(value = 8)
-		Optional<Double> doubleOptional = Optional.of( 7.5 );
-
-		@UnwrapValidatedValue
-		@Null
-		Optional<Integer> emptyOptional = Optional.empty();
-
-		@UnwrapValidatedValue
-		@Valid
-		Optional<Bar> barOptional = Optional.of( new Bar() );
-
-		@UnwrapValidatedValue
 		@Max(value = 5)
 		public Optional<Long> getOptionalLong() {
 			return Optional.of( 7L );
 		}
+	}
 
-		public void setOptionalLong(@UnwrapValidatedValue @Min(5) Optional<Long> optionalLongPara) {
+	@SuppressWarnings("unused")
+	private class Snafu {
+		@Valid
+		Optional<Bar> barOptional = Optional.of( new Bar() );
+	}
 
+	@SuppressWarnings("unused")
+	private class Fubar {
+		public void setBar(@UnwrapValidatedValue @Valid Optional<Bar> optionalBarPara) {
 		}
+	}
 
-		@UnwrapValidatedValue
+	@SuppressWarnings("unused")
+	private class Qux {
 		@Valid
 		public Optional<Bar> getBar() {
 			return Optional.empty();
 		}
+	}
 
-		public void setBar(@UnwrapValidatedValue @Valid Optional<Bar> optionalBarPara) {
-
+	@SuppressWarnings("unused")
+	private class Baz {
+		public void setOptionalLong(@UnwrapValidatedValue @Min(5) Optional<Long> optionalLongPara) {
 		}
 	}
 

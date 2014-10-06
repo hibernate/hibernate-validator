@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
@@ -39,6 +40,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -58,6 +61,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public class PropertyMetaData extends AbstractConstraintMetaData implements Cascadable {
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * The member marked as cascaded (either field or getter). Used to retrieve
@@ -80,15 +84,15 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 							 Set<MetaConstraint<?>> typeArgumentsConstraints,
 							 Map<Class<?>, Class<?>> groupConversions,
 							 Member cascadingMember,
-							 boolean requiresUnwrapping) {
+							 UnwrapMode unwrapMode) {
 		super(
 				propertyName,
 				type,
 				constraints,
 				ElementKind.PROPERTY,
 				cascadingMember != null,
-				cascadingMember != null || !constraints.isEmpty(),
-				requiresUnwrapping
+				cascadingMember != null || !constraints.isEmpty() || !typeArgumentsConstraints.isEmpty(),
+				unwrapMode
 		);
 
 		if ( cascadingMember != null ) {
@@ -180,6 +184,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		private final Type propertyType;
 		private Member cascadingMember;
 		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
+		private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
+		private boolean unwrapModeExplicitlyConfigured = false;
 
 		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );
@@ -224,8 +230,27 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 		@Override
 		public void add(ConstrainedElement constrainedElement) {
-
 			super.add( constrainedElement );
+
+			// HV-925
+			// Trying to detect inconsistent value unwrapping configuration between a property field and its getter.
+			// If a field or getter explicitly uses @UnwrapValidatedValue, the corresponding getter / field needs to either
+			// not use @UnwrapValidatedValue or use the same value for the annotation.
+			UnwrapMode newUnwrapMode = constrainedElement.unwrapMode();
+			if ( unwrapModeExplicitlyConfigured ) {
+				if ( !UnwrapMode.AUTOMATIC.equals( newUnwrapMode ) && !newUnwrapMode.equals( unwrapMode ) ) {
+					throw log.getInconsistentValueUnwrappingConfigurationBetweenFieldAndItsGetterException(
+							propertyName,
+							getBeanClass().getName()
+					);
+				}
+			}
+			else {
+				if ( !UnwrapMode.AUTOMATIC.equals( newUnwrapMode ) ) {
+					unwrapMode = constrainedElement.unwrapMode();
+					unwrapModeExplicitlyConfigured = true;
+				}
+			}
 
 			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 				typeArgumentsConstraints.addAll( ( (ConstrainedField) constrainedElement ).getTypeArgumentsConstraints() );
@@ -239,6 +264,10 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			}
 		}
 
+		public UnwrapMode unwrapMode() {
+			return unwrapMode;
+		}
+
 		@Override
 		public PropertyMetaData build() {
 			return new PropertyMetaData(
@@ -248,7 +277,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 					typeArgumentsConstraints,
 					getGroupConversions(),
 					cascadingMember,
-					requiresUnwrapping()
+					unwrapMode()
 			);
 		}
 

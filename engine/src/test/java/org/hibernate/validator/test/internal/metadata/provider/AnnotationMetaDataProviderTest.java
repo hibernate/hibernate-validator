@@ -23,7 +23,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Map;
-
 import javax.validation.Constraint;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Payload;
@@ -36,8 +35,10 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -56,7 +57,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Unit test for {@link AnnotationMetaDataProvider}.
@@ -343,7 +344,19 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 
 		ConstrainedField constrainedField = findConstrainedField( beanConfigurations, GolfPlayer.class, "name" );
 
-		assertTrue( constrainedField.requiresUnwrapping() );
+		assertEquals( constrainedField.unwrapMode(), UnwrapMode.UNWRAP );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-925")
+	public void testAutomaticUnwrapValidatedValueOnField() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
+
+		ConstrainedField constrainedField = findConstrainedField( beanConfigurations, GolfPlayer.class, "nickname" );
+
+		assertEquals( constrainedField.unwrapMode(), UnwrapMode.AUTOMATIC );
 	}
 
 	@Test
@@ -359,7 +372,23 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 				"getHandicap"
 		);
 
-		assertTrue( constrainedMethod.requiresUnwrapping() );
+		assertEquals( constrainedMethod.unwrapMode(), UnwrapMode.UNWRAP );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-925")
+	public void testSkipUnwrapValidatedValueOnProperty() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
+
+		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
+				beanConfigurations,
+				GolfPlayer.class,
+				"getScore"
+		);
+
+		assertEquals( constrainedMethod.unwrapMode(), UnwrapMode.SKIP_UNWRAP );
 	}
 
 	@Test
@@ -375,7 +404,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 				"enterTournament"
 		);
 
-		assertTrue( constrainedMethod.requiresUnwrapping() );
+		assertEquals( constrainedMethod.unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
 	@Test
@@ -392,7 +421,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 				Object.class
 		);
 
-		assertTrue( constrainedConstructor.requiresUnwrapping() );
+		assertEquals( constrainedConstructor.unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
 	@Test
@@ -409,7 +438,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 				Wrapper.class
 		);
 
-		assertTrue( constrainedMethod.getParameterMetaData( 0 ).requiresUnwrapping() );
+		assertEquals( constrainedMethod.getParameterMetaData( 0 ).unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
 	private static class Foo {
@@ -564,12 +593,18 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	}
 
 	private static class GolfPlayer {
+		private Wrapper<String> nickname;
 
 		@UnwrapValidatedValue
 		private Wrapper<String> name;
 
 		@UnwrapValidatedValue
 		public Wrapper<Double> getHandicap() {
+			return null;
+		}
+
+		@UnwrapValidatedValue(false)
+		public Wrapper<Double> getScore() {
 			return null;
 		}
 

@@ -29,6 +29,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
@@ -225,7 +226,7 @@ public class ExecutableMetaDataTest {
 				)
 		);
 
-		assertTrue( methodMetaData.requiresUnwrapping() );
+		assertEquals( methodMetaData.unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
 	@Test
@@ -237,7 +238,7 @@ public class ExecutableMetaDataTest {
 				)
 		);
 
-		assertTrue( constructorMetaData.requiresUnwrapping() );
+		assertEquals( constructorMetaData.unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
 	@Test
@@ -419,7 +420,7 @@ public class ExecutableMetaDataTest {
 		assertFalse( methodMetaData.isConstrained() );
 		assertThat( methodMetaData ).isEmpty();
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
-		assertFalse( methodMetaData.requiresUnwrapping() );
+		assertEquals( methodMetaData.unwrapMode(), UnwrapMode.AUTOMATIC );
 
 		assertThat( methodMetaData.getParameterMetaData( 0 ).isConstrained() ).isFalse();
 		assertThat( methodMetaData.getParameterMetaData( 0 ).isCascading() ).isFalse();

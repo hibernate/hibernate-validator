@@ -18,6 +18,7 @@ package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.UnexpectedTypeException;
 import javax.validation.Validator;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Max;
@@ -27,38 +28,31 @@ import javax.validation.constraints.Size;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.MapProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleWrapper;
-import javafx.beans.property.ReadOnlyFloatWrapper;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.property.ReadOnlyProperty;
-import javafx.beans.property.SetProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleMapProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleSetProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * Tests for {@link org.hibernate.validator.internal.engine.valuehandling.JavaFXPropertyValueUnwrapper}.
  *
  * @author Khalid Alqinyah
+ * @author Hardy Ferentschik
  */
 public class JavaFXPropertyValueUnwrapperTest {
 
@@ -70,37 +64,69 @@ public class JavaFXPropertyValueUnwrapperTest {
 	}
 
 	@Test
-	public void testJavaFXPropertyUnwrappedValueViolations() {
+	public void testJavaFXPropertyDefaultUnwrapping() {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
-		assertNumberOfViolations( constraintViolations, 9 );
+		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"doubleProperty",
 				"integerProperty",
-				"stringProperty",
-				"booleanProperty",
-				"floatProperty",
-				"objectProperty",
-				"mapProperty",
-				"listProperty",
-				"setProperty"
+				"booleanProperty"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
+				Max.class,
 				Min.class,
-				NotBlank.class,
-				AssertTrue.class,
-				Max.class,
-				Max.class,
-				Size.class,
-				Size.class,
-				NotNull.class,
+				AssertTrue.class
+		);
+	}
+
+	@Test
+	public void testJavaFXPropertyExplicitUnwrapping() {
+		Set<ConstraintViolation<Fubar>> constraintViolations = validator.validate( new Fubar() );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"listProperty"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				Size.class
+		);
+	}
+
+	@Test
+	public void testValidatorForWrapperAndWrappedValueThrowsException() {
+		try {
+			validator.validate( new Bar1() );
+			fail( "Should have thrown an exception" );
+		}
+		catch ( UnexpectedTypeException e ) {
+			assertTrue( e.getMessage().startsWith( "HV000186" ) );
+		}
+	}
+
+	@Test
+	public void testJavaFXPropertyExplicitUnwrappingNotNull() {
+		Set<ConstraintViolation<Bar2>> constraintViolations = validator.validate( new Bar2() );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"property"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
 				NotNull.class
 		);
 	}
 
+	@Test
+	public void testJavaFXPropertySkipUnwrapping() {
+		assertNumberOfViolations( validator.validate( new Bar3() ), 0 );
+	}
+
 	@SuppressWarnings("unused")
-	private class Foo {
+	public class Foo {
 		@UnwrapValidatedValue
 		@Max(value = 3)
 		ReadOnlyDoubleWrapper doubleProperty = new ReadOnlyDoubleWrapper( 4.5 );
@@ -110,35 +136,36 @@ public class JavaFXPropertyValueUnwrapperTest {
 		IntegerProperty integerProperty = new SimpleIntegerProperty( 2 );
 
 		@UnwrapValidatedValue
-		@NotBlank
-		SimpleStringProperty stringProperty = new SimpleStringProperty( "" );
-
-		@UnwrapValidatedValue
 		@AssertTrue
 		ReadOnlyBooleanProperty booleanProperty = new SimpleBooleanProperty( false );
+	}
 
-		@UnwrapValidatedValue
-		@Max(value = 4)
-		Property<Number> floatProperty = new ReadOnlyFloatWrapper( 5.5f );
-
-		@UnwrapValidatedValue
-		@NotNull
-		ReadOnlyProperty<Object> objectProperty = new SimpleObjectProperty( null );
-
-		@UnwrapValidatedValue
-		@NotNull
-		MapProperty mapProperty = new SimpleMapProperty( null );
-
+	@SuppressWarnings("unused")
+	public class Fubar {
+		// Need to explicitly unwrap, since ReadOnlyListProperty in itself implements List
 		@UnwrapValidatedValue
 		@Size(min = 5)
 		ReadOnlyListProperty listProperty = new ReadOnlyListWrapper( FXCollections.observableArrayList( 1, 2, 3 ) );
-
-		@UnwrapValidatedValue
-		@Size(min = 5)
-		SetProperty setProperty = new SimpleSetProperty( FXCollections.observableSet( 1, 2, 3 ) );
-
-		@UnwrapValidatedValue
-		@Min(value = 2)
-		ObservableValue<Number> longProperty = new SimpleLongProperty( 4 );
 	}
+
+	@SuppressWarnings("unused")
+	public class Bar1 {
+		@NotNull
+		MapProperty property = new SimpleMapProperty( null );
+	}
+
+	@SuppressWarnings("unused")
+	public class Bar2 {
+		@UnwrapValidatedValue(true)
+		@NotNull
+		MapProperty property = new SimpleMapProperty( null );
+	}
+
+	@SuppressWarnings("unused")
+	public class Bar3 {
+		@UnwrapValidatedValue(false)
+		@NotNull
+		MapProperty property = new SimpleMapProperty( null );
+	}
+
 }

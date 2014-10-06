@@ -22,9 +22,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -67,8 +67,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
 	 * return value shall be performed or not.
-	 * @param requiresUnwrapping Whether the value of the executable's return value must be unwrapped prior to
-	 * validation or not
+	 * @param unwrapMode Whether the value of the executable's return value must be unwrapped prior to
+	 * validation or not.
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
@@ -76,7 +76,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
 			boolean isCascading,
-			boolean requiresUnwrapping) {
+			UnwrapMode unwrapMode) {
 		this(
 				source,
 				location,
@@ -86,7 +86,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				Collections.<MetaConstraint<?>>emptySet(),
 				groupConversions,
 				isCascading,
-				requiresUnwrapping
+				unwrapMode
 		);
 	}
 
@@ -107,8 +107,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
 	 * return value shall be performed or not.
-	 * @param requiresUnwrapping Whether the value of the executable's return value must be unwrapped prior to
-	 * validation or not
+	 * @param unwrapMode Determines how the value of the executable's return value must be handled in regards to
+	 * unwrapping prior to validation.
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
@@ -119,7 +119,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			Set<MetaConstraint<?>> typeArgumentsConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
 			boolean isCascading,
-			boolean requiresUnwrapping) {
+			UnwrapMode unwrapMode) {
 		super(
 				source,
 				( location.getMember() instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
@@ -127,7 +127,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				returnValueConstraints,
 				groupConversions,
 				isCascading,
-				requiresUnwrapping
+				unwrapMode
 		);
 
 		this.executable = ( location.getMember() instanceof Method ) ?
@@ -308,6 +308,15 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );
 
+		// TODO - Is this the right way of handling the merge of unwrapMode? (HF)
+		UnwrapMode mergedUnwrapMode;
+		if ( source.getPriority() > other.source.getPriority() ) {
+			mergedUnwrapMode = unwrapMode;
+		}
+		else {
+			mergedUnwrapMode = other.unwrapMode;
+		}
+
 		return new ConstrainedExecutable(
 				mergedSource,
 				getLocation(),
@@ -317,7 +326,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				mergedTypeArgumentsConstraints,
 				mergedGroupConversions,
 				isCascading || other.isCascading,
-				requiresUnwrapping || other.requiresUnwrapping
+				mergedUnwrapMode
 		);
 	}
 

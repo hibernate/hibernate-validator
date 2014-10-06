@@ -26,6 +26,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -49,6 +50,7 @@ import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -259,13 +261,22 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	}
 
 	/**
-	 * Returns those validators registered with this constraint which apply to
-	 * the given constraint type (either generic or cross-parameter).
+	 * Return all constraint validators classes (either generic or cross-parameter) which are registered for the
+	 * constraint of this despriptor.
 	 *
 	 * @return The validators applying to type of this constraint.
 	 */
 	public List<Class<? extends ConstraintValidator<T, ?>>> getMatchingConstraintValidatorClasses() {
 		return matchingConstraintValidatorClasses;
+	}
+
+	public Map<Type, Class<? extends ConstraintValidator<T, ?>>> getAvailableValidatorTypes() {
+
+		Map<Type, Class<? extends ConstraintValidator<T, ?>>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
+				getAnnotationType(),
+				getMatchingConstraintValidatorClasses()
+		);
+		return availableValidatorTypes;
 	}
 
 	@Override

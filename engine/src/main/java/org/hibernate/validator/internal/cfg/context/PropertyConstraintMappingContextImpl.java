@@ -111,7 +111,7 @@ final class PropertyConstraintMappingContextImpl
 					Collections.<MetaConstraint<?>>emptySet(),
 					groupConversions,
 					isCascading,
-					isUnwrapValidatedValue()
+					unwrapMode()
 			);
 		}
 		else {
@@ -121,7 +121,7 @@ final class PropertyConstraintMappingContextImpl
 					getConstraints( constraintHelper ),
 					groupConversions,
 					isCascading,
-					isUnwrapValidatedValue()
+					unwrapMode()
 			);
 		}
 	}

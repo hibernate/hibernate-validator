@@ -324,7 +324,7 @@
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <!-- These classes are imported from other sources and are not re-formatted.
                         The tests use Java 8 type annotation syntax which is not supported yet by CheckStyle-->
-                        <excludes>**/ConcurrentReferenceHashMap.java,**/TypeHelper*.java,**/TypeAnnotationAwareMetaDataProviderTest.java,**/TypeUseValidationTest.java</excludes>
+                        <excludes>**/ConcurrentReferenceHashMap.java,**/TypeHelper*.java,**/TypeAnnotationAwareMetaDataProviderTest.java,**/TypeAnnotationConstraintTest.java,**/UnwrapModesTest.java</excludes>
                     </configuration>
                     <executions>
                         <execution>

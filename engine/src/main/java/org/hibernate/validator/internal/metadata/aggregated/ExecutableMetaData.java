@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
 import org.hibernate.validator.internal.metadata.aggregated.rule.OverridingMethodMustNotAlterParameterConstraints;
 import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue;
@@ -96,7 +97,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			boolean isCascading,
 			boolean isConstrained,
 			boolean isGetter,
-			boolean requiresUnwrapping) {
+			UnwrapMode unwrapMode) {
 		super(
 				name,
 				returnType,
@@ -104,7 +105,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				kind,
 				isCascading,
 				isConstrained,
-				requiresUnwrapping
+				unwrapMode
 		);
 
 		this.parameterTypes = parameterTypes;
@@ -117,7 +118,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				typeArgumentsConstraints,
 				isCascading,
 				returnValueGroupConversions,
-				requiresUnwrapping
+				unwrapMode
 		);
 		this.isGetter = isGetter;
 	}
@@ -385,7 +386,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					isCascading(),
 					isConstrained,
 					executable.isGetterMethod(),
-					requiresUnwrapping()
+					unwrapMode()
 			);
 		}
 

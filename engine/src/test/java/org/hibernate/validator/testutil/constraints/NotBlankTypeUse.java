@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.util.constraints;
+package org.hibernate.validator.testutil.constraints;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -47,6 +47,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @NotBlank
 public @interface NotBlankTypeUse {
 	String message() default "{org.hibernate.validator.constraints.NotBlank.message}";
+
 	Class<?>[] groups() default { };
+
 	Class<? extends Payload>[] payload() default { };
 }

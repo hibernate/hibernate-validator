@@ -18,11 +18,11 @@ package org.hibernate.validator.internal.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
-
 import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
@@ -73,7 +73,15 @@ public class ValueContext<T, V> {
 	 */
 	private Type typeOfAnnotatedElement;
 
-	private ValidatedValueUnwrapper<? super V> validatedValueHandler;
+	/**
+	 * An optional value unwrapper for the current value
+	 */
+	private ValidatedValueUnwrapper validatedValueHandler;
+
+	/**
+	 * Enum specifying how to handle validated values
+	 */
+	private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
@@ -118,6 +126,7 @@ public class ValueContext<T, V> {
 	 *
 	 * @return the current value to be validated
 	 */
+	@SuppressWarnings( "unchecked" )
 	public final Object getCurrentValidatedValue() {
 		return validatedValueHandler != null ? validatedValueHandler.handleValidatedValue( currentValue ) : currentValue;
 	}
@@ -189,7 +198,7 @@ public class ValueContext<T, V> {
 	 * @return the declared type of the currently validated element
 	 */
 	public final Type getTypeOfAnnotatedElement() {
-		return validatedValueHandler != null ? validatedValueHandler.getValidatedValueType( typeOfAnnotatedElement ) : typeOfAnnotatedElement;
+		return typeOfAnnotatedElement;
 	}
 
 	public final void setTypeOfAnnotatedElement(Type typeOfAnnotatedElement) {
@@ -211,7 +220,19 @@ public class ValueContext<T, V> {
 		return sb.toString();
 	}
 
-	public void setValidatedValueHandler(ValidatedValueUnwrapper<? super V> handler) {
+	public void setValidatedValueHandler(ValidatedValueUnwrapper handler) {
 		this.validatedValueHandler = handler;
+	}
+
+	public ValidatedValueUnwrapper getValidatedValueHandler() {
+		return validatedValueHandler;
+	}
+
+	public UnwrapMode getUnwrapMode() {
+		return unwrapMode;
+	}
+
+	public void setUnwrapMode(UnwrapMode unwrapMode) {
+		this.unwrapMode = unwrapMode;
 	}
 }

@@ -26,6 +26,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
@@ -107,7 +108,7 @@ public class ParameterMetaDataTest {
 		assertFalse( parameterMetaData.isCascading() );
 		assertFalse( parameterMetaData.isConstrained() );
 		assertThat( parameterMetaData ).isEmpty();
-		assertFalse( parameterMetaData.requiresUnwrapping() );
+		assertEquals( parameterMetaData.unwrapMode(), UnwrapMode.AUTOMATIC );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
@@ -136,6 +137,6 @@ public class ParameterMetaDataTest {
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
-		assertTrue( parameterMetaData.requiresUnwrapping() );
+		assertEquals( parameterMetaData.unwrapMode(), UnwrapMode.UNWRAP );
 	}
 }

@@ -17,12 +17,10 @@ public class Car {
 	private List<@ValidPart String> parts = new ArrayList<>();
 
 	@Valid
-	private EnumMap<FuelConsumption, @MaxAllowedFuelConsumption Integer> fuelConsumption = new EnumMap<>( FuelConsumption.class );
+	private EnumMap<FuelConsumption, @MaxAllowedFuelConsumption Integer> fuelConsumption = new EnumMap<>(FuelConsumption.class);
 
-	@Valid
 	private Optional<@MinTowingCapacity(1000) Integer> towingCapacity = Optional.empty();
 
-	@Valid
 	private GearBox<@MinTorque(100) Gear> gearBox;
 
 	public void addPart(String part) {

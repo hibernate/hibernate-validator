@@ -628,10 +628,11 @@ public interface Log extends BasicLogger {
 			value = "Wrong number of parameters. Method or constructor %1$s expects %2$d parameters, but got %3$d.")
 	IllegalArgumentException getInvalidParameterCountForExecutableException(String executable, int expectedParameterCount, int actualParameterCount);
 
-	@Message(id = 182, value = "No validation value unwrapper is registered for type %1$s.")
+	@Message(id = 182, value = "No validation value unwrapper is registered for type '%1$s'.")
 	ValidationException getNoUnwrapperFoundForTypeException(String typeName);
 
-	@Message(id = 183, value = "Unable to load 'javax.el.ExpressionFactory'. Check that you have the EL dependencies on the classpath, or use ParameterMessageInterpolator instead")
+	@Message(id = 183,
+			value = "Unable to load 'javax.el.ExpressionFactory'. Check that you have the EL dependencies on the classpath, or use ParameterMessageInterpolator instead")
 	ValidationException getMissingELDependenciesException();
 
 	@LogMessage(level = WARN)
@@ -642,4 +643,19 @@ public interface Log extends BasicLogger {
 	@Message(id = 185, value = "Message contains EL expression: %1s, which is unsupported with chosen Interpolator")
 	void getElUnsupported(String expression);
 
+	@Message(id = 186,
+			value = "The constraint of type '%2$s' defined on '%1$s' has multiple matching constraint validators which is due to an additional value handler of type '%3$s'. It is unclear which value needs validating. Clarify configuration via @UnwrapValidatedValue.")
+	UnexpectedTypeException getConstraintValidatorExistsForWrapperAndWrappedValueException(String property, String constraint, String valueHandler);
+
+	@Message(id = 187,
+			value = "When using type annotation constraints on parameterized iterables or map @Valid must be used. Check %s#%s")
+	ValidationException getTypeAnnotationConstraintOnIterableRequiresUseOfValidAnnotationException(String declaringClass, String name);
+
+	@LogMessage(level = WARN)
+	@Message(id = 188, value = "ParameterMessageInterpolator has been chosen, EL interpolation will not be supported")
+	void parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported();
+
+	@Message(id = 189,
+			value = "The configuration of value unwrapping for property '%s' of bean '%s' is inconsistent between the field and its getter.")
+	ConstraintDeclarationException getInconsistentValueUnwrappingConfigurationBetweenFieldAndItsGetterException(String property, String clazz);
 }

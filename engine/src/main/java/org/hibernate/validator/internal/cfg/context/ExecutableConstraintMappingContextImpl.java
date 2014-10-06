@@ -28,6 +28,7 @@ import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContex
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -140,7 +141,7 @@ class ExecutableConstraintMappingContextImpl
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
 				returnValueContext != null ? returnValueContext.isCascading() : false,
-				returnValueContext != null ? returnValueContext.isUnwrapValidatedValue() : false
+				returnValueContext != null ? returnValueContext.unwrapMode() : UnwrapMode.AUTOMATIC
 		);
 	}
 

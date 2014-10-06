@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
@@ -54,7 +55,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
 				false,
-				false
+				UnwrapMode.AUTOMATIC
 		);
 	}
 
@@ -72,7 +73,8 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param groupConversions The group conversions of the represented method parameter, if any.
 	 * @param isCascading Whether a cascaded validation of the represented method
 	 * parameter shall be performed or not.
-	 * @param requiresUnwrapping Whether the value of the parameter must be unwrapped prior to validation or not
+	 * @param unwrapMode Determines how the value of the parameter must be handled in regards to
+	 * unwrapping prior to validation.
 	 */
 	public ConstrainedParameter(ConfigurationSource source,
 								ConstraintLocation location,
@@ -83,7 +85,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 								Set<MetaConstraint<?>> typeArgumentsConstraints,
 								Map<Class<?>, Class<?>> groupConversions,
 								boolean isCascading,
-								boolean requiresUnwrapping) {
+								UnwrapMode unwrapMode) {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,
@@ -91,7 +93,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				constraints,
 				groupConversions,
 				isCascading,
-				requiresUnwrapping
+				unwrapMode
 		);
 
 		this.type = type;
@@ -130,12 +132,20 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		ConfigurationSource mergedSource = ConfigurationSource.max( source, other.source );
 
 		String mergedName;
-
 		if ( source.getPriority() > other.source.getPriority() ) {
 			mergedName = name;
 		}
 		else {
 			mergedName = other.name;
+		}
+
+		// TODO - Is this the right way of handling the merge of unwrapMode? (HF)
+		UnwrapMode mergedUnwrapMode;
+		if ( source.getPriority() > other.source.getPriority() ) {
+			mergedUnwrapMode = unwrapMode;
+		}
+		else {
+			mergedUnwrapMode = other.unwrapMode;
 		}
 
 		Set<MetaConstraint<?>> mergedConstraints = newHashSet( constraints );
@@ -157,7 +167,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				mergedTypeArgumentsConstraints,
 				mergedGroupConversions,
 				isCascading || other.isCascading,
-				requiresUnwrapping || other.requiresUnwrapping
+				mergedUnwrapMode
 		);
 	}
 

@@ -18,7 +18,8 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 
 import java.util.Collections;
 import java.util.Map;
-import javax.validation.Path;
+
+import org.hibernate.validator.internal.engine.path.PathImpl;
 
 /**
  * Container class for the information needed to create a constraint violation.
@@ -27,14 +28,14 @@ import javax.validation.Path;
  */
 public class ConstraintViolationCreationContext {
 	private final String message;
-	private final Path propertyPath;
+	private final PathImpl propertyPath;
 	private final Map<String, Object> expressionVariables;
 
-	public ConstraintViolationCreationContext(String message, Path property) {
+	public ConstraintViolationCreationContext(String message, PathImpl property) {
 		this( message, property, Collections.<String, Object>emptyMap() );
 	}
 
-	public ConstraintViolationCreationContext(String message, Path property, Map<String, Object> expressionVariables) {
+	public ConstraintViolationCreationContext(String message, PathImpl property, Map<String, Object> expressionVariables) {
 		this.message = message;
 		this.propertyPath = property;
 		this.expressionVariables = expressionVariables;
@@ -44,7 +45,7 @@ public class ConstraintViolationCreationContext {
 		return message;
 	}
 
-	public final Path getPath() {
+	public final PathImpl getPath() {
 		return propertyPath;
 	}
 

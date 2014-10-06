@@ -19,6 +19,7 @@ package org.hibernate.validator.internal.engine;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -34,6 +35,9 @@ import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
+
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
@@ -41,8 +45,11 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.IdentitySet;
+import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -133,6 +140,16 @@ public class ValidationContext<T> {
 	private final ParameterNameProvider parameterNameProvider;
 
 	/**
+	 * List of value un-wrappers.
+	 */
+	private final List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers;
+
+	/**
+	 * Used for resolving generic type information.
+	 */
+	private final TypeResolutionHelper typeResolutionHelper;
+
+	/**
 	 * Whether or not validation should fail on the first constraint violation.
 	 */
 	private final boolean failFast;
@@ -142,6 +159,8 @@ public class ValidationContext<T> {
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
 			ParameterNameProvider parameterNameProvider,
+			List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
+			TypeResolutionHelper typeResolutionHelper,
 			boolean failFast,
 			T rootBean,
 			Class<T> rootBeanClass,
@@ -153,17 +172,20 @@ public class ValidationContext<T> {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.traversableResolver = traversableResolver;
 		this.parameterNameProvider = parameterNameProvider;
+		this.validatedValueUnwrappers = validatedValueUnwrappers;
+		this.typeResolutionHelper = typeResolutionHelper;
 		this.failFast = failFast;
+
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
 		this.executable = executable;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
 
-		processedBeansPerGroup = newHashMap();
-		processedPathsPerBean = new IdentityHashMap<Object, Set<PathImpl>>();
-		processedMetaConstraints = newHashMap();
-		failingConstraintViolations = newHashSet();
+		this.processedBeansPerGroup = newHashMap();
+		this.processedPathsPerBean = new IdentityHashMap<Object, Set<PathImpl>>();
+		this.processedMetaConstraints = newHashMap();
+		this.failingConstraintViolations = newHashSet();
 	}
 
 	public static ValidationContextBuilder getValidationContext(
@@ -171,6 +193,8 @@ public class ValidationContext<T> {
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
+			List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
+			TypeResolutionHelper typeResolutionHelper,
 			boolean failFast) {
 
 		return new ValidationContextBuilder(
@@ -178,6 +202,8 @@ public class ValidationContext<T> {
 				messageInterpolator,
 				constraintValidatorFactory,
 				traversableResolver,
+				validatedValueUnwrappers,
+				typeResolutionHelper,
 				failFast
 		);
 	}
@@ -211,7 +237,7 @@ public class ValidationContext<T> {
 	 * from the current {@link ParameterNameProvider}.
 	 *
 	 * @return The current executable's parameter names,if this context was
-	 *         created for parameter validation, {@code null} otherwise.
+	 * created for parameter validation, {@code null} otherwise.
 	 */
 	public List<String> getParameterNames() {
 		if ( parameterNameProvider == null ) {
@@ -274,7 +300,8 @@ public class ValidationContext<T> {
 				descriptor,
 				constraintViolationCreationContext.getExpressionVariables()
 		);
-		Path path = constraintViolationCreationContext.getPath();
+		// at this point we make a copy of the path to avoid side effects
+		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
 
 		if ( executableParameters != null ) {
 			return ConstraintViolationImpl.forParameterValidation(
@@ -336,6 +363,31 @@ public class ValidationContext<T> {
 			set.add( metaConstraint );
 			processedMetaConstraints.put( beanAndPath, set );
 		}
+	}
+
+	/**
+	 * Returns the first validated value handler found which supports the given type.
+	 * <p>
+	 * If required this could be enhanced to search for the most-specific handler and raise an exception in case more
+	 * than one matching handler is found (or a scheme of prioritizing handlers to process several handlers in order.
+	 *
+	 * @param type the type to be handled
+	 *
+	 * @return the handler for the given type or {@code null} if no matching handler was found
+	 */
+	public ValidatedValueUnwrapper<?> getValidatedValueUnwrapper(Type type) {
+		TypeResolver typeResolver = typeResolutionHelper.getTypeResolver();
+
+		for ( ValidatedValueUnwrapper<?> handler : validatedValueUnwrappers ) {
+			ResolvedType handlerType = typeResolver.resolve( handler.getClass() );
+			List<ResolvedType> typeParameters = handlerType.typeParametersFor( ValidatedValueUnwrapper.class );
+
+			if ( TypeHelper.isAssignable( typeParameters.get( 0 ).getErasedType(), type ) ) {
+				return handler;
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -431,10 +483,10 @@ public class ValidationContext<T> {
 	}
 
 	/**
-	 * Builder for creating {@link ValidationContext}s suited for the different
-	 * kinds of validation. Retrieve a builder with all common attributes via
-	 * {@link ValidationContext#getValidationContext(ConstraintValidatorManager,
-	 * MessageInterpolator, ConstraintValidatorFactory, TraversableResolver, boolean)} and then invoke one of
+	 * Builder for creating {@link ValidationContext}s suited for the different kinds of validation.
+	 *
+	 * Retrieve a builder with all common attributes via {@link ValidationContext#getValidationContext(ConstraintValidatorManager,
+	 * MessageInterpolator, ConstraintValidatorFactory, TraversableResolver, List, TypeResolutionHelper, boolean)} and then invoke one of
 	 * the dedicated methods such as {@link #forValidate(Object)}.
 	 *
 	 * @author Gunnar Morling
@@ -444,6 +496,8 @@ public class ValidationContext<T> {
 		private final MessageInterpolator messageInterpolator;
 		private final ConstraintValidatorFactory constraintValidatorFactory;
 		private final TraversableResolver traversableResolver;
+		private final List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers;
+		private final TypeResolutionHelper typeResolutionHelper;
 		private final boolean failFast;
 
 		private ValidationContextBuilder(
@@ -451,11 +505,15 @@ public class ValidationContext<T> {
 				MessageInterpolator messageInterpolator,
 				ConstraintValidatorFactory constraintValidatorFactory,
 				TraversableResolver traversableResolver,
+				List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
+				TypeResolutionHelper typeResolutionHelper,
 				boolean failFast) {
 			this.constraintValidatorManager = constraintValidatorManager;
 			this.messageInterpolator = messageInterpolator;
 			this.constraintValidatorFactory = constraintValidatorFactory;
 			this.traversableResolver = traversableResolver;
+			this.validatedValueUnwrappers = validatedValueUnwrappers;
+			this.typeResolutionHelper = typeResolutionHelper;
 			this.failFast = failFast;
 		}
 
@@ -467,7 +525,9 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
-					null, //parameter name provider
+					null, //parameter name provider,
+					validatedValueUnwrappers,
+					typeResolutionHelper,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -485,7 +545,9 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
-					null, //parameter name provider
+					null, //parameter name provider,
+					validatedValueUnwrappers,
+					typeResolutionHelper,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -502,6 +564,8 @@ public class ValidationContext<T> {
 					constraintValidatorFactory,
 					traversableResolver,
 					null, //parameter name provider
+					validatedValueUnwrappers,
+					typeResolutionHelper,
 					failFast,
 					null, //root bean
 					rootBeanClass,
@@ -525,6 +589,8 @@ public class ValidationContext<T> {
 					constraintValidatorFactory,
 					traversableResolver,
 					parameterNameProvider,
+					validatedValueUnwrappers,
+					typeResolutionHelper,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -547,6 +613,8 @@ public class ValidationContext<T> {
 					constraintValidatorFactory,
 					traversableResolver,
 					null, //parameter name provider
+					validatedValueUnwrappers,
+					typeResolutionHelper,
 					failFast,
 					rootBean,
 					rootBeanClass,

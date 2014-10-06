@@ -20,6 +20,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
+import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 
@@ -133,7 +134,7 @@ public class UnwrapValidatedValueTest {
 		ConstraintMapping mapping = configuration.createConstraintMapping();
 		mapping.type( OrderLine.class )
 				.property( "id", ElementType.FIELD )
-					.unwrapValidatedValue();
+					.unwrapValidatedValue( true );
 
 		Validator validator = configuration.addMapping( mapping )
 				.addValidatedValueHandler( new PropertyValueUnwrapper() )
@@ -144,6 +145,22 @@ public class UnwrapValidatedValueTest {
 		assertEquals( violations.size(), 1 );
 	}
 
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
+	public void explicitly_skipping_unwrapping_leads_to_exception_due_to_missing_constraint_validator() {
+		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
+		ConstraintMapping mapping = configuration.createConstraintMapping();
+		mapping.type( OrderLine.class )
+				.property( "id", ElementType.FIELD )
+					.unwrapValidatedValue( false );
+
+		Validator validator = configuration.addMapping( mapping )
+				.addValidatedValueHandler( new PropertyValueUnwrapper() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		validator.validate( new OrderLine() );
+	}
+
 	@Test
 	public void shouldUnwrapParameterValueBasedOnProgrammaticConfiguration() throws Exception {
 		HibernateValidatorConfiguration configuration = ValidatorUtil.getConfiguration();
@@ -151,7 +168,7 @@ public class UnwrapValidatedValueTest {
 		mapping.type( OrderLine.class )
 				.method( "setId", Property.class )
 					.parameter( 0 )
-						.unwrapValidatedValue();
+						.unwrapValidatedValue( true );
 
 		Validator validator = configuration.addMapping( mapping )
 				.addValidatedValueHandler( new PropertyValueUnwrapper() )
@@ -175,7 +192,7 @@ public class UnwrapValidatedValueTest {
 		mapping.type( OrderLine.class )
 				.method( "getId" )
 					.returnValue()
-						.unwrapValidatedValue();
+						.unwrapValidatedValue( true );
 
 		Validator validator = configuration.addMapping( mapping )
 				.addValidatedValueHandler( new PropertyValueUnwrapper() )

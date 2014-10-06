@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.validation.Valid;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -34,8 +35,8 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.test.internal.util.constraints.NotBlankTypeUse;
-import org.hibernate.validator.test.internal.util.constraints.NotNullTypeUse;
+import org.hibernate.validator.testutil.constraints.NotBlankTypeUse;
+import org.hibernate.validator.testutil.constraints.NotNullTypeUse;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -149,29 +150,32 @@ public class TypeAnnotationAwareMetaDataProviderTest extends AnnotationMetaDataP
 	}
 
 	static class A {
+		@Valid
 		List<@NotNullTypeUse @NotBlankTypeUse String> names;
 	}
 
 	static class B {
+		@Valid
 		public List<@NotNullTypeUse @NotBlankTypeUse String> getNames() {
 			return Collections.emptyList();
 		}
 	}
 
 	static class C {
+		@Valid
 		public List<@NotNullTypeUse @NotBlankTypeUse String> returnNames() {
 			return Collections.emptyList();
 		}
 	}
 
 	static class D {
-		public void setValues(String s, Integer i, List<@NotNullTypeUse @NotBlankTypeUse String> numbers) {
+		public void setValues(String s, Integer i, @Valid List<@NotNullTypeUse @NotBlankTypeUse String> numbers) {
 
 		}
 	}
 
 	static class E {
-		public E(String s, Integer i, List<@NotNullTypeUse @NotBlankTypeUse String> numbers) {
+		public E(String s, Integer i, @Valid List<@NotNullTypeUse @NotBlankTypeUse String> numbers) {
 
 		}
 	}

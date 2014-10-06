@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.hibernate.validator.test.internal.engine.typeuse.model;
+package org.hibernate.validator.test.internal.engine.typeannotationconstraint;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -29,11 +29,13 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 
+import org.apache.log4j.Logger;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.test.internal.util.constraints.NotBlankTypeUse;
-import org.hibernate.validator.test.internal.util.constraints.NotNullTypeUse;
+import org.hibernate.validator.testutil.constraints.NotBlankTypeUse;
+import org.hibernate.validator.testutil.constraints.NotNullTypeUse;
+import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
@@ -42,9 +44,12 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
+ * Tests Java 8 type use annotations.
+ *
  * @author Khalid Alqinyah
+ * @author Hardy Ferentschik
  */
-public class TypeUseValidationTest {
+public class TypeAnnotationConstraintTest {
 
 	private Validator validator;
 
@@ -54,30 +59,48 @@ public class TypeUseValidationTest {
 	}
 
 	@Test
-	public void testTypeUseWithList() {
-		A a = new A();
+	public void field_constraint_provided_on_type_parameter_of_a_list_gets_validated() {
+		A1 a = new A1();
 		a.names = Arrays.asList( "First", "", null );
-		Set<ConstraintViolation<A>> constraintViolations = validator.validate( a );
+
+		Set<ConstraintViolation<A1>> constraintViolations = validator.validate( a );
+
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths( constraintViolations, "names[1]", "names[2]", "names[2]" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class, NotBlankTypeUse.class, NotNullTypeUse.class );
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlankTypeUse.class,
+				NotBlankTypeUse.class,
+				NotNullTypeUse.class
+		);
+	}
+
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000187.*")
+	public void valid_annotation_required_for_constraint_on_type_parameter_of_iterable() {
+		A2 a = new A2();
+		a.names = Arrays.asList( "First", "", null );
+		validator.validate( a );
 	}
 
 	@Test
-	public void testTypeUseWithMap() {
-		F f = new F();
-		f.namesMap = newHashMap();
-		f.namesMap.put("first", "Name 1");
-		f.namesMap.put("second", "");
-		f.namesMap.put("third", "Name 3");
-		Set<ConstraintViolation<F>> constraintViolations = validator.validate( f );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "namesMap[second]" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class );
+	public void getter_constraint_provided_on_type_parameter_of_a_list_gets_validated() {
+		A3 a = new A3();
+		a.strings = Arrays.asList( "", "First", null );
+
+		Set<ConstraintViolation<A3>> constraintViolations = validator.validate( a );
+
+		assertNumberOfViolations( constraintViolations, 3 );
+		assertCorrectPropertyPaths( constraintViolations, "strings[0]", "strings[2]", "strings[2]" );
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlankTypeUse.class,
+				NotBlankTypeUse.class,
+				NotNullTypeUse.class
+		);
 	}
 
 	@Test
-	public void testTypeUseWithCustomBean() {
+	public void constraint_provided_on_custom_bean_used_as_list_parameter_gets_validated() {
 		B b = new B();
 		b.bars = Arrays.asList( new Bar( 2 ), null );
 		Set<ConstraintViolation<B>> constraintViolations = validator.validate( b );
@@ -87,17 +110,32 @@ public class TypeUseValidationTest {
 	}
 
 	@Test
-	public void testTypeUseWithOptional() {
+	public void constraint_specified_on_type_parameter_of_optional_gets_validated() {
 		C c = new C();
 		c.stringOptional = Optional.of( "" );
+
 		Set<ConstraintViolation<C>> constraintViolations = validator.validate( c );
+
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "stringOptional" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class );
 	}
 
-	@Test( expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000182.*" )
-	public void testTypeUseWithCustomType() {
+	@Test
+	public void constraint_specified_on_value_type_of_map_gets_validated() {
+		F f = new F();
+		f.namesMap = newHashMap();
+		f.namesMap.put( "first", "Name 1" );
+		f.namesMap.put( "second", "" );
+		f.namesMap.put( "third", "Name 3" );
+		Set<ConstraintViolation<F>> constraintViolations = validator.validate( f );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "namesMap[second]" );
+		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class );
+	}
+
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000182.*")
+	public void custom_generic_type_with_type_annotation_constraint_but_no_unwrapper_throws_exception() {
 		// No unwrapper is registered for Baz
 		BazHolder bazHolder = new BazHolder();
 		bazHolder.baz = null;
@@ -105,84 +143,104 @@ public class TypeUseValidationTest {
 	}
 
 	@Test
-	public void testTypeUseWithGetter() {
-		D d = new D();
-		d.strings = Arrays.asList( "", "First", null );
-		Set<ConstraintViolation<D>> constraintViolations = validator.validate( d );
-		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "strings[0]", "strings[2]", "strings[2]" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class, NotBlankTypeUse.class, NotNullTypeUse.class );
-	}
-
-	@Test
-	public void testTypeUseWithReturnValue() throws Exception {
+	public void return_value_constraint_provided_on_type_parameter_of_a_list_gets_validated() throws Exception {
 		Method method = E.class.getDeclaredMethod( "returnStrings" );
 		Set<ConstraintViolation<E>> constraintViolations = validator.forExecutables().validateReturnValue(
 				new E(),
 				method,
-				Arrays.asList( "First", "", null ) );
+				Arrays.asList( "First", "", null )
+		);
 		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations,
+		assertCorrectPropertyPaths(
+				constraintViolations,
 				"returnStrings.<return value>[1]",
 				"returnStrings.<return value>[2]",
-				"returnStrings.<return value>[2]" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class, NotBlankTypeUse.class, NotNullTypeUse.class );
+				"returnStrings.<return value>[2]"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlankTypeUse.class,
+				NotBlankTypeUse.class,
+				NotNullTypeUse.class
+		);
 	}
 
 	@Test
-	public void testTypeUseWithExecutableParameter() throws Exception {
+	public void method_parameter_constraint_provided_as_type_parameter_of_a_list_gets_validated()
+			throws Exception {
 		Method method = H.class.getDeclaredMethod( "setValues", List.class, Optional.class );
-		Object[] values = new Object[] {Arrays.asList( "", "First", null ), Optional.of( "" ) };
+		Object[] values = new Object[] { Arrays.asList( "", "First", null ), Optional.of( "" ) };
 
 		Set<ConstraintViolation<H>> constraintViolations = validator.forExecutables().validateParameters(
 				new H(),
 				method,
-				values );
+				values
+		);
 		assertNumberOfViolations( constraintViolations, 4 );
-		assertCorrectPropertyPaths( constraintViolations,
+		assertCorrectPropertyPaths(
+				constraintViolations,
 				"setValues.arg0[0]",
 				"setValues.arg0[2]",
 				"setValues.arg0[2]",
-				"setValues.arg1" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class, NotBlankTypeUse.class, NotNullTypeUse.class, NotBlankTypeUse.class );
+				"setValues.arg1"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlankTypeUse.class,
+				NotBlankTypeUse.class,
+				NotNullTypeUse.class,
+				NotBlankTypeUse.class
+		);
 	}
 
 	@Test
-	public void testTypeUseWithConstructorParameter() throws Exception {
+	public void constructor_parameter_constraint_provided_on_type_parameter_of_a_list_gets_validated()
+			throws Exception {
 		Constructor<G> constructor = G.class.getDeclaredConstructor( List.class, Optional.class );
-		Object[] values = new Object[] {Arrays.asList( "", "First", null ), Optional.of( "" ) };
+		Object[] values = new Object[] { Arrays.asList( "", "First", null ), Optional.of( "" ) };
 
 		Set<ConstraintViolation<G>> constraintViolations = validator.forExecutables().validateConstructorParameters(
 				constructor,
 				values
 		);
 		assertNumberOfViolations( constraintViolations, 4 );
-		assertCorrectPropertyPaths( constraintViolations,
+		assertCorrectPropertyPaths(
+				constraintViolations,
 				"G.arg0[0]",
 				"G.arg0[2]",
 				"G.arg0[2]",
-				"G.arg1" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class, NotBlankTypeUse.class, NotNullTypeUse.class, NotBlankTypeUse.class );
+				"G.arg1"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlankTypeUse.class,
+				NotBlankTypeUse.class,
+				NotNullTypeUse.class,
+				NotBlankTypeUse.class
+		);
 	}
 
 	@Test
-	public void testTypeUseWithMoreThanOneTypeArgument() {
+	public void unsupported_use_of_type_constraints_logs_warning() {
+		Logger log4jRootLogger = Logger.getRootLogger();
+		MessageLoggedAssertionLogger assertingLogger = new MessageLoggedAssertionLogger( "HV000188" );
+		log4jRootLogger.addAppender( assertingLogger );
+
 		// No unwrapper exception shouldn't be thrown, type use constraints are ignored
 		FooHolder fooHolder = new FooHolder();
 		fooHolder.foo = null;
 		validator.validate( fooHolder );
+
+		assertingLogger.assertMessageLogged();
+		log4jRootLogger.removeAppender( assertingLogger );
 	}
 
-	@Test
-	public void testTypeUseWithoutValidAnnotation() {
-		I i = new I();
-		i.names = Arrays.asList( "First", "", null );
-		Set<ConstraintViolation<I>> constraintViolations = validator.validate( i );
-		assertNumberOfViolations( constraintViolations, 0 );
-	}
-
-	static class A {
+	static class A1 {
 		@Valid
+		List<@NotNullTypeUse @NotBlankTypeUse String> names;
+	}
+
+	static class A2 {
 		List<@NotNullTypeUse @NotBlankTypeUse String> names;
 	}
 
@@ -192,11 +250,10 @@ public class TypeUseValidationTest {
 	}
 
 	static class C {
-		@Valid
 		Optional<@NotBlankTypeUse String> stringOptional;
 	}
 
-	static class D {
+	static class A3 {
 		List<String> strings;
 
 		@Valid
@@ -220,19 +277,15 @@ public class TypeUseValidationTest {
 	}
 
 	static class G {
-		public G(@Valid List<@NotNullTypeUse @NotBlankTypeUse String> names, @Valid Optional<@NotBlankTypeUse String> optionalParameter) {
+		public G(@Valid List<@NotNullTypeUse @NotBlankTypeUse String> names, Optional<@NotBlankTypeUse String> optionalParameter) {
 
 		}
 	}
 
 	static class H {
-		public void setValues(@Valid List<@NotNullTypeUse @NotBlankTypeUse String> listParameter, @Valid Optional<@NotBlankTypeUse String> optionalParameter) {
+		public void setValues(@Valid List<@NotNullTypeUse @NotBlankTypeUse String> listParameter, Optional<@NotBlankTypeUse String> optionalParameter) {
 
 		}
-	}
-
-	static class I {
-		List<@NotNullTypeUse @NotBlankTypeUse String> names;
 	}
 
 	static class Bar {
@@ -245,7 +298,6 @@ public class TypeUseValidationTest {
 	}
 
 	static class BazHolder {
-		@Valid
 		Baz<@NotNullTypeUse String> baz;
 	}
 
@@ -254,7 +306,6 @@ public class TypeUseValidationTest {
 	}
 
 	class FooHolder {
-		@Valid
 		Foo<@NotNullTypeUse Integer, @NotBlankTypeUse String> foo;
 	}
 

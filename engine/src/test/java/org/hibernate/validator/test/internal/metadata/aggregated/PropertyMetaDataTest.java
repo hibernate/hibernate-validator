@@ -18,7 +18,6 @@ package org.hibernate.validator.test.internal.metadata.aggregated;
 
 import java.util.Collections;
 import java.util.Set;
-
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
@@ -28,17 +27,18 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
 
 /**
  * @author Gunnar Morling
@@ -79,23 +79,29 @@ public class PropertyMetaDataTest {
 	@Test
 	public void unwrapValidatedValueGivenOnField() {
 		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( Customer.class ).getMetaDataFor( "name" );
-		assertTrue( property.requiresUnwrapping() );
+		assertEquals( property.unwrapMode(), UnwrapMode.UNWRAP );
 
 		property = beanMetaDataManager.getBeanMetaData( Customer.class ).getMetaDataFor( "age" );
-		assertFalse( property.requiresUnwrapping() );
+		assertEquals( property.unwrapMode(), UnwrapMode.AUTOMATIC );
 	}
 
 	@Test
 	public void unwrapValidatedValueGivenOnProperty() {
 		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( Customer.class ).getMetaDataFor( "firstName" );
-		assertTrue( property.requiresUnwrapping() );
+		assertEquals( property.unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
 	@Test
 	public void unwrapValidatedValueGivenOnPropertyInSuperClass() {
 		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( RetailCustomer.class )
 				.getMetaDataFor( "firstName" );
-		assertTrue( property.requiresUnwrapping() );
+		assertEquals( property.unwrapMode(), UnwrapMode.UNWRAP );
+	}
+
+	@TestForIssue( jiraKey = "HV-925")
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000189.*")
+	public void inconsistent_unwrap_configuration_between_field_and_getter_throws_exception() {
+		beanMetaDataManager.getBeanMetaData( DiscountCustomer.class ).getMetaDataFor( "firstName" );
 	}
 
 	public interface Complete extends Default {
@@ -157,5 +163,17 @@ public class PropertyMetaDataTest {
 	}
 
 	private static class RetailCustomer extends Customer {
+	}
+
+	@SuppressWarnings("unused")
+	private static class DiscountCustomer {
+
+		@UnwrapValidatedValue(false)
+		private String firstName;
+
+		@UnwrapValidatedValue
+		public String getFirstName() {
+			return firstName;
+		}
 	}
 }

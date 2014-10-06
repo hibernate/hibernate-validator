@@ -27,6 +27,7 @@ import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorImpl;
@@ -61,15 +62,15 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 							  Set<MetaConstraint<?>> typeArgumentsConstraints,
 							  boolean isCascading,
 							  Map<Class<?>, Class<?>> groupConversions,
-							  boolean requiresUnwrapping) {
+							  UnwrapMode unwrapMode) {
 		super(
 				name,
 				type,
 				constraints,
 				ElementKind.PARAMETER,
 				isCascading,
-				!constraints.isEmpty() || isCascading,
-				requiresUnwrapping
+				!constraints.isEmpty() || isCascading || !typeArgumentsConstraints.isEmpty(),
+				unwrapMode
 		);
 
 		this.index = index;
@@ -164,7 +165,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					typeArgumentsConstraints,
 					isCascading(),
 					getGroupConversions(),
-					requiresUnwrapping()
+					unwrapMode()
 			);
 		}
 	}

@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.validation.ParameterNameProvider;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -94,7 +95,7 @@ class ConstrainedParameterBuilder {
 					Collections.<MetaConstraint<?>>emptySet(),
 					groupConversions,
 					parameterType.getValid() != null,
-					false
+					UnwrapMode.AUTOMATIC
 			);
 			constrainedParameters.add( constrainedParameter );
 			i++;

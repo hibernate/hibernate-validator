@@ -22,9 +22,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
-@Constraint(validatedBy = {})
+@Constraint(validatedBy = { AuthorBusinessRules.AuthorBusinessRulesValidator.class })
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -34,4 +36,17 @@ public @interface AuthorBusinessRules {
 	Class<?>[] groups() default {};
 
 	Class<? extends Payload>[] payload() default {};
+
+	public class AuthorBusinessRulesValidator implements ConstraintValidator<AuthorBusinessRules, Object> {
+
+		@Override
+		public void initialize(AuthorBusinessRules constraintAnnotation) {
+
+		}
+
+		@Override
+		public boolean isValid(Object value, ConstraintValidatorContext context) {
+			return true;
+		}
+	}
 }

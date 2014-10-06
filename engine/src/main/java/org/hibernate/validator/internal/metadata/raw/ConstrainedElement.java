@@ -19,6 +19,7 @@ package org.hibernate.validator.internal.metadata.raw;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
@@ -77,7 +78,7 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 * element.
 	 *
 	 * @return A set with this constrained element's constraints. May be empty,
-	 *         but never <code>null</code>.
+	 *         but never {@code null}.
 	 */
 	Set<MetaConstraint<?>> getConstraints();
 
@@ -110,9 +111,13 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	boolean isConstrained();
 
 	/**
-	 * Whether this element is marked for unwrapping prior to validation or not.
+	 * Determines how to handle unwrapping of validated values. Per default unwrapping occurs automatically
+	 * based on the validated type and registered {@code ValidatedValueUnwrapper}s. It can also be explcitly configured
+	 * using {@code UnwrapValidatedValue}.
 	 *
-	 * @return {@code true} if the value to be validated needs to unwrapped, {@code false} otherwise.
+	 * @return Returns the unwrapping mode for this constrained element.
+	 * @see org.hibernate.validator.valuehandling.UnwrapValidatedValue
+	 * @see org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper
 	 */
-	boolean requiresUnwrapping();
+	UnwrapMode unwrapMode();
 }

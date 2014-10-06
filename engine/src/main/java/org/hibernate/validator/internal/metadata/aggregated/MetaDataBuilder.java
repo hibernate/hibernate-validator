@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -50,7 +51,7 @@ public abstract class MetaDataBuilder {
 	private final Set<MetaConstraint<?>> constraints = newHashSet();
 	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
-	private boolean requiresUnwrapping = false;
+	private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 
 	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper) {
 		this.beanClass = beanClass;
@@ -79,7 +80,7 @@ public abstract class MetaDataBuilder {
 	public void add(ConstrainedElement constrainedElement) {
 		constraints.addAll( constrainedElement.getConstraints() );
 		isCascading = isCascading || constrainedElement.isCascading();
-		requiresUnwrapping = requiresUnwrapping || constrainedElement.requiresUnwrapping();
+		unwrapMode = constrainedElement.unwrapMode();
 
 		addGroupConversions( constrainedElement.getGroupConversions() );
 	}
@@ -122,8 +123,12 @@ public abstract class MetaDataBuilder {
 		return isCascading;
 	}
 
-	public boolean requiresUnwrapping() {
-		return requiresUnwrapping;
+	protected Class<?> getBeanClass() {
+		return beanClass;
+	}
+
+	public UnwrapMode unwrapMode() {
+		return unwrapMode;
 	}
 
 	/**
