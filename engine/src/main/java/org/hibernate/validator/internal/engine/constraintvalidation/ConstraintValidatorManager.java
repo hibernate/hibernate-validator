@@ -243,7 +243,6 @@ public class ConstraintValidatorManager {
 										ConstraintDescriptorImpl<?> descriptor,
 										List<Type> constraintValidatorTypesForValidatedValue,
 										List<Type> constraintValidatorTypesForWrappedValue) {
-		Type typeOfValidatedElement = valueContext.getDeclaredTypeOfValidatedElement();
 		TypeResolutionResult typeResolutionResult = typeResolutionOutcome(
 				constraintValidatorTypesForValidatedValue,
 				constraintValidatorTypesForWrappedValue,
@@ -276,17 +275,22 @@ public class ConstraintValidatorManager {
 					);
 				}
 				else {
-					String className = typeOfValidatedElement.toString();
+					Type typeOfValidatedElement = getValidatedValueTypeForErrorReporting( valueContext );
+					String validatedValueClassName = typeOfValidatedElement.toString();
 					if ( typeOfValidatedElement instanceof Class ) {
 						Class<?> clazz = (Class<?>) typeOfValidatedElement;
 						if ( clazz.isArray() ) {
-							className = clazz.getComponentType().toString() + "[]";
+							validatedValueClassName = clazz.getComponentType().toString() + "[]";
 						}
 						else {
-							className = clazz.getName();
+							validatedValueClassName = clazz.getName();
 						}
 					}
-					throw log.getNoValidatorFoundForTypeException( className );
+					throw log.getNoValidatorFoundForTypeException(
+							descriptor.getAnnotationType().getName(),
+							validatedValueClassName,
+							valueContext.getPropertyPath().toString()
+					);
 				}
 			}
 			case MULTIPLE_VALIDATORS_FOR_WRAPPED_VALUE: {

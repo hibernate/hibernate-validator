@@ -154,8 +154,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 29, value = "Constraint factory returned null when trying to create instance of %s.")
 	ValidationException getConstraintFactoryMustNotReturnNullException(String validatorClassName);
 
-	@Message(id = 30, value = "No validator could be found for type: %s.")
-	UnexpectedTypeException getNoValidatorFoundForTypeException(String className);
+	@Message(id = 30,
+			value = "No validator could be found for constraint '%s' validating type '%s'. Check configuration for '%s'")
+	UnexpectedTypeException getNoValidatorFoundForTypeException(String constraintType,
+			String validatedValueType,
+			String path);
 
 	@Message(id = 31,
 			value = "There are multiple validator classes which could validate the type %1$s. The validator classes are: %2$s.")
