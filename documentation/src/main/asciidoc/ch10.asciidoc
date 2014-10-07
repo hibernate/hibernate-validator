@@ -485,7 +485,7 @@ public class ExpressRentalStation implements RentalStation {
 === Java EE
 
 When your application runs on a Java EE application server such as WildFly, you also can obtain
-Validator and ValidatorFactory instances via @Resource injection in managed objects such as EJBs
++Validator+ and +ValidatorFactory+ instances via +@Resource+ injection in managed objects such as EJBs
 etc., as shown in <<example-validator-resource-injection>>.
 
 [[example-validator-resource-injection]]
@@ -510,9 +510,9 @@ public class RentalStationBean {
 ====
 
 Alternatively you can obtain a validator and a validator factory from JNDI under the names
-"java:comp/Validator" and "java:comp/ValidatorFactory", respectively.
+"_java:comp/Validator_" and "_java:comp/ValidatorFactory_", respectively.
 
-Similar to CDI-based injection via @Inject, these objects represent default validator and validator
+Similar to CDI-based injection via +@Inject+, these objects represent default validator and validator
 factory and thus can be configured using the XML descriptor _META-INF/validation.xml_ (see
 <<chapter-xml-configuration>>).
 
@@ -522,5 +522,8 @@ dependency injection in constraint validators.
 === JavaFX
 
 Hibernate Validator also provides support for the unwrapping of JavaFX properties. If JavaFX is present
-on the classpath and the +@UnwrapValidatedValue+ is used, the JavaFX property is unwrapped and the
-internal value is validated. See <<section-javafx-unwrapper>> for examples and further discussion.
+on the classpath a +ValidatedValueUnwrapper+ for JavaFX properties is automatically registered. In some
+cases, however, it is also necessary to explicitly use +@UnwrapValidatedValue+. This is required if
+the constraint validator resolution is not unique and there is a potential constraint validator for
+the actual JavaFX property as well as the contained property value itself.
+See <<section-javafx-unwrapper>> for examples and further discussion.

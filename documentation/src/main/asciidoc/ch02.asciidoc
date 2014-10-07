@@ -139,7 +139,7 @@ to be validated twice.
 
 Starting from Java 8, it is possible to specify constraints directly on the type argument of a
 parameterized type. However, this requires that +ElementType.TYPE_USE+ is specified via +@Target+
-in the constraint definition. To maintain backwards compatibility built-in Bean Validation as well as
+in the constraint definition. To maintain backwards compatibility, built-in Bean Validation as well as
 Hibernate Validator specific constraints do not yet specify +ElementType.TYPE_USE+. To make use of
 type argument constraints, custom constraints must be used (see <<validator-customconstraints>>).
 
@@ -255,7 +255,6 @@ import javax.validation.Valid;
 
 public class Car {
 
-	@Valid
 	private Optional<@MinTowingCapacity(1000) Integer> towingCapacity = Optional.empty();
 
 	public void setTowingCapacity(Integer alias) {
@@ -301,7 +300,6 @@ package org.hibernate.validator.referenceguide.chapter02.typeargument;
 
 public class Car {
 
-	@Valid
 	private GearBox<@MinTorque(100) Gear> gearBox;
 
 	public void setGearBox(GearBox<Gear> gearBox) {

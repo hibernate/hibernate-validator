@@ -500,19 +500,19 @@ Alternatively you can specify a Paranamer implementation of your choice when cre
 ParanamerParameterNameProvider instance.
 
 [[section-value-handling]]
-=== Unwrapping values prior to validation
+=== Unwrapping values
 
-Sometimes it is required to unwrap values prior to the validation. E.g. in
-<<example-using-unwrapvalidatedvalue>> property types as specified by
-link:$$http://docs.oracle.com/javafx/$$[JavaFX] are used to define an element of some domain model.
+Sometimes it is required to unwrap values prior to validating them. For example, in
+<<example-using-unwrapvalidatedvalue>> a link:http://docs.oracle.com/javafx/[JavaFX] property type
+is used to define an element of a domain model. The +@Size+ constraint is meant to be applied to the
+string value not the wrapping +Property+ instance.
 
 [[example-using-unwrapvalidatedvalue]]
-.Using +@UnwrapValidatedValue+
+.Applying a constraint to wrapped value of a JavaFX property
 ====
 [source, JAVA]
 ----
 @Size(min = 3)
-@UnwrapValidatedValue
 private Property<String> name = new SimpleStringProperty( "Bob" );
 ----
 ====
@@ -524,17 +524,17 @@ general means of value handling in future releases. Please let us know about you
 functionality.
 ====
 
-In JavaFX, bean properties are typically not of simple data types like String or int, but are
-wrapped in Property types which allows to make them observable, use them for data binding etc. When
-applying a constraint such as @Size to an element of type Property<String> without further
+Bean properties in JavaFX are typically not of simple data types like +String+ or +int+, but are
+wrapped in +Property+ types which allows to make them observable, use them for data binding etc. When
+applying a constraint such as +@Size+ to an element of type +Property<String>+ without further
 preparation, an exception would be raised, indicating that no suitable validator for that constraint
 and data type can be found. Thus the validated value must be unwrapped from the containing property
 object before looking up a validator and invoking it.
 
-To do so, put the @UnwrapValidatedValue annotation to the element in question. This will advice the
-validation engine to look for an unwrapper implementation which returns the data type to be used for
-constraint validator resolution and unwraps the validated value. Unwrapper types must extend the SPI
-class ValidatedValueUnwrapper as shown in <<example-implementation-of-validatedvalueunwrapper>>.
+For unwrapping to occur a +ValidatedValueUnwrapper+ needs to be registered for the type
+requiring unwrapping. Example <<example-implementation-of-validatedvalueunwrapper>> shows how this
+schematically looks for a JavaFX +PropertyValueUnwrapper+. You just need to extend the SPI class
++ValidatedValueUnwrapper+ and implement its abstract methods.
 
 [[example-implementation-of-validatedvalueunwrapper]]
 .Implementing the ValidatedValueUnwrapper interface
@@ -556,7 +556,7 @@ public class PropertyValueUnwrapper extends ValidatedValueUnwrapper<Property<?>>
 ----
 ====
 
-Value unwrappers must be registered when obtaining a Validator instance as follows:
+The +ValidatedValueUnwrapper+ needs also to be registered with the +ValidatorFactory+:
 
 [[example-registering-validatedvalueunwrapper]]
 .Registering a ValidatedValueUnwrapper
@@ -571,78 +571,92 @@ Validator validator = Validation.byProvider( HibernateValidator.class )
 ----
 ====
 
-Several unwrapper implementations can be registered when working with different kinds of wrapper
-types in one application. Note that it is not specified which of the unwrapper implementations is
-chosen when more than one implementation is suitable to unwrap a given element.
+Several unwrapper implementations can be registered. During constraint validator resolution
+Hibernate Validator automatically checks whether a +ValidatedValueUnwrapper+ exists for the validated
+value. If so, unwrapping occurs automatically. In some cases, however, constraint validator instances
+for a given constraint might exist for the wrapper as well as the wrapped value (+@NotNull+ for example
+applies to all objects). In this case Hibernate Validator needs to be explicitly told which value
+to validate. This can be done via +@UnwrapValidatedValue(true)+ respectively
++@UnwrapValidatedValue(false)+.
 
-Alternatively, the fully-qualified names of one ore more unwrapper implementations can be specified
-via the configuration property hibernate.validator.validated_value_handlers which can be useful when
+[NOTE]
+====
+Note that it is not specified which of the unwrapper implementations is
+chosen when more than one implementation is suitable to unwrap a given element.
+====
+
+Instead of programmatically registering +ValidatedValueUnwrapper+ types, the fully-qualified names
+of one ore more unwrapper implementations can be specified
+via the configuration property +hibernate.validator.validated_value_handlers+ which can be useful when
 configuring the default validator factory using the descriptor _META-INF/validation.xml_ (see
 <<chapter-xml-configuration>>).
 
 [[section-optional-unwrapper]]
 ==== Optional unwrapper
 
-Hibernate Validator provides built-in unwrapping for the +Optional+ introduced in Java 8. The unwrapper is registered
-automatically for Java 8 environments, and no further configuration is required. An example of unwrapping
-an +Optional+ is shown in <<example-using-unwrapvalidatedvalue-and-optional>>.
+Hibernate Validator provides built-in unwrapping for +Optional+ introduced in Java 8.
+The unwrapper is registered automatically in Java 8 environments, and no further configuration is
+required. An example of unwrapping an +Optional+ instance is shown in
+<<example-using-unwrapvalidatedvalue-and-optional>>.
 
 [[example-using-unwrapvalidatedvalue-and-optional]]
-.+@UnwrapValidatedValue+ with +Optional+
+.Unwrapping +Optional+ instances
 ====
 [source, JAVA]
 ----
 @Size(min = 3)
-@UnwrapValidatedValue
-private Optional<String> name = Optional.of( "Bob" );
+private Optional<String> firstName = Optional.of( "John" );
+
+@NotNull
+@UnwrapValidatedValue // UnwrapValidatedValue required since otherwise unclear which value to validate
+private Optional<String> lastName = Optional.of( "Doe" );
 ----
 ====
 
 [NOTE]
 ====
-+Optional.empty()+ is treated as +null+ during validation. This means that for constraints where +null+ is considered
-valid, +Optional.empty()+ is similarly valid.
++Optional.empty()+ is treated as +null+ during validation. This means that for constraints where
++null+ is considered valid, +Optional.empty()+ is similarly valid.
 ====
 
 [[section-javafx-unwrapper]]
 ==== JavaFX unwrapper
 
-Additionally, Hibernate Validator provides built-in unwrapping for JavaFX property values. The unwrapper is registered
-automatically for environments where JavaFX is present, and no further configuration is required.
-+ObservableValue+ and its sub-types are supported.
-An example of some of the different ways in which +JavaFX+ property values can be unwrapped is shown in <<example-using-unwrapvalidatedvalue-and-javafx>>.
+Hibernate Validator also provides built-in unwrapping for JavaFX property values. The unwrapper is
+registered automatically for environments where JavaFX is present, and no further configuration is
+required. +ObservableValue+ and its sub-types are supported.
+An example of some of the different ways in which +JavaFX+ property values can be unwrapped is
+shown in <<example-using-unwrapvalidatedvalue-and-javafx>>.
 
 [[example-using-unwrapvalidatedvalue-and-javafx]]
-.+@UnwrapValidatedValue+ with +JavaFX+
+.Unwrapping +JavaFX+ properties
 ====
 [source, JAVA]
 ----
 @Min(value = 3)
-@UnwrapValidatedValue
 IntegerProperty integerProperty1 = new SimpleIntegerProperty( 4 );
 
 @Min(value = 3)
-@UnwrapValidatedValue
 Property<Number> integerProperty2 = new SimpleIntegerProperty( 4 );
 
 @Min(value = 3)
-@UnwrapValidatedValue
 ObservableValue<Number> integerProperty3 = new SimpleIntegerProperty( 4 );
 ----
 ====
 
 ==== Unwrapping object graphs
 
-Unwrapping can also be used with object graphs (cascaded validation) as shown in <<example-using-unwrapvalidatedvalue-and-optional-with-valid>>.
-When validating the object holding the +Optional<Person>+, a cascaded validation of the +Person+ object would be performed.
+Unwrapping can also be used with object graphs (cascaded validation) as shown in
+<<example-using-unwrapvalidatedvalue-and-optional-with-valid>>.
+When validating the object holding the +Optional<Person>+, a cascaded validation of the +Person+
+object would be performed.
 
 [[example-using-unwrapvalidatedvalue-and-optional-with-valid]]
-.+@UnwrapValidatedValue+ with +Optional+ and +@Valid+
+.Unwrapping +Optional+ prior to cascaded validation via +@Valid+
 ====
 [source, JAVA]
 ----
 @Valid
-@UnwrapValidatedValue
 private Optional<Person> person = Optional.of( new Person() );
 ----
 [source, JAVA]
