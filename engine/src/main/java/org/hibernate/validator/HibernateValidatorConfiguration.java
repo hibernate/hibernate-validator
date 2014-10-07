@@ -19,6 +19,7 @@ package org.hibernate.validator;
 import javax.validation.Configuration;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.spi.constraintvalidator.ConstraintValidatorLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
@@ -118,4 +119,20 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @hv.experimental This API is considered experimental and may change in future revisions
 	 */
 	HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler);
+
+	/**
+	 * @return return the default {@link ConstraintValidatorLocator}. Never {@code null}.
+	 */
+	ConstraintValidatorLocator getDefaultConstraintValidatorLocator();
+
+	/**
+	 * Registers the given {@code ConstraintValidatorLocator} with the bootstrapped validator factory.
+	 *
+	 * @param locator the {@code ConstraintValidatorLocator} to register. Cannot be {@code null}.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @hv.experimental This API is considered experimental and may change in future revisions
+	 */
+	HibernateValidatorConfiguration addConstraintValidatorLocator(ConstraintValidatorLocator locator);
 }
