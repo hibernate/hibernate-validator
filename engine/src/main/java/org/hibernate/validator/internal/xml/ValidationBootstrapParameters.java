@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -36,6 +35,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -57,6 +57,7 @@ public class ValidationBootstrapParameters {
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = newHashMap();
 	private final Set<InputStream> mappings = newHashSet();
+	private final Set<ConstraintDefinitionContributor> constraintDefinitionContributors = newHashSet();
 
 	public ValidationBootstrapParameters() {
 	}
@@ -190,7 +191,7 @@ public class ValidationBootstrapParameters {
 		if ( constraintFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) run (
+				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) run(
 						LoadClass.action( constraintFactoryFqcn, this.getClass() )
 				);
 				constraintValidatorFactory = run( NewInstance.action( clazz, "constraint factory class" ) );
@@ -252,5 +253,13 @@ public class ValidationBootstrapParameters {
 
 	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
 		return validatedValueHandlers;
+	}
+
+	public void addConstraintDefinitionContributor(ConstraintDefinitionContributor contributor) {
+		constraintDefinitionContributors.add( contributor );
+	}
+
+	public Set<ConstraintDefinitionContributor> getConstraintDefinitionContributors() {
+		return constraintDefinitionContributors;
 	}
 }

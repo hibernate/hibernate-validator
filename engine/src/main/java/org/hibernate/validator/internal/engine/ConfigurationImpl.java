@@ -24,7 +24,6 @@ import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -55,6 +54,7 @@ import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
@@ -81,6 +81,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final TraversableResolver defaultTraversableResolver;
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
+	private final ConstraintDefinitionContributor defaultConstraintDefinitionContributor;
 
 	private ValidationProviderResolver providerResolver;
 	private final ValidationBootstrapParameters validationBootstrapParameters;
@@ -126,11 +127,17 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 					)
 			);
 		}
-		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES );
+		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator(
+				ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES
+		);
 		this.defaultTraversableResolver = new DefaultTraversableResolver();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultMessageInterpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
+		this.defaultConstraintDefinitionContributor = new ServiceLoaderBasedConstraintDefinitionContributor(
+				typeResolutionHelper
+		);
+		this.addConstraintDefinitionContributor( defaultConstraintDefinitionContributor );
 	}
 
 	@Override
@@ -228,6 +235,23 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler) {
 		Contracts.assertNotNull( handler, MESSAGES.parameterMustNotBeNull( "handler" ) );
 		validationBootstrapParameters.addValidatedValueHandler( handler );
+
+		return this;
+	}
+
+	@Override
+	public ConstraintDefinitionContributor getDefaultConstraintDefinitionContributor() {
+		return defaultConstraintDefinitionContributor;
+	}
+
+	public Set<ConstraintDefinitionContributor> getConstraintDefinitionContributors() {
+		return validationBootstrapParameters.getConstraintDefinitionContributors();
+	}
+
+	@Override
+	public HibernateValidatorConfiguration addConstraintDefinitionContributor(ConstraintDefinitionContributor contributor) {
+		Contracts.assertNotNull( contributor, MESSAGES.parameterMustNotBeNull( "contributor" ) );
+		validationBootstrapParameters.addConstraintDefinitionContributor( contributor );
 
 		return this;
 	}
@@ -381,7 +405,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 		}
 		else {
-			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters( getBootstrapConfiguration() );
+			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters(
+					getBootstrapConfiguration()
+			);
 			applyXmlSettings( xmlParameters );
 		}
 	}
@@ -409,7 +435,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 		if ( validationBootstrapParameters.getConstraintValidatorFactory() == null ) {
 			if ( xmlParameters.getConstraintValidatorFactory() != null ) {
-				validationBootstrapParameters.setConstraintValidatorFactory( xmlParameters.getConstraintValidatorFactory() );
+				validationBootstrapParameters.setConstraintValidatorFactory(
+						xmlParameters.getConstraintValidatorFactory()
+				);
 			}
 			else {
 				validationBootstrapParameters.setConstraintValidatorFactory( defaultConstraintValidatorFactory );
