@@ -475,7 +475,7 @@ public interface HibernateMessageInterpolatorContext extends MessageInterpolator
 === ParaNamer based ParameterNameProvider
 
 Hibernate Validator comes with a ParameterNameProvider implementation which leverages the
-link:$$http://paranamer.codehaus.org/$$[ParaNamer] library.
+link:http://paranamer.codehaus.org/[ParaNamer] library.
 
 This library provides several ways for obtaining parameter names at runtime, e.g. based on debug
 symbols created by the Java compiler, constants with the parameter names woven into the bytecode in
@@ -667,3 +667,92 @@ public class Person {
 }
 ----
 ====
+
+[[section-constraint-definition-contribution]]
+=== Providing constraint definitions
+
+Bean Validation allows to (re-)define constraint definitions via XML in its constraint mapping
+files. See <<section-mapping-xml-constraints>> for more information and <<example-constraints-car>>
+for an example. While this approach is sufficient for many use cases,  it has it shortcomings
+in others. Imagine for example a constraint library wanting to contribute constraint
+definitions for custom types. This library could provide a mapping file with their library, but this
+file still would need to be referenced by the user of the library. Luckily there are better ways.
+
+[NOTE]
+====
+The following concepts are considered experimental at this time. Let us know whether you find them
+useful and whether they meet your needs.
+====
+
+==== Constraint definitions via +ServiceLoader+
+
+Hibernate Validator allows to utilize Java's
+link:http://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html/[ServiceLoader]
+mechanism to register additional constraint definitions. All you have to do is to add the file
+_javax.validation.ConstraintValidator_ to _META-INF/services_. In this service file you list the
+fully qualified classnames of your constraint validator classes (one per line). Hibernate Validator
+will automatically infer the constraint types they apply to.
+See <<example-using-service-file-for-constraint-definitions>> for an example
+
+[[example-using-service-file-for-constraint-definitions]]
+.Using _META-INF/services/javax.validation.ConstraintValidator_ for constraint definitions
+====
+[source]
+----
+org.mycompany.CheckCaseValidato
+----
+====
+
+==== Constraint definitions via +ConstraintDefinitionContributor+
+
+While the service loader approach works in many scenarios, but not in all (think for example
+OSGi where service files are not visible), there is yet another way of contributing constraint
+definitions. You can provide one or more implementations of +ConstraintDefinitionContributor+ to
++HibernateConfiguration+ during bootstrapping of the +ValidatorFactory+ - see
+<<example-using-constraint-definition-contributor>>
+
+[[example-using-constraint-definition-contributor]]
+.Using +ConstraintDefinitionContributor+ to register constraint definitions
+====
+[source, JAVA]
+----
+public class CarTest {
+
+	private static Validator validator;
+
+	public static class MyConstraintDefinitionContributor
+			implements ConstraintDefinitionContributor {
+
+		@Override
+		public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
+			builder.constraint( ValidPassengerCount.class )
+					.validatedBy( ValidPassengerCountValidator.class );
+		}
+	}
+
+	@BeforeClass
+	public static void setUpValidator() {
+
+		HibernateValidatorConfiguration configuration = Validation
+				.byProvider( HibernateValidator.class )
+				.configure();
+
+		ConstraintDefinitionContributor contributor = new MyConstraintDefinitionContributor();
+		configuration.addConstraintDefinitionContributor( contributor );
+
+		validator = configuration.buildValidatorFactory().getValidator();
+	}
+
+    // ...
+}
+----
+====
+
+Instead of programmatically registering +ConstraintDefinitionContributor+ instances, the
+fully-qualified classnames of one or more implementations can be specified via the
+property +hibernate.validator.constraint_definition_contributors+. This can be useful when
+configuring the default validator factory using _META-INF/validation.xml_ (see
+<<chapter-xml-configuration>>).
+
+
+
