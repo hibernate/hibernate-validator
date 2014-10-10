@@ -57,6 +57,8 @@ part of the public this is not necessarily true for its sub-packages.
             and its default implementation.
 |org.hibernate.validator.parameternameprovider|A ParameterNameProvider based on the
             ParaNamer library, see <<section-paranamer-parameternameprovider>>.
+|org.hibernate.validator.spi.constraintdefinition|An SPI for registering additional constraint validators programmatically,
+            see <<section-constraint-definition-contribution>>.
 |org.hibernate.validator.valuehandling,
             org.hibernate.validator.spi.valuehandling|Classes related to the processing of values prior to their
             validation, see <<section-value-handling>>.
@@ -692,14 +694,14 @@ mechanism to register additional constraint definitions. All you have to do is t
 _javax.validation.ConstraintValidator_ to _META-INF/services_. In this service file you list the
 fully qualified classnames of your constraint validator classes (one per line). Hibernate Validator
 will automatically infer the constraint types they apply to.
-See <<example-using-service-file-for-constraint-definitions>> for an example
+See <<example-using-service-file-for-constraint-definitions>> for an example.
 
 [[example-using-service-file-for-constraint-definitions]]
 .Using _META-INF/services/javax.validation.ConstraintValidator_ for constraint definitions
 ====
 [source]
 ----
-org.mycompany.CheckCaseValidato
+org.mycompany.CheckCaseValidator
 ----
 ====
 
@@ -709,7 +711,7 @@ While the service loader approach works in many scenarios, but not in all (think
 OSGi where service files are not visible), there is yet another way of contributing constraint
 definitions. You can provide one or more implementations of +ConstraintDefinitionContributor+ to
 +HibernateConfiguration+ during bootstrapping of the +ValidatorFactory+ - see
-<<example-using-constraint-definition-contributor>>
+<<example-using-constraint-definition-contributor>>.
 
 [[example-using-constraint-definition-contributor]]
 .Using +ConstraintDefinitionContributor+ to register constraint definitions
