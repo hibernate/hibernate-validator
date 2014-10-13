@@ -145,4 +145,36 @@ public class ConstraintLocation {
 				+ declaringClass + ", typeForValidatorResolution="
 				+ typeForValidatorResolution + "]";
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+
+		ConstraintLocation that = (ConstraintLocation) o;
+
+		if ( !declaringClass.equals( that.declaringClass ) ) {
+			return false;
+		}
+		if ( member != null ? !member.equals( that.member ) : that.member != null ) {
+			return false;
+		}
+		if ( !typeForValidatorResolution.equals( that.typeForValidatorResolution ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = member != null ? member.hashCode() : 0;
+		result = 31 * result + declaringClass.hashCode();
+		result = 31 * result + typeForValidatorResolution.hashCode();
+		return result;
+	}
 }
