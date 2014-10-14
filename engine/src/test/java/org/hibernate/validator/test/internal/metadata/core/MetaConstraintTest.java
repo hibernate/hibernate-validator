@@ -60,7 +60,7 @@ public class MetaConstraintTest {
 				constraintHelper, barMethod, constraintAnnotation, METHOD
 		);
 		ConstraintLocation location2 = ConstraintLocation.forClass( Foo.class );
-		MetaConstraint<NotNull> metaConstraint2 = new MetaConstraint<NotNull>( constraintDescriptor1, location1 );
+		MetaConstraint<NotNull> metaConstraint2 = new MetaConstraint<NotNull>( constraintDescriptor2, location2 );
 
 		assertEquals(
 				metaConstraint1, metaConstraint2, "Two MetaConstraint instances for the same constraint should be equal"
