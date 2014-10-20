@@ -23,8 +23,60 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Validate that the string is a valid URL.
+ * Validates the annotated string is an URL.
  *
+ * <p>
+ * The parameters {@code protocol}, {@code host} and {@code port} are matched against the corresponding parts of the URL.
+ * and an additional regular expression can be specified using {@code regexp} and {@code flags} to further restrict the
+ * matching criteria.
+ * </p>
+ *
+ * <p>
+ * <b>Note</b>:
+ * Per default the constraint validator for this constraint uses the {@code java.net.URL} constructor to validate the string.
+ * This means that a matching protocol handler needs to be available. Handlers for the following protocols are guaranteed
+ * to exist within a default JVM - http, https, ftp, file, and jar.
+ * See also the Javadoc for <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URL.html">URL</a>.
+ * </p>
+ * <p>
+ * In case URLs with non default protocol handlers need to be validated, Hibernate Validator can be configured to use
+ * a regular expression based URL validator only. This can be done programmatically via a {@code ConstraintDefinitionContributor}:
+ * <pre>
+ * {@code
+ * HibernateValidatorConfiguration configuration = Validation
+ *         .byProvider( HibernateValidator.class )
+ *         .configure();
+ *
+ *     configuration.addConstraintDefinitionContributor(
+ *         new ConstraintDefinitionContributor() {
+ *             public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
+ *                 builder.constraint( URL.class )
+ *                 .includeExistingValidators( false )
+ *                 .validatedBy( RegexpURLValidator.class );
+ *             }
+ *         }
+ *     );
+ * }
+ * </pre>
+ * or via a constraint mapping configuration:
+ * <pre>
+ * {@code
+ *     <constraint-mappings
+ *         xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+ *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *         xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd">
+ *
+ *         <constraint-definition annotation="org.hibernate.validator.constraints.URL">
+ *             <validated-by include-existing-validators="false">
+ *                 <value>org.hibernate.validator.constraintvalidators.RegexpURLValidator</value>
+ *             </validated-by>
+ *         </constraint-definition>
+ *     </constraint-mappings>
+ * }
+ * </pre>
+ *
+ * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">RFC2396</a>
+ * @see org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor
  * @author Hardy Ferentschik
  */
 @Documented
@@ -33,17 +85,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @ReportAsSingleViolation
 @Pattern(regexp = "")
-/**
- * {@code URL} is a field/method level constraint which can be applied on a string to assert that the string
- * represents a valid URL. Per default the constraint verifies that the annotated value conforms to
- * <a href="http://www.ietf.org/rfc/rfc2396.txt">RFC2396</a>. Via the parameters {@code protocol}, {@code host}
- * and {@code port} one can assert the corresponding parts of the parsed URL.
- * <p>
- * Due to the fact that RFC2396 is a very generic specification it often is not restrictive enough for a given usecase.
- * In this case one can also specify the optional {@code regexp} and {@code flags} parameters. This way an additional
- * Java regular expression can be specified which the string (URL) has to match.
- * </p>
- */
 public @interface URL {
 	String message() default "{org.hibernate.validator.constraints.URL.message}";
 
