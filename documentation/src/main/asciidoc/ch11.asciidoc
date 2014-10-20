@@ -705,6 +705,7 @@ org.mycompany.CheckCaseValidator
 ----
 ====
 
+[[section-constraint-definition-contributor]]
 ==== Constraint definitions via +ConstraintDefinitionContributor+
 
 While the service loader approach works in many scenarios, but not in all (think for example
@@ -755,6 +756,34 @@ fully-qualified classnames of one or more implementations can be specified via t
 property +hibernate.validator.constraint_definition_contributors+. This can be useful when
 configuring the default validator factory using _META-INF/validation.xml_ (see
 <<chapter-xml-configuration>>).
+
+[TIP]
+====
+One use case for +ConstraintDefinitionContributor+ is the ability to specify an alternative
+constraint validator for the +@URL+ constraint. Historically, Hibernate Validator's default constraint
+validator for this constraint uses the +java.net.URL+ constructor to validate an URL.
+However, there is also a purely regular expression based version available which can be configured using
+a +ConstraintDefinitionContributor+:
+
+.Using a +ConstraintDefinitionContributor+ to register a regular expression based constraint definition for +@URL+
+[source, JAVA]
+----
+HibernateValidatorConfiguration configuration = Validation
+	.byProvider( HibernateValidator.class )
+	.configure();
+
+configuration.addConstraintDefinitionContributor(
+    new ConstraintDefinitionContributor() {
+        @Override
+        public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
+            builder.constraint( URL.class )
+            .includeExistingValidators( false )
+            .validatedBy( RegexpURLValidator.class );
+        }
+    }
+);
+----
+====
 
 
 

@@ -10,19 +10,17 @@ import java.net.MalformedURLException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.hibernate.validator.constraints.URL;
-
 /**
- * Validate that the character sequence (e.g. string) is a valid URL.
+ * Validate that the character sequence (e.g. string) is a valid URL using the {@code java.net.URL} constructor.
  *
  * @author Hardy Ferentschik
  */
-public class URLValidator implements ConstraintValidator<URL, CharSequence> {
+public class URLValidator implements ConstraintValidator<org.hibernate.validator.constraints.URL, CharSequence> {
 	private String protocol;
 	private String host;
 	private int port;
 
-	public void initialize(URL url) {
+	public void initialize(org.hibernate.validator.constraints.URL url) {
 		this.protocol = url.protocol();
 		this.host = url.host();
 		this.port = url.port();
