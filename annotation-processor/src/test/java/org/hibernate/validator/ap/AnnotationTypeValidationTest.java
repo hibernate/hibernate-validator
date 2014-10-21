@@ -1,19 +1,9 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.ap;
 
 import java.io.File;
@@ -52,7 +42,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
-				diagnostics, new DiagnosticExpectation( Kind.ERROR, 27 ), new DiagnosticExpectation( Kind.ERROR, 28 )
+				diagnostics, new DiagnosticExpectation( Kind.ERROR, 17 ), new DiagnosticExpectation( Kind.ERROR, 18 )
 		);
 	}
 
@@ -68,7 +58,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 33 ), new DiagnosticExpectation( Kind.ERROR, 48 )
+				new DiagnosticExpectation( Kind.ERROR, 23 ), new DiagnosticExpectation( Kind.ERROR, 38 )
 		);
 	}
 
@@ -84,7 +74,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 42 ), new DiagnosticExpectation( Kind.ERROR, 58 )
+				new DiagnosticExpectation( Kind.ERROR, 32 ), new DiagnosticExpectation( Kind.ERROR, 48 )
 		);
 	}
 
@@ -100,7 +90,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 34 )
+				new DiagnosticExpectation( Kind.ERROR, 24 )
 		);
 	}
 
@@ -116,7 +106,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 33 ), new DiagnosticExpectation( Kind.ERROR, 48 )
+				new DiagnosticExpectation( Kind.ERROR, 23 ), new DiagnosticExpectation( Kind.ERROR, 38 )
 		);
 	}
 
@@ -132,13 +122,13 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 34 ),
-				new DiagnosticExpectation( Kind.ERROR, 51 ),
-				new DiagnosticExpectation( Kind.ERROR, 66 ),
-				new DiagnosticExpectation( Kind.ERROR, 81 ),
-				new DiagnosticExpectation( Kind.ERROR, 96 ),
-				new DiagnosticExpectation( Kind.ERROR, 111 ),
-				new DiagnosticExpectation( Kind.ERROR, 126 )
+				new DiagnosticExpectation( Kind.ERROR, 24 ),
+				new DiagnosticExpectation( Kind.ERROR, 41 ),
+				new DiagnosticExpectation( Kind.ERROR, 56 ),
+				new DiagnosticExpectation( Kind.ERROR, 71 ),
+				new DiagnosticExpectation( Kind.ERROR, 86 ),
+				new DiagnosticExpectation( Kind.ERROR, 101 ),
+				new DiagnosticExpectation( Kind.ERROR, 116 )
 		);
 	}
 
@@ -154,14 +144,14 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 34 ),
-				new DiagnosticExpectation( Kind.ERROR, 52 ),
-				new DiagnosticExpectation( Kind.ERROR, 67 ),
-				new DiagnosticExpectation( Kind.ERROR, 82 ),
-				new DiagnosticExpectation( Kind.ERROR, 97 ),
-				new DiagnosticExpectation( Kind.ERROR, 112 ),
-				new DiagnosticExpectation( Kind.ERROR, 127 ),
-				new DiagnosticExpectation( Kind.ERROR, 142 )
+				new DiagnosticExpectation( Kind.ERROR, 24 ),
+				new DiagnosticExpectation( Kind.ERROR, 42 ),
+				new DiagnosticExpectation( Kind.ERROR, 57 ),
+				new DiagnosticExpectation( Kind.ERROR, 72 ),
+				new DiagnosticExpectation( Kind.ERROR, 87 ),
+				new DiagnosticExpectation( Kind.ERROR, 102 ),
+				new DiagnosticExpectation( Kind.ERROR, 117 ),
+				new DiagnosticExpectation( Kind.ERROR, 132 )
 		);
 	}
 
