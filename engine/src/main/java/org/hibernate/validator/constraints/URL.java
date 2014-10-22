@@ -47,31 +47,31 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *         .byProvider( HibernateValidator.class )
  *         .configure();
  *
- *     configuration.addConstraintDefinitionContributor(
- *         new ConstraintDefinitionContributor() {
- *             public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
- *                 builder.constraint( URL.class )
+ * configuration.addConstraintDefinitionContributor(
+ *     new ConstraintDefinitionContributor() {
+ *         public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
+ *             builder.constraint( URL.class )
  *                 .includeExistingValidators( false )
  *                 .validatedBy( RegexpURLValidator.class );
- *             }
  *         }
- *     );
+ *     }
+ * );
  * }
  * </pre>
  * or via a constraint mapping configuration:
  * <pre>
  * {@code
- *     <constraint-mappings
- *         xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
- *         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- *         xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd">
+ * <constraint-mappings
+ *     xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+ *     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *     xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd">
  *
- *         <constraint-definition annotation="org.hibernate.validator.constraints.URL">
- *             <validated-by include-existing-validators="false">
- *                 <value>org.hibernate.validator.constraintvalidators.RegexpURLValidator</value>
- *             </validated-by>
- *         </constraint-definition>
- *     </constraint-mappings>
+ *     <constraint-definition annotation="org.hibernate.validator.constraints.URL">
+ *         <validated-by include-existing-validators="false">
+ *             <value>org.hibernate.validator.constraintvalidators.RegexpURLValidator</value>
+ *         </validated-by>
+ *     </constraint-definition>
+ * </constraint-mappings>
  * }
  * </pre>
  *
