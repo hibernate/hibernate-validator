@@ -1,6 +1,85 @@
 Hibernate Validator Changelog
 =============================
 
+5.2.0.Alpha1 (22.10.2014)
+-------------------------
+
+** Sub-task
+    * [HV-874] - Support new date/time datatypes (JSR 310)
+    * [HV-876] - Retrieve parameter names via reflection to report parameter constraint violations
+    * [HV-877] - Use type annotations to support constraints on collection elements
+    * [HV-878] - Integrate with the new Optional type and/or JavaFX types
+    * [HV-884] - Switch build to use JDK 8
+    * [HV-900] - Add dedicated Java 8 chapter to summarize and reference Java 8 features and specifics
+
+** Bug
+    * [HV-881] - @CreditCardNumber throws PropertyNotFoundException on validation error
+    * [HV-886] - Javadoc of URL constraint is really misleading
+    * [HV-889] - Translation error in ValidationMessages_zh_CN.properties
+    * [HV-895] - @Valid doesn't work together with @UnwrapValidatedValue
+    * [HV-901] - Luhn Credit Card Validator incorrect return statement
+    * [HV-902] - Cascading validation does not work on classes which implement Iterable.
+    * [HV-906] - org.hibernate.validator.constraints.CreditCardNumber does not fail on a non-numbers string
+    * [HV-907] - Unwanted classes during build created in source tree of annotation-processor
+    * [HV-908] - Fix Chinese translation file
+    * [HV-924] - Make HV 5.1.x compatible with Java 6
+    * [HV-929] - Minimum requirement for 5.5.2 is Java 7 not Java 6 as indicated
+    * [HV-930] - ConstraintLocation does not specify equals() and hashCode()
+    * [HV-931] - Using NaN and Infinity triggers an exception for (Decimal)Min and (Decimal)Max constraints
+    * [HV-940] - ConstraintDescriptorImpl.equals does not match Annotation Proxies
+
+** Improvement
+    * [HV-853] - Provide a NonElMessageInterpolator for usecases where no EL is provided
+    * [HV-888] - ValidationMessage for Korean
+    * [HV-893] - Improve execution speed of BeanMetaDataManagerTest under JDK 8
+    * [HV-903] - Improve error message HV000030
+    * [HV-905] - Allow for auto unwrapping of values
+    * [HV-920] - URLValidator performance
+    * [HV-921] - Use precompiled regexp Pattern instances in AbstractMessageInterpolator for meta character replacements
+    * [HV-922] - Avoid unnecessary conversions from Collections to arrays and vice versa
+    * [HV-923] - Precalculate identifier of Executable element instead of using string concatenation on each getIdentifier() call
+    * [HV-936] - Upgrade JSoup dependecy
+
+** New Feature
+    * [HV-296] - Apply constraints on the elements of an Iterable instance
+    * [HV-825] - Integration with Java 8
+
+** Task
+    * [HV-826] - Switch from docbook to asciidoc
+    * [HV-828] - Provide a mechanism to automatically discover custom constraint validators
+    * [HV-894] - Check release process for Java 8
+    * [HV-912] - Improve integration with Java's security manager
+    * [HV-916] - Disable BeanMetaDataManagerTest
+    * [HV-925] - Implement rules for automatic value unwrapping
+    * [HV-926] - Remove license headers in source files
+    * [HV-939] - Assembly plugin logs warning about javax.el:el-api exclusion
+
+
+5.1.3.Final (22.10.2014)
+------------------------
+
+** Bug
+    * [HV-924] - Make HV 5.1.x compatible with Java 6
+    * [HV-929] - Minimum requirement for 5.5.2 is Java 7 not Java 6 as indicated
+    * [HV-930] - ConstraintLocation does not specify equals() and hashCode()
+    * [HV-931] - Using NaN and Infinity triggers an exception for (Decimal)Min and (Decimal)Max constraints
+    * [HV-940] - ConstraintDescriptorImpl.equals does not match Annotation Proxies
+
+
+5.1.2.Final (25.07.2014)
+------------------------
+
+** Bug
+    * [HV-889] - Translation error in ValidationMessages_zh_CN.properties
+    * [HV-901] - Luhn Credit Card Validator incorrect return statement
+    * [HV-902] - Cascading validation does not work on classes which implement Iterable.
+    * [HV-906] - org.hibernate.validator.constraints.CreditCardNumber does not fail on a non-numbers string
+    * [HV-908] - Fix Chinese translation file
+
+** Task
+    * [HV-912] - Improve integration with Java's security manager
+
+
 5.1.1.Final (06.05.2014)
 ------------------------
 
