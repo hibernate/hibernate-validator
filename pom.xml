@@ -20,7 +20,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
-    <version>5.1.3-SNAPSHOT</version>
+    <version>5.1.3.Final</version>
     <packaging>pom</packaging>
 
     <name>Hibernate Validator Aggregator</name>
@@ -576,7 +576,8 @@
         <connection>scm:git:git://github.com/hibernate/hibernate-validator.git</connection>
         <developerConnection>scm:git:git@github.com:hibernate/hibernate-validator.git</developerConnection>
         <url>http://github.com/hibernate/hibernate-validator</url>
-    </scm>
+      <tag>5.1.3.Final</tag>
+  </scm>
 
     <distributionManagement>
         <repository>
