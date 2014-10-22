@@ -773,14 +773,14 @@ HibernateValidatorConfiguration configuration = Validation
 	.configure();
 
 configuration.addConstraintDefinitionContributor(
-    new ConstraintDefinitionContributor() {
-        @Override
-        public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
-            builder.constraint( URL.class )
-            .includeExistingValidators( false )
-            .validatedBy( RegexpURLValidator.class );
-        }
-    }
+	new ConstraintDefinitionContributor() {
+		@Override
+		public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
+			builder.constraint( URL.class )
+				.includeExistingValidators( false )
+				.validatedBy( RegexpURLValidator.class );
+		}
+	}
 );
 ----
 ====
