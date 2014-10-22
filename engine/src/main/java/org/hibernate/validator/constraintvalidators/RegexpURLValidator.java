@@ -34,12 +34,14 @@ public class RegexpURLValidator implements ConstraintValidator<URL, CharSequence
 	private String host;
 	private int port;
 
+	@Override
 	public void initialize(URL url) {
 		this.protocol = url.protocol();
 		this.host = url.host();
 		this.port = url.port();
 	}
 
+	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null || value.length() == 0 ) {
 			return true;
@@ -84,7 +86,7 @@ public class RegexpURLValidator implements ConstraintValidator<URL, CharSequence
 		return valueHolder;
 	}
 
-	private class ValueHolder {
+	private static class ValueHolder {
 		private final String protocol;
 		private final String host;
 		private final int port;
