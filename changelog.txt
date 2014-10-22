@@ -1,6 +1,17 @@
 Hibernate Validator Changelog
 =============================
 
+5.1.3.Final (22.10.2014)
+------------------------
+
+** Bug
+    * [HV-924] - Make HV 5.1.x compatible with Java 6
+    * [HV-929] - Minimum requirement for 5.5.2 is Java 7 not Java 6 as indicated
+    * [HV-930] - ConstraintLocation does not specify equals() and hashCode()
+    * [HV-931] - Using NaN and Infinity triggers an exception for (Decimal)Min and (Decimal)Max constraints
+    * [HV-940] - ConstraintDescriptorImpl.equals does not match Annotation Proxies
+
+
 5.1.2.Final (25.07.2014)
 ------------------------
 
