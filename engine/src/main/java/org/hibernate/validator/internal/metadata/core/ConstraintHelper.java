@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
@@ -89,6 +90,7 @@ import org.hibernate.validator.internal.constraintvalidators.PastValidatorForDat
 import org.hibernate.validator.internal.constraintvalidators.PastValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.PastValidatorForReadablePartial;
 import org.hibernate.validator.internal.constraintvalidators.PatternValidator;
+import org.hibernate.validator.internal.constraintvalidators.PatternValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.SafeHtmlValidator;
 import org.hibernate.validator.internal.constraintvalidators.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForArray;
@@ -196,6 +198,7 @@ public class ConstraintHelper {
 
 		constraintList = newArrayList();
 		constraintList.add( PatternValidator.class );
+		constraintList.add( PatternValidatorForCollection.class );
 		builtinConstraints.put( Pattern.class, constraintList );
 
 		constraintList = newArrayList();
