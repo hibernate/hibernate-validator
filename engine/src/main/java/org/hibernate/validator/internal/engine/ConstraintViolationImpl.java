@@ -6,14 +6,16 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import java.io.Serializable;
-import java.lang.annotation.ElementType;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import java.io.Serializable;
+import java.lang.annotation.ElementType;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * @author Emmanuel Bernard
@@ -30,6 +32,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	private final Object leafBeanInstance;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final String messageTemplate;
+	private final Map<String, Object> expressionVariables;
 	private final Class<T> rootBeanClass;
 	private final ElementType elementType;
 	private final Object[] executableParameters;
@@ -37,16 +40,44 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	private final int hashCode;
 
 	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate,
-			String interpolatedMessage,
-			Class<T> rootBeanClass,
-			T rootBean,
-			Object leafBeanInstance,
-			Object value,
-			Path propertyPath,
-			ConstraintDescriptor<?> constraintDescriptor,
-			ElementType elementType) {
+															   Map<String, Object> expressionVariables,
+															   String interpolatedMessage,
+															   Class<T> rootBeanClass,
+															   T rootBean,
+															   Object leafBeanInstance,
+															   Object value,
+															   Path propertyPath,
+															   ConstraintDescriptor<?> constraintDescriptor,
+															   ElementType elementType) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
+				expressionVariables,
+				interpolatedMessage,
+				rootBeanClass,
+				rootBean,
+				leafBeanInstance,
+				value,
+				propertyPath,
+				constraintDescriptor,
+				elementType,
+				null,
+				null
+		);
+	}
+
+	@Deprecated
+	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate,
+															   String interpolatedMessage,
+															   Class<T> rootBeanClass,
+															   T rootBean,
+															   Object leafBeanInstance,
+															   Object value,
+															   Path propertyPath,
+															   ConstraintDescriptor<?> constraintDescriptor,
+															   ElementType elementType) {
+		return new ConstraintViolationImpl<T>(
+				messageTemplate,
+				Collections.<String, Object>emptyMap(),
 				interpolatedMessage,
 				rootBeanClass,
 				rootBean,
@@ -61,17 +92,46 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	}
 
 	public static <T> ConstraintViolation<T> forParameterValidation(String messageTemplate,
-			String interpolatedMessage,
-			Class<T> rootBeanClass,
-			T rootBean,
-			Object leafBeanInstance,
-			Object value,
-			Path propertyPath,
-			ConstraintDescriptor<?> constraintDescriptor,
-			ElementType elementType,
-			Object[] executableParameters) {
+																	Map<String, Object> expressionVariables,
+																	String interpolatedMessage,
+																	Class<T> rootBeanClass,
+																	T rootBean,
+																	Object leafBeanInstance,
+																	Object value,
+																	Path propertyPath,
+																	ConstraintDescriptor<?> constraintDescriptor,
+																	ElementType elementType,
+																	Object[] executableParameters) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
+				expressionVariables,
+				interpolatedMessage,
+				rootBeanClass,
+				rootBean,
+				leafBeanInstance,
+				value,
+				propertyPath,
+				constraintDescriptor,
+				elementType,
+				executableParameters,
+				null
+		);
+	}
+
+	@Deprecated
+	public static <T> ConstraintViolation<T> forParameterValidation(String messageTemplate,
+																	String interpolatedMessage,
+																	Class<T> rootBeanClass,
+																	T rootBean,
+																	Object leafBeanInstance,
+																	Object value,
+																	Path propertyPath,
+																	ConstraintDescriptor<?> constraintDescriptor,
+																	ElementType elementType,
+																	Object[] executableParameters) {
+		return new ConstraintViolationImpl<T>(
+				messageTemplate,
+				Collections.<String, Object>emptyMap(),
 				interpolatedMessage,
 				rootBeanClass,
 				rootBean,
@@ -86,17 +146,46 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	}
 
 	public static <T> ConstraintViolation<T> forReturnValueValidation(String messageTemplate,
-			String interpolatedMessage,
-			Class<T> rootBeanClass,
-			T rootBean,
-			Object leafBeanInstance,
-			Object value,
-			Path propertyPath,
-			ConstraintDescriptor<?> constraintDescriptor,
-			ElementType elementType,
-			Object executableReturnValue) {
+																	  Map<String, Object> expressionVariables,
+																	  String interpolatedMessage,
+																	  Class<T> rootBeanClass,
+																	  T rootBean,
+																	  Object leafBeanInstance,
+																	  Object value,
+																	  Path propertyPath,
+																	  ConstraintDescriptor<?> constraintDescriptor,
+																	  ElementType elementType,
+																	  Object executableReturnValue) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
+				expressionVariables,
+				interpolatedMessage,
+				rootBeanClass,
+				rootBean,
+				leafBeanInstance,
+				value,
+				propertyPath,
+				constraintDescriptor,
+				elementType,
+				null,
+				executableReturnValue
+		);
+	}
+
+	@Deprecated
+	public static <T> ConstraintViolation<T> forReturnValueValidation(String messageTemplate,
+																	  String interpolatedMessage,
+																	  Class<T> rootBeanClass,
+																	  T rootBean,
+																	  Object leafBeanInstance,
+																	  Object value,
+																	  Path propertyPath,
+																	  ConstraintDescriptor<?> constraintDescriptor,
+																	  ElementType elementType,
+																	  Object executableReturnValue) {
+		return new ConstraintViolationImpl<T>(
+				messageTemplate,
+				Collections.<String, Object>emptyMap(),
 				interpolatedMessage,
 				rootBeanClass,
 				rootBean,
@@ -111,6 +200,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	}
 
 	private ConstraintViolationImpl(String messageTemplate,
+			Map<String, Object> expressionVariables,
 			String interpolatedMessage,
 			Class<T> rootBeanClass,
 			T rootBean,
@@ -122,6 +212,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 			Object[] executableParameters,
 			Object executableReturnValue) {
 		this.messageTemplate = messageTemplate;
+		this.expressionVariables = expressionVariables;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
 		this.value = value;
@@ -144,6 +235,14 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	@Override
 	public final String getMessageTemplate() {
 		return messageTemplate;
+	}
+
+	/**
+	 *
+	 * @return the expression variables added using {@link org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl#addExpressionVariable(String, Object)}
+	 */
+	public Map<String, Object> getExpressionVariables() {
+		return expressionVariables;
 	}
 
 	@Override
@@ -196,6 +295,9 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 
 	@Override
 	// IMPORTANT - some behaviour of Validator depends on the correct implementation of this equals method!
+	// Do not take expressionVariables into account here. If everything else matches, the two CV should be considered
+	// equals (and because of the scary comment above). After all, expressionVariables is just a hint about how we got
+	// to the actual CV.
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
@@ -254,6 +356,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		return sb.toString();
 	}
 
+	// Same as for equals, do not take expressionVariables into account here.
 	private int createHashCode() {
 		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
 		result = 31 * result + ( propertyPath != null ? propertyPath.hashCode() : 0 );
