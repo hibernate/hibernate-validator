@@ -6,11 +6,12 @@
  */
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.Set;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.junit.Assert;
+import org.testng.annotations.Test;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -18,10 +19,12 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.testng.annotations.Test;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
@@ -71,6 +74,21 @@ public class HibernateConstraintValidatorContextTest {
 
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectConstraintViolationMessages( constraintViolations, "the answer is: ${foo}" );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HV-951")
+	public void testExpressionVariablesAreExposedInConstraintViolation() throws Exception {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( QUESTION_1 ) );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+
+		ConstraintViolationImpl<Foo> constraintViolation = (ConstraintViolationImpl<Foo>) constraintViolations.iterator()
+				.next();
+		Map<String, Object> expressionVariables = constraintViolation.getExpressionVariables();
+		Assert.assertEquals(1, expressionVariables.size());
+		Assert.assertEquals(42, expressionVariables.get("answer"));
 	}
 
 	public class Foo {
