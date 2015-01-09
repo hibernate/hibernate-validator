@@ -14,7 +14,6 @@ import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -65,32 +64,6 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		);
 	}
 
-	@Deprecated
-	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate,
-															   String interpolatedMessage,
-															   Class<T> rootBeanClass,
-															   T rootBean,
-															   Object leafBeanInstance,
-															   Object value,
-															   Path propertyPath,
-															   ConstraintDescriptor<?> constraintDescriptor,
-															   ElementType elementType) {
-		return new ConstraintViolationImpl<T>(
-				messageTemplate,
-				Collections.<String, Object>emptyMap(),
-				interpolatedMessage,
-				rootBeanClass,
-				rootBean,
-				leafBeanInstance,
-				value,
-				propertyPath,
-				constraintDescriptor,
-				elementType,
-				null,
-				null
-		);
-	}
-
 	public static <T> ConstraintViolation<T> forParameterValidation(String messageTemplate,
 																	Map<String, Object> expressionVariables,
 																	String interpolatedMessage,
@@ -118,33 +91,6 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		);
 	}
 
-	@Deprecated
-	public static <T> ConstraintViolation<T> forParameterValidation(String messageTemplate,
-																	String interpolatedMessage,
-																	Class<T> rootBeanClass,
-																	T rootBean,
-																	Object leafBeanInstance,
-																	Object value,
-																	Path propertyPath,
-																	ConstraintDescriptor<?> constraintDescriptor,
-																	ElementType elementType,
-																	Object[] executableParameters) {
-		return new ConstraintViolationImpl<T>(
-				messageTemplate,
-				Collections.<String, Object>emptyMap(),
-				interpolatedMessage,
-				rootBeanClass,
-				rootBean,
-				leafBeanInstance,
-				value,
-				propertyPath,
-				constraintDescriptor,
-				elementType,
-				executableParameters,
-				null
-		);
-	}
-
 	public static <T> ConstraintViolation<T> forReturnValueValidation(String messageTemplate,
 																	  Map<String, Object> expressionVariables,
 																	  String interpolatedMessage,
@@ -159,33 +105,6 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				expressionVariables,
-				interpolatedMessage,
-				rootBeanClass,
-				rootBean,
-				leafBeanInstance,
-				value,
-				propertyPath,
-				constraintDescriptor,
-				elementType,
-				null,
-				executableReturnValue
-		);
-	}
-
-	@Deprecated
-	public static <T> ConstraintViolation<T> forReturnValueValidation(String messageTemplate,
-																	  String interpolatedMessage,
-																	  Class<T> rootBeanClass,
-																	  T rootBean,
-																	  Object leafBeanInstance,
-																	  Object value,
-																	  Path propertyPath,
-																	  ConstraintDescriptor<?> constraintDescriptor,
-																	  ElementType elementType,
-																	  Object executableReturnValue) {
-		return new ConstraintViolationImpl<T>(
-				messageTemplate,
-				Collections.<String, Object>emptyMap(),
 				interpolatedMessage,
 				rootBeanClass,
 				rootBean,
