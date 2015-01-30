@@ -25,6 +25,11 @@ public class CPFValidatorTest {
 				new Person( "134.241.313-00" )
 		);
 		assertNumberOfViolations( violations, 0 );
+
+		violations =  ValidatorUtil.getValidator().validate(
+				new Person( "13424131300" )
+		);
+		assertNumberOfViolations(violations, 0 );
 	}
 
 	@Test
@@ -39,6 +44,17 @@ public class CPFValidatorTest {
 				new Person( "999.999.999-99" )
 		);
 		assertNumberOfViolations( violations, 1 );
+
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "00000000000" )
+		);
+		assertNumberOfViolations( violations, 1 );
+
+		violations = ValidatorUtil.getValidator().validate(
+				new Person( "99999999999" )
+		);
+		assertNumberOfViolations( violations, 1 );
+
 	}
 
 	@Test

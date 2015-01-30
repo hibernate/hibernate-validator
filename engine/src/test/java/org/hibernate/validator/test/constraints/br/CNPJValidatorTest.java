@@ -25,6 +25,11 @@ public class CNPJValidatorTest {
 				new Company( "91.509.901/0001-69" )
 		);
 		assertNumberOfViolations( violations, 0 );
+
+		violations = ValidatorUtil.getValidator().validate(
+				new Company( "91509901000169" )
+		);
+		assertNumberOfViolations( violations, 0 );
 	}
 
 	@Test
