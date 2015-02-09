@@ -78,7 +78,7 @@ You will also need a JDK 8 and Maven 3 (>= 3.0.3). With these prerequisites in p
 
     mvn clean install -s settings-example.xml
 
-There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://community.jboss.org/wiki/ContributingtoHibernateValidator).
+There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://hibernate.org/validator/contribute/).
 
 ## Hibernate Validator URLs
 
