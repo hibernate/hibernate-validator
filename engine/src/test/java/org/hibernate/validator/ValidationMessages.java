@@ -18,6 +18,9 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
+ * Allows us to proxy the Hibernate Validator built-in {@code ValidationMessages.properties}.
+ * This way parts of the message interpolation algorithm becomes testable.
+ *
  * @author Hardy Ferentschik
  */
 public class ValidationMessages extends ResourceBundle {
@@ -38,6 +41,7 @@ public class ValidationMessages extends ResourceBundle {
 	}
 
 	private void addTestPropertiesToBundle() {
+		// see ResourceBundleMessageInterpolatorTest#testRecursiveMessageInterpolation
 		messages.put( "replace.in.default.bundle1", "{replace.in.default.bundle2}" );
 		messages.put( "replace.in.default.bundle2", "foobar" );
 	}

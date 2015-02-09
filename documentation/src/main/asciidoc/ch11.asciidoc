@@ -694,16 +694,24 @@ mechanism to register additional constraint definitions. All you have to do is t
 _javax.validation.ConstraintValidator_ to _META-INF/services_. In this service file you list the
 fully qualified classnames of your constraint validator classes (one per line). Hibernate Validator
 will automatically infer the constraint types they apply to.
-See <<example-using-service-file-for-constraint-definitions>> for an example.
+See <<example-using-service-file-for-constraint-definitions,Constraint definition via service file>>
+for an example.
 
 [[example-using-service-file-for-constraint-definitions]]
-.Using _META-INF/services/javax.validation.ConstraintValidator_ for constraint definitions
+._META-INF/services/javax.validation.ConstraintValidator_
+
 ====
 [source]
 ----
+# Assuming a custom constraint annotation @org.mycompany.CheckCase
 org.mycompany.CheckCaseValidator
 ----
 ====
+
+To contribute default messages for your custom constraints, place a ContributorValidationMessages.properties_
+and/or its locale-specific specializations into the same package as your custom constraint annotations.
+In the example above, this would mean _org.mycompany_. If you your constraint annotation are spread
+over multiple packages, you need to specify one properties file per package.
 
 [[section-constraint-definition-contributor]]
 ==== Constraint definitions via +ConstraintDefinitionContributor+

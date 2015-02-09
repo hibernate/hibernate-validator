@@ -68,6 +68,11 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	public static final String USER_VALIDATION_MESSAGES = "ValidationMessages";
 
 	/**
+	 * Default name of the message bundle defined by a constraint definition contributor.
+	 */
+	public static final String CONTRIBUTOR_VALIDATION_MESSAGES = "ContributorValidationMessages";
+
+	/**
 	 * The default locale in the current JVM.
 	 */
 	private final Locale defaultLocale;
@@ -213,6 +218,13 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		if ( resolvedMessage == null ) {
 			ResourceBundle userResourceBundle = userResourceBundleLocator
 					.getResourceBundle( locale );
+
+			ResourceBundleLocator constraintResourceBundleLocator = getResourceBundleLocatorForConstraintContributions(
+					context
+			);
+			ResourceBundle constraintContributorResourceBundle = constraintResourceBundleLocator
+					.getResourceBundle( locale );
+
 			ResourceBundle defaultResourceBundle = defaultResourceBundleLocator
 					.getResourceBundle( locale );
 
@@ -224,6 +236,13 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 				userBundleResolvedMessage = interpolateBundleMessage(
 						resolvedMessage, userResourceBundle, locale, true
 				);
+
+				// search the constraint contributor bundle recursive (only if the user did not define a message)
+				if ( !hasReplacementTakenPlace( userBundleResolvedMessage, resolvedMessage ) ) {
+					userBundleResolvedMessage = interpolateBundleMessage(
+							resolvedMessage, constraintContributorResourceBundle, locale, true
+					);
+				}
 
 				// exit condition - we have at least tried to validate against the default bundle and there was no
 				// further replacements
@@ -293,6 +312,12 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		resolvedMessage = replaceEscapedLiterals( resolvedMessage );
 
 		return resolvedMessage;
+	}
+
+	private ResourceBundleLocator getResourceBundleLocatorForConstraintContributions(Context context) {
+		String constraintPackage = context.getConstraintDescriptor().getAnnotation().annotationType().getPackage().getName();
+		String constraintValidationMessagesResourceBundle = constraintPackage + "." + CONTRIBUTOR_VALIDATION_MESSAGES;
+		return new PlatformResourceBundleLocator( constraintValidationMessagesResourceBundle );
 	}
 
 	private String replaceEscapedLiterals(String resolvedMessage) {
