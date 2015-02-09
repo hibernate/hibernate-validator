@@ -21,17 +21,27 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  * @author Adam Stawicki
  */
 public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolator {
-
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator defaultResourceBundleLocator) {
-		this( defaultResourceBundleLocator, true );
-	}
-
 	public ResourceBundleMessageInterpolator() {
 		super();
 	}
 
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator testResourceBundleLocator, boolean cachingEnabled) {
-		super( testResourceBundleLocator, cachingEnabled );
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
+		super( userResourceBundleLocator );
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator) {
+		super( userResourceBundleLocator, contributorResourceBundleLocator );
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator,
+			boolean cachingEnabled) {
+		super( userResourceBundleLocator, contributorResourceBundleLocator, cachingEnabled );
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled) {
+		super( userResourceBundleLocator, null, cachingEnabled );
 	}
 
 	@Override

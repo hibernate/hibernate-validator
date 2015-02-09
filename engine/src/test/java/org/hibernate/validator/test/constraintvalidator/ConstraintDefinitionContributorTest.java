@@ -20,6 +20,7 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertNotNull;
@@ -126,13 +127,36 @@ public class ConstraintDefinitionContributorTest {
 		validator.validate( new Baz() );
 	}
 
+	@Test
+	@TestForIssue( jiraKey = "HV-953")
+	public void constraints_defined_via_constraint_definition_contributor_can_have_default_message() {
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
+		assertCorrectConstraintViolationMessages( constraintViolations, "MustMatch default message" );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HV-953")
+	public void user_can_override_default_message_of_constraint_definition_contributor() {
+		Set<ConstraintViolation<Quz>> constraintViolations = validator.validate( new Quz() );
+		assertCorrectConstraintViolationMessages( constraintViolations, "MustNotMatch user message" );
+	}
+
 	public class Foo {
 		// constraint validator defined in service file!
 		@MustMatch("Foo")
 		String getFoo() {
-			return "Foobar";
+			return "Bar";
 		}
 	}
+
+	public class Quz {
+		// constraint validator defined in service file!
+		@MustNotMatch("Foo")
+		String getFoo() {
+			return "Foo";
+		}
+	}
+
 
 	public class Bar {
 		@AcmeConstraint
