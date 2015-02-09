@@ -39,7 +39,8 @@ public final class GetResources implements PrivilegedAction<Enumeration<URL>> {
 			return classLoader.getResources( resourceName );
 		}
 		catch ( IOException e ) {
-			return Collections.emptyEnumeration();
+			// Collections.emptyEnumeration() would be 1.7
+			return Collections.enumeration( Collections.<URL>emptyList() );
 		}
 	}
 }
