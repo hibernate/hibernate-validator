@@ -28,8 +28,6 @@ grant codeBase "file:${localRepository}/org/hibernate/hibernate-validator/${proj
     permission java.lang.RuntimePermission "accessDeclaredMembers";
 
     // JAXB
-    permission java.lang.RuntimePermission "accessClassInPackage.com.sun.xml.internal.bind.*";
-    permission java.util.PropertyPermission "com.sun.xml.internal.bind.*", "read";
     permission java.util.PropertyPermission "mapAnyUriToUri", "read";
 };
 
@@ -40,16 +38,14 @@ grant codeBase "file:${basedir}/../engine/target/hibernate-validator-${project.v
     permission java.lang.RuntimePermission "accessDeclaredMembers";
 
     // JAXB
-    permission java.lang.RuntimePermission "accessClassInPackage.com.sun.xml.internal.bind.*";
-    permission java.util.PropertyPermission "com.sun.xml.internal.bind.*", "read";
     permission java.util.PropertyPermission "mapAnyUriToUri", "read";
 };
 
-grant codeBase "file:${localRepository}/com/fasterxml/classmate/${classmate.version}/classmate-${classmate.version}.jar" {
+grant codeBase "file:${localRepository}/com/fasterxml/classmate/-" {
     permission java.lang.RuntimePermission "accessDeclaredMembers";
 };
 
-grant codeBase "file:${localRepository}/org/jboss/logging/jboss-logging/3.1.3.GA/jboss-logging-3.1.3.GA.jar" {
+grant codeBase "file:${localRepository}/org/jboss/logging/jboss-logging/-" {
     permission java.util.PropertyPermission "org.jboss.logging.provider", "read";
 };
 
@@ -57,7 +53,7 @@ grant codeBase "file:${localRepository}/org/jboss/logging/jboss-logging/3.1.3.GA
 /* Bean Validation API */
 /* =================== */
 
-grant codeBase "file:${localRepository}/javax/validation/validation-api/${bv.api.version}/validation-api-${bv.api.version}.jar" {
+grant codeBase "file:${localRepository}/javax/validation/validation-api/-" {
     permission java.io.FilePermission "<<ALL FILES>>", "read";
 };
 
@@ -65,11 +61,7 @@ grant codeBase "file:${localRepository}/javax/validation/validation-api/${bv.api
 /* Bean Validation TCK */
 /* =================== */
 
-grant codeBase "file:${localRepository}/org/hibernate/beanvalidation/tck/beanvalidation-tck-tests/${tck.version}/beanvalidation-tck-tests-${tck.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/hibernate/beanvalidation/tck/beanvalidation-standalone-container-adapter/${tck.version}/beanvalidation-standalone-container-adapter-${tck.version}.jar" {
+grant codeBase "file:${localRepository}/org/hibernate/beanvalidation/tck/-" {
     permission java.security.AllPermission;
 };
 
@@ -93,59 +85,11 @@ grant codeBase "file:${project.build.directory}/test-classes" {
 /* Arquillian/ShrinkWrap */
 /* ===================== */
 
-grant codeBase "file:${localRepository}/org/jboss/arquillian/test/arquillian-test-spi/${arquillian.version}/arquillian-test-spi-${arquillian.version}.jar" {
+grant codeBase "file:${localRepository}/org/jboss/arquillian/-" {
     permission java.security.AllPermission;
 };
 
-grant codeBase "file:${localRepository}/org/jboss/arquillian/testng/arquillian-testng-core/${arquillian.version}/arquillian-testng-core-${arquillian.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/arquillian/core/arquillian-core-spi/${arquillian.version}/arquillian-core-spi-${arquillian.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/arquillian/test/arquillian-test-impl-base/${arquillian.version}/arquillian-test-impl-base-${arquillian.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/arquillian/core/arquillian-core-impl-base/${arquillian.version}/arquillian-core-impl-base-${arquillian.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/arquillian/config/arquillian-config-impl-base/${arquillian.version}/arquillian-config-impl-base-${arquillian.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/arquillian/config/arquillian-config-impl-base/${arquillian.version}/arquillian-config-impl-base-${arquillian.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/arquillian/container/arquillian-container-test-impl-base/${arquillian.version}/arquillian-container-test-impl-base-${arquillian.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/arquillian/container/arquillian-container-impl-base/${arquillian.version}/arquillian-container-impl-base-${arquillian.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/arquillian/testng/arquillian-testng-container/${arquillian.version}/arquillian-testng-container-${arquillian.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/arquillian/container/arquillian-container-test-spi/${arquillian.version}/arquillian-container-test-spi-${arquillian.version}.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/shrinkwrap/descriptors/shrinkwrap-descriptors-api-base/2.0.0-alpha-3/shrinkwrap-descriptors-api-base-2.0.0-alpha-3.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/shrinkwrap/shrinkwrap-api/1.0.1/shrinkwrap-api-1.0.1.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/jboss/shrinkwrap/shrinkwrap-impl-base/1.0.1/shrinkwrap-impl-base-1.0.1.jar" {
+grant codeBase "file:${localRepository}/org/jboss/shrinkwrap/-" {
     permission java.security.AllPermission;
 };
 
@@ -153,12 +97,12 @@ grant codeBase "file:${localRepository}/org/jboss/shrinkwrap/shrinkwrap-impl-bas
 /* TestNG  */
 /* ======= */
 
-grant codeBase "file:${localRepository}/org/testng/testng/6.8/testng-6.8.jar" {
+grant codeBase "file:${localRepository}/org/testng/testng/-" {
     permission java.security.AllPermission;
 };
 
 // Dependency of TestNG
-grant codeBase "file:${localRepository}/org/beanshell/bsh/2.0b4/bsh-2.0b4.jar" {
+grant codeBase "file:${localRepository}/org/beanshell/-" {
     permission java.security.AllPermission;
 };
 
@@ -166,14 +110,7 @@ grant codeBase "file:${localRepository}/org/beanshell/bsh/2.0b4/bsh-2.0b4.jar" {
 /* Surefire  */
 /* ========= */
 
-grant codeBase "file:${localRepository}/org/apache/maven/surefire/surefire-booter/2.15/surefire-booter-2.15.jar" {
+grant codeBase "file:${localRepository}/org/apache/maven/surefire/-" {
     permission java.security.AllPermission;
 };
 
-grant codeBase "file:${localRepository}/org/apache/maven/surefire/surefire-testng/2.15/surefire-testng-2.15.jar" {
-    permission java.security.AllPermission;
-};
-
-grant codeBase "file:${localRepository}/org/apache/maven/surefire/surefire-api/2.15/surefire-api-2.15.jar" {
-    permission java.security.AllPermission;
-};
