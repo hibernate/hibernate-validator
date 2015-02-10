@@ -21,6 +21,8 @@ import com.fasterxml.classmate.members.RawMethod;
 import com.fasterxml.classmate.members.ResolvedMethod;
 
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetResolvedMemberMethods;
 
 /**
@@ -31,7 +33,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetResolvedMember
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public final class ExecutableHelper {
-
+	private static final Log log = LoggerFactory.make();
 	private final TypeResolver typeResolver;
 
 	public ExecutableHelper(TypeResolutionHelper typeResolutionHelper) {
@@ -45,7 +47,7 @@ public final class ExecutableHelper {
 	 * @param other The method to test.
 	 *
 	 * @return {@code true} If this methods overrides the passed method,
-	 *         {@code false} otherwise.
+	 * {@code false} otherwise.
 	 */
 	public boolean overrides(ExecutableElement executableElement, ExecutableElement other) {
 		//constructors never override another constructor
@@ -63,7 +65,7 @@ public final class ExecutableHelper {
 	 * @param superTypeMethod The super type method (cannot be {@code null}).
 	 *
 	 * @return Returns {@code true} if {@code subTypeMethod} overrides {@code superTypeMethod},
-	 *         {@code false} otherwise.
+	 * {@code false} otherwise.
 	 */
 	public boolean overrides(Method subTypeMethod, Method superTypeMethod) {
 		Contracts.assertValueNotNull( subTypeMethod, "subTypeMethod" );
@@ -85,7 +87,15 @@ public final class ExecutableHelper {
 			return false;
 		}
 
-		if ( Modifier.isStatic( superTypeMethod.getModifiers() ) || Modifier.isStatic( subTypeMethod.getModifiers() ) ) {
+		if ( Modifier.isStatic( superTypeMethod.getModifiers() ) || Modifier.isStatic(
+				subTypeMethod.getModifiers()
+		) ) {
+			return false;
+		}
+
+		// HV-861 Bridge method should be ignored. Classmates type/member resolution will take care of proper
+		// override detection without considering bridge methods
+		if ( subTypeMethod.isBridge() ) {
 			return false;
 		}
 
@@ -129,12 +139,23 @@ public final class ExecutableHelper {
 
 		// For methods with generic parameters I have to compare the argument
 		// types (which are resolved) of the two filtered member methods.
-		for ( int i = 0; i < resolvedMethods[0].getArgumentCount(); i++ ) {
-
-			if ( !resolvedMethods[0].getArgumentType( i )
-					.equals( resolvedMethods[1].getArgumentType( i ) ) ) {
-				return false;
+		try {
+			for ( int i = 0; i < resolvedMethods[0].getArgumentCount(); i++ ) {
+				if ( !resolvedMethods[0].getArgumentType( i )
+						.equals( resolvedMethods[1].getArgumentType( i ) ) ) {
+					return false;
+				}
 			}
+		}
+		// Putting this in as a safe guard for HV-861. In case the issue occurs again we will have some
+		// better information
+		catch ( ArrayIndexOutOfBoundsException e ) {
+			log.debug(
+					"Error in ExecutableHelper#instanceMethodParametersResolveToSameTypes comparing "
+							+ subTypeMethod
+							+ " with "
+							+ superTypeMethod
+			);
 		}
 
 		return true;
