@@ -10,6 +10,16 @@ used when running
 
     $ mvn clean test
 
+By default this will run the tests with a security manager enabled in order to make sure Hibernate Validator invokes
+security-relevant APIs using privileged actions. You can run the tests without the security manager e.g. for analysis
+purposes like this:
+
+    $ mvn clean test -Dwith-security-manager=false
+
+The policy file is located at src/test/resources/test.policy. You may need to adapt the URL of the Hibernate Validator
+engine entry depending on your specific set-up, e.g. when obtaining these classes from engine/target/classes while
+running the tests from within an IDE.
+
 ## In container
 
 You can also run the TCK test against Wildfly. In this case the tests are bundled as war files and executed
