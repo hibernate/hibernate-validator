@@ -14,6 +14,7 @@ import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -48,6 +49,8 @@ import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionCont
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
@@ -77,9 +80,13 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final ValidationBootstrapParameters validationBootstrapParameters;
 	private boolean ignoreXmlConfiguration = false;
 	private final Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
+	private BootstrapConfiguration bootstrapConfiguration;
+
+	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = CollectionHelper.newHashSet();
 	private boolean failFast;
-	private BootstrapConfiguration bootstrapConfiguration;
+	private final Set<ConstraintDefinitionContributor> constraintDefinitionContributors = newHashSet();
+	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -104,18 +111,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.validationBootstrapParameters = new ValidationBootstrapParameters();
 		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
 		if ( isJavaFxInClasspath() ) {
-			this.validationBootstrapParameters.addValidatedValueHandler(
-					new JavaFXPropertyValueUnwrapper(
-							typeResolutionHelper
-					)
-			);
+			validatedValueHandlers.add( new JavaFXPropertyValueUnwrapper( typeResolutionHelper ) );
 		}
 		if ( Version.getJavaRelease() >= 8 ) {
-			this.validationBootstrapParameters.addValidatedValueHandler(
-					new OptionalValueUnwrapper(
-							typeResolutionHelper
-					)
-			);
+			validatedValueHandlers.add( new OptionalValueUnwrapper( typeResolutionHelper ) );
 		}
 		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator(
 				ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES
@@ -224,7 +223,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler) {
 		Contracts.assertNotNull( handler, MESSAGES.parameterMustNotBeNull( "handler" ) );
-		validationBootstrapParameters.addValidatedValueHandler( handler );
+		validatedValueHandlers.add( handler );
 
 		return this;
 	}
@@ -235,13 +234,13 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public Set<ConstraintDefinitionContributor> getConstraintDefinitionContributors() {
-		return validationBootstrapParameters.getConstraintDefinitionContributors();
+		return constraintDefinitionContributors;
 	}
 
 	@Override
 	public HibernateValidatorConfiguration addConstraintDefinitionContributor(ConstraintDefinitionContributor contributor) {
 		Contracts.assertNotNull( contributor, MESSAGES.parameterMustNotBeNull( "contributor" ) );
-		validationBootstrapParameters.addConstraintDefinitionContributor( contributor );
+		constraintDefinitionContributors.add( contributor );
 
 		return this;
 	}
@@ -332,7 +331,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
-		return validationBootstrapParameters.getValidatedValueHandlers();
+		return validatedValueHandlers;
 	}
 
 	@Override

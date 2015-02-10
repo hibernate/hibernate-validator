@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.validation.BootstrapConfiguration;
@@ -25,10 +24,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
-import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -42,12 +38,10 @@ public class ValidationBootstrapParameters {
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
 	private ParameterNameProvider parameterNameProvider;
-	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = newHashMap();
 	private final Set<InputStream> mappings = newHashSet();
-	private final Set<ConstraintDefinitionContributor> constraintDefinitionContributors = newHashSet();
 
 	public ValidationBootstrapParameters() {
 	}
@@ -235,21 +229,5 @@ public class ValidationBootstrapParameters {
 	 */
 	private <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
-
-	public void addValidatedValueHandler(ValidatedValueUnwrapper<?> handler) {
-		validatedValueHandlers.add( handler );
-	}
-
-	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
-		return validatedValueHandlers;
-	}
-
-	public void addConstraintDefinitionContributor(ConstraintDefinitionContributor contributor) {
-		constraintDefinitionContributors.add( contributor );
-	}
-
-	public Set<ConstraintDefinitionContributor> getConstraintDefinitionContributors() {
-		return constraintDefinitionContributors;
 	}
 }
