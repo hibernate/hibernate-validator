@@ -220,10 +220,10 @@
                             javax.persistence.*;version="[2.0.0,3.0.0)";resolution:=optional,
                             javax.validation.*;version="[1.0.0,2.0.0)",
                             javax.xml.*;version="0",
-                            javax.el.*;version="[2.0.0,4.0.0)",
+                            javax.el.*;version="[2.0.0,4.0.0)";resolution:=optional,
                             org.xml.sax.*;version="0",
                             org.jboss.logging.*;version="[3.1.0,4.0.0)",
-                            com.fasterxml.classmate.*;version="0.8.0",
+                            com.fasterxml.classmate.*;version="[${classmate.version},2.0.0)",
                             org.joda.time.*;version="[1.6.0,2.0.0)";resolution:=optional,
                             org.jsoup.*;version="[1.5.2,2.0.0)";resolution:=optional
                         </Import-Package>
