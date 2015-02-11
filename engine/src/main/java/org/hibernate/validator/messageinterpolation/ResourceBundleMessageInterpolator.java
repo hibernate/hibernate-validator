@@ -26,7 +26,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	private static final Log log = LoggerFactory.make();
 	
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator defaultResourceBundleLocator) {
-		this(defaultResourceBundleLocator, true);
+		this( defaultResourceBundleLocator, true );
 	}
 
 	public ResourceBundleMessageInterpolator() {
@@ -34,7 +34,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator testResourceBundleLocator, boolean cachingEnabled) {
-		super(testResourceBundleLocator, cachingEnabled);
+		super( testResourceBundleLocator, cachingEnabled );
 	}
 
 	@Override

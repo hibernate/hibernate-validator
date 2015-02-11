@@ -294,7 +294,7 @@ public class ValidationContext<T> {
 		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
 		//same for expression variables
 		Map<String, Object> expressionVariables =
-				Collections.unmodifiableMap(constraintViolationCreationContext.getExpressionVariables());
+				Collections.unmodifiableMap( constraintViolationCreationContext.getExpressionVariables() );
 		if ( executableParameters != null ) {
 			return ConstraintViolationImpl.forParameterValidation(
 					messageTemplate,

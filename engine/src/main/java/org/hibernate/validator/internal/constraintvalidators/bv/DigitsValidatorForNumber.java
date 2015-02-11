@@ -42,7 +42,7 @@ public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Num
 
 		BigDecimal bigNum;
 		if ( num instanceof BigDecimal ) {
-			bigNum = ( BigDecimal ) num;
+			bigNum = (BigDecimal) num;
 		}
 		else {
 			bigNum = new BigDecimal( num.toString() ).stripTrailingZeros();

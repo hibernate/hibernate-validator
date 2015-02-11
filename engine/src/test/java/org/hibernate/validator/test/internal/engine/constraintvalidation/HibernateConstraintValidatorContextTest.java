@@ -87,8 +87,8 @@ public class HibernateConstraintValidatorContextTest {
 		ConstraintViolationImpl<Foo> constraintViolation = (ConstraintViolationImpl<Foo>) constraintViolations.iterator()
 				.next();
 		Map<String, Object> expressionVariables = constraintViolation.getExpressionVariables();
-		Assert.assertEquals(1, expressionVariables.size());
-		Assert.assertEquals(42, expressionVariables.get("answer"));
+		Assert.assertEquals( 1, expressionVariables.size() );
+		Assert.assertEquals( 42, expressionVariables.get( "answer" ) );
 	}
 
 	public class Foo {

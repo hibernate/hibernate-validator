@@ -38,7 +38,7 @@ public class Group {
 			return false;
 		}
 
-		Group group1 = ( Group ) o;
+		Group group1 = (Group) o;
 
 		if ( group != null ? !group.equals( group1.group ) : group1.group != null ) {
 			return false;

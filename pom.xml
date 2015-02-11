@@ -304,16 +304,26 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.9.1</version>
+                    <version>2.14</version>
                     <configuration>
                         <configLocation>src/main/build-config/checkstyle.xml</configLocation>
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
                         <violationSeverity>error</violationSeverity>
+                        <includeResources>false</includeResources>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <!-- These classes are imported from other sources and are not re-formatted.
                         The tests use Java 8 type annotation syntax which is not supported yet by CheckStyle-->
-                        <excludes>**/ConcurrentReferenceHashMap.java,**/TypeHelper*.java,**/TypeAnnotationAwareMetaDataProviderTest.java,**/TypeAnnotationConstraintTest.java,**/UnwrapModesTest.java</excludes>
+                        <excludes>
+                            **/org/hibernate/validator/internal/xml/*.java,
+                            **/Log_$logger.java,
+                            **/Messages_$bundle.java,
+                            **/ConcurrentReferenceHashMap.java,
+                            **/TypeHelper*.java,
+                            **/TypeAnnotationAwareMetaDataProviderTest.java,
+                            **/TypeAnnotationConstraintTest.java,
+                            **/UnwrapModesTest.java
+                        </excludes>
                     </configuration>
                     <executions>
                         <execution>

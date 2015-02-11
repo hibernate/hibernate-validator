@@ -37,7 +37,7 @@ public class GetterCheck extends AbstractConstraintCheck {
 					)
 			);
 		}
-		else if (!hasReturnValue(element)) {
+		else if ( !hasReturnValue( element ) ) {
 			return CollectionHelper.asSet(
 					new ConstraintCheckError(
 							element, annotation, "ONLY_NON_VOID_METHODS_MAY_BE_ANNOTATED"

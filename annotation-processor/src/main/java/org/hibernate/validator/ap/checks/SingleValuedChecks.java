@@ -55,20 +55,20 @@ public class SingleValuedChecks implements ConstraintChecks {
 		for ( ConstraintCheck oneCheck : checks ) {
 
 			if ( element.getKind() == ElementKind.FIELD ) {
-				theValue.addAll( oneCheck.checkField( ( VariableElement ) element, annotation ) );
+				theValue.addAll( oneCheck.checkField( (VariableElement) element, annotation ) );
 			}
 			else if ( element.getKind() == ElementKind.METHOD ) {
-				theValue.addAll( oneCheck.checkMethod( ( ExecutableElement ) element, annotation ) );
+				theValue.addAll( oneCheck.checkMethod( (ExecutableElement) element, annotation ) );
 			}
 			else if ( element.getKind() == ElementKind.ANNOTATION_TYPE ) {
-				theValue.addAll( oneCheck.checkAnnotationType( ( TypeElement ) element, annotation ) );
+				theValue.addAll( oneCheck.checkAnnotationType( (TypeElement) element, annotation ) );
 			}
 			else if (
 					element.getKind() == ElementKind.CLASS ||
 							element.getKind() == ElementKind.INTERFACE ||
 							element.getKind() == ElementKind.ENUM ) {
 
-				theValue.addAll( oneCheck.checkNonAnnotationType( ( TypeElement ) element, annotation ) );
+				theValue.addAll( oneCheck.checkNonAnnotationType( (TypeElement) element, annotation ) );
 			}
 
 			if ( !theValue.isEmpty() ) {

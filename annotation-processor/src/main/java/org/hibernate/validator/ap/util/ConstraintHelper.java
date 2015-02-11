@@ -739,7 +739,7 @@ public class ConstraintHelper {
 
 		for ( AnnotationMirror oneAnnotationMirror : annotationMirrors ) {
 
-			AnnotationType annotationType = getAnnotationType(oneAnnotationMirror);
+			AnnotationType annotationType = getAnnotationType( oneAnnotationMirror );
 
 			if ( annotationType == AnnotationType.CONSTRAINT_ANNOTATION ) {
 				composingConstraints.add( oneAnnotationMirror );
