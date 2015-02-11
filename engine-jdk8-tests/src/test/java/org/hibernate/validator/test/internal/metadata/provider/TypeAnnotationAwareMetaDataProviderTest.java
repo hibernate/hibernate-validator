@@ -7,6 +7,7 @@
 package org.hibernate.validator.test.internal.metadata.provider;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Member;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
@@ -36,7 +38,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  *
  * @author Khalid Alqinyah
  */
-public class TypeAnnotationAwareMetaDataProviderTest extends AnnotationMetaDataProviderTestBase {
+public class TypeAnnotationAwareMetaDataProviderTest {
 
 	private TypeAnnotationAwareMetaDataProvider provider;
 
@@ -137,6 +139,42 @@ public class TypeAnnotationAwareMetaDataProviderTest extends AnnotationMetaDataP
 			annotationsTypes.add( iter.next().getDescriptor().getAnnotation().annotationType() );
 		}
 		return annotationsTypes;
+	}
+
+	private <T> ConstrainedField findConstrainedField(Iterable<BeanConfiguration<? super T>> beanConfigurations,
+			Class<? super T> clazz, String fieldName) throws Exception {
+		return (ConstrainedField) findConstrainedElement( beanConfigurations, clazz.getDeclaredField( fieldName ) );
+	}
+
+	private <T> ConstrainedExecutable findConstrainedMethod(Iterable<BeanConfiguration<? super T>> beanConfigurations,
+			Class<? super T> clazz, String methodName, Class<?>... parameterTypes)
+			throws Exception {
+		return (ConstrainedExecutable) findConstrainedElement(
+				beanConfigurations,
+				clazz.getMethod( methodName, parameterTypes )
+		);
+	}
+
+	private <T> ConstrainedExecutable findConstrainedConstructor(
+			Iterable<BeanConfiguration<? super T>> beanConfigurations, Class<? super T> clazz,
+			Class<?>... parameterTypes) throws Exception {
+		return (ConstrainedExecutable) findConstrainedElement(
+				beanConfigurations,
+				clazz.getConstructor( parameterTypes )
+		);
+	}
+
+	private ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations,
+			Member member) {
+		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
+			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
+				if ( constrainedElement.getLocation().getMember().equals( member ) ) {
+					return constrainedElement;
+				}
+			}
+		}
+
+		throw new RuntimeException( "Found no constrained element for " + member );
 	}
 
 	static class A {
