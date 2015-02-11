@@ -83,7 +83,7 @@
         <org.codehaus.mojo.chronos.version>1.0-beta-3</org.codehaus.mojo.chronos.version>
         <bv.api.version>1.1.0.Final</bv.api.version>
         <classmate.version>1.0.0</classmate.version>
-        <wildfly.version>8.0.0.Final</wildfly.version>
+        <wildfly.version>8.2.0.Final</wildfly.version>
         <arquillian.version>1.0.2.Final</arquillian.version>
     </properties>
 

@@ -21,6 +21,7 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
@@ -48,7 +49,9 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 		return ShrinkWrap
 				.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses( User.class )
-				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar() )
+				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar()
+								.as( JavaArchive.class )
+								.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" ) )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )
