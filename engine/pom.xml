@@ -206,6 +206,7 @@
                             <classesDirectory>${project.build.testOutputDirectory}</classesDirectory>
                             <includes>
                                 <include>org/hibernate/validator/testutil/**</include>
+                                <include>org/hibernate/validator/test/internal/metadata/provider/AnnotationMetaDataProviderTestBase*</include>
                             </includes>
                         </configuration>
                     </execution>

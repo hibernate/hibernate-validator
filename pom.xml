@@ -64,6 +64,7 @@
 
     <modules>
         <module>engine</module>
+        <module>engine-jdk8-tests</module>
         <module>cdi</module>
         <module>tck-runner</module>
         <module>integration</module>
@@ -293,12 +294,10 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.3.2</version>
+                    <version>3.2</version>
                     <configuration>
                         <source>1.6</source>
                         <target>1.6</target>
-                        <testSource>1.8</testSource>
-                        <testTarget>1.8</testTarget>
                         <testCompilerArgument>-parameters</testCompilerArgument>
                     </configuration>
                 </plugin>
