@@ -64,6 +64,7 @@
 
     <modules>
         <module>engine</module>
+        <module>engine-jdk8-tests</module>
         <module>cdi</module>
         <module>tck-runner</module>
         <module>integration</module>
