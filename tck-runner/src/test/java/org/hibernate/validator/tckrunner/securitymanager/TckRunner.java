@@ -41,7 +41,7 @@ public class TckRunner {
 		suite.setName( "JSR-349-TCK" );
 
 		XmlTest test = new XmlTest(suite);
-		test.setName("JSR-349-TCK");
+		test.setName( "JSR-349-TCK" );
 
 		List<XmlPackage> packages = Collections.singletonList( new XmlPackage( "org.hibernate.beanvalidation.tck.tests" ) );
 		test.setXmlPackages( packages );
@@ -57,7 +57,7 @@ public class TckRunner {
 		TestListenerAdapter tla = new TestListenerAdapter();
 		TestNG testng = new TestNG();
 		testng.setXmlSuites( Collections.singletonList( suite ) );
-		testng.addListener(tla);
+		testng.addListener( tla );
 		testng.run();
 
 		for ( ITestResult failure: tla.getConfigurationFailures() ) {

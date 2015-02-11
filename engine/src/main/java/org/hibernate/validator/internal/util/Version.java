@@ -31,9 +31,9 @@ public final class Version {
 	 */
 	public static int getJavaRelease() {
 		// Will return something like 1.8
-		String[] specificationVersion = System.getProperty("java.specification.version").split("\\.");
+		String[] specificationVersion = System.getProperty( "java.specification.version" ).split( "\\." );
 
-		return Integer.parseInt(specificationVersion[1]);
+		return Integer.parseInt( specificationVersion[1] );
 	}
 
 	// helper class should not have a public constructor

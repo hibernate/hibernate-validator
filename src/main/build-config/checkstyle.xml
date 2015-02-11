@@ -43,6 +43,11 @@
         <module name="CovariantEquals"/>
         <module name="ArrayTypeStyle"/>
         <module name="DefaultComesLast"/>
+
+        <module name="ParenPad">
+            <property name="tokens" value="CTOR_CALL, METHOD_CALL, SUPER_CTOR_CALL" />
+            <property name="option" value="space" />
+        </module>
     </module>
 
     <!-- Checks that a file ends with a new line  -->

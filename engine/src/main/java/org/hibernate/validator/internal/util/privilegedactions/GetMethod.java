@@ -30,7 +30,7 @@ public final class GetMethod implements PrivilegedAction<Method> {
 	@Override
 	public Method run() {
 		try {
-			return clazz.getMethod(methodName);
+			return clazz.getMethod( methodName );
 		}
 		catch ( NoSuchMethodException e ) {
 			return null;

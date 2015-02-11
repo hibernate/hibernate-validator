@@ -39,7 +39,7 @@ public class InterpolationTerm {
 
 	public InterpolationTerm(String expression, Locale locale) {
 		this.expression = expression;
-		if ( isElExpression(expression) ) {
+		if ( isElExpression( expression ) ) {
 			this.type = InterpolationTermType.EL;
 			this.resolver = new ElTermResolver(locale);
 		}
