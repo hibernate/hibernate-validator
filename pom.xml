@@ -122,7 +122,12 @@
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
-                <version>3.1.3.GA</version>
+                <version>3.2.1.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging-processor</artifactId>
+                <version>1.2.0.Final</version>
             </dependency>
             <!-- Not going to upgrade to org.glassfish:javax.el:3.0.0 for now, since it is only Java 7 compatible -->
             <dependency>
@@ -511,37 +516,6 @@
                     <groupId>org.zanata</groupId>
                     <artifactId>zanata-maven-plugin</artifactId>
                     <version>1.3</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.bsc.maven</groupId>
-                    <artifactId>maven-processor-plugin</artifactId>
-                    <version>2.2.4</version>
-                    <configuration>
-                        <defaultOutputDirectory>${project.build.directory}/generated-sources/logging
-                        </defaultOutputDirectory>
-                        <processors>
-                            <processor>org.jboss.logging.processor.apt.LoggingToolsProcessor</processor>
-                        </processors>
-                        <compilerArguments>-AtranslationFilesPath=${project.basedir}/src/main/resources -source 1.6
-                            -target 1.6 -sourcepath ${project.build.directory}/generated-sources/jaxb -encoding UTF-8
-                        </compilerArguments>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>process</id>
-                            <phase>generate-sources</phase>
-                            <goals>
-                                <goal>process</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.jboss.logging</groupId>
-                            <artifactId>jboss-logging-processor</artifactId>
-                            <version>1.0.3.Final</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
