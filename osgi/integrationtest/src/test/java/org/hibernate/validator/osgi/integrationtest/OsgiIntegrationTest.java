@@ -17,6 +17,8 @@ import javax.validation.ValidationProviderResolver;
 import javax.validation.spi.ValidationProvider;
 
 import com.example.Customer;
+import com.example.ExampleConstraintValidatorFactory;
+import com.example.Order;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +31,7 @@ import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 
 import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.maven;
@@ -41,6 +44,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+
 
 /**
  * Integration test for Bean Validation and Hibernate Validator under OSGi.
@@ -108,6 +112,59 @@ public class OsgiIntegrationTest {
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "must be greater than or equal to 1", constraintViolations.iterator().next().getMessage() );
+	}
+
+	@Test
+	public void canConfigureCustomConstraintValidatorFactoryViaValidationXml() {
+		ExampleConstraintValidatorFactory.invocationCounter.set( 0 );
+
+		HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class )
+				.providerResolver( new MyValidationProviderResolver() )
+				.configure()
+				.userClassLoader( getClass().getClassLoader() );
+
+		String constraintValidatorFactoryClassName = configuration.getBootstrapConfiguration()
+				.getConstraintValidatorFactoryClassName();
+
+		assertEquals(
+				"META-INF/validation.xml could not be read",
+				ExampleConstraintValidatorFactory.class.getName(),
+				constraintValidatorFactoryClassName
+		);
+
+		configuration.buildValidatorFactory()
+				.getValidator()
+				.validate( new Customer() );
+
+		assertEquals( 1, ExampleConstraintValidatorFactory.invocationCounter.get() );
+	}
+
+	@Test
+	public void canConfigureConstraintViaXmlMapping() {
+		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+				.providerResolver( new MyValidationProviderResolver() )
+				.configure()
+				.userClassLoader( getClass().getClassLoader() )
+				.buildValidatorFactory()
+				.getValidator()
+				.validate( new Customer() );
+
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage() );
+	}
+
+	@Test
+	public void canConfigureCustomConstraintViaXmlMapping() {
+		Set<ConstraintViolation<Order>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+				.providerResolver( new MyValidationProviderResolver() )
+				.configure()
+				.userClassLoader( getClass().getClassLoader() )
+				.buildValidatorFactory()
+				.getValidator()
+				.validate( new Order() );
+
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "Invalid", constraintViolations.iterator().next().getMessage() );
 	}
 
 	public static class MyValidationProviderResolver implements ValidationProviderResolver {

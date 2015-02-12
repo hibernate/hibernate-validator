@@ -34,27 +34,31 @@ final class ResourceLoaderHelper {
 	 *
 	 * @see InputStream#markSupported()
 	 */
-	static InputStream getResettableInputStreamForPath(String path) {
+	static InputStream getResettableInputStreamForPath(String path, ClassLoader userClassLoader) {
 		//TODO not sure if it's the right thing to removing '/'
 		String inputPath = path;
 		if ( inputPath.startsWith( "/" ) ) {
 			inputPath = inputPath.substring( 1 );
 		}
 
-		boolean isContextCL = true;
-		// try the context class loader first
-		ClassLoader loader = run( GetClassLoader.fromContext() );
+		InputStream inputStream = null;
 
-		if ( loader == null ) {
-			log.debug( "No default context class loader, fall back to Bean Validation's loader" );
-			loader = run( GetClassLoader.fromClass( ResourceLoaderHelper.class ) );
-			isContextCL = false;
+		if ( userClassLoader != null ) {
+			log.debug( "Trying to load " + path + " via user class loader" );
+			inputStream = userClassLoader.getResourceAsStream( inputPath );
 		}
-		InputStream inputStream = loader.getResourceAsStream( inputPath );
 
-		// try the current class loader
-		if ( isContextCL && inputStream == null ) {
-			loader = run( GetClassLoader.fromClass( ResourceLoaderHelper.class ) );
+		if ( inputStream == null ) {
+			ClassLoader loader = run( GetClassLoader.fromContext() );
+			if ( loader != null ) {
+				log.debug( "Trying to load " + path + " via TCCL" );
+				inputStream = loader.getResourceAsStream( inputPath );
+			}
+		}
+
+		if ( inputStream == null ) {
+			log.debug( "Trying to load " + path + " via Hibernate Validator's class loader" );
+			ClassLoader loader = ResourceLoaderHelper.class.getClassLoader();
 			inputStream = loader.getResourceAsStream( inputPath );
 		}
 

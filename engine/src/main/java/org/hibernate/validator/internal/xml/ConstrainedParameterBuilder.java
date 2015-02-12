@@ -42,7 +42,8 @@ class ConstrainedParameterBuilder {
 																		String defaultPackage,
 																		ConstraintHelper constraintHelper,
 																		ParameterNameProvider parameterNameProvider,
-																		AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+																		AnnotationProcessingOptionsImpl annotationProcessingOptions,
+																		ClassLoader userClassLoader) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
 		int i = 0;
 		List<String> parameterNames = executableElement.getParameterNames( parameterNameProvider );
@@ -56,13 +57,15 @@ class ConstrainedParameterBuilder {
 						ElementType.PARAMETER,
 						defaultPackage,
 						constraintHelper,
-						null
+						null,
+						userClassLoader
 				);
 				metaConstraints.add( metaConstraint );
 			}
 			Map<Class<?>, Class<?>> groupConversions = GroupConversionBuilder.buildGroupConversionMap(
 					parameterType.getConvertGroup(),
-					defaultPackage
+					defaultPackage,
+					userClassLoader
 			);
 
 			// ignore annotations

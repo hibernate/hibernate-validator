@@ -51,10 +51,11 @@ class MetaConstraintBuilder {
 																			   java.lang.annotation.ElementType type,
 																			   String defaultPackage,
 																			   ConstraintHelper constraintHelper,
-																			   ConstraintDescriptorImpl.ConstraintType constraintType) {
+																			   ConstraintDescriptorImpl.ConstraintType constraintType,
+																			   ClassLoader userClassLoader) {
 		Class<A> annotationClass;
 		try {
-			annotationClass = (Class<A>) ClassLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage );
+			annotationClass = (Class<A>) ClassLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage, userClassLoader );
 		}
 		catch ( ValidationException e ) {
 			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
@@ -64,14 +65,14 @@ class MetaConstraintBuilder {
 		if ( constraint.getMessage() != null ) {
 			annotationDescriptor.setValue( MESSAGE_PARAM, constraint.getMessage() );
 		}
-		annotationDescriptor.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
-		annotationDescriptor.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
+		annotationDescriptor.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage, userClassLoader ) );
+		annotationDescriptor.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage, userClassLoader ) );
 
 		for ( ElementType elementType : constraint.getElement() ) {
 			String name = elementType.getName();
 			checkNameIsValid( name );
 			Class<?> returnType = getAnnotationParameterType( annotationClass, name );
-			Object elementValue = getElementValue( elementType, returnType, defaultPackage );
+			Object elementValue = getElementValue( elementType, returnType, defaultPackage, userClassLoader );
 			annotationDescriptor.setValue( name, elementValue );
 		}
 
@@ -92,12 +93,12 @@ class MetaConstraintBuilder {
 		return new MetaConstraint<A>( constraintDescriptor, constraintLocation );
 	}
 
-	private static <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage) {
+	private static <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage, ClassLoader userClassLoader) {
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
 		for ( ElementType elementType : annotationType.getElement() ) {
 			String name = elementType.getName();
 			Class<?> parameterType = getAnnotationParameterType( returnType, name );
-			Object elementValue = getElementValue( elementType, parameterType, defaultPackage );
+			Object elementValue = getElementValue( elementType, parameterType, defaultPackage, userClassLoader );
 			annotationDescriptor.setValue( name, elementValue );
 		}
 		return AnnotationFactory.create( annotationDescriptor );
@@ -117,7 +118,7 @@ class MetaConstraintBuilder {
 		return m.getReturnType();
 	}
 
-	private static Object getElementValue(ElementType elementType, Class<?> returnType, String defaultPackage) {
+	private static Object getElementValue(ElementType elementType, Class<?> returnType, String defaultPackage, ClassLoader userClassLoader) {
 		removeEmptyContentElements( elementType );
 
 		boolean isArray = returnType.isArray();
@@ -125,12 +126,12 @@ class MetaConstraintBuilder {
 			if ( elementType.getContent().size() != 1 ) {
 				throw log.getAttemptToSpecifyAnArrayWhereSingleValueIsExpectedException();
 			}
-			return getSingleValue( elementType.getContent().get( 0 ), returnType, defaultPackage );
+			return getSingleValue( elementType.getContent().get( 0 ), returnType, defaultPackage, userClassLoader );
 		}
 		else {
 			List<Object> values = newArrayList();
 			for ( Serializable s : elementType.getContent() ) {
-				values.add( getSingleValue( s, returnType.getComponentType(), defaultPackage ) );
+				values.add( getSingleValue( s, returnType.getComponentType(), defaultPackage, userClassLoader ) );
 			}
 			return values.toArray( (Object[]) Array.newInstance( returnType.getComponentType(), values.size() ) );
 		}
@@ -146,18 +147,18 @@ class MetaConstraintBuilder {
 		elementType.getContent().removeAll( contentToDelete );
 	}
 
-	private static Object getSingleValue(Serializable serializable, Class<?> returnType, String defaultPackage) {
+	private static Object getSingleValue(Serializable serializable, Class<?> returnType, String defaultPackage, ClassLoader userClassLoader) {
 
 		Object returnValue;
 		if ( serializable instanceof String ) {
 			String value = (String) serializable;
-			returnValue = convertStringToReturnType( returnType, value, defaultPackage );
+			returnValue = convertStringToReturnType( returnType, value, defaultPackage, userClassLoader );
 		}
 		else if ( serializable instanceof JAXBElement && ( (JAXBElement<?>) serializable ).getDeclaredType()
 				.equals( String.class ) ) {
 			JAXBElement<?> elem = (JAXBElement<?>) serializable;
 			String value = (String) elem.getValue();
-			returnValue = convertStringToReturnType( returnType, value, defaultPackage );
+			returnValue = convertStringToReturnType( returnType, value, defaultPackage, userClassLoader );
 		}
 		else if ( serializable instanceof JAXBElement && ( (JAXBElement<?>) serializable ).getDeclaredType()
 				.equals( AnnotationType.class ) ) {
@@ -166,7 +167,7 @@ class MetaConstraintBuilder {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
-				returnValue = MetaConstraintBuilder.buildAnnotation( annotationType, annotationClass, defaultPackage );
+				returnValue = MetaConstraintBuilder.buildAnnotation( annotationType, annotationClass, defaultPackage, userClassLoader );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getUnexpectedParameterValueException( e );
@@ -179,7 +180,7 @@ class MetaConstraintBuilder {
 
 	}
 
-	private static Object convertStringToReturnType(Class<?> returnType, String value, String defaultPackage) {
+	private static Object convertStringToReturnType(Class<?> returnType, String value, String defaultPackage, ClassLoader userClassLoader) {
 		Object returnValue;
 		if ( returnType.getName().equals( byte.class.getName() ) ) {
 			try {
@@ -242,7 +243,7 @@ class MetaConstraintBuilder {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ClassLoadingHelper.loadClass( value, defaultPackage, MetaConstraintBuilder.class );
+			returnValue = ClassLoadingHelper.loadClass( value, defaultPackage, userClassLoader );
 		}
 		else {
 			try {
@@ -257,27 +258,27 @@ class MetaConstraintBuilder {
 		return returnValue;
 	}
 
-	private static Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
+	private static Class<?>[] getGroups(GroupsType groupsType, String defaultPackage, ClassLoader userClassLoader) {
 		if ( groupsType == null ) {
 			return new Class[] { };
 		}
 
 		List<Class<?>> groupList = newArrayList();
 		for ( String groupClass : groupsType.getValue() ) {
-			groupList.add( ClassLoadingHelper.loadClass( groupClass, defaultPackage ) );
+			groupList.add( ClassLoadingHelper.loadClass( groupClass, defaultPackage, userClassLoader ) );
 		}
 		return groupList.toArray( new Class[groupList.size()] );
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
+	private static Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage, ClassLoader userClassLoader) {
 		if ( payloadType == null ) {
 			return new Class[] { };
 		}
 
 		List<Class<? extends Payload>> payloadList = newArrayList();
 		for ( String groupClass : payloadType.getValue() ) {
-			Class<?> payload = ClassLoadingHelper.loadClass( groupClass, defaultPackage );
+			Class<?> payload = ClassLoadingHelper.loadClass( groupClass, defaultPackage, userClassLoader );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
 				throw log.getWrongPayloadClassException( payload.getName() );
 			}

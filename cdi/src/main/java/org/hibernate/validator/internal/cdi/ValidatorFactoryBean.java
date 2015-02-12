@@ -137,7 +137,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) run(
 				LoadClass.action(
 						messageInterpolatorFqcn,
-						this.getClass()
+						null
 				)
 		);
 
@@ -156,7 +156,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		Class<TraversableResolver> traversableResolverClass = (Class<TraversableResolver>) run(
 				LoadClass.action(
 						traversableResolverFqcn,
-						this.getClass()
+						null
 				)
 		);
 
@@ -175,7 +175,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		Class<ParameterNameProvider> parameterNameProviderClass = (Class<ParameterNameProvider>) run(
 				LoadClass.action(
 						parameterNameProviderFqcn,
-						this.getClass()
+						null
 				)
 		);
 
@@ -195,7 +195,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		Class<ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<ConstraintValidatorFactory>) run(
 				LoadClass.action(
 						constraintValidatorFactoryFqcn,
-						this.getClass()
+						null
 				)
 		);
 

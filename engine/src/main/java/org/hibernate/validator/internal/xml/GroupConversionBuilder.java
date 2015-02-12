@@ -22,11 +22,11 @@ class GroupConversionBuilder {
 	}
 
 	static Map<Class<?>, Class<?>> buildGroupConversionMap(List<GroupConversionType> groupConversionTypes,
-																  String defaultPackage) {
+																  String defaultPackage, ClassLoader userClassLoader) {
 		Map<Class<?>, Class<?>> groupConversionMap = newHashMap();
 		for ( GroupConversionType groupConversionType : groupConversionTypes ) {
-			Class<?> fromClass = ClassLoadingHelper.loadClass( groupConversionType.getFrom(), defaultPackage );
-			Class<?> toClass = ClassLoadingHelper.loadClass( groupConversionType.getTo(), defaultPackage );
+			Class<?> fromClass = ClassLoadingHelper.loadClass( groupConversionType.getFrom(), defaultPackage, userClassLoader );
+			Class<?> toClass = ClassLoadingHelper.loadClass( groupConversionType.getTo(), defaultPackage, userClassLoader );
 			groupConversionMap.put( fromClass, toClass );
 		}
 

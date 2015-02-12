@@ -14,6 +14,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -125,6 +126,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
+	private final ClassLoader userClassLoader;
+
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.traversableResolver = configurationState.getTraversableResolver();
@@ -133,6 +136,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
+		this.userClassLoader = getUserClassLoader( configurationState );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -140,7 +144,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		else {
 			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, parameterNameProvider, configurationState.getMappingStreams()
+					constraintHelper, parameterNameProvider, configurationState.getMappingStreams(), userClassLoader
 			);
 		}
 
@@ -174,6 +178,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.validatedValueHandlers = Collections.unmodifiableList( tmpValidatedValueHandlers );
 
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
+	}
+
+	private static ClassLoader getUserClassLoader(ConfigurationState configurationState) {
+		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getUserClassLoader() : null;
 	}
 
 	@Override
@@ -336,7 +344,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		for ( String handlerName : handlerNames ) {
 			@SuppressWarnings("unchecked")
 			Class<? extends ValidatedValueUnwrapper<?>> handlerType = (Class<? extends ValidatedValueUnwrapper<?>>)
-					run( LoadClass.action( handlerName, ValidatorFactoryImpl.class ) );
+					run( LoadClass.action( handlerName, userClassLoader ) );
 			handlers.add( run( NewInstance.action( handlerType, "validated value handler class" ) ) );
 		}
 
@@ -367,7 +375,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		for ( String fqcn : constraintDefinitionContributorNames ) {
 			@SuppressWarnings("unchecked")
 			Class<ConstraintDefinitionContributor> contributorType = (Class<ConstraintDefinitionContributor>)
-					run( LoadClass.action( fqcn, ValidatorFactoryImpl.class ) );
+					run( LoadClass.action( fqcn, userClassLoader ) );
 			constraintDefinitionContributors.add(
 					run( NewInstance.action( contributorType, "constraint definition contributor class" ) )
 			);

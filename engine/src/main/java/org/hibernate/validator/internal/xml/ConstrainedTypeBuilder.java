@@ -35,13 +35,14 @@ class ConstrainedTypeBuilder {
 													   String defaultPackage,
 													   ConstraintHelper constraintHelper,
 													   AnnotationProcessingOptionsImpl annotationProcessingOptions,
-													   Map<Class<?>, List<Class<?>>> defaultSequences) {
+													   Map<Class<?>, List<Class<?>>> defaultSequences,
+													   ClassLoader userClassLoader) {
 		if ( classType == null ) {
 			return null;
 		}
 
 		// group sequence
-		List<Class<?>> groupSequence = createGroupSequence( classType.getGroupSequence(), defaultPackage );
+		List<Class<?>> groupSequence = createGroupSequence( classType.getGroupSequence(), defaultPackage, userClassLoader );
 		if ( !groupSequence.isEmpty() ) {
 			defaultSequences.put( beanClass, groupSequence );
 		}
@@ -56,7 +57,8 @@ class ConstrainedTypeBuilder {
 					java.lang.annotation.ElementType.TYPE,
 					defaultPackage,
 					constraintHelper,
-					null
+					null,
+					userClassLoader
 			);
 			metaConstraints.add( metaConstraint );
 		}
@@ -76,11 +78,11 @@ class ConstrainedTypeBuilder {
 		);
 	}
 
-	private static List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {
+	private static List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage, ClassLoader userClassLoader) {
 		List<Class<?>> groupSequence = newArrayList();
 		if ( groupSequenceType != null ) {
 			for ( String groupName : groupSequenceType.getValue() ) {
-				Class<?> group = ClassLoadingHelper.loadClass( groupName, defaultPackage );
+				Class<?> group = ClassLoadingHelper.loadClass( groupName, defaultPackage, userClassLoader );
 				groupSequence.add( group );
 			}
 		}

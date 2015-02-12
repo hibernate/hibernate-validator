@@ -40,7 +40,7 @@ public class XmlMappingParserTest {
 	@BeforeMethod
 	public void setupParserHelper() {
 		constraintHelper = new ConstraintHelper();
-		xmlMappingParser = new XmlMappingParser( constraintHelper, new DefaultParameterNameProvider() );
+		xmlMappingParser = new XmlMappingParser( constraintHelper, new DefaultParameterNameProvider(), null );
 	}
 
 	@Test

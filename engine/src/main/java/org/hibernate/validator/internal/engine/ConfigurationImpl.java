@@ -88,6 +88,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final Set<ConstraintDefinitionContributor> constraintDefinitionContributors = newHashSet();
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
 
+	private ClassLoader userClassLoader;
+
 	public ConfigurationImpl(BootstrapState state) {
 		this();
 		if ( state.getValidationProviderResolver() == null ) {
@@ -246,6 +248,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
+	public HibernateValidatorConfiguration userClassLoader(ClassLoader userClassLoader) {
+		Contracts.assertNotNull( userClassLoader, MESSAGES.parameterMustNotBeNull( "userClassLoader" ) );
+		this.userClassLoader = userClassLoader;
+
+		return this;
+	}
+
+	@Override
 	public final ValidatorFactory buildValidatorFactory() {
 		parseValidationXml();
 		ValidatorFactory factory = null;
@@ -320,7 +330,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public BootstrapConfiguration getBootstrapConfiguration() {
 		if ( bootstrapConfiguration == null ) {
-			bootstrapConfiguration = new ValidationXmlParser().parseValidationXml();
+			bootstrapConfiguration = new ValidationXmlParser( userClassLoader ).parseValidationXml();
 		}
 		return bootstrapConfiguration;
 	}
@@ -337,6 +347,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public final Map<String, String> getProperties() {
 		return validationBootstrapParameters.getConfigProperties();
+	}
+
+	public ClassLoader getUserClassLoader() {
+		return userClassLoader;
 	}
 
 	@Override
@@ -395,7 +409,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 		else {
 			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters(
-					getBootstrapConfiguration()
+					getBootstrapConfiguration(), userClassLoader
 			);
 			applyXmlSettings( xmlParameters );
 		}
@@ -458,7 +472,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private boolean isClassPresent(String className) {
 		try {
-			run( LoadClass.action( className, getClass() ) );
+			run( LoadClass.action( className, getClass().getClassLoader() ) );
 			return true;
 		}
 		catch ( ValidationException e ) {

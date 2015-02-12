@@ -55,7 +55,8 @@ class ConstrainedExecutableBuilder {
 																			  String defaultPackage,
 																			  ParameterNameProvider parameterNameProvider,
 																			  ConstraintHelper constraintHelper,
-																			  AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+																			  AnnotationProcessingOptionsImpl annotationProcessingOptions,
+																			  ClassLoader userClassLoader) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<Method> alreadyProcessedMethods = newArrayList();
 		for ( MethodType methodType : methods ) {
@@ -63,7 +64,8 @@ class ConstrainedExecutableBuilder {
 			List<Class<?>> parameterTypes = createParameterTypes(
 					methodType.getParameter(),
 					beanClass,
-					defaultPackage
+					defaultPackage,
+					userClassLoader
 			);
 
 			String methodName = methodType.getName();
@@ -109,7 +111,8 @@ class ConstrainedExecutableBuilder {
 					methodExecutableElement,
 					constraintHelper,
 					parameterNameProvider,
-					annotationProcessingOptions
+					annotationProcessingOptions,
+					userClassLoader
 			);
 
 			constrainedExecutables.add( constrainedExecutable );
@@ -122,7 +125,8 @@ class ConstrainedExecutableBuilder {
 																				   String defaultPackage,
 																				   ParameterNameProvider parameterNameProvider,
 																				   ConstraintHelper constraintHelper,
-																				   AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+																				   AnnotationProcessingOptionsImpl annotationProcessingOptions,
+																				   ClassLoader userClassLoader) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<Constructor<?>> alreadyProcessedConstructors = newArrayList();
 		for ( ConstructorType constructorType : constructors ) {
@@ -130,7 +134,8 @@ class ConstrainedExecutableBuilder {
 			List<Class<?>> constructorParameterTypes = createParameterTypes(
 					constructorType.getParameter(),
 					beanClass,
-					defaultPackage
+					defaultPackage,
+					userClassLoader
 			);
 
 			final Constructor<?> constructor = run(
@@ -174,7 +179,8 @@ class ConstrainedExecutableBuilder {
 					constructorExecutableElement,
 					constraintHelper,
 					parameterNameProvider,
-					annotationProcessingOptions
+					annotationProcessingOptions,
+					userClassLoader
 			);
 			constrainedExecutables.add( constrainedExecutable );
 		}
@@ -188,14 +194,16 @@ class ConstrainedExecutableBuilder {
 															 ExecutableElement executableElement,
 															 ConstraintHelper constraintHelper,
 															 ParameterNameProvider parameterNameProvider,
-															 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+															 AnnotationProcessingOptionsImpl annotationProcessingOptions,
+															 ClassLoader userClassLoader) {
 		List<ConstrainedParameter> parameterMetaData = ConstrainedParameterBuilder.buildConstrainedParameters(
 				parameterTypeList,
 				executableElement,
 				defaultPackage,
 				constraintHelper,
 				parameterNameProvider,
-				annotationProcessingOptions
+				annotationProcessingOptions,
+				userClassLoader
 		);
 
 		Set<MetaConstraint<?>> crossParameterConstraints = parseCrossParameterConstraints(
@@ -203,7 +211,8 @@ class ConstrainedExecutableBuilder {
 				crossParameterType,
 				executableElement,
 				constraintHelper,
-				annotationProcessingOptions
+				annotationProcessingOptions,
+				userClassLoader
 		);
 
 		// parse the return value
@@ -216,7 +225,9 @@ class ConstrainedExecutableBuilder {
 				groupConversions,
 				defaultPackage,
 				constraintHelper,
-				annotationProcessingOptions
+				annotationProcessingOptions,
+				userClassLoader
+
 		);
 
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
@@ -237,7 +248,8 @@ class ConstrainedExecutableBuilder {
 																		 CrossParameterType crossParameterType,
 																		 ExecutableElement executableElement,
 																		 ConstraintHelper constraintHelper,
-																		 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+																		 AnnotationProcessingOptionsImpl annotationProcessingOptions,
+																		 ClassLoader userClassLoader) {
 
 		Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		if ( crossParameterType == null ) {
@@ -253,7 +265,8 @@ class ConstrainedExecutableBuilder {
 					executableElement.getElementType(),
 					defaultPackage,
 					constraintHelper,
-					ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER
+					ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER,
+					userClassLoader
 			);
 			crossParameterConstraints.add( metaConstraint );
 		}
@@ -275,7 +288,8 @@ class ConstrainedExecutableBuilder {
 												Map<Class<?>, Class<?>> groupConversions,
 												String defaultPackage,
 												ConstraintHelper constraintHelper,
-												AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+												AnnotationProcessingOptionsImpl annotationProcessingOptions,
+												ClassLoader userClassLoader) {
 		if ( returnValueType == null ) {
 			return false;
 		}
@@ -288,14 +302,16 @@ class ConstrainedExecutableBuilder {
 					executableElement.getElementType(),
 					defaultPackage,
 					constraintHelper,
-					ConstraintDescriptorImpl.ConstraintType.GENERIC
+					ConstraintDescriptorImpl.ConstraintType.GENERIC,
+					userClassLoader
 			);
 			returnValueConstraints.add( metaConstraint );
 		}
 		groupConversions.putAll(
 				GroupConversionBuilder.buildGroupConversionMap(
 						returnValueType.getConvertGroup(),
-						defaultPackage
+						defaultPackage,
+						userClassLoader
 				)
 		);
 
@@ -312,13 +328,14 @@ class ConstrainedExecutableBuilder {
 
 	private static List<Class<?>> createParameterTypes(List<ParameterType> parameterList,
 													   Class<?> beanClass,
-													   String defaultPackage) {
+													   String defaultPackage,
+													   ClassLoader userClassLoader) {
 		List<Class<?>> parameterTypes = newArrayList();
 		for ( ParameterType parameterType : parameterList ) {
 			String type = null;
 			try {
 				type = parameterType.getType();
-				Class<?> parameterClass = ClassLoadingHelper.loadClass( type, defaultPackage );
+				Class<?> parameterClass = ClassLoadingHelper.loadClass( type, defaultPackage, userClassLoader );
 				parameterTypes.add( parameterClass );
 			}
 			catch ( ValidationException e ) {

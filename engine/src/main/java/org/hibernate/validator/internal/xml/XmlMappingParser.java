@@ -65,6 +65,8 @@ public class XmlMappingParser {
 	private final XmlParserHelper xmlParserHelper;
 	private final ParameterNameProvider parameterNameProvider;
 
+	private final ClassLoader userClassLoader;
+
 	private static final ConcurrentMap<String, String> SCHEMAS_BY_VERSION = new ConcurrentHashMap<String, String>(
 			2,
 			0.75f,
@@ -76,13 +78,14 @@ public class XmlMappingParser {
 		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
 	}
 
-	public XmlMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+	public XmlMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider, ClassLoader userClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.defaultSequences = newHashMap();
 		this.constrainedElements = newHashMap();
 		this.xmlParserHelper = new XmlParserHelper();
 		this.parameterNameProvider = parameterNameProvider;
+		this.userClassLoader = userClassLoader;
 	}
 
 	/**
@@ -116,7 +119,7 @@ public class XmlMappingParser {
 				);
 
 				for ( BeanType bean : mapping.getBean() ) {
-					Class<?> beanClass = ClassLoadingHelper.loadClass( bean.getClazz(), defaultPackage );
+					Class<?> beanClass = ClassLoadingHelper.loadClass( bean.getClazz(), defaultPackage, userClassLoader );
 					checkClassHasNotBeenProcessed( processedClasses, beanClass );
 
 					// update annotation ignores
@@ -131,7 +134,8 @@ public class XmlMappingParser {
 							defaultPackage,
 							constraintHelper,
 							annotationProcessingOptions,
-							defaultSequences
+							defaultSequences,
+							userClassLoader
 					);
 					if ( constrainedType != null ) {
 						addConstrainedElement( beanClass, constrainedType );
@@ -142,7 +146,8 @@ public class XmlMappingParser {
 							beanClass,
 							defaultPackage,
 							constraintHelper,
-							annotationProcessingOptions
+							annotationProcessingOptions,
+							userClassLoader
 					);
 					addConstrainedElements( beanClass, constrainedFields );
 
@@ -151,7 +156,9 @@ public class XmlMappingParser {
 							beanClass,
 							defaultPackage,
 							constraintHelper,
-							annotationProcessingOptions
+							annotationProcessingOptions,
+							userClassLoader
+
 					);
 					addConstrainedElements( beanClass, constrainedGetters );
 
@@ -161,7 +168,8 @@ public class XmlMappingParser {
 							defaultPackage,
 							parameterNameProvider,
 							constraintHelper,
-							annotationProcessingOptions
+							annotationProcessingOptions,
+							userClassLoader
 					);
 					addConstrainedElements( beanClass, constrainedConstructors );
 
@@ -171,7 +179,8 @@ public class XmlMappingParser {
 							defaultPackage,
 							parameterNameProvider,
 							constraintHelper,
-							annotationProcessingOptions
+							annotationProcessingOptions,
+							userClassLoader
 					);
 					addConstrainedElements( beanClass, constrainedMethods );
 
@@ -218,7 +227,7 @@ public class XmlMappingParser {
 				alreadyProcessedConstraintDefinitions.add( annotationClassName );
 			}
 
-			Class<?> clazz = ClassLoadingHelper.loadClass( annotationClassName, defaultPackage );
+			Class<?> clazz = ClassLoadingHelper.loadClass( annotationClassName, defaultPackage, userClassLoader );
 			if ( !clazz.isAnnotation() ) {
 				throw log.getIsNotAnAnnotationException( annotationClassName );
 			}
@@ -234,7 +243,7 @@ public class XmlMappingParser {
 		for ( String validatorClassName : validatedByType.getValue() ) {
 			@SuppressWarnings("unchecked")
 			Class<? extends ConstraintValidator<A, ?>> validatorClass = (Class<? extends ConstraintValidator<A, ?>>) run(
-					LoadClass.action( validatorClassName, this.getClass() )
+					LoadClass.action( validatorClassName, userClassLoader )
 			);
 
 

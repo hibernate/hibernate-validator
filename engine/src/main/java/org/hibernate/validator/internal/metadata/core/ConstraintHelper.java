@@ -594,7 +594,7 @@ public class ConstraintHelper {
 
 	private static boolean isClassPresent(String className) {
 		try {
-			run( LoadClass.action( className, ConstraintHelper.class ) );
+			run( LoadClass.action( className, ConstraintHelper.class.getClassLoader() ) );
 			return true;
 		}
 		catch ( ValidationException e ) {

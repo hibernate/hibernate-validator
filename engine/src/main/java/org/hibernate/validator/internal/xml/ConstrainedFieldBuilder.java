@@ -43,7 +43,8 @@ class ConstrainedFieldBuilder {
 															   Class<?> beanClass,
 															   String defaultPackage,
 															   ConstraintHelper constraintHelper,
-															   AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+															   AnnotationProcessingOptionsImpl annotationProcessingOptions,
+															   ClassLoader userClassLoader) {
 		Set<ConstrainedField> constrainedFields = newHashSet();
 		List<String> alreadyProcessedFieldNames = newArrayList();
 		for ( FieldType fieldType : fields ) {
@@ -57,13 +58,15 @@ class ConstrainedFieldBuilder {
 						java.lang.annotation.ElementType.FIELD,
 						defaultPackage,
 						constraintHelper,
-						null
+						null,
+						userClassLoader
 				);
 				metaConstraints.add( metaConstraint );
 			}
 			Map<Class<?>, Class<?>> groupConversions = GroupConversionBuilder.buildGroupConversionMap(
 					fieldType.getConvertGroup(),
-					defaultPackage
+					defaultPackage,
+					userClassLoader
 			);
 
 			// TODO HV-919 Support specification of type parameter constraints via XML and API
