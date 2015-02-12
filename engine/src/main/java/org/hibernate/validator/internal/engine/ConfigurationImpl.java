@@ -14,7 +14,6 @@ import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -395,7 +394,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 			// make sure we use the defaults in case they haven't been provided yet
 			if ( validationBootstrapParameters.getMessageInterpolator() == null ) {
-				validationBootstrapParameters.setMessageInterpolator( defaultMessageInterpolator );
+				validationBootstrapParameters.setMessageInterpolator(
+						getDefaultMessageInterpolatorConfiguredWithClassLoader()
+				);
 			}
 			if ( validationBootstrapParameters.getTraversableResolver() == null ) {
 				validationBootstrapParameters.setTraversableResolver( defaultTraversableResolver );
@@ -423,7 +424,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 				validationBootstrapParameters.setMessageInterpolator( xmlParameters.getMessageInterpolator() );
 			}
 			else {
-				validationBootstrapParameters.setMessageInterpolator( defaultMessageInterpolator );
+				validationBootstrapParameters.setMessageInterpolator(
+						getDefaultMessageInterpolatorConfiguredWithClassLoader()
+				);
 			}
 		}
 
@@ -478,6 +481,20 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		catch ( ValidationException e ) {
 			return false;
 		}
+	}
+
+	/**
+	 * Returns the default message interpolator, configured with the given user class loader, if present.
+	 */
+	private MessageInterpolator getDefaultMessageInterpolatorConfiguredWithClassLoader() {
+		return userClassLoader != null ?
+				new ResourceBundleMessageInterpolator(
+						new PlatformResourceBundleLocator(
+								ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
+								userClassLoader
+						)
+				) :
+				defaultMessageInterpolator;
 	}
 
 	/**

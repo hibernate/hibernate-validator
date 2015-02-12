@@ -19,6 +19,7 @@ import javax.validation.spi.ValidationProvider;
 import com.example.Customer;
 import com.example.ExampleConstraintValidatorFactory;
 import com.example.Order;
+import com.example.RetailOrder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +45,6 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
-
 
 /**
  * Integration test for Bean Validation and Hibernate Validator under OSGi.
@@ -165,6 +165,20 @@ public class OsgiIntegrationTest {
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "Invalid", constraintViolations.iterator().next().getMessage() );
+	}
+
+	@Test
+	public void canObtainValuesFromValidationMessages() {
+		Set<ConstraintViolation<RetailOrder>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+				.providerResolver( new MyValidationProviderResolver() )
+				.configure()
+				.userClassLoader( getClass().getClassLoader() )
+				.buildValidatorFactory()
+				.getValidator()
+				.validate( new RetailOrder() );
+
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "Not a valid retail order name", constraintViolations.iterator().next().getMessage() );
 	}
 
 	public static class MyValidationProviderResolver implements ValidationProviderResolver {
