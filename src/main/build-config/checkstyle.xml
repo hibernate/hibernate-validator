@@ -46,6 +46,9 @@
 
         <!-- Checks white spaces -->
         <module name="TypecastParenPad" />
+        <module name="WhitespaceAfter">
+            <property name="tokens" value="TYPECAST" />
+        </module>
         <module name="ParenPad">
             <property name="tokens" value="CTOR_CALL, METHOD_CALL, SUPER_CTOR_CALL" />
             <property name="option" value="space" />
