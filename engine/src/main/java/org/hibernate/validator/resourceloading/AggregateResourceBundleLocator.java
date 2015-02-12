@@ -58,13 +58,10 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 		super( delegate );
 
 		Contracts.assertValueNotNull( bundleNames, "bundleNames" );
-
-		List<String> tmpBundleNames = new ArrayList<String>();
-		tmpBundleNames.addAll( bundleNames );
-
-		this.bundleNames = Collections.unmodifiableList( tmpBundleNames );
+		this.bundleNames = Collections.unmodifiableList( bundleNames );
 	}
 
+	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
 		List<ResourceBundle> sourceBundles = new ArrayList<ResourceBundle>();
 
@@ -96,7 +93,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * @author Gunnar Morling
 	 */
 	public static class AggregateBundle extends ResourceBundle {
-		private Map<String, Object> contents = new HashMap<String, Object>();
+		private final Map<String, Object> contents = new HashMap<String, Object>();
 
 		/**
 		 * Creates a new AggregateBundle.
@@ -143,7 +140,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 */
 	private static class IteratorEnumeration<T> implements Enumeration<T> {
 
-		private Iterator<T> source;
+		private final Iterator<T> source;
 
 		/**
 		 * Creates a new IterationEnumeration.
@@ -159,10 +156,12 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 			this.source = source;
 		}
 
+		@Override
 		public boolean hasMoreElements() {
 			return source.hasNext();
 		}
 
+		@Override
 		public T nextElement() {
 			return source.next();
 		}

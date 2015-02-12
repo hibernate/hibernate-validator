@@ -26,10 +26,11 @@ public abstract class DelegatingResourceBundleLocator implements ResourceBundleL
 	 *
 	 * @param delegate The delegate.
 	 */
-	public DelegatingResourceBundleLocator(org.hibernate.validator.spi.resourceloading.ResourceBundleLocator delegate) {
+	public DelegatingResourceBundleLocator(ResourceBundleLocator delegate) {
 		this.delegate = delegate;
 	}
 
+	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
 		return delegate == null ? null : delegate.getResourceBundle( locale );
 	}

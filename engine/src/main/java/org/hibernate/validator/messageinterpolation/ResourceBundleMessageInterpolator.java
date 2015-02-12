@@ -9,8 +9,6 @@ package org.hibernate.validator.messageinterpolation;
 import java.util.Locale;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -23,8 +21,7 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  * @author Adam Stawicki
  */
 public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolator {
-	private static final Log log = LoggerFactory.make();
-	
+
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator defaultResourceBundleLocator) {
 		this( defaultResourceBundleLocator, true );
 	}
@@ -42,6 +39,4 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 		InterpolationTerm expression = new InterpolationTerm( term, locale );
 		return expression.interpolate( context );
 	}
-	
-	
 }
