@@ -23,8 +23,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
-public @interface MustMatch {
-	String message() default "{org.hibernate.validator.test.constraintvalidator.MustMatch.message}";
+public @interface MustNotMatch {
+	String message() default "{org.hibernate.validator.test.constraintvalidator.MustNotMatch.message}";
 
 	Class<?>[] groups() default { };
 
