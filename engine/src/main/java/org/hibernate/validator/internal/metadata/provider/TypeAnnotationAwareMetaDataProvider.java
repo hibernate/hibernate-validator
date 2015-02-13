@@ -188,7 +188,7 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 			}
 
 			// If it is not a Map, log a message and ignore
-			log.parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported();
+			log.parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported( annotatedType.getType().getTypeName() );
 		}
 
 		return Optional.empty();
