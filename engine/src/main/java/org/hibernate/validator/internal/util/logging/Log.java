@@ -28,10 +28,10 @@ import javax.validation.ValidationException;
 import javax.xml.stream.XMLStreamException;
 
 import org.jboss.logging.BasicLogger;
-import org.jboss.logging.Cause;
-import org.jboss.logging.LogMessage;
-import org.jboss.logging.Message;
-import org.jboss.logging.MessageLogger;
+import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.LogMessage;
+import org.jboss.logging.annotations.Message;
+import org.jboss.logging.annotations.MessageLogger;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
@@ -40,7 +40,7 @@ import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
 /**
- * The logger interface for JBoss Logging.
+ * The Hibernate Validator logger interface for JBoss Logging.
  * <p>
  * <b>Note</b>:<br>
  * New log messages must always use a new (incremented) message id. Don't re-use of existing message ids, even
@@ -49,7 +49,6 @@ import static org.jboss.logging.Logger.Level.WARN;
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2012 SERLI
  */
-@SuppressWarnings("deprecation")
 @MessageLogger(projectCode = "HV")
 public interface Log extends BasicLogger {
 
