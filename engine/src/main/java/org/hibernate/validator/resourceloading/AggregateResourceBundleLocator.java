@@ -86,14 +86,14 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	public ResourceBundle getResourceBundle(Locale locale) {
 		List<ResourceBundle> sourceBundles = new ArrayList<ResourceBundle>();
 
-		for ( String oneBundleName : bundleNames ) {
-			ResourceBundleLocator oneLocator =
-					new PlatformResourceBundleLocator( oneBundleName, classLoader );
+		for ( String bundleName : bundleNames ) {
+			ResourceBundleLocator resourceBundleLocator =
+					new PlatformResourceBundleLocator( bundleName, classLoader );
 
-			ResourceBundle oneBundle = oneLocator.getResourceBundle( locale );
+			ResourceBundle resourceBundle = resourceBundleLocator.getResourceBundle( locale );
 
-			if ( oneBundle != null ) {
-				sourceBundles.add( oneBundle );
+			if ( resourceBundle != null ) {
+				sourceBundles.add( resourceBundle );
 			}
 		}
 
