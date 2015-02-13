@@ -104,6 +104,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator-test-utils</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <scope>test</scope>
@@ -202,20 +207,6 @@
                                     <Specification-Version>1.1</Specification-Version>
                                 </manifestEntries>
                             </archive>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>test-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>testing</classifier>
-                            <classesDirectory>${project.build.testOutputDirectory}</classesDirectory>
-                            <includes>
-                                <include>org/hibernate/validator/testutil/**</include>
-                            </includes>
                         </configuration>
                     </execution>
                 </executions>
