@@ -63,6 +63,7 @@
     </mailingLists>
 
     <modules>
+        <module>test-utils</module>
         <module>engine</module>
         <module>engine-jdk8-tests</module>
         <module>cdi</module>
@@ -100,8 +101,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <classifier>testing</classifier>
+                <artifactId>hibernate-validator-test-utils</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

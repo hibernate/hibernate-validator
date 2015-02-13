@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
@@ -23,8 +25,7 @@ import org.fest.assertions.Assertions;
 import org.fest.assertions.CollectionAssert;
 
 import static org.fest.assertions.Formatting.format;
-import static org.hibernate.validator.internal.engine.path.PathImpl.createPathFromString;
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.PathImpl.createNewPath;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -62,8 +63,8 @@ public final class ConstraintViolationAssert {
 	 * @param expectedMessages The expected constraint violation messages.
 	 */
 	public static void assertCorrectConstraintViolationMessages(Set<? extends ConstraintViolation<?>> violations,
-																String... expectedMessages) {
-		List<String> actualMessages = newArrayList();
+			String... expectedMessages) {
+		List<String> actualMessages = new ArrayList<String>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualMessages.add( violation.getMessage() );
 		}
@@ -72,7 +73,7 @@ public final class ConstraintViolationAssert {
 	}
 
 	public static void assertCorrectConstraintViolationMessages(ConstraintViolationException e,
-																String... expectedMessages) {
+			String... expectedMessages) {
 		assertCorrectConstraintViolationMessages( e.getConstraintViolations(), expectedMessages );
 	}
 
@@ -84,8 +85,8 @@ public final class ConstraintViolationAssert {
 	 * @param expectedConstraintTypes The expected constraint types.
 	 */
 	public static <T> void assertCorrectConstraintTypes(Set<ConstraintViolation<T>> violations,
-														Class<?>... expectedConstraintTypes) {
-		List<Class<? extends Annotation>> actualConstraintTypes = newArrayList();
+			Class<?>... expectedConstraintTypes) {
+		List<Class<? extends Annotation>> actualConstraintTypes = new ArrayList<Class<? extends Annotation>>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualConstraintTypes.add( violation.getConstraintDescriptor().getAnnotation().annotationType() );
 		}
@@ -100,10 +101,10 @@ public final class ConstraintViolationAssert {
 	 * @param expectedPropertyPaths The expected property paths.
 	 */
 	public static void assertCorrectPropertyPaths(Set<? extends ConstraintViolation<?>> violations,
-												  String... expectedPropertyPaths) {
+			String... expectedPropertyPaths) {
 		List<String> expectedPathsAsList = Arrays.asList( expectedPropertyPaths );
 
-		List<String> actualPaths = newArrayList();
+		List<String> actualPaths = new ArrayList<String>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualPaths.add( violation.getPropertyPath().toString() );
 		}
@@ -137,9 +138,9 @@ public final class ConstraintViolationAssert {
 	 * @param propertyPath The expected property path.
 	 */
 	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
-												 Class<?> rootBeanClass, Object invalidValue, String propertyPath) {
+			Class<?> rootBeanClass, Object invalidValue, String propertyPath) {
 		assertTrue(
-				pathsAreEqual( violation.getPropertyPath(), createPathFromString( propertyPath ) ),
+				pathsAreEqual( violation.getPropertyPath(), createNewPath( propertyPath ) ),
 				"Wrong propertyPath"
 		);
 		assertConstraintViolation( violation, errorMessage, rootBeanClass, invalidValue );
@@ -155,7 +156,7 @@ public final class ConstraintViolationAssert {
 	 * @param invalidValue The expected invalid value.
 	 */
 	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
-												 Class<?> rootBeanClass, Object invalidValue) {
+			Class<?> rootBeanClass, Object invalidValue) {
 		assertEquals( violation.getInvalidValue(), invalidValue, "Wrong invalid value" );
 		assertConstraintViolation( violation, errorMessage, rootBeanClass );
 	}
@@ -169,7 +170,7 @@ public final class ConstraintViolationAssert {
 	 * @param rootBeanClass The expected root bean class.
 	 */
 	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
-												 Class<?> rootBeanClass) {
+			Class<?> rootBeanClass) {
 		assertEquals( violation.getRootBean().getClass(), rootBeanClass, "Wrong root bean type" );
 		assertConstraintViolation( violation, errorMessage );
 	}
@@ -191,7 +192,7 @@ public final class ConstraintViolationAssert {
 	 * @param numberOfViolations The expected number of violation.
 	 */
 	public static void assertNumberOfViolations(Set<? extends ConstraintViolation<?>> violations,
-												int numberOfViolations) {
+			int numberOfViolations) {
 		assertEquals(
 				violations.size(),
 				numberOfViolations,
@@ -200,8 +201,8 @@ public final class ConstraintViolationAssert {
 	}
 
 	public static void assertConstraintTypes(Set<ConstraintDescriptor<?>> descriptors,
-											 Class<?>... expectedConstraintTypes) {
-		List<Class<? extends Annotation>> actualConstraintTypes = newArrayList();
+			Class<?>... expectedConstraintTypes) {
+		List<Class<? extends Annotation>> actualConstraintTypes = new ArrayList<Class<? extends Annotation>>();
 
 		for ( ConstraintDescriptor<?> descriptor : descriptors ) {
 			actualConstraintTypes.add( descriptor.getAnnotation().annotationType() );
@@ -314,13 +315,13 @@ public final class ConstraintViolationAssert {
 	 * @param expectedConstraintTypes The expected constraint types.
 	 */
 	private static <T> void assertCorrectConstraintTypes(Iterable<Class<? extends Annotation>> actualConstraintTypes,
-														 Class<?>... expectedConstraintTypes) {
-		List<String> expectedConstraintTypeNames = newArrayList();
+			Class<?>... expectedConstraintTypes) {
+		List<String> expectedConstraintTypeNames = new ArrayList<String>();
 		for ( Class<?> expectedConstraintType : expectedConstraintTypes ) {
 			expectedConstraintTypeNames.add( expectedConstraintType.getName() );
 		}
 
-		List<String> actualConstraintTypeNames = newArrayList();
+		List<String> actualConstraintTypeNames = new ArrayList<String>();
 		for ( Class<?> actualConstraintType : actualConstraintTypes ) {
 			actualConstraintTypeNames.add( actualConstraintType.getName() );
 		}
@@ -352,7 +353,7 @@ public final class ConstraintViolationAssert {
 			isNotNull();
 
 			List<PathExpectation> expectedPaths = Arrays.asList( paths );
-			List<PathExpectation> actualPaths = newArrayList();
+			List<PathExpectation> actualPaths = new ArrayList<PathExpectation>();
 
 			for ( ConstraintViolation<?> violation : actualViolations ) {
 				actualPaths.add( new PathExpectation( violation.getPropertyPath() ) );
@@ -376,7 +377,7 @@ public final class ConstraintViolationAssert {
 		public void containsPath(PathExpectation expectedPath) {
 			isNotNull();
 
-			List<PathExpectation> actualPaths = newArrayList();
+			List<PathExpectation> actualPaths = new ArrayList<PathExpectation>();
 			for ( ConstraintViolation<?> violation : actualViolations ) {
 				PathExpectation actual = new PathExpectation( violation.getPropertyPath() );
 				if ( actual.equals( expectedPath ) ) {
@@ -400,7 +401,7 @@ public final class ConstraintViolationAssert {
 	 */
 	public static class PathExpectation {
 
-		private final List<NodeExpectation> nodes = newArrayList();
+		private final List<NodeExpectation> nodes = new ArrayList<NodeExpectation>();
 
 		private PathExpectation() {
 		}
@@ -523,7 +524,7 @@ public final class ConstraintViolationAssert {
 		}
 
 		private NodeExpectation(String name, ElementKind kind, boolean inIterable, Object key, Integer index,
-								Integer parameterIndex) {
+				Integer parameterIndex) {
 			this.name = name;
 			this.kind = kind;
 			this.inIterable = inIterable;
@@ -602,6 +603,217 @@ public final class ConstraintViolationAssert {
 				return false;
 			}
 			return true;
+		}
+	}
+
+	public static class PathImpl implements Path {
+		/**
+		 * Regular expression used to split a string path into its elements.
+		 *
+		 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
+		 */
+		private static final Pattern pathPattern = Pattern.compile(
+				"(\\w+)(\\[(\\w*)\\])?(\\.(.*))*"
+		);
+		private static final int PROPERTY_NAME_GROUP = 1;
+		private static final int INDEXED_GROUP = 2;
+		private static final int INDEX_GROUP = 3;
+		private static final int REMAINING_STRING_GROUP = 5;
+
+		private static final String PROPERTY_PATH_SEPARATOR = ".";
+		private static final String INDEX_OPEN = "[";
+		private static final String INDEX_CLOSE = "]";
+
+		private final List<Node> nodeList;
+
+		/**
+		 * Returns a {@code Path} instance representing the path described by the given string. To create a root node the empty string should be passed.
+		 *
+		 * @param propertyPath the path as string representation.
+		 *
+		 * @return a {@code Path} instance representing the path described by the given string.
+		 *
+		 * @throws IllegalArgumentException in case {@code property == null} or {@code property} cannot be parsed.
+		 */
+		public static PathImpl createPathFromString(String propertyPath) {
+			if ( propertyPath == null ) {
+				throw new IllegalArgumentException( "null is not allowed as property path." );
+			}
+
+			if ( propertyPath.length() == 0 ) {
+				return createNewPath( null );
+			}
+
+			return parseProperty( propertyPath );
+		}
+
+		public static PathImpl createNewPath(String name) {
+			PathImpl path = new PathImpl();
+			NodeImpl node = new NodeImpl( name );
+			path.addNode( node );
+			return path;
+		}
+
+		private PathImpl() {
+			nodeList = new ArrayList<Node>();
+		}
+
+		public void addNode(Node node) {
+			nodeList.add( node );
+		}
+
+		@Override
+		public Iterator<Path.Node> iterator() {
+			return nodeList.iterator();
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder();
+			Iterator<Path.Node> iter = iterator();
+			boolean first = true;
+			while ( iter.hasNext() ) {
+				Node node = iter.next();
+				if ( node.isInIterable() ) {
+					appendIndex( builder, node );
+				}
+				if ( node.getName() != null ) {
+					if ( !first ) {
+						builder.append( PROPERTY_PATH_SEPARATOR );
+					}
+					builder.append( node.getName() );
+				}
+				first = false;
+			}
+			return builder.toString();
+		}
+
+		private void appendIndex(StringBuilder builder, Node node) {
+			builder.append( INDEX_OPEN );
+			if ( node.getIndex() != null ) {
+				builder.append( node.getIndex() );
+			}
+			else if ( node.getKey() != null ) {
+				builder.append( node.getKey() );
+			}
+			builder.append( INDEX_CLOSE );
+		}
+
+		private static PathImpl parseProperty(String property) {
+			PathImpl path = new PathImpl();
+			String tmp = property;
+			boolean indexed = false;
+			String indexOrKey = null;
+			do {
+				Matcher matcher = pathPattern.matcher( tmp );
+				if ( matcher.matches() ) {
+					String value = matcher.group( PROPERTY_NAME_GROUP );
+
+					NodeImpl node = new NodeImpl( value );
+					path.addNode( node );
+
+					// need to look backwards!!
+					if ( indexed ) {
+						updateNodeIndexOrKey( indexOrKey, node );
+					}
+
+					indexed = matcher.group( INDEXED_GROUP ) != null;
+					indexOrKey = matcher.group( INDEX_GROUP );
+
+					tmp = matcher.group( REMAINING_STRING_GROUP );
+				}
+				else {
+					throw new IllegalArgumentException( "Unable to parse property path " + property );
+				}
+			} while ( tmp != null );
+
+			// check for a left over indexed node
+			if ( indexed ) {
+				NodeImpl node = new NodeImpl( (String) null );
+				updateNodeIndexOrKey( indexOrKey, node );
+				path.addNode( node );
+			}
+			return path;
+		}
+
+		private static void updateNodeIndexOrKey(String indexOrKey, NodeImpl node) {
+			node.setInIterable( true );
+			if ( indexOrKey != null && indexOrKey.length() > 0 ) {
+				try {
+					Integer i = Integer.parseInt( indexOrKey );
+					node.setIndex( i );
+				}
+				catch ( NumberFormatException e ) {
+					node.setKey( indexOrKey );
+				}
+			}
+		}
+	}
+
+	public static class NodeImpl implements Path.Node {
+		private final String name;
+		private boolean isInIterable;
+		private Integer index;
+		private Object key;
+
+		public NodeImpl(String name) {
+			this.name = name;
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public boolean isInIterable() {
+			return isInIterable;
+		}
+
+		public void setInIterable(boolean inIterable) {
+			isInIterable = inIterable;
+		}
+
+		@Override
+		public Integer getIndex() {
+			return index;
+		}
+
+		public void setIndex(Integer index) {
+			isInIterable = true;
+			this.index = index;
+		}
+
+		@Override
+		public Object getKey() {
+			return key;
+		}
+
+		@Override
+		public ElementKind getKind() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public <T extends Path.Node> T as(Class<T> nodeType) {
+			throw new UnsupportedOperationException();
+		}
+
+		public void setKey(Object key) {
+			isInIterable = true;
+			this.key = key;
+		}
+
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder();
+			sb.append( "NodeImpl" );
+			sb.append( "{index=" ).append( index );
+			sb.append( ", name='" ).append( name ).append( '\'' );
+			sb.append( ", isInIterable=" ).append( isInIterable );
+			sb.append( ", key=" ).append( key );
+			sb.append( '}' );
+			return sb.toString();
 		}
 	}
 }

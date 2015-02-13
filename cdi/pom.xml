@@ -104,8 +104,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <classifier>testing</classifier>
+            <artifactId>hibernate-validator-test-utils</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
