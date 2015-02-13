@@ -36,6 +36,7 @@ import org.jboss.logging.MessageLogger;
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
@@ -644,9 +645,9 @@ public interface Log extends BasicLogger {
 			value = "When using type annotation constraints on parameterized iterables or map @Valid must be used. Check %s#%s")
 	ValidationException getTypeAnnotationConstraintOnIterableRequiresUseOfValidAnnotationException(String declaringClass, String name);
 
-	@LogMessage(level = WARN)
-	@Message(id = 188, value = "ParameterMessageInterpolator has been chosen, EL interpolation will not be supported")
-	void parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported();
+	@LogMessage(level = DEBUG)
+	@Message(id = 188, value = "Parameterized type with more than one argument is not supported: %s")
+	void parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported(String type);
 
 	@Message(id = 189,
 			value = "The configuration of value unwrapping for property '%s' of bean '%s' is inconsistent between the field and its getter.")
