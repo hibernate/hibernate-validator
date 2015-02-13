@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<validation-config
+        xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.1.xsd">
+
+    <constraint-validator-factory>
+        com.example.ExampleConstraintValidatorFactory
+    </constraint-validator-factory>
+
+    <constraint-mapping>META-INF/constraint-mappings.xml</constraint-mapping>
+</validation-config>
