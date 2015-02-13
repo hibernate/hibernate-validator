@@ -71,6 +71,7 @@
         <module>integration</module>
         <module>annotation-processor</module>
         <module>performance</module>
+        <module>osgi</module>
     </modules>
 
     <properties>
