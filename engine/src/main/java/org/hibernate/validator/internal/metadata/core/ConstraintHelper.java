@@ -48,6 +48,8 @@ import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraints.br.CNPJ;
+import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertFalseValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMaxValidatorForCharSequence;
@@ -108,6 +110,8 @@ import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidat
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -148,6 +152,14 @@ public class ConstraintHelper {
 		constraintList = newArrayList();
 		constraintList.add( AssertTrueValidator.class );
 		builtinConstraints.put( AssertTrue.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( CNPJValidator.class );
+		builtinConstraints.put( CNPJ.class, constraintList );
+
+		constraintList = newArrayList();
+		constraintList.add( CPFValidator.class );
+		builtinConstraints.put( CPF.class, constraintList );
 
 		constraintList = newArrayList();
 		constraintList.add( DecimalMaxValidatorForNumber.class );

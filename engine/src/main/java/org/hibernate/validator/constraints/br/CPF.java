@@ -14,8 +14,6 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
 
-import org.hibernate.validator.constraints.Mod11Check;
-
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
@@ -42,16 +40,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 		@Pattern(regexp = "^(?:(?!777\\.?777\\.?777-?77).)*$"),
 		@Pattern(regexp = "^(?:(?!888\\.?888\\.?888-?88).)*$"),
 		@Pattern(regexp = "^(?:(?!999\\.?999\\.?999-?99).)*$")
-})
-@Mod11Check.List({
-		@Mod11Check(checkDigitIndex = 12,
-				endIndex = 10,
-				treatCheck10As = '0',
-				ignoreNonDigitCharacters = true),
-		@Mod11Check(checkDigitIndex = 13,
-				endIndex = 12,
-				treatCheck10As = '0',
-				ignoreNonDigitCharacters = true)
 })
 @ReportAsSingleViolation
 @Documented

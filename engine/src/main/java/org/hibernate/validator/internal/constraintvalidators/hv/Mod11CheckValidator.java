@@ -45,24 +45,44 @@ public class Mod11CheckValidator extends ModCheckBase
 	private char treatCheck11As;
 
 	/**
-	 * @return The threshold for the algorithm multiplier multiplier growth
+	 * The threshold for the algorithm multiplier multiplier growth
 	 */
 	private int threshold;
 
 	@Override
 	public void initialize(Mod11Check constraintAnnotation) {
-		super.initialize(
+		initialize(
 				constraintAnnotation.startIndex(),
 				constraintAnnotation.endIndex(),
 				constraintAnnotation.checkDigitIndex(),
-				constraintAnnotation.ignoreNonDigitCharacters()
+				constraintAnnotation.ignoreNonDigitCharacters(),
+				constraintAnnotation.threshold(),
+				constraintAnnotation.treatCheck10As(),
+				constraintAnnotation.treatCheck11As(),
+				constraintAnnotation.processingDirection()
 		);
-		this.threshold = constraintAnnotation.threshold();
+	}
 
-		this.reverseOrder = constraintAnnotation.processingDirection() == ProcessingDirection.LEFT_TO_RIGHT;
+	public void initialize(int startIndex,
+			int endIndex,
+			int checkDigitIndex,
+			boolean ignoreNonDigitCharacters,
+			int threshold,
+			char treatCheck10As,
+			char treatCheck11As,
+			ProcessingDirection direction
+	) {
+		super.initialize(
+				startIndex,
+				endIndex,
+				checkDigitIndex,
+				ignoreNonDigitCharacters
+		);
+		this.threshold = threshold;
+		this.reverseOrder = direction == ProcessingDirection.LEFT_TO_RIGHT;
 
-		this.treatCheck10As = constraintAnnotation.treatCheck10As();
-		this.treatCheck11As = constraintAnnotation.treatCheck11As();
+		this.treatCheck10As = treatCheck10As;
+		this.treatCheck11As = treatCheck11As;
 
 		if ( !Character.isLetterOrDigit( this.treatCheck10As ) ) {
 			throw log.getTreatCheckAsIsNotADigitNorALetterException( this.treatCheck10As );
