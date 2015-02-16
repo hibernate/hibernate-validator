@@ -82,7 +82,7 @@ There are more build options available as well. For more information refer to [C
 
 ## Hibernate Validator URLs
 
-* [Home Page](http://validator.hibernate.org)
+* [Home Page](http://hibernate.org/validator/)
 * [Bean Validation Home](http://beanvalidation.org)
 * [Downloads](http://hibernate.org/validator/downloads/)
 * [Mailing Lists](http://hibernate.org/community/)
