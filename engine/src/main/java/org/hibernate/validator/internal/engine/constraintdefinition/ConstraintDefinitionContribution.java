@@ -66,7 +66,7 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 			return false;
 		}
 
-		ConstraintDefinitionContribution that = (ConstraintDefinitionContribution) o;
+		ConstraintDefinitionContribution<?> that = (ConstraintDefinitionContribution<?>) o;
 
 		if ( !constraintType.equals( that.constraintType ) ) {
 			return false;

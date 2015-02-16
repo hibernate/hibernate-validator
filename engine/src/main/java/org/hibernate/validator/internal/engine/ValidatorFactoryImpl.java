@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -399,22 +398,21 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 	}
 
-	private static <A extends Annotation> void registerConstraintValidators(ConstraintDefinitionContributor contributor, ConstraintHelper constraintHelper) {
+	private static void registerConstraintValidators(ConstraintDefinitionContributor contributor, ConstraintHelper constraintHelper) {
 		ConstraintDefinitionBuilderImpl builder = new ConstraintDefinitionBuilderImpl();
 		contributor.collectConstraintDefinitions( builder );
-		List<ConstraintDefinitionContribution<?>> constraintDefinitionContributions = builder.getConstraintValidatorContributions();
-		for ( ConstraintDefinitionContribution<?> constraintDefinitionContribution : constraintDefinitionContributions ) {
-			@SuppressWarnings("unchecked")
-			Class<A> constraintType = (Class<A>) constraintDefinitionContribution.getConstraintType();
-			@SuppressWarnings("unchecked")
-			List<Class<? extends ConstraintValidator<A, ?>>> constraintValidatorTypes = (List) constraintDefinitionContribution
-					.getConstraintValidators();
-			constraintHelper.putValidatorClasses(
-					constraintType,
-					constraintValidatorTypes,
-					constraintDefinitionContribution.keepDefaults()
-			);
+
+		for ( ConstraintDefinitionContribution<?> constraintDefinitionContribution : builder.getConstraintValidatorContributions() ) {
+			processConstraintDefinitionContribution( constraintDefinitionContribution, constraintHelper );
 		}
+	}
+
+	private static <A extends Annotation> void processConstraintDefinitionContribution(ConstraintDefinitionContribution<A> constraintDefinitionContribution, ConstraintHelper constraintHelper) {
+		constraintHelper.putValidatorClasses(
+				constraintDefinitionContribution.getConstraintType(),
+				constraintDefinitionContribution.getConstraintValidators(),
+				constraintDefinitionContribution.keepDefaults()
+		);
 	}
 
 	/**
