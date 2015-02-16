@@ -254,13 +254,13 @@ image::annotation_processor_netbeans.png[]
 
 The following known issues exist as of May 2010:
 
-* http://opensource.atlassian.com/projects/hibernate/browse/HV-308[HV-308]: Additional validators
+* https://hibernate.atlassian.net/browse/HV-308[HV-308]: Additional validators
 registered for a constraint
-http://docs.jboss.org/hibernate/stable/validator/reference/en/html_single/#d0e1957[using XML] are
+http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#chapter-xml-configuration[using XML] are
 not evaluated by the annotation processor.
 
 * Sometimes custom constraints can't be
-http://opensource.atlassian.com/projects/hibernate/browse/HV-293[properly evaluated] when
+https://hibernate.atlassian.net/browse/HV-293[properly evaluated] when
 using the processor within Eclipse. Cleaning the project can help in these situations. This seems to
 be an issue with the Eclipse JSR 269 API implementation, but further investigation is required here.
 
