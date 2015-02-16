@@ -42,20 +42,22 @@ class MetaConstraintBuilder {
 	private static final String GROUPS_PARAM = "groups";
 	private static final String PAYLOAD_PARAM = "payload";
 
-	private MetaConstraintBuilder() {
+	private final ClassLoadingHelper classLoadingHelper;
+
+	MetaConstraintBuilder(ClassLoadingHelper classLoadingHelper) {
+		this.classLoadingHelper = classLoadingHelper;
 	}
 
 	@SuppressWarnings("unchecked")
-	static <A extends Annotation> MetaConstraint<A> buildMetaConstraint(ConstraintLocation constraintLocation,
+	<A extends Annotation> MetaConstraint<A> buildMetaConstraint(ConstraintLocation constraintLocation,
 																			   ConstraintType constraint,
 																			   java.lang.annotation.ElementType type,
 																			   String defaultPackage,
 																			   ConstraintHelper constraintHelper,
-																			   ConstraintDescriptorImpl.ConstraintType constraintType,
-																			   ClassLoader externalClassLoader) {
+																			   ConstraintDescriptorImpl.ConstraintType constraintType) {
 		Class<A> annotationClass;
 		try {
-			annotationClass = (Class<A>) ClassLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage, externalClassLoader );
+			annotationClass = (Class<A>) classLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage );
 		}
 		catch ( ValidationException e ) {
 			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
@@ -65,14 +67,14 @@ class MetaConstraintBuilder {
 		if ( constraint.getMessage() != null ) {
 			annotationDescriptor.setValue( MESSAGE_PARAM, constraint.getMessage() );
 		}
-		annotationDescriptor.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage, externalClassLoader ) );
-		annotationDescriptor.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage, externalClassLoader ) );
+		annotationDescriptor.setValue( GROUPS_PARAM, getGroups( constraint.getGroups(), defaultPackage ) );
+		annotationDescriptor.setValue( PAYLOAD_PARAM, getPayload( constraint.getPayload(), defaultPackage ) );
 
 		for ( ElementType elementType : constraint.getElement() ) {
 			String name = elementType.getName();
 			checkNameIsValid( name );
 			Class<?> returnType = getAnnotationParameterType( annotationClass, name );
-			Object elementValue = getElementValue( elementType, returnType, defaultPackage, externalClassLoader );
+			Object elementValue = getElementValue( elementType, returnType, defaultPackage );
 			annotationDescriptor.setValue( name, elementValue );
 		}
 
@@ -93,12 +95,12 @@ class MetaConstraintBuilder {
 		return new MetaConstraint<A>( constraintDescriptor, constraintLocation );
 	}
 
-	private static <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage, ClassLoader externalClassLoader) {
+	private <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage) {
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
 		for ( ElementType elementType : annotationType.getElement() ) {
 			String name = elementType.getName();
 			Class<?> parameterType = getAnnotationParameterType( returnType, name );
-			Object elementValue = getElementValue( elementType, parameterType, defaultPackage, externalClassLoader );
+			Object elementValue = getElementValue( elementType, parameterType, defaultPackage );
 			annotationDescriptor.setValue( name, elementValue );
 		}
 		return AnnotationFactory.create( annotationDescriptor );
@@ -118,7 +120,7 @@ class MetaConstraintBuilder {
 		return m.getReturnType();
 	}
 
-	private static Object getElementValue(ElementType elementType, Class<?> returnType, String defaultPackage, ClassLoader externalClassLoader) {
+	private Object getElementValue(ElementType elementType, Class<?> returnType, String defaultPackage) {
 		removeEmptyContentElements( elementType );
 
 		boolean isArray = returnType.isArray();
@@ -126,12 +128,12 @@ class MetaConstraintBuilder {
 			if ( elementType.getContent().size() != 1 ) {
 				throw log.getAttemptToSpecifyAnArrayWhereSingleValueIsExpectedException();
 			}
-			return getSingleValue( elementType.getContent().get( 0 ), returnType, defaultPackage, externalClassLoader );
+			return getSingleValue( elementType.getContent().get( 0 ), returnType, defaultPackage );
 		}
 		else {
 			List<Object> values = newArrayList();
 			for ( Serializable s : elementType.getContent() ) {
-				values.add( getSingleValue( s, returnType.getComponentType(), defaultPackage, externalClassLoader ) );
+				values.add( getSingleValue( s, returnType.getComponentType(), defaultPackage ) );
 			}
 			return values.toArray( (Object[]) Array.newInstance( returnType.getComponentType(), values.size() ) );
 		}
@@ -147,18 +149,18 @@ class MetaConstraintBuilder {
 		elementType.getContent().removeAll( contentToDelete );
 	}
 
-	private static Object getSingleValue(Serializable serializable, Class<?> returnType, String defaultPackage, ClassLoader externalClassLoader) {
+	private Object getSingleValue(Serializable serializable, Class<?> returnType, String defaultPackage) {
 
 		Object returnValue;
 		if ( serializable instanceof String ) {
 			String value = (String) serializable;
-			returnValue = convertStringToReturnType( returnType, value, defaultPackage, externalClassLoader );
+			returnValue = convertStringToReturnType( returnType, value, defaultPackage );
 		}
 		else if ( serializable instanceof JAXBElement && ( (JAXBElement<?>) serializable ).getDeclaredType()
 				.equals( String.class ) ) {
 			JAXBElement<?> elem = (JAXBElement<?>) serializable;
 			String value = (String) elem.getValue();
-			returnValue = convertStringToReturnType( returnType, value, defaultPackage, externalClassLoader );
+			returnValue = convertStringToReturnType( returnType, value, defaultPackage );
 		}
 		else if ( serializable instanceof JAXBElement && ( (JAXBElement<?>) serializable ).getDeclaredType()
 				.equals( AnnotationType.class ) ) {
@@ -167,7 +169,7 @@ class MetaConstraintBuilder {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
-				returnValue = MetaConstraintBuilder.buildAnnotation( annotationType, annotationClass, defaultPackage, externalClassLoader );
+				returnValue = buildAnnotation( annotationType, annotationClass, defaultPackage );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getUnexpectedParameterValueException( e );
@@ -180,7 +182,7 @@ class MetaConstraintBuilder {
 
 	}
 
-	private static Object convertStringToReturnType(Class<?> returnType, String value, String defaultPackage, ClassLoader externalClassLoader) {
+	private Object convertStringToReturnType(Class<?> returnType, String value, String defaultPackage) {
 		Object returnValue;
 		if ( returnType.getName().equals( byte.class.getName() ) ) {
 			try {
@@ -243,7 +245,7 @@ class MetaConstraintBuilder {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ClassLoadingHelper.loadClass( value, defaultPackage, externalClassLoader );
+			returnValue = classLoadingHelper.loadClass( value, defaultPackage );
 		}
 		else {
 			try {
@@ -258,27 +260,27 @@ class MetaConstraintBuilder {
 		return returnValue;
 	}
 
-	private static Class<?>[] getGroups(GroupsType groupsType, String defaultPackage, ClassLoader externalClassLoader) {
+	private Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
 		if ( groupsType == null ) {
 			return new Class[] { };
 		}
 
 		List<Class<?>> groupList = newArrayList();
 		for ( String groupClass : groupsType.getValue() ) {
-			groupList.add( ClassLoadingHelper.loadClass( groupClass, defaultPackage, externalClassLoader ) );
+			groupList.add( classLoadingHelper.loadClass( groupClass, defaultPackage ) );
 		}
 		return groupList.toArray( new Class[groupList.size()] );
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage, ClassLoader externalClassLoader) {
+	private Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
 		if ( payloadType == null ) {
 			return new Class[] { };
 		}
 
 		List<Class<? extends Payload>> payloadList = newArrayList();
 		for ( String groupClass : payloadType.getValue() ) {
-			Class<?> payload = ClassLoadingHelper.loadClass( groupClass, defaultPackage, externalClassLoader );
+			Class<?> payload = classLoadingHelper.loadClass( groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
 				throw log.getWrongPayloadClassException( payload.getName() );
 			}

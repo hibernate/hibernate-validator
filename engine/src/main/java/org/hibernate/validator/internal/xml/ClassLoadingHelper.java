@@ -45,10 +45,13 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 		PRIMITIVE_NAME_TO_PRIMITIVE = Collections.unmodifiableMap( tmpMap );
 	}
 
-	private ClassLoadingHelper() {
+	private final ClassLoader externalClassLoader;
+
+	ClassLoadingHelper(ClassLoader externalClassLoader) {
+		this.externalClassLoader = externalClassLoader;
 	}
 
-	/*package*/ static Class<?> loadClass(String className, String defaultPackage, ClassLoader externalClassLoader) {
+	/*package*/ Class<?> loadClass(String className, String defaultPackage) {
 		if ( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className ) ) {
 			return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
 		}
@@ -73,10 +76,10 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 			fullyQualifiedClass.append( ARRAY_CLASS_NAME_SUFFIX );
 		}
 
-		return loadClass( fullyQualifiedClass.toString(), externalClassLoader );
+		return loadClass( fullyQualifiedClass.toString() );
 	}
 
-	private static Class<?> loadClass(String className, ClassLoader externalClassLoader) {
+	private Class<?> loadClass(String className) {
 		return run( LoadClass.action( className, externalClassLoader ) );
 	}
 

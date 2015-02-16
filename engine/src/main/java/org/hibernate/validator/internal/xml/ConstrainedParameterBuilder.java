@@ -34,16 +34,20 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 class ConstrainedParameterBuilder {
 
-	private ConstrainedParameterBuilder() {
+	private final GroupConversionBuilder groupConversionBuilder;
+	private final MetaConstraintBuilder metaConstraintBuilder;
+
+	ConstrainedParameterBuilder(MetaConstraintBuilder metaConstraintBuilder, GroupConversionBuilder groupConversionBuilder) {
+		this.metaConstraintBuilder = metaConstraintBuilder;
+		this.groupConversionBuilder = groupConversionBuilder;
 	}
 
-	static List<ConstrainedParameter> buildConstrainedParameters(List<ParameterType> parameterList,
+	List<ConstrainedParameter> buildConstrainedParameters(List<ParameterType> parameterList,
 																		ExecutableElement executableElement,
 																		String defaultPackage,
 																		ConstraintHelper constraintHelper,
 																		ParameterNameProvider parameterNameProvider,
-																		AnnotationProcessingOptionsImpl annotationProcessingOptions,
-																		ClassLoader externalClassLoader) {
+																		AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
 		int i = 0;
 		List<String> parameterNames = executableElement.getParameterNames( parameterNameProvider );
@@ -51,21 +55,19 @@ class ConstrainedParameterBuilder {
 			ConstraintLocation constraintLocation = ConstraintLocation.forParameter( executableElement, i );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : parameterType.getConstraint() ) {
-				MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,
 						constraint,
 						ElementType.PARAMETER,
 						defaultPackage,
 						constraintHelper,
-						null,
-						externalClassLoader
+						null
 				);
 				metaConstraints.add( metaConstraint );
 			}
-			Map<Class<?>, Class<?>> groupConversions = GroupConversionBuilder.buildGroupConversionMap(
+			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
 					parameterType.getConvertGroup(),
-					defaultPackage,
-					externalClassLoader
+					defaultPackage
 			);
 
 			// ignore annotations

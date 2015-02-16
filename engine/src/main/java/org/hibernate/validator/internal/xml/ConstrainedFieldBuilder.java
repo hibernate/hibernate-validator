@@ -36,15 +36,19 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 class ConstrainedFieldBuilder {
 	private static final Log log = LoggerFactory.make();
 
-	private ConstrainedFieldBuilder() {
+	private final GroupConversionBuilder groupConversionBuilder;
+	private final MetaConstraintBuilder metaConstraintBuilder;
+
+	ConstrainedFieldBuilder(MetaConstraintBuilder metaConstraintBuilder, GroupConversionBuilder groupConversionBuilder) {
+		this.metaConstraintBuilder = metaConstraintBuilder;
+		this.groupConversionBuilder = groupConversionBuilder;
 	}
 
-	static Set<ConstrainedField> buildConstrainedFields(List<FieldType> fields,
+	Set<ConstrainedField> buildConstrainedFields(List<FieldType> fields,
 															   Class<?> beanClass,
 															   String defaultPackage,
 															   ConstraintHelper constraintHelper,
-															   AnnotationProcessingOptionsImpl annotationProcessingOptions,
-															   ClassLoader externalClassLoader) {
+															   AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		Set<ConstrainedField> constrainedFields = newHashSet();
 		List<String> alreadyProcessedFieldNames = newArrayList();
 		for ( FieldType fieldType : fields ) {
@@ -52,21 +56,19 @@ class ConstrainedFieldBuilder {
 			ConstraintLocation constraintLocation = ConstraintLocation.forProperty( field );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : fieldType.getConstraint() ) {
-				MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,
 						constraint,
 						java.lang.annotation.ElementType.FIELD,
 						defaultPackage,
 						constraintHelper,
-						null,
-						externalClassLoader
+						null
 				);
 				metaConstraints.add( metaConstraint );
 			}
-			Map<Class<?>, Class<?>> groupConversions = GroupConversionBuilder.buildGroupConversionMap(
+			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
 					fieldType.getConvertGroup(),
-					defaultPackage,
-					externalClassLoader
+					defaultPackage
 			);
 
 			// TODO HV-919 Support specification of type parameter constraints via XML and API

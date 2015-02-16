@@ -37,15 +37,19 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 class ConstrainedGetterBuilder {
 	private static final Log log = LoggerFactory.make();
 
-	private ConstrainedGetterBuilder() {
+	private final GroupConversionBuilder groupConversionBuilder;
+	private final MetaConstraintBuilder metaConstraintBuilder;
+
+	ConstrainedGetterBuilder(MetaConstraintBuilder metaConstraintBuilder, GroupConversionBuilder groupConversionBuilder) {
+		this.metaConstraintBuilder = metaConstraintBuilder;
+		this.groupConversionBuilder = groupConversionBuilder;
 	}
 
-	static Set<ConstrainedExecutable> buildConstrainedGetters(List<GetterType> getterList,
+	Set<ConstrainedExecutable> buildConstrainedGetters(List<GetterType> getterList,
 																	 Class<?> beanClass,
 																	 String defaultPackage,
 																	 ConstraintHelper constraintHelper,
-																	 AnnotationProcessingOptionsImpl annotationProcessingOptions,
-																	 ClassLoader externalClassLoader) {
+																	 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<String> alreadyProcessedGetterNames = newArrayList();
 		for ( GetterType getterType : getterList ) {
@@ -55,21 +59,19 @@ class ConstrainedGetterBuilder {
 
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : getterType.getConstraint() ) {
-				MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,
 						constraint,
 						java.lang.annotation.ElementType.METHOD,
 						defaultPackage,
 						constraintHelper,
-						null,
-						externalClassLoader
+						null
 				);
 				metaConstraints.add( metaConstraint );
 			}
-			Map<Class<?>, Class<?>> groupConversions = GroupConversionBuilder.buildGroupConversionMap(
+			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
 					getterType.getConvertGroup(),
-					defaultPackage,
-					externalClassLoader
+					defaultPackage
 			);
 
 			// TODO HV-919 Support specification of type parameter constraints via XML and API
