@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -39,17 +38,18 @@ class ConstrainedGetterBuilder {
 
 	private final GroupConversionBuilder groupConversionBuilder;
 	private final MetaConstraintBuilder metaConstraintBuilder;
+	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 
-	ConstrainedGetterBuilder(MetaConstraintBuilder metaConstraintBuilder, GroupConversionBuilder groupConversionBuilder) {
+	ConstrainedGetterBuilder(MetaConstraintBuilder metaConstraintBuilder, GroupConversionBuilder groupConversionBuilder,
+			AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		this.metaConstraintBuilder = metaConstraintBuilder;
 		this.groupConversionBuilder = groupConversionBuilder;
+		this.annotationProcessingOptions = annotationProcessingOptions;
 	}
 
 	Set<ConstrainedExecutable> buildConstrainedGetters(List<GetterType> getterList,
 																	 Class<?> beanClass,
-																	 String defaultPackage,
-																	 ConstraintHelper constraintHelper,
-																	 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+																	 String defaultPackage) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<String> alreadyProcessedGetterNames = newArrayList();
 		for ( GetterType getterType : getterList ) {
@@ -64,7 +64,6 @@ class ConstrainedGetterBuilder {
 						constraint,
 						java.lang.annotation.ElementType.METHOD,
 						defaultPackage,
-						constraintHelper,
 						null
 				);
 				metaConstraints.add( metaConstraint );

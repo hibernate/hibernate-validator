@@ -13,7 +13,6 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.List;
-
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBElement;
@@ -43,9 +42,11 @@ class MetaConstraintBuilder {
 	private static final String PAYLOAD_PARAM = "payload";
 
 	private final ClassLoadingHelper classLoadingHelper;
+	private final ConstraintHelper constraintHelper;
 
-	MetaConstraintBuilder(ClassLoadingHelper classLoadingHelper) {
+	MetaConstraintBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper) {
 		this.classLoadingHelper = classLoadingHelper;
+		this.constraintHelper = constraintHelper;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -53,7 +54,6 @@ class MetaConstraintBuilder {
 																			   ConstraintType constraint,
 																			   java.lang.annotation.ElementType type,
 																			   String defaultPackage,
-																			   ConstraintHelper constraintHelper,
 																			   ConstraintDescriptorImpl.ConstraintType constraintType) {
 		Class<A> annotationClass;
 		try {

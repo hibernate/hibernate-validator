@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -38,17 +37,18 @@ class ConstrainedFieldBuilder {
 
 	private final GroupConversionBuilder groupConversionBuilder;
 	private final MetaConstraintBuilder metaConstraintBuilder;
+	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 
-	ConstrainedFieldBuilder(MetaConstraintBuilder metaConstraintBuilder, GroupConversionBuilder groupConversionBuilder) {
+	ConstrainedFieldBuilder(MetaConstraintBuilder metaConstraintBuilder, GroupConversionBuilder groupConversionBuilder,
+			AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		this.metaConstraintBuilder = metaConstraintBuilder;
 		this.groupConversionBuilder = groupConversionBuilder;
+		this.annotationProcessingOptions = annotationProcessingOptions;
 	}
 
 	Set<ConstrainedField> buildConstrainedFields(List<FieldType> fields,
 															   Class<?> beanClass,
-															   String defaultPackage,
-															   ConstraintHelper constraintHelper,
-															   AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+															   String defaultPackage) {
 		Set<ConstrainedField> constrainedFields = newHashSet();
 		List<String> alreadyProcessedFieldNames = newArrayList();
 		for ( FieldType fieldType : fields ) {
@@ -61,7 +61,6 @@ class ConstrainedFieldBuilder {
 						constraint,
 						java.lang.annotation.ElementType.FIELD,
 						defaultPackage,
-						constraintHelper,
 						null
 				);
 				metaConstraints.add( metaConstraint );

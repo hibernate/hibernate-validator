@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -29,18 +28,20 @@ class ConstrainedTypeBuilder {
 
 	private final ClassLoadingHelper classLoadingHelper;
 	private final MetaConstraintBuilder metaConstraintBuilder;
+	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 
-	ConstrainedTypeBuilder(ClassLoadingHelper classLoadingHelper, MetaConstraintBuilder metaConstraintBuilder) {
+	public ConstrainedTypeBuilder(ClassLoadingHelper classLoadingHelper,
+			MetaConstraintBuilder metaConstraintBuilder,
+			AnnotationProcessingOptionsImpl annotationProcessingOptions,
+			Map<Class<?>, List<Class<?>>> defaultSequences) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.metaConstraintBuilder = metaConstraintBuilder;
+		this.annotationProcessingOptions = annotationProcessingOptions;
+		this.defaultSequences = defaultSequences;
 	}
 
-	ConstrainedType buildConstrainedType(ClassType classType,
-													   Class<?> beanClass,
-													   String defaultPackage,
-													   ConstraintHelper constraintHelper,
-													   AnnotationProcessingOptionsImpl annotationProcessingOptions,
-													   Map<Class<?>, List<Class<?>>> defaultSequences) {
+	ConstrainedType buildConstrainedType(ClassType classType, Class<?> beanClass, String defaultPackage) {
 		if ( classType == null ) {
 			return null;
 		}
@@ -60,7 +61,6 @@ class ConstrainedTypeBuilder {
 					constraint,
 					java.lang.annotation.ElementType.TYPE,
 					defaultPackage,
-					constraintHelper,
 					null
 			);
 			metaConstraints.add( metaConstraint );
