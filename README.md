@@ -5,14 +5,14 @@
 
 ## What is it?
 
-This is the reference implementation of [JSR-349 - Bean Validation 1.1](http://www.beanvalidation.org/).
+This is the reference implementation of [JSR-349 - Bean Validation 1.1](http://beanvalidation.org/).
 Bean Validation defines a metadata model and API for JavaBean as well as method validation.
 The default metadata source are annotations, with the ability to override and extend
 the meta-data through the use of XML validation descriptors.
 
 ## Documentation
 
-The documentation for this release is included in the _docs_ directory of the distribution package or can be accessed [online](http://www.hibernate.org/subprojects/validator/docs.html).
+The documentation for this release is included in the _docs_ directory of the distribution package or can be accessed [online](http://hibernate.org/validator/documentation/).
 
 ## Release Notes
 
@@ -82,10 +82,10 @@ There are more build options available as well. For more information refer to [C
 
 ## Hibernate Validator URLs
 
-* [Home Page](http://validator.hibernate.org)
+* [Home Page](http://hibernate.org/validator/)
 * [Bean Validation Home](http://beanvalidation.org)
-* [Downloads](http://www.hibernate.org/subprojects/validator/download.html)
-* [Mailing Lists](http://www.hibernate.org/community/mailinglists.html)
+* [Downloads](http://hibernate.org/validator/downloads/)
+* [Mailing Lists](http://hibernate.org/community/)
 * [Source Code](git://github.com/hibernate/hibernate-validator.git)
-* [Issue Tracking](http://opensource.atlassian.com/projects/hibernate/browse/HV)
+* [Issue Tracking](https://hibernate.atlassian.net/browse/HV)
 * [Continuous Integration](https://hibernate-validator.ci.cloudbees.com/) [![Build Status](https://hibernate-validator.ci.cloudbees.com/buildStatus/icon?job=HV-5-MASTER)](https://hibernate-validator.ci.cloudbees.com/view/Hibernate%20Validator%205/job/HV-5-MASTER/)

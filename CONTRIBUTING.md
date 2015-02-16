@@ -9,7 +9,7 @@ If you need help with cloning, compiling or setting the project up in an IDE ple
 If you are just getting started with Git, GitHub and/or contributing to Hibernate Validator there are a
 few pre-requisite steps:
 
-* Make sure you have a [Hibernate JIRA account](https://hibernate.onjira.com)
+* Make sure you have a [Hibernate JIRA account](https://hibernate.atlassian.net)
 * Make sure you have a [GitHub account](https://github.com/signup/free)
 * [Fork](http://help.github.com/fork-a-repo) the Hibernate Validator [repository](https://github.com/hibernate/hibernate-validator).
 As discussed in the linked page, this also includes:
@@ -43,7 +43,7 @@ appreciated btw), please use rebasing rather than merging.  Merging creates
 "merge commits" that really muck up the project timeline._
 
 ## Submit
-* Sign the [Contributor License Agreement](https://cla.jboss.org/index.seam).
+* Sign the [Contributor License Agreement](https://cla.jboss.org/).
 * Push your changes to a topic branch in your fork of the repository.
 * Initiate a [pull request](http://help.github.com/send-pull-requests/)
 * Update the JIRA issue, adding a comment including a link to the created pull request
