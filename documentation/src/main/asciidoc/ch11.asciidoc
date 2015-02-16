@@ -785,5 +785,42 @@ configuration.addConstraintDefinitionContributor(
 ----
 ====
 
+[[section-constraint-customizing-class-loading]]
+=== Customizing class-loading
 
+There are several cases in which Hibernate Validator needs to load resources or classes given by name:
 
+* XML descriptors (+META-INF/validation.xml+ as well as XML constraint mappings)
+* classes specified by name in XML descriptors (e.g. custom message interpolators etc.)
+* the +ValidationMessages+ resource bundle
+
+By default Hibernate Validator tries to load these resources via the current thread context classloader.
+If that's not successful, Hibernate Validator's own classloader will be tried as a fallback.
+
+For cases where this strategy is not appropriate (e.g. modularized environments such as OSGi),
+you may provide a specific classloader for loading these resources when bootstrapping the validator factory:
+
+[[example-using-external-class-loader]]
+.Providing a classloader for loading external resources and classes
+====
+[source, JAVA]
+----
+ClassLoader classLoader = ...;
+
+Validator validator = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.externalClassLoader( classLoader )
+		.buildValidatorFactory()
+		.getValidator();
+----
+====
+
+In the case of OSGi, you could e.g. pass the loader of a class from the bundle bootstrapping Hibernate Validator
+or a custom classloader implementation which delegates to +Bundle#loadClass()+ etc.
+
+[NOTE]
+====
+Call +ValidatorFactory#close()+ if a given validator factory instance is not needed any longer.
+Failure to do so may result in a classloader leak in cases where applications/bundles are re-deployed and a non-closed
+validator factory still is referenced by application code.
+====
