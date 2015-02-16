@@ -6,10 +6,15 @@
  */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import javax.validation.ParameterNameProvider;
 import javax.validation.constraints.NotNull;
+import javax.validation.executable.ExecutableType;
+import javax.validation.executable.ValidateOnExecution;
 import javax.validation.groups.Default;
 
 import org.testng.annotations.BeforeMethod;
@@ -29,6 +34,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
@@ -128,5 +134,68 @@ public class ParameterMetaDataTest {
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
 		assertEquals( parameterMetaData.unwrapMode(), UnwrapMode.UNWRAP );
+	}
+
+	@Test @TestForIssue( jiraKey = "HV-887" )
+	public void parameterNameInInheritanceHierarchy() throws Exception {
+
+		// The bug is due to a random choice for the parameter name used.
+		// The first matching method in the class hierarchy will fit (Service or ServiceImpl in our case).
+		//
+		// The failure rate on my current VM before fixing the bug is 50%.
+		// Running it in a loop does not improve the odds of failure: all tests will pass or fail for all loop run.
+		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+				new ConstraintHelper(),
+				new ExecutableHelper( new TypeResolutionHelper() ),
+				new SkewedParameterNameProvider(),
+				Collections.<MetaDataProvider>emptyList()
+		);
+		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );
+
+		Method method = Service.class.getMethod( "sayHello", String.class );
+		ExecutableMetaData methodMetaData = localBeanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+
+		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
+
+		assertEquals( parameterMetaData.getIndex(), 0 );
+		assertEquals( parameterMetaData.getName(), "good", "Parameter name from Service should be used, nor ServiceImpl" );
+		assertThat( parameterMetaData ).hasSize( 1 );
+		assertEquals(
+				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
+		);
+	}
+
+	private interface Service {
+		void sayHello(@NotNull String world);
+	}
+
+	private static class ServiceImpl implements Service {
+		@Override
+		@ValidateOnExecution(type = ExecutableType.NONE)
+		public void sayHello(String world) {}
+	}
+
+	public class SkewedParameterNameProvider implements ParameterNameProvider {
+		private final ParameterNameProvider defaultProvider = new DefaultParameterNameProvider();
+
+		@Override
+		public List<String> getParameterNames(Constructor<?> constructor) {
+			return defaultProvider.getParameterNames( constructor );
+		}
+
+		@Override
+		public List<String> getParameterNames(Method method) {
+			if ( method.getDeclaringClass().equals( Service.class ) ) {
+				// the parameter name we expect
+				return Collections.singletonList( "good" );
+			}
+			else if ( method.getDeclaringClass().equals( ServiceImpl.class ) ) {
+				// the parameter name we do not expect
+				return Collections.singletonList( "bad" );
+			}
+			else {
+				return defaultProvider.getParameterNames( method );
+			}
+		}
 	}
 }

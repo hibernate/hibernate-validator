@@ -111,7 +111,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	public static class Builder extends MetaDataBuilder {
 		private final Type parameterType;
 		private final int parameterIndex;
-		private String name;
+		private ConstrainedParameter nameFromConstrainedParameter;
 		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 
 		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
@@ -140,8 +140,15 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 			typeArgumentsConstraints.addAll( constrainedParameter.getTypeArgumentsConstraints() );
 
-			if ( name == null ) {
-				name = constrainedParameter.getName();
+			if ( nameFromConstrainedParameter == null ) {
+				nameFromConstrainedParameter = constrainedParameter;
+			}
+			else if ( constrainedParameter.getLocation().getDeclaringClass().isAssignableFrom( nameFromConstrainedParameter.getLocation().getDeclaringClass() ) ) {
+				// If the current parameter is from a method hosted on a parent class,
+				// use this parent class parameter name instead of the more specific one.
+				// Worse case, we are consistent, best case parameters from parents are more meaningful.
+				// See HV-887 and the associated unit test
+				nameFromConstrainedParameter = constrainedParameter;
 			}
 		}
 
@@ -149,7 +156,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		public ParameterMetaData build() {
 			return new ParameterMetaData(
 					parameterIndex,
-					name,
+					nameFromConstrainedParameter.getName(),
 					parameterType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					typeArgumentsConstraints,
