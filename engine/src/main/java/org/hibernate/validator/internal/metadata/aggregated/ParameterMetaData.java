@@ -111,7 +111,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	public static class Builder extends MetaDataBuilder {
 		private final Type parameterType;
 		private final int parameterIndex;
-		private String name;
+		private ConstrainedParameter constrainedParameter;
 		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 
 		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
@@ -136,12 +136,21 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		public void add(ConstrainedElement constrainedElement) {
 			super.add( constrainedElement );
 
-			ConstrainedParameter constrainedParameter = (ConstrainedParameter) constrainedElement;
+			ConstrainedParameter newConstrainedParameter = (ConstrainedParameter) constrainedElement;
 
-			typeArgumentsConstraints.addAll( constrainedParameter.getTypeArgumentsConstraints() );
+			typeArgumentsConstraints.addAll( newConstrainedParameter.getTypeArgumentsConstraints() );
 
-			if ( name == null ) {
-				name = constrainedParameter.getName();
+			if ( constrainedParameter == null ) {
+				constrainedParameter = newConstrainedParameter;
+			}
+			else if ( newConstrainedParameter.getLocation().getDeclaringClass().isAssignableFrom(
+					constrainedParameter.getLocation().getDeclaringClass()
+			) ) {
+				// If the current parameter is from a method hosted on a parent class,
+				// use this parent class parameter name instead of the more specific one.
+				// Worse case, we are consistent, best case parameters from parents are more meaningful.
+				// See HV-887 and the associated unit test
+				constrainedParameter = newConstrainedParameter;
 			}
 		}
 
@@ -149,7 +158,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		public ParameterMetaData build() {
 			return new ParameterMetaData(
 					parameterIndex,
-					name,
+					constrainedParameter.getName(),
 					parameterType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					typeArgumentsConstraints,
