@@ -110,7 +110,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	/**
 	 * Metadata provider for XML configuration.
 	 */
-	private final XmlMetaDataProvider xmlMetaDataProvider;
+	private XmlMetaDataProvider xmlMetaDataProvider;
 
 	/**
 	 * Prior to the introduction of {@code ParameterNameProvider} all the bean meta data was static and could be
@@ -126,8 +126,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
-	private final ClassLoader externalClassLoader;
-
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.traversableResolver = configurationState.getTraversableResolver();
@@ -136,7 +134,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
-		this.externalClassLoader = getExternalClassLoader( configurationState );
+
+		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -165,7 +164,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
 
-			registerCustomConstraintValidators( hibernateSpecificConfig, properties );
+			registerCustomConstraintValidators( hibernateSpecificConfig, properties, externalClassLoader, constraintHelper );
 		}
 		this.constraintMappings = Collections.unmodifiableSet( tmpConstraintMappings );
 
@@ -174,7 +173,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 		this.failFast = tmpFailFast;
 
-		tmpValidatedValueHandlers.addAll( getPropertyConfiguredValidatedValueHandlers( properties ) );
+		tmpValidatedValueHandlers.addAll( getPropertyConfiguredValidatedValueHandlers( properties, externalClassLoader ) );
 		this.validatedValueHandlers = Collections.unmodifiableList( tmpValidatedValueHandlers );
 
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
@@ -244,6 +243,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagerMap.values() ) {
 			beanMetaDataManager.clear();
 		}
+
+		// this holds a reference to the provided external class-loader, thus freeing it to be on the safe side
+		xmlMetaDataProvider = null;
 	}
 
 	Validator createValidator(ConstraintValidatorFactory constraintValidatorFactory,
@@ -330,8 +332,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 *
 	 * @return a list with property-configured {@link ValidatedValueUnwrapper}s; May be empty but never {@code null}
 	 */
-	private List<ValidatedValueUnwrapper<?>> getPropertyConfiguredValidatedValueHandlers(
-			Map<String, String> properties) {
+	private static List<ValidatedValueUnwrapper<?>> getPropertyConfiguredValidatedValueHandlers(
+			Map<String, String> properties, ClassLoader externalClassLoader) {
 		String propertyValue = properties.get( HibernateValidatorConfiguration.VALIDATED_VALUE_HANDLERS );
 
 		if ( propertyValue == null || propertyValue.isEmpty() ) {
@@ -359,8 +361,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 *
 	 * @return a list with property-configured {@link org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor}s. May be empty but never {@code null}.
 	 */
-	private List<ConstraintDefinitionContributor> getPropertyConfiguredConstraintDefinitionContributors(
-			Map<String, String> properties) {
+	private static List<ConstraintDefinitionContributor> getPropertyConfiguredConstraintDefinitionContributors(
+			Map<String, String> properties, ClassLoader externalClassLoader) {
 		String propertyValue = properties.get( HibernateValidatorConfiguration.CONSTRAINT_DEFINITION_CONTRIBUTORS );
 
 		if ( propertyValue == null || propertyValue.isEmpty() ) {
@@ -384,20 +386,20 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return constraintDefinitionContributors;
 	}
 
-	private void registerCustomConstraintValidators(ConfigurationImpl hibernateSpecificConfig,
-			Map<String, String> properties) {
+	private static void registerCustomConstraintValidators(ConfigurationImpl hibernateSpecificConfig,
+			Map<String, String> properties, ClassLoader externalClassLoader, ConstraintHelper constraintHelper) {
 		for ( ConstraintDefinitionContributor contributor : hibernateSpecificConfig.getConstraintDefinitionContributors() ) {
-			registerConstraintValidators( contributor );
+			registerConstraintValidators( contributor, constraintHelper );
 		}
 
 		for ( ConstraintDefinitionContributor contributor : getPropertyConfiguredConstraintDefinitionContributors(
-				properties
+				properties, externalClassLoader
 		) ) {
-			registerConstraintValidators( contributor );
+			registerConstraintValidators( contributor, constraintHelper );
 		}
 	}
 
-	private <A extends Annotation> void registerConstraintValidators(ConstraintDefinitionContributor contributor) {
+	private static <A extends Annotation> void registerConstraintValidators(ConstraintDefinitionContributor contributor, ConstraintHelper constraintHelper) {
 		ConstraintDefinitionBuilderImpl builder = new ConstraintDefinitionBuilderImpl();
 		contributor.collectConstraintDefinitions( builder );
 		List<ConstraintDefinitionContribution<?>> constraintDefinitionContributions = builder.getConstraintValidatorContributions();
@@ -421,7 +423,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
-	private <T> T run(PrivilegedAction<T> action) {
+	private static <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
