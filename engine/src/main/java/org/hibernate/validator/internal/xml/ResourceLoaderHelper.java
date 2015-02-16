@@ -34,7 +34,7 @@ final class ResourceLoaderHelper {
 	 *
 	 * @see InputStream#markSupported()
 	 */
-	static InputStream getResettableInputStreamForPath(String path, ClassLoader userClassLoader) {
+	static InputStream getResettableInputStreamForPath(String path, ClassLoader externalClassLoader) {
 		//TODO not sure if it's the right thing to removing '/'
 		String inputPath = path;
 		if ( inputPath.startsWith( "/" ) ) {
@@ -43,9 +43,9 @@ final class ResourceLoaderHelper {
 
 		InputStream inputStream = null;
 
-		if ( userClassLoader != null ) {
+		if ( externalClassLoader != null ) {
 			log.debug( "Trying to load " + path + " via user class loader" );
-			inputStream = userClassLoader.getResourceAsStream( inputPath );
+			inputStream = externalClassLoader.getResourceAsStream( inputPath );
 		}
 
 		if ( inputStream == null ) {

@@ -48,7 +48,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 	private ClassLoadingHelper() {
 	}
 
-	/*package*/ static Class<?> loadClass(String className, String defaultPackage, ClassLoader userClassLoader) {
+	/*package*/ static Class<?> loadClass(String className, String defaultPackage, ClassLoader externalClassLoader) {
 		if ( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className ) ) {
 			return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
 		}
@@ -73,11 +73,11 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 			fullyQualifiedClass.append( ARRAY_CLASS_NAME_SUFFIX );
 		}
 
-		return loadClass( fullyQualifiedClass.toString(), userClassLoader );
+		return loadClass( fullyQualifiedClass.toString(), externalClassLoader );
 	}
 
-	private static Class<?> loadClass(String className, ClassLoader userClassLoader) {
-		return run( LoadClass.action( className, userClassLoader ) );
+	private static Class<?> loadClass(String className, ClassLoader externalClassLoader) {
+		return run( LoadClass.action( className, externalClassLoader ) );
 	}
 
 	private static boolean isArrayClassName(String className) {

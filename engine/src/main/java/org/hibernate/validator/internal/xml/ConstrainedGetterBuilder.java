@@ -45,7 +45,7 @@ class ConstrainedGetterBuilder {
 																	 String defaultPackage,
 																	 ConstraintHelper constraintHelper,
 																	 AnnotationProcessingOptionsImpl annotationProcessingOptions,
-																	 ClassLoader userClassLoader) {
+																	 ClassLoader externalClassLoader) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<String> alreadyProcessedGetterNames = newArrayList();
 		for ( GetterType getterType : getterList ) {
@@ -62,14 +62,14 @@ class ConstrainedGetterBuilder {
 						defaultPackage,
 						constraintHelper,
 						null,
-						userClassLoader
+						externalClassLoader
 				);
 				metaConstraints.add( metaConstraint );
 			}
 			Map<Class<?>, Class<?>> groupConversions = GroupConversionBuilder.buildGroupConversionMap(
 					getterType.getConvertGroup(),
 					defaultPackage,
-					userClassLoader
+					externalClassLoader
 			);
 
 			// TODO HV-919 Support specification of type parameter constraints via XML and API

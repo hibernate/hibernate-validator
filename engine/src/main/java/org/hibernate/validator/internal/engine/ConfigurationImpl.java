@@ -87,7 +87,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final Set<ConstraintDefinitionContributor> constraintDefinitionContributors = newHashSet();
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
 
-	private ClassLoader userClassLoader;
+	private ClassLoader externalClassLoader;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -247,9 +247,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
-	public HibernateValidatorConfiguration userClassLoader(ClassLoader userClassLoader) {
-		Contracts.assertNotNull( userClassLoader, MESSAGES.parameterMustNotBeNull( "userClassLoader" ) );
-		this.userClassLoader = userClassLoader;
+	public HibernateValidatorConfiguration externalClassLoader(ClassLoader externalClassLoader) {
+		Contracts.assertNotNull( externalClassLoader, MESSAGES.parameterMustNotBeNull( "externalClassLoader" ) );
+		this.externalClassLoader = externalClassLoader;
 
 		return this;
 	}
@@ -329,7 +329,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public BootstrapConfiguration getBootstrapConfiguration() {
 		if ( bootstrapConfiguration == null ) {
-			bootstrapConfiguration = new ValidationXmlParser( userClassLoader ).parseValidationXml();
+			bootstrapConfiguration = new ValidationXmlParser( externalClassLoader ).parseValidationXml();
 		}
 		return bootstrapConfiguration;
 	}
@@ -348,8 +348,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return validationBootstrapParameters.getConfigProperties();
 	}
 
-	public ClassLoader getUserClassLoader() {
-		return userClassLoader;
+	public ClassLoader getExternalClassLoader() {
+		return externalClassLoader;
 	}
 
 	@Override
@@ -410,7 +410,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 		else {
 			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters(
-					getBootstrapConfiguration(), userClassLoader
+					getBootstrapConfiguration(), externalClassLoader
 			);
 			applyXmlSettings( xmlParameters );
 		}
@@ -487,11 +487,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	 * Returns the default message interpolator, configured with the given user class loader, if present.
 	 */
 	private MessageInterpolator getDefaultMessageInterpolatorConfiguredWithClassLoader() {
-		return userClassLoader != null ?
+		return externalClassLoader != null ?
 				new ResourceBundleMessageInterpolator(
 						new PlatformResourceBundleLocator(
 								ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
-								userClassLoader
+								externalClassLoader
 						)
 				) :
 				defaultMessageInterpolator;

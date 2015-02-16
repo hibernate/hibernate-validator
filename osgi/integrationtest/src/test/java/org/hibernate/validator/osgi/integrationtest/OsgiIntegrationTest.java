@@ -121,7 +121,7 @@ public class OsgiIntegrationTest {
 		HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class )
 				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
-				.userClassLoader( getClass().getClassLoader() );
+				.externalClassLoader( getClass().getClassLoader() );
 
 		String constraintValidatorFactoryClassName = configuration.getBootstrapConfiguration()
 				.getConstraintValidatorFactoryClassName();
@@ -144,7 +144,7 @@ public class OsgiIntegrationTest {
 		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byProvider( HibernateValidator.class )
 				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
-				.userClassLoader( getClass().getClassLoader() )
+				.externalClassLoader( getClass().getClassLoader() )
 				.buildValidatorFactory()
 				.getValidator()
 				.validate( new Customer() );
@@ -158,7 +158,7 @@ public class OsgiIntegrationTest {
 		Set<ConstraintViolation<Order>> constraintViolations = Validation.byProvider( HibernateValidator.class )
 				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
-				.userClassLoader( getClass().getClassLoader() )
+				.externalClassLoader( getClass().getClassLoader() )
 				.buildValidatorFactory()
 				.getValidator()
 				.validate( new Order() );
@@ -172,7 +172,7 @@ public class OsgiIntegrationTest {
 		Set<ConstraintViolation<RetailOrder>> constraintViolations = Validation.byProvider( HibernateValidator.class )
 				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
-				.userClassLoader( getClass().getClassLoader() )
+				.externalClassLoader( getClass().getClassLoader() )
 				.buildValidatorFactory()
 				.getValidator()
 				.validate( new RetailOrder() );

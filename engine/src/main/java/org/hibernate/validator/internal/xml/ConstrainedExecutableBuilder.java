@@ -56,7 +56,7 @@ class ConstrainedExecutableBuilder {
 																			  ParameterNameProvider parameterNameProvider,
 																			  ConstraintHelper constraintHelper,
 																			  AnnotationProcessingOptionsImpl annotationProcessingOptions,
-																			  ClassLoader userClassLoader) {
+																			  ClassLoader externalClassLoader) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<Method> alreadyProcessedMethods = newArrayList();
 		for ( MethodType methodType : methods ) {
@@ -65,7 +65,7 @@ class ConstrainedExecutableBuilder {
 					methodType.getParameter(),
 					beanClass,
 					defaultPackage,
-					userClassLoader
+					externalClassLoader
 			);
 
 			String methodName = methodType.getName();
@@ -112,7 +112,7 @@ class ConstrainedExecutableBuilder {
 					constraintHelper,
 					parameterNameProvider,
 					annotationProcessingOptions,
-					userClassLoader
+					externalClassLoader
 			);
 
 			constrainedExecutables.add( constrainedExecutable );
@@ -126,7 +126,7 @@ class ConstrainedExecutableBuilder {
 																				   ParameterNameProvider parameterNameProvider,
 																				   ConstraintHelper constraintHelper,
 																				   AnnotationProcessingOptionsImpl annotationProcessingOptions,
-																				   ClassLoader userClassLoader) {
+																				   ClassLoader externalClassLoader) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<Constructor<?>> alreadyProcessedConstructors = newArrayList();
 		for ( ConstructorType constructorType : constructors ) {
@@ -135,7 +135,7 @@ class ConstrainedExecutableBuilder {
 					constructorType.getParameter(),
 					beanClass,
 					defaultPackage,
-					userClassLoader
+					externalClassLoader
 			);
 
 			final Constructor<?> constructor = run(
@@ -180,7 +180,7 @@ class ConstrainedExecutableBuilder {
 					constraintHelper,
 					parameterNameProvider,
 					annotationProcessingOptions,
-					userClassLoader
+					externalClassLoader
 			);
 			constrainedExecutables.add( constrainedExecutable );
 		}
@@ -195,7 +195,7 @@ class ConstrainedExecutableBuilder {
 															 ConstraintHelper constraintHelper,
 															 ParameterNameProvider parameterNameProvider,
 															 AnnotationProcessingOptionsImpl annotationProcessingOptions,
-															 ClassLoader userClassLoader) {
+															 ClassLoader externalClassLoader) {
 		List<ConstrainedParameter> parameterMetaData = ConstrainedParameterBuilder.buildConstrainedParameters(
 				parameterTypeList,
 				executableElement,
@@ -203,7 +203,7 @@ class ConstrainedExecutableBuilder {
 				constraintHelper,
 				parameterNameProvider,
 				annotationProcessingOptions,
-				userClassLoader
+				externalClassLoader
 		);
 
 		Set<MetaConstraint<?>> crossParameterConstraints = parseCrossParameterConstraints(
@@ -212,7 +212,7 @@ class ConstrainedExecutableBuilder {
 				executableElement,
 				constraintHelper,
 				annotationProcessingOptions,
-				userClassLoader
+				externalClassLoader
 		);
 
 		// parse the return value
@@ -226,7 +226,7 @@ class ConstrainedExecutableBuilder {
 				defaultPackage,
 				constraintHelper,
 				annotationProcessingOptions,
-				userClassLoader
+				externalClassLoader
 
 		);
 
@@ -249,7 +249,7 @@ class ConstrainedExecutableBuilder {
 																		 ExecutableElement executableElement,
 																		 ConstraintHelper constraintHelper,
 																		 AnnotationProcessingOptionsImpl annotationProcessingOptions,
-																		 ClassLoader userClassLoader) {
+																		 ClassLoader externalClassLoader) {
 
 		Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		if ( crossParameterType == null ) {
@@ -266,7 +266,7 @@ class ConstrainedExecutableBuilder {
 					defaultPackage,
 					constraintHelper,
 					ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER,
-					userClassLoader
+					externalClassLoader
 			);
 			crossParameterConstraints.add( metaConstraint );
 		}
@@ -289,7 +289,7 @@ class ConstrainedExecutableBuilder {
 												String defaultPackage,
 												ConstraintHelper constraintHelper,
 												AnnotationProcessingOptionsImpl annotationProcessingOptions,
-												ClassLoader userClassLoader) {
+												ClassLoader externalClassLoader) {
 		if ( returnValueType == null ) {
 			return false;
 		}
@@ -303,7 +303,7 @@ class ConstrainedExecutableBuilder {
 					defaultPackage,
 					constraintHelper,
 					ConstraintDescriptorImpl.ConstraintType.GENERIC,
-					userClassLoader
+					externalClassLoader
 			);
 			returnValueConstraints.add( metaConstraint );
 		}
@@ -311,7 +311,7 @@ class ConstrainedExecutableBuilder {
 				GroupConversionBuilder.buildGroupConversionMap(
 						returnValueType.getConvertGroup(),
 						defaultPackage,
-						userClassLoader
+						externalClassLoader
 				)
 		);
 
@@ -329,13 +329,13 @@ class ConstrainedExecutableBuilder {
 	private static List<Class<?>> createParameterTypes(List<ParameterType> parameterList,
 													   Class<?> beanClass,
 													   String defaultPackage,
-													   ClassLoader userClassLoader) {
+													   ClassLoader externalClassLoader) {
 		List<Class<?>> parameterTypes = newArrayList();
 		for ( ParameterType parameterType : parameterList ) {
 			String type = null;
 			try {
 				type = parameterType.getType();
-				Class<?> parameterClass = ClassLoadingHelper.loadClass( type, defaultPackage, userClassLoader );
+				Class<?> parameterClass = ClassLoadingHelper.loadClass( type, defaultPackage, externalClassLoader );
 				parameterTypes.add( parameterClass );
 			}
 			catch ( ValidationException e ) {
