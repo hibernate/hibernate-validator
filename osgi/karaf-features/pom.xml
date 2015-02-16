@@ -18,7 +18,7 @@
     <artifactId>hibernate-validator-osgi-karaf-features</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Validator Karaf features</name>
+    <name>Hibernate Validator Karaf Features</name>
     <description>Hibernate Validator features for Apache Karaf</description>
 
     <properties>
@@ -53,7 +53,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.8</version>
                 <executions>
                     <execution>
                         <id>attach-artifacts</id>
@@ -79,5 +78,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
