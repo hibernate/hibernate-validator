@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -37,14 +36,20 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 class ConstrainedGetterBuilder {
 	private static final Log log = LoggerFactory.make();
 
-	private ConstrainedGetterBuilder() {
+	private final GroupConversionBuilder groupConversionBuilder;
+	private final MetaConstraintBuilder metaConstraintBuilder;
+	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+
+	ConstrainedGetterBuilder(MetaConstraintBuilder metaConstraintBuilder, GroupConversionBuilder groupConversionBuilder,
+			AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+		this.metaConstraintBuilder = metaConstraintBuilder;
+		this.groupConversionBuilder = groupConversionBuilder;
+		this.annotationProcessingOptions = annotationProcessingOptions;
 	}
 
-	static Set<ConstrainedExecutable> buildConstrainedGetters(List<GetterType> getterList,
+	Set<ConstrainedExecutable> buildConstrainedGetters(List<GetterType> getterList,
 																	 Class<?> beanClass,
-																	 String defaultPackage,
-																	 ConstraintHelper constraintHelper,
-																	 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+																	 String defaultPackage) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<String> alreadyProcessedGetterNames = newArrayList();
 		for ( GetterType getterType : getterList ) {
@@ -54,17 +59,16 @@ class ConstrainedGetterBuilder {
 
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : getterType.getConstraint() ) {
-				MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,
 						constraint,
 						java.lang.annotation.ElementType.METHOD,
 						defaultPackage,
-						constraintHelper,
 						null
 				);
 				metaConstraints.add( metaConstraint );
 			}
-			Map<Class<?>, Class<?>> groupConversions = GroupConversionBuilder.buildGroupConversionMap(
+			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
 					getterType.getConvertGroup(),
 					defaultPackage
 			);

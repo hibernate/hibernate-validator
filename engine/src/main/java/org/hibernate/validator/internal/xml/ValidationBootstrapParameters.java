@@ -12,6 +12,7 @@ import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -46,13 +47,13 @@ public class ValidationBootstrapParameters {
 	public ValidationBootstrapParameters() {
 	}
 
-	public ValidationBootstrapParameters(BootstrapConfiguration bootstrapConfiguration) {
-		setProviderClass( bootstrapConfiguration.getDefaultProviderClassName() );
-		setMessageInterpolator( bootstrapConfiguration.getMessageInterpolatorClassName() );
-		setTraversableResolver( bootstrapConfiguration.getTraversableResolverClassName() );
-		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName() );
-		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName() );
-		setMappingStreams( bootstrapConfiguration.getConstraintMappingResourcePaths() );
+	public ValidationBootstrapParameters(BootstrapConfiguration bootstrapConfiguration, ClassLoader externalClassLoader) {
+		setProviderClass( bootstrapConfiguration.getDefaultProviderClassName(), externalClassLoader );
+		setMessageInterpolator( bootstrapConfiguration.getMessageInterpolatorClassName(), externalClassLoader );
+		setTraversableResolver( bootstrapConfiguration.getTraversableResolverClassName(), externalClassLoader );
+		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
+		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName(), externalClassLoader );
+		setMappingStreams( bootstrapConfiguration.getConstraintMappingResourcePaths(), externalClassLoader );
 		setConfigProperties( bootstrapConfiguration.getProperties() );
 	}
 
@@ -125,11 +126,11 @@ public class ValidationBootstrapParameters {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void setProviderClass(String providerFqcn) {
+	private void setProviderClass(String providerFqcn, ClassLoader externalClassLoader) {
 		if ( providerFqcn != null ) {
 			try {
 				providerClass = (Class<? extends ValidationProvider<?>>) run(
-						LoadClass.action( providerFqcn, this.getClass() )
+						LoadClass.action( providerFqcn, externalClassLoader )
 				);
 				log.usingValidationProvider( providerFqcn );
 			}
@@ -139,12 +140,12 @@ public class ValidationBootstrapParameters {
 		}
 	}
 
-	private void setMessageInterpolator(String messageInterpolatorFqcn) {
+	private void setMessageInterpolator(String messageInterpolatorFqcn, ClassLoader externalClassLoader) {
 		if ( messageInterpolatorFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) run(
-						LoadClass.action( messageInterpolatorFqcn, this.getClass() )
+						LoadClass.action( messageInterpolatorFqcn, externalClassLoader )
 				);
 				messageInterpolator = run( NewInstance.action( messageInterpolatorClass, "message interpolator" ) );
 				log.usingMessageInterpolator( messageInterpolatorFqcn );
@@ -155,12 +156,12 @@ public class ValidationBootstrapParameters {
 		}
 	}
 
-	private void setTraversableResolver(String traversableResolverFqcn) {
+	private void setTraversableResolver(String traversableResolverFqcn, ClassLoader externalClassLoader) {
 		if ( traversableResolverFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<TraversableResolver> clazz = (Class<TraversableResolver>) run(
-						LoadClass.action( traversableResolverFqcn, this.getClass() )
+						LoadClass.action( traversableResolverFqcn, externalClassLoader )
 				);
 				traversableResolver = run( NewInstance.action( clazz, "traversable resolver" ) );
 				log.usingTraversableResolver( traversableResolverFqcn );
@@ -171,12 +172,12 @@ public class ValidationBootstrapParameters {
 		}
 	}
 
-	private void setConstraintFactory(String constraintFactoryFqcn) {
+	private void setConstraintFactory(String constraintFactoryFqcn, ClassLoader externalClassLoader) {
 		if ( constraintFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) run(
-						LoadClass.action( constraintFactoryFqcn, this.getClass() )
+						LoadClass.action( constraintFactoryFqcn, externalClassLoader )
 				);
 				constraintValidatorFactory = run( NewInstance.action( clazz, "constraint factory class" ) );
 				log.usingConstraintFactory( constraintFactoryFqcn );
@@ -187,12 +188,12 @@ public class ValidationBootstrapParameters {
 		}
 	}
 
-	private void setParameterNameProvider(String parameterNameProviderFqcn) {
+	private void setParameterNameProvider(String parameterNameProviderFqcn, ClassLoader externalClassLoader) {
 		if ( parameterNameProviderFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<ParameterNameProvider> clazz = (Class<ParameterNameProvider>) run(
-						LoadClass.action( parameterNameProviderFqcn, this.getClass() )
+						LoadClass.action( parameterNameProviderFqcn, externalClassLoader )
 				);
 				parameterNameProvider = run( NewInstance.action( clazz, "parameter name provider class" ) );
 				log.usingParameterNameProvider( parameterNameProviderFqcn );
@@ -203,11 +204,11 @@ public class ValidationBootstrapParameters {
 		}
 	}
 
-	private void setMappingStreams(Set<String> mappingFileNames) {
+	private void setMappingStreams(Set<String> mappingFileNames, ClassLoader externalClassLoader) {
 		for ( String mappingFileName : mappingFileNames ) {
 			log.debugf( "Trying to open input stream for %s.", mappingFileName );
 
-			InputStream in = ResourceLoaderHelper.getResettableInputStreamForPath( mappingFileName );
+			InputStream in = ResourceLoaderHelper.getResettableInputStreamForPath( mappingFileName, externalClassLoader );
 			if ( in == null ) {
 				throw log.getUnableToOpenInputStreamForMappingFileException( mappingFileName );
 			}

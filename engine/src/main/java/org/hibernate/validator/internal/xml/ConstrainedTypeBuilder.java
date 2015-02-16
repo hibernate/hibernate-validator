@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -27,15 +26,22 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 class ConstrainedTypeBuilder {
 
-	private ConstrainedTypeBuilder() {
+	private final ClassLoadingHelper classLoadingHelper;
+	private final MetaConstraintBuilder metaConstraintBuilder;
+	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+	private final Map<Class<?>, List<Class<?>>> defaultSequences;
+
+	public ConstrainedTypeBuilder(ClassLoadingHelper classLoadingHelper,
+			MetaConstraintBuilder metaConstraintBuilder,
+			AnnotationProcessingOptionsImpl annotationProcessingOptions,
+			Map<Class<?>, List<Class<?>>> defaultSequences) {
+		this.classLoadingHelper = classLoadingHelper;
+		this.metaConstraintBuilder = metaConstraintBuilder;
+		this.annotationProcessingOptions = annotationProcessingOptions;
+		this.defaultSequences = defaultSequences;
 	}
 
-	static ConstrainedType buildConstrainedType(ClassType classType,
-													   Class<?> beanClass,
-													   String defaultPackage,
-													   ConstraintHelper constraintHelper,
-													   AnnotationProcessingOptionsImpl annotationProcessingOptions,
-													   Map<Class<?>, List<Class<?>>> defaultSequences) {
+	ConstrainedType buildConstrainedType(ClassType classType, Class<?> beanClass, String defaultPackage) {
 		if ( classType == null ) {
 			return null;
 		}
@@ -50,12 +56,11 @@ class ConstrainedTypeBuilder {
 		ConstraintLocation constraintLocation = ConstraintLocation.forClass( beanClass );
 		Set<MetaConstraint<?>> metaConstraints = newHashSet();
 		for ( ConstraintType constraint : classType.getConstraint() ) {
-			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+			MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 					constraintLocation,
 					constraint,
 					java.lang.annotation.ElementType.TYPE,
 					defaultPackage,
-					constraintHelper,
 					null
 			);
 			metaConstraints.add( metaConstraint );
@@ -76,11 +81,11 @@ class ConstrainedTypeBuilder {
 		);
 	}
 
-	private static List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {
+	private List<Class<?>> createGroupSequence(GroupSequenceType groupSequenceType, String defaultPackage) {
 		List<Class<?>> groupSequence = newArrayList();
 		if ( groupSequenceType != null ) {
 			for ( String groupName : groupSequenceType.getValue() ) {
-				Class<?> group = ClassLoadingHelper.loadClass( groupName, defaultPackage );
+				Class<?> group = classLoadingHelper.loadClass( groupName, defaultPackage );
 				groupSequence.add( group );
 			}
 		}

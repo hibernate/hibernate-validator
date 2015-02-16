@@ -64,7 +64,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		// check whether we have Persistence on the classpath
 		Class<?> persistenceClass;
 		try {
-			persistenceClass = run( LoadClass.action( PERSISTENCE_CLASS_NAME, this.getClass() ) );
+			persistenceClass = run( LoadClass.action( PERSISTENCE_CLASS_NAME, this.getClass().getClassLoader() ) );
 		}
 		catch ( ValidationException e ) {
 			log.debugf(
@@ -108,7 +108,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		try {
 			@SuppressWarnings("unchecked")
 			Class<? extends TraversableResolver> jpaAwareResolverClass = (Class<? extends TraversableResolver>)
-					run( LoadClass.action( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass() ) );
+					run( LoadClass.action( JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME, this.getClass().getClassLoader() ) );
 			jpaTraversableResolver = run( NewInstance.action( jpaAwareResolverClass, "" ) );
 			log.debugf(
 					"Instantiated JPA aware TraversableResolver of type %s.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME

@@ -13,7 +13,6 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.List;
-
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBElement;
@@ -42,19 +41,23 @@ class MetaConstraintBuilder {
 	private static final String GROUPS_PARAM = "groups";
 	private static final String PAYLOAD_PARAM = "payload";
 
-	private MetaConstraintBuilder() {
+	private final ClassLoadingHelper classLoadingHelper;
+	private final ConstraintHelper constraintHelper;
+
+	MetaConstraintBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper) {
+		this.classLoadingHelper = classLoadingHelper;
+		this.constraintHelper = constraintHelper;
 	}
 
 	@SuppressWarnings("unchecked")
-	static <A extends Annotation> MetaConstraint<A> buildMetaConstraint(ConstraintLocation constraintLocation,
+	<A extends Annotation> MetaConstraint<A> buildMetaConstraint(ConstraintLocation constraintLocation,
 																			   ConstraintType constraint,
 																			   java.lang.annotation.ElementType type,
 																			   String defaultPackage,
-																			   ConstraintHelper constraintHelper,
 																			   ConstraintDescriptorImpl.ConstraintType constraintType) {
 		Class<A> annotationClass;
 		try {
-			annotationClass = (Class<A>) ClassLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage );
+			annotationClass = (Class<A>) classLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage );
 		}
 		catch ( ValidationException e ) {
 			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
@@ -92,7 +95,7 @@ class MetaConstraintBuilder {
 		return new MetaConstraint<A>( constraintDescriptor, constraintLocation );
 	}
 
-	private static <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage) {
+	private <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage) {
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
 		for ( ElementType elementType : annotationType.getElement() ) {
 			String name = elementType.getName();
@@ -117,7 +120,7 @@ class MetaConstraintBuilder {
 		return m.getReturnType();
 	}
 
-	private static Object getElementValue(ElementType elementType, Class<?> returnType, String defaultPackage) {
+	private Object getElementValue(ElementType elementType, Class<?> returnType, String defaultPackage) {
 		removeEmptyContentElements( elementType );
 
 		boolean isArray = returnType.isArray();
@@ -146,7 +149,7 @@ class MetaConstraintBuilder {
 		elementType.getContent().removeAll( contentToDelete );
 	}
 
-	private static Object getSingleValue(Serializable serializable, Class<?> returnType, String defaultPackage) {
+	private Object getSingleValue(Serializable serializable, Class<?> returnType, String defaultPackage) {
 
 		Object returnValue;
 		if ( serializable instanceof String ) {
@@ -166,7 +169,7 @@ class MetaConstraintBuilder {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
-				returnValue = MetaConstraintBuilder.buildAnnotation( annotationType, annotationClass, defaultPackage );
+				returnValue = buildAnnotation( annotationType, annotationClass, defaultPackage );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getUnexpectedParameterValueException( e );
@@ -179,7 +182,7 @@ class MetaConstraintBuilder {
 
 	}
 
-	private static Object convertStringToReturnType(Class<?> returnType, String value, String defaultPackage) {
+	private Object convertStringToReturnType(Class<?> returnType, String value, String defaultPackage) {
 		Object returnValue;
 		if ( returnType.getName().equals( byte.class.getName() ) ) {
 			try {
@@ -242,7 +245,7 @@ class MetaConstraintBuilder {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ClassLoadingHelper.loadClass( value, defaultPackage, MetaConstraintBuilder.class );
+			returnValue = classLoadingHelper.loadClass( value, defaultPackage );
 		}
 		else {
 			try {
@@ -257,27 +260,27 @@ class MetaConstraintBuilder {
 		return returnValue;
 	}
 
-	private static Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
+	private Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
 		if ( groupsType == null ) {
 			return new Class[] { };
 		}
 
 		List<Class<?>> groupList = newArrayList();
 		for ( String groupClass : groupsType.getValue() ) {
-			groupList.add( ClassLoadingHelper.loadClass( groupClass, defaultPackage ) );
+			groupList.add( classLoadingHelper.loadClass( groupClass, defaultPackage ) );
 		}
 		return groupList.toArray( new Class[groupList.size()] );
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
+	private Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
 		if ( payloadType == null ) {
 			return new Class[] { };
 		}
 
 		List<Class<? extends Payload>> payloadList = newArrayList();
 		for ( String groupClass : payloadType.getValue() ) {
-			Class<?> payload = ClassLoadingHelper.loadClass( groupClass, defaultPackage );
+			Class<?> payload = classLoadingHelper.loadClass( groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
 				throw log.getWrongPayloadClassException( payload.getName() );
 			}

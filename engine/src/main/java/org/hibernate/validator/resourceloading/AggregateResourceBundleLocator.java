@@ -28,6 +28,7 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  */
 public class AggregateResourceBundleLocator extends DelegatingResourceBundleLocator {
 	private final List<String> bundleNames;
+	private final ClassLoader classLoader;
 
 	/**
 	 * Creates a locator that delivers a resource bundle merged from the given
@@ -55,10 +56,30 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * source bundles.
 	 */
 	public AggregateResourceBundleLocator(List<String> bundleNames, ResourceBundleLocator delegate) {
-		super( delegate );
+		this( bundleNames, delegate, null );
+	}
 
+	/**
+	 * Creates a locator that delivers a resource bundle merged from the given
+	 * list of source bundles.
+	 *
+	 * @param bundleNames A list with source bundle names. The returned bundle will
+	 * contain all keys from all source bundles. In case a key occurs
+	 * in multiple source bundles, the value will be taken from the
+	 * first bundle containing the key.
+	 * @param delegate A delegate resource bundle locator. The bundle returned by
+	 * this locator will be added to the aggregate bundle after all
+	 * source bundles.
+	 * @param classLoader The classloader to use for loading the bundle.
+	 * @since 5.2
+	 */
+	public AggregateResourceBundleLocator(List<String> bundleNames, ResourceBundleLocator delegate,
+			ClassLoader classLoader) {
+		super( delegate );
 		Contracts.assertValueNotNull( bundleNames, "bundleNames" );
+
 		this.bundleNames = Collections.unmodifiableList( bundleNames );
+		this.classLoader = classLoader;
 	}
 
 	@Override
@@ -67,7 +88,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 
 		for ( String oneBundleName : bundleNames ) {
 			ResourceBundleLocator oneLocator =
-					new PlatformResourceBundleLocator( oneBundleName );
+					new PlatformResourceBundleLocator( oneBundleName, classLoader );
 
 			ResourceBundle oneBundle = oneLocator.getResourceBundle( locale );
 
@@ -90,6 +111,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * <p>
 	 * This class is package-private for the sake of testability.
 	 * </p>
+	 *
 	 * @author Gunnar Morling
 	 */
 	public static class AggregateBundle extends ResourceBundle {

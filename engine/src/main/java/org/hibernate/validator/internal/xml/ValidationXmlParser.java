@@ -48,10 +48,15 @@ public class ValidationXmlParser {
 	);
 
 	private final XmlParserHelper xmlParserHelper = new XmlParserHelper();
+	private final ClassLoader externalClassLoader;
 
 	static {
 		SCHEMAS_BY_VERSION.put( "1.0", "META-INF/validation-configuration-1.0.xsd" );
 		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-configuration-1.1.xsd" );
+	}
+
+	public ValidationXmlParser(ClassLoader externalClassLoader) {
+		this.externalClassLoader = externalClassLoader;
 	}
 
 	/**
@@ -79,7 +84,7 @@ public class ValidationXmlParser {
 
 	private InputStream getInputStream() {
 		log.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
-		InputStream inputStream = ResourceLoaderHelper.getResettableInputStreamForPath( VALIDATION_XML_FILE );
+		InputStream inputStream = ResourceLoaderHelper.getResettableInputStreamForPath( VALIDATION_XML_FILE, externalClassLoader );
 
 		if ( inputStream != null ) {
 			return inputStream;

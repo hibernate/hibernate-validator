@@ -131,4 +131,21 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @hv.experimental This API is considered experimental and may change in future revisions
 	 */
 	HibernateValidatorConfiguration addConstraintDefinitionContributor(ConstraintDefinitionContributor contributor);
+
+	/**
+	 * Sets the class loader to be used for loading user-provided resources:
+	 * <ul>
+	 * <li>XML descriptors ({@code META-INF/validation.xml} as well as XML constraint mappings)</li>
+	 * <li>classes specified by name in XML descriptors (e.g. custom message interpolators etc.)</li>
+	 * <li>the {@code ValidationMessages} resource bundle</li>
+	 * </ul>
+	 * If no class loader is given, these resources will be obtained through the thread context class loader and as a
+	 * last fallback through Hibernate Validator's own class loader.
+	 *
+	 * @param externalClassLoader
+	 *            The class loader for loading user-provided resources.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 */
+	HibernateValidatorConfiguration externalClassLoader(ClassLoader externalClassLoader);
 }

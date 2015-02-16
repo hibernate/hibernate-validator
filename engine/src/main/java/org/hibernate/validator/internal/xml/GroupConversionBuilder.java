@@ -18,15 +18,18 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
  */
 class GroupConversionBuilder {
 
-	private GroupConversionBuilder() {
+	private final ClassLoadingHelper classLoadingHelper;
+
+	GroupConversionBuilder(ClassLoadingHelper classLoadingHelper) {
+		this.classLoadingHelper = classLoadingHelper;
 	}
 
-	static Map<Class<?>, Class<?>> buildGroupConversionMap(List<GroupConversionType> groupConversionTypes,
+	Map<Class<?>, Class<?>> buildGroupConversionMap(List<GroupConversionType> groupConversionTypes,
 																  String defaultPackage) {
 		Map<Class<?>, Class<?>> groupConversionMap = newHashMap();
 		for ( GroupConversionType groupConversionType : groupConversionTypes ) {
-			Class<?> fromClass = ClassLoadingHelper.loadClass( groupConversionType.getFrom(), defaultPackage );
-			Class<?> toClass = ClassLoadingHelper.loadClass( groupConversionType.getTo(), defaultPackage );
+			Class<?> fromClass = classLoadingHelper.loadClass( groupConversionType.getFrom(), defaultPackage );
+			Class<?> toClass = classLoadingHelper.loadClass( groupConversionType.getTo(), defaultPackage );
 			groupConversionMap.put( fromClass, toClass );
 		}
 

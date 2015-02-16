@@ -11,12 +11,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -34,15 +32,23 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 class ConstrainedParameterBuilder {
 
-	private ConstrainedParameterBuilder() {
+	private final GroupConversionBuilder groupConversionBuilder;
+	private final ParameterNameProvider parameterNameProvider;
+	private final MetaConstraintBuilder metaConstraintBuilder;
+	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+
+	ConstrainedParameterBuilder(MetaConstraintBuilder metaConstraintBuilder,
+			ParameterNameProvider parameterNameProvider, GroupConversionBuilder groupConversionBuilder,
+			AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+		this.metaConstraintBuilder = metaConstraintBuilder;
+		this.parameterNameProvider = parameterNameProvider;
+		this.groupConversionBuilder = groupConversionBuilder;
+		this.annotationProcessingOptions = annotationProcessingOptions;
 	}
 
-	static List<ConstrainedParameter> buildConstrainedParameters(List<ParameterType> parameterList,
+	List<ConstrainedParameter> buildConstrainedParameters(List<ParameterType> parameterList,
 																		ExecutableElement executableElement,
-																		String defaultPackage,
-																		ConstraintHelper constraintHelper,
-																		ParameterNameProvider parameterNameProvider,
-																		AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+																		String defaultPackage) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
 		int i = 0;
 		List<String> parameterNames = executableElement.getParameterNames( parameterNameProvider );
@@ -50,17 +56,16 @@ class ConstrainedParameterBuilder {
 			ConstraintLocation constraintLocation = ConstraintLocation.forParameter( executableElement, i );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : parameterType.getConstraint() ) {
-				MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,
 						constraint,
 						ElementType.PARAMETER,
 						defaultPackage,
-						constraintHelper,
 						null
 				);
 				metaConstraints.add( metaConstraint );
 			}
-			Map<Class<?>, Class<?>> groupConversions = GroupConversionBuilder.buildGroupConversionMap(
+			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
 					parameterType.getConvertGroup(),
 					defaultPackage
 			);

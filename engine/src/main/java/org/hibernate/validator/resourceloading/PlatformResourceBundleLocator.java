@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 
 import org.jboss.logging.Logger;
 
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -25,10 +26,29 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  */
 public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	private static final Logger log = Logger.getLogger( PlatformResourceBundleLocator.class.getName() );
+
 	private final String bundleName;
+	private final ClassLoader classLoader;
 
 	public PlatformResourceBundleLocator(String bundleName) {
+		this( bundleName, null );
+	}
+
+	/**
+	 * Creates a new {@link PlatformResourceBundleLocator}.
+	 *
+	 * @param bundleName the name of the bundle to load
+	 * @param classLoader the classloader to be used for loading the bundle. If {@code null}, the current thread context
+	 * classloader and finally Hibernate Validator's own classloader will be used for loading the specified
+	 * bundle.
+	 *
+	 * @since 5.2
+	 */
+	public PlatformResourceBundleLocator(String bundleName, ClassLoader classLoader) {
+		Contracts.assertNotNull( bundleName, "bundleName" );
+
 		this.bundleName = bundleName;
+		this.classLoader = classLoader;
 	}
 
 	/**
@@ -42,18 +62,29 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
 		ResourceBundle rb = null;
-		ClassLoader classLoader = GetClassLoader.fromContext();
+
 		if ( classLoader != null ) {
 			rb = loadBundle(
 					classLoader, locale, bundleName
-					+ " not found by thread local classloader"
+							+ " not found by user-provided classloader"
 			);
 		}
+
 		if ( rb == null ) {
-			classLoader = GetClassLoader.fromClass( PlatformResourceBundleLocator.class );
+			ClassLoader classLoader = GetClassLoader.fromContext();
+			if ( classLoader != null ) {
+				rb = loadBundle(
+						classLoader, locale, bundleName
+								+ " not found by thread context classloader"
+				);
+			}
+		}
+
+		if ( rb == null ) {
+			ClassLoader classLoader = GetClassLoader.fromClass( PlatformResourceBundleLocator.class );
 			rb = loadBundle(
 					classLoader, locale, bundleName
-					+ " not found by validator classloader"
+							+ " not found by validator classloader"
 			);
 		}
 		if ( rb != null ) {

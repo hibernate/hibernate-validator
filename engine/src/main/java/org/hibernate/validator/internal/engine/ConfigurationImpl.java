@@ -14,7 +14,6 @@ import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -87,6 +86,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean failFast;
 	private final Set<ConstraintDefinitionContributor> constraintDefinitionContributors = newHashSet();
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
+
+	private ClassLoader externalClassLoader;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -246,6 +247,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
+	public HibernateValidatorConfiguration externalClassLoader(ClassLoader externalClassLoader) {
+		Contracts.assertNotNull( externalClassLoader, MESSAGES.parameterMustNotBeNull( "externalClassLoader" ) );
+		this.externalClassLoader = externalClassLoader;
+
+		return this;
+	}
+
+	@Override
 	public final ValidatorFactory buildValidatorFactory() {
 		parseValidationXml();
 		ValidatorFactory factory = null;
@@ -320,7 +329,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public BootstrapConfiguration getBootstrapConfiguration() {
 		if ( bootstrapConfiguration == null ) {
-			bootstrapConfiguration = new ValidationXmlParser().parseValidationXml();
+			bootstrapConfiguration = new ValidationXmlParser( externalClassLoader ).parseValidationXml();
 		}
 		return bootstrapConfiguration;
 	}
@@ -337,6 +346,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public final Map<String, String> getProperties() {
 		return validationBootstrapParameters.getConfigProperties();
+	}
+
+	public ClassLoader getExternalClassLoader() {
+		return externalClassLoader;
 	}
 
 	@Override
@@ -381,7 +394,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 			// make sure we use the defaults in case they haven't been provided yet
 			if ( validationBootstrapParameters.getMessageInterpolator() == null ) {
-				validationBootstrapParameters.setMessageInterpolator( defaultMessageInterpolator );
+				validationBootstrapParameters.setMessageInterpolator(
+						getDefaultMessageInterpolatorConfiguredWithClassLoader()
+				);
 			}
 			if ( validationBootstrapParameters.getTraversableResolver() == null ) {
 				validationBootstrapParameters.setTraversableResolver( defaultTraversableResolver );
@@ -395,7 +410,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		}
 		else {
 			ValidationBootstrapParameters xmlParameters = new ValidationBootstrapParameters(
-					getBootstrapConfiguration()
+					getBootstrapConfiguration(), externalClassLoader
 			);
 			applyXmlSettings( xmlParameters );
 		}
@@ -409,7 +424,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 				validationBootstrapParameters.setMessageInterpolator( xmlParameters.getMessageInterpolator() );
 			}
 			else {
-				validationBootstrapParameters.setMessageInterpolator( defaultMessageInterpolator );
+				validationBootstrapParameters.setMessageInterpolator(
+						getDefaultMessageInterpolatorConfiguredWithClassLoader()
+				);
 			}
 		}
 
@@ -458,12 +475,26 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	private boolean isClassPresent(String className) {
 		try {
-			run( LoadClass.action( className, getClass() ) );
+			run( LoadClass.action( className, getClass().getClassLoader() ) );
 			return true;
 		}
 		catch ( ValidationException e ) {
 			return false;
 		}
+	}
+
+	/**
+	 * Returns the default message interpolator, configured with the given user class loader, if present.
+	 */
+	private MessageInterpolator getDefaultMessageInterpolatorConfiguredWithClassLoader() {
+		return externalClassLoader != null ?
+				new ResourceBundleMessageInterpolator(
+						new PlatformResourceBundleLocator(
+								ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
+								externalClassLoader
+						)
+				) :
+				defaultMessageInterpolator;
 	}
 
 	/**

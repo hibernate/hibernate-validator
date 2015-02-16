@@ -13,7 +13,6 @@ import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Map;
 
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
 /**
@@ -46,14 +45,13 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 		PRIMITIVE_NAME_TO_PRIMITIVE = Collections.unmodifiableMap( tmpMap );
 	}
 
-	private ClassLoadingHelper() {
+	private final ClassLoader externalClassLoader;
+
+	ClassLoadingHelper(ClassLoader externalClassLoader) {
+		this.externalClassLoader = externalClassLoader;
 	}
 
-	/*package*/ static Class<?> loadClass(String className, String defaultPackage) {
-		return loadClass( className, defaultPackage, ReflectionHelper.class );
-	}
-
-	/*package*/ static Class<?> loadClass(String className, String defaultPackage, Class<?> caller) {
+	/*package*/ Class<?> loadClass(String className, String defaultPackage) {
 		if ( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className ) ) {
 			return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
 		}
@@ -78,11 +76,11 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 			fullyQualifiedClass.append( ARRAY_CLASS_NAME_SUFFIX );
 		}
 
-		return loadClass( fullyQualifiedClass.toString(), caller );
+		return loadClass( fullyQualifiedClass.toString() );
 	}
 
-	private static Class<?> loadClass(String className, Class<?> caller) {
-		return run( LoadClass.action( className, caller ) );
+	private Class<?> loadClass(String className) {
+		return run( LoadClass.action( className, externalClassLoader ) );
 	}
 
 	private static boolean isArrayClassName(String className) {

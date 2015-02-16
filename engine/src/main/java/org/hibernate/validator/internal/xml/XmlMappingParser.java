@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ParameterNameProvider;
 import javax.xml.bind.JAXBContext;
@@ -39,7 +38,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
 
@@ -65,6 +63,8 @@ public class XmlMappingParser {
 	private final XmlParserHelper xmlParserHelper;
 	private final ParameterNameProvider parameterNameProvider;
 
+	private final ClassLoadingHelper classLoadingHelper;
+
 	private static final ConcurrentMap<String, String> SCHEMAS_BY_VERSION = new ConcurrentHashMap<String, String>(
 			2,
 			0.75f,
@@ -76,13 +76,15 @@ public class XmlMappingParser {
 		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
 	}
 
-	public XmlMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+	public XmlMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider,
+			ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.defaultSequences = newHashMap();
 		this.constrainedElements = newHashMap();
 		this.xmlParserHelper = new XmlParserHelper();
 		this.parameterNameProvider = parameterNameProvider;
+		this.classLoadingHelper = new ClassLoadingHelper( externalClassLoader );
 	}
 
 	/**
@@ -96,6 +98,36 @@ public class XmlMappingParser {
 			// JAXBContext#newInstance() requires several permissions internally and doesn't use any privileged blocks
 			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
 			JAXBContext jc = run( NewJaxbContext.action( ConstraintMappingsType.class ) );
+
+			MetaConstraintBuilder metaConstraintBuilder = new MetaConstraintBuilder(
+					classLoadingHelper,
+					constraintHelper
+			);
+			GroupConversionBuilder groupConversionBuilder = new GroupConversionBuilder( classLoadingHelper );
+
+			ConstrainedTypeBuilder constrainedTypeBuilder = new ConstrainedTypeBuilder(
+					classLoadingHelper,
+					metaConstraintBuilder,
+					annotationProcessingOptions,
+					defaultSequences
+			);
+			ConstrainedFieldBuilder constrainedFieldBuilder = new ConstrainedFieldBuilder(
+					metaConstraintBuilder,
+					groupConversionBuilder,
+					annotationProcessingOptions
+			);
+			ConstrainedExecutableBuilder constrainedExecutableBuilder = new ConstrainedExecutableBuilder(
+					classLoadingHelper,
+					parameterNameProvider,
+					metaConstraintBuilder,
+					groupConversionBuilder,
+					annotationProcessingOptions
+			);
+			ConstrainedGetterBuilder constrainedGetterBuilder = new ConstrainedGetterBuilder(
+					metaConstraintBuilder,
+					groupConversionBuilder,
+					annotationProcessingOptions
+			);
 
 			Set<String> alreadyProcessedConstraintDefinitions = newHashSet();
 			for ( InputStream in : mappingStreams ) {
@@ -116,7 +148,7 @@ public class XmlMappingParser {
 				);
 
 				for ( BeanType bean : mapping.getBean() ) {
-					Class<?> beanClass = ClassLoadingHelper.loadClass( bean.getClazz(), defaultPackage );
+					Class<?> beanClass = classLoadingHelper.loadClass( bean.getClazz(), defaultPackage );
 					checkClassHasNotBeenProcessed( processedClasses, beanClass );
 
 					// update annotation ignores
@@ -125,53 +157,41 @@ public class XmlMappingParser {
 							bean.getIgnoreAnnotations()
 					);
 
-					ConstrainedType constrainedType = ConstrainedTypeBuilder.buildConstrainedType(
+					ConstrainedType constrainedType = constrainedTypeBuilder.buildConstrainedType(
 							bean.getClassType(),
 							beanClass,
-							defaultPackage,
-							constraintHelper,
-							annotationProcessingOptions,
-							defaultSequences
+							defaultPackage
 					);
 					if ( constrainedType != null ) {
 						addConstrainedElement( beanClass, constrainedType );
 					}
 
-					Set<ConstrainedField> constrainedFields = ConstrainedFieldBuilder.buildConstrainedFields(
+					Set<ConstrainedField> constrainedFields = constrainedFieldBuilder.buildConstrainedFields(
 							bean.getField(),
 							beanClass,
-							defaultPackage,
-							constraintHelper,
-							annotationProcessingOptions
+							defaultPackage
 					);
 					addConstrainedElements( beanClass, constrainedFields );
 
-					Set<ConstrainedExecutable> constrainedGetters = ConstrainedGetterBuilder.buildConstrainedGetters(
+					Set<ConstrainedExecutable> constrainedGetters = constrainedGetterBuilder.buildConstrainedGetters(
 							bean.getGetter(),
 							beanClass,
-							defaultPackage,
-							constraintHelper,
-							annotationProcessingOptions
+							defaultPackage
+
 					);
 					addConstrainedElements( beanClass, constrainedGetters );
 
-					Set<ConstrainedExecutable> constrainedConstructors = ConstrainedExecutableBuilder.buildConstructorConstrainedExecutable(
+					Set<ConstrainedExecutable> constrainedConstructors = constrainedExecutableBuilder.buildConstructorConstrainedExecutable(
 							bean.getConstructor(),
 							beanClass,
-							defaultPackage,
-							parameterNameProvider,
-							constraintHelper,
-							annotationProcessingOptions
+							defaultPackage
 					);
 					addConstrainedElements( beanClass, constrainedConstructors );
 
-					Set<ConstrainedExecutable> constrainedMethods = ConstrainedExecutableBuilder.buildMethodConstrainedExecutable(
+					Set<ConstrainedExecutable> constrainedMethods = constrainedExecutableBuilder.buildMethodConstrainedExecutable(
 							bean.getMethod(),
 							beanClass,
-							defaultPackage,
-							parameterNameProvider,
-							constraintHelper,
-							annotationProcessingOptions
+							defaultPackage
 					);
 					addConstrainedElements( beanClass, constrainedMethods );
 
@@ -207,8 +227,8 @@ public class XmlMappingParser {
 
 	@SuppressWarnings("unchecked")
 	private void parseConstraintDefinitions(List<ConstraintDefinitionType> constraintDefinitionList,
-											String defaultPackage,
-											Set<String> alreadyProcessedConstraintDefinitions) {
+			String defaultPackage,
+			Set<String> alreadyProcessedConstraintDefinitions) {
 		for ( ConstraintDefinitionType constraintDefinition : constraintDefinitionList ) {
 			String annotationClassName = constraintDefinition.getAnnotation();
 			if ( alreadyProcessedConstraintDefinitions.contains( annotationClassName ) ) {
@@ -218,25 +238,24 @@ public class XmlMappingParser {
 				alreadyProcessedConstraintDefinitions.add( annotationClassName );
 			}
 
-			Class<?> clazz = ClassLoadingHelper.loadClass( annotationClassName, defaultPackage );
+			Class<?> clazz = classLoadingHelper.loadClass( annotationClassName, defaultPackage );
 			if ( !clazz.isAnnotation() ) {
 				throw log.getIsNotAnAnnotationException( annotationClassName );
 			}
 			Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) clazz;
 
-			addValidatorDefinitions( annotationClass, constraintDefinition.getValidatedBy() );
+			addValidatorDefinitions( annotationClass, defaultPackage, constraintDefinition.getValidatedBy() );
 		}
 	}
 
-	private <A extends Annotation> void addValidatorDefinitions(Class<A> annotationClass, ValidatedByType validatedByType) {
+	private <A extends Annotation> void addValidatorDefinitions(Class<A> annotationClass, String defaultPackage,
+			ValidatedByType validatedByType) {
 		List<Class<? extends ConstraintValidator<A, ?>>> constraintValidatorClasses = newArrayList();
 
 		for ( String validatorClassName : validatedByType.getValue() ) {
 			@SuppressWarnings("unchecked")
-			Class<? extends ConstraintValidator<A, ?>> validatorClass = (Class<? extends ConstraintValidator<A, ?>>) run(
-					LoadClass.action( validatorClassName, this.getClass() )
-			);
-
+			Class<? extends ConstraintValidator<A, ?>> validatorClass = (Class<? extends ConstraintValidator<A, ?>>) classLoadingHelper
+					.loadClass( validatorClassName, defaultPackage );
 
 			if ( !ConstraintValidator.class.isAssignableFrom( validatorClass ) ) {
 				throw log.getIsNotAConstraintValidatorClassException( validatorClass );
@@ -306,7 +325,13 @@ public class XmlMappingParser {
 
 			// Unmashaller#unmarshal() requires several permissions internally and doesn't use any privileged blocks
 			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
-			JAXBElement<ConstraintMappingsType> root = run( Unmarshal.action( unmarshaller, stream, ConstraintMappingsType.class ) );
+			JAXBElement<ConstraintMappingsType> root = run(
+					Unmarshal.action(
+							unmarshaller,
+							stream,
+							ConstraintMappingsType.class
+					)
+			);
 			constraintMappings = root.getValue();
 
 			if ( markSupported ) {
