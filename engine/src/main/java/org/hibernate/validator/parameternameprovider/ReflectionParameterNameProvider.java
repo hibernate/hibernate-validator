@@ -25,6 +25,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  *
  * <p>See also <a href="http://openjdk.java.net/jeps/118">JEP 118</a></p>
  * @author Khalid Alqinyah
+ *
+ * @since 5.2
  */
 @IgnoreJava6Requirement
 public class ReflectionParameterNameProvider implements ParameterNameProvider {

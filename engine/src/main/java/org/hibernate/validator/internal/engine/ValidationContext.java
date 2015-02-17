@@ -480,10 +480,6 @@ public class ValidationContext<T> {
 	/**
 	 * Builder for creating {@link ValidationContext}s suited for the different kinds of validation.
 	 *
-	 * Retrieve a builder with all common attributes via {@link ValidationContext#getValidationContext(ConstraintValidatorManager,
-	 * MessageInterpolator, ConstraintValidatorFactory, TraversableResolver, List, TypeResolutionHelper, boolean)} and then invoke one of
-	 * the dedicated methods such as {@link #forValidate(Object)}.
-	 *
 	 * @author Gunnar Morling
 	 */
 	public static class ValidationContextBuilder {

@@ -17,6 +17,8 @@ import org.hibernate.validator.constraints.URL;
  * Validate that the character sequence (e.g. string) is a valid URL using a regular expression.
  *
  * @author Hardy Ferentschik
+ *
+ * @since 5.2
  */
 public class RegexpURLValidator implements ConstraintValidator<URL, CharSequence> {
 
