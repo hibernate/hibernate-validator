@@ -209,7 +209,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
-				validatedValueHandlers
+				validatedValueHandlers,
+				timeProvider
 		);
 	}
 
@@ -239,6 +240,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
 		return validatedValueHandlers;
+	}
+
+	TimeProvider getTimeProvider() {
+		return timeProvider;
 	}
 
 	@Override
@@ -271,7 +276,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			TraversableResolver traversableResolver,
 			ParameterNameProvider parameterNameProvider,
 			boolean failFast,
-			List<ValidatedValueUnwrapper<?>> validatedValueHandlers) {
+			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
+			TimeProvider timeProvider) {
 
 		// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
 		// factory

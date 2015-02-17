@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.future;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 
@@ -25,6 +26,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Future;
 
+import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.joda.time.DateTime;
@@ -159,6 +161,33 @@ public class TimeProviderFutureTest {
 
 		assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsYearMonth" );
 	}
+
+	@Test
+	public void canConfigureTimeProviderForValidator() {
+		Validator validator = getConfiguration().buildValidatorFactory().getValidator();
+
+		Order order = new Order();
+		order.shipmentDateAsCalendar = Calendar.getInstance();
+		order.shipmentDateAsCalendar.set( 2099, 1, 15 );
+
+		assertThat( validator.validate( order ) ).isEmpty();
+
+		FixedDateTimeProvider timeProvider = new FixedDateTimeProvider(
+				ZonedDateTime.of(
+						2100, 2, 15, 4, 0, 0, 0,
+						TZ_BERLIN
+						)
+				);
+
+		validator = getConfiguration().buildValidatorFactory()
+				.unwrap( HibernateValidatorFactory.class )
+				.usingContext()
+				.timeProvider( timeProvider )
+				.getValidator();
+
+		assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsCalendar" );
+	}
+
 
 	private static class Order {
 
