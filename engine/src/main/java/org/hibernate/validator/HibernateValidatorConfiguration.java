@@ -45,6 +45,14 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	String CONSTRAINT_DEFINITION_CONTRIBUTORS = "hibernate.validator.constraint_definition_contributors";
 
 	/**
+	 * Property corresponding to the {@link #timeProvider(TimeProvider)} method. Accepts a String with the
+	 * fully-qualified class name of a {@link TimeProvider} implementation.
+	 *
+	 * @since 5.2
+	 */
+	String TIME_PROVIDER = "hibernate.validator.time_provider";
+
+	/**
 	 * <p>
 	 * Returns the {@link ResourceBundleLocator} used by the
 	 * {@link Configuration#getDefaultMessageInterpolator() default message

@@ -133,16 +133,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
+		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
+
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = configurationState.getParameterNameProvider();
-		this.timeProvider = getTimeProvider( configurationState );
+		this.timeProvider = getTimeProvider( configurationState, externalClassLoader );
 		this.beanMetaDataManagerMap = Collections.synchronizedMap( new IdentityHashMap<ParameterNameProvider, BeanMetaDataManager>() );
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
 
-		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -190,12 +191,25 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getExternalClassLoader() : null;
 	}
 
-	private static TimeProvider getTimeProvider(ConfigurationState configurationState) {
+	private static TimeProvider getTimeProvider(ConfigurationState configurationState, ClassLoader externalClassLoader) {
 		TimeProvider timeProvider = null;
 
+		// programmatic config
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hvConfig = (ConfigurationImpl) configurationState;
 			timeProvider = hvConfig.getTimeProvider();
+		}
+
+		// XML config
+		if ( timeProvider == null ) {
+			String timeProviderClassName = configurationState.getProperties().get( HibernateValidatorConfiguration.TIME_PROVIDER );
+
+			if ( timeProviderClassName != null ) {
+				@SuppressWarnings("unchecked")
+				Class<? extends TimeProvider> handlerType = (Class<? extends TimeProvider>) run( LoadClass
+						.action( timeProviderClassName, externalClassLoader ) );
+				timeProvider = run( NewInstance.action( handlerType, "time provider class" ) );
+			}
 		}
 
 		return timeProvider != null ? timeProvider : DefaultTimeProvider.getInstance();
