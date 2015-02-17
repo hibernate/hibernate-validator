@@ -9,6 +9,7 @@ package org.hibernate.validator;
 
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidatorContext;
 
@@ -32,6 +33,12 @@ public interface HibernateValidatorContext extends ValidatorContext {
 
 	@Override
 	HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory);
+
+	/**
+	 * @since 5.2
+	 */
+	@Override
+	HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider);
 
 	/**
 	 * En- or disables the fail fast mode. When fail fast is enabled the validation

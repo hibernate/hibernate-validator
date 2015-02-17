@@ -38,6 +38,8 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Adam Stawicki
+ *
+ * @since 5.2
  */
 public abstract class AbstractMessageInterpolator implements MessageInterpolator {
 	private static final Log log = LoggerFactory.make();

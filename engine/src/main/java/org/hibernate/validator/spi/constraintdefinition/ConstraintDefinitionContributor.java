@@ -22,6 +22,8 @@ import javax.validation.ConstraintValidator;
  *
  * @author Hardy Ferentschik
  * @hv.experimental This API is considered experimental and may change in future revisions
+ *
+ * @since 5.2
  */
 public interface ConstraintDefinitionContributor {
 

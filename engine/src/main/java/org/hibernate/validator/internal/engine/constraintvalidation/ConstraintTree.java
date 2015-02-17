@@ -117,7 +117,7 @@ public class ConstraintTree<A extends Annotation> {
 			// check for a potential unwrapper
 
 			Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
-			ValidatedValueUnwrapper validatedValueUnwrapper = validationContext.getValidatedValueUnwrapper(
+			ValidatedValueUnwrapper<?> validatedValueUnwrapper = validationContext.getValidatedValueUnwrapper(
 					validatedValueType
 			);
 			if( !valueContext.getUnwrapMode().equals( UnwrapMode.SKIP_UNWRAP )) {
