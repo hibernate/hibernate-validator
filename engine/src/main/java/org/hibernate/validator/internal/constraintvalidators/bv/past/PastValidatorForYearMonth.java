@@ -6,12 +6,15 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
+import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.Calendar;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 
 /**
@@ -34,6 +37,13 @@ public class PastValidatorForYearMonth implements ConstraintValidator<Past, Year
 			return true;
 		}
 
-		return value.isBefore( YearMonth.now() );
+		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime();
+
+		LocalDateTime dateOfNow = LocalDateTime.ofInstant( now.toInstant(), now.getTimeZone().toZoneId() );
+		YearMonth currentYearMonth = YearMonth.of( dateOfNow.getYear(), dateOfNow.getMonth() );
+
+		return value.isBefore( currentYearMonth );
 	}
 }

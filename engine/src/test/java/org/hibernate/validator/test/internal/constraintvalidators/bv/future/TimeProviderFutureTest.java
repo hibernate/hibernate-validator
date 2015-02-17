@@ -160,7 +160,6 @@ public class TimeProviderFutureTest {
 		assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsYearMonth" );
 	}
 
-
 	private static class Order {
 
 		@Future

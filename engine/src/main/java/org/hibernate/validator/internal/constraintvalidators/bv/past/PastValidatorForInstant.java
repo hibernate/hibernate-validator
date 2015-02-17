@@ -7,11 +7,13 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
 import java.time.Instant;
+import java.util.Date;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 
 /**
@@ -34,6 +36,11 @@ public class PastValidatorForInstant implements ConstraintValidator<Past, Instan
 			return true;
 		}
 
-		return value.isBefore( Instant.now() );
+		Date now = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime()
+				.getTime();
+
+		return value.isBefore( now.toInstant() );
 	}
 }

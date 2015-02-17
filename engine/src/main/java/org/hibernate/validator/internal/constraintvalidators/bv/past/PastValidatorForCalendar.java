@@ -7,9 +7,12 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
 import java.util.Calendar;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
+
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 /**
  * Check that the <code>java.util.Calendar</code> passed to be validated is in the
@@ -19,14 +22,21 @@ import javax.validation.constraints.Past;
  */
 public class PastValidatorForCalendar implements ConstraintValidator<Past, Calendar> {
 
+	@Override
 	public void initialize(Past constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(Calendar cal, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( cal == null ) {
 			return true;
 		}
-		return cal.before( Calendar.getInstance() );
+
+		Calendar now = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime();
+
+		return cal.before( now );
 	}
 }

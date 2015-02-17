@@ -6,12 +6,15 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
+import java.util.Calendar;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
-
+import org.joda.time.DateTime;
 import org.joda.time.ReadableInstant;
 
 /**
@@ -35,6 +38,10 @@ public class PastValidatorForReadableInstant implements ConstraintValidator<Past
 			return true;
 		}
 
-		return value.isBefore( null );
+		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime();
+
+		return value.isBefore( new DateTime( now ) );
 	}
 }
