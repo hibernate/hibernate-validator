@@ -84,7 +84,7 @@ public final class ConstraintViolationAssert {
 	 * @param violations The violation list to verify.
 	 * @param expectedConstraintTypes The expected constraint types.
 	 */
-	public static <T> void assertCorrectConstraintTypes(Set<ConstraintViolation<T>> violations,
+	public static void assertCorrectConstraintTypes(Set<? extends ConstraintViolation<?>> violations,
 			Class<?>... expectedConstraintTypes) {
 		List<Class<? extends Annotation>> actualConstraintTypes = new ArrayList<Class<? extends Annotation>>();
 		for ( ConstraintViolation<?> violation : violations ) {
@@ -200,7 +200,7 @@ public final class ConstraintViolationAssert {
 		);
 	}
 
-	public static void assertConstraintTypes(Set<ConstraintDescriptor<?>> descriptors,
+	public static void assertConstraintTypes(Set<? extends ConstraintDescriptor<?>> descriptors,
 			Class<?>... expectedConstraintTypes) {
 		List<Class<? extends Annotation>> actualConstraintTypes = new ArrayList<Class<? extends Annotation>>();
 
