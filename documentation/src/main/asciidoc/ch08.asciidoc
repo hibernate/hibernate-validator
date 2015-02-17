@@ -237,10 +237,9 @@ Validator validator = validatorFactory.getValidator();
 ----
 ====
 
-Hibernate Validator provides two TraversableResolvers out of the box which will be enabled
-automatically depending on your environment. The first is DefaultTraversableResolver which will
-always return +true+ for isReachable() and isTraversable(). The second is JPATraversableResolver
-which gets enabled when Hibernate Validator is used in combination with JPA 2.
+If no specific traversable resolver has been configured, the default behavior is to consider all properties as reachable and cascadable.
+When using Hibernate Validator together with a JPA 2 provider such as Hibernate ORM, only those properties will be considered reachable
+which already have been loaded by the persistence provider and all properties will be considered cascadable.
 
 ==== ConstraintValidatorFactory
 
