@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
+
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
@@ -19,6 +20,7 @@ import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import javax.validation.ConstraintValidatorFactory;
@@ -29,6 +31,7 @@ import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
+
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -144,11 +147,14 @@ public class ValidationContext<T> {
 	 */
 	private final boolean failFast;
 
+	private final TimeProvider timeProvider;
+
 	private ValidationContext(ConstraintValidatorManager constraintValidatorManager,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
 			ParameterNameProvider parameterNameProvider,
+			TimeProvider timeProvider,
 			List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
 			TypeResolutionHelper typeResolutionHelper,
 			boolean failFast,
@@ -162,6 +168,7 @@ public class ValidationContext<T> {
 		this.constraintValidatorFactory = constraintValidatorFactory;
 		this.traversableResolver = traversableResolver;
 		this.parameterNameProvider = parameterNameProvider;
+		this.timeProvider = timeProvider;
 		this.validatedValueUnwrappers = validatedValueUnwrappers;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.failFast = failFast;
@@ -183,6 +190,7 @@ public class ValidationContext<T> {
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
+			TimeProvider timeProvider,
 			List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
 			TypeResolutionHelper typeResolutionHelper,
 			boolean failFast) {
@@ -192,6 +200,7 @@ public class ValidationContext<T> {
 				messageInterpolator,
 				constraintValidatorFactory,
 				traversableResolver,
+				timeProvider,
 				validatedValueUnwrappers,
 				typeResolutionHelper,
 				failFast
@@ -239,6 +248,10 @@ public class ValidationContext<T> {
 		else {
 			return parameterNameProvider.getParameterNames( (Constructor<?>) executable.getMember() );
 		}
+	}
+
+	public TimeProvider getTimeProvider() {
+		return timeProvider;
 	}
 
 	public Set<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
@@ -487,6 +500,7 @@ public class ValidationContext<T> {
 		private final MessageInterpolator messageInterpolator;
 		private final ConstraintValidatorFactory constraintValidatorFactory;
 		private final TraversableResolver traversableResolver;
+		private final TimeProvider timeProvider;
 		private final List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers;
 		private final TypeResolutionHelper typeResolutionHelper;
 		private final boolean failFast;
@@ -496,6 +510,7 @@ public class ValidationContext<T> {
 				MessageInterpolator messageInterpolator,
 				ConstraintValidatorFactory constraintValidatorFactory,
 				TraversableResolver traversableResolver,
+				TimeProvider timeProvider,
 				List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
 				TypeResolutionHelper typeResolutionHelper,
 				boolean failFast) {
@@ -503,6 +518,7 @@ public class ValidationContext<T> {
 			this.messageInterpolator = messageInterpolator;
 			this.constraintValidatorFactory = constraintValidatorFactory;
 			this.traversableResolver = traversableResolver;
+			this.timeProvider = timeProvider;
 			this.validatedValueUnwrappers = validatedValueUnwrappers;
 			this.typeResolutionHelper = typeResolutionHelper;
 			this.failFast = failFast;
@@ -517,6 +533,7 @@ public class ValidationContext<T> {
 					constraintValidatorFactory,
 					traversableResolver,
 					null, //parameter name provider,
+					timeProvider,
 					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
@@ -537,6 +554,7 @@ public class ValidationContext<T> {
 					constraintValidatorFactory,
 					traversableResolver,
 					null, //parameter name provider,
+					timeProvider,
 					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
@@ -555,6 +573,7 @@ public class ValidationContext<T> {
 					constraintValidatorFactory,
 					traversableResolver,
 					null, //parameter name provider
+					timeProvider,
 					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
@@ -580,6 +599,7 @@ public class ValidationContext<T> {
 					constraintValidatorFactory,
 					traversableResolver,
 					parameterNameProvider,
+					timeProvider,
 					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
@@ -604,6 +624,7 @@ public class ValidationContext<T> {
 					constraintValidatorFactory,
 					traversableResolver,
 					null, //parameter name provider
+					timeProvider,
 					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,

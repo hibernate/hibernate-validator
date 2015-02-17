@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
@@ -66,6 +67,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
+import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -126,6 +128,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final ParameterNameProvider parameterNameProvider;
 
+	private final TimeProvider timeProvider;
+
 	/**
 	 * Indicates if validation has to be stopped on first constraint violation.
 	 */
@@ -151,6 +155,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						 TraversableResolver traversableResolver,
 						 BeanMetaDataManager beanMetaDataManager,
 						 ParameterNameProvider parameterNameProvider,
+						 TimeProvider timeProvider,
 						 TypeResolutionHelper typeResolutionHelper,
 						 List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 						 ConstraintValidatorManager constraintValidatorManager,
@@ -160,6 +165,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.parameterNameProvider = parameterNameProvider;
+		this.timeProvider = timeProvider;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.validatedValueHandlers = validatedValueHandlers;
 		this.constraintValidatorManager = constraintValidatorManager;
@@ -335,6 +341,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				messageInterpolator,
 				constraintValidatorFactory,
 				getCachingTraversableResolver(),
+				timeProvider,
 				validatedValueHandlers,
 				typeResolutionHelper,
 				failFast

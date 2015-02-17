@@ -29,9 +29,12 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
 	/**
+	 * Creates a new {@link XmlMetaDataProvider}.
+	 *
 	 * @param constraintHelper the constraint helper
 	 * @param parameterNameProvider the name provider
 	 * @param mappingStreams the input stream for the xml configuration
+	 * @param externalClassLoader class loader for user-provided resources/classes
 	 */
 	public XmlMetaDataProvider(ConstraintHelper constraintHelper,
 							   ParameterNameProvider parameterNameProvider,

@@ -14,6 +14,7 @@ import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -46,6 +47,7 @@ import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpo
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -86,8 +88,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean failFast;
 	private final Set<ConstraintDefinitionContributor> constraintDefinitionContributors = newHashSet();
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
-
 	private ClassLoader externalClassLoader;
+	private TimeProvider timeProvider;
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -255,6 +257,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
+	public HibernateValidatorConfiguration timeProvider(TimeProvider timeProvider) {
+		Contracts.assertNotNull( timeProvider, MESSAGES.parameterMustNotBeNull( "timeProvider" ) );
+		this.timeProvider = timeProvider;
+
+		return this;
+	}
+
+	@Override
 	public final ValidatorFactory buildValidatorFactory() {
 		parseValidationXml();
 		ValidatorFactory factory = null;
@@ -341,6 +351,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
 		return validatedValueHandlers;
+	}
+
+	public TimeProvider getTimeProvider() {
+		return timeProvider;
 	}
 
 	@Override

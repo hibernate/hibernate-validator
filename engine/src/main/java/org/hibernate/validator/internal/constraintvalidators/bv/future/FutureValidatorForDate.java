@@ -11,6 +11,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+
 /**
  * Check that the <code>java.util.Date</code> passed to be validated is in the
  * future.
@@ -19,14 +21,22 @@ import javax.validation.constraints.Future;
  */
 public class FutureValidatorForDate implements ConstraintValidator<Future, Date> {
 
+	@Override
 	public void initialize(Future constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(Date date, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( date == null ) {
 			return true;
 		}
-		return date.after( new Date() );
+
+		Date now = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime()
+				.getTime();
+
+		return date.after( now );
 	}
 }

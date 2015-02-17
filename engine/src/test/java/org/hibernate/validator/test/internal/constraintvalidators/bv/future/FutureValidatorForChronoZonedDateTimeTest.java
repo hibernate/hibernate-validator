@@ -12,9 +12,9 @@ import java.time.ZonedDateTime;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForChronoZonedDateTime;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -41,8 +41,8 @@ public class FutureValidatorForChronoZonedDateTimeTest {
 			ZoneId zone = ZoneId.ofOffset( "UTC", ZoneOffset.ofHours( i ) );
 			ZonedDateTime future = ZonedDateTime.now( zone ).plusHours( 1 );
 			ZonedDateTime past = ZonedDateTime.now( zone ).minusHours( 1 );
-			assertTrue( constraint.isValid( future, null ), "Future ZonedDateTime '" + future + "' fails validation." );
-			assertFalse( constraint.isValid( past, null ), "Past ZonedDateTime '" + past + "' validated as future." );
+			assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future ZonedDateTime '" + future + "' fails validation." );
+			assertFalse( constraint.isValid( past, getConstraintValidatorContext() ), "Past ZonedDateTime '" + past + "' validated as future." );
 		}
 	}
 }

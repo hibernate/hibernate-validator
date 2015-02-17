@@ -11,6 +11,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+
 /**
  * Check that the <code>java.util.Calendar</code> passed to be validated is in
  * the future.
@@ -19,14 +21,21 @@ import javax.validation.constraints.Future;
  */
 public class FutureValidatorForCalendar implements ConstraintValidator<Future, Calendar> {
 
+	@Override
 	public void initialize(Future constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(Calendar cal, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( cal == null ) {
 			return true;
 		}
-		return cal.after( Calendar.getInstance() );
+
+		Calendar now = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime();
+
+		return cal.after( now );
 	}
 }

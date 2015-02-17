@@ -41,7 +41,9 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
+import org.hibernate.validator.internal.engine.time.DefaultTimeProvider;
 import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
+import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -74,6 +76,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * The default parameter name provider for this factory.
 	 */
 	private final ParameterNameProvider parameterNameProvider;
+
+	/**
+	 * Provider for the current time when validating {@code @Future} or code @Past}
+	 */
+	private final TimeProvider timeProvider;
 
 	/**
 	 * The default constraint validator factory for this factory.
@@ -129,6 +136,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = configurationState.getParameterNameProvider();
+		this.timeProvider = getTimeProvider( configurationState );
 		this.beanMetaDataManagerMap = Collections.synchronizedMap( new IdentityHashMap<ParameterNameProvider, BeanMetaDataManager>() );
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
@@ -180,6 +188,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static ClassLoader getExternalClassLoader(ConfigurationState configurationState) {
 		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getExternalClassLoader() : null;
+	}
+
+	private static TimeProvider getTimeProvider(ConfigurationState configurationState) {
+		TimeProvider timeProvider = null;
+
+		if ( configurationState instanceof ConfigurationImpl ) {
+			ConfigurationImpl hvConfig = (ConfigurationImpl) configurationState;
+			timeProvider = hvConfig.getTimeProvider();
+		}
+
+		return timeProvider != null ? timeProvider : DefaultTimeProvider.getInstance();
 	}
 
 	@Override
@@ -285,6 +304,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				beanMetaDataManager,
 				parameterNameProvider,
+				timeProvider,
 				typeResolutionHelper,
 				validatedValueHandlers,
 				constraintValidatorManager,
