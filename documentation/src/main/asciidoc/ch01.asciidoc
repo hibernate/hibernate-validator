@@ -89,6 +89,36 @@ Note that adding this dependency is usually not required for applications runnin
 application server. You can learn more about the integration of Bean Validation and CDI in
 <<section-integration-with-cdi>>.
 
+[[section-getting-started-security-manager]]
+==== Running with a security manager
+
+Hibernate Validator supports running with a http://docs.oracle.com/javase/8/docs/technotes/guides/security/index.html[security manager] being enabled.
+To do so, you must assign several permissions to the Hibernate Validator and the Bean Validation API code bases.
+The following shows how to do this via a http://docs.oracle.com/javase/8/docs/technotes/guides/security/PolicyFiles.html[policy file] as processed by the Java default policy implementation:
+
+.Policy file for using Hibernate Validator with a security manager
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+grant codeBase "file:path/to/hibernate-validator-{hvVersion}.jar" {
+    permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+    permission java.lang.RuntimePermission "accessDeclaredMembers";
+
+    // Only needed when working with XML descriptors (validation.xml or XML constraint mappings)
+    permission java.util.PropertyPermission "mapAnyUriToUri", "read";
+};
+
+grant codeBase "file:path/to/validation-api-{bvVersion}.jar" {
+    permission java.io.FilePermission "path/to/hibernate-validator-{hvVersion}.jar", "read";
+};
+----
+====
+
+All API invocations requiring special permissions are done via privileged actions.
+This means only Hibernate Validator and the Bean Validation API themselves need the listed permissions.
+You don't need to assign any permissions to other code bases calling Hibernate Validator.
+
 [[validator-gettingstarted-createmodel]]
 === Applying constraints
 
