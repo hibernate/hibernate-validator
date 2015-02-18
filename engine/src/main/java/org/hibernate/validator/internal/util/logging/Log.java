@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.util.logging;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -230,9 +229,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 56, value = "Method or constructor %1$s doesn't have a parameter with index %2$d.")
 	IllegalArgumentException getInvalidExecutableParameterIndexException(String executable, int index);
-
-	@Message(id = 57, value = "Unable to find constraints for  %s.")
-	ValidationException getUnableToFindAnnotationConstraintsException(Class<? extends Annotation> annotationClass);
 
 	@Message(id = 59, value = "Unable to retrieve annotation parameter value.")
 	ValidationException getUnableToRetrieveAnnotationParameterValueException(@Cause Exception e);
