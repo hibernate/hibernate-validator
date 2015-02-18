@@ -11,7 +11,7 @@
         http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
 
     <engine>
-        <property name="deploymentExportPath">target/</property>
+        <property name="deploymentExportPath">${basedir}/target/</property>
     </engine>
 
     <container qualifier="wildfly" default="true">
