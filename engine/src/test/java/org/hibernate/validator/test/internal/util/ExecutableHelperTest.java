@@ -367,6 +367,24 @@ public class ExecutableHelperTest {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-861")
+	public void testBridgeMethodOverride() throws Exception {
+		Method setDataObjectBase = Node.class.getDeclaredMethod( "setData", Object.class );
+
+		Method setDataObject = MyNode.class.getDeclaredMethod( "setData", Object.class );
+		assertFalse(
+				executableHelper.overrides( setDataObject, setDataObjectBase ),
+				"MyNode#setData(Object) is the generated bridge method. It should be ignored."
+		);
+
+		Method setDataInteger = MyNode.class.getDeclaredMethod( "setData", Integer.class );
+		assertTrue(
+				executableHelper.overrides( setDataInteger, setDataObjectBase ),
+				"MyNode#setData(Integer) should override Node#setData(T)"
+		);
+	}
+
 	public abstract static class GenericServiceBase<T> {
 		public abstract void doSomething(T t);
 	}
