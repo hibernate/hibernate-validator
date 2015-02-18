@@ -97,6 +97,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 					PERSISTENCE_CLASS_NAME,
 					PERSISTENCE_UTIL_METHOD
 			);
+			return;
 		}
 
 		log.debugf(
