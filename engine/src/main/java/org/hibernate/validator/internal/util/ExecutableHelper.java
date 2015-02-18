@@ -89,6 +89,10 @@ public final class ExecutableHelper {
 			return false;
 		}
 
+		if ( Modifier.isPrivate( superTypeMethod.getModifiers() ) ) {
+			return false;
+		}
+
 		return instanceMethodParametersResolveToSameTypes( subTypeMethod, superTypeMethod );
 	}
 

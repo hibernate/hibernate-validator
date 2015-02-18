@@ -7,6 +7,8 @@
 package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Member;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
@@ -489,6 +492,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<BuilderDelegate> builders) {
+			// HV-890 Not adding meta-data for private super-type methods to the meta-data of this bean;
+			// It is not needed and it may conflict with sub-type methods of the same signature
+			if ( constrainableElement.getKind() == ConstrainedElementKind.METHOD ) {
+				Member member = ((ConstrainedExecutable) constrainableElement).getExecutable().getMember();
+				if ( beanClass != member.getDeclaringClass() && Modifier.isPrivate( member.getModifiers() ) ) {
+					return;
+				}
+			}
+
 			for ( BuilderDelegate builder : builders ) {
 				boolean foundBuilder = builder.add( constrainableElement );
 
