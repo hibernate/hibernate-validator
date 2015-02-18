@@ -13,6 +13,7 @@ import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.Constraint;
@@ -123,6 +124,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
@@ -141,175 +143,109 @@ public class ConstraintHelper {
 	private static final Log log = LoggerFactory.make();
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 
-	private final ConcurrentMap<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints = newConcurrentHashMap();
+	// immutable
+	private final Map<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints;
+
 	private final ValidatorClassMap validatorClasses = new ValidatorClassMap();
 
 	public ConstraintHelper() {
-		List<Class<? extends ConstraintValidator<?, ?>>> constraintList = newArrayList();
-		constraintList.add( AssertFalseValidator.class );
-		builtinConstraints.put( AssertFalse.class, constraintList );
+		Map<Class<? extends Annotation>, List<? extends Class<?>>> tmpConstraints = newHashMap();
 
-		constraintList = newArrayList();
-		constraintList.add( AssertTrueValidator.class );
-		builtinConstraints.put( AssertTrue.class, constraintList );
+		putConstraint( tmpConstraints, AssertFalse.class, AssertFalseValidator.class );
+		putConstraint( tmpConstraints, AssertTrue.class, AssertTrueValidator.class );
+		putConstraint( tmpConstraints, CNPJ.class, CNPJValidator.class );
+		putConstraint( tmpConstraints, CPF.class, CPFValidator.class );
 
-		constraintList = newArrayList();
-		constraintList.add( CNPJValidator.class );
-		builtinConstraints.put( CNPJ.class, constraintList );
+		putConstraints( tmpConstraints, DecimalMax.class, DecimalMaxValidatorForNumber.class, DecimalMaxValidatorForCharSequence.class );
+		putConstraints( tmpConstraints, DecimalMin.class, DecimalMinValidatorForNumber.class, DecimalMinValidatorForCharSequence.class );
+		putConstraints( tmpConstraints, Digits.class, DigitsValidatorForCharSequence.class, DigitsValidatorForNumber.class );
 
-		constraintList = newArrayList();
-		constraintList.add( CPFValidator.class );
-		builtinConstraints.put( CPF.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( DecimalMaxValidatorForNumber.class );
-		constraintList.add( DecimalMaxValidatorForCharSequence.class );
-		builtinConstraints.put( DecimalMax.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( DecimalMinValidatorForNumber.class );
-		constraintList.add( DecimalMinValidatorForCharSequence.class );
-		builtinConstraints.put( DecimalMin.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( DigitsValidatorForCharSequence.class );
-		constraintList.add( DigitsValidatorForNumber.class );
-		builtinConstraints.put( Digits.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( FutureValidatorForCalendar.class );
-		constraintList.add( FutureValidatorForDate.class );
+		List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = newArrayList( 11 );
+		futureValidators.add( FutureValidatorForCalendar.class );
+		futureValidators.add( FutureValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
-			constraintList.add( FutureValidatorForReadableInstant.class );
-			constraintList.add( FutureValidatorForReadablePartial.class );
+			futureValidators.add( FutureValidatorForReadableInstant.class );
+			futureValidators.add( FutureValidatorForReadablePartial.class );
 		}
 		if ( Version.getJavaRelease() >= 8 ) {
 			// Java 8 date/time API validators
-			constraintList.add( FutureValidatorForChronoLocalDate.class );
-			constraintList.add( FutureValidatorForChronoLocalDateTime.class );
-			constraintList.add( FutureValidatorForChronoZonedDateTime.class );
-			constraintList.add( FutureValidatorForInstant.class );
-			constraintList.add( FutureValidatorForYear.class );
-			constraintList.add( FutureValidatorForYearMonth.class );
-			constraintList.add( FutureValidatorForOffsetDateTime.class );
+			futureValidators.add( FutureValidatorForChronoLocalDate.class );
+			futureValidators.add( FutureValidatorForChronoLocalDateTime.class );
+			futureValidators.add( FutureValidatorForChronoZonedDateTime.class );
+			futureValidators.add( FutureValidatorForInstant.class );
+			futureValidators.add( FutureValidatorForYear.class );
+			futureValidators.add( FutureValidatorForYearMonth.class );
+			futureValidators.add( FutureValidatorForOffsetDateTime.class );
 		}
-		builtinConstraints.put( Future.class, constraintList );
+		putConstraints( tmpConstraints, Future.class, futureValidators );
 
-		constraintList = newArrayList();
-		constraintList.add( MaxValidatorForNumber.class );
-		constraintList.add( MaxValidatorForCharSequence.class );
-		builtinConstraints.put( Max.class, constraintList );
+		putConstraints( tmpConstraints, Max.class, MaxValidatorForNumber.class, MaxValidatorForCharSequence.class );
+		putConstraints( tmpConstraints, Min.class, MinValidatorForNumber.class, MinValidatorForCharSequence.class );
+		putConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
+		putConstraint( tmpConstraints, Null.class, NullValidator.class );
 
-		constraintList = newArrayList();
-		constraintList.add( MinValidatorForNumber.class );
-		constraintList.add( MinValidatorForCharSequence.class );
-		builtinConstraints.put( Min.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( NotNullValidator.class );
-		builtinConstraints.put( NotNull.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( NullValidator.class );
-		builtinConstraints.put( Null.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( PastValidatorForCalendar.class );
-		constraintList.add( PastValidatorForDate.class );
+		List<Class<? extends ConstraintValidator<Past, ?>>> pastValidators = newArrayList( 11 );
+		pastValidators.add( PastValidatorForCalendar.class );
+		pastValidators.add( PastValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
-			constraintList.add( PastValidatorForReadableInstant.class );
-			constraintList.add( PastValidatorForReadablePartial.class );
+			pastValidators.add( PastValidatorForReadableInstant.class );
+			pastValidators.add( PastValidatorForReadablePartial.class );
 		}
 		if ( Version.getJavaRelease() >= 8 ) {
 			// Java 8 date/time API validators
-			constraintList.add( PastValidatorForChronoLocalDate.class );
-			constraintList.add( PastValidatorForChronoLocalDateTime.class );
-			constraintList.add( PastValidatorForChronoZonedDateTime.class );
-			constraintList.add( PastValidatorForInstant.class );
-			constraintList.add( PastValidatorForYear.class );
-			constraintList.add( PastValidatorForYearMonth.class );
-			constraintList.add( PastValidatorForOffsetDateTime.class );
+			pastValidators.add( PastValidatorForChronoLocalDate.class );
+			pastValidators.add( PastValidatorForChronoLocalDateTime.class );
+			pastValidators.add( PastValidatorForChronoZonedDateTime.class );
+			pastValidators.add( PastValidatorForInstant.class );
+			pastValidators.add( PastValidatorForYear.class );
+			pastValidators.add( PastValidatorForYearMonth.class );
+			pastValidators.add( PastValidatorForOffsetDateTime.class );
 		}
-		builtinConstraints.put( Past.class, constraintList );
+		putConstraints( tmpConstraints, Past.class, pastValidators );
 
-		constraintList = newArrayList();
-		constraintList.add( PatternValidator.class );
-		builtinConstraints.put( Pattern.class, constraintList );
+		putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
 
-		constraintList = newArrayList();
-		constraintList.add( SizeValidatorForCharSequence.class );
-		constraintList.add( SizeValidatorForCollection.class );
-		constraintList.add( SizeValidatorForArray.class );
-		constraintList.add( SizeValidatorForMap.class );
-		constraintList.add( SizeValidatorForArraysOfBoolean.class );
-		constraintList.add( SizeValidatorForArraysOfByte.class );
-		constraintList.add( SizeValidatorForArraysOfChar.class );
-		constraintList.add( SizeValidatorForArraysOfDouble.class );
-		constraintList.add( SizeValidatorForArraysOfFloat.class );
-		constraintList.add( SizeValidatorForArraysOfInt.class );
-		constraintList.add( SizeValidatorForArraysOfLong.class );
-		builtinConstraints.put( Size.class, constraintList );
+		List<Class<? extends ConstraintValidator<Size, ?>>> sizeValidators = newArrayList( 11 );
+		sizeValidators.add( SizeValidatorForCharSequence.class );
+		sizeValidators.add( SizeValidatorForCollection.class );
+		sizeValidators.add( SizeValidatorForArray.class );
+		sizeValidators.add( SizeValidatorForMap.class );
+		sizeValidators.add( SizeValidatorForArraysOfBoolean.class );
+		sizeValidators.add( SizeValidatorForArraysOfByte.class );
+		sizeValidators.add( SizeValidatorForArraysOfChar.class );
+		sizeValidators.add( SizeValidatorForArraysOfDouble.class );
+		sizeValidators.add( SizeValidatorForArraysOfFloat.class );
+		sizeValidators.add( SizeValidatorForArraysOfInt.class );
+		sizeValidators.add( SizeValidatorForArraysOfLong.class );
 
-		constraintList = newArrayList();
-		constraintList.add( EANValidator.class );
-		builtinConstraints.put( EAN.class, constraintList );
+		putConstraints( tmpConstraints, Size.class, sizeValidators );
 
-		constraintList = newArrayList();
-		constraintList.add( EmailValidator.class );
-		builtinConstraints.put( Email.class, constraintList );
+		putConstraint( tmpConstraints, EAN.class, EANValidator.class );
+		putConstraint( tmpConstraints, Email.class, EmailValidator.class );
+		putConstraint( tmpConstraints, Length.class, LengthValidator.class );
+		putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
+		putConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
+		putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
+		putConstraint( tmpConstraints, Mod11Check.class, Mod11CheckValidator.class );
+		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
+		putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
+		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
+		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
+		putConstraint( tmpConstraints, URL.class, URLValidator.class );
 
-		constraintList = newArrayList();
-		constraintList.add( LengthValidator.class );
-		builtinConstraints.put( Length.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( ModCheckValidator.class );
-		builtinConstraints.put( ModCheck.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( LuhnCheckValidator.class );
-		builtinConstraints.put( LuhnCheck.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( Mod10CheckValidator.class );
-		builtinConstraints.put( Mod10Check.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( Mod11CheckValidator.class );
-		builtinConstraints.put( Mod11Check.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( NotBlankValidator.class );
-		builtinConstraints.put( NotBlank.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( ParameterScriptAssertValidator.class );
-		builtinConstraints.put( ParameterScriptAssert.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( SafeHtmlValidator.class );
-		builtinConstraints.put( SafeHtml.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( ScriptAssertValidator.class );
-		builtinConstraints.put( ScriptAssert.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( URLValidator.class );
-		builtinConstraints.put( URL.class, constraintList );
+		this.builtinConstraints = Collections.unmodifiableMap( tmpConstraints );
 	}
 
-	private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getBuiltInConstraints(Class<A> annotationClass) {
-		//safe cause all CV for a given annotation A are CV<A, ?>
-		@SuppressWarnings("unchecked")
-		final List<Class<? extends ConstraintValidator<A, ?>>> builtInList = (List<Class<? extends ConstraintValidator<A, ?>>>) builtinConstraints
-				.get( annotationClass );
+	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<? extends Class<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType) {
+		validators.put( constraintType, Collections.singletonList( validatorType ) );
+	}
 
-		if ( builtInList == null || builtInList.size() == 0 ) {
-			throw log.getUnableToFindAnnotationConstraintsException( annotationClass );
-		}
+	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<? extends Class<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType1, Class<? extends ConstraintValidator<A, ?>> validatorType2) {
+		validators.put( constraintType, Collections.unmodifiableList( Arrays.<Class<?>>asList( validatorType1, validatorType2 ) ) );
+	}
 
-		return builtInList;
+	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<? extends Class<?>>> validators, Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorTypes) {
+		validators.put( constraintType, Collections.unmodifiableList( validatorTypes ) );
 	}
 
 	private boolean isBuiltinConstraint(Class<? extends Annotation> annotationType) {
@@ -591,17 +527,21 @@ public class ConstraintHelper {
 	 *         {@link Constraint#validatedBy()} or the list of validators for
 	 *         built-in constraints.
 	 */
+	@SuppressWarnings("unchecked")
 	private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getDefaultValidatorClasses(Class<A> annotationType) {
-		if ( isBuiltinConstraint( annotationType ) ) {
-			return getBuiltInConstraints( annotationType );
+		//safe cause all CV for a given annotation A are CV<A, ?>
+		final List<Class<? extends ConstraintValidator<A, ?>>> builtInValidators = (List<Class<? extends ConstraintValidator<A, ?>>>) builtinConstraints
+				.get( annotationType );
+
+		if ( builtInValidators != null ) {
+			return builtInValidators;
 		}
-		else {
-			@SuppressWarnings("unchecked")
-			Class<? extends ConstraintValidator<A, ?>>[] validatedBy = (Class<? extends ConstraintValidator<A, ?>>[]) annotationType
-					.getAnnotation( Constraint.class )
-					.validatedBy();
-			return Arrays.asList( validatedBy );
-		}
+
+		Class<? extends ConstraintValidator<A, ?>>[] validatedBy = (Class<? extends ConstraintValidator<A, ?>>[]) annotationType
+				.getAnnotation( Constraint.class )
+				.validatedBy();
+
+		return Arrays.asList( validatedBy );
 	}
 
 	private static boolean isClassPresent(String className) {
