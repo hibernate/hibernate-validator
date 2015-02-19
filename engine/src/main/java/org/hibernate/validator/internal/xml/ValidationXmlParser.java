@@ -47,7 +47,6 @@ public class ValidationXmlParser {
 			1
 	);
 
-	private final XmlParserHelper xmlParserHelper = new XmlParserHelper();
 	private final ClassLoader externalClassLoader;
 
 	static {
@@ -65,14 +64,19 @@ public class ValidationXmlParser {
 	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of {@code ConfigurationImpl.ValidationBootstrapParameters}.
 	 */
 	public final BootstrapConfiguration parseValidationXml() {
-		InputStream inputStream = getInputStream();
+		InputStream inputStream = getValidationXmlInputStream();
 		if ( inputStream == null ) {
 			return BootstrapConfigurationImpl.getDefaultBootstrapConfiguration();
 		}
 
 		try {
+			// HV-970 The parser helper is only loaded if there actually is a validation.xml file;
+			// this avoids accessing javax.xml.stream.* (which does not exist on Android) when not actually
+			// working with the XML configuration
+			XmlParserHelper xmlParserHelper = new XmlParserHelper();
+
 			String schemaVersion = xmlParserHelper.getSchemaVersion( VALIDATION_XML_FILE, inputStream );
-			Schema schema = getSchema( schemaVersion );
+			Schema schema = getSchema( xmlParserHelper, schemaVersion );
 			ValidationConfigType validationConfig = unmarshal( inputStream, schema );
 
 			return createBootstrapConfiguration( validationConfig );
@@ -82,7 +86,7 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private InputStream getInputStream() {
+	private InputStream getValidationXmlInputStream() {
 		log.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
 		InputStream inputStream = ResourceLoaderHelper.getResettableInputStreamForPath( VALIDATION_XML_FILE, externalClassLoader );
 
@@ -95,7 +99,7 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private Schema getSchema(String schemaVersion) {
+	private Schema getSchema(XmlParserHelper xmlParserHelper, String schemaVersion) {
 		String schemaResource = SCHEMAS_BY_VERSION.get( schemaVersion );
 
 		if ( schemaResource == null ) {
