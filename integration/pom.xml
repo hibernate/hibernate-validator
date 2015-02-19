@@ -40,6 +40,12 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator-test-utils</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.testng</groupId>
+                    <artifactId>testng</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
