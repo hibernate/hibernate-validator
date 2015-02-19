@@ -31,8 +31,8 @@ import static org.junit.Assert.assertTrue;
  * @author Hardy Ferentschik
  */
 @RunWith(Arquillian.class)
-public class ConstraintDefinitionContributorUnitIT {
-	private static final String WAR_FILE_NAME = ConstraintDefinitionContributorUnitIT.class.getSimpleName() + ".war";
+public class ConstraintDefinitionContributorIT {
+	private static final String WAR_FILE_NAME = ConstraintDefinitionContributorIT.class.getSimpleName() + ".war";
 
 	@Inject
 	private Validator validator;
