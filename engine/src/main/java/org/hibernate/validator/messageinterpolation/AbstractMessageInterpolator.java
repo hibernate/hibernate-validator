@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
-
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -15,7 +13,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.validation.MessageInterpolator;
 import javax.xml.bind.ValidationException;
 
@@ -30,6 +27,8 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 /**
  * Resource bundle backed message interpolator.
@@ -68,6 +67,11 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	public static final String USER_VALIDATION_MESSAGES = "ValidationMessages";
 
 	/**
+	 * Default name of the message bundle defined by a constraint definition contributor.
+	 */
+	public static final String CONTRIBUTOR_VALIDATION_MESSAGES = "ContributorValidationMessages";
+
+	/**
 	 * The default locale in the current JVM.
 	 */
 	private final Locale defaultLocale;
@@ -81,6 +85,11 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 * Loads built-in resource bundles.
 	 */
 	private final ResourceBundleLocator defaultResourceBundleLocator;
+
+	/**
+	 * Loads contributed resource bundles.
+	 */
+	private final ResourceBundleLocator contributorResourceBundleLocator;
 
 	/**
 	 * Step 1-3 of message interpolation can be cached. We do this in this map.
@@ -112,10 +121,17 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	}
 
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
-		this( userResourceBundleLocator, true );
+		this( userResourceBundleLocator, null );
 	}
 
-	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cacheMessages) {
+	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator) {
+		this( userResourceBundleLocator, contributorResourceBundleLocator, true );
+	}
+
+	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator,
+			boolean cacheMessages) {
 		defaultLocale = Locale.getDefault();
 
 		if ( userResourceBundleLocator == null ) {
@@ -125,9 +141,20 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 			this.userResourceBundleLocator = userResourceBundleLocator;
 		}
 
-		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES );
-		this.cachingEnabled = cacheMessages;
+		if ( contributorResourceBundleLocator == null ) {
+			this.contributorResourceBundleLocator = new PlatformResourceBundleLocator(
+					CONTRIBUTOR_VALIDATION_MESSAGES,
+					null,
+					true
+			);
+		}
+		else {
+			this.contributorResourceBundleLocator = contributorResourceBundleLocator;
+		}
 
+		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator( DEFAULT_VALIDATION_MESSAGES );
+
+		this.cachingEnabled = cacheMessages;
 		if ( cachingEnabled ) {
 			this.resolvedMessages = new ConcurrentReferenceHashMap<LocalizedMessage, String>(
 					DEFAULT_INITIAL_CAPACITY,
@@ -213,6 +240,10 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		if ( resolvedMessage == null ) {
 			ResourceBundle userResourceBundle = userResourceBundleLocator
 					.getResourceBundle( locale );
+
+			ResourceBundle constraintContributorResourceBundle = contributorResourceBundleLocator
+					.getResourceBundle( locale );
+
 			ResourceBundle defaultResourceBundle = defaultResourceBundleLocator
 					.getResourceBundle( locale );
 
@@ -224,6 +255,13 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 				userBundleResolvedMessage = interpolateBundleMessage(
 						resolvedMessage, userResourceBundle, locale, true
 				);
+
+				// search the constraint contributor bundle recursive (only if the user did not define a message)
+				if ( !hasReplacementTakenPlace( userBundleResolvedMessage, resolvedMessage ) ) {
+					userBundleResolvedMessage = interpolateBundleMessage(
+							resolvedMessage, constraintContributorResourceBundle, locale, true
+					);
+				}
 
 				// exit condition - we have at least tried to validate against the default bundle and there was no
 				// further replacements

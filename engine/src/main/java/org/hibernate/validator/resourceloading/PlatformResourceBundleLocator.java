@@ -6,20 +6,32 @@
  */
 package org.hibernate.validator.resourceloading;
 
+import java.io.IOException;
+import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.MissingResourceException;
+import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.jboss.logging.Logger;
 
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.GetResources;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 /**
- * A resource bundle locator, that loads resource bundles by simply
- * invoking <code>ResourceBundle.loadBundle(...)</code>.
+ * A resource bundle locator, that loads resource bundles by invoking {@code ResourceBundle.loadBundle(String, Local, ClassLoader)}.
+ *
+ * This locator is also able to load all property files of a given name (in case there are multiple with the same
+ * name on the classpath) and aggregates them into a {@code ResourceBundle}.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
@@ -29,6 +41,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 
 	private final String bundleName;
 	private final ClassLoader classLoader;
+	private final boolean aggregate;
 
 	public PlatformResourceBundleLocator(String bundleName) {
 		this( bundleName, null );
@@ -45,10 +58,26 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 * @since 5.2
 	 */
 	public PlatformResourceBundleLocator(String bundleName, ClassLoader classLoader) {
+		this( bundleName, classLoader, false );
+	}
+
+	/**
+	 * Creates a new {@link PlatformResourceBundleLocator}.
+	 *
+	 * @param bundleName the name of the bundle to load
+	 * @param classLoader the classloader to be used for loading the bundle. If {@code null}, the current thread context
+	 * classloader and finally Hibernate Validator's own classloader will be used for loading the specified
+	 * bundle.
+	 * @param aggregate Whether ot not all resource bundles of a given name should be loaded and potentially merged.
+	 *
+	 * @since 5.2
+	 */
+	public PlatformResourceBundleLocator(String bundleName, ClassLoader classLoader, boolean aggregate) {
 		Contracts.assertNotNull( bundleName, "bundleName" );
 
 		this.bundleName = bundleName;
 		this.classLoader = classLoader;
+		this.aggregate = aggregate;
 	}
 
 	/**
@@ -57,7 +86,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 *
 	 * @param locale The locale of the bundle to load.
 	 *
-	 * @return the resource bundle or <code>null</code> if none is found.
+	 * @return the resource bundle or {@code null} if none is found.
 	 */
 	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
@@ -71,7 +100,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		}
 
 		if ( rb == null ) {
-			ClassLoader classLoader = GetClassLoader.fromContext();
+			ClassLoader classLoader = run( GetClassLoader.fromContext() );
 			if ( classLoader != null ) {
 				rb = loadBundle(
 						classLoader, locale, bundleName
@@ -81,7 +110,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		}
 
 		if ( rb == null ) {
-			ClassLoader classLoader = GetClassLoader.fromClass( PlatformResourceBundleLocator.class );
+			ClassLoader classLoader = run( GetClassLoader.fromClass( PlatformResourceBundleLocator.class ) );
 			rb = loadBundle(
 					classLoader, locale, bundleName
 							+ " not found by validator classloader"
@@ -99,10 +128,21 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	private ResourceBundle loadBundle(ClassLoader classLoader, Locale locale, String message) {
 		ResourceBundle rb = null;
 		try {
-			rb = ResourceBundle.getBundle(
-					bundleName, locale,
-					classLoader
-			);
+			if ( aggregate ) {
+				rb = ResourceBundle.getBundle(
+						bundleName,
+						locale,
+						classLoader,
+						AggregateResourceBundle.CONTROL
+				);
+			}
+			else {
+				rb = ResourceBundle.getBundle(
+						bundleName,
+						locale,
+						classLoader
+				);
+			}
 		}
 		catch ( MissingResourceException e ) {
 			log.trace( message );
@@ -110,44 +150,75 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		return rb;
 	}
 
-	private static class GetClassLoader implements PrivilegedAction<ClassLoader> {
-		private final Class<?> clazz;
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
 
-		private static ClassLoader fromContext() {
-			final GetClassLoader action = new GetClassLoader( null );
-			if ( System.getSecurityManager() != null ) {
-				return AccessController.doPrivileged( action );
-			}
-			else {
-				return action.run();
-			}
-		}
+	/**
+	 * Inspired by <a href="http://stackoverflow.com/questions/4614465/is-it-possible-to-include-resource-bundle-files-within-a-resource-bundle">this</a>
+	 * Stack Overflow question.
+	 */
+	private static class AggregateResourceBundle extends ResourceBundle {
 
-		private static ClassLoader fromClass(Class<?> clazz) {
-			if ( clazz == null ) {
-				throw new IllegalArgumentException( "Class is null" );
-			}
-			final GetClassLoader action = new GetClassLoader( clazz );
-			if ( System.getSecurityManager() != null ) {
-				return AccessController.doPrivileged( action );
-			}
-			else {
-				return action.run();
-			}
-		}
+		protected static final Control CONTROL = new AggregateResourceBundleControl();
+		private Properties properties;
 
-		private GetClassLoader(Class<?> clazz) {
-			this.clazz = clazz;
+		protected AggregateResourceBundle(Properties properties) {
+			this.properties = properties;
 		}
 
 		@Override
-		public ClassLoader run() {
-			if ( clazz != null ) {
-				return clazz.getClassLoader();
+		protected Object handleGetObject(String key) {
+			return properties.get( key );
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public Enumeration<String> getKeys() {
+			Set<String> keySet = newHashSet();
+			keySet.addAll( properties.stringPropertyNames() );
+			if ( parent != null ) {
+				keySet.addAll( Collections.list( parent.getKeys() ) );
 			}
-			else {
-				return Thread.currentThread().getContextClassLoader();
+			return Collections.enumeration( keySet );
+		}
+	}
+
+	private static class AggregateResourceBundleControl extends ResourceBundle.Control {
+		@Override
+		public ResourceBundle newBundle(
+				String baseName,
+				Locale locale,
+				String format,
+				ClassLoader loader,
+				boolean reload)
+				throws IllegalAccessException, InstantiationException, IOException {
+			// only *.properties files can be aggregated. Other formats are delegated to the default implementation
+			if ( !"java.properties".equals( format ) ) {
+				return super.newBundle( baseName, locale, format, loader, reload );
 			}
+
+			String resourceName = toBundleName( baseName, locale ) + ".properties";
+			Properties properties = load( resourceName, loader );
+			return properties.size() == 0 ? null : new AggregateResourceBundle( properties );
+		}
+
+		private Properties load(String resourceName, ClassLoader loader) throws IOException {
+			Properties aggregatedProperties = new Properties();
+			Enumeration<URL> urls = run( GetResources.action( loader, resourceName ) );
+			while ( urls.hasMoreElements() ) {
+				URL url = urls.nextElement();
+				Properties properties = new Properties();
+				properties.load( url.openStream() );
+				aggregatedProperties.putAll( properties );
+			}
+			return aggregatedProperties;
 		}
 	}
 }
