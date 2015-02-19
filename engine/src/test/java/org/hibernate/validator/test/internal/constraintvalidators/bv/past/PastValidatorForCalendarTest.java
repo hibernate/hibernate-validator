@@ -8,11 +8,12 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
 import java.util.Calendar;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForCalendar;
 
 /**
@@ -33,8 +34,8 @@ public class PastValidatorForCalendarTest {
 		Calendar futureDate = getFutureDate();
 		Calendar pastDate = getPastDate();
 		assertTrue( constraint.isValid( null, null ) );
-		assertTrue( constraint.isValid( pastDate, null ) );
-		assertFalse( constraint.isValid( futureDate, null ) );
+		assertTrue( constraint.isValid( pastDate, getConstraintValidatorContext() ) );
+		assertFalse( constraint.isValid( futureDate, getConstraintValidatorContext() ) );
 	}
 
 	private Calendar getFutureDate() {

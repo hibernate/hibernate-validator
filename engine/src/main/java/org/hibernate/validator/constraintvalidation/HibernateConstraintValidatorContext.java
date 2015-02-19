@@ -8,14 +8,14 @@ package org.hibernate.validator.constraintvalidation;
 
 import javax.validation.ConstraintValidatorContext;
 
+import org.hibernate.validator.spi.time.TimeProvider;
+
 /**
  * A custom {@link ConstraintValidatorContext} which allows to set additional message parameters for
  * interpolation.
  *
  * @author Hardy Ferentschik
- * @hv.experimental Adding custom parameters to the context is considered experimental, especially the exact semantics
- * regarding to which generated constraint violation these parameters apply might change. At the moment they apply
- * to all violations.
+ * @author Gunnar Morling
  */
 public interface HibernateConstraintValidatorContext extends ConstraintValidatorContext {
 
@@ -51,6 +51,21 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * @return a reference to itself to allow method chaining
 	 *
 	 * @throws IllegalArgumentException in case the provided name is {@code null}
+	 * @hv.experimental Adding custom parameters to the context is considered experimental, especially the exact semantics
+	 * regarding to which generated constraint violation these parameters apply might change. At the moment they apply
+	 * to all violations.
 	 */
 	HibernateConstraintValidatorContext addExpressionVariable(String name, Object value);
+
+	/**
+	 * Returns the provider for obtaining the current time, e.g. when validating the {@code Future} and {@code Past}
+	 * constraints.
+	 *
+	 * @return the provider for obtaining the current time, never {@code null}. If no specific provider has been
+	 * configured during bootstrap, a default implementation using the current system time and the current
+	 * default time zone will be returned.
+	 *
+	 * @since 5.2
+	 */
+	TimeProvider getTimeProvider();
 }

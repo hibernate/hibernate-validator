@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderDefinedContext;
@@ -24,6 +25,7 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -38,14 +40,16 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	private final Map<String, Object> expressionVariables = newHashMap();
 	private final List<String> methodParameterNames;
+	private final TimeProvider timeProvider;
 	private final List<ConstraintViolationCreationContext> constraintViolationCreationContexts = newArrayList( 3 );
 	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
 
-	public ConstraintValidatorContextImpl(List<String> methodParameterNames, PathImpl propertyPath,
+	public ConstraintValidatorContextImpl(List<String> methodParameterNames, TimeProvider timeProvider, PathImpl propertyPath,
 			ConstraintDescriptor<?> constraintDescriptor) {
 		this.methodParameterNames = methodParameterNames;
+		this.timeProvider = timeProvider;
 		this.basePath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
@@ -83,6 +87,11 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		Contracts.assertNotNull( name, "null is not a valid value" );
 		this.expressionVariables.put( name, value );
 		return this;
+	}
+
+	@Override
+	public TimeProvider getTimeProvider() {
+		return timeProvider;
 	}
 
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {

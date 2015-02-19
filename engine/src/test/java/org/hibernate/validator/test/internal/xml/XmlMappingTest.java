@@ -11,6 +11,7 @@ import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
@@ -27,7 +28,9 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
@@ -40,6 +43,13 @@ import static org.testng.Assert.assertEquals;
  * @author Gunnar Morling
  */
 public class XmlMappingTest {
+
+	private static ValidationXmlTestHelper validationXmlTestHelper;
+
+	@BeforeClass
+	public static void setupValidationXmlTestHelper() {
+		validationXmlTestHelper = new ValidationXmlTestHelper( XmlMappingTest.class );
+	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-214")
@@ -182,7 +192,7 @@ public class XmlMappingTest {
 
 	@Test
 	public void testParameterNameProviderConfiguration() {
-		runWithCustomValidationXml(
+		validationXmlTestHelper.runWithCustomValidationXml(
 				"parameter-name-provider-validation.xml", new Runnable() {
 
 			@Override
@@ -211,7 +221,7 @@ public class XmlMappingTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-707")
 	public void shouldReturnDefaultExecutableTypesForValidationXmlWithoutTypesGiven() {
-		runWithCustomValidationXml(
+		validationXmlTestHelper.runWithCustomValidationXml(
 				"bv-1.0-validation.xml", new Runnable() {
 
 			@Override
@@ -248,7 +258,7 @@ public class XmlMappingTest {
 
 	@Test
 	public void testLoadingOfBv10ValidationXml() {
-		runWithCustomValidationXml(
+		validationXmlTestHelper.runWithCustomValidationXml(
 				"bv-1.0-validation.xml", new Runnable() {
 
 			@Override
@@ -273,7 +283,7 @@ public class XmlMappingTest {
 			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for META-INF/validation.xml: 2\\.0\\."
 	)
 	public void shouldFailToLoadValidationXmlWithUnsupportedVersion() {
-		runWithCustomValidationXml(
+		validationXmlTestHelper.runWithCustomValidationXml(
 				"unsupported-validation.xml", new Runnable() {
 
 			@Override
@@ -289,7 +299,7 @@ public class XmlMappingTest {
 			expectedExceptionsMessageRegExp = "HV000100: Unable to parse META-INF/validation.xml."
 	)
 	public void shouldFailToLoad10ValidationXmlWithParameterNameProvider() {
-		runWithCustomValidationXml(
+		validationXmlTestHelper.runWithCustomValidationXml(
 				"invalid-bv-1.0-validation.xml", new Runnable() {
 
 			@Override
@@ -315,35 +325,5 @@ public class XmlMappingTest {
 
 		assertEquals( violations.size(), 1 );
 		assertCorrectConstraintTypes( violations, NotNull.class );
-	}
-
-	/**
-	 * Executes the given runnable, using the specified file as replacement for
-	 * {@code META-INF/validation.xml}.
-	 *
-	 * @param validationXmlName The file to be used as validation.xml file.
-	 * @param runnable The runnable to execute.
-	 */
-	private void runWithCustomValidationXml(final String validationXmlName, Runnable runnable) {
-		ClassLoader previousContextCl = Thread.currentThread().getContextClassLoader();
-
-		try {
-			Thread.currentThread().setContextClassLoader(
-					new ClassLoader( previousContextCl ) {
-						@Override
-						public InputStream getResourceAsStream(String name) {
-							if ( name.equals( "META-INF/validation.xml" ) ) {
-								return XmlMappingTest.class.getResourceAsStream( validationXmlName );
-							}
-
-							return super.getResourceAsStream( name );
-						}
-					}
-			);
-			runnable.run();
-		}
-		finally {
-			Thread.currentThread().setContextClassLoader( previousContextCl );
-		}
 	}
 }

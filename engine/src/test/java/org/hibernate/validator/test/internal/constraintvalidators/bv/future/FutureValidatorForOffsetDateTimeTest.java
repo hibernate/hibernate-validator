@@ -11,9 +11,9 @@ import java.time.ZoneOffset;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForOffsetDateTime;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -40,8 +40,8 @@ public class FutureValidatorForOffsetDateTimeTest {
 			ZoneOffset offset = ZoneOffset.ofHours( i );
 			OffsetDateTime future = OffsetDateTime.now( offset ).plusHours( 1 );
 			OffsetDateTime past = OffsetDateTime.now( offset ).minusHours( 1 );
-			assertTrue( constraint.isValid( future, null ), "Future OffsetDateTime '" + future + "' fails validation.");
-			assertFalse( constraint.isValid( past, null ), "Past OffsetDateTime '" + past + "' validated as future.");
+			assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future OffsetDateTime '" + future + "' fails validation.");
+			assertFalse( constraint.isValid( past, getConstraintValidatorContext() ), "Past OffsetDateTime '" + past + "' validated as future.");
 		}
 	}
 }

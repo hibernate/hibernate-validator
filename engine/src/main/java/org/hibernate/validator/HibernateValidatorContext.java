@@ -9,9 +9,11 @@ package org.hibernate.validator;
 
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidatorContext;
 
+import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
@@ -21,6 +23,7 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  *
  * @author Emmanuel Bernard
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Gunnar Morling
  */
 public interface HibernateValidatorContext extends ValidatorContext {
 
@@ -32,6 +35,12 @@ public interface HibernateValidatorContext extends ValidatorContext {
 
 	@Override
 	HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory);
+
+	/**
+	 * @since 5.2
+	 */
+	@Override
+	HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider);
 
 	/**
 	 * En- or disables the fail fast mode. When fail fast is enabled the validation
@@ -56,4 +65,18 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 * @hv.experimental This API is considered experimental and may change in future revisions
 	 */
 	HibernateValidatorContext addValidationValueHandler(ValidatedValueUnwrapper<?> handler);
+
+	/**
+	 * Registers the given time provider with the bootstrapped validator. This provider will be used to obtain the
+	 * current time when validating {@code @Future} and {@code @Past} constraints. If not set or if {@code null} is
+	 * passed as a parameter, the time provider of the {@link javax.validation.ValidatorFactory} is used.
+	 *
+	 * @param timeProvider
+	 *            the time provider to register.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 5.2
+	 */
+	HibernateValidatorContext timeProvider(TimeProvider timeProvider);
 }

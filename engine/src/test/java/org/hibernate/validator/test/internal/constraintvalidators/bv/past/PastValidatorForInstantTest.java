@@ -10,9 +10,9 @@ import java.time.Instant;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForInstant;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -36,7 +36,7 @@ public class PastValidatorForInstantTest {
 		Instant past = Instant.now().minusSeconds( 3600 );
 
 		assertTrue( constraint.isValid( null, null ), "null fails validation." );
-		assertTrue( constraint.isValid( past, null ), "Past Instant '" + past + "' fails validation.");
-		assertFalse( constraint.isValid( future, null ), "Future Instant '" + future + "' validated as past.");
+		assertTrue( constraint.isValid( past, getConstraintValidatorContext() ), "Past Instant '" + past + "' fails validation.");
+		assertFalse( constraint.isValid( future, getConstraintValidatorContext() ), "Future Instant '" + future + "' validated as past.");
 	}
 }

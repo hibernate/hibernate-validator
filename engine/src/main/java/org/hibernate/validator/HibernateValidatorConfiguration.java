@@ -11,6 +11,7 @@ import javax.validation.Configuration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
@@ -38,8 +39,18 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	/**
 	 * Property corresponding to the {@link #addConstraintDefinitionContributor(org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor)}
 	 * method. Accepts a String with the comma-separated fully-qualified names of one or more {@link org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor} implementations.
+	 *
+	 * @since 5.2
 	 */
 	String CONSTRAINT_DEFINITION_CONTRIBUTORS = "hibernate.validator.constraint_definition_contributors";
+
+	/**
+	 * Property corresponding to the {@link #timeProvider(TimeProvider)} method. Accepts a String with the
+	 * fully-qualified class name of a {@link TimeProvider} implementation.
+	 *
+	 * @since 5.2
+	 */
+	String TIME_PROVIDER = "hibernate.validator.time_provider";
 
 	/**
 	 * <p>
@@ -118,6 +129,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 
 	/**
 	 * @return the default {@link org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor}. Never {@code null}.
+	 * @since 5.2
 	 */
 	ConstraintDefinitionContributor getDefaultConstraintDefinitionContributor();
 
@@ -129,6 +141,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @return {@code this} following the chaining method pattern
 	 *
 	 * @hv.experimental This API is considered experimental and may change in future revisions
+	 * @since 5.2
 	 */
 	HibernateValidatorConfiguration addConstraintDefinitionContributor(ConstraintDefinitionContributor contributor);
 
@@ -146,6 +159,20 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 *            The class loader for loading user-provided resources.
 	 *
 	 * @return {@code this} following the chaining method pattern
+	 * @since 5.2
 	 */
 	HibernateValidatorConfiguration externalClassLoader(ClassLoader externalClassLoader);
+
+	/**
+	 * Registers the given time provider with the bootstrapped validator factory. This provider will be used to obtain
+	 * the current time when validating {@code @Future} and {@code @Past} constraints. By default the current system
+	 * time and the current default time zone will be used when validating these constraints.
+	 *
+	 * @param timeProvider the time provider to register. Must not be {@code null}
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @since 5.2
+	 */
+	HibernateValidatorConfiguration timeProvider(TimeProvider timeProvider);
 }

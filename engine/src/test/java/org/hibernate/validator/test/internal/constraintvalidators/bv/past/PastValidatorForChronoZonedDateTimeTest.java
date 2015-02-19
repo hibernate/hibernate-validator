@@ -9,13 +9,12 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoZonedDateTime;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -40,10 +39,10 @@ public class PastValidatorForChronoZonedDateTimeTest {
 		// Test allowed zone offsets (UTC-18 to UTC+18) with 1 hour increments
 		for ( int i = -18; i <= 18; i++ ) {
 			ZoneId zone = ZoneId.ofOffset( "UTC", ZoneOffset.ofHours( i ) );
-			ChronoZonedDateTime future = ZonedDateTime.now( zone ).plusHours( 1 );
-			ChronoZonedDateTime past = ZonedDateTime.now( zone ).minusHours( 1 );
-			assertTrue( constraint.isValid( past, null ), "Past ZonedDateTime '" + past + "' fails validation.");
-			assertFalse( constraint.isValid( future, null ), "Future ZonedDateTime '" + future + "' validated as past.");
+			ZonedDateTime future = ZonedDateTime.now( zone ).plusHours( 1 );
+			ZonedDateTime past = ZonedDateTime.now( zone ).minusHours( 1 );
+			assertTrue( constraint.isValid( past, getConstraintValidatorContext() ), "Past ZonedDateTime '" + past + "' fails validation.");
+			assertFalse( constraint.isValid( future, getConstraintValidatorContext() ), "Future ZonedDateTime '" + future + "' validated as past.");
 		}
 	}
 }

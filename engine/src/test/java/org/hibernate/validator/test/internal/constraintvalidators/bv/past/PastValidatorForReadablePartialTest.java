@@ -6,13 +6,14 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
+
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Partial;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadablePartial;
 
 /**
@@ -33,8 +34,8 @@ public class PastValidatorForReadablePartialTest {
 		Partial past = new Partial( new LocalDate().minusYears( 1 ) );
 
 		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( past, null ) );
-		Assert.assertFalse( validator.isValid( future, null ) );
+		Assert.assertTrue( validator.isValid( past, getConstraintValidatorContext() ) );
+		Assert.assertFalse( validator.isValid( future, getConstraintValidatorContext() ) );
 	}
 
 	@Test
@@ -43,8 +44,8 @@ public class PastValidatorForReadablePartialTest {
 		LocalDate past = new LocalDate().minusYears( 1 );
 
 		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( past, null ) );
-		Assert.assertFalse( validator.isValid( future, null ) );
+		Assert.assertTrue( validator.isValid( past, getConstraintValidatorContext() ) );
+		Assert.assertFalse( validator.isValid( future, getConstraintValidatorContext() ) );
 	}
 
 	@Test
@@ -53,7 +54,7 @@ public class PastValidatorForReadablePartialTest {
 		LocalDateTime past = new LocalDateTime().minusYears( 1 );
 
 		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( past, null ) );
-		Assert.assertFalse( validator.isValid( future, null ) );
+		Assert.assertTrue( validator.isValid( past, getConstraintValidatorContext() ) );
+		Assert.assertFalse( validator.isValid( future, getConstraintValidatorContext() ) );
 	}
 }

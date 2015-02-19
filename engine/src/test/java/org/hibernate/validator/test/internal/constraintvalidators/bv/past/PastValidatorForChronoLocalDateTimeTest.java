@@ -7,13 +7,12 @@
 package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoLocalDateTime;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -33,11 +32,11 @@ public class PastValidatorForChronoLocalDateTimeTest {
 
 	@Test
 	public void testIsValid() {
-		ChronoLocalDateTime future = LocalDateTime.now().plusDays( 1 );
-		ChronoLocalDateTime past = LocalDateTime.now().minusDays( 1 );
+		LocalDateTime future = LocalDateTime.now().plusDays( 1 );
+		LocalDateTime past = LocalDateTime.now().minusDays( 1 );
 
 		assertTrue( constraint.isValid( null, null ), "null fails validation." );
-		assertTrue( constraint.isValid( past, null ), "Past LocalDateTime '" + past + "' fails validation.");
-		assertFalse( constraint.isValid( future, null ), "Future LocalDateTime '" + future + "' validated as past.");
+		assertTrue( constraint.isValid( past, getConstraintValidatorContext() ), "Past LocalDateTime '" + past + "' fails validation.");
+		assertFalse( constraint.isValid( future, getConstraintValidatorContext() ), "Future LocalDateTime '" + future + "' validated as past.");
 	}
 }
