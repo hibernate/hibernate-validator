@@ -61,6 +61,12 @@
             <groupId>org.hibernate.beanvalidation.tck</groupId>
             <artifactId>beanvalidation-tck-tests</artifactId>
             <version>${tck.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.test-audit</groupId>
+                    <artifactId>jboss-test-audit-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.testng</groupId>

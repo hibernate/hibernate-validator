@@ -236,7 +236,7 @@
             <dependency>
                 <groupId>org.jboss.arquillian.container</groupId>
                 <artifactId>arquillian-weld-se-embedded-1.1</artifactId>
-                <version>1.0.0.CR6</version>
+                <version>1.0.0.CR8</version>
             </dependency>
             <dependency>
                 <groupId>com.thoughtworks.paranamer</groupId>
