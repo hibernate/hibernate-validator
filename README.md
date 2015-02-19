@@ -30,7 +30,7 @@ the JBoss Logging API, an abstraction layer which supports several logging solut
 provided by the JDK) as implementation. Just add a supported logging library to the classpath (e.g. _log4j-&lt;version&gt;.jar_) and JBoss
 Logging will delegate any log requests to that provider.
 
-* Add the following to your Maven or Ivy dependency list (Hibernate Validator can be found in the [JBoss Maven repository](http://repository.jboss.org/nexus/content/groups/public-jboss)):
+* Add the following to your Maven or Ivy dependency list
 
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -76,7 +76,7 @@ the Apache Software License 2.0. Refer to license.txt for more information.
 You can build Hibernate Validator from source by cloning the git repository git://github.com/hibernate/hibernate-validator.git.
 You will also need a JDK 8 and Maven 3 (>= 3.0.3). With these prerequisites in place you can compile the source via
 
-    mvn clean install -s settings-example.xml
+    mvn clean install
 
 There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://hibernate.org/validator/contribute/).
 
