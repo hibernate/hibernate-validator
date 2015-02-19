@@ -28,11 +28,14 @@ part of the public this is not necessarily true for its sub-packages.
             see <<chapter-bootstrapping>>.
 |org.hibernate.validator.cfg,
             org.hibernate.validator.cfg.context,
-            org.hibernate.validator.cfg.defs|Hibernate Validator's fluent API for constraint
+            org.hibernate.validator.cfg.defs,
+            org.hibernate.validator.spi.cfg|Hibernate Validator's fluent API for constraint
             declaration; In org.hibernate.validator.cfg you
-            will find the ConstraintMapping interface
-            and in org.hibernate.validator.cfg.defs all
-            constraint definitions. Refer to <<section-programmatic-api>> for the details.
+            will find the ConstraintMapping interface,
+            in org.hibernate.validator.cfg.defs all
+            constraint definitions and in org.hibernate.validator.spi.cfg a
+            callback for using the API for configuring the default validator factory.
+            Refer to <<section-programmatic-api>> for the details.
 |org.hibernate.validator.constraints,
             org.hibernate.validator.constraints.br|Some useful custom constraints provided by Hibernate
             Validator in addition to the built-in constraints defined by the
@@ -309,6 +312,43 @@ constraintMapping
 		.defaultGroupSequenceProviderClass( RentalCarGroupSequenceProvider.class );
 ----
 ====
+
+[[section-programmatic-api-contributor]]
+=== Applying programmatic constraint declarations to the default validator factory
+
+If you are not bootstrapping a validator factory manually
+but work with the default factory as configured via _META-INF/validation.xml_
+(see <<chapter-xml-configuration>>),
+you can add one or more constraint mappings by creating a constraint mapping contributor.
+To do so, implement the +ConstraintMappingContributor+ contract:
+
+[[example-constraint-mapping-contributor]]
+.Custom +ConstraintMappingContributor+ implementation
+====
+[source, JAVA]
+----
+public static class MyConstraintMappingContributor implements ConstraintMappingContributor {
+
+	@Override
+	public void createConstraintMappings(ConstraintMappingBuilder builder) {
+		builder.addConstraintMapping()
+			.type( Marathon.class )
+				.property( "name", METHOD )
+					.constraint( new NotNullDef() )
+				.property( "numberOfHelpers", FIELD )
+					.constraint( new MinDef().value( 1 ) );
+
+		builder.addConstraintMapping()
+			.type( Runner.class )
+				.property( "paidEntryFee", FIELD )
+					.constraint( new AssertTrueDef() );
+	}
+}
+----
+====
+
+You then need to specify the fully-qualified class name of the contributor implementation in _META-INF/validation.xml_,
+using the property key +hibernate.validator.constraint_mapping_contributor+.
 
 [[section-boolean-constraint-composition]]
 === Boolean composition of constraints
