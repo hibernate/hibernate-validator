@@ -71,6 +71,7 @@
         <module>integration</module>
         <module>annotation-processor</module>
         <module>performance</module>
+        <module>osgi</module>
     </modules>
 
     <properties>
@@ -86,6 +87,9 @@
         <classmate.version>1.0.0</classmate.version>
         <wildfly.version>8.2.0.Final</wildfly.version>
         <arquillian.version>1.0.2.Final</arquillian.version>
+        <slf4j.version>1.7.2</slf4j.version>
+        <jboss.logging.version>3.2.1.Final</jboss.logging.version>
+        <javax.el.version>2.2.4</javax.el.version>
     </properties>
 
     <prerequisites>
@@ -122,7 +126,7 @@
             <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
-                <version>3.2.1.Final</version>
+                <version>${jboss.logging.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>
@@ -133,12 +137,12 @@
             <dependency>
                 <groupId>javax.el</groupId>
                 <artifactId>javax.el-api</artifactId>
-                <version>2.2.4</version>
+                <version>${javax.el.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish.web</groupId>
                 <artifactId>javax.el</artifactId>
-                <version>2.2.4</version>
+                <version>${javax.el.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml</groupId>
@@ -163,7 +167,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.2</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate.javax.persistence</groupId>
@@ -556,6 +560,16 @@
                     <version>1.4</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.servicemix.tooling</groupId>
+                    <artifactId>depends-maven-plugin</artifactId>
+                    <version>1.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>1.8</version>
+                </plugin>
+                <plugin>
                     <!-- Creates a report by running "mvn clirr:clirr" -->
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>clirr-maven-plugin</artifactId>
@@ -634,6 +648,19 @@
                                     </pluginExecutionFilter>
                                     <action>
                                         <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.servicemix.tooling</groupId>
+                                        <artifactId>depends-maven-plugin</artifactId>
+                                        <versionRange>[1.2,)</versionRange>
+                                        <goals>
+                                            <goal>generate-depends-file</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>

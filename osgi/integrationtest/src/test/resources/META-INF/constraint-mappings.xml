@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<constraint-mappings
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/mapping validation-mapping-1.0.xsd"
+    xmlns="http://jboss.org/xml/ns/javax/validation/mapping">
+
+    <default-package>com.example</default-package>
+
+    <bean class="Customer" ignore-annotations="true">
+        <field name="status">
+            <constraint annotation="javax.validation.constraints.Min">
+                <element name="value">2</element>
+            </constraint>
+        </field>
+    </bean>
+
+    <bean class="Order" ignore-annotations="true">
+        <field name="name">
+            <constraint annotation="com.example.constraint.ValidName"/>
+        </field>
+    </bean>
+
+    <constraint-definition annotation="com.example.constraint.ValidName">
+        <validated-by include-existing-validators="false">
+            <value>com.example.constraint.ValidNameValidator</value>
+        </validated-by>
+    </constraint-definition>
+</constraint-mappings>
