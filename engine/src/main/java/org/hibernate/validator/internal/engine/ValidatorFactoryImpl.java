@@ -25,6 +25,7 @@ import javax.validation.spi.ConfigurationState;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionBuilderImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
@@ -41,6 +42,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
+import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
@@ -150,14 +152,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		boolean tmpFailFast = false;
 		List<ValidatedValueUnwrapper<?>> tmpValidatedValueHandlers = newArrayList( 5 );
-		Set<DefaultConstraintMapping> tmpConstraintMappings = newHashSet();
 
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
-			if ( hibernateSpecificConfig.getProgrammaticMappings().size() > 0 ) {
-				tmpConstraintMappings.addAll( hibernateSpecificConfig.getProgrammaticMappings() );
-			}
 			// check whether fail fast is programmatically enabled
 			tmpFailFast = hibernateSpecificConfig.getFailFast();
 
@@ -165,7 +163,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			registerCustomConstraintValidators( hibernateSpecificConfig, properties, externalClassLoader, constraintHelper );
 		}
-		this.constraintMappings = Collections.unmodifiableSet( tmpConstraintMappings );
+
+		this.constraintMappings = Collections.unmodifiableSet( getConstraintMappings( configurationState, externalClassLoader ) );
 
 		tmpFailFast = checkPropertiesForFailFast(
 				properties, tmpFailFast
@@ -180,6 +179,35 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static ClassLoader getExternalClassLoader(ConfigurationState configurationState) {
 		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getExternalClassLoader() : null;
+	}
+
+	private static Set<DefaultConstraintMapping> getConstraintMappings(ConfigurationState configurationState, ClassLoader externalClassLoader) {
+		Set<DefaultConstraintMapping> constraintMappings;
+
+		// programmatic config
+		if ( configurationState instanceof ConfigurationImpl ) {
+			constraintMappings = ( (ConfigurationImpl) configurationState ).getProgrammaticMappings();
+		}
+		else {
+			constraintMappings = newHashSet();
+		}
+
+		// XML
+		String constraintMappingContributorClassName = configurationState.getProperties().get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTOR );
+
+		if ( constraintMappingContributorClassName != null ) {
+			@SuppressWarnings("unchecked")
+			Class<? extends ConstraintMappingContributor> contributorType = (Class<? extends ConstraintMappingContributor>) run( LoadClass
+					.action( constraintMappingContributorClassName, externalClassLoader ) );
+
+			ConstraintMappingContributor contributor = run( NewInstance.action( contributorType, "constraint mapping contributor class" ) );
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder();
+			contributor.createConstraintMappings( builder );
+
+			constraintMappings.addAll( builder.mappings );
+		}
+
+		return constraintMappings;
 	}
 
 	@Override
@@ -423,5 +451,20 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private static <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	/**
+	 * The one and only {@link ConstraintMappingContributor.ConstraintMappingBuilder} implementation.
+	 */
+	private static class DefaultConstraintMappingBuilder implements ConstraintMappingContributor.ConstraintMappingBuilder {
+
+		private final Set<DefaultConstraintMapping> mappings = newHashSet();
+
+		@Override
+		public ConstraintMapping addConstraintMapping() {
+			DefaultConstraintMapping mapping = new DefaultConstraintMapping();
+			mappings.add( mapping );
+			return mapping;
+		}
 	}
 }
