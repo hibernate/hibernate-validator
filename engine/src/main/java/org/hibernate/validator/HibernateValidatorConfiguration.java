@@ -42,6 +42,15 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	String CONSTRAINT_DEFINITION_CONTRIBUTORS = "hibernate.validator.constraint_definition_contributors";
 
 	/**
+	 * Property for configuring a constraint mapping contributor, allowing to set up one or more constraint mappings for
+	 * the default validator factory. Accepts a String with the fully-qualified class name of a
+	 * {@link org.hibernate.validator.spi.cfg.ConstraintMappingContributor} implementation.
+	 *
+	 * @since 5.2
+	 */
+	String CONSTRAINT_MAPPING_CONTRIBUTOR = "hibernate.validator.constraint_mapping_contributor";
+
+	/**
 	 * <p>
 	 * Returns the {@link ResourceBundleLocator} used by the
 	 * {@link Configuration#getDefaultMessageInterpolator() default message
