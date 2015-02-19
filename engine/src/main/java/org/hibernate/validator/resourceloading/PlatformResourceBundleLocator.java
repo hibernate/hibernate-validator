@@ -29,7 +29,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * A resource bundle locator, that loads resource bundles by invoking {@code ResourceBundle.loadBundle(String, Local, ClassLoader)}.
- *
+ * <p>
  * This locator is also able to load all property files of a given name (in case there are multiple with the same
  * name on the classpath) and aggregates them into a {@code ResourceBundle}.
  *
@@ -68,7 +68,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 * @param classLoader the classloader to be used for loading the bundle. If {@code null}, the current thread context
 	 * classloader and finally Hibernate Validator's own classloader will be used for loading the specified
 	 * bundle.
-	 * @param aggregate Whether ot not all resource bundles of a given name should be loaded and potentially merged.
+	 * @param aggregate Whether or not all resource bundles of a given name should be loaded and potentially merged.
 	 *
 	 * @since 5.2
 	 */
@@ -167,7 +167,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	private static class AggregateResourceBundle extends ResourceBundle {
 
 		protected static final Control CONTROL = new AggregateResourceBundleControl();
-		private Properties properties;
+		private final Properties properties;
 
 		protected AggregateResourceBundle(Properties properties) {
 			this.properties = properties;
@@ -179,7 +179,6 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
 		public Enumeration<String> getKeys() {
 			Set<String> keySet = newHashSet();
 			keySet.addAll( properties.stringPropertyNames() );

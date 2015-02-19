@@ -708,8 +708,12 @@ org.mycompany.CheckCaseValidator
 ----
 ====
 
-To contribute default messages for your custom constraints, place a ContributorValidationMessages.properties_
-and/or its locale-specific specializations at the root your jar.
+To contribute default messages for your custom constraints, place a file _ContributorValidationMessages.properties_
+and/or its locale-specific specializations at the root your JAR. Hibernate Validator will consider the
+entries from all the bundles with this name found on the classpath in addition to those given in _ValidationMessages.properties_.
+
+This mechanism is also helpful when creating large multi-module applications: Instead of putting all the constraint
+messages into one single bundle, you can have one resource bundle per module containing only those messages of that module.
 
 [[section-constraint-definition-contributor]]
 ==== Constraint definitions via +ConstraintDefinitionContributor+

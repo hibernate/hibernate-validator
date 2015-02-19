@@ -68,6 +68,8 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 
 	/**
 	 * Default name of the message bundle defined by a constraint definition contributor.
+	 *
+	 * @since 5.2
 	 */
 	public static final String CONTRIBUTOR_VALIDATION_MESSAGES = "ContributorValidationMessages";
 
@@ -124,11 +126,17 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		this( userResourceBundleLocator, null );
 	}
 
+	/**
+	 * @since 5.2
+	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator) {
 		this( userResourceBundleLocator, contributorResourceBundleLocator, true );
 	}
 
+	/**
+	 * @since 5.2
+	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator,
 			boolean cacheMessages) {
