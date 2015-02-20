@@ -86,6 +86,5 @@ There are more build options available as well. For more information refer to [C
 * [Bean Validation Home](http://beanvalidation.org)
 * [Downloads](http://hibernate.org/validator/downloads/)
 * [Mailing Lists](http://hibernate.org/community/)
-* [Source Code](git://github.com/hibernate/hibernate-validator.git)
 * [Issue Tracking](https://hibernate.atlassian.net/browse/HV)
 * [Continuous Integration](https://hibernate-validator.ci.cloudbees.com/) [![Build Status](https://hibernate-validator.ci.cloudbees.com/buildStatus/icon?job=HV-5-MASTER)](https://hibernate-validator.ci.cloudbees.com/view/Hibernate%20Validator%205/job/HV-5-MASTER/)
