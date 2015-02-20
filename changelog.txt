@@ -1,6 +1,48 @@
 Hibernate Validator Changelog
 =============================
 
+5.2.0.Beta1 (20.02.2015)
+-------------------------
+
+** Bug
+    * [HV-861] - AIOOBE in ReflectionHelper#parametersResolveToSameTypes
+    * [HV-887] - Validator ParanamerParameterNameProvider with inheritance
+    * [HV-890] - Take visibility into account for method override check
+    * [HV-933] - @CPF and @CPNJ only works with input containing puctuation characters like 134.241.313-00
+    * [HV-943] - Reference guide incorrect regarding DefaultTraversableResolver
+    * [HV-948] - Incorrect JPA 2 detection
+    * [HV-950] - Wrong warning log in TypeAnnotationAwareMetaDataProvider.getTypeParameter
+    * [HV-957] - WhiteListType.RELAXED allows <div>, <span>
+    * [HV-959] - CPF validation
+    * [HV-965] - The module description list on the contribute page needs updating
+    * [HV-969] - No tests are executed for the CDI module
+
+** Improvement
+    * [HV-913] - Provide a way to run the test suite using a security manager
+    * [HV-914] - Document permissions required to run Hibernate Validator with a security manager
+    * [HV-944] - French translation of @Min and @Max messages is incorrect
+    * [HV-946] - French translation of @DecimalMin and @DecimalMax messages is incorrect (with inclusive parameter)
+    * [HV-951] - Make expression variables accessible from ConstraintViolation
+    * [HV-953] - Create possiblity to contribute resource bundles as part of a ConstraintDefinitionContributor
+    * [HV-964] - Create a dedicated module for the testutils code
+    * [HV-968] - Performance improvements for ConstraintHelper
+    * [HV-970] - Avoid accessing package javax.xml.stream.* when not working with XML descriptors
+    * [HV-971] - Remove requirement to use JBoss's Maven repositories
+
+** New Feature
+    * [HV-582] - Introduce a class loading service
+    * [HV-955] - Using the fluent API in a JavaEE environment
+
+** Task
+    * [HV-896] - Add "ParenPad" CheckStyle rule
+    * [HV-915] - Make it possible to import the project in Eclipse
+    * [HV-942] - Upgrade Wildfly version for tck/integration tests to 8.2.0.Final
+    * [HV-960] - Create Karaf-based integration test for running HV in OSGi
+    * [HV-963] - Upgrade to the latest JBoss Logging version
+    * [HV-967] - Updating old and broken links in documentation, README.md and CONTRIBUTING.md
+    * [HV-972] - Avoid dependency on ASM4 (upgrade groovy-jsr223)
+
+
 5.2.0.Alpha1 (22.10.2014)
 -------------------------
 
