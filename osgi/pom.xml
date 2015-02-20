@@ -18,7 +18,7 @@
     <artifactId>hibernate-validator-osgi</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Validator OSGi modules</name>
+    <name>Hibernate Validator OSGi Modules</name>
     <description>Hibernate Validator OSGi modules aggregator</description>
 
     <modules>
