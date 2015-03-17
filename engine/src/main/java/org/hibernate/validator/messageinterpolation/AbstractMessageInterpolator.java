@@ -127,6 +127,10 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	}
 
 	/**
+	 * {@code MessageInterpolator} taking two resource bundle locators.
+	 *
+	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
+	 * @param contributorResourceBundleLocator {@code ResourceBundleLocator} used to load resource bundle of constraint contributor
 	 * @since 5.2
 	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
@@ -135,6 +139,11 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	}
 
 	/**
+	 * {@code MessageInterpolator} taking two resource bundle locators.
+	 *
+	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
+	 * @param contributorResourceBundleLocator {@code ResourceBundleLocator} used to load resource bundle of constraint contributor
+	 * @param cacheMessages Whether resolved messages should be cached or not.
 	 * @since 5.2
 	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
