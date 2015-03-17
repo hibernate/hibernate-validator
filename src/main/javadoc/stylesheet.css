@@ -530,3 +530,15 @@ a:link, td.colFirst strong a:active, td.colFirst strong a:visited, td.colFirst s
 td.colLast strong a:active, td.colLast strong a:visited, td.colLast strong a:hover {
     font-weight: bold;
 }
+
+/*Method Summary style fix (HV-892)*/
+.contentContainer ul.blockList li.blockList .memberSummary caption span{
+    padding:0;
+    height: 25px;
+}
+
+.memberSummary caption span:first-child:nth-last-child(2),
+.memberSummary caption span:first-child:nth-last-child(2) ~ span {
+    padding: 6px 0 0 9px !important;
+    height: 18px !important;
+}

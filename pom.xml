@@ -133,6 +133,11 @@
                 <artifactId>jboss-logging-processor</artifactId>
                 <version>1.2.0.Final</version>
             </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging-annotations</artifactId>
+                <version>1.2.0.Final</version>
+            </dependency>
             <!-- Not going to upgrade to org.glassfish:javax.el:3.0.0 for now, since it is only Java 7 compatible -->
             <dependency>
                 <groupId>javax.el</groupId>
