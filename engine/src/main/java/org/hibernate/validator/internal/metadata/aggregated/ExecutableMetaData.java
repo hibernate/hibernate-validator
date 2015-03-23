@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
@@ -276,7 +277,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 */
 		private final ConstrainedElement.ConstrainedElementKind kind;
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
-		private final ExecutableElement executable;
+		private ExecutableElement executable;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 		private boolean isConstrained = false;
@@ -335,6 +336,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			typeArgumentsConstraints.addAll( constrainedExecutable.getTypeArgumentsConstraints() );
 
 			addToExecutablesByDeclaringType( constrainedExecutable );
+
+			// keep the "lowest" executable in hierarchy to make sure any type parameters declared on super-types (and
+			// used in overridden methods) are resolved for the specific sub-type we are interested in
+			if ( executable != null && executableHelper.overrides( constrainedExecutable.getExecutable(), executable ) ) {
+				executable = constrainedExecutable.getExecutable();
+			}
 		}
 
 		/**
