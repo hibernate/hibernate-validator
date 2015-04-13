@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -339,6 +340,25 @@ public final class ReflectionHelper {
 		if ( type instanceof WildcardType ) {
 			Type[] upperBounds = ( (WildcardType) type ).getUpperBounds();
 			return upperBounds.length != 0 && isList( upperBounds[0] );
+		}
+		return false;
+	}
+
+	/**
+	* @param type the type to check
+	* 
+	* @return Returns <code>true</code> if <code>type</code> is implementing <code>Set</code>, <code>false</code> otherwise.
+	*/
+	public static boolean isSet(Type type) {
+		if ( type instanceof Class && Set.class.isAssignableFrom( (Class<?>) type ) ) {
+			return true;
+		}
+		if ( type instanceof ParameterizedType ) {
+			return isSet( ( (ParameterizedType) type ).getRawType() );
+		}
+		if ( type instanceof WildcardType ) {
+			Type[] upperBounds = ( (WildcardType) type ).getUpperBounds();
+			return upperBounds.length != 0 && isSet( upperBounds[0] );
 		}
 		return false;
 	}
