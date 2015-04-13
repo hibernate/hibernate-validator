@@ -64,7 +64,7 @@ public class ClassValidatorWithTypeVariableTest {
 
 		Set<ConstraintViolation<Batch>> violations = validator.validate( batch );
 		assertNumberOfViolations( violations, 1 );
-		assertCorrectPropertyPaths( violations, "offers[].item" );
+		assertCorrectPropertyPaths( violations, "offers[" + offer.toString() + "].item" );
 		assertCorrectConstraintTypes( violations, NotNull.class );
 	}
 
@@ -78,7 +78,7 @@ public class ClassValidatorWithTypeVariableTest {
 
 		Set<ConstraintViolation<Batch>> violations = validator.validate( batch );
 		assertNumberOfViolations( violations, 1 );
-		assertCorrectPropertyPaths( violations, "offers[].item.date" );
+		assertCorrectPropertyPaths( violations, "offers[" + offer.toString() + "].item.date" );
 		assertCorrectConstraintTypes( violations, NotNull.class );
 	}
 

@@ -138,12 +138,13 @@ public class ConstraintValidatorContextTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-709")
 	public void testAddingNodesInClassLevelConstraintKeepsInIterableKeyAndIndex() {
-		Set<ConstraintViolation<FooContainer>> constraintViolations = validator.validate( new FooContainer() );
+		FooContainer fooContainer = new FooContainer();
+		Set<ConstraintViolation<FooContainer>> constraintViolations = validator.validate( fooContainer );
 
 		assertThat( constraintViolations ).containsPaths(
 				pathWith().property( "fooList" ).property( "myNode1", true, null, 1 ),
 				pathWith().property( "fooArray" ).property( "myNode1", true, null, 1 ),
-				pathWith().property( "fooSet" ).property( "myNode1", true, null, null ),
+				pathWith().property( "fooSet" ).property( "myNode1", true, fooContainer.fooSetElement, null ),
 				pathWith().property( "fooMap" ).property( "myNode1", true, "MapKey", null )
 		);
 	}
@@ -218,6 +219,8 @@ public class ConstraintValidatorContextTest {
 	}
 
 	private static class FooContainer {
+		private final Foo fooSetElement = new Foo();
+
 		@Valid
 		private final List<Foo> fooList = Arrays.asList( null, new Foo() );
 
@@ -225,7 +228,7 @@ public class ConstraintValidatorContextTest {
 		private final Foo[] fooArray = new Foo[] { null, new Foo() };
 
 		@Valid
-		private final Set<Foo> fooSet = asSet( null, new Foo() );
+		private final Set<Foo> fooSet = asSet( null, fooSetElement );
 
 		@Valid
 		private final Map<String, Foo> fooMap;

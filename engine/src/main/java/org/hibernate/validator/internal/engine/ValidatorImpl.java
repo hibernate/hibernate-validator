@@ -602,6 +602,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							validationContext,
 							valueIter,
 							false,
+							false,
 							valueContext,
 							validationOrder
 					);
@@ -613,11 +614,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					Type type = value.getClass();
 					Iterator<?> elementsIter = createIteratorForCascadedValue( type, value, valueContext );
 					boolean isIndexable = isIndexable( type );
+					boolean isSetIterator = ReflectionHelper.isSet( type );
 
 					validateCascadedConstraint(
 							validationContext,
 							elementsIter,
 							isIndexable,
+							isSetIterator,
 							valueContext,
 							validationOrder
 					);
@@ -684,7 +687,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return isIndexable;
 	}
 
-	private void validateCascadedConstraint(ValidationContext<?> context, Iterator<?> iter, boolean isIndexable, ValueContext<?, ?> valueContext, ValidationOrder validationOrder) {
+	private void validateCascadedConstraint(ValidationContext<?> context, Iterator<?> iter, boolean isIndexable, boolean isSetIterator, ValueContext<?, ?> valueContext, ValidationOrder validationOrder) {
 		Object value;
 		Object mapKey;
 		int i = 0;
@@ -694,6 +697,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				mapKey = ( (Map.Entry<?, ?>) value ).getKey();
 				valueContext.setKey( mapKey );
 				value = ( (Map.Entry<?, ?>) value ).getValue();
+			}
+			else if ( isSetIterator ) {
+				valueContext.setKey( value );
 			}
 			else if ( isIndexable ) {
 				valueContext.setIndex( i );
