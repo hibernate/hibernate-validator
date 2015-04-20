@@ -8,10 +8,8 @@ package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import javax.validation.constraints.AssertTrue;
 
 /**
  * @author Hardy Ferentschik
@@ -38,4 +36,3 @@ public class Project {
 		return this.getStart().orElse( LocalDate.MAX ).isBefore( this.getEnd().orElse( LocalDate.MIN ) );
 	}
 }
-
