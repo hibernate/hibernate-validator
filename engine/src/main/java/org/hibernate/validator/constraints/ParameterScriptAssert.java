@@ -37,7 +37,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * comes with the JDK:
  * </p>
  * <pre>
- * {@code @ParametersScriptAssert(script = "arg0.before(arg1)", lang = "javascript")
+ * {@code @ParameterScriptAssert(script = "arg0.before(arg1)", lang = "javascript")
  * public void createEvent(Date start, Date end) { ... }
  * }
  * </pre>
