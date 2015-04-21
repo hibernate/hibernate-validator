@@ -6,33 +6,29 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
-
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Past;
 
-import org.hibernate.validator.spi.time.TimeProvider;
-import org.hibernate.validator.testutil.TestForIssue;
 import org.joda.time.DateTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import org.hibernate.validator.spi.time.TimeProvider;
+import org.hibernate.validator.testutil.TestForIssue;
+
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 
 /**
  * Test for using the {@code TimeProvider} contract in {@code @Past} validators.
@@ -72,22 +68,6 @@ public class TimeProviderPastTest {
 		order.orderDateAsCalendar.set( 1901, 1, 15 );
 
 		assertCorrectPropertyPaths( validator.validate( order ), "orderDateAsCalendar" );
-	}
-
-	@Test
-	public void timeServiceIsUsedForPastOnLocalDate() {
-		Order order = new Order();
-		order.orderDateAsLocalDate = LocalDate.of( 1901, 2, 15 );
-
-		assertCorrectPropertyPaths( validator.validate( order ), "orderDateAsLocalDate" );
-	}
-
-	@Test
-	public void timeServiceIsUsedForPastOnLocalDateTime() {
-		Order order = new Order();
-		order.orderDateAsLocalDateTime = LocalDateTime.of( 1901, 2, 15, 4, 0, 0 );
-
-		assertCorrectPropertyPaths( validator.validate( order ), "orderDateAsLocalDateTime" );
 	}
 
 	@Test
@@ -144,32 +124,10 @@ public class TimeProviderPastTest {
 		assertCorrectPropertyPaths( validator.validate( order ), "orderDateAsReadablePartial" );
 	}
 
-	@Test
-	public void timeServiceIsUsedForPastOnYear() {
-		Order order = new Order();
-		order.orderDateAsYear = Year.of( 1901 );
-
-		assertCorrectPropertyPaths( validator.validate( order ), "orderDateAsYear" );
-	}
-
-	@Test
-	public void timeServiceIsUsedForPastOnYearMonth() {
-		Order order = new Order();
-		order.orderDateAsYearMonth = YearMonth.of( 1901, 2 );
-
-		assertCorrectPropertyPaths( validator.validate( order ), "orderDateAsYearMonth" );
-	}
-
 	private static class Order {
 
 		@Past
 		private Calendar orderDateAsCalendar;
-
-		@Past
-		private LocalDate orderDateAsLocalDate;
-
-		@Past
-		private LocalDateTime orderDateAsLocalDateTime;
 
 		@Past
 		private ZonedDateTime orderDateAsZonedDateTime;
@@ -188,12 +146,6 @@ public class TimeProviderPastTest {
 
 		@Past
 		private ReadablePartial orderDateAsReadablePartial;
-
-		@Past
-		private Year orderDateAsYear;
-
-		@Past
-		private YearMonth orderDateAsYearMonth;
 	}
 
 	private static class FixedDateTimeProvider implements TimeProvider {
