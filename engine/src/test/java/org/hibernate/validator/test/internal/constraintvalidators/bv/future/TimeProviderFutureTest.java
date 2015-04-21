@@ -249,20 +249,20 @@ public class TimeProviderFutureTest {
 
 	public static class FixedDateTimeProvider implements TimeProvider {
 
-		private final GregorianCalendar now;
+		private final long fixedTime;
 
 		// Used in XML configuration test
 		public FixedDateTimeProvider() {
-			now = GregorianCalendar.from( ZonedDateTime.of( 2100, 2, 15, 4, 0, 0, 0, TZ_BERLIN ) );
+			fixedTime = GregorianCalendar.from( ZonedDateTime.of( 2100, 2, 15, 4, 0, 0, 0, TZ_BERLIN ) ).getTimeInMillis();
 		}
 
 		private FixedDateTimeProvider(ZonedDateTime date) {
-			this.now = GregorianCalendar.from( date );
+			this.fixedTime = GregorianCalendar.from( date ).getTimeInMillis();
 		}
 
 		@Override
-		public Calendar getCurrentTime() {
-			return now;
+		public long getCurrentTime() {
+			return fixedTime;
 		}
 	}
 }

@@ -12,6 +12,7 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Check that the <code>java.util.Date</code> passed to be validated is in the
@@ -32,11 +33,10 @@ public class FutureValidatorForDate implements ConstraintValidator<Future, Date>
 			return true;
 		}
 
-		Date now = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime()
-				.getTime();
+		TimeProvider timeProvider = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+		long now = timeProvider.getCurrentTime();
 
-		return date.after( now );
+		return date.getTime() > now;
 	}
 }

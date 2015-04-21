@@ -12,6 +12,7 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Check that the <code>java.util.Calendar</code> passed to be validated is in
@@ -26,16 +27,16 @@ public class FutureValidatorForCalendar implements ConstraintValidator<Future, C
 	}
 
 	@Override
-	public boolean isValid(Calendar cal, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(Calendar cal, ConstraintValidatorContext context) {
 		//null values are valid
 		if ( cal == null ) {
 			return true;
 		}
 
-		Calendar now = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime();
+		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+		long now = timeProvider.getCurrentTime();
 
-		return cal.after( now );
+		return cal.getTimeInMillis() > now;
 	}
 }

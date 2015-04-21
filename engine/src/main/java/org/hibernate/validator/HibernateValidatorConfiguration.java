@@ -182,6 +182,7 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 *
+	 * @hv.experimental This API is considered experimental and may change in future revisions
 	 * @since 5.2
 	 */
 	HibernateValidatorConfiguration timeProvider(TimeProvider timeProvider);

@@ -7,13 +7,13 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
 import java.time.OffsetDateTime;
-import java.util.Calendar;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Check that the {@code java.time.OffsetDateTime} passed is in the future.
@@ -35,10 +35,10 @@ public class FutureValidatorForOffsetDateTime implements ConstraintValidator<Fut
 			return true;
 		}
 
-		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime();
+		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+		long now = timeProvider.getCurrentTime();
 
-		return value.isAfter( OffsetDateTime.ofInstant( now.toInstant(), now.getTimeZone().toZoneId() ) );
+		return value.toInstant().toEpochMilli() > now;
 	}
 }

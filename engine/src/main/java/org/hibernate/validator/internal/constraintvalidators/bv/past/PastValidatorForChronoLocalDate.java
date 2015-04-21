@@ -10,13 +10,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.util.Calendar;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Check that the {@code java.time.chrono.ChronoLocalDate} passed is in the past.
@@ -38,9 +38,11 @@ public class PastValidatorForChronoLocalDate implements ConstraintValidator<Past
 			return true;
 		}
 
-		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime();
+		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+
+		Calendar now = Calendar.getInstance();
+		now.setTimeInMillis( timeProvider.getCurrentTime() );
 
 		LocalDate today = LocalDateTime.ofInstant( now.toInstant(), now.getTimeZone().toZoneId() ).toLocalDate();
 

@@ -198,15 +198,15 @@ public class TimeProviderPastTest {
 
 	private static class FixedDateTimeProvider implements TimeProvider {
 
-		private final GregorianCalendar now;
+		private final long fixedTime;
 
 		private FixedDateTimeProvider(ZonedDateTime date) {
-			this.now = GregorianCalendar.from( date );
+			this.fixedTime = GregorianCalendar.from( date ).getTimeInMillis();
 		}
 
 		@Override
-		public Calendar getCurrentTime() {
-			return now;
+		public long getCurrentTime() {
+			return fixedTime;
 		}
 	}
 }

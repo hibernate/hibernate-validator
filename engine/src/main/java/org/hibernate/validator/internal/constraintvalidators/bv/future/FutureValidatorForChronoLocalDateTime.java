@@ -15,6 +15,7 @@ import javax.validation.constraints.Future;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Check that the {@code java.time.chrono.ChronoLocalDateTime} passed is in the future.
@@ -36,9 +37,11 @@ public class FutureValidatorForChronoLocalDateTime implements ConstraintValidato
 			return true;
 		}
 
-		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime();
+		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+
+		Calendar now = Calendar.getInstance();
+		now.setTimeInMillis( timeProvider.getCurrentTime() );
 
 		return value.isAfter( LocalDateTime.ofInstant( now.toInstant(), now.getTimeZone().toZoneId() ) );
 	}

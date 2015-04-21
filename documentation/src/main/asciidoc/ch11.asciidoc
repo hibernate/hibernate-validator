@@ -470,9 +470,7 @@ public class MyFutureValidator implements ConstraintValidator<Future, Date> {
 				HibernateConstraintValidatorContext.class
 		);
 
-		Date now = hibernateContext.getTimeProvider()
-				.getCurrentTime()
-				.getTime();
+		Date now = new Date( hibernateContext.getTimeProvider().getCurrentTime() );
 
 		if ( !value.after( now ) ) {
 			hibernateContext.disableDefaultConstraintViolation();
@@ -909,9 +907,9 @@ To address such scenarios, Hibernate Validator provides a custom contract for ob
 public class CustomTimeProvider implements TimeProvider {
 
 	@Override
-	public Calendar getCurrentTime() {
+	public long getCurrentTime() {
 		Calendar now = ...;
-		return now;
+		return now.getTimeInMillis();
 	}
 }
 ----

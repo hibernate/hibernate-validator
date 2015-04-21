@@ -6,21 +6,18 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
-import java.util.Calendar;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
-import org.joda.time.DateTime;
 import org.joda.time.ReadableInstant;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+import org.hibernate.validator.spi.time.TimeProvider;
+
 /**
- * Check if Joda Time type who implements
- * {@code org.joda.time.ReadableInstant}
- * is in the past.
+ * Check if Joda Time type who implements {@code org.joda.time.ReadableInstant} is in the past.
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
@@ -38,10 +35,10 @@ public class PastValidatorForReadableInstant implements ConstraintValidator<Past
 			return true;
 		}
 
-		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime();
+		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+		long now = timeProvider.getCurrentTime();
 
-		return value.isBefore( new DateTime( now ) );
+		return value.getMillis() < now;
 	}
 }

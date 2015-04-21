@@ -7,14 +7,13 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
 import java.time.OffsetDateTime;
-import java.util.Calendar;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Check that the {@code java.time.OffsetDateTime} passed is in the past.
@@ -36,10 +35,10 @@ public class PastValidatorForOffsetDateTime implements ConstraintValidator<Past,
 			return true;
 		}
 
-		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime();
+		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+		long now = timeProvider.getCurrentTime();
 
-		return value.isBefore( OffsetDateTime.ofInstant( now.toInstant(), now.getTimeZone().toZoneId() ) );
+		return value.toInstant().toEpochMilli() < now;
 	}
 }

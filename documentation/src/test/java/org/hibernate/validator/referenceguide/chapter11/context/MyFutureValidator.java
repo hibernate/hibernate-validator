@@ -24,9 +24,7 @@ public class MyFutureValidator implements ConstraintValidator<Future, Date> {
 				HibernateConstraintValidatorContext.class
 		);
 
-		Date now = hibernateContext.getTimeProvider()
-				.getCurrentTime()
-				.getTime();
+		Date now = new Date( hibernateContext.getTimeProvider().getCurrentTime() );
 
 		if ( !value.after( now ) ) {
 			hibernateContext.disableDefaultConstraintViolation();
