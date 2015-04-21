@@ -62,16 +62,12 @@ import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorF
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForCalendar;
-import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForChronoLocalDate;
-import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForChronoLocalDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForChronoZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForOffsetDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadablePartial;
-import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForYear;
-import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForCharSequence;
@@ -86,16 +82,12 @@ import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator
 import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForCalendar;
-import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoLocalDate;
-import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoLocalDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForOffsetDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadablePartial;
-import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForYear;
-import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
@@ -169,12 +161,8 @@ public class ConstraintHelper {
 		}
 		if ( Version.getJavaRelease() >= 8 ) {
 			// Java 8 date/time API validators
-			futureValidators.add( FutureValidatorForChronoLocalDate.class );
-			futureValidators.add( FutureValidatorForChronoLocalDateTime.class );
 			futureValidators.add( FutureValidatorForChronoZonedDateTime.class );
 			futureValidators.add( FutureValidatorForInstant.class );
-			futureValidators.add( FutureValidatorForYear.class );
-			futureValidators.add( FutureValidatorForYearMonth.class );
 			futureValidators.add( FutureValidatorForOffsetDateTime.class );
 		}
 		putConstraints( tmpConstraints, Future.class, futureValidators );
@@ -193,12 +181,8 @@ public class ConstraintHelper {
 		}
 		if ( Version.getJavaRelease() >= 8 ) {
 			// Java 8 date/time API validators
-			pastValidators.add( PastValidatorForChronoLocalDate.class );
-			pastValidators.add( PastValidatorForChronoLocalDateTime.class );
 			pastValidators.add( PastValidatorForChronoZonedDateTime.class );
 			pastValidators.add( PastValidatorForInstant.class );
-			pastValidators.add( PastValidatorForYear.class );
-			pastValidators.add( PastValidatorForYearMonth.class );
 			pastValidators.add( PastValidatorForOffsetDateTime.class );
 		}
 		putConstraints( tmpConstraints, Past.class, pastValidators );

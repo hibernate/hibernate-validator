@@ -6,37 +6,33 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.future;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
-
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Future;
 
-import org.hibernate.validator.HibernateValidatorFactory;
-import org.hibernate.validator.spi.time.TimeProvider;
-import org.hibernate.validator.test.internal.xml.XmlMappingTest;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.joda.time.DateTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.spi.time.TimeProvider;
+import org.hibernate.validator.test.internal.xml.XmlMappingTest;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidationXmlTestHelper;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 
 /**
  * Test for using the {@code TimeProvider} contract in {@code @Future} validators.
@@ -79,22 +75,6 @@ public class TimeProviderFutureTest {
 		order.shipmentDateAsCalendar.set( 2099, 1, 15 );
 
 		assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsCalendar" );
-	}
-
-	@Test
-	public void timeServiceIsUsedForFutureOnLocalDate() {
-		Order order = new Order();
-		order.shipmentDateAsLocalDate = LocalDate.of( 2099, 2, 15 );
-
-		assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsLocalDate" );
-	}
-
-	@Test
-	public void timeServiceIsUsedForFutureOnLocalDateTime() {
-		Order order = new Order();
-		order.shipmentDateAsLocalDateTime = LocalDateTime.of( 2099, 2, 15, 4, 0, 0 );
-
-		assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsLocalDateTime" );
 	}
 
 	@Test
@@ -152,22 +132,6 @@ public class TimeProviderFutureTest {
 	}
 
 	@Test
-	public void timeServiceIsUsedForFutureOnYear() {
-		Order order = new Order();
-		order.shipmentDateAsYear = Year.of( 2099 );
-
-		assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsYear" );
-	}
-
-	@Test
-	public void timeServiceIsUsedForFutureOnYearMonth() {
-		Order order = new Order();
-		order.shipmentDateAsYearMonth = YearMonth.of( 2099, 2 );
-
-		assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsYearMonth" );
-	}
-
-	@Test
 	public void canConfigureTimeProviderForValidator() {
 		Validator validator = getConfiguration().buildValidatorFactory().getValidator();
 
@@ -181,8 +145,8 @@ public class TimeProviderFutureTest {
 				ZonedDateTime.of(
 						2100, 2, 15, 4, 0, 0, 0,
 						TZ_BERLIN
-						)
-				);
+				)
+		);
 
 		validator = getConfiguration().buildValidatorFactory()
 				.unwrap( HibernateValidatorFactory.class )
@@ -198,29 +162,24 @@ public class TimeProviderFutureTest {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"time-provider-validation.xml", new Runnable() {
 
-			@Override
-			public void run() {
-				Validator validator = getConfiguration().buildValidatorFactory().getValidator();
+					@Override
+					public void run() {
+						Validator validator = getConfiguration().buildValidatorFactory().getValidator();
 
-				Order order = new Order();
-				order.shipmentDateAsCalendar = Calendar.getInstance();
-				order.shipmentDateAsCalendar.set( 2099, 1, 15 );
+						Order order = new Order();
+						order.shipmentDateAsCalendar = Calendar.getInstance();
+						order.shipmentDateAsCalendar.set( 2099, 1, 15 );
 
-				assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsCalendar" );
-			}
-		});
+						assertCorrectPropertyPaths( validator.validate( order ), "shipmentDateAsCalendar" );
+					}
+				}
+		);
 	}
 
 	private static class Order {
 
 		@Future
 		private Calendar shipmentDateAsCalendar;
-
-		@Future
-		private LocalDate shipmentDateAsLocalDate;
-
-		@Future
-		private LocalDateTime shipmentDateAsLocalDateTime;
 
 		@Future
 		private ZonedDateTime shipmentDateAsZonedDateTime;
@@ -239,12 +198,6 @@ public class TimeProviderFutureTest {
 
 		@Future
 		private ReadablePartial shipmentDateAsReadablePartial;
-
-		@Future
-		private Year shipmentDateAsYear;
-
-		@Future
-		private YearMonth shipmentDateAsYearMonth;
 	}
 
 	public static class FixedDateTimeProvider implements TimeProvider {
@@ -253,7 +206,8 @@ public class TimeProviderFutureTest {
 
 		// Used in XML configuration test
 		public FixedDateTimeProvider() {
-			fixedTime = GregorianCalendar.from( ZonedDateTime.of( 2100, 2, 15, 4, 0, 0, 0, TZ_BERLIN ) ).getTimeInMillis();
+			fixedTime = GregorianCalendar.from( ZonedDateTime.of( 2100, 2, 15, 4, 0, 0, 0, TZ_BERLIN ) )
+					.getTimeInMillis();
 		}
 
 		private FixedDateTimeProvider(ZonedDateTime date) {
