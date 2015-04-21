@@ -7,12 +7,12 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
 import java.util.Date;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Check that the <code>java.util.Date</code> passed to be validated is in the
@@ -33,11 +33,10 @@ public class PastValidatorForDate implements ConstraintValidator<Past, Date> {
 			return true;
 		}
 
-		Date now = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime()
-				.getTime();
+		TimeProvider timeProvider = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+		long now = timeProvider.getCurrentTime();
 
-		return date.before( now );
+		return date.getTime() < now;
 	}
 }

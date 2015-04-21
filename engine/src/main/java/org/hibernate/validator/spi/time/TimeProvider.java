@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.spi.time;
 
-import java.util.Calendar;
-
 /**
  * Contract for obtaining the current time when validating the {@code @Future} and {@code @Past} constraints.
  * <p>
@@ -19,7 +17,7 @@ import java.util.Calendar;
  *
  * @author Gunnar Morling
  * @see org.hibernate.validator.HibernateValidatorConfiguration#timeProvider(TimeProvider)
- *
+ * @hv.experimental This API is considered experimental and may change in future revisions
  * @since 5.2
  */
 public interface TimeProvider {
@@ -29,5 +27,5 @@ public interface TimeProvider {
 	 *
 	 * @return The current time; Must not be {@code null}
 	 */
-	Calendar getCurrentTime();
+	long getCurrentTime();
 }

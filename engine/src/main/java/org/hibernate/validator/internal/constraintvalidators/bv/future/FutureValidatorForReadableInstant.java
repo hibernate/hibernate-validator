@@ -6,21 +6,18 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
-import java.util.Calendar;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
-import org.joda.time.DateTime;
 import org.joda.time.ReadableInstant;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+import org.hibernate.validator.spi.time.TimeProvider;
+
 /**
- * Check if Joda Time type who implements
- * {@code import org.joda.time.ReadableInstant}
- * is in the future.
+ * Check if Joda Time type who implements {@code import org.joda.time.ReadableInstant} is in the future.
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
@@ -38,10 +35,10 @@ public class FutureValidatorForReadableInstant implements ConstraintValidator<Fu
 			return true;
 		}
 
-		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime();
+		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+		long now = timeProvider.getCurrentTime();
 
-		return value.isAfter( new DateTime( now ) );
+		return value.getMillis() > now;
 	}
 }

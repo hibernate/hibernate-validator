@@ -7,12 +7,12 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
 import java.util.Calendar;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Check that the <code>java.util.Calendar</code> passed to be validated is in the
@@ -33,10 +33,10 @@ public class PastValidatorForCalendar implements ConstraintValidator<Past, Calen
 			return true;
 		}
 
-		Calendar now = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime();
+		TimeProvider timeProvider = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+		long now = timeProvider.getCurrentTime();
 
-		return cal.before( now );
+		return cal.getTimeInMillis() < now;
 	}
 }

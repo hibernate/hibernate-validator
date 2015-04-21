@@ -15,6 +15,7 @@ import javax.validation.constraints.Future;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Check that the {@code java.time.YearMonth} passed is in the future.
@@ -36,9 +37,11 @@ public class FutureValidatorForYearMonth implements ConstraintValidator<Future, 
 			return true;
 		}
 
-		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime();
+		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+
+		Calendar now = Calendar.getInstance();
+		now.setTimeInMillis( timeProvider.getCurrentTime() );
 
 		LocalDateTime dateOfNow = LocalDateTime.ofInstant( now.toInstant(), now.getTimeZone().toZoneId() );
 		YearMonth currentYearMonth = YearMonth.of( dateOfNow.getYear(), dateOfNow.getMonth() );

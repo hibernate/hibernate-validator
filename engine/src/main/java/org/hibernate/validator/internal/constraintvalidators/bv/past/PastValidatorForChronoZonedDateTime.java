@@ -6,15 +6,14 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
-import java.time.Instant;
 import java.time.chrono.ChronoZonedDateTime;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Check that the {@code java.time.chrono.ChronoZonedDateTime} passed is in the past.
@@ -36,11 +35,10 @@ public class PastValidatorForChronoZonedDateTime implements ConstraintValidator<
 			return true;
 		}
 
-		Instant now = context.unwrap( HibernateConstraintValidatorContext.class )
-				.getTimeProvider()
-				.getCurrentTime()
-				.toInstant();
+		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider();
+		long now = timeProvider.getCurrentTime();
 
-		return value.toInstant().isBefore( now );
+		return value.toInstant().toEpochMilli() < now;
 	}
 }

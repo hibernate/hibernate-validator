@@ -76,6 +76,7 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 *
 	 * @return {@code this} following the chaining method pattern
 	 *
+	 * @hv.experimental This API is considered experimental and may change in future revisions
 	 * @since 5.2
 	 */
 	HibernateValidatorContext timeProvider(TimeProvider timeProvider);

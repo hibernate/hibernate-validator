@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.time;
 
-import java.util.Calendar;
-
 import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
@@ -27,7 +25,7 @@ public class DefaultTimeProvider implements TimeProvider {
 	}
 
 	@Override
-	public Calendar getCurrentTime() {
-		return Calendar.getInstance();
+	public long getCurrentTime() {
+		return System.currentTimeMillis();
 	}
 }
