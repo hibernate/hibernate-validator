@@ -6,12 +6,14 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
+import java.time.LocalDateTime;
 import java.time.Year;
-
+import java.util.Calendar;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 
 /**
@@ -34,6 +36,15 @@ public class FutureValidatorForYear implements ConstraintValidator<Future, Year>
 			return true;
 		}
 
-		return value.isAfter( Year.now() );
+		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime();
+
+		Year currentYear = Year.of(
+				LocalDateTime.ofInstant( now.toInstant(), now.getTimeZone().toZoneId() )
+						.getYear()
+		);
+
+		return value.isAfter( currentYear );
 	}
 }

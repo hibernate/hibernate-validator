@@ -10,9 +10,9 @@ import java.time.Year;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForYear;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -36,7 +36,7 @@ public class FutureValidatorForYearTest {
 		Year past = Year.now().minusYears( 1 );
 
 		assertTrue( constraint.isValid( null, null ), "null fails validation." );
-		assertTrue( constraint.isValid( future, null ), "Future Year '" + future + "' fails validation.");
-		assertFalse( constraint.isValid( past, null ), "Past Year '" + past + "' validated as future.");
+		assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future Year '" + future + "' fails validation.");
+		assertFalse( constraint.isValid( past, getConstraintValidatorContext() ), "Past Year '" + past + "' validated as future.");
 	}
 }

@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -15,6 +16,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
@@ -31,9 +33,9 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private TraversableResolver traversableResolver;
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private ParameterNameProvider parameterNameProvider;
-
 	private boolean failFast;
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
+	private TimeProvider timeProvider;
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
 		this.validatorFactory = validatorFactory;
@@ -45,6 +47,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.validatedValueHandlers = new ArrayList<ValidatedValueUnwrapper<?>>(
 				validatorFactory.getValidatedValueHandlers()
 		);
+		this.timeProvider = validatorFactory.getTimeProvider();
 	}
 
 	@Override
@@ -104,6 +107,17 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext timeProvider(TimeProvider timeProvider) {
+		if ( timeProvider == null ) {
+			this.timeProvider = validatorFactory.getTimeProvider();
+		}
+		else {
+			this.timeProvider = timeProvider;
+		}
+		return this;
+	}
+
+	@Override
 	public Validator getValidator() {
 		return validatorFactory.createValidator(
 				constraintValidatorFactory,
@@ -111,7 +125,8 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
-				validatedValueHandlers
+				validatedValueHandlers,
+				timeProvider
 		);
 	}
 }

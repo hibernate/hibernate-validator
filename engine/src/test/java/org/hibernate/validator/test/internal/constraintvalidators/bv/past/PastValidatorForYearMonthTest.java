@@ -10,9 +10,9 @@ import java.time.YearMonth;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForYearMonth;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -36,7 +36,7 @@ public class PastValidatorForYearMonthTest {
 		YearMonth past = YearMonth.now().minusYears( 1 );
 
 		assertTrue( constraint.isValid( null, null ), "null fails validation." );
-		assertTrue( constraint.isValid( past, null ), "Past YearMonth '" + past + "' fails validation.");
-		assertFalse( constraint.isValid( future, null ), "Future YearMonth '" + future + "' validated as past.");
+		assertTrue( constraint.isValid( past, getConstraintValidatorContext() ), "Past YearMonth '" + past + "' fails validation.");
+		assertFalse( constraint.isValid( future, getConstraintValidatorContext() ), "Future YearMonth '" + future + "' validated as past.");
 	}
 }

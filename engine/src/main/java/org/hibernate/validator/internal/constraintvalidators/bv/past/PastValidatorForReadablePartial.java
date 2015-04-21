@@ -10,8 +10,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
-
+import org.joda.time.DateTime;
 import org.joda.time.ReadablePartial;
 
 /**
@@ -35,6 +36,13 @@ public class PastValidatorForReadablePartial implements ConstraintValidator<Past
 			return true;
 		}
 
-		return value.toDateTime( null ).isBeforeNow();
+		DateTime now = new DateTime(
+				context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime()
+				.getTime()
+		);
+
+		return value.toDateTime( now ).isBefore( now );
 	}
 }

@@ -62,6 +62,8 @@ part of the public this is not necessarily true for its sub-packages.
             ParaNamer library, see <<section-paranamer-parameternameprovider>>.
 |org.hibernate.validator.spi.constraintdefinition|An SPI for registering additional constraint validators programmatically,
             see <<section-constraint-definition-contribution>>.
+|org.hibernate.validator.spi.time|An SPI for customizing the retrieval of the current time when validating +@Future+ and +@Past+,
+            see <<section-time-provider>>.
 |org.hibernate.validator.valuehandling,
             org.hibernate.validator.spi.valuehandling|Classes related to the processing of values prior to their
             validation, see <<section-value-handling>>.
@@ -481,12 +483,16 @@ custom extensions for both of these interfaces.
 ==== HibernateConstraintValidatorContext
 
 [[section-custom-constraint-validator-context]]
-HibernateConstraintValidatorContext is a subtype of ConstraintValidatorContext which allows you to
-set arbitrary parameters for interpolation via the Expression Language message interpolation
-facility (see <<section-interpolation-with-message-expressions>>). For example the default error
-message for the @Future constraint is "must be in the future". What if you would like to include the
-current date to make the message more explicit? <<example-custom-message-parameter>> shows how this
-could be achieved.
++HibernateConstraintValidatorContext+ is a subtype of +ConstraintValidatorContext+ which allows you to:
+
+* set arbitrary parameters for interpolation via the Expression Language message interpolation
+facility (see <<section-interpolation-with-message-expressions>>)
+* obtain the +TimeProvider+ for getting the current time when validating the +Future+ and +@Past+ constraints
+(see <<section-time-provider>>)
+
+This is useful if you for instance would like to customize the message of the +@Future+ constraint.
+By default the message just is "must be in the future". <<example-custom-message-parameter>> shows
+how to include the current date in order to make the message more explicit.
 
 [[example-custom-message-parameter]]
 .Custom @Future validator with message parameters
@@ -495,16 +501,25 @@ could be achieved.
 ----
 public class MyFutureValidator implements ConstraintValidator<Future, Date> {
 
+	@Override
 	public void initialize(Future constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(Date value, ConstraintValidatorContext context) {
-		Date now = GregorianCalendar.getInstance().getTime();
+		if ( value == null ) {
+			return true;
+		}
 
-		if ( value.before( now ) ) {
-			HibernateConstraintValidatorContext hibernateContext =
-					context.unwrap( HibernateConstraintValidatorContext.class );
+		HibernateConstraintValidatorContext hibernateContext = context.unwrap(
+				HibernateConstraintValidatorContext.class
+		);
 
+		Date now = hibernateContext.getTimeProvider()
+				.getCurrentTime()
+				.getTime();
+
+		if ( !value.after( now ) ) {
 			hibernateContext.disableDefaultConstraintViolation();
 			hibernateContext.addExpressionVariable( "now", now )
 					.buildConstraintViolationWithTemplate( "Must be after ${now}" )
@@ -919,3 +934,41 @@ Call +ValidatorFactory#close()+ if a given validator factory instance is not nee
 Failure to do so may result in a classloader leak in cases where applications/bundles are re-deployed and a non-closed
 validator factory still is referenced by application code.
 ====
+
+[[section-time-provider]]
+=== Time providers for @Future and @Past
+
+By default the current system time is used when validating the +@Future+ and +@Past+ constraints.
+In some cases it can be necessary though to work with another "logical" date rather than the system time,
+e.g. for testing purposes or in the context of batch applications which may require to run with
+yesterday's date when re-running a failed job execution.
+
+To address such scenarios, Hibernate Validator provides a custom contract for obtaining the current time, +TimeProvider+.
+<<example-using-time-provider>> shows an implementation of this contract and its registration when bootstrapping a validator factory.
+
+[[example-using-time-provider]]
+.Using a custom +TimeProvider+
+====
+[source, JAVA]
+----
+public class CustomTimeProvider implements TimeProvider {
+
+	@Override
+	public Calendar getCurrentTime() {
+		Calendar now = ...;
+		return now;
+	}
+}
+----
+[source, JAVA]
+----
+ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
+		.configure()
+		.timeProvider( timeProvider )
+		.buildValidatorFactory();
+----
+====
+
+Alternatively, you can specify the fully-qualified classname of a +TimeProvider+ implementation using the property
++hibernate.validator.time_provider+ when configuring the default validator factory via _META-INF/validation.xml_
+(see <<chapter-xml-configuration>>).

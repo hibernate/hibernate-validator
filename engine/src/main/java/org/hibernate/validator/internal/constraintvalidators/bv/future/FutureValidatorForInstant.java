@@ -7,11 +7,12 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
 import java.time.Instant;
-
+import java.util.Date;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 
 /**
@@ -20,7 +21,7 @@ import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
  * @author Khalid Alqinyah
  */
 @IgnoreJava6Requirement
-public class FutureValidatorForInstant  implements ConstraintValidator<Future, Instant> {
+public class FutureValidatorForInstant implements ConstraintValidator<Future, Instant> {
 
 	@Override
 	public void initialize(Future constraintAnnotation) {
@@ -34,6 +35,11 @@ public class FutureValidatorForInstant  implements ConstraintValidator<Future, I
 			return true;
 		}
 
-		return value.isAfter( Instant.now() );
+		Date now = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime()
+				.getTime();
+
+		return value.isAfter( now.toInstant() );
 	}
 }

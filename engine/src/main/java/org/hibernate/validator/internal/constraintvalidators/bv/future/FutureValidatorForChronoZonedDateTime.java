@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.time.chrono.ChronoZonedDateTime;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 
 /**
@@ -29,12 +29,17 @@ public class FutureValidatorForChronoZonedDateTime implements ConstraintValidato
 	}
 
 	@Override
-	public boolean isValid(ChronoZonedDateTime value, ConstraintValidatorContext context) {
+	public boolean isValid(ChronoZonedDateTime<?> value, ConstraintValidatorContext context) {
 		// null values are valid
 		if ( value == null ) {
 			return true;
 		}
 
-		return value.isAfter( ZonedDateTime.now() );
+		Instant now = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime()
+				.toInstant();
+
+		return value.toInstant().isAfter( now );
 	}
 }
