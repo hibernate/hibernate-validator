@@ -111,7 +111,10 @@ public class ConstraintTree<A extends Annotation> {
 
 			// create a constraint validator context
 			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-					validationContext.getParameterNames(), valueContext.getPropertyPath(), descriptor
+					validationContext.getParameterNames(),
+					validationContext.getTimeProvider(),
+					valueContext.getPropertyPath(),
+					descriptor
 			);
 
 			// check for a potential unwrapper
@@ -120,7 +123,7 @@ public class ConstraintTree<A extends Annotation> {
 			ValidatedValueUnwrapper<?> validatedValueUnwrapper = validationContext.getValidatedValueUnwrapper(
 					validatedValueType
 			);
-			if( !valueContext.getUnwrapMode().equals( UnwrapMode.SKIP_UNWRAP )) {
+			if ( !valueContext.getUnwrapMode().equals( UnwrapMode.SKIP_UNWRAP ) ) {
 				valueContext.setValidatedValueHandler( validatedValueUnwrapper );
 			}
 
@@ -163,7 +166,8 @@ public class ConstraintTree<A extends Annotation> {
 	private <T> boolean mainConstraintNeedsEvaluation(ValidationContext<T> executionContext,
 			Set<ConstraintViolation<T>> constraintViolations) {
 		// we are dealing with a composing constraint with no validator for the main constraint
-		if ( !descriptor.getComposingConstraints().isEmpty() && descriptor.getMatchingConstraintValidatorClasses().isEmpty() ) {
+		if ( !descriptor.getComposingConstraints().isEmpty() && descriptor.getMatchingConstraintValidatorClasses()
+				.isEmpty() ) {
 			return false;
 		}
 

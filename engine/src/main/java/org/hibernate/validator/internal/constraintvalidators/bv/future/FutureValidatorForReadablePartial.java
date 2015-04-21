@@ -10,8 +10,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
-
+import org.joda.time.DateTime;
 import org.joda.time.ReadablePartial;
 
 /**
@@ -35,6 +36,13 @@ public class FutureValidatorForReadablePartial implements ConstraintValidator<Fu
 			return true;
 		}
 
-		return value.toDateTime( null ).isAfterNow();
+		DateTime now = new DateTime(
+				context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime()
+				.getTime()
+		);
+
+		return value.toDateTime( now ).isAfter( now );
 	}
 }

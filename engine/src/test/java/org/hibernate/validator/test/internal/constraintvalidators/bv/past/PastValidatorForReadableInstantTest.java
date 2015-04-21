@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
+import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
+
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
@@ -13,7 +15,6 @@ import org.joda.time.MutableDateTime;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadableInstant;
 
 /**
@@ -34,8 +35,8 @@ public class PastValidatorForReadableInstantTest {
 		Instant past = new Instant().minus( 31557600000L );
 
 		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( past, null ) );
-		Assert.assertFalse( validator.isValid( future, null ) );
+		Assert.assertTrue( validator.isValid( past, getConstraintValidatorContext() ) );
+		Assert.assertFalse( validator.isValid( future, getConstraintValidatorContext() ) );
 	}
 
 	@Test
@@ -44,8 +45,8 @@ public class PastValidatorForReadableInstantTest {
 		DateTime past = new DateTime().minusYears( 1 );
 
 		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( past, null ) );
-		Assert.assertFalse( validator.isValid( future, null ) );
+		Assert.assertTrue( validator.isValid( past, getConstraintValidatorContext() ) );
+		Assert.assertFalse( validator.isValid( future, getConstraintValidatorContext() ) );
 	}
 
 	@Test
@@ -54,8 +55,8 @@ public class PastValidatorForReadableInstantTest {
 		DateMidnight past = new DateMidnight().minusYears( 1 );
 
 		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( past, null ) );
-		Assert.assertFalse( validator.isValid( future, null ) );
+		Assert.assertTrue( validator.isValid( past, getConstraintValidatorContext() ) );
+		Assert.assertFalse( validator.isValid( future, getConstraintValidatorContext() ) );
 	}
 
 	@Test
@@ -67,7 +68,7 @@ public class PastValidatorForReadableInstantTest {
 		past.addYears( -1 );
 
 		Assert.assertTrue( validator.isValid( null, null ) );
-		Assert.assertTrue( validator.isValid( past, null ) );
-		Assert.assertFalse( validator.isValid( future, null ) );
+		Assert.assertTrue( validator.isValid( past, getConstraintValidatorContext() ) );
+		Assert.assertFalse( validator.isValid( future, getConstraintValidatorContext() ) );
 	}
 }

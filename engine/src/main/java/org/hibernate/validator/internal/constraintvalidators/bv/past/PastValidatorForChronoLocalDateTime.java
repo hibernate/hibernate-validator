@@ -8,11 +8,13 @@ package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDateTime;
+import java.util.Calendar;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 
 /**
@@ -29,12 +31,16 @@ public class PastValidatorForChronoLocalDateTime implements ConstraintValidator<
 	}
 
 	@Override
-	public boolean isValid(ChronoLocalDateTime value, ConstraintValidatorContext context) {
+	public boolean isValid(ChronoLocalDateTime<?> value, ConstraintValidatorContext context) {
 		// null values are valid
 		if ( value == null ) {
 			return true;
 		}
 
-		return value.isBefore( LocalDateTime.now() );
+		Calendar now = context.unwrap( HibernateConstraintValidatorContext.class )
+				.getTimeProvider()
+				.getCurrentTime();
+
+		return value.isBefore( LocalDateTime.ofInstant( now.toInstant(), now.getTimeZone().toZoneId() ) );
 	}
 }
