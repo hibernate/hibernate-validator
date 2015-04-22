@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
@@ -320,10 +319,9 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 			//are the locations equal (created by different builders) or
 			//does one of the executables override the other one?
-			return
-					executable.equals( executableElement ) ||
-							executableHelper.overrides( executable, executableElement ) ||
-							executableHelper.overrides( executableElement, executable );
+			return executable.equals( executableElement ) ||
+					executableHelper.overrides( executable, executableElement ) ||
+					executableHelper.overrides( executableElement, executable );
 		}
 
 		@Override
