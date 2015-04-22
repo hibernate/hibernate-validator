@@ -1,8 +1,11 @@
+// tag::include[]
 package org.hibernate.validator.referenceguide.chapter11.failfast;
 
+//end::include[]
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
+//tag::include[]
 public class Car {
 
 	@NotNull
@@ -18,3 +21,4 @@ public class Car {
 
 	//getters and setters...
 }
+//end::include[]
