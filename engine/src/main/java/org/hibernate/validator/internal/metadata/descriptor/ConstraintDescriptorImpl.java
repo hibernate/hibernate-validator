@@ -32,6 +32,7 @@ import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.ValidationException;
+import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -182,13 +183,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 
 		this.constraintType = determineConstraintType(
+				annotation.annotationType(),
 				member,
 				type,
 				!genericValidatorClasses.isEmpty(),
 				!crossParameterValidatorClasses.isEmpty(),
 				externalConstraintType
 		);
-		this.composingConstraints = parseComposingConstraints( member, constraintHelper, externalConstraintType );
+		this.composingConstraints = parseComposingConstraints( member, constraintHelper, constraintType );
 		this.compositionType = parseCompositionType( constraintHelper );
 		validateComposingConstraintTypes();
 
@@ -367,13 +369,14 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 *
 	 * @return The type of this constraint
 	 */
-	private ConstraintType determineConstraintType(Member member,
+	private ConstraintType determineConstraintType(Class<? extends Annotation> constraintAnnotationType,
+			Member member,
 			ElementType elementType,
 			boolean hasGenericValidators,
 			boolean hasCrossParameterValidator,
 			ConstraintType externalConstraintType) {
 		ConstraintTarget constraintTarget = (ConstraintTarget) attributes.get( ConstraintHelper.VALIDATION_APPLIES_TO );
-		ConstraintType constraintType;
+		ConstraintType constraintType = null;
 		boolean isExecutable = isExecutable( elementType );
 
 		//target explicitly set to RETURN_VALUE
@@ -412,6 +415,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			else if ( !isExecutable ) {
 				constraintType = ConstraintType.GENERIC;
 			}
+			else if ( constraintAnnotationType.isAnnotationPresent( SupportedValidationTarget.class ) ) {
+				SupportedValidationTarget supportedValidationTarget = constraintAnnotationType.getAnnotation( SupportedValidationTarget.class );
+				if ( supportedValidationTarget.value().length == 1 ) {
+					constraintType = supportedValidationTarget.value()[0] == ValidationTarget.ANNOTATED_ELEMENT ? ConstraintType.GENERIC : ConstraintType.CROSS_PARAMETER;
+				}
+			}
+
 			//try to derive from existence of parameters/return value
 			else {
 				boolean hasParameters = hasParameters( member );
@@ -423,11 +433,12 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				else if ( hasParameters && !hasReturnValue ) {
 					constraintType = ConstraintType.CROSS_PARAMETER;
 				}
-				// Now we are out of luck
-				else {
-					throw log.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType.getName() );
-				}
 			}
+		}
+
+		// Now we are out of luck
+		if ( constraintType == null ){
+			throw log.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType.getName() );
 		}
 
 		if ( constraintType == ConstraintType.CROSS_PARAMETER ) {
@@ -605,7 +616,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 	}
 
-	private Set<ConstraintDescriptorImpl<?>> parseComposingConstraints(Member member, ConstraintHelper constraintHelper, ConstraintType externalConstraintType) {
+	private Set<ConstraintDescriptorImpl<?>> parseComposingConstraints(Member member, ConstraintHelper constraintHelper, ConstraintType constraintType) {
 		Set<ConstraintDescriptorImpl<?>> composingConstraintsSet = newHashSet();
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
 
@@ -622,7 +633,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 						overrideParameters,
 						OVERRIDES_PARAMETER_DEFAULT_INDEX,
 						declaredAnnotation,
-						externalConstraintType,
+						constraintType,
 						constraintHelper
 				);
 				composingConstraintsSet.add( descriptor );
@@ -637,7 +648,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 							overrideParameters,
 							index,
 							constraintAnnotation,
-							externalConstraintType,
+							constraintType,
 							constraintHelper
 					);
 					composingConstraintsSet.add( descriptor );
@@ -672,7 +683,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			Map<ClassIndexWrapper, Map<String, Object>> overrideParameters,
 			int index,
 			U constraintAnnotation,
-			ConstraintType externalConstraintType,
+			ConstraintType constraintType,
 			ConstraintHelper constraintHelper) {
 
 		@SuppressWarnings("unchecked")
@@ -699,12 +710,24 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		annotationDescriptor.setValue( ConstraintHelper.GROUPS, groups.toArray( new Class<?>[groups.size()] ) );
 		annotationDescriptor.setValue( ConstraintHelper.PAYLOAD, payloads.toArray( new Class<?>[payloads.size()] ) );
 		if ( annotationDescriptor.getElements().containsKey( ConstraintHelper.VALIDATION_APPLIES_TO ) ) {
-			annotationDescriptor.setValue( ConstraintHelper.VALIDATION_APPLIES_TO, getValidationAppliesTo() );
+			ConstraintTarget validationAppliesTo = getValidationAppliesTo();
+
+			// composed constraint does not declare validationAppliesTo() itself
+			if ( validationAppliesTo == null ) {
+				if ( constraintType == ConstraintType.CROSS_PARAMETER ) {
+					validationAppliesTo = ConstraintTarget.PARAMETERS;
+				}
+				else {
+					 validationAppliesTo = ConstraintTarget.IMPLICIT;
+				}
+			}
+
+			annotationDescriptor.setValue( ConstraintHelper.VALIDATION_APPLIES_TO, validationAppliesTo );
 		}
 
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
 		return new ConstraintDescriptorImpl<U>(
-				constraintHelper, member, annotationProxy, elementType, null, definedOn, externalConstraintType
+				constraintHelper, member, annotationProxy, elementType, null, definedOn, constraintType
 		);
 	}
 
