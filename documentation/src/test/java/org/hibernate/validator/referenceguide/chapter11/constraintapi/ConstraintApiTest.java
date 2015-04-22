@@ -6,8 +6,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.groups.Default;
 
-import org.junit.Test;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -15,6 +13,7 @@ import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.MaxDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
+import org.junit.Test;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -23,6 +22,7 @@ public class ConstraintApiTest {
 
 	@Test
 	public void constraintMapping() {
+		//tag::constraintMapping[]
 		HibernateValidatorConfiguration configuration = Validation
 				.byProvider( HibernateValidator.class )
 				.configure();
@@ -44,6 +44,7 @@ public class ConstraintApiTest {
 		Validator validator = configuration.addMapping( constraintMapping )
 				.buildValidatorFactory()
 				.getValidator();
+		//end::constraintMapping[]
 	}
 
 	@Test
@@ -52,6 +53,7 @@ public class ConstraintApiTest {
 				.byProvider( HibernateValidator.class )
 				.configure();
 
+		//tag::genericConstraintDef[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
 		constraintMapping
@@ -60,6 +62,7 @@ public class ConstraintApiTest {
 					.constraint( new GenericConstraintDef<CheckCase>( CheckCase.class )
 						.param( "value", CaseMode.UPPER )
 					);
+		//end::genericConstraintDef[]
 	}
 
 	@Test
@@ -68,6 +71,7 @@ public class ConstraintApiTest {
 				.byProvider( HibernateValidator.class )
 				.configure();
 
+		//tag::cascaded[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
 		constraintMapping
@@ -79,6 +83,7 @@ public class ConstraintApiTest {
 			.type( Person.class )
 				.property( "name", FIELD )
 					.constraint( new NotNullDef().groups( PersonDefault.class ) );
+		//end::cascaded[]
 	}
 
 	@Test
@@ -87,6 +92,7 @@ public class ConstraintApiTest {
 				.byProvider( HibernateValidator.class )
 				.configure();
 
+		//tag::executableConfiguration[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
 		constraintMapping
@@ -110,6 +116,7 @@ public class ConstraintApiTest {
 					.returnValue()
 						.constraint( new NotNullDef() )
 						.valid();
+		//end::executableConfiguration[]
 	}
 
 	@Test
@@ -118,6 +125,7 @@ public class ConstraintApiTest {
 				.byProvider( HibernateValidator.class )
 				.configure();
 
+		//tag::defaultGroupSequence[]
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
 		constraintMapping
@@ -125,6 +133,7 @@ public class ConstraintApiTest {
 				.defaultGroupSequence( Car.class, CarChecks.class )
 			.type( RentalCar.class )
 				.defaultGroupSequenceProviderClass( RentalCarGroupSequenceProvider.class );
+		//end::defaultGroupSequence[]
 	}
 
 	public interface PersonDefault {

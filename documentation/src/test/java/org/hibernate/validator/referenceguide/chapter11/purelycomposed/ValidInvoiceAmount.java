@@ -1,5 +1,7 @@
+// tag::include[]
 package org.hibernate.validator.referenceguide.chapter11.purelycomposed;
 
+//end::include[]
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -20,6 +22,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+//tag::include[]
 @Min(value = 0)
 @NotNull
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
@@ -40,3 +43,4 @@ public @interface ValidInvoiceAmount {
 	@OverridesAttribute(constraint = Min.class, name = "value")
 	long value();
 }
+//end::include[]
