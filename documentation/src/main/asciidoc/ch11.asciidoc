@@ -1,3 +1,5 @@
+:sourcedir: ../../test/java
+
 [[validator-specifics]]
 == Hibernate Validator Specifics
 
@@ -93,40 +95,14 @@ all.
 [[example-using-fail-fast]]
 .Using the fail fast validation mode
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter11.failfast;
-
-public class Car {
-
-	@NotNull
-	private String manufacturer;
-
-	@AssertTrue
-	private boolean isRegistered;
-
-	public Car(String manufacturer, boolean isRegistered) {
-		this.manufacturer = manufacturer;
-		this.isRegistered = isRegistered;
-	}
-
-	//getters and setters...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/failfast/Car.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Validator validator = Validation.byProvider( HibernateValidator.class )
-		.configure()
-		.failFast( true )
-		.buildValidatorFactory()
-		.getValidator();
-
-Car car = new Car( null, false );
-
-Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
-
-assertEquals( 1, constraintViolations.size() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/failfast/FailFastTest.java[tags=include]
 ----
 ====
 
@@ -167,29 +143,9 @@ manner as shown in <<example-constraint-mapping>>.
 [[example-constraint-mapping]]
 .Programmatic constraint declaration
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-HibernateValidatorConfiguration configuration = Validation
-		.byProvider( HibernateValidator.class )
-		.configure();
-
-ConstraintMapping constraintMapping = configuration.createConstraintMapping();
-
-constraintMapping
-	.type( Car.class )
-		.property( "manufacturer", FIELD )
-			.constraint( new NotNullDef() )
-		.property( "licensePlate", FIELD )
-			.ignoreAnnotations()
-			.constraint( new NotNullDef() )
-			.constraint( new SizeDef().min( 2 ).max( 14 ) )
-	.type( RentalCar.class )
-		.property( "rentalStation", METHOD )
-			.constraint( new NotNullDef() );
-
-Validator validator = configuration.addMapping( constraintMapping )
-		.buildValidatorFactory()
-		.getValidator()
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraintapi/ConstraintApiTest.java[tags=constraintMapping]
 ----
 ====
 
@@ -221,16 +177,9 @@ you can use +GenericConstraintDef+ as seen in <<example-generic-constraint-mappi
 [[example-generic-constraint-mapping]]
 .Programmatic declaration of a custom constraint
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ConstraintMapping constraintMapping = configuration.createConstraintMapping();
-
-constraintMapping
-	.type( Car.class )
-		.property( "licensePlate", FIELD )
-			.constraint( new GenericConstraintDef<CheckCase>( CheckCase.class )
-				.param( "value", CaseMode.UPPER )
-			);
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraintapi/ConstraintApiTest.java[tags=genericConstraintDef]
 ----
 ====
 
@@ -242,19 +191,9 @@ it with +@Valid+. Configure any group conversions to be applied during cascaded 
 [[example-cascading-constraints]]
 .Marking a property for cascaded validation
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ConstraintMapping constraintMapping = configuration.createConstraintMapping();
-
-constraintMapping
-	.type( Car.class )
-		.property( "driver", FIELD )
-			.constraint( new NotNullDef() )
-			.valid()
-			.convertGroup( Default.class ).to( PersonDefault.class )
-	.type( Person.class )
-		.property( "name", FIELD )
-			.constraint( new NotNullDef().groups( PersonDefault.class ) );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraintapi/ConstraintApiTest.java[tags=cascaded]
 ----
 ====
 
@@ -267,31 +206,9 @@ constraints as well as cross-parameter constraints.
 [[example-method-constraint-mapping]]
 .Programmatic declaration of method and constructor constraints
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ConstraintMapping constraintMapping = configuration.createConstraintMapping();
-
-constraintMapping
-	.type( Car.class )
-		.constructor( String.class )
-			.parameter( 0 )
-				.constraint( new SizeDef().min( 3 ).max( 50 ) )
-			.returnValue()
-				.valid()
-		.method( "drive", int.class )
-			.parameter( 0 )
-				.constraint( new MaxDef().value ( 75 ) )
-		.method( "load", List.class, List.class )
-			.crossParameter()
-				.constraint( new GenericConstraintDef<LuggageCountMatchesPassengerCount>(
-						LuggageCountMatchesPassengerCount.class ).param(
-							"piecesOfLuggagePerPassenger", 2
-						)
-				)
-		.method( "getDriver" )
-			.returnValue()
-				.constraint( new NotNullDef() )
-				.valid();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraintapi/ConstraintApiTest.java[tags=executableConfiguration]
 ----
 ====
 
@@ -301,15 +218,9 @@ provider of a type as shown in the following example.
 [[example-sequences]]
 .Configuration of default group sequence and default group sequence provider
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ConstraintMapping constraintMapping = configuration.createConstraintMapping();
-
-constraintMapping
-	.type( Car.class )
-		.defaultGroupSequence( Car.class, CarChecks.class )
-	.type( RentalCar.class )
-		.defaultGroupSequenceProviderClass( RentalCarGroupSequenceProvider.class );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraintapi/ConstraintApiTest.java[tags=defaultGroupSequence]
 ----
 ====
 
@@ -325,25 +236,9 @@ To do so, implement the +ConstraintMappingContributor+ contract:
 [[example-constraint-mapping-contributor]]
 .Custom +ConstraintMappingContributor+ implementation
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-public static class MyConstraintMappingContributor implements ConstraintMappingContributor {
-
-	@Override
-	public void createConstraintMappings(ConstraintMappingBuilder builder) {
-		builder.addConstraintMapping()
-			.type( Marathon.class )
-				.property( "name", METHOD )
-					.constraint( new NotNullDef() )
-				.property( "numberOfHelpers", FIELD )
-					.constraint( new MinDef().value( 1 ) );
-
-		builder.addConstraintMapping()
-			.type( Runner.class )
-				.property( "paidEntryFee", FIELD )
-					.constraint( new AssertTrueDef() );
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraintapi/MyConstraintMappingContributor.java[tags=include]
 ----
 ====
 
@@ -370,28 +265,7 @@ given on a method declaration.
 ====
 [source, JAVA]
 ----
-package org.hibernate.validator.referenceguide.chapter11.purelycomposed;
-
-@Min(value = 0)
-@NotNull
-@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
-@Retention(RUNTIME)
-@Documented
-@Constraint(validatedBy = {})
-@SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
-@ReportAsSingleViolation
-public @interface ValidInvoiceAmount {
-
-	String message() default "{org.hibernate.validator.referenceguide.chapter11.purelycomposed."
-			+ "ValidInvoiceAmount.message}";
-
-	Class<?>[] groups() default {};
-
-	Class<? extends Payload>[] payload() default {};
-
-	@OverridesAttribute(constraint = Min.class, name = "value")
-	long value();
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/purelycomposed/ValidInvoiceAmount.java[tags=include]
 ----
 ====
 
