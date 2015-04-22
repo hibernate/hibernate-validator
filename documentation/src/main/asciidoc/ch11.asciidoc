@@ -350,8 +350,53 @@ public static class MyConstraintMappingContributor implements ConstraintMappingC
 You then need to specify the fully-qualified class name of the contributor implementation in _META-INF/validation.xml_,
 using the property key +hibernate.validator.constraint_mapping_contributor+.
 
+[[section-advanced-constraint-composition]]
+=== Advanced constraint composition features
+
+==== Validation target specification for purely composed constraints
+
+In case you specify a purely composed constraint - i.e. a constraint which has no validator itself but is solely made
+up from other, composing constraints - on a method declaration, the validation engine cannot determine whether that
+constraint is to be applied as a return value constraint or as a cross-parameter constraint.
+
+Hibernate Validator allows to resolve such ambiguities by specifying the +@SupportedValidationTarget+ annotation on the
+declaration of the composed constraint type as shown in <<example-purely-composed-constraint-validation-target>>.
+The +@ValidInvoiceAmount+ does not declare any validator, but it is solely composed by the +@Min+ and +@NotNull+
+constraints. The +@SupportedValidationTarget+ ensures that the constraint is applied to the method return value when
+given on a method declaration.
+
+[[example-purely-composed-constraint-validation-target]]
+.Specifying the validation target of a purely composed constraint
+====
+[source, JAVA]
+----
+package org.hibernate.validator.referenceguide.chapter11.purelycomposed;
+
+@Min(value = 0)
+@NotNull
+@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+@Retention(RUNTIME)
+@Documented
+@Constraint(validatedBy = {})
+@SupportedValidationTarget(ValidationTarget.ANNOTATED_ELEMENT)
+@ReportAsSingleViolation
+public @interface ValidInvoiceAmount {
+
+	String message() default "{org.hibernate.validator.referenceguide.chapter11.purelycomposed."
+			+ "ValidInvoiceAmount.message}";
+
+	Class<?>[] groups() default {};
+
+	Class<? extends Payload>[] payload() default {};
+
+	@OverridesAttribute(constraint = Min.class, name = "value")
+	long value();
+}
+----
+====
+
 [[section-boolean-constraint-composition]]
-=== Boolean composition of constraints
+==== Boolean composition of constraints
 
 Bean Validation specifies that the constraints of a composed constraint (see
 <<section-constraint-composition>>) are all combined via a logical _AND_. This means all of the
