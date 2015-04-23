@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -209,7 +210,7 @@ public class ConstraintValidatorManager {
 
 		// if we also have a suitable value unwrapper we resolve for the type provided by the unwrapper as well
 		List<Type> suitableTypesForWrappedValue;
-		ValidatedValueUnwrapper validatedValueHandler = valueContext.getValidatedValueHandler();
+		ValidatedValueUnwrapper<?> validatedValueHandler = valueContext.getValidatedValueHandler();
 		if ( validatedValueHandler != null) {
 			Type unwrappedType = validatedValueHandler.getValidatedValueType( typeOfValidatedElement );
 			suitableTypesForWrappedValue = findSuitableValidatorTypes( unwrappedType, availableValidatorTypes );
@@ -347,7 +348,7 @@ public class ConstraintValidatorManager {
 		}
 	}
 
-	private ConstraintValidatorManager.TypeResolutionResult getTypeResolutionResultForValidatedValue(ValueContext valueContext,
+	private ConstraintValidatorManager.TypeResolutionResult getTypeResolutionResultForValidatedValue(ValueContext<?, ?> valueContext,
 			List<Type> constraintValidatorTypesForValidatedValue) {
 		if ( constraintValidatorTypesForValidatedValue.size() == 0 ) {
 			return ConstraintValidatorManager.TypeResolutionResult.NO_VALIDATORS;
