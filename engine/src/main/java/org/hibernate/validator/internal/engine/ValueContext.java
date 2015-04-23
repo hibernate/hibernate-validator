@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
+
 import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 
@@ -166,6 +167,7 @@ public class ValueContext<T, V> {
 	}
 
 	public final void setCurrentValidatedValue(V currentValue) {
+		propertyPath.setLeafNodeValue( currentValue );
 		this.currentValue = currentValue;
 	}
 

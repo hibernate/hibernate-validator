@@ -31,7 +31,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 public class NodeImpl
-		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Serializable {
+		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, org.hibernate.validator.path.PropertyNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
 
@@ -53,14 +53,16 @@ public class NodeImpl
 	//type-specific attributes
 	private final Class<?>[] parameterTypes;
 	private final Integer parameterIndex;
+	private final Object value;
 
 	private String asString;
 
-	private NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes, Integer parameterIndex) {
+	private NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes, Integer parameterIndex, Object value) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
 		this.key = key;
+		this.value = value;
 		this.isIterable = indexable;
 		this.kind = kind;
 		this.parameterTypes = parameterTypes;
@@ -78,6 +80,7 @@ public class NodeImpl
 				null,
 				ElementKind.PROPERTY,
 				EMPTY_CLASS_ARRAY,
+				null,
 				null
 		);
 	}
@@ -91,7 +94,8 @@ public class NodeImpl
 				null,
 				ElementKind.PARAMETER,
 				EMPTY_CLASS_ARRAY,
-				parameterIndex
+				parameterIndex,
+				null
 		);
 	}
 
@@ -104,16 +108,17 @@ public class NodeImpl
 				null,
 				ElementKind.CROSS_PARAMETER,
 				EMPTY_CLASS_ARRAY,
+				null,
 				null
 		);
 	}
 
 	public static NodeImpl createMethodNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null );
 	}
 
 	public static NodeImpl createConstructorNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null );
 	}
 
 	public static NodeImpl createBeanNode(NodeImpl parent) {
@@ -125,6 +130,7 @@ public class NodeImpl
 				null,
 				ElementKind.BEAN,
 				EMPTY_CLASS_ARRAY,
+				null,
 				null
 		);
 	}
@@ -138,6 +144,7 @@ public class NodeImpl
 				null,
 				ElementKind.RETURN_VALUE,
 				EMPTY_CLASS_ARRAY,
+				null,
 				null
 		);
 	}
@@ -151,7 +158,8 @@ public class NodeImpl
 				null,
 				node.kind,
 				node.parameterTypes,
-				node.parameterIndex
+				node.parameterIndex,
+				node.value
 
 		);
 	}
@@ -165,7 +173,8 @@ public class NodeImpl
 				null,
 				node.kind,
 				node.parameterTypes,
-				node.parameterIndex
+				node.parameterIndex,
+				node.value
 		);
 	}
 
@@ -178,7 +187,22 @@ public class NodeImpl
 				key,
 				node.kind,
 				node.parameterTypes,
-				node.parameterIndex
+				node.parameterIndex,
+				node.value
+		);
+	}
+
+	public static NodeImpl setPropertyValue(NodeImpl node, Object value) {
+		return new NodeImpl(
+				node.name,
+				node.parent,
+				node.isIterable,
+				node.index,
+				node.key,
+				node.kind,
+				node.parameterTypes,
+				node.parameterIndex,
+				value
 		);
 	}
 
@@ -232,7 +256,7 @@ public class NodeImpl
 				( kind == ElementKind.CROSS_PARAMETER && nodeType == CrossParameterNode.class ) ||
 				( kind == ElementKind.METHOD && nodeType == MethodNode.class ) ||
 				( kind == ElementKind.PARAMETER && nodeType == ParameterNode.class ) ||
-				( kind == ElementKind.PROPERTY && nodeType == PropertyNode.class ) ||
+				( kind == ElementKind.PROPERTY && ( nodeType == PropertyNode.class || nodeType == org.hibernate.validator.path.PropertyNode.class ) ) ||
 				( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class ) ) {
 			return nodeType.cast( this );
 		}
@@ -252,6 +276,11 @@ public class NodeImpl
 				"getParameterIndex() may only be invoked for nodes of ElementKind.PARAMETER."
 		);
 		return parameterIndex.intValue();
+	}
+
+	@Override
+	public Object getValue() {
+		return value;
 	}
 
 	@Override
