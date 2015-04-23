@@ -229,10 +229,8 @@ public class ValidationExtension implements Extension {
 
 		EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( clazz );
 
-		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( clazz );
 		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables(
 				type,
-				beanDescriptor,
 				classLevelExecutableTypes
 		);
 		if ( !constrainedCallables.isEmpty() ) {
@@ -245,19 +243,16 @@ public class ValidationExtension implements Extension {
 	}
 
 	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type,
-			BeanDescriptor beanDescriptor,
 			EnumSet<ExecutableType> classLevelExecutableTypes) {
 		Set<AnnotatedCallable<? super T>> callables = newHashSet();
 
-		determineConstrainedConstructors( type, beanDescriptor, classLevelExecutableTypes, callables );
-		determineConstrainedMethod( type, beanDescriptor, callables );
+		determineConstrainedConstructors( type, classLevelExecutableTypes, callables );
+		determineConstrainedMethod( type, callables );
 
 		return callables;
 	}
 
-	private <T> void determineConstrainedMethod(AnnotatedType<T> type,
-			BeanDescriptor beanDescriptor,
-			Set<AnnotatedCallable<? super T>> callables) {
+	private <T> void determineConstrainedMethod(AnnotatedType<T> type, Set<AnnotatedCallable<? super T>> callables) {
 		List<Method> overriddenAndImplementedMethods = InheritedMethodsHelper.getAllMethods( type.getJavaClass() );
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
@@ -277,6 +272,7 @@ public class ValidationExtension implements Extension {
 				continue;
 			}
 
+			BeanDescriptor beanDescriptor = validator.getConstraintsForClass( method.getDeclaringClass() );
 			boolean needsValidation;
 			if ( isGetter ) {
 				needsValidation = isGetterConstrained( method, beanDescriptor );
@@ -291,9 +287,10 @@ public class ValidationExtension implements Extension {
 		}
 	}
 
-	private <T> void determineConstrainedConstructors(AnnotatedType<T> type, BeanDescriptor beanDescriptor,
+	private <T> void determineConstrainedConstructors(AnnotatedType<T> type,
 			EnumSet<ExecutableType> classLevelExecutableTypes, Set<AnnotatedCallable<? super T>> callables) {
 		// no special inheritance rules to consider for constructors
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( type.getJavaClass() );
 		for ( AnnotatedConstructor<T> annotatedConstructor : type.getConstructors() ) {
 			Constructor<?> constructor = annotatedConstructor.getJavaMember();
 			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnConstructor( constructor );
