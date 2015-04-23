@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.validation.ElementKind;
 import javax.validation.Path;
 
@@ -186,6 +187,15 @@ public final class PathImpl implements Path, Serializable {
 
 	public NodeImpl setLeafNodeMapKey(Object key) {
 		currentLeafNode = NodeImpl.setMapKey( currentLeafNode, key );
+
+		nodeList.remove( nodeList.size() - 1 );
+		nodeList.add( currentLeafNode );
+		hashCode = -1;
+		return currentLeafNode;
+	}
+
+	public NodeImpl setLeafNodeValue(Object value) {
+		currentLeafNode = NodeImpl.setPropertyValue( currentLeafNode, value );
 
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
