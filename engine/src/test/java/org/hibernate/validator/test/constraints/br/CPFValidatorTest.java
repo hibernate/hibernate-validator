@@ -96,6 +96,13 @@ public class CPFValidatorTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-979")
+	public void correct_cpf_with_dash_only_separator_validates() {
+		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "134241313-00" ) );
+		assertNumberOfViolations( violations, 0 );
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HV-808")
 	public void invalid_cpf_with_separator_creates_constraint_violation() {
 		Set<ConstraintViolation<Person>> violations = validator.validate( new Person( "378.796.950-02" ) );
