@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
 
@@ -120,7 +121,8 @@ public class ConstraintTree<A extends Annotation> {
 			// check for a potential unwrapper
 
 			Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
-			ValidatedValueUnwrapper<?> validatedValueUnwrapper = validationContext.getValidatedValueUnwrapper(
+			@SuppressWarnings("unchecked")
+			ValidatedValueUnwrapper<V> validatedValueUnwrapper = (ValidatedValueUnwrapper<V>) validationContext.getValidatedValueUnwrapper(
 					validatedValueType
 			);
 			if ( !valueContext.getUnwrapMode().equals( UnwrapMode.SKIP_UNWRAP ) ) {

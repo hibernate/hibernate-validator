@@ -67,7 +67,7 @@ public class ValueContext<T, V> {
 	/**
 	 * An optional value unwrapper for the current value
 	 */
-	private ValidatedValueUnwrapper validatedValueHandler;
+	private ValidatedValueUnwrapper<V> validatedValueHandler;
 
 	/**
 	 * Enum specifying how to handle validated values
@@ -117,7 +117,6 @@ public class ValueContext<T, V> {
 	 *
 	 * @return the current value to be validated
 	 */
-	@SuppressWarnings( "unchecked" )
 	public final Object getCurrentValidatedValue() {
 		return validatedValueHandler != null ? validatedValueHandler.handleValidatedValue( currentValue ) : currentValue;
 	}
@@ -212,11 +211,11 @@ public class ValueContext<T, V> {
 		return sb.toString();
 	}
 
-	public void setValidatedValueHandler(ValidatedValueUnwrapper handler) {
+	public void setValidatedValueHandler(ValidatedValueUnwrapper<V> handler) {
 		this.validatedValueHandler = handler;
 	}
 
-	public ValidatedValueUnwrapper getValidatedValueHandler() {
+	public ValidatedValueUnwrapper<V> getValidatedValueHandler() {
 		return validatedValueHandler;
 	}
 
