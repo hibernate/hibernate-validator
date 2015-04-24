@@ -262,12 +262,13 @@ public class ValidationExtension implements Extension {
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
 
-			// if the method implements an interface we need to use the configuration of the interface
-			method = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );
 			boolean isGetter = ReflectionHelper.isGetterMethod( method );
 
-			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( method.getDeclaringClass() );
-			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnMethod( method, isGetter );
+			// obtain @ValidateOnExecution from the top-most method in the hierarchy
+			Method methodForExecutableTypeRetrieval = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );
+
+			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( methodForExecutableTypeRetrieval.getDeclaringClass() );
+			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnMethod( methodForExecutableTypeRetrieval, isGetter );
 
 			ExecutableType currentExecutableType = isGetter ? ExecutableType.GETTER_METHODS : ExecutableType.NON_GETTER_METHODS;
 
