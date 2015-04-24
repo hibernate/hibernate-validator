@@ -772,13 +772,9 @@ impact portability of your application between Bean Validation providers.
               +fraction+ fractional digits|Defines column precision and scale
 |+@Future+|+java.util.Date+,
               +java.util.Calendar+,
-              +java.time.chrono.ChronoLocalDate+,
-              +java.time.chrono.ChronoLocalDateTime+,
               +java.time.chrono.ChronoZonedDateTime+,
               +java.time.Instant+,
-              +java.time.OffsetDateTime+,
-              +java.time.Year+,
-              +java.time.YearMonth+; Additionally
+              +java.time.OffsetDateTime+; Additionally
               supported by HV, if the link:$$http://joda-time.sourceforge.net/$$[Joda Time]
               date/time API is on the class path: any implementations of
               +ReadablePartial+ and
@@ -808,13 +804,9 @@ impact portability of your application between Bean Validation providers.
               +null+|None
 |+@Past+|+java.util.Date+,
               +java.util.Calendar+,
-              +java.time.chrono.ChronoLocalDate+,
-              +java.time.chrono.ChronoLocalDateTime+,
               +java.time.chrono.ChronoZonedDateTime+,
               +java.time.Instant+,
-              +java.time.OffsetDateTime+,
-              +java.time.Year+,
-              +java.time.YearMonth+; Additionally
+              +java.time.OffsetDateTime+; Additionally
               supported by HV, if the link:$$http://joda-time.sourceforge.net/$$[Joda Time]
               date/time API is on the class path: any implementations of
               +ReadablePartial+ and

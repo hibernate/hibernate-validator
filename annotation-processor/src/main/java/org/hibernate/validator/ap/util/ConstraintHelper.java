@@ -162,13 +162,9 @@ public class ConstraintHelper {
 		);
 		registerAllowedTypesForBuiltInConstraint(
 				BeanValidationTypes.FUTURE,
-				Java8DateTime.CHRONO_LOCAL_DATE,
-				Java8DateTime.CHRONO_LOCAL_DATE_TIME,
 				Java8DateTime.CHRONO_ZONED_DATE_TIME,
 				Java8DateTime.OFFSET_DATE_TIME,
-				Java8DateTime.INSTANT,
-				Java8DateTime.YEAR,
-				Java8DateTime.YEAR_MONTH
+				Java8DateTime.INSTANT
 		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class );
@@ -182,13 +178,9 @@ public class ConstraintHelper {
 		);
 		registerAllowedTypesForBuiltInConstraint(
 				BeanValidationTypes.PAST,
-				Java8DateTime.CHRONO_LOCAL_DATE,
-				Java8DateTime.CHRONO_LOCAL_DATE_TIME,
 				Java8DateTime.CHRONO_ZONED_DATE_TIME,
 				Java8DateTime.OFFSET_DATE_TIME,
-				Java8DateTime.INSTANT,
-				Java8DateTime.YEAR,
-				Java8DateTime.YEAR_MONTH
+				Java8DateTime.INSTANT
 		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PATTERN, String.class );
 		registerAllowedTypesForBuiltInConstraint(
