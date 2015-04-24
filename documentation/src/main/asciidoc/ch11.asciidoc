@@ -1,3 +1,5 @@
+:sourcedir: ../../test/java
+
 [[validator-specifics]]
 == Hibernate Validator Specifics
 
@@ -60,6 +62,8 @@ part of the public this is not necessarily true for its sub-packages.
             and its default implementation.
 |org.hibernate.validator.parameternameprovider|A ParameterNameProvider based on the
             ParaNamer library, see <<section-paranamer-parameternameprovider>>.
+|+org.hibernate.validator.propertypath+|Extensions to the +javax.validation.Path+ API,
+            see <<section-extensions-path-api>>.
 |org.hibernate.validator.spi.constraintdefinition|An SPI for registering additional constraint validators programmatically,
             see <<section-constraint-definition-contribution>>.
 |org.hibernate.validator.spi.time|An SPI for customizing the retrieval of the current time when validating +@Future+ and +@Past+,
@@ -442,6 +446,24 @@ public @interface PatternOrSize {
 Using _$$ALL_FALSE$$_ as composition type implicitly enforces that only a single violation will get
 reported in case validation of the constraint composition fails.
 ====
+
+[[section-extensions-path-api]]
+=== Extensions of the Path API
+
+Hibernate Validator provides an extension to the +javax.validation.Path+ API.
+For nodes of +ElementKind.PROPERTY+ it allows to obtain the value of the represented property.
+To do so, narrow down a given node to the type +org.hibernate.validator.path.PropertyNode+ using +Node#as()+, as shown in the following example:
+
+[[example-property-node-get-value]]
+.Getting the value from property nodes
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/propertypath/PropertyPathTest.java[tags=include]
+----
+====
+
+This is specifically useful to obtain the element of +Set+ properties on the property path (e.g. +apartments+ in the example) which otherwise could not be identified (unlike for +Map+ and +List+, there is no key nor index in this case).
 
 [[non-el-message-interpolator]]
 === ParameterMessageInterpolator
