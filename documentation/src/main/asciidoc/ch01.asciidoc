@@ -158,13 +158,13 @@ public class Car {
 ----
 ====
 
-The@NotNull, @Size and @Min annotations are used to declare the constraints which should be applied
+The +@NotNull+, +@Size+ and +@Min+ annotations are used to declare the constraints which should be applied
 to the fields of a Car instance:
 
 
-*  manufacturer must never be +null+
-*  licensePlate must never be +null+ and must be between 2 and 14 characters long
-*  seatCount must be at least 2
+*  +manufacturer+ must never be +null+
+*  +licensePlate+ must never be +null+ and must be between 2 and 14 characters long
+*  +seatCount+ must be at least 2
 
 [TIP]
 ====
@@ -176,8 +176,8 @@ on GitHub.
 
 === Validating constraints
 
-To perform a validation of these constraints, you use a Validator instance. Let's have a look at a
-unit test forCar:
+To perform a validation of these constraints, you use a +Validator+ instance. Let's have a look at a
+unit test for +Car+:
 
 .Class CarTest showing validation examples
 ====
@@ -258,22 +258,22 @@ public class CarTest {
 ----
 ====
 
-In the setUp() method a Validator object is retrieved from the ValidatorFactory. A Validator
+In the +setUp()+ method a +Validator+ object is retrieved from the +ValidatorFactory+. A +Validator+
 instance is thread-safe and may be reused multiple times. It thus can safely be stored in a static
-field and be used in the test methods to validate the different Car instances.
+field and be used in the test methods to validate the different +Car+ instances.
 
-The validate() method returns a set of ConstraintViolation instances, which you can iterate over in
+The +validate()+ method returns a set of +ConstraintViolation+ instances, which you can iterate over in
 order to see which validation errors occurred. The first three test methods show some expected
 constraint violations:
 
 
-* The @NotNull constraint on manufacturer is violated in manufacturerIsNull()
-* The @Size constraint on licensePlate is violated in licensePlateTooShort()
-* The @Min constraint on seatCount is violated in seatCountTooLow()
+* The +@NotNull+ constraint on +manufacturer+ is violated in +manufacturerIsNull()+
+* The +@Size+ constraint on +licensePlate+ is violated in +licensePlateTooShort()+
+* The +@Min+ constraint on +seatCount+ is violated in +seatCountTooLow()+
 
-If the object validates successfully, validate() returns an empty set as you can see in carIsValid().
+If the object validates successfully, +validate()+ returns an empty set as you can see in +carIsValid()+.
 
-Note that only classes from the package javax.validation are used. These are provided from the Bean
+Note that only classes from the package +javax.validation+ are used. These are provided from the Bean
 Validation API. No classes from Hibernate Validator are directly referenced, resulting in portable
 code.
 
@@ -306,7 +306,7 @@ from the new API.
 
 ==== Optional type
 
-Hibernate Validator provides also support for Java 8 +Optional+ type, by unwrapping the `Optional`
+Hibernate Validator provides also support for Java 8 +Optional+ type, by unwrapping the +Optional+
 instance and validating the internal value. <<section-optional-unwrapper>> provides examples and a
 further discussion.
 
