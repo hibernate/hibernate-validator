@@ -220,6 +220,11 @@ public class ConstraintValidatorManager {
 			suitableTypesForWrappedValue = Collections.emptyList();
 		}
 
+		if ( UnwrapMode.AUTOMATIC == valueContext.getUnwrapMode() && suitableTypesForWrappedValue.isEmpty() ) {
+			// We don't have a validator for the wrapped value, validate the wrapper.
+			valueContext.setValidatedValueHandler( null );
+		}
+
 		Type suitableType = verifyResolveWasUnique(
 				valueContext,
 				descriptor,
@@ -320,12 +325,9 @@ public class ConstraintValidatorManager {
 					return getTypeResolutionResultForWrappedValue( constraintValidatorTypesForWrappedValue );
 				}
 				case SKIP_UNWRAP: {
-					// explicitly set the value handler to null. Is there a better place to do this? (HF)
-					valueContext.setValidatedValueHandler( null );
 					return getTypeResolutionResultForValidatedValue( valueContext, constraintValidatorTypesForValidatedValue );
 				}
 			}
-
 		}
 
 		if ( constraintValidatorTypesForWrappedValue.size() == 0 ) {
@@ -354,8 +356,6 @@ public class ConstraintValidatorManager {
 			return ConstraintValidatorManager.TypeResolutionResult.NO_VALIDATORS;
 		}
 		else if ( constraintValidatorTypesForValidatedValue.size() == 1 ) {
-			// explicitly set the value handler to null. Is there a better place to do this? (HF)
-			valueContext.setValidatedValueHandler( null );
 			return ConstraintValidatorManager.TypeResolutionResult.SINGLE_VALIDATOR_FOR_VALIDATED_VALUE;
 		}
 		else {
