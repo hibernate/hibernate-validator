@@ -86,10 +86,10 @@ public class OptionalTypeAnnotationConstraintUsingValidatePropertyTest {
 		model.valueWithNotNull = null;
 
 		Set<ConstraintViolation<Model>> constraintViolations = validator.validateProperty( model, "valueWithNotNull" );
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNull" );
-		assertConstraintViolation( constraintViolations.iterator().next(), "container" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertNumberOfViolations( constraintViolations, 2 );
+		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNull", "valueWithNotNull" );
+		Assertions.assertThat( constraintViolations ).onProperty( "message" ).containsOnly( "container", "type" );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNullTypeUse.class );
 	}
 
 	@Test
