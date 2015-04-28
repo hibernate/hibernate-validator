@@ -103,6 +103,12 @@ public class UnwrapModesTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "integerHolder" );
 		assertCorrectConstraintTypes( constraintViolations, ValueHolderConstraint.class );
+
+		// execute validation twice to ensure that the handling for this case is not subjective to caching (see HV-976)
+		constraintViolations = validatorWithUnwrapper.validate( new Qux() );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "integerHolder" );
+		assertCorrectConstraintTypes( constraintViolations, ValueHolderConstraint.class );
 	}
 
 	@Test

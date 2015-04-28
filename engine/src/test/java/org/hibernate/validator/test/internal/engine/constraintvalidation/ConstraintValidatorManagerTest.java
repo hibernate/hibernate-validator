@@ -9,7 +9,6 @@ package org.hibernate.validator.test.internal.engine.constraintvalidation;
 import java.util.Set;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
-import javax.validation.UnexpectedTypeException;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -33,6 +32,7 @@ import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -67,7 +67,7 @@ public class ConstraintValidatorManagerTest {
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		ConstraintValidator<?, ?> constraintValidator = constraintValidatorManager.getInitializedValidator(
-				valueContext,
+				valueContext.getDeclaredTypeOfValidatedElement(),
 				constraintDescriptor,
 				constraintValidatorFactory
 		);
@@ -82,7 +82,7 @@ public class ConstraintValidatorManagerTest {
 		valueContext.setDeclaredTypeOfValidatedElement( null );
 
 		constraintValidatorManager.getInitializedValidator(
-				valueContext,
+				valueContext.getDeclaredTypeOfValidatedElement(),
 				constraintDescriptor,
 				constraintValidatorFactory
 		);
@@ -94,7 +94,7 @@ public class ConstraintValidatorManagerTest {
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		constraintValidatorManager.getInitializedValidator(
-				valueContext,
+				valueContext.getDeclaredTypeOfValidatedElement(),
 				null,
 				constraintValidatorFactory
 		);
@@ -107,14 +107,13 @@ public class ConstraintValidatorManagerTest {
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		constraintValidatorManager.getInitializedValidator(
-				valueContext,
+				valueContext.getDeclaredTypeOfValidatedElement(),
 				constraintDescriptor,
 				null
 		);
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class,
-			expectedExceptionsMessageRegExp = "HV000030.*")
+	@Test
 	public void testUnexpectedTypeException() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s2" );
 
@@ -123,11 +122,12 @@ public class ConstraintValidatorManagerTest {
 		);
 		valueContext.setDeclaredTypeOfValidatedElement( Object.class );
 
-		constraintValidatorManager.getInitializedValidator(
-				valueContext,
+		ConstraintValidator<?, ?> constraintValidator = constraintValidatorManager.getInitializedValidator(
+				valueContext.getDeclaredTypeOfValidatedElement(),
 				constraintDescriptor,
 				constraintValidatorFactory
 		);
+		assertNull( constraintValidator, "there should be no matching constraint validator" );
 	}
 
 	@Test
@@ -137,7 +137,7 @@ public class ConstraintValidatorManagerTest {
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		ConstraintValidator<?, ?> constraintValidator1 = constraintValidatorManager.getInitializedValidator(
-				valueContext,
+				valueContext.getDeclaredTypeOfValidatedElement(),
 				constraintDescriptor,
 				constraintValidatorFactory
 		);
@@ -148,7 +148,7 @@ public class ConstraintValidatorManagerTest {
 		);
 
 		ConstraintValidator<?, ?> constraintValidator2 = constraintValidatorManager.getInitializedValidator(
-				valueContext,
+				valueContext.getDeclaredTypeOfValidatedElement(),
 				constraintDescriptor,
 				new MyCustomValidatorFactory()
 		);
@@ -173,7 +173,7 @@ public class ConstraintValidatorManagerTest {
 
 		for ( int i = 0; i < 10; i++ ) {
 			constraintValidatorManager.getInitializedValidator(
-					valueContext,
+					valueContext.getDeclaredTypeOfValidatedElement(),
 					constraintDescriptor,
 					new MyCustomValidatorFactory()
 			);
@@ -215,13 +215,19 @@ public class ConstraintValidatorManagerTest {
 		);
 
 		ConstraintValidator<?, Object> notNullValidatorForFirstName1 = constraintValidatorManager.getInitializedValidator(
-				valueContext, notNullOnFirstNameDescriptor, constraintValidatorFactory
+				valueContext.getDeclaredTypeOfValidatedElement(),
+				notNullOnFirstNameDescriptor,
+				constraintValidatorFactory
 		);
 		ConstraintValidator<?, Object> notNullValidatorForFirstName2 = constraintValidatorManager.getInitializedValidator(
-				valueContext, notNullOnFirstNameDescriptor, constraintValidatorFactory
+				valueContext.getDeclaredTypeOfValidatedElement(),
+				notNullOnFirstNameDescriptor,
+				constraintValidatorFactory
 		);
 		ConstraintValidator<?, Object> notNullValidatorForLastName = constraintValidatorManager.getInitializedValidator(
-				valueContext, notNullOnLastNameDescriptor, constraintValidatorFactory
+				valueContext.getDeclaredTypeOfValidatedElement(),
+				notNullOnLastNameDescriptor,
+				constraintValidatorFactory
 		);
 
 		assertThat( notNullValidatorForFirstName1 ).isSameAs( notNullValidatorForFirstName2 );
@@ -254,13 +260,13 @@ public class ConstraintValidatorManagerTest {
 		);
 
 		ConstraintValidator<?, Object> sizeValidatorForMiddleName = constraintValidatorManager.getInitializedValidator(
-				valueContext, sizeOnMiddleNameDescriptor, constraintValidatorFactory
+				valueContext.getDeclaredTypeOfValidatedElement(), sizeOnMiddleNameDescriptor, constraintValidatorFactory
 		);
 		ConstraintValidator<?, Object> sizeValidatorForAddress1 = constraintValidatorManager.getInitializedValidator(
-				valueContext, sizeOnAddress1Descriptor, constraintValidatorFactory
+				valueContext.getDeclaredTypeOfValidatedElement(), sizeOnAddress1Descriptor, constraintValidatorFactory
 		);
 		ConstraintValidator<?, Object> sizeValidatorForAddress2 = constraintValidatorManager.getInitializedValidator(
-				valueContext, sizeOnAddress2Descriptor, constraintValidatorFactory
+				valueContext.getDeclaredTypeOfValidatedElement(), sizeOnAddress2Descriptor, constraintValidatorFactory
 		);
 
 		assertThat( sizeValidatorForMiddleName ).isNotSameAs( sizeValidatorForAddress1 );
