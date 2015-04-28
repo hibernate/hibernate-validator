@@ -40,6 +40,9 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2012 SERLI
  */
 public class ConstraintTree<A extends Annotation> {
+
+	private static final String TYPE_USE = "TYPE_USE";
+
 	private static final Log log = LoggerFactory.make();
 
 	private final ConstraintTree<?> parent;
@@ -119,13 +122,15 @@ public class ConstraintTree<A extends Annotation> {
 			);
 
 			// check for a potential unwrapper
-
-			Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
-			@SuppressWarnings("unchecked")
-			ValidatedValueUnwrapper<V> validatedValueUnwrapper = (ValidatedValueUnwrapper<V>) validationContext.getValidatedValueUnwrapper(
-					validatedValueType
-			);
-			if ( !valueContext.getUnwrapMode().equals( UnwrapMode.SKIP_UNWRAP ) ) {
+			if ( valueContext.getUnwrapMode().equals( UnwrapMode.SKIP_UNWRAP )
+					&& !TYPE_USE.equals( valueContext.getElementType().name() ) ) {
+				valueContext.setValidatedValueHandler( null );
+			}
+			else {
+				Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
+				@SuppressWarnings("unchecked")
+				ValidatedValueUnwrapper<V> validatedValueUnwrapper = (ValidatedValueUnwrapper<V>) validationContext
+						.getValidatedValueUnwrapper( validatedValueType );
 				valueContext.setValidatedValueHandler( validatedValueUnwrapper );
 			}
 
@@ -244,7 +249,8 @@ public class ConstraintTree<A extends Annotation> {
 			ValueContext<?, ?> valueContext,
 			Set<ConstraintViolation<T>> constraintViolations) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
-		for ( ConstraintTree<?> tree : getChildren() ) {
+		List<ConstraintTree<?>> children = getChildren();
+		for ( ConstraintTree<?> tree : children ) {
 			Set<ConstraintViolation<T>> tmpViolations = newHashSet();
 			tree.validateConstraints( executionContext, valueContext, tmpViolations );
 			constraintViolations.addAll( tmpViolations );

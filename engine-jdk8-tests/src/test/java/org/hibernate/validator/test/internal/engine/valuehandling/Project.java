@@ -8,7 +8,6 @@ package org.hibernate.validator.test.internal.engine.valuehandling;
 
 import java.time.LocalDate;
 import java.util.Optional;
-
 import javax.validation.constraints.AssertTrue;
 
 /**

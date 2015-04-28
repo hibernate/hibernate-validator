@@ -167,15 +167,15 @@ public class UnwrapModesTest {
 	}
 
 	@Documented
-	@Constraint(validatedBy = { })
+	@Constraint(validatedBy = {})
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)
 	public @interface DummyConstraint {
 		String message() default "dummy constraint";
 
-		Class<?>[] groups() default { };
+		Class<?>[] groups() default {};
 
-		Class<? extends Payload>[] payload() default { };
+		Class<? extends Payload>[] payload() default {};
 	}
 
 	@Documented
@@ -185,9 +185,9 @@ public class UnwrapModesTest {
 	public @interface ValueHolderConstraint {
 		String message() default "value holder constraint";
 
-		Class<?>[] groups() default { };
+		Class<?>[] groups() default {};
 
-		Class<? extends Payload>[] payload() default { };
+		Class<? extends Payload>[] payload() default {};
 	}
 
 	public static class ValueHandlerConstraintValidator
