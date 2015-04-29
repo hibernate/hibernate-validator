@@ -240,16 +240,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 
 		boolean isCascading = field.isAnnotationPresent( Valid.class );
-		UnwrapValidatedValue unwrapValidatedValue = field.getAnnotation( UnwrapValidatedValue.class );
-		UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
-		if ( unwrapValidatedValue != null ) {
-			unwrapMode = unwrapValidatedValue.value() ? UnwrapMode.UNWRAP : UnwrapMode.SKIP_UNWRAP;
-		}
-
 		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForMember( field );
-		if ( !typeArgumentsConstraints.isEmpty() && !ReflectionHelper.isIterable( ReflectionHelper.typeOf( field ) ) ) {
-			unwrapMode = UnwrapMode.UNWRAP;
-		}
+
+		boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
+		UnwrapMode unwrapMode = unwrapMode( field, typeArgumentAnnotated );
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
@@ -262,6 +256,18 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
+	private UnwrapMode unwrapMode(Field field, boolean typeArgumentAnnotated) {
+		boolean notIterable = !ReflectionHelper.isIterable( ReflectionHelper.typeOf( field ) );
+		UnwrapValidatedValue unwrapValidatedValue = field.getAnnotation( UnwrapValidatedValue.class );
+		return unwrapMode( typeArgumentAnnotated, notIterable, unwrapValidatedValue );
+	}
+
+	private UnwrapMode unwrapMode(ExecutableElement executable, boolean typeArgumentAnnotated) {
+		boolean notIterable = !ReflectionHelper.isIterable( ReflectionHelper.typeOf( executable.getMember() ) );
+		UnwrapValidatedValue unwrapValidatedValue = executable.getAccessibleObject().getAnnotation( UnwrapValidatedValue.class );
+		return unwrapMode( typeArgumentAnnotated, notIterable, unwrapValidatedValue );
+	}
+
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
@@ -269,6 +275,27 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			constraints.add( createMetaConstraint( field, constraintDescription ) );
 		}
 		return constraints;
+	}
+
+	private UnwrapMode unwrapMode(boolean typeArgumentAnnotated, boolean notIterable, UnwrapValidatedValue unwrapValidatedValue) {
+		if ( unwrapValidatedValue == null && typeArgumentAnnotated && notIterable ) {
+			/*
+			 * Optional<@NotNull String> exampleValue
+			 */
+			return UnwrapMode.UNWRAP;
+		}
+		else if ( unwrapValidatedValue != null ) {
+			/*
+			 * @UnwrapValidatedValue(false) Optional<@NotNull String> exampleValue
+			 */
+			return unwrapValidatedValue.value() ? UnwrapMode.UNWRAP : UnwrapMode.SKIP_UNWRAP;
+		}
+		/*
+		 * @NotNull Optional<String> exampleValue
+		 *
+		 * @NotNull String otherExampleValue
+		 */
+		return UnwrapMode.AUTOMATIC;
 	}
 
 	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
@@ -348,22 +375,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			isCascading = false;
 		}
 		else {
-			UnwrapValidatedValue unwrapValidatedValue = executable.getAccessibleObject().getAnnotation(
-					UnwrapValidatedValue.class
-			);
-			if ( unwrapValidatedValue != null ) {
-				unwrapMode = unwrapValidatedValue.value() ? UnwrapMode.UNWRAP : UnwrapMode.SKIP_UNWRAP;
-			}
-
 			typeArgumentsConstraints = findTypeAnnotationConstraintsForMember( executable.getMember() );
-			if ( !typeArgumentsConstraints.isEmpty() && !ReflectionHelper.isIterable(
-					ReflectionHelper.typeOf(
-							executable.getMember()
-					)
-			) ) {
-				unwrapMode = UnwrapMode.UNWRAP;
-			}
-
+			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
+			unwrapMode = unwrapMode( executable, typeArgumentAnnotated );
 			returnValueConstraints = convertToMetaConstraints(
 					executableConstraints.get( ConstraintType.GENERIC ),
 					executable
@@ -446,7 +460,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				continue;
 			}
 
-			UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
+			UnwrapValidatedValue unwrapValidatedValue = null;
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
 				//1. mark parameter as cascading if this annotation is the @Valid annotation
 				if ( parameterAnnotation.annotationType().equals( Valid.class ) ) {
@@ -463,8 +477,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 				//3. unwrapping required?
 				else if ( parameterAnnotation.annotationType().equals( UnwrapValidatedValue.class ) ) {
-					UnwrapValidatedValue unwrapValidatedValue = (UnwrapValidatedValue) parameterAnnotation;
-					unwrapMode = unwrapValidatedValue.value() ? UnwrapMode.UNWRAP : UnwrapMode.SKIP_UNWRAP;
+					unwrapValidatedValue = (UnwrapValidatedValue) parameterAnnotation;
 				}
 
 				//4. collect constraints if this annotation is a constraint annotation
@@ -479,12 +492,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			}
 
 			typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable.getMember(), i );
-			// if there are type annotation constraints for a parameter which is not an iterable, we force the unwrapping
-			if ( !typeArgumentsConstraints.isEmpty() ) {
-				if ( !ReflectionHelper.isIterable( ReflectionHelper.typeOf( executable, i ) ) ) {
-					unwrapMode = UnwrapMode.UNWRAP;
-				}
-			}
+			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
+			boolean notIterable = !ReflectionHelper.isIterable( ReflectionHelper.typeOf( executable, i ) );
+			UnwrapMode unwrapMode = unwrapMode( typeArgumentAnnotated, notIterable, unwrapValidatedValue );
 
 			metaData.add(
 					new ConstrainedParameter(

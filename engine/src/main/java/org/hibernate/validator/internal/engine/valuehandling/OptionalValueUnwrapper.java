@@ -26,6 +26,10 @@ public class OptionalValueUnwrapper extends TypeResolverBasedValueUnwrapper<Opti
 
 	@Override
 	public Object handleValidatedValue(Optional<?> value) {
+		if ( value == null ) {
+			return null;
+		}
+
 		if ( value.isPresent() ) {
 			return value.get();
 		}
