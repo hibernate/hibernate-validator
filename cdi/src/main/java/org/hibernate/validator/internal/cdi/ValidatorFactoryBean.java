@@ -13,7 +13,7 @@ import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -82,7 +82,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	@Override
 	public Class<? extends Annotation> getScope() {
-		return ApplicationScoped.class;
+		return Dependent.class;
 	}
 
 	@Override
