@@ -10,7 +10,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Set;
-import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -19,6 +18,7 @@ import javax.enterprise.inject.spi.PassivationCapable;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import org.hibernate.validator.cdi.ModuleScoped;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 
@@ -70,7 +70,7 @@ public class ValidatorBean implements Bean<Validator>, PassivationCapable {
 
 	@Override
 	public Class<? extends Annotation> getScope() {
-		return Dependent.class;
+		return ModuleScoped.class;
 	}
 
 	@Override
