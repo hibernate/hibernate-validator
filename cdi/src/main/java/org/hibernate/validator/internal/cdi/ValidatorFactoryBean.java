@@ -13,7 +13,6 @@ import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -28,6 +27,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import org.hibernate.validator.cdi.ModuleScoped;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
@@ -82,7 +82,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	@Override
 	public Class<? extends Annotation> getScope() {
-		return ApplicationScoped.class;
+		return ModuleScoped.class;
 	}
 
 	@Override
