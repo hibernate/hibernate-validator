@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
@@ -45,8 +44,10 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.cdi.HibernateValidator;
+import org.hibernate.validator.cdi.ModuleScoped;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationEnabledAnnotatedType;
 import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
+import org.hibernate.validator.internal.cdi.scope.ModuleScopeContext;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -236,6 +237,14 @@ public class ValidationExtension implements Extension {
 		}
 	}
 
+	public void addScope(@Observes final BeforeBeanDiscovery event) {
+		event.addScope( ModuleScoped.class, true, false );
+	}
+
+	public void registerContext(@Observes final AfterBeanDiscovery event) {
+		event.addContext( new ModuleScopeContext() );
+	}
+
 	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type) {
 		Set<AnnotatedCallable<? super T>> callables = newHashSet();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( type.getJavaClass() );
@@ -255,10 +264,18 @@ public class ValidationExtension implements Extension {
 			boolean isGetter = ReflectionHelper.isGetterMethod( method );
 
 			// obtain @ValidateOnExecution from the top-most method in the hierarchy
-			Method methodForExecutableTypeRetrieval = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );
+			Method methodForExecutableTypeRetrieval = replaceWithOverriddenOrInterfaceMethod(
+					method,
+					overriddenAndImplementedMethods
+			);
 
-			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( methodForExecutableTypeRetrieval.getDeclaringClass() );
-			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnMethod( methodForExecutableTypeRetrieval, isGetter );
+			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType(
+					methodForExecutableTypeRetrieval.getDeclaringClass()
+			);
+			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnMethod(
+					methodForExecutableTypeRetrieval,
+					isGetter
+			);
 
 			ExecutableType currentExecutableType = isGetter ? ExecutableType.GETTER_METHODS : ExecutableType.NON_GETTER_METHODS;
 
