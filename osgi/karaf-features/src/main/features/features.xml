@@ -22,5 +22,8 @@
         <bundle>mvn:com.fasterxml/classmate/${classmate.version}</bundle>
         <bundle>mvn:javax.el/javax.el-api/${javax.el.version}</bundle>
         <bundle>mvn:org.glassfish.web/javax.el/${javax.el.version}</bundle>
+        <bundle>wrap:mvn:com.thoughtworks.paranamer:paranamer:${paranamer.version}</bundle>
+        <bundle>org.jsoup:jsoup:${jsoup.version}</bundle>
+        <bundle>joda-time:joda-time:${joda-time.version}</bundle>
     </feature>
 </features>
