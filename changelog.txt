@@ -1,6 +1,36 @@
 Hibernate Validator Changelog
 =============================
 
+5.2.0.CR1 (22.05.2015)
+-------------------------
+
+** Bug
+    * [HV-726] - Retrieve constraint target from composing constraints for purely composed constraints
+    * [HV-847] - Custom constraint causes "target cannot be inferred" exception when used for return value
+    * [HV-897] - Create a TimeProvider contract to get the current data time
+    * [HV-975] - NullPointerException in ValueContext.appendNode
+    * [HV-976] - Optional and Type Annotations
+    * [HV-977] - OptionalValueUnwrapper needs to handle null values passed to handleValidatedValue
+    * [HV-978] - Generic method is not validated
+    * [HV-979] - CPF Validation still fails (partly)
+    * [HV-982] - SNAPSHOT deploy fails with compiler error
+    * [HV-993] - OSGi metadata is missing optional import for com.thoughtworks.paranamer
+    * [HV-997] - Upgrade asciidoctor plugin
+
+** Improvement
+    * [HV-846] - Make hibernate-validator-cdi OSGI compliant
+    * [HV-941] - Documentation review and improvements (chapter 1,2,11)
+    * [HV-974] - Deploy the test util artifact
+    * [HV-980] - Store violated element of a java.util.Set in Path
+    * [HV-985] - Update to Classmate 1.1.0 or latest
+    * [HV-989] - ConcurrentReferenceHashMap is inadvertently licensed as LGPL
+
+** Task
+    * [HV-892] - Update javadoc css templates to match the JDK doclet output
+    * [HV-899] - Errors during javadoc creations
+    * [HV-981] - Remove @Future and @Past validators validation partial dates
+
+
 5.2.0.Beta1 (20.02.2015)
 -------------------------
 
