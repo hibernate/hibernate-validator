@@ -42,3 +42,4 @@ maven-eclipse.xml
 # Miscellaneous
 *.log
 .clover
+.DS_Store
