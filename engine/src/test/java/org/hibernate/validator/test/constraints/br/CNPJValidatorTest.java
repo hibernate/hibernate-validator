@@ -55,6 +55,12 @@ public class CNPJValidatorTest {
 		assertNumberOfViolations( violations, 1 );
 	}
 
+	@Test
+	public void correct_cnpj_with_check_digit_zero_validates() {
+		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "07755311000100" ) );
+		assertNumberOfViolations( violations, 0 );
+	}
+
 	public static class Company {
 		@CNPJ
 		private String cnpj;

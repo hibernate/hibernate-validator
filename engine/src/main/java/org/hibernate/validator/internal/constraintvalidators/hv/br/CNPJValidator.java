@@ -33,19 +33,19 @@ public class CNPJValidator implements ConstraintValidator<CNPJ, CharSequence> {
 		// check digit being the digit directly after the hyphen. The second checksum is over all digits
 		// pre hyphen + first check digit. The check digit in this case is the second digit after the hyphen
 		withSeparatorMod11Validator1.initialize(
-				0, 14, 16, true, 9, 'X', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
+				0, 14, 16, true, 9, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
 		);
 		withSeparatorMod11Validator2.initialize(
-				0, 16, 17, true, 9, 'X', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
+				0, 16, 17, true, 9, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
 		);
 
 		// validates CNPJ strings without separator, eg 91509901000169
 		// checksums as described above, except there are no separator characters
 		withoutSeparatorMod11Validator1.initialize(
-				0, 11, 12, true, 9, 'X', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
+				0, 11, 12, true, 9, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
 		);
 		withoutSeparatorMod11Validator2.initialize(
-				0, 12, 13, true, 9, 'X', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
+				0, 12, 13, true, 9, '0', '0', Mod11Check.ProcessingDirection.RIGHT_TO_LEFT
 		);
 	}
 
