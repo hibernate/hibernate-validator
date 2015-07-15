@@ -1,7 +1,7 @@
 [[chapter-groups]]
 == Grouping constraints
 
-All validation methods on Validator and ExecutableValidator discussed in earlier chapters also take
+All validation methods on `Validator` and `ExecutableValidator` discussed in earlier chapters also take
 a var-arg argument groups. So far we have been ignoring this parameter, but it is time to have a
 closer look.
 
@@ -12,19 +12,19 @@ validation groups are UI wizards where in each step only a specified subset of c
 get validated. The groups targeted are passed as var-arg parameters to the appropriate validate
 method.
 
-Let's have a look at an example. The class Person in <<example-person>> has a @NotNull constraint on
-name. Since no group is specified for this annotation the default group
-javax.validation.groups.Default is assumed.
+Let's have a look at an example. The class `Person` in <<example-person>> has a `@NotNull`
+constraint on `name`. Since no group is specified for this annotation the default group
+`javax.validation.groups.Default` is assumed.
 
 [NOTE]
 ====
 When more than one group is requested, the order in which the groups are evaluated is not
-deterministic. If no group is specified the default group javax.validation.groups.Default is
+deterministic. If no group is specified the default group `javax.validation.groups.Default` is
 assumed.
 ====
 
 [[example-person]]
-.Person
+.Example class `Person`
 ====
 [source, JAVA]
 ----
@@ -44,18 +44,16 @@ public class Person {
 ----
 ====
 
-The class Driver in <<example-driver>> extends Person and adds the properties age and
-hasDrivingLicense. Drivers must be at least 18 years old (@Min(18)) and have a driving license
-(@AssertTrue). Both constraints defined on these properties belong to the group DriverChecks which
+The class `Driver` in <<example-driver>> extends `Person` and adds the properties `age` and
+`hasDrivingLicense`. Drivers must be at least 18 years old (`@Min(18)`) and have a driving license
+(`@AssertTrue`). Both constraints defined on these properties belong to the group `DriverChecks` which
 is just a simple tagging interface.
-
 
 [TIP]
 ====
 Using interfaces makes the usage of groups type-safe and allows for easy refactoring. It also means
 that groups can inherit from each other via class inheritance.
 ====
-
 
 [[example-driver]]
 .Driver
@@ -105,8 +103,8 @@ public interface DriverChecks {
 ----
 ====
 
-Finally the class Car (<<example-car>>) has some constraints which are part of the default group as
-well as @AssertTrue in the group CarChecks on the property passedVehicleInspection which indicates
+Finally the class `Car` (<<example-car>>) has some constraints which are part of the default group as
+well as `@AssertTrue` in the group `CarChecks` on the property `passedVehicleInspection` which indicates
 whether a car passed the road worthy tests.
 
 [[example-car]]
@@ -157,12 +155,12 @@ public interface CarChecks {
 
 Overall three different groups are used in the example:
 
-* The constraints on Person.name, Car.manufacturer, Car.licensePlate and Car.seatCount all belong
-to the Default group
-* The constraints on Driver.age and Driver.hasDrivingLicense belong to DriverChecks
-* The constraint on Car.passedVehicleInspection belongs to the group CarChecks
+* The constraints on `Person.name`, `Car.manufacturer`, `Car.licensePlate` and `Car.seatCount`
+all belong to the `Default` group
+* The constraints on `Driver.age` and `Driver.hasDrivingLicense` belong to `DriverChecks`
+* The constraint on `Car.passedVehicleInspection` belongs to the group `CarChecks`
 
-<<example-drive-away>> shows how passing different group combinations to the Validator#validate()
+<<example-drive-away>> shows how passing different group combinations to the `Validator#validate()`
 method results in different validation results.
 
 [[example-drive-away]]
@@ -214,16 +212,16 @@ assertEquals(
 ----
 ====
 
-The first validate() call in <<example-drive-away>> is done using no explicit group. There are no
-validation errors, even though the property passedVehicleInspection is per default false. However,
+The first `validate()` call in <<example-drive-away>> is done using no explicit group. There are no
+validation errors, even though the property `passedVehicleInspection` is per default `false`. However,
 the constraint defined on this property does not belong to the default group.
 
-The next validation using the CarChecks group fails until the car passes the vehicle inspection.
-Adding a driver to the car and validating against DriverChecks again yields one constraint violation
+The next validation using the `CarChecks` group fails until the car passes the vehicle inspection.
+Adding a driver to the car and validating against `DriverChecks` again yields one constraint violation
 due to the fact that the driver has not yet passed the driving test. Only after setting
-passedDrivingTest to +true+ the validation against DriverChecks passes.
+`passedDrivingTest` to `true` the validation against `DriverChecks` passes.
 
-The last validate() call finally shows that all constraints are passing by validating against all
+The last `validate()` call finally shows that all constraints are passing by validating against all
 defined groups.
 
 [[section-defining-group-sequences]]
@@ -237,7 +235,7 @@ car constraints are passing before checking the road worthiness of the car. Fina
 away, the actual driver constraints should be checked.
 
 In order to implement such a validation order you just need to define an interface and annotate it
-with @GroupSequence, defining the order in which the groups have to be validated (see
+with `@GroupSequence`, defining the order in which the groups have to be validated (see
 <<example-defining-group-sequence>>). If at least one constraint fails in a sequenced group none of the
 constraints of the following groups in the sequence get validated.
 
@@ -258,7 +256,7 @@ public interface OrderedChecks {
 ====
 Groups defining a sequence and groups composing a sequence must not be involved in a cyclic
 dependency either directly or indirectly, either through cascaded sequence definition or group
-inheritance. If a group containing such a circularity is evaluated, a GroupDefinitionException is
+inheritance. If a group containing such a circularity is evaluated, a `GroupDefinitionException` is
 raised.
 ====
 
@@ -284,16 +282,16 @@ assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );
 [[section-default-group-class]]
 === Redefining the default group sequence
 
-==== @GroupSequence
+==== `@GroupSequence`
 
-Besides defining group sequences, the @GroupSequence annotation also allows to redefine the default
-group for a given class. To do so, just add the @GroupSequence annotation to the class and specify
+Besides defining group sequences, the `@GroupSequence` annotation also allows to redefine the default
+group for a given class. To do so, just add the `@GroupSequence` annotation to the class and specify
 the sequence of groups which substitute Default for this class within the annotation.
 
-<<example-rental-car>> introduces a new class RentalCar with a redefined default group.
+<<example-rental-car>> introduces a new class `RentalCar` with a redefined default group.
 
 [[example-rental-car]]
-.Class RentalCar with redefined default group
+.Class `RentalCar` with redefined default group
 ====
 [source, JAVA]
 ----
@@ -327,8 +325,8 @@ public interface RentalChecks {
 ----
 ====
 
-With this definition you can evaluate the constraints belonging to RentalChecks, CarChecks and
-RentalCar by just requesting the Default group as seen in <<example-testCarIsRented>>.
+With this definition you can evaluate the constraints belonging to `RentalChecks`, `CarChecks` and
+`RentalCar` by just requesting the `Default` group as seen in <<example-testCarIsRented>>.
 
 [[example-testCarIsRented]]
 .Validating an object with redefined default group
@@ -358,27 +356,27 @@ assertEquals( 0, constraintViolations.size() );
 [NOTE]
 ====
 Since there must no cyclic dependency in the group and group sequence definitions one cannot just
-add Default to the sequence redefining Default for a class. Instead the class itself has to be
+add `Default` to the sequence redefining `Default` for a class. Instead the class itself has to be
 added!
 ====
 
-The Default group sequence overriding is local to the class it is defined on and is not propagated
-to associated objects. For the example this means that adding DriverChecks to the default group
-sequence of RentalCar would not have any effects. Only the group Default will be propagated to the
+The `Default` group sequence overriding is local to the class it is defined on and is not propagated
+to associated objects. For the example this means that adding `DriverChecks` to the default group
+sequence of `RentalCar` would not have any effects. Only the group `Default` will be propagated to the
 driver association.
 
 Note that you can control the propagated group(s) by declaring a group conversion rule (see
 <<section-group-conversion>>).
 
-==== @GroupSequenceProvider
+==== `@GroupSequenceProvider`
 
-In addition to statically redefining default group sequences via @GroupSequence, Hibernate Validator
+In addition to statically redefining default group sequences via `@GroupSequence`, Hibernate Validator
 also provides an SPI for the dynamic redefinition of default group sequences depending on the object
 state.
 
-For that purpose you need to implement the interface DefaultGroupSequenceProvider and register this
-implementation with the target class via the @GroupSequenceProvider annotation. In the rental car
-scenario you could for instance dynamically add the CarChecks as seen in
+For that purpose you need to implement the interface `DefaultGroupSequenceProvider` and register this
+implementation with the target class via the `@GroupSequenceProvider` annotation. In the rental car
+scenario you could for instance dynamically add the `CarChecks` as seen in
 <<example-implementing-using-default-group-sequence-provider>>.
 
 [[example-implementing-using-default-group-sequence-provider]]
@@ -435,17 +433,17 @@ public class RentalCar extends Car {
 
 What if you wanted to validate the car related checks together with the driver checks? Of course you
 could pass the required groups to the validate call explicitly, but what if you wanted to make these
-validations occur as part of the Default group validation? Here @ConvertGroup comes into play which
+validations occur as part of the `Default` group validation? Here `@ConvertGroup` comes into play which
 allows you during cascaded validation to use a different group than the originally requested one.
 
-Let's have a look at <<example-group-conversion-dedault-to-driver-checks>>. Here @GroupSequence({
-CarChecks.class, Car.class }) is used to combine the car related constraints under the Default group
-(see <<section-default-group-class>>). There is also a @ConvertGroup(from = Default.class, to =
-DriverChecks.class) which ensures the Default group gets converted to the DriverChecks group during
+Let's have a look at <<example-group-conversion-dedault-to-driver-checks>>. Here `@GroupSequence({
+CarChecks.class, Car.class })` is used to combine the car related constraints under the `Default` group
+(see <<section-default-group-class>>). There is also a `@ConvertGroup(from = Default.class, to =
+DriverChecks.class)` which ensures the `Default` group gets converted to the `DriverChecks` group during
 cascaded validation of the driver association.
 
 [[example-group-conversion-dedault-to-driver-checks]]
-.@ConvertGroup usage
+.`@ConvertGroup` usage
 ====
 [source, JAVA]
 ----
@@ -520,11 +518,11 @@ public class Car {
 ====
 
 As a result the validation in <<example-group-conversion-test>> succeeds, even though the constraint
-on hasDrivingLicense belongs to the DriverChecks group and only the Default group is requested in
-the validate() call.
+on `hasDrivingLicense` belongs to the `DriverChecks` group and only the `Default` group is requested in
+the `validate()` call.
 
 [[example-group-conversion-test]]
-.Test case for @ConvertGroup
+.Test case for `@ConvertGroup`
 ====
 [source, JAVA]
 ----
@@ -550,26 +548,24 @@ assertEquals(
 ----
 ====
 
-You can define group conversions wherever @Valid can be used, namely associations as well as method
+You can define group conversions wherever `@Valid` can be used, namely associations as well as method
 and constructor parameters and return values. Multiple conversions can be specified using
-@ConvertGroup.List.
+`@ConvertGroup.List`.
 
 However, the following restrictions apply:
 
-* @ConvertGroup must only be used in combination with @Valid. If used without, a
-ConstraintDeclarationException is thrown.
-
+* `@ConvertGroup` must only be used in combination with `@Valid`. If used without, a
+`ConstraintDeclarationException` is thrown.
 
 * It is not legal to have multiple conversion rules on the same element with the same from value.
-In this case, a ConstraintDeclarationException is raised.
+In this case, a `ConstraintDeclarationException` is raised.
 
-
-* The from attribute must not refer to a group sequence. A ConstraintDeclarationException is
+* The from attribute must not refer to a group sequence. A `ConstraintDeclarationException` is
 raised in this situation.
 
 [NOTE]
 ====
 Rules are not executed recursively. The first matching conversion rule is used and subsequent rules
-are ignored. For example if a set of @ConvertGroup declarations chains group A to B and B to C, the
-group A will be converted to B and not to C.
+are ignored. For example if a set of `@ConvertGroup` declarations chains group `A` to `B` and
+`B` to `C`, the group `A` will be converted to `B` and not to `C`.
 ====

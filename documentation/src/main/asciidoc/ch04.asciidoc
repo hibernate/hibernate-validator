@@ -31,12 +31,12 @@ public class Car {
 ====
 
 If a constraint is violated, its descriptor will be interpolated by the validation engine using the
-currently configured MessageInterpolator. The interpolated error message can then be retrieved from
-the resulting constraint violation by calling ConstraintViolation#getMessage().
+currently configured `MessageInterpolator`. The interpolated error message can then be retrieved from
+the resulting constraint violation by calling `ConstraintViolation#getMessage()`.
 
 Message descriptors can contain _message parameters_ as well as _message expressions_ which will be
-resolved during interpolation. Message parameters are string literals enclosed in +{}+, while
-message expressions are string literals enclosed in +${}+. The following algorithm is applied during
+resolved during interpolation. Message parameters are string literals enclosed in `{}`, while
+message expressions are string literals enclosed in `${}`. The following algorithm is applied during
 method interpolation:
 
 
@@ -47,17 +47,17 @@ the replaced value again contains message parameters. The resource bundle is exp
 by the application developer, e.g. by adding a file named _ValidationMessages.properties_ to the
 classpath. You can also create localized error messages by providing locale specific variations of
 this bundle, such as _$$ValidationMessages_en_US.properties$$_. By default, the JVM's default locale
-(Locale#getDefault()) will be used when looking up messages in the bundle.
+(`Locale#getDefault()`) will be used when looking up messages in the bundle.
 
 . Resolve any message parameters by using them as key for a resource bundle containing the standard
 error messages for the built-in constraints as defined in Appendix B of the Bean Validation
 specification. In the case of Hibernate Validator, this bundle is named
-org.hibernate.validator.ValidationMessages. If this step triggers a replacement, step 1 is executed
+`org.hibernate.validator.ValidationMessages`. If this step triggers a replacement, step 1 is executed
 again, otherwise step 3 is applied.
 
 
 . Resolve any message parameters by replacing them with the value of the constraint annotation member
-of the same name. This allows to refer to attribute values of the constraint (e.g. Size#min()) in
+of the same name. This allows to refer to attribute values of the constraint (e.g. `Size#min()`) in
 the error message (e.g. "must be at least ${min}").
 
 
@@ -68,36 +68,35 @@ Unified EL in error messages.
 [TIP]
 ====
 You can find the formal definition of the interpolation algorithm in section
-link:$$http://beanvalidation.org/1.1/spec/#default-resolution-algorithm$$[5.3.1.1] of the Bean
+link:http://beanvalidation.org/1.1/spec/#default-resolution-algorithm[5.3.1.1] of the Bean
 Validation specification.
 ====
-
 
 [[section-special-characters]]
 ==== Special characters
 
-Since the characters +{+, +}+ and +$+ have a special meaning in message descriptors they need to be escaped if you want to use them literally. The following rules apply:
+Since the characters `{`, `}` and `$` have a special meaning in message descriptors they need to be escaped if you want to use them literally. The following rules apply:
 
-* ++\{++ is considered as the literal +{+
-* +\}+ is considered as the literal +}+
-* +\$+ is considered as the literal +$+
-* +\\+ is considered as the literal +\+
+* `\{` is considered as the literal `{`
+* `\}` is considered as the literal `}`
+* `\$` is considered as the literal `$`
+* `\\` is considered as the literal `\`
 
 
 [[section-interpolation-with-message-expressions]]
 ==== Interpolation with message expressions
 
 As of Hibernate Validator 5 (Bean Validation 1.1) it is possible to use the Unified Expression
-Language (as defined by link:$$http://jcp.org/en/jsr/detail?id=341$$[JSR 341]) in constraint
+Language (as defined by link:http://jcp.org/en/jsr/detail?id=341[JSR 341]) in constraint
 violation messages. This allows to define error messages based on conditional logic and also enables
 advanced formatting options. The validation engine makes the following objects available in the EL
 context:
 
-
 * the attribute values of the constraint mapped to the attribute names
-* the currently validated value (property, bean, method parameter etc.) under the name validatedValue
-* a bean mapped to the name formatter exposing the var-arg method format(String format,
-Object... args) which behaves like java.util.Formatter.format(String format, Object... args).
+* the currently validated value (property, bean, method parameter etc.) under the name _validatedValue_
+* a bean mapped to the name formatter exposing the var-arg method
+`format(String format, Object... args)` which behaves like
+`java.util.Formatter.format(String format, Object... args)`.
 
 The following section provides several examples for using EL expressions in error messages.
 
@@ -118,21 +117,18 @@ public class Car {
 	@NotNull
 	private String manufacturer;
 
-	@Size(
-			min = 2,
-			max = 14,
-			message = "The license plate '${validatedValue}' must be between {min} and {max} characters long"
+	@Size(min = 2,
+		max = 14,
+		message = "The license plate '${validatedValue}' must be between {min} and {max} characters long"
 	)
 	private String licensePlate;
 
-	@Min(
-			value = 2,
-			message = "There must be at least {value} seat${value > 1 ? 's' : ''}"
+	@Min(value = 2,
+		message = "There must be at least {value} seat${value > 1 ? 's' : ''}"
 	)
 	private int seatCount;
 
-	@DecimalMax(
-			value = "350",
+	@DecimalMax(value = "350",
 			message = "The top speed ${formatter.format('%1$.2f', validatedValue)} is higher " +
 					"than {value}"
 	)
@@ -159,36 +155,34 @@ public class Car {
 ----
 ====
 
-Validating an invalid Car instance yields constraint violations with the messages shown by the
+Validating an invalid `Car` instance yields constraint violations with the messages shown by the
 assertions in <<example-expected-error-messages>>:
 
-
-* the @NotNull constraint on the manufacturer field causes the error message "may not be null", as
+* the `@NotNull` constraint on the `manufacturer` field causes the error message "may not be null", as
 this is the default message defined by the Bean Validation specification and no specific descriptor
 is given in the message attribute
 
-* the @Size constraint on the licensePlate field shows the interpolation of message parameters
-(++{min}++, ++{max}++) and how to add the validated value to the error message using the EL
-expression ++${validatedValue}++
+* the `@Size` constraint on the `licensePlate` field shows the interpolation of message parameters
+(`{min}`, `{max}`) and how to add the validated value to the error message using the EL
+expression `${validatedValue}`
 
-* the @Min constraint on seatCount demonstrates how use an EL expression with a ternery expression to
+* the `@Min` constraint on `seatCount` demonstrates how use an EL expression with a ternery expression to
 dynamically chose singular or plural form, depending on an attribute of the constraint ("There must
 be at least 1 seat" vs. "There must be at least 2 seats")
 
-* the message for the @DecimalMax constraint on topSpeed shows how to format the validated value using
-the formatter object
+* the message for the `@DecimalMax` constraint on `topSpeed` shows how to format the validated
+value using the formatter instance
 
-* finally, the @DecimalMax constraint on price shows that parameter interpolation has precedence over
-expression evaluation, causing the +$+ sign to show up in front of the maximum price
+* finally, the `@DecimalMax` constraint on price shows that parameter interpolation has precedence over
+expression evaluation, causing the `$` sign to show up in front of the maximum price
 
 [TIP]
 ====
 Only actual constraint attributes can be interpolated using message parameters in the form
-+{attributeName}+. When referring to the validated value or custom expression variables added to the
+`{attributeName}`. When referring to the validated value or custom expression variables added to the
 interpolation context (see <<section-hibernateconstraintvalidatorcontext>>), an EL expression in the
-form +${attributeName}+ must be used.
+form `${attributeName}` must be used.
 ====
-
 
 [[example-expected-error-messages]]
 .Expected error messages
@@ -227,30 +221,30 @@ assertEquals( "Price must not be higher than $100000", message );
 === Custom message interpolation
 
 If the default message interpolation algorithm does not fit your requirements it is also possible to
-plug in a custom MessageInterpolator implementation.
+plug in a custom `MessageInterpolator` implementation.
 
-Custom interpolators must implement the interface javax.validation.MessageInterpolator. Note that
+Custom interpolators must implement the interface `javax.validation.MessageInterpolator`. Note that
 implementations must be thread-safe. It is recommended that custom message interpolators delegate
 final implementation to the default interpolator, which can be obtained via
-Configuration#getDefaultMessageInterpolator().
+`Configuration#getDefaultMessageInterpolator()`.
 
 In order to use a custom message interpolator it must be registered either by configuring it in the
 Bean Validation XML descriptor _META-INF/validation.xml_ (see
-<<section-configuration-validation-xml>>) or by passing it when bootstrapping a ValidatorFactory or
-Validator (see <<section-validator-factory-message-interpolator>> and
+<<section-configuration-validation-xml>>) or by passing it when bootstrapping a `ValidatorFactory` or
+`Validator` (see <<section-validator-factory-message-interpolator>> and
 <<section-configuring-validator>>, respectively).
 
 [[section-resource-bundle-locator]]
-==== ResourceBundleLocator
+==== `ResourceBundleLocator`
 
 In some use cases you want to use the message interpolation algorithm as defined by the Bean
 Validation specification, but retrieve error messages from other resource bundles than
-_ValidationMessages_. In this situation Hibernate Validator's ResourceBundleLocator SPI can help.
+_ValidationMessages_. In this situation Hibernate Validator's `ResourceBundleLocator` SPI can help.
 
-The default message interpolator in Hibernate Validator, ResourceBundleMessageInterpolator,
+The default message interpolator in Hibernate Validator, `ResourceBundleMessageInterpolator`,
 delegates retrieval of resource bundles to that SPI. Using an alternative bundle only requires
-passing an instance of PlatformResourceBundleLocator with the bundle name when bootstrapping the
-ValidatorFactory as shown in <<example-using-specific-resource-bundle-locator>>.
+passing an instance of `PlatformResourceBundleLocator` with the bundle name when bootstrapping the
+`ValidatorFactory` as shown in <<example-using-specific-resource-bundle-locator>>.
 
 [[example-using-specific-resource-bundle-locator]]
 .Using a specific resource bundle
@@ -269,19 +263,19 @@ Validator validator = Validation.byDefaultProvider()
 ----
 ====
 
-Of course you also could implement a completely different ResourceBundleLocator, which for instance
+Of course you also could implement a completely different `ResourceBundleLocator`, which for instance
 returns bundles backed by records in a database. In this case you can obtain the default locator via
-HibernateValidatorConfiguration#getDefaultResourceBundleLocator(), which you e.g. could use as
-fallback for your custom locator.
+`HibernateValidatorConfiguration#getDefaultResourceBundleLocator()`, which you e.g. could use as
+fall-back for your custom locator.
 
-Besides PlatformResourceBundleLocator, Hibernate Validator provides another resource bundle locator
-implementation out of the box, namely AggregateResourceBundleLocator, which allows to retrieve error
+Besides `PlatformResourceBundleLocator`, Hibernate Validator provides another resource bundle locator
+implementation out of the box, namely `AggregateResourceBundleLocator`, which allows to retrieve error
 messages from more than one resource bundle. You could for instance use this implementation in a
 multi-module application where you want to have one message bundle per module.
-<<example-using-aggregate-resource-bundle-locator>> shows how to use AggregateResourceBundleLocator.
+<<example-using-aggregate-resource-bundle-locator>> shows how to use `AggregateResourceBundleLocator`.
 
 [[example-using-aggregate-resource-bundle-locator]]
-.Using AggregateResourceBundleLocator
+.Using `AggregateResourceBundleLocator`
 ====
 [source, JAVA]
 ----

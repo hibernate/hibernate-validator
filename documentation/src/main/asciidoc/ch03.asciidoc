@@ -5,43 +5,37 @@ As of Bean Validation 1.1, constraints can not only be applied to JavaBeans and 
 but also to the parameters and return values of the methods and constructors of any Java type. That
 way Bean Validation constraints can be used to specify
 
-
 * the preconditions that must be satisfied by the caller before a method or constructor may be
 invoked (by applying constraints to the parameters of an executable)
 * the postconditions that are guaranteed to the caller after a method or constructor invocation
 returns (by applying constraints to the return value of an executable)
 
-
 [NOTE]
 ====
 For the purpose of this reference guide, the term _method constraint_ refers to both, method and
-constructor constraints, if not stated otherwise. Ocassionally, the term _executable_ is used when
-referering to methods and constructors.
+constructor constraints, if not stated otherwise. Occasionally, the term _executable_ is used when
+referring to methods and constructors.
 ====
-
 
 This approach has several advantages over traditional ways of checking the correctness of parameters
 and return values:
 
-
-* the checks don't have to be performed manually (e.g. by throwing IllegalArgumentExceptions or
+* the checks don't have to be performed manually (e.g. by throwing `IllegalArgumentException` or
 similar), resulting in less code to write and maintain
 * an executable's pre- and postconditions don't have to be expressed again in its documentation,
 since the constraint annotations will automatically be included in the generated JavaDoc. This
 avoids redundancies and reduces the chance of inconsistencies between implementation and
 documentation
 
-
 [TIP]
 ====
-In order to make annotations show up in the JavaDoc of annoted elements, the annotation types
+In order to make annotations show up in the JavaDoc of annotated elements, the annotation types
 themselves must be annotated with the meta annotation @Documented. This is the case for all built-in
 constraints and is considered a best practice for any custom constraints.
 ====
 
-
 In the remainder of this chapter you will learn how to declare parameter and return value
-constraints and how to validate them using the ExecutableValidator API.
+constraints and how to validate them using the `ExecutableValidator` API.
 
 [[section-declaring-method-constraints]]
 === Declaring method constraints
@@ -76,13 +70,13 @@ public class RentalStation {
 
 The following preconditions are declared here:
 
-
-* The name passed to the RentalCar constructor must not be +null+
-* When invoking the rentCar() method, the given customer must not be +null+, the rental's start
-date must not be +null+ and must be in the future and the rental duration must be at least one day
+* The `name` passed to the `RentalCar` constructor must not be `null`
+* When invoking the `rentCar()` method, the given `customer` must not be `null`, the rental's start
+date must not be `null` as well as be in the future and finally the rental duration must be at least
+one day
 
 Note that declaring method or constructor constraints itself does not automatically cause their
-validation upon invocation of the executable. Instead, the ExecutableValidator API (see
+validation upon invocation of the executable. Instead, the `ExecutableValidator` API (see
 <<section-validating-executable-constraints>>) must be used to perform the validation, which is
 often done using a method interception facility such as AOP, proxy objects etc.
 
@@ -105,7 +99,7 @@ constraints apply to several parameters of an executable.
 
 In contrast to single-parameter constraints, cross-parameter constraints are declared on the method
 or constructor as you can see in <<example-using-cross-parameter-constraint>>. Here the cross-
-parameter constraint @LuggageCountMatchesPassengerCount declared on the load() method is used to
+parameter constraint `@LuggageCountMatchesPassengerCount` declared on the `load()` method is used to
 ensure that no passenger has more than two pieces of luggage.
 
 [[example-using-cross-parameter-constraint]]
@@ -127,19 +121,19 @@ public class Car {
 
 As you will learn in the next section, return value constraints are also declared on the method
 level. In order to distinguish cross-parameter constraints from return value constraints, the
-constraint target is configured in the ConstraintValidator implementation using the
-@SupportedValidationTarget annotation. You can find out about the details in
+constraint target is configured in the `ConstraintValidator` implementation using the
+`@SupportedValidationTarget` annotation. You can find out about the details in
 <<section-cross-parameter-constraints>> which shows how to implement your own cross-parameter constraint.
 
 In some cases a constraint can be applied to an executable's parameters (i.e. it is a cross-
 parameter constraint), but also to the return value. One example for this are custom constraints
 which allow to specify validation rules using expression or script languages.
 
-Such constraints must define a member validationAppliesTo() which can be used at declaration time to
+Such constraints must define a member `validationAppliesTo()` which can be used at declaration time to
 specify the constraint target. As shown in <<example-specifying-constraint-target>> you apply the
-constraint to an executable's parameters by specifying +validationAppliesTo =
-ConstraintTarget.PARAMETERS+, while ConstraintTarget.RETURN_VALUE is used to apply the constraint to
-the executable return value.
+constraint to an executable's parameters by specifying
+`validationAppliesTo = ConstraintTarget.PARAMETERS`, while `ConstraintTarget.RETURN_VALUE` is used
+to apply the constraint to the executable return value.
 
 [[example-specifying-constraint-target]]
 .Specifying a constraint's target
@@ -166,7 +160,6 @@ public class Garage {
 Although such a constraint is applicable to the parameters and return value of an executable, the
 target can often be inferred automatically. This is the case, if the constraint is declared on
 
-
 * a void method with parameters (the constraint applies to the parameters)
 * an executable with return value but no parameters (the constraint applies to the return value)
 * neither a method nor a constructor, but a field, parameter etc. (the constraint applies to the
@@ -175,8 +168,6 @@ annotated element)
 In these situations you don't have to specify the constraint target. It is still recommended to do
 so if it increases readability of the source code. If the constraint target is not specified in
 situations where it can't be determined automatically, a ConstraintDeclarationException is raised.
-
-
 
 ==== Return value constraints
 
@@ -208,22 +199,19 @@ public class RentalStation {
 
 The following constraints apply to the executables of RentalStation:
 
-
-* Any newly created RentalStation object must satisfy the @ValidRentalStation constraint
-* The customer list returned by getCustomers() must not be +null+ and must contain at least on element
-
-
+* Any newly created `RentalStation` object must satisfy the `@ValidRentalStation` constraint
+* The customer list returned by `getCustomers()` must not be `null` and must contain at least on element
 
 ==== Cascaded validation
 
 Similar to the cascaded validation of JavaBeans properties (see
-<<section-object-graph-validation>>), the @Valid annotation can be used to mark executable parameters
-and return values for
-cascaded validation. When validating a parameter or return value annotated with @Valid, the
-constraints declared on the parameter or return value object are validated as well.
+<<section-object-graph-validation>>), the `@Valid` annotation can be used to mark executable
+parameters and return values for cascaded validation. When validating a parameter or return value
+annotated with `@Valid`, the constraints declared on the parameter or return value object are
+validated as well.
 
-In <<example-cascaded-executable-validation>>, the car parameter of the method Garage#checkCar() as
-well as the return value of the Garage constructor are marked for cascaded validation.
+In <<example-cascaded-executable-validation>>, the `car` parameter of the method `Garage#checkCar()` as
+well as the return value of the `Garage` constructor are marked for cascaded validation.
 
 [[example-cascaded-executable-validation]]
 .Marking executable parameters and return values for cascaded validation
@@ -271,29 +259,29 @@ public class Car {
 ----
 ====
 
-When validating the arguments of the checkCar() method, the constraints on the properties of the
-passed Car object are evaluated as well. Similarly, the @NotNull constraint on the name field of
-Garage is checked when validating the return value of the Garage constructor.
+When validating the arguments of the `checkCar()` method, the constraints on the properties of the
+passed `Car` object are evaluated as well. Similarly, the `@NotNull` constraint on the name field of
+`Garage` is checked when validating the return value of the `Garage` constructor.
 
 Generally, the cascaded validation works for executables in exactly the same way as it does for
 JavaBeans properties.
 
-In particular, +null+ values are ignored during cascaded validation (naturally this can't happen
+In particular, `null` values are ignored during cascaded validation (naturally this can't happen
 during constructor return value validation) and cascaded validation is performed recursively, i.e.
 if a parameter or return value object which is marked for cascaded validation itself has properties
-marked with @Valid, the constraints declared on the referenced elements will be validated as well.
+marked with `@Valid`, the constraints declared on the referenced elements will be validated as well.
 
 Cascaded validation can not only be applied to simple object references but also to collection-typed
-parameters and return values. This means when putting the @Valid annotation to a parameter or return
+parameters and return values. This means when putting the `@Valid` annotation to a parameter or return
 value which
 
 * is an array
-* implements java.lang.Iterable
-* or implements java.util.Map
+* implements `java.lang.Iterable`
+* or implements `java.util.Map`
 
-each contained element gets validated. So when validating the arguments of the checkCars() method in
+each contained element gets validated. So when validating the arguments of the `checkCars()` method in
 <<example-cascaded-executable-validation-listtyped>>, each element instance of the passed list will
-be validated and a ConstraintViolation created when any of the contained Car objects is invalid.
+be validated and a `ConstraintViolation` created when any of the contained `Car` instances is invalid.
 
 [[example-cascaded-executable-validation-listtyped]]
 .List-typed method parameter marked for cascaded validation
@@ -311,20 +299,19 @@ public class Garage {
 ----
 ====
 
-
 ==== Method constraints in inheritance hierarchies
 
 When declaring method constraints in inheritance hierarchies, it is important to be aware of the
 following rules:
 
-* The preconditions to be satisified by the caller of a method may not be strengthened in subtypes
+* The preconditions to be satisfied by the caller of a method may not be strengthened in subtypes
 * The postconditions guaranteed to the caller of a method may not be weakened in subtypes
 
 These rules are motivated by the concept of _behavioral subtyping_ which requires that wherever a
-type T is used, also a subtype S of T may be used without altering the program's behavior.
+type `T` is used, also a subtype `S` of `T` may be used without altering the program's behavior.
 
-As an example, consider a class invoking a method on an object with the static type T. If the
-runtime type of that object was S and S imposed additional preconditions, the client class might
+As an example, consider a class invoking a method on an object with the static type `T`. If the
+runtime type of that object was `S` and `S` imposed additional preconditions, the client class might
 fail to satisfy these preconditions as is not aware of them. The rules of behavioral subtyping are
 also known as the link:$$http://en.wikipedia.org/wiki/Liskov_substitution_principle$$[Liskov
 substitution principle].
@@ -360,16 +347,16 @@ public class Car implements Vehicle {
 ----
 ====
 
-The @Max constraint on Car#drive() is illegal since this method implements the interface method
-Vehicle#drive(). Note that parameter constraints on overriding methods are also disallowed, if the
+The `@Max` constraint on `Car#drive()` is illegal since this method implements the interface method
+`Vehicle#drive()`. Note that parameter constraints on overriding methods are also disallowed, if the
 supertype method itself doesn't declare any parameter constraints.
 
 Furthermore, if a method overrides or implements a method declared in several parallel supertypes
 (e.g. two interfaces not extending each other or a class and an interface not implemented by that
 class), no parameter constraints may be specified for the method in any of the involved types. The
 types in <<example-illegal-parameter-constraints-parallel-types>> demonstrate a violation of that
-rule. The method RacingCar#drive() overrides Vehicle#drive() as well as Car#drive(). Therefore the
-constraint on Vehicle#drive() is illegal.
+rule. The method `RacingCar#drive()` overrides `Vehicle#drive()` as well as `Car#drive()`.
+Therefore the constraint on `Vehicle#drive()` is illegal.
 
 [[example-illegal-parameter-constraints-parallel-types]]
 .Illegal method parameter constraint in parallel types of a hierarchy
@@ -418,9 +405,9 @@ overridden/implemented supertype methods. This is legal as putting additional re
 constraints in place may never represent a weakening of the postconditions guaranteed to the caller
 of a method.
 
-So when validating the return value of the method Car#getPassengers() shown in
-<<example-return-value-constraints-in-hierarchy>>, the @Size constraint on the method itself as well
-as the @NotNull constraint on the implemented interface method Vehicle#getPassengers() apply.
+So when validating the return value of the method `Car#getPassengers()` shown in
+<<example-return-value-constraints-in-hierarchy>>, the `@Size` constraint on the method itself as well
+as the `@NotNull` constraint on the implemented interface method `Vehicle#getPassengers()` apply.
 
 [[example-return-value-constraints-in-hierarchy]]
 .Return value constraints on supertype and subtype method
@@ -453,7 +440,7 @@ public class Car implements Vehicle {
 ====
 
 If the validation engine detects a violation of any of the aforementioned rules, a
-ConstraintDeclarationException will be raised.
+`ConstraintDeclarationException` will be raised.
 
 [NOTE]
 ====
@@ -466,26 +453,26 @@ apply, but never any constraints declared on supertype constructors.
 [[section-validating-executable-constraints]]
 === Validating method constraints
 
-The validation of method constraints is done using the ExecutableValidator interface.
+The validation of method constraints is done using the `ExecutableValidator` interface.
 
-In <<section-obtaining-executable-validator>> you will learn how to obtain an ExecutableValidator
+In <<section-obtaining-executable-validator>> you will learn how to obtain an `ExecutableValidator`
 instance while <<section-executable-validator-methods>> shows how to use the different methods
 offered by this interface.
 
-Instead of calling the ExecutableValidator methods directly from within application code, they are
+Instead of calling the `ExecutableValidator` methods directly from within application code, they are
 usually invoked via a method interception technology such as AOP, proxy objects, etc. This causes
 executable constraints to be validated automatically and transparently upon method or constructor
-invocation. Typically a ConstraintViolationException is raised by the integration layer in case any
+invocation. Typically a `ConstraintViolationException` is raised by the integration layer in case any
 of the constraints is violated.
 
 [[section-obtaining-executable-validator]]
-==== Obtaining an ExecutableValidator instance
+==== Obtaining an `ExecutableValidator` instance
 
-You can retrieve an ExecutableValidator instance via Validator#forExecutables() as shown in
+You can retrieve an `ExecutableValidator` instance via `Validator#forExecutables()` as shown in
 <<example-obtaining-executable-validator>>.
 
 [[example-obtaining-executable-validator]]
-.Obtaining an ExecutableValidator
+.Obtaining an `ExecutableValidator` instance
 ====
 [source, JAVA]
 ----
@@ -500,23 +487,23 @@ required you could also bootstrap a specifically configured factory as described
 (see <<section-parameter-name-provider>>).
 
 [[section-executable-validator-methods]]
-==== ExecutableValidator methods
+==== `ExecutableValidator` methods
 
-The ExecutableValidator interface offers altogether four methods:
+The `ExecutableValidator` interface offers altogether four methods:
 
-* validateParameters() and validateReturnValue() for method validation
-* validateConstructorParameters() and validateConstructorReturnValue() for constructor validation
+* `validateParameters()` and `validateReturnValue()` for method validation
+* `validateConstructorParameters()` and `validateConstructorReturnValue()` for constructor validation
 
-Just as the methods on Validator, all these methods return a Set<ConstraintViolation> which contains
-a ConstraintViolation instance for each violated constraint and which is empty if the validation
+Just as the methods on `Validator`, all these methods return a `Set<ConstraintViolation>` which contains
+a `ConstraintViolation` instance for each violated constraint and which is empty if the validation
 succeeds. Also all the methods have a var-args groups parameter by which you can pass the validation
 groups to be considered for validation.
 
-The examples in the following sections are based on the methods on constructors of the Car class
+The examples in the following sections are based on the methods on constructors of the `Car` class
 shown in <<example-executable-validator-class-car>>.
 
 [[example-executable-validator-class-car]]
-.Class Car with constrained methods and constructors
+.Class `Car` with constrained methods and constructors
 ====
 [source, JAVA]
 ----
@@ -545,14 +532,14 @@ public class Car {
 ----
 ====
 
-===== ExecutableValidator#validateParameters()
+===== `ExecutableValidator#validateParameters()`
 
-The method validateParameters() is used to validate the arguments of a method invocation.
-<<example-executable-validator-validate-parameters>> shows an example. The validation results in a 
-violation of the @Max constraint on the parameter of the drive() method.
+The method `validateParameters()` is used to validate the arguments of a method invocation.
+<<example-executable-validator-validate-parameters>> shows an example. The validation results in a
+violation of the `@Max` constraint on the parameter of the `drive()` method.
 
 [[example-executable-validator-validate-parameters]]
-.Using ExecutableValidator#validateParameters()
+.Using `ExecutableValidator#validateParameters()`
 ====
 [source, JAVA]
 ----
@@ -575,17 +562,17 @@ assertEquals( Max.class, constraintType );
 ----
 ====
 
-Note that validateParameters() validates all the parameter constraints of a method, i.e. constraints
+Note that `validateParameters()` validates all the parameter constraints of a method, i.e. constraints
 on individual parameters as well as cross-parameter constraints.
 
-===== ExecutableValidator#validateReturnValue()
+===== `ExecutableValidator#validateReturnValue()`
 
-Using validateReturnValue() the return value of a method can can be validated. The validation in
+Using `validateReturnValue()` the return value of a method can can be validated. The validation in
 <<example-executable-validator-validate-return-value>> yields one constraint violation since the
-getPassengers() method is expect to return at least one Passenger object.
+`getPassengers()` method is expect to return at least one `Passenger` instance.
 
 [[example-executable-validator-validate-return-value]]
-.Using ExecutableValidator#validateReturnValue()
+.Using `ExecutableValidator#validateReturnValue()`
 ====
 [source, JAVA]
 ----
@@ -608,15 +595,15 @@ assertEquals( Size.class, constraintType );
 ----
 ====
 
-===== ExecutableValidator#validateConstructorParameters()
+===== `ExecutableValidator#validateConstructorParameters()`
 
-The arguments of constructor invocations can be validated with validateConstructorParameters() as
+The arguments of constructor invocations can be validated with `validateConstructorParameters()` as
 shown in method <<example-executable-validator-validate-constructor-parameters>>. Due to the
-@NotNull constraint on the manufacturer parameter, the validation call returns one constraint
+`@NotNull` constraint on the manufacturer parameter, the validation call returns one constraint
 violation.
 
 [[example-executable-validator-validate-constructor-parameters]]
-.Using ExecutableValidator#validateConstructorParameters()
+.Using `ExecutableValidator#validateConstructorParameters()`
 ====
 [source, JAVA]
 ----
@@ -637,15 +624,15 @@ assertEquals( NotNull.class, constraintType );
 ----
 ====
 
-===== ExecutableValidator#validateConstructorReturnValue()
+===== `ExecutableValidator#validateConstructorReturnValue()`
 
-Finally, by using validateConstructorReturnValue() you can valide a constructor's return value. In
-<<example-executable-validator-validate-constructor-return-value>>, validateConstructorReturnValue()
-returns one constraint violation, since the Car object returned by the constructor doesn't satisfy
-the @ValidRacingCar constraint (not shown).
+Finally, by using `validateConstructorReturnValue()` you can validate a constructor's return value. In
+<<example-executable-validator-validate-constructor-return-value>>, `validateConstructorReturnValue()`
+returns one constraint violation, since the `Car` instance returned by the constructor doesn't satisfy
+the `@ValidRacingCar` constraint (not shown).
 
 [[example-executable-validator-validate-constructor-return-value]]
-.Using ExecutableValidator#validateConstructorReturnValue()
+.Using `ExecutableValidator#validateConstructorReturnValue()`
 ====
 [source, JAVA]
 ----
@@ -667,23 +654,22 @@ assertEquals( ValidRacingCar.class, constraintType );
 ----
 ====
 
-
-==== ConstraintViolation methods for method validation
+==== `ConstraintViolation` methods for method validation
 
 In addition to the methods introduced in <<section-constraint-violation-methods>>,
-ConstraintViolation provides two more methods specific to the validation of executable parameters
+`ConstraintViolation` provides two more methods specific to the validation of executable parameters
 and return values.
 
-ConstraintViolation#getExecutableParameters() returns the validated parameter array in case of
-method or constructor parameter validation, while ConstraintViolation#getExecutableReturnValue()
+`ConstraintViolation#getExecutableParameters()` returns the validated parameter array in case of
+method or constructor parameter validation, while `ConstraintViolation#getExecutableReturnValue()`
 provides access to the validated object in case of return value validation.
 
-All the other ConstraintViolation methods generally work for method validation in the same way as
+All the other `ConstraintViolation` methods generally work for method validation in the same way as
 for validation of beans. Refer to the link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1
 /api/index.html?javax/validation/metadata/BeanDescriptor.html$$[JavaDoc] to learn more about the
 behavior of the individual methods and their return values during bean and method validation.
 
-Note that getPropertyPath() can be very useful in order to obtain detailed information about the
+Note that `getPropertyPath()` can be very useful in order to obtain detailed information about the
 validated parameter or return value, e.g. for logging purposes. In particular, you can retrieve name
 and argument types of the concerned method as well as the index of the concerned parameter from the
 path nodes. How this can be done is shown in <<example-executable-validation-property-path>>.
@@ -718,26 +704,26 @@ assertEquals( 0, parameterNode.getParameterIndex() );
 ----
 ====
 
-The parameter name is determined using the current ParameterNameProvider (see
-<<section-parameter-name-provider>>) and defaults to +arg0+, +arg1+ etc.
+The parameter name is determined using the current `ParameterNameProvider` (see
+<<section-parameter-name-provider>>) and defaults to `arg0`, `arg1` etc.
 
 [[section-builtin-method-constraints]]
 === Built-in method constraints
 
 In addition to the built-in bean and property-level constraints discussed in
 <<section-builtin-constraints>>, Hibernate Validator currently provides one method-level constraint,
-@ParameterScriptAssert. This is a generic cross-parameter constraint which allows to implement
+`@ParameterScriptAssert`. This is a generic cross-parameter constraint which allows to implement
 validation routines using any JSR 223 compatible ("Scripting for the Java^TM^ Platform") scripting
 language, provided an engine for this language is available on the classpath.
 
 To refer to the executable's parameters from within the expression, use their name as obtained from
 the active parameter name provider (see <<section-parameter-name-provider>>).
-<<example-parameterscriptassert>> shows how the validation logic of the @LuggageCountMatchesPassengerCount
+<<example-parameterscriptassert>> shows how the validation logic of the `@LuggageCountMatchesPassengerCount`
 constraint from <<example-using-cross-parameter-constraint>> could be expressed with the help of
-@ParameterScriptAssert.
+`@ParameterScriptAssert`.
 
 [[example-parameterscriptassert]]
-.Using @ParameterScriptAssert
+.Using `@ParameterScriptAssert`
 ====
 [source, JAVA]
 ----

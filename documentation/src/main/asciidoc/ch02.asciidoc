@@ -23,7 +23,7 @@ constraints:
 [NOTE]
 ====
 Not all constraints can be placed on all of these levels. In fact, none of the default constraints
-defined by Bean Validation can be placed at class level. The +java.lang.annotation.Target+ annotation
+defined by Bean Validation can be placed at class level. The `java.lang.annotation.Target` annotation
 in the constraint annotation itself determines on which elements a constraint can be placed. See
 <<validator-customconstraints>> for more information.
 ====
@@ -138,22 +138,22 @@ to be validated twice.
 ==== Type argument constraints
 
 Starting from Java 8, it is possible to specify constraints directly on the type argument of a
-parameterized type. However, this requires that +ElementType.TYPE_USE+ is specified via +@Target+
+parameterized type. However, this requires that `ElementType.TYPE_USE` is specified via `@Target`
 in the constraint definition. To maintain backwards compatibility, built-in Bean Validation as well as
-Hibernate Validator specific constraints do not yet specify +ElementType.TYPE_USE+. To make use of
+Hibernate Validator specific constraints do not yet specify `ElementType.TYPE_USE`. To make use of
 type argument constraints, custom constraints must be used (see <<validator-customconstraints>>).
 
 Hibernate Validator validates type arguments constraints specified on collections, map values,
-+java.util.Optional+, and custom parameterized types.
+`java.util.Optional`, and custom parameterized types.
 
-===== With +Iterable+
+===== With `Iterable`
 
-When applying constraints on an +Iterable+ type argument, Hibernate Validator will validate each
+When applying constraints on an `Iterable` type argument, Hibernate Validator will validate each
 element. <<example-type-arguments-constraints-collections>> shows an example of a
-+List+ with a type argument constraint.
+`List` with a type argument constraint.
 
 [[example-type-arguments-constraints-collections]]
-.Type argument constraint on +List+
+.Type argument constraint on `List`
 ====
 [source, JAVA]
 ----
@@ -189,10 +189,10 @@ assertEquals( "parts[1]", constraintViolations.iterator().next().getPropertyPath
 ----
 ====
 
-===== With +Map+
+===== With `Map`
 
 Type argument constraints are also validated for map values. Constraints on the key are ignored.
-<<example-type-arguments-constraints-map>> shows an example of a +Map+ value with a type
+<<example-type-arguments-constraints-map>> shows an example of a `Map` value with a type
 argument constraint.
 
 [[example-type-arguments-constraints-map]]
@@ -234,11 +234,11 @@ assertEquals( "20 is outside the max fuel consumption.", constraintViolations.it
 ====
 
 
-===== With +java.util.Optional+
+===== With `java.util.Optional`
 
-When applying a constraint on the type argument of +Optional+, Hibernate Validator will automatically
+When applying a constraint on the type argument of `Optional`, Hibernate Validator will automatically
 unwrap the type and validate the internal value. <<example-type-arguments-constraints-optional>> shows
-an example of an +Optional+ with a type argument constraint.
+an example of an `Optional` with a type argument constraint.
 
 [[example-type-arguments-constraints-optional]]
 .Type argument constraint on Optional
@@ -283,7 +283,7 @@ assertEquals( "towingCapacity", constraintViolations.iterator().next().getProper
 ===== With custom parameterized types
 
 Type arguments constraints can with two restrictions also be used with custom types. First, a
-+ValidatedValueUnwrapper+ must be registered for the custom type allowing to retrieve
+`ValidatedValueUnwrapper` must be registered for the custom type allowing to retrieve
 the value to validate (see <<section-value-handling>>). Second, only types with one type arguments
 are supported. Parameterized types with two or more type arguments are not checked for type argument
 constraints. This limitation might change in future versions.
@@ -389,10 +389,10 @@ Last but not least, a constraint can also be placed on the class level. In this 
 property is subject of the validation but the complete object. Class-level constraints are useful if
 the validation depends on a correlation between several properties of an object.
 
-The Car class in <<example-class-level>> has the two attributes +seatCount+ and +passengers+ and it
+The Car class in <<example-class-level>> has the two attributes `seatCount` and `passengers` and it
 should be ensured that the list of passengers has not more entries than seats are available. For
-that purpose the +@ValidPassengerCount+ constraint is added on the class level. The validator of that
-constraint has access to the complete +Car+ object, allowing to compare the numbers of seats and
+that purpose the `@ValidPassengerCount` constraint is added on the class level. The validator of that
+constraint has access to the complete `Car` object, allowing to compare the numbers of seats and
 passengers.
 
 Refer to <<section-class-level-constraints>> to learn in detail how to implement this custom
@@ -461,22 +461,22 @@ public class RentalCar extends Car {
 ----
 ====
 
-Here the class +RentalCar+ is a subclass of +Car+ and adds the property +rentalStation+. If an instance of
-+RentalCar+ is validated, not only the +@NotNull+ constraint on +rentalStation+ is evaluated, but also the
-constraint on +manufacturer+ from the parent class.
+Here the class `RentalCar` is a subclass of `Car` and adds the property `rentalStation`. If an instance of
+`RentalCar` is validated, not only the `@NotNull` constraint on `rentalStation` is evaluated, but also the
+constraint on `manufacturer` from the parent class.
 
-The same would be true, if +Car+ was not a superclass but an interface implemented by +RentalCar+.
+The same would be true, if `Car` was not a superclass but an interface implemented by `RentalCar`.
 
-Constraint annotations are aggregated if methods are overridden. So if +RentalCar+ overrode the
-+getManufacturer()+ method from +Car+, any constraints annotated at the overriding method would be
-evaluated in addition to the +@NotNull+ constraint from the superclass.
+Constraint annotations are aggregated if methods are overridden. So if `RentalCar` overrode the
+`getManufacturer()` method from `Car`, any constraints annotated at the overriding method would be
+evaluated in addition to the `@NotNull` constraint from the superclass.
 
 [[section-object-graph-validation]]
 ==== Object graphs
 
 The Bean Validation API does not only allow to validate single class instances but also complete
 object graphs (cascaded validation). To do so, just annotate a field or property representing a
-reference to another object with +@Valid+ as demonstrated in <<example-cascaded-validation>>.
+reference to another object with `@Valid` as demonstrated in <<example-cascaded-validation>>.
 
 [[example-cascaded-validation]]
 .Cascaded validation
@@ -509,25 +509,25 @@ public class Person {
 ----
 ====
 
-If an instance of +Car+ is validated, the referenced +Person+ object will be validated as well, as the
-+driver+ field is annotated with +@Valid+. Therefore the validation of a +Car+ will fail if the +name+ field
-of the referenced +Person+ instance is +null+.
+If an instance of `Car` is validated, the referenced `Person` object will be validated as well, as the
+`driver` field is annotated with `@Valid`. Therefore the validation of a `Car` will fail if the `name` field
+of the referenced `Person` instance is `null`.
 
 The validation of object graphs is recursive, i.e. if a reference marked for cascaded validation
-points to an object which itself has properties annotated with +@Valid+, these references will be
+points to an object which itself has properties annotated with `@Valid`, these references will be
 followed up by the validation engine as well. The validation engine will ensure that no infinite
 loops occur during cascaded validation, for example if two objects hold references to each other.
 
-Note that +null+ values are getting ignored during cascaded validation.
+Note that `null` values are getting ignored during cascaded validation.
 
 Object graph validation also works for collection-typed fields. That means any attributes that
 
 
 * are arrays
-* implement +java.lang.Iterable+ (especially +Collection+, +List+ and +Set+)
-* implement +java.util.Map+
+* implement `java.lang.Iterable` (especially `Collection`, `List` and `Set`)
+* implement `java.util.Map`
 
-can be annotated with +@Valid+, which will cause each contained element to be validated, when the
+can be annotated with `@Valid`, which will cause each contained element to be validated, when the
 parent object is validated.
 
 [[example-cascaded-validation-list]]
@@ -548,25 +548,25 @@ public class Car {
 ----
 ====
 
-So when validating an instance of the +Car+ class shown in <<example-cascaded-validation-list>>, a
-+ConstraintViolation+ will be created, if any of the +Person+ objects contained in the passengers list
-has a +null+ name.
+So when validating an instance of the `Car` class shown in <<example-cascaded-validation-list>>, a
+`ConstraintViolation` will be created, if any of the `Person` objects contained in the passengers list
+has a `null` name.
 
 [[section-validating-bean-constraints]]
 === Validating bean constraints
 
-The +Validator+ interface is the most important object in Bean Validation. The next section shows how
-to obtain an +Validator+ instance. Afterwards you'll learn how to use the different methods of the
-+Validator+ interface.
+The `Validator` interface is the most important object in Bean Validation. The next section shows how
+to obtain an `Validator` instance. Afterwards you'll learn how to use the different methods of the
+`Validator` interface.
 
 [[section-obtaining-validator]]
-==== Obtaining a +Validator+ instance
+==== Obtaining a `Validator` instance
 
-The first step towards validating an entity instance is to get hold of a +Validator+ instance. The
-road to this instance leads via the +Validation+ class and a +ValidatorFactory+. The easiest way is to
-use the static method +Validation#buildDefaultValidatorFactory()+:
+The first step towards validating an entity instance is to get hold of a `Validator` instance. The
+road to this instance leads via the `Validation` class and a `ValidatorFactory`. The easiest way is to
+use the static method `Validation#buildDefaultValidatorFactory()`:
 
-.+Validation#buildDefaultValidatorFactory()+
+.`Validation#buildDefaultValidatorFactory()`
 ====
 [source, JAVA]
 ----
@@ -577,30 +577,30 @@ Validator validator = factory.getValidator();
 
 This bootstraps a validator in the default configuration. Refer to <<chapter-bootstrapping>> to
 learn more about the different bootstrapping methods and how to obtain a specifically configured
-+Validator+ instance.
+`Validator` instance.
 
 ==== Validator methods
 
-The +Validator+ interface contains three methods that can be used to either validate entire entities
+The `Validator` interface contains three methods that can be used to either validate entire entities
 or just single properties of the entity.
 
-All three methods return a +Set<ConstraintViolation>+. The set is empty, if the validation succeeds.
-Otherwise a +ConstraintViolation+ instance is added for each violated constraint.
+All three methods return a `Set<ConstraintViolation>`. The set is empty, if the validation succeeds.
+Otherwise a `ConstraintViolation` instance is added for each violated constraint.
 
 All the validation methods have a var-args parameter which can be used to specify, which validation
 groups shall be considered when performing the validation. If the parameter is not specified the
-default validation group (+javax.validation.groups.Default+) is used. The topic of validation groups
+default validation group (`javax.validation.groups.Default`) is used. The topic of validation groups
 is discussed in detail in <<chapter-groups>>.
 
-===== +Validator#validate()+
+===== `Validator#validate()`
 
-Use the +validate()+ method to perform validation of all constraints of a given bean.
-<<example-validator-validate>> shows the validation of an instance of the +Car+ class from
-<<example-property-level>> which fails to satisfy the +@NotNull+ constraint on the +manufacturer+
-property. The validation call therefore returns one +ConstraintViolation+ object.
+Use the `validate()` method to perform validation of all constraints of a given bean.
+<<example-validator-validate>> shows the validation of an instance of the `Car` class from
+<<example-property-level>> which fails to satisfy the `@NotNull` constraint on the `manufacturer`
+property. The validation call therefore returns one `ConstraintViolation` object.
 
 [[example-validator-validate]]
-.Using +Validator#validate()+
+.Using `Validator#validate()`
 ====
 [source, JAVA]
 ----
@@ -614,12 +614,12 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
 ====
 
 
-===== +Validator#validateProperty()+
+===== `Validator#validateProperty()`
 
-With help of the +validateProperty()+ you can validate a single named property of a given object. The
+With help of the `validateProperty()` you can validate a single named property of a given object. The
 property name is the JavaBeans property name.
 
-.Using +Validator#validateProperty()+
+.Using `Validator#validateProperty()`
 ====
 [source, JAVA]
 ----
@@ -636,12 +636,12 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
 ====
 
 
-===== +Validator#validateValue()+
+===== `Validator#validateValue()`
 
-By using the +validateValue()+ method you can check whether a single property of a given class can be
+By using the `validateValue()` method you can check whether a single property of a given class can be
 validated successfully, if the property had the specified value:
 
-.Using +Validator#validateValue()+
+.Using `Validator#validateValue()`
 ====
 [source, JAVA]
 ----
@@ -659,40 +659,40 @@ assertEquals( "may not be null", constraintViolations.iterator().next().getMessa
 
 [NOTE]
 ====
-+@Valid+ is not honored by +validateProperty()+ or +validateValue()+.
+`@Valid` is not honored by `validateProperty()` or `validateValue()`.
 ====
 
 
-+Validator#validateProperty()+ is for example used in the integration of Bean Validation into JSF 2
+`Validator#validateProperty()` is for example used in the integration of Bean Validation into JSF 2
 (see <<section-presentation-layer>>) to perform a validation of the values entered into a form
 before they are propagated to the model.
 
 [[section-constraint-violation-methods]]
 
-==== +ConstraintViolation+ methods
+==== `ConstraintViolation` methods
 
-Now it is time to have a closer look at what a +ConstraintViolation+ is. Using the different methods
-of +ConstraintViolation+ a lot of useful information about the cause of the validation failure can be
+Now it is time to have a closer look at what a `ConstraintViolation` is. Using the different methods
+of `ConstraintViolation` a lot of useful information about the cause of the validation failure can be
 determined. <<table-constraint-violation>> gives an overview of these methods. The values in the
 "Example" column refer to <<example-validator-validate>>.
 
 [[table-constraint-violation]]
-.The various +ConstraintViolation+ methods
+.The various `ConstraintViolation` methods
 [options="header"]
 |===============
 |Method|Usage|Example
-|+getMessage()+|The interpolated error message|"may not be null"
-|+getMessageTemplate()+|The non-interpolated error message|"{... NotNull.message}"
-|+getRootBean()+|The root bean being validated|car
-|+getRootBeanClass()+|The class of the root bean being validated|+Car.class+
-|+getLeafBean()+|If a bean constraint, the bean instance the constraint is
+|`getMessage()`|The interpolated error message|"may not be null"
+|`getMessageTemplate()`|The non-interpolated error message|"{... NotNull.message}"
+|`getRootBean()`|The root bean being validated|car
+|`getRootBeanClass()`|The class of the root bean being validated|`Car.class`
+|`getLeafBean()`|If a bean constraint, the bean instance the constraint is
               applied on; If a property constraint, the bean instance hosting
-              the property the constraint is applied on|+car+
-|+getPropertyPath()+|The property path to the validated value from root
+              the property the constraint is applied on|`car`
+|`getPropertyPath()`|The property path to the validated value from root
               bean|contains one node with kind
-              +PROPERTY+ and name "manufacturer"
-|+getInvalidValue()+|The value failing to pass the constraint|+null+
-|+getConstraintDescriptor()+|Constraint metadata reported to fail|descriptor for +@NotNull+
+              `PROPERTY` and name "manufacturer"
+|`getInvalidValue()`|The value failing to pass the constraint|`null`
+|`getConstraintDescriptor()`|Constraint metadata reported to fail|descriptor for `@NotNull`
 
 |===============
 
@@ -718,7 +718,7 @@ your model (see column "Hibernate metadata impact").
 [NOTE]
 ====
 Hibernate Validator allows some constraints to be applied to more data types than required by the
-Bean Validation specification (e.g. @Max can be applied to Strings). Relying on this feature can
+Bean Validation specification (e.g. `@Max` can be applied to strings). Relying on this feature can
 impact portability of your application between Bean Validation providers.
 ====
 
@@ -728,98 +728,98 @@ impact portability of your application between Bean Validation providers.
 [options="header"]
 |===============
 |Annotation|Supported data types|Use|Hibernate metadata impact
-|+@AssertFalse+|+Boolean+,
-              +boolean+|Checks that the annotated element is
+|`@AssertFalse`|`Boolean`,
+              `boolean`|Checks that the annotated element is
               false|None
-|+@AssertTrue+|+Boolean+,
-              +boolean+|Checks that the annotated element is
+|`@AssertTrue`|`Boolean`,
+              `boolean`|Checks that the annotated element is
               true|None
-|+@DecimalMax(value=,inclusive=)+|+BigDecimal+,
-              +BigInteger+,
-              +CharSequence+,
-              +byte+, +short+,
-              +int+, +long+ and the
+|`@DecimalMax(value=,inclusive=)`|`BigDecimal`,
+              `BigInteger`,
+              `CharSequence`,
+              `byte`, `short`,
+              `int`, `long` and the
               respective wrappers of the primitive types; Additionally
               supported by HV: any sub-type of
-              +Number+|Checks whether the annotated value is less than the
+              `Number`|Checks whether the annotated value is less than the
               specified maximum, when inclusive=false.
               Otherwise whether the value is less than or equal to the
               specified maximum. The parameter value is
               the string representation of the max value according to the
-              +BigDecimal+ string representation.|None
-|+@DecimalMin(value=,inclusive=)+|+BigDecimal+,
-              +BigInteger+,
-              +CharSequence+,
-              +byte+, +short+,
-              +int+, +long+ and the
+              `BigDecimal` string representation.|None
+|`@DecimalMin(value=,inclusive=)`|`BigDecimal`,
+              `BigInteger`,
+              `CharSequence`,
+              `byte`, `short`,
+              `int`, `long` and the
               respective wrappers of the primitive types; Additionally
               supported by HV: any sub-type of
-              +Number+|Checks whether the annotated value is larger than the
+              `Number`|Checks whether the annotated value is larger than the
               specified minimum, when inclusive=false.
               Otherwise whether the value is larger than or equal to the
               specified minimum. The parameter value is
               the string representation of the min value according to the
-              +BigDecimal+ string representation.|None
-|+@Digits(integer=,fraction=)+|BigDecimal,
-              +BigInteger+,
-              +CharSequence+,
-              +byte+, +short+,
-              +int+, +long+ and the
+              `BigDecimal` string representation.|None
+|`@Digits(integer=,fraction=)`|BigDecimal,
+              `BigInteger`,
+              `CharSequence`,
+              `byte`, `short`,
+              `int`, `long` and the
               respective wrappers of the primitive types; Additionally
               supported by HV: any sub-type of
-              +Number+|Checks whether the annotated value is a number having up to
-              +integer+ digits and
-              +fraction+ fractional digits|Defines column precision and scale
-|+@Future+|+java.util.Date+,
-              +java.util.Calendar+,
-              +java.time.chrono.ChronoZonedDateTime+,
-              +java.time.Instant+,
-              +java.time.OffsetDateTime+; Additionally
+              `Number`|Checks whether the annotated value is a number having up to
+              `integer` digits and
+              `fraction` fractional digits|Defines column precision and scale
+|`@Future`|`java.util.Date`,
+              `java.util.Calendar`,
+              `java.time.chrono.ChronoZonedDateTime`,
+              `java.time.Instant`,
+              `java.time.OffsetDateTime`; Additionally
               supported by HV, if the link:$$http://joda-time.sourceforge.net/$$[Joda Time]
               date/time API is on the class path: any implementations of
-              +ReadablePartial+ and
-              +ReadableInstant+|Checks whether the annotated date is in the
+              `ReadablePartial` and
+              `ReadableInstant`|Checks whether the annotated date is in the
               future|None
-|+@Max(value=)+|+BigDecimal+,
-              +BigInteger+, +byte+,
-              +short+, +int+,
-              +long+ and the respective wrappers of the
+|`@Max(value=)`|`BigDecimal`,
+              `BigInteger`, `byte`,
+              `short`, `int`,
+              `long` and the respective wrappers of the
               primitive types; Additionally supported by HV: any sub-type of
-              +CharSequence+ (the numeric value
+              `CharSequence` (the numeric value
               represented by the character sequence is evaluated), any
-              sub-type of +Number+|Checks whether the annotated value is less than or equal
+              sub-type of `Number`|Checks whether the annotated value is less than or equal
               to the specified maximum|Adds a check constraint on the column
-|+@Min(value=)+|+BigDecimal+,
-              +BigInteger+, +byte+,
-              +short+, +int+,
-              +long+ and the respective wrappers of the
+|`@Min(value=)`|`BigDecimal`,
+              `BigInteger`, `byte`,
+              `short`, `int`,
+              `long` and the respective wrappers of the
               primitive types; Additionally supported by HV: any sub-type of
-              +CharSequence+ (the numeric value
+              `CharSequence` (the numeric value
               represented by the char sequence is evaluated), any sub-type of
-              +Number+|Checks whether the annotated value is higher than or
+              `Number`|Checks whether the annotated value is higher than or
               equal to the specified minimum|Adds a check constraint on the column
-|+@NotNull+|Any type|Checks that the annotated value is not
-              +null+.|Column(s) are not nullable
-|+@Null+|Any type|Checks that the annotated value is
-              +null+|None
-|+@Past+|+java.util.Date+,
-              +java.util.Calendar+,
-              +java.time.chrono.ChronoZonedDateTime+,
-              +java.time.Instant+,
-              +java.time.OffsetDateTime+; Additionally
+|`@NotNull`|Any type|Checks that the annotated value is not
+              `null`.|Column(s) are not nullable
+|`@Null`|Any type|Checks that the annotated value is
+              `null`|None
+|`@Past`|`java.util.Date`,
+              `java.util.Calendar`,
+              `java.time.chrono.ChronoZonedDateTime`,
+              `java.time.Instant`,
+              `java.time.OffsetDateTime`; Additionally
               supported by HV, if the link:$$http://joda-time.sourceforge.net/$$[Joda Time]
               date/time API is on the class path: any implementations of
-              +ReadablePartial+ and
-              +ReadableInstant+|Checks whether the annotated date is in the past|None
-|+@Pattern(regex=,flag=)+|+CharSequence+|Checks if the annotated string matches the regular
-              expression +regex+ considering the given
-              flag +match+|None
-|+@Size(min=, max=)+|+CharSequence+,
-              +Collection+, +Map+
-              and arrays|Checks if the annotated element's size is between +min+ and
-              +max+ (inclusive)|Column length will be set to
-              +max+
-|+@Valid+|Any non-primitive type|Performs validation recursively on the associated object.
+              `ReadablePartial` and
+              `ReadableInstant`|Checks whether the annotated date is in the past|None
+|`@Pattern(regex=,flag=)`|`CharSequence`|Checks if the annotated string matches the regular
+              expression `regex` considering the given
+              flag `match`|None
+|`@Size(min=, max=)`|`CharSequence`,
+              `Collection`, `Map`
+              and arrays|Checks if the annotated element's size is between `min` and
+              `max` (inclusive)|Column length will be set to
+              `max`
+|`@Valid`|Any non-primitive type|Performs validation recursively on the associated object.
               If the object is a collection or an array, the elements are
               validated recursively. If the object is a map, the value
               elements are validated recursively.|None
@@ -840,7 +840,7 @@ message, groups and payload. This is a requirement of the Bean Validation specif
 
 In addition to the constraints defined by the Bean Validation API Hibernate Validator provides
 several useful custom constraints which are listed in <<table-custom-constraints>>. With one
-exception also these constraints apply to the field/property level, only +@ScriptAssert+ is a class-
+exception also these constraints apply to the field/property level, only `@ScriptAssert` is a class-
 level constraint.
 
 [[table-custom-constraints]]
@@ -852,136 +852,136 @@ level constraint.
 |Use
 |Hibernate metadata impact
 
-|+@CreditCardNumber(ignoreNonDigitCharacters=)+
-|+CharSequence+
+|`@CreditCardNumber(ignoreNonDigitCharacters=)`
+|`CharSequence`
 |Checks that the annotated character sequence passes the
  Luhn checksum test. Note, this validation aims to check for user
  mistakes, not credit card validity! See also
- http://www.merriampark.com/anatomycc.htm[Anatomy of Credit Card Numbers]. +ignoreNonDigitCharacters+
- allows to ignore non digit characters. The default is +false+.
+ http://www.merriampark.com/anatomycc.htm[Anatomy of Credit Card Numbers]. `ignoreNonDigitCharacters`
+ allows to ignore non digit characters. The default is `false`.
 |None
 
-|+@EAN+
-|+CharSequence+
+|`@EAN`
+|`CharSequence`
 |Checks that the annotated character sequence is a valid
 link:$$http://en.wikipedia.org/wiki/International_Article_Number_%28EAN%29$$[EAN] barcode.
 type determines the type of barcode. The default is EAN-13.
 |None
 
-|+@Email+
-|+CharSequence+
+|`@Email`
+|`CharSequence`
 |Checks whether the specified character sequence is a valid email address. The optional parameters
-+regexp+ and +flags+ allow to specify an additional regular expression (including regular expression
+`regexp` and `flags` allow to specify an additional regular expression (including regular expression
 flags) which the email must match.
 |None
 
-|+@Length(min=, +
-         max=)+
-|+CharSequence+
+|`@Length(min=, +
+         max=)`
+|`CharSequence`
 |Validates that the annotated character sequence is
-              between +min+ and
-              +max+ included
+              between `min` and
+              `max` included
 |Column length will be set to max
 
-|+@LuhnCheck(startIndex= , +
+|`@LuhnCheck(startIndex= , +
             endIndex=, +
             checkDigitIndex=, +
-            ignoreNonDigitCharacters=)+
-|+CharSequence+
+            ignoreNonDigitCharacters=)`
+|`CharSequence`
 |Checks that the digits within the annotated character
 sequence pass the Luhn checksum algorithm (see also
-link:$$http://en.wikipedia.org/wiki/Luhn_algorithm$$[Luhn algorithm]). +startIndex+ and
-+endIndex+ allow to only run the algorithm on
-the specified sub-string. +checkDigitIndex+
+link:$$http://en.wikipedia.org/wiki/Luhn_algorithm$$[Luhn algorithm]). `startIndex` and
+`endIndex` allow to only run the algorithm on
+the specified sub-string. `checkDigitIndex`
 allows to use an arbitrary digit within the character sequence
 as the check digit. If not specified it is assumed that the
 check digit is part of the specified range. Last but not least,
-+ignoreNonDigitCharacters+ allows to ignore
+`ignoreNonDigitCharacters` allows to ignore
 non digit characters.
 |None
 
-|+@Mod10Check(multiplier=, +
+|`@Mod10Check(multiplier=, +
              weight=, +
              startIndex=, +
              endIndex=, +
              checkDigitIndex=, +
-             ignoreNonDigitCharacters=)+
-|+CharSequence+
+             ignoreNonDigitCharacters=)`
+|`CharSequence`
 |Checks that the digits within the annotated character
 sequence pass the generic mod 10 checksum algorithm.
-+multiplier+ determines the multiplier for
-odd numbers (defaults to 3), +weight+ the
+`multiplier` determines the multiplier for
+odd numbers (defaults to 3), `weight` the
 weight for even numbers (defaults to 1).
-+startIndex+ and
-+endIndex+ allow to only run the algorithm on
-the specified sub-string. +checkDigitIndex+
+`startIndex` and
+`endIndex` allow to only run the algorithm on
+the specified sub-string. `checkDigitIndex`
 allows to use an arbitrary digit within the character sequence
 as the check digit. If not specified it is assumed that the
 check digit is part of the specified range. Last but not least,
-+ignoreNonDigitCharacters+ allows to ignore
+`ignoreNonDigitCharacters` allows to ignore
 non digit characters.
 |None
 
-|+@Mod11Check(threshold=, +
+|`@Mod11Check(threshold=, +
              startIndex=, +
              endIndex=, +
              checkDigitIndex=, +
              ignoreNonDigitCharacters=, +
              treatCheck10As=, +
-             treatCheck11As=)+
-|+CharSequence+
+             treatCheck11As=)`
+|`CharSequence`
 |Checks that the digits within the annotated character
 sequence pass the mod 11 checksum algorithm.
-+threshold+ specifies the threshold for the
+`threshold` specifies the threshold for the
 mod11 multiplier growth; if no value is specified the multiplier
-will grow indefinitely. +treatCheck10As+
-and +treatCheck11As+ specify the check
+will grow indefinitely. `treatCheck10As`
+and `treatCheck11As` specify the check
 digits to be used when the mod 11 checksum equals 10 or 11,
 respectively. Default to X and 0, respectively.
-+startIndex+, +endIndex+
-+checkDigitIndex+ and
-+ignoreNonDigitCharacters+ carry the same
-semantics as in +@Mod10Check+.
+`startIndex`, `endIndex`
+`checkDigitIndex` and
+`ignoreNonDigitCharacters` carry the same
+semantics as in `@Mod10Check`.
 |None
 
-|+@NotBlank+
-|+CharSequence+
+|`@NotBlank`
+|`CharSequence`
 |Checks that the annotated character sequence is not null
 and the trimmed length is greater than 0. The difference to
-+@NotEmpty+ is that this constraint can
+`@NotEmpty` is that this constraint can
 only be applied on strings and that trailing white-spaces are
 ignored.
 |None
 
-|+@NotEmpty+
-|+CharSequence+, +Collection+, +Map+ and arrays
+|`@NotEmpty`
+|`CharSequence`, `Collection`, `Map` and arrays
 |Checks whether the annotated element is not null nor empty
 |None
 
-|+@Range(min=, +
-        max=)+
-|+BigDecimal+, +BigInteger+, +CharSequence+, +byte+, +short+, +int+, +long+ and the respective wrappers of the
+|`@Range(min=, +
+        max=)`
+|`BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the
 primitive types
 |Checks whether the annotated value lies between (inclusive) the specified minimum and maximum
 |None
 
-|+@SafeHtml(whitelistType= , +
+|`@SafeHtml(whitelistType= , +
            additionalTags=, +
-           additionalTagsWithAttributes=)+
-|+CharSequence+
+           additionalTagsWithAttributes=)`
+|`CharSequence`
 |Checks whether the annotated value
-contains potentially malicious fragments such as +<script/>+. In order to use this
+contains potentially malicious fragments such as `<script/>`. In order to use this
 constraint, the
 link:$$http://jsoup.org/$$[jsoup] library must be part of the class path.
-With the +whitelistType+ attribute a predefined whitelist type can be chosen which can
-be refined via +additionalTags+ or +additionalTagsWithAttributes+. The former allows to
+With the `whitelistType` attribute a predefined whitelist type can be chosen which can
+be refined via `additionalTags` or `additionalTagsWithAttributes`. The former allows to
 add tags without any attributes, whereas the latter allows to specify tags and
-optionally allowed attributes using the annotation +@SafeHtml.Tag+.
+optionally allowed attributes using the annotation `@SafeHtml.Tag`.
 |None
 
-|+@ScriptAssert(lang=, +
+|`@ScriptAssert(lang=, +
               script=, +
-              alias=)+
+              alias=)`
 |Any type
 |Checks whether the given script can successfully be
 evaluated against the annotated element. In order to use this
@@ -993,24 +993,24 @@ any scripting or expression language, for which a JSR 223
 compatible engine can be found in the class path.
 |None
 
-|+@URL(protocol=, +
+|`@URL(protocol=, +
       host=, +
       port=, +
       regexp=, +
-      flags=)+
-|+CharSequence+
+      flags=)`
+|`CharSequence`
 |Checks if the annotated character sequence is a valid URL
 according to RFC2396. If any of the optional parameters
-+protocol+, +host+ or
-+port+ are specified, the corresponding URL
+`protocol`, `host` or
+`port` are specified, the corresponding URL
 fragments must match the specified values. The optional
-parameters +regexp+ and
-+flags+ allow to specify an additional
+parameters `regexp` and
+`flags` allow to specify an additional
 regular expression (including regular expression flags) which
-the URL must match. Per default this constraint used the +java.net.URL+ constructor to
+the URL must match. Per default this constraint used the `java.net.URL` constructor to
 verify whether a given string represents a valid URL. A regular expression based version is also
-available - +RegexpURLValidator+ - which can be configured via XML
-(see <<section-mapping-xml-constraints>>) or a +ConstraintDefinitionContributor+
+available - `RegexpURLValidator` - which can be configured via XML
+(see <<section-mapping-xml-constraints>>) or a `ConstraintDefinitionContributor`
 (see <<section-constraint-definition-contributor>>).
 |None
 
@@ -1036,13 +1036,13 @@ Hibernate Validator!
 [options="header"]
 |===============
 |Annotation|Supported data types|Use|Country|Hibernate metadata impact
-|+@CNPJ+|+CharSequence+|Checks that the annotated character sequence represents
+|`@CNPJ`|`CharSequence`|Checks that the annotated character sequence represents
                 a Brazilian corporate tax payer registry number (Cadastro de
                 Pessoa Juríeddica)|Brazil|None
-|+@CPF+|+CharSequence+|Checks that the annotated character sequence represents
+|`@CPF`|`CharSequence`|Checks that the annotated character sequence represents
                 a Brazilian individual taxpayer registry number (Cadastro de
                 Pessoa Fídsica)|Brazil|None
-|+@TituloEleitoral+|+CharSequence+|Checks that the annotated character sequence represents
+|`@TituloEleitoral`|`CharSequence`|Checks that the annotated character sequence represents
                 a Brazilian voter ID card number (link:$$http://ghiorzi.org/cgcancpf.htm$$[Título Eleitoral])|Brazil|None
 
 |===============

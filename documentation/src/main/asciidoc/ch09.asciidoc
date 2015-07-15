@@ -4,7 +4,7 @@
 The Bean Validation specification provides not only a validation engine, but also an API for
 retrieving constraint metadata in a uniform way, no matter whether the constraints are declared
 using annotations or via XML mappings. Read this chapter to learn more about this API and its
-possibilities. You can find all the metadata API types in the package javax.validation.metadata.
+possibilities. You can find all the metadata API types in the package `javax.validation.metadata`.
 
 The examples presented in this chapter are based on the classes and constraint declarations shown in
 <<metadata-example-car>>.
@@ -110,27 +110,25 @@ public class Car implements Vehicle {
 ====
 
 
-=== BeanDescriptor
+=== `BeanDescriptor`
 
-The entry point into the metadata API is the method Validator#getConstraintsForClass(), which
-returns an instance of the link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.
-html?javax/validation/metadata/BeanDescriptor.html$$[BeanDescriptor] interface. Using this
+The entry point into the metadata API is the method `Validator#getConstraintsForClass()`, which
+returns an instance of the `link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.
+html?javax/validation/metadata/BeanDescriptor.html$$[BeanDescriptor]` interface. Using this
 descriptor, you can obtain metadata for constraints declared directly on the bean itself (class- or
 property-level), but also retrieve metadata descriptors representing single properties, methods and
 constructors.
 
-<<metadata-example-using-beandescriptor>> demonstrates how to retrieve a BeanDescriptor for the
-Car class and how to use this descriptor in form of assertions.
-
+<<metadata-example-using-beandescriptor>> demonstrates how to retrieve a `BeanDescriptor` for the
+`Car` class and how to use this descriptor in form of assertions.
 
 [TIP]
 ====
-If a constraint declaration hosted by the requested class is invalid, a ValidationException is thrown.
+If a constraint declaration hosted by the requested class is invalid, a `ValidationException` is thrown.
 ====
 
-
 [[metadata-example-using-beandescriptor]]
-.Using BeanDescriptor
+.Using `BeanDescriptor`
 ====
 [source, JAVA]
 ----
@@ -198,42 +196,42 @@ assertNotNull(
 ====
 
 You can determine whether the specified class hosts any class- or property-level constraints via
-isBeanConstrained(). Method or constructor constraints are not considered by isBeanConstrained().
+`isBeanConstrained()`. Method or constructor constraints are not considered by `isBeanConstrained()`.
 
-The method getConstraintDescriptors() is common to all descriptors derived from ElementDescriptor
+The method `getConstraintDescriptors()` is common to all descriptors derived from `ElementDescriptor`
 (see <<validator-metadata-api-elementdescriptor>>) and returns a set of descriptors representing the
-constraints directly declared on the given element. In case of BeanDescriptor, the bean's class-
-level constraints are returned. More details on ConstraintDescriptor can be found in
+constraints directly declared on the given element. In case of `BeanDescriptor`, the bean's class-
+level constraints are returned. More details on `ConstraintDescriptor` can be found in
 <<section-constraint-descriptor>>.
 
-Via getConstraintsForProperty(), getConstraintsForMethod() and getConstraintsForConstructor() you
+Via `getConstraintsForProperty()`, `getConstraintsForMethod()` and `getConstraintsForConstructor()` you
 can obtain a descriptor representing one given property or executable element, identified by its
 name and, in case of methods and constructors, parameter types. The different descriptor types
 returned by these methods are described in the following sections.
 
 Note that these methods consider constraints declared at super-types according to the rules for
 constraint inheritance as described in <<section-constraint-inheritance>>. An example is the
-descriptor for the manufacturer property, which provides access to all constraints defined on
-Vehicle#getManufacturer() and the implementing method Car#getManufacturer(). +null+ is returned in
+descriptor for the `manufacturer` property, which provides access to all constraints defined on
+`Vehicle#getManufacturer()` and the implementing method `Car#getManufacturer()`. `null` is returned in
 case the specified element does not exist or is not constrained.
 
-The methods getConstrainedProperties(), getConstrainedMethods() and getConstrainedConstructors()
+The methods `getConstrainedProperties()`, `getConstrainedMethods()` and `getConstrainedConstructors()`
 return (potentially empty) sets with all constrained properties, methods and constructors,
 respectively. An element is considered constrained, if it has at least one constraint or is marked
-for cascaded validation. When invoking getConstrainedMethods(), you can specify the type of the
+for cascaded validation. When invoking `getConstrainedMethods()`, you can specify the type of the
 methods to be returned (getters, non-getters or both).
 
 [[section-property-descriptor]]
-=== PropertyDescriptor
+=== `PropertyDescriptor`
 
 The interface
-link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/PropertyDescriptor.html$$[PropertyDescriptor] represents one given property of a
+`link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/PropertyDescriptor.html$$[PropertyDescriptor]` represents one given property of a
 class. It is transparent whether constraints are declared on a field or a property getter, provided
 the JavaBeans naming conventions are respected. <<metadata-example-using-propertydescriptor>> shows
-how to use the PropertyDescriptor interface.
+how to use the `PropertyDescriptor` interface.
 
 [[metadata-example-using-propertydescriptor]]
-.Using PropertyDescriptor
+.Using `PropertyDescriptor`
 ====
 [source, JAVA]
 ----
@@ -259,22 +257,22 @@ assertEquals( 1, driverDescriptor.getGroupConversions().size() );
 ----
 ====
 
-Using getConstrainedDescriptors(), you can retrieve a set of ConstraintDescriptors providing more
-information on the individual constraints of a given property. The method isCascaded() returns
-+true+, if the property is marked for cascaded validation (either using the @Valid annotation or via
-XML), +false+ otherwise. Any configured group conversions are returned by getGroupConversions(). See
-<<section-group-conversion-descriptor>> for more details on GroupConversionDescriptor.
+Using `getConstrainedDescriptors()`, you can retrieve a set of `ConstraintDescriptors` providing more
+information on the individual constraints of a given property. The method `isCascaded()` returns
+`true`, if the property is marked for cascaded validation (either using the `@Valid` annotation or via
+XML), `false` otherwise. Any configured group conversions are returned by `getGroupConversions()`. See
+<<section-group-conversion-descriptor>> for more details on `GroupConversionDescriptor`.
 
-=== MethodDescriptor and ConstructorDescriptor
+=== `MethodDescriptor` and `ConstructorDescriptor`
 
 Constrained methods and constructors are represented by the interfaces
-link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/MethodDescriptor.html$$[MethodDescriptor]
-and link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ConstructorDescriptor.html$$[ConstructorDescriptor], respectively.
+`link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/MethodDescriptor.html$$[MethodDescriptor]`
+and `link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ConstructorDescriptor.html$$[ConstructorDescriptor]`, respectively.
 <<metadata-example-using-methodandconstructordescriptor>> demonstrates how to work with these
 descriptors.
 
 [[metadata-example-using-methodandconstructordescriptor]]
-.Using MethodDescriptor and ConstructorDescriptor
+.Using `MethodDescriptor` and `ConstructorDescriptor`
 ====
 [source, JAVA]
 ----
@@ -349,58 +347,58 @@ assertEquals(
 ----
 ====
 
-getName() returns the name of the given method or constructor. The methods
-hasConstrainedParameters() and hasConstrainedReturnValue() can be used to perform a quick check
+`getName()` returns the name of the given method or constructor. The methods
+`hasConstrainedParameters()` and `hasConstrainedReturnValue()` can be used to perform a quick check
 whether an executable element has any parameter constraints (either constraints on single parameters
 or cross-parameter constraints) or return value constraints.
 
-Note that any constraints are not directly exposed on MethodDescriptor and ConstructorDescriptor,
+Note that any constraints are not directly exposed on `MethodDescriptor` and `ConstructorDescriptor`,
 but rather on dedicated descriptors representing an executable's parameters, its return value and
 its cross-parameter constraints. To get hold of one of these descriptors, invoke
-getParameterDescriptors(), getReturnValueDescriptor() or getCrossParameterDescriptor(),
+`getParameterDescriptors()`, `getReturnValueDescriptor()` or `getCrossParameterDescriptor()`,
 respectively.
 
-These descriptors provide access to the element's constraints (getConstraintDescriptors()) and, in
-case of parameters and return value, to its configuration for cascaded validation (isValid() and
-getGroupConversions()). For parameters, you also can retrieve the index and the name, as returned by
-the currently used parameter name provider (see <<section-parameter-name-provider>>) via getName()
-and getIndex().
+These descriptors provide access to the element's constraints (`getConstraintDescriptors()`) and, in
+case of parameters and return value, to its configuration for cascaded validation (`isValid()` and
+`getGroupConversions()`). For parameters, you also can retrieve the index and the name, as returned by
+the currently used parameter name provider (see <<section-parameter-name-provider>>) via `getName()`
+and `getIndex()`.
 
 [TIP]
 ====
 Getter methods following the JavaBeans naming conventions are considered as bean properties but also
 as constrained methods.
 
-That means you can retrieve the related metadata either by obtaining a PropertyDescriptor (e.g.
-BeanDescriptor.getConstraintsForProperty("foo")) or by examining the return value descriptor of the
-getter's MethodDescriptor (e.g.
-BeanDescriptor.getConstraintsForMethod("getFoo").getReturnValueDescriptor()).
+That means you can retrieve the related metadata either by obtaining a `PropertyDescriptor` (e.g.
+`BeanDescriptor.getConstraintsForProperty("foo")`) or by examining the return value descriptor of the
+getter's `MethodDescriptor` (e.g.
+`BeanDescriptor.getConstraintsForMethod("getFoo").getReturnValueDescriptor())`.
 ====
 
 
 [[validator-metadata-api-elementdescriptor]]
-=== ElementDescriptor
+=== `ElementDescriptor`
 
-The link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ElementDescriptor.html$$[ElementDiscriptor]
+The `link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ElementDescriptor.html$$[ElementDiscriptor]`
 interface is the common base class for the
-individual descriptor types such as BeanDescriptor, PropertyDescriptor etc. Besides
-getConstraintDescriptors() it provides some more methods common to all descriptors.
+individual descriptor types such as `BeanDescriptor`, `PropertyDescriptor` etc. Besides
+`getConstraintDescriptors()` it provides some more methods common to all descriptors.
 
-hasConstraints() allows for a quick check whether an element has any direct constraints (e.g. class-
-level constraints in case of BeanDescriptor). getElementClass() returns the Java type of the element
+`hasConstraints()` allows for a quick check whether an element has any direct constraints (e.g. class-
+level constraints in case of `BeanDescriptor`). `getElementClass()` returns the Java type of the element
 represented by a given descriptor. More specifically, the method returns
 
-* the object type when invoked on BeanDescriptor,
-* the type of a property or parameter when invoked on PropertyDescriptor or ParameterDescriptor
+* the object type when invoked on `BeanDescriptor`,
+* the type of a property or parameter when invoked on `PropertyDescriptor` or `ParameterDescriptor`
 respectively,
-* Object[].class when invoked on CrossParameterDescriptor,
-* the return type when invoked on ConstructorDescriptor, MethodDescriptor or ReturnValueDescriptor.
-void.class will be returned for methods which don't have a return value.
+* `Object[].class` when invoked on `CrossParameterDescriptor`,
+* the return type when invoked on `ConstructorDescriptor`, `MethodDescriptor` or `ReturnValueDescriptor`.
+`void.class` will be returned for methods which don't have a return value.
 
 <<metadata-example-using-elementdescriptor>> shows how these methods are used.
 
 [[metadata-example-using-elementdescriptor]]
-.Using ElementDescriptor methods
+.Using `ElementDescriptor methods`
 ====
 [source, JAVA]
 ----
@@ -422,12 +420,12 @@ assertEquals( Object[].class, loadCrossParameterDescriptor.getElementClass() );
 ----
 ====
 
-Finally, ElementDescriptor offers access to the ConstraintFinder API which allows you to query for
+Finally, `ElementDescriptor` offers access to the `ConstraintFinder` API which allows you to query for
 constraint metadata in a fine grained way. <<example-constraint-finder>> shows how to retrieve a
-ConstraintFinder instance via findConstraints() and use the API to query for constraint metadata.
+`ConstraintFinder` instance via `findConstraints()` and use the API to query for constraint metadata.
 
 [[example-constraint-finder]]
-.Usage of ConstraintFinder
+.Usage of `ConstraintFinder`
 ====
 [source, JAVA]
 ----
@@ -483,37 +481,37 @@ assertEquals(
 ----
 ====
 
-Via declaredOn() you can search for ConstraintDescriptors declared on certain element types. This is
+Via `declaredOn()` you can search for `ConstraintDescriptors` declared on certain element types. This is
 useful to find property constraints declared on either fields or getter methods.
 
-unorderedAndMatchingGroups() restricts the resulting constraints to those matching the given
+`unorderedAndMatchingGroups()` restricts the resulting constraints to those matching the given
 validation group(s).
 
-lookingAt() allows to distinguish between constraints directly specified on the element
-(Scope.LOCAL_ELEMENT) or constraints belonging to the element but hosted anywhere in the class
-hierarchy (Scope.HIERARCHY).
+`lookingAt()` allows to distinguish between constraints directly specified on the element
+(`Scope.LOCAL_ELEMENT`) or constraints belonging to the element but hosted anywhere in the class
+hierarchy (`Scope.HIERARCHY`).
 
 You can also combine the different options as shown in the last example.
 
 [WARNING]
 ====
-Order is not respected by unorderedAndMatchingGroups(), but group inheritance and inheritance via
+Order is not respected by `unorderedAndMatchingGroups()`, but group inheritance and inheritance via
 sequence are.
 ====
 
 [[section-group-conversion-descriptor]]
-=== GroupConversionDescriptor
+=== `GroupConversionDescriptor`
 
 All those descriptor types that represent elements which can be subject of cascaded validation
-(i.e., PropertyDescriptor, ParameterDescriptor and ReturnValueDescriptor) provide access to the
-element's group conversions via getGroupConversions(). The returned set contains a
-link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/GroupConversionDescriptor.html$$[GroupConversionDescriptor]
+(i.e., `PropertyDescriptor`, `ParameterDescriptor` and `ReturnValueDescriptor`) provide access to the
+element's group conversions via `getGroupConversions()`. The returned set contains a
+`link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/GroupConversionDescriptor.html$$[GroupConversionDescriptor]`
 for each configured conversion, allowing to retrieve
 source and target groups of the conversion. <<metadata-example-using-groupconversiondescriptor>>
 shows an example.
 
 [[metadata-example-using-groupconversiondescriptor]]
-.Using GroupConversionDescriptor
+.Using `GroupConversionDescriptor`
 
 ====
 [source, JAVA]
@@ -531,21 +529,21 @@ assertEquals( Person.Basic.class, groupConversionDescriptor.getTo() );
 ====
 
 [[section-constraint-descriptor]]
-=== ConstraintDescriptor
+=== `ConstraintDescriptor`
 
 Last but not least, the
-link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ConstraintDescriptor.html$$[ConstraintDescriptor]
+`link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ConstraintDescriptor.html$$[ConstraintDescriptor]`
 interface describes a
 single constraint together with its composing constraints. Via an instance of this interface you get
 access to the constraint annotation and its parameters.
 
 <<metadata-example-using-constraintdescriptor>>
 shows how to retrieve default constraint attributes (such as message template, groups etc.) as well
-as custom constraint attributes (piecesOfLuggagePerPassenger) and other metadata such as the
-constraint's annotation type and its validators from a ConstraintDescriptor.
+as custom constraint attributes (`piecesOfLuggagePerPassenger`) and other metadata such as the
+constraint's annotation type and its validators from a `ConstraintDescriptor`.
 
 [[metadata-example-using-constraintdescriptor]]
-.Using ConstraintDescriptor
+.Using `ConstraintDescriptor`
 ====
 [source, JAVA]
 ----

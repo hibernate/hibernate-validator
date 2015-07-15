@@ -1,9 +1,8 @@
 [[validator-customconstraints]]
-
 == Creating custom constraints
 
-The Bean Validation API defines a whole set of standard constraint annotations such as @NotNull,
-@Size etc. In cases where these buit-in constraints are not sufficient, you cean easily create
+The Bean Validation API defines a whole set of standard constraint annotations such as `@NotNull`,
+`@Size` etc. In cases where these buit-in constraints are not sufficient, you cean easily create
 custom constraints tailored to your specific validation requirements.
 
 [[validator-customconstraints-simple]]
@@ -20,13 +19,13 @@ To create a custom constraint, the following three steps are required:
 
 This section shows how to write a constraint annotation which can be used to ensure that a given
 string is either completely upper case or lower case. Later on this constraint will be applied to
-the licensePlate field of the Car class from <<validator-gettingstarted>> to ensure, that the field
-is always an upper-case string.
+the `licensePlate` field of the `Car` class from <<validator-gettingstarted>> to ensure, that
+the field is always an upper-case string.
 
-The first thing needed is a way to express the two case modes. While you could use String constants,
+The first thing needed is a way to express the two case modes. While you could use `String` constants,
 a better approach is using a Java 5 enum for that purpose:
 
-.Enum CaseMode to express upper vs. lower case
+.Enum `CaseMode` to express upper vs. lower case
 ====
 [source, JAVA]
 ----
@@ -43,7 +42,7 @@ The next step is to define the actual constraint annotation. If you've never des
 before, this may look a bit scary, but actually it's not that hard:
 
 [[example-defining-custom-constraint]]
-.Defining the @CheckCase constraint annotation
+.Defining the `@CheckCase` constraint annotation
 ====
 [source, JAVA]
 ----
@@ -74,19 +73,17 @@ public @interface CheckCase {
 ----
 ====
 
-An annotation type is defined using the @interface keyword. All attributes of an annotation type are
+An annotation type is defined using the `@interface` keyword. All attributes of an annotation type are
 declared in a method-like manner. The specification of the Bean Validation API demands, that any
 constraint annotation defines
 
-
-* an attribute message that returns the default key for creating error messages in case the
+* an attribute `message` that returns the default key for creating error messages in case the
 constraint is violated
 
-* an attribute groups that allows the specification of validation groups, to which this constraint
-belongs (see <<chapter-groups>>). This must default to an empty array of type Class&lt;?&gt;.
+* an attribute `groups` that allows the specification of validation groups, to which this constraint
+belongs (see <<chapter-groups>>). This must default to an empty array of type Class<?>.
 
-
-* an attribute payload that can be used by clients of the Bean Validation API to assign custom
+* an attribute `payload` that can be used by clients of the Bean Validation API to assign custom
 payload objects to a constraint. This attribute is not used by the API itself. An example for a
 custom payload could be the definition of a severity:
 +
@@ -114,53 +111,53 @@ public class ContactDetails {
 ----
 ====
 +
-Now a client can after the validation of a ContactDetails instance access the severity of a
-constraint using ConstraintViolation.getConstraintDescriptor().getPayload() and adjust its behaviour
+Now a client can after the validation of a `ContactDetails` instance access the severity of a
+constraint using `ConstraintViolation.getConstraintDescriptor().getPayload()` and adjust its behavior
 depending on the severity.
 
-Besides these three mandatory attributes there is another one, value, allowing for the required case
-mode to be specified. The name value is a special one, which can be omitted when using the
-annotation, if it is the only attribute specified, as e.g. in @CheckCase(CaseMode.UPPER).
+Besides these three mandatory attributes there is another one, `value`, allowing for the required case
+mode to be specified. The name `value` is a special one, which can be omitted when using the
+annotation, if it is the only attribute specified, as e.g. in `@CheckCase(CaseMode.UPPER)`.
 
 In addition, the constraint annotation is decorated with a couple of meta annotations:
 
-* @Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE}): Defines the supported target element types
-for the constraint. @CheckCase may be used on fields (element type FIELD), JavaBeans properties as
-well as method return values (METHOD) and method/constructor parameters (PARAMETER). The element
-type ANNOTATION_TYPE allows for the creation of composed constraints
-(see <<section-constraint-composition>>) based on @CheckCase.
+* `@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE})`: Defines the supported target element types
+for the constraint. `@CheckCase` may be used on fields (element type `FIELD`), JavaBeans properties as
+well as method return values (`METHOD`) and method/constructor parameters (`PARAMETER`). The element
+type `ANNOTATION_TYPE` allows for the creation of composed constraints
+(see <<section-constraint-composition>>) based on `@CheckCase`.
 +
 When creating a class-level constraint (see <<validator-usingvalidator-classlevel>>), the element
-type TYPE would have to be used. Constraints targetting the return value of a constructor need to
-support the element type CONSTRUCTOR. Cross-parameter constraints (see
+type `TYPE` would have to be used. Constraints targeting the return value of a constructor need to
+support the element type `CONSTRUCTOR`. Cross-parameter constraints (see
 <<section-cross-parameter-constraints>>) which are used to validate all the parameters of a method
-or constructor together, must support METHOD or CONSTRUCTOR, respectively.
+or constructor together, must support `METHOD` or `CONSTRUCTOR`, respectively.
 
-* @Retention(RUNTIME): Specifies, that annotations of this type will be available at runtime by the
+* `@Retention(RUNTIME)`: Specifies, that annotations of this type will be available at runtime by the
 means of reflection
 
-* @Constraint(validatedBy = CheckCaseValidator.class): Marks the annotation type as constraint
-annotation and specifies the validator to be used to validate elements annotated with @CheckCase.
+* `@Constraint(validatedBy = CheckCaseValidator.class)`: Marks the annotation type as constraint
+annotation and specifies the validator to be used to validate elements annotated with `@CheckCase`.
 If a constraint may be used on several data types, several validators may be specified, one for
 each data type.
 
-* @Documented: Says, that the use of @CheckCase will be contained in the JavaDoc of elements
+* `@Documented`: Says, that the use of `@CheckCase` will be contained in the JavaDoc of elements
 annotated with it
 
-Finally, there is an inner annotation type named List. This annotation allows to specify several
-@CheckCase annotations on the same element, e.g. with different validation groups and messages.
+Finally, there is an inner annotation type named `List`. This annotation allows to specify several
+`@CheckCase` annotations on the same element, e.g. with different validation groups and messages.
 While also another name could be used, the Bean Validation specification recommends to use the name
-List and make the annotation an inner annotation of the corresponding constraint type.
+`List` and make the annotation an inner annotation of the corresponding constraint type.
 
 [[section-constraint-validator]]
 ==== The constraint validator
 
 Having defined the annotation, you need to create a constraint validator, which is able to validate
-elements with a @CheckCase annotation. To do so, implement the interface ConstraintValidator as
+elements with a `@CheckCase` annotation. To do so, implement the interface `ConstraintValidator` as
 shown below:
 
 [[example-constraint-validator]]
-.Implementing a constraint validator for the constraint @CheckCase
+.Implementing a constraint validator for the constraint `@CheckCase`
 ====
 [source, JAVA]
 ----
@@ -192,33 +189,33 @@ public class CheckCaseValidator implements ConstraintValidator<CheckCase, String
 ----
 ====
 
-The ConstraintValidator interface defines two type parameters which are set in the implementation.
-The first one specifies the annotation type to be validated (CheckCase), the second one the type of
-elements, which the validator can handle (String). In case a constraint supports several data types,
-a ConstraintValidator for each allowed type has to be implemented and registered at the constraint
+The `ConstraintValidator` interface defines two type parameters which are set in the implementation.
+The first one specifies the annotation type to be validated (`CheckCase`), the second one the type of
+elements, which the validator can handle (`String`). In case a constraint supports several data types,
+a `ConstraintValidator` for each allowed type has to be implemented and registered at the constraint
 annotation as shown above.
 
-The implementation of the validator is straightforward. The initialize() method gives you access to
+The implementation of the validator is straightforward. The `initialize()` method gives you access to
 the attribute values of the validated constraint and allows you to store them in a field of the
 validator as shown in the example.
 
-The isValid() method contains the actual validation logic. For @CheckCase this is the check whether
+The `isValid()` method contains the actual validation logic. For `@CheckCase` this is the check whether
 a given string is either completely lower case or upper case, depending on the case mode retrieved
-in initialize(). Note that the Bean Validation specification recommends to consider null values as
-being valid. If null is not a valid value for an element, it should be annotated with @NotNull
+in `initialize()`. Note that the Bean Validation specification recommends to consider null values as
+being valid. If `null` is not a valid value for an element, it should be annotated with `@NotNull`
 explicitly.
 
-===== The ConstraintValidatorContext
+===== The `ConstraintValidatorContext`
 
 <<example-constraint-validator>>
-relies on the default error message generation by just returning true or false from the isValid()
-method. Using the passed ConstraintValidatorContext object it is possible to either add additional
+relies on the default error message generation by just returning `true` or `false` from the `isValid()`
+method. Using the passed `ConstraintValidatorContext` object it is possible to either add additional
 error messages or completely disable the default error message generation and solely define custom
-error messages. The ConstraintValidatorContext API is modeled as fluent interface and is best
+error messages. The `ConstraintValidatorContext` API is modeled as fluent interface and is best
 demonstrated with an example:
 
 [[example-constraint-validator-context]]
-.Using ConstraintValidatorContext to define custom error messages
+.Using `ConstraintValidatorContext` to define custom error messages
 ====
 [source, JAVA]
 ----
@@ -264,27 +261,26 @@ public class CheckCaseValidator implements ConstraintValidator<CheckCase, String
 
 <<example-constraint-validator-context>>
 shows how you can disable the default error message generation and add a custom error message using
-a specified message template. In this example the use of the ConstraintValidatorContext results in
+a specified message template. In this example the use of the `ConstraintValidatorContext` results in
 the same error message as the default error message generation.
-
 
 [TIP]
 ====
-It is important to add each configured constraint violation by calling addConstraintViolation().
+It is important to add each configured constraint violation by calling `addConstraintViolation()`.
 Only after that the new constraint violation will be created.
 ====
 
-Refer to <<section-custom-property-paths>> to learn how to use the ConstraintValidatorContext API to
+Refer to <<section-custom-property-paths>> to learn how to use the `ConstraintValidatorContext` API to
 control the property path of constraint violations for class-level constraints.
 
 [[validator-customconstraints-errormessage]]
 ==== The error message
 
-The last missing building block is an error message which should be used in case a @CheckCase
-constraint is violated. To define this, create a file__ValidationMessages.properties__ with the
+The last missing building block is an error message which should be used in case a `@CheckCase`
+constraint is violated. To define this, create a file _ValidationMessages.properties_ with the
 following contents (see also <<section-message-interpolation>>):
 
-.Defining a custom error message for the CheckCase constraint
+.Defining a custom error message for the `CheckCase` constraint
 ====
 ----
 org.hibernate.validator.referenceguide.chapter06.CheckCase.message=Case mode must be {value}.
@@ -292,17 +288,17 @@ org.hibernate.validator.referenceguide.chapter06.CheckCase.message=Case mode mus
 ====
 
 If a validation error occurs, the validation runtime will use the default value, that you specified
-for the message attribute of the @CheckCase annotation to look up the error message in this resource
+for the message attribute of the `@CheckCase` annotation to look up the error message in this resource
 bundle.
 
 [[validator-customconstraints-using]]
 ==== Using the constraint
 
-You can now use the constraint in the Car class from the <<validator-gettingstarted>> chapter to
-specify that the licensePlate field should only contain upper-case strings:
+You can now use the constraint in the `Car` class from the <<validator-gettingstarted>> chapter to
+specify that the `licensePlate` field should only contain upper-case strings:
 
 [[example-car-with-checkcase]]
-.Applying the @CheckCase constraint
+.Applying the `@CheckCase` constraint
 ====
 [source, JAVA]
 ----
@@ -332,11 +328,11 @@ public class Car {
 ----
 ====
 
-Finally, <<example-using-checkcase>> demonstrates how validating a Car object with an invalid
-license plate causes the @CheckCase constraint to be violated.
+Finally, <<example-using-checkcase>> demonstrates how validating a `Car` instance with an invalid
+license plate causes the `@CheckCase` constraint to be violated.
 
 [[example-using-checkcase]]
-.Validating objects with the @CheckCase constraint
+.Validating objects with the `@CheckCase` constraint
 ====
 [source, JAVA]
 ----
@@ -365,7 +361,7 @@ assertEquals( 0, constraintViolations.size() );
 As discussed earlier, constraints can also be applied on the class level to validate the state of an
 entire object. Class-level constraints are defined in the same was as are property constraints.
 <<example-implementing-classlevel-constraint>> shows constraint annotation and validator of the
-@ValidPassengerCount constraint you already saw in use in <<example-class-level>>.
+`@ValidPassengerCount` constraint you already saw in use in <<example-class-level>>.
 
 [[example-implementing-classlevel-constraint]]
 .Implementing a class-level constraint
@@ -412,28 +408,28 @@ public class ValidPassengerCountValidator
 ----
 ====
 
-As the example demonstrates, you need to use the element type TYPE in the @Target annotation. This
+As the example demonstrates, you need to use the element type `TYPE` in the `@Target` annotation. This
 allows the constraint to be put on type definitions. The validator of the constraint in the example
-receives a Car in the isValid() method and can access the complete object state to decide whether
+receives a `Car` in the `isValid()` method and can access the complete object state to decide whether
 the given instance is valid or not.
 
 [[section-custom-property-paths]]
 ==== Custom property paths
 
 By default the constraint violation for a class-level constraint is reported on the level of the
-annotated type, e.g. Car.
+annotated type, e.g. `Car`.
 
 In some cases it is preferable though that the violation's property path refers to one of the
-involved properties. For instance you might want to report the @ValidPassengerCount constraint
-against the passengers property instead of the Car bean.
+involved properties. For instance you might want to report the `@ValidPassengerCount` constraint
+against the passengers property instead of the `Car` bean.
 
 <<example-custom-error>>
-shows how this can be done by using the constraint validator context passed to isValid() to build a
+shows how this can be done by using the constraint validator context passed to `isValid()` to build a
 custom constraint violation with a property node for the property passengers. Note that you also
 could add several property nodes, pointing to a sub-entity of the validated bean.
 
 [[example-custom-error]]
-.Adding a new ConstraintViolation with custom property path
+.Adding a new `ConstraintViolation` with custom property path
 ====
 [source, JAVA]
 ----
@@ -478,12 +474,12 @@ array of parameters of a method or constructor and can be used to express valida
 depends on several parameter values.
 
 In order to define a cross-parameter constraint, its validator class must be annotated with
-@SupportedValidationTarget(ValidationTarget.PARAMETERS). The type parameter T from the
-ConstraintValidator interface must resolve to either Object or Object[] in order to receive the
-array of method/constructor arguments in the isValid() method.
+`@SupportedValidationTarget(ValidationTarget.PARAMETERS)`. The type parameter `T` from the
+`ConstraintValidator` interface must resolve to either `Object` or `Object[]` in order to receive the
+array of method/constructor arguments in the `isValid()` method.
 
 The following example shows the definition of a cross-parameter constraint which can be used to
-check that two Date parameters of a method are in the correct order:
+check that two `Date` parameters of a method are in the correct order:
 
 .Cross-parameter constraint
 ====
@@ -508,18 +504,18 @@ public @interface ConsistentDateParameters {
 ====
 
 The definition of a cross-parameter constraint isn't any different from defining a generic
-constraint, i.e. it must specify the members message(), groups() and payload() and be annotated with
-@Constraint. This meta annotation also specifies the corresponding validator, which is shown in
-<<example-cross-parameter-validator>>. Note that besides the element types METHOD and CONSTRUCTOR
-also ANNOTATION_TYPE is specified as target of the annotation, in order to enable the creation of
-composed constraints based on @ConsistentDateParameters (see
+constraint, i.e. it must specify the members `message()`, `groups()` and `payload()` and be annotated with
+`@Constraint`. This meta annotation also specifies the corresponding validator, which is shown in
+<<example-cross-parameter-validator>>. Note that besides the element types `METHOD` and `CONSTRUCTOR`
+also `ANNOTATION_TYPE` is specified as target of the annotation, in order to enable the creation of
+composed constraints based on `@ConsistentDateParameters` (see
 <<section-constraint-composition>>).
 
 [NOTE]
 ====
 Cross-parameter constraints are specified directly on the declaration of a method or constructor,
 which is also the case for return value constraints. In order to improve code readability, it is
-therefore recommended to chose constraint names - such as @ConsistentDateParameters - which make the
+therefore recommended to chose constraint names - such as `@ConsistentDateParameters` - which make the
 constraint target apparent.
 ====
 
@@ -562,31 +558,31 @@ public class ConsistentDateParameterValidator implements
 ----
 ====
 
-As discussed above, the validation target PARAMETERS must be configured for a cross-parameter
-validator by using the @SupportedValidationTarget annotation. Since a cross-parameter constraint
+As discussed above, the validation target `PARAMETERS` must be configured for a cross-parameter
+validator by using the `@SupportedValidationTarget` annotation. Since a cross-parameter constraint
 could be applied to any method or constructor, it is considered a best practice to check for the
 expected number and types of parameters in the validator implementation.
 
-As with generic constraints, +null+ parameters should be considered valid and @NotNull on the
-individual parameters should be used to make sure that parameters are not +null+.
+As with generic constraints, `null` parameters should be considered valid and `@NotNull` on the
+individual parameters should be used to make sure that parameters are not `null`.
 
 [TIP]
 ====
 Similar to class-level constraints, you can create custom constraint violations on single parameters
 instead of all parameters when validating a cross-parameter constraint. Just obtain a node builder
-from the ConstraintValidatorContext passed to isValid() and add a parameter node by calling
-addParameterNode(). In the example you could use this to create a constraint violation on the end
+from the `ConstraintValidatorContext` passed to `isValid()` and add a parameter node by calling
+`addParameterNode()`. In the example you could use this to create a constraint violation on the end
 date parameter of the validated method.
 ====
 
 In rare situations a constraint is both, generic and cross-parameter. This is the case if a
 constraint has a validator class which is annotated with
-@SupportedValidationTarget({ValidationTarget.PARAMETERS, ValidationTarget.ANNOTATED_ELEMENT}) or if
+`@SupportedValidationTarget({ValidationTarget.PARAMETERS, ValidationTarget.ANNOTATED_ELEMENT})` or if
 it has a generic and a cross-parameter validator class.
 
 When declaring such a constraint on a method which has parameters and also a return value, the
 intended constraint target can't be determined. Constraints which are generic and cross-parameter at
-the same time, must therefore define a member validationAppliesTo() which allows the constraint user
+the same time, must therefore define a member `validationAppliesTo()` which allows the constraint user
 to specify the constraint's target as shown in <<example-dual-cross-parameter-constraint>>.
 
 [[example-dual-cross-parameter-constraint]]
@@ -619,13 +615,13 @@ public @interface ScriptAssert {
 ----
 ====
 
-The @ScriptAssert constraint has two validators (not shown), a generic and a cross-parameter one and
-thus defines the member validationAppliesTo(). The default value IMPLICIT allows to derive the
+The `@ScriptAssert` constraint has two validators (not shown), a generic and a cross-parameter one and
+thus defines the member `validationAppliesTo()`. The default value `IMPLICIT` allows to derive the
 target automatically in situations where this is possible (e.g. if the constraint is declared on a
 field or on a method which has parameters but no return value).
 
-If the target can not be determined implicitly, it must be set by the user to either PARAMETERS or
-RETURN_VALUE as shown in <<example-dual-cross-parameter-constraint-usage>>.
+If the target can not be determined implicitly, it must be set by the user to either `PARAMETERS` or
+`RETURN_VALUE` as shown in <<example-dual-cross-parameter-constraint-usage>>.
 
 [[example-dual-cross-parameter-constraint-usage]]
 .Specifying the target for a generic and cross-parameter constraint
@@ -642,18 +638,18 @@ public Car buildCar(int seatCount, List<Passenger> passengers) {
 [[section-constraint-composition]]
 === Constraint composition
 
-Looking at the licensePlate field of the Car class in <<example-car-with-checkcase>>, you see three
+Looking at the `licensePlate` field of the `Car` class in <<example-car-with-checkcase>>, you see three
 constraint annotations already. In complexer scenarios, where even more constraints could be applied
-to one element, this might become a bit confusing easily. Furthermore, if there was a licensePlate
+to one element, this might become a bit confusing easily. Furthermore, if there was a `licensePlate`
 field in another class, you would have to copy all constraint declarations to the other class as
 well, violating the DRY principle.
 
 You can address this kind of problem by creating higher level constraints, composed from several
 basic constraints. <<example-composed-constraint>> shows a composed constraint annotation which
-comprises the constraints @NotNull, @Size and @CheckCase:
+comprises the constraints `@NotNull`, `@Size` and `@CheckCase`:
 
 [[example-composed-constraint]]
-.Creating a composing constraint @ValidLicensePlate
+.Creating a composing constraint `@ValidLicensePlate`
 ====
 [source, JAVA]
 ----
@@ -680,13 +676,13 @@ public @interface ValidLicensePlate {
 
 To create a composed constraint, simply annotate the constraint declaration with its comprising
 constraints. If the composed constraint itself requires a validator, this validator is to be
-specified within the @Constraint annotation. For composed constraints which don't need an additional
-validator such as @ValidLicensePlate, just set validatedBy() to an empty array.
+specified within the `@Constraint` annotation. For composed constraints which don't need an additional
+validator such as `@ValidLicensePlate`, just set `validatedBy()` to an empty array.
 
-Using the new composed constraint at the licensePlate field is fully equivalent to the previous
+Using the new composed constraint at the `licensePlate` field is fully equivalent to the previous
 version, where the three constraints were declared directly at the field itself:
 
-.Application of composing constraint ValidLicensePlate
+.Application of composing constraint `ValidLicensePlate`
 ====
 [source, JAVA]
 ----
@@ -702,10 +698,10 @@ public class Car {
 ----
 ====
 
-The set of ConstraintViolations retrieved when validating a Car instance will contain an entry for
-each violated composing constraint of the @ValidLicensePlate constraint. If you rather prefer a
-single ConstraintViolation in case any of the composing constraints is violated, the
-@ReportAsSingleViolation meta constraint can be used as follows:
+The set of `ConstraintViolations` retrieved when validating a `Car` instance will contain an entry for
+each violated composing constraint of the `@ValidLicensePlate` constraint. If you rather prefer a
+single `ConstraintViolation` in case any of the composing constraints is violated, the
+`@ReportAsSingleViolation` meta constraint can be used as follows:
 
 .Using @ReportAsSingleViolation
 ====
