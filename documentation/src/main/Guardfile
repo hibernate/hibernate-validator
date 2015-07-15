@@ -1,0 +1,19 @@
+Bundler.require(:default)
+
+if !File.exist?('../../target/asciidoc-preview')
+	Dir.mkdir '../../target/asciidoc-preview'
+end
+guard 'shell' do
+  watch(/.*\.asciidoc$/) {|m|
+    doc_file_name = m[0].split('/')[1]
+    html_file_name = doc_file_name.gsub(/asciidoc/, 'html')
+    html = Asciidoctor.convert_file(m[0], :header_footer => true)
+    File.open("../../target/asciidoc-preview/#{html_file_name}", 'w') { |file| file.write("#{html.render}") }
+    # not sure why the file also gets created in the source directory!?
+    if File.exist?("asciidoc/#{html_file_name}")
+    	File.delete("asciidoc/#{html_file_name}")
+    end
+  }
+end
+
+
