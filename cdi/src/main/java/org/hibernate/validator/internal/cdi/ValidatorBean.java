@@ -1,62 +1,56 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.cdi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.Any;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
-import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import javax.validation.executable.ExecutableValidator;
 
-import org.hibernate.validator.cdi.HibernateValidator;
-import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 
 /**
+ * A {@link Bean} representing a {@link Validator}. There is one instance of this type representing the default
+ * validator and optionally another instance representing the HV validator in case the default provider is not HV.
+ *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ValidatorBean implements Bean<Validator>, PassivationCapable {
-	private final BeanManager beanManager;
-	private final Set<Annotation> qualifiers;
 
-	public ValidatorBean(BeanManager beanManager, Set<Annotation> qualifiers) {
+	private final BeanManager beanManager;
+	private final ValidationProviderHelper validationProviderHelper;
+	private final Set<Type> types;
+	private final Bean<?> validatorFactoryBean;
+
+	public ValidatorBean(BeanManager beanManager, Bean<?> validatorFactoryBean,
+			ValidationProviderHelper validationProviderHelper) {
 		this.beanManager = beanManager;
-		this.qualifiers = CollectionHelper.newHashSet();
-		this.qualifiers.addAll( qualifiers );
-		this.qualifiers.add(
-				new AnnotationLiteral<Any>() {
-				}
+		this.validatorFactoryBean = validatorFactoryBean;
+		this.validationProviderHelper = validationProviderHelper;
+		this.types = Collections.unmodifiableSet(
+				CollectionHelper.<Type>newHashSet(
+						ClassHierarchyHelper.getHierarchy( validationProviderHelper.getValidatorBeanClass() )
+				)
 		);
 	}
 
 	@Override
 	public Class<?> getBeanClass() {
-		return ValidatorImpl.class;
+		return validationProviderHelper.getValidatorBeanClass();
 	}
 
 	@Override
@@ -71,7 +65,7 @@ public class ValidatorBean implements Bean<Validator>, PassivationCapable {
 
 	@Override
 	public Set<Annotation> getQualifiers() {
-		return qualifiers;
+		return validationProviderHelper.getQualifiers();
 	}
 
 	@Override
@@ -86,12 +80,6 @@ public class ValidatorBean implements Bean<Validator>, PassivationCapable {
 
 	@Override
 	public Set<Type> getTypes() {
-		Set<Type> types = new HashSet<Type>();
-
-		types.add( Validator.class );
-		types.add( ExecutableValidator.class );
-		types.add( Object.class );
-
 		return types;
 	}
 
@@ -107,30 +95,26 @@ public class ValidatorBean implements Bean<Validator>, PassivationCapable {
 
 	@Override
 	public Validator create(CreationalContext<Validator> ctx) {
-		ValidatorFactory validatorFactory = getReference( beanManager, ValidatorFactory.class );
+		ValidatorFactory validatorFactory = createValidatorFactory();
 		return validatorFactory.getValidator();
+	}
+
+	private ValidatorFactory createValidatorFactory() {
+		CreationalContext<?> context = beanManager.createCreationalContext( validatorFactoryBean );
+		return (ValidatorFactory) beanManager.getReference( validatorFactoryBean, ValidatorFactory.class, context );
 	}
 
 	@Override
 	public void destroy(Validator instance, CreationalContext<Validator> ctx) {
 	}
 
-	@SuppressWarnings("unchecked")
-	private <T> T getReference(BeanManager beanManager, Class<T> clazz) {
-		Set<Bean<?>> beans = beanManager.getBeans( clazz, qualifiers.toArray( new Annotation[qualifiers.size()] ) );
-		for ( Bean<?> bean : beans ) {
-			for ( Annotation annotation : bean.getQualifiers() ) {
-				if ( annotation.annotationType().getName().equals( HibernateValidator.class.getName() ) ) {
-					CreationalContext<?> context = beanManager.createCreationalContext( bean );
-					return (T) beanManager.getReference( bean, clazz, context );
-				}
-			}
-		}
-		return null;
+	@Override
+	public String getId() {
+		return ValidatorBean.class.getName() + "_" + ( validationProviderHelper.isDefaultProvider() ? "default" : "hv" );
 	}
 
-    @Override
-    public String getId() {
-        return ValidatorBean.class.getName();
-    }
+	@Override
+	public String toString() {
+		return "ValidatorBean [id=" + getId() + "]";
+	}
 }

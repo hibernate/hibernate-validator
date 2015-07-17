@@ -1,26 +1,12 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.annotation.Annotation;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -29,6 +15,11 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import java.lang.annotation.Annotation;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -50,6 +41,7 @@ public abstract class MetaDataBuilder {
 	private final Set<MetaConstraint<?>> constraints = newHashSet();
 	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
+	private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 
 	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper) {
 		this.beanClass = beanClass;
@@ -78,6 +70,7 @@ public abstract class MetaDataBuilder {
 	public void add(ConstrainedElement constrainedElement) {
 		constraints.addAll( constrainedElement.getConstraints() );
 		isCascading = isCascading || constrainedElement.isCascading();
+		unwrapMode = constrainedElement.unwrapMode();
 
 		addGroupConversions( constrainedElement.getGroupConversions() );
 	}
@@ -120,6 +113,14 @@ public abstract class MetaDataBuilder {
 		return isCascading;
 	}
 
+	protected Class<?> getBeanClass() {
+		return beanClass;
+	}
+
+	public UnwrapMode unwrapMode() {
+		return unwrapMode;
+	}
+
 	/**
 	 * Adapts the given constraints to the given bean type. In case a constraint
 	 * is defined locally at the bean class the original constraint will be
@@ -144,21 +145,22 @@ public abstract class MetaDataBuilder {
 	}
 
 	private <A extends Annotation> MetaConstraint<A> adaptOriginAndImplicitGroup(MetaConstraint<A> constraint) {
-		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getBeanClass() );
+		ConstraintOrigin definedIn = definedIn( beanClass, constraint.getLocation().getDeclaringClass() );
 
 		if ( definedIn == ConstraintOrigin.DEFINED_LOCALLY ) {
 			return constraint;
 		}
 
-		Class<?> constraintClass = constraint.getLocation().getBeanClass();
+		Class<?> constraintClass = constraint.getLocation().getDeclaringClass();
 
 		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
-				constraint.getDescriptor().getAnnotation(),
 				constraintHelper,
-				constraintClass.isInterface() ? constraintClass : null,
+				constraint.getLocation().getMember(),
+				constraint.getDescriptor().getAnnotation(),
 				constraint.getElementType(),
+				constraintClass.isInterface() ? constraintClass : null,
 				definedIn,
-				constraint.getLocation().getMember()
+				constraint.getDescriptor().getConstraintType()
 		);
 
 		return new MetaConstraint<A>(

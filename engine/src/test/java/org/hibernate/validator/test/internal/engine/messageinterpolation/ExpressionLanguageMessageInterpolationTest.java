@@ -1,36 +1,26 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,  
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
-
-import java.util.Locale;
-import javax.validation.MessageInterpolator;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import javax.validation.MessageInterpolator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.Collections;
+import java.util.Locale;
 
 import static org.testng.Assert.assertEquals;
 
@@ -51,21 +41,19 @@ public class ExpressionLanguageMessageInterpolationTest {
 		AnnotationDescriptor<NotNull> descriptor = new AnnotationDescriptor<NotNull>( NotNull.class );
 		NotNull notNull = AnnotationFactory.create( descriptor );
 		notNullDescriptor = new ConstraintDescriptorImpl<NotNull>(
+				new ConstraintHelper(),
 				null,
 				notNull,
-				new ConstraintHelper(),
-				java.lang.annotation.ElementType.FIELD,
-				ConstraintOrigin.DEFINED_LOCALLY
+				java.lang.annotation.ElementType.FIELD
 		);
 
 		AnnotationDescriptor<Size> sizeAnnotationDescriptor = new AnnotationDescriptor<Size>( Size.class );
 		Size size = AnnotationFactory.create( sizeAnnotationDescriptor );
 		sizeDescriptor = new ConstraintDescriptorImpl<Size>(
+				new ConstraintHelper(),
 				null,
 				size,
-				new ConstraintHelper(),
-				java.lang.annotation.ElementType.FIELD,
-				ConstraintOrigin.DEFINED_LOCALLY
+				java.lang.annotation.ElementType.FIELD
 		);
 
 		interpolatorUnderTest = new ResourceBundleMessageInterpolator();
@@ -75,7 +63,12 @@ public class ExpressionLanguageMessageInterpolationTest {
 	public void testExpressionLanguageGraphNavigation() {
 		User user = new User();
 		user.setAge( 18 );
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, user, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext(
+				notNullDescriptor,
+				user,
+				null,
+				Collections.<String, Object>emptyMap()
+		);
 
 		String expected = "18";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.age}", context );
@@ -84,7 +77,12 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testUnknownPropertyInExpressionLanguageGraphNavigation() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, new User(), null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext(
+				notNullDescriptor,
+				new User(),
+				null,
+				Collections.<String, Object>emptyMap()
+		);
 
 		String expected = "${validatedValue.foo}";
 		String actual = interpolatorUnderTest.interpolate( "${validatedValue.foo}", context );
@@ -93,7 +91,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testNullValidatedValue() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( notNullDescriptor );
 
 		String expected = "Validated value was null";
 		String actual = interpolatorUnderTest.interpolate(
@@ -105,7 +103,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testExpressionAndParameterInterpolationInSameMessageDescriptor() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
 
 		String expected = "2 0 2147483647";
 		String actual = interpolatorUnderTest.interpolate( "${1+1} {min} {max}", context );
@@ -114,7 +112,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testEscapedExpressionLanguage() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
 
 		String expected = "${1+1}";
 		String actual = interpolatorUnderTest.interpolate( "\\${1+1}", context );
@@ -123,7 +121,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testTernaryExpressionLanguageOperator() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
 
 		String expected = "foo";
 		String actual = interpolatorUnderTest.interpolate( "${min == 0 ? 'foo' : 'bar'}", context );
@@ -132,7 +130,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testParameterFormatting() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
 
 		String expected = "Max 2147483647, min 0";
 		String actual = interpolatorUnderTest.interpolate( "${formatter.format('Max %s, min %s', max, min)}", context );
@@ -141,7 +139,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testLiteralStaysUnchanged() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
 
 		String expected = "foo";
 		String actual = interpolatorUnderTest.interpolate( "foo", context );
@@ -150,7 +148,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testLiteralBackslash() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
 
 		String expected = "\\foo";
 		String actual = interpolatorUnderTest.interpolate( "\\foo", context );
@@ -159,7 +157,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testPrecedenceOfParameterInterpolation() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
 
 		String expected = "$0";
 		String actual = interpolatorUnderTest.interpolate( "${min}", context );
@@ -168,7 +166,12 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testLocaleBasedFormatting() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, 42.00000d, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext(
+				notNullDescriptor,
+				42.00000d,
+				null,
+				Collections.<String, Object>emptyMap()
+		);
 
 		// german locale
 		String expected = "42,00";
@@ -191,7 +194,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testMissingFormatArgument() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
 		String expected = "${formatter.format('%1$s')}";
 		String actual = interpolatorUnderTest.interpolate( "${formatter.format('%1$s')}", context );
 		assertEquals(
@@ -203,7 +207,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testNoParametersToFormatter() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
 		String expected = "${formatter.format()}";
 		String actual = interpolatorUnderTest.interpolate( "${formatter.format()}", context );
 		assertEquals( actual, expected, "Calling of formatter#format w/o parameters. No substitution should occur" );
@@ -211,7 +216,8 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testNonFormatterFunction() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( sizeDescriptor, null, null );
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
 		String expected = "foo";
 		String actual = interpolatorUnderTest.interpolate( "${'foobar'.substring(0,3)}", context );
 		assertEquals( actual, expected, "Calling of String#substring should work" );
@@ -219,7 +225,12 @@ public class ExpressionLanguageMessageInterpolationTest {
 
 	@Test
 	public void testCallingWrongFormatterMethod() {
-		MessageInterpolator.Context context = new MessageInterpolatorContext( notNullDescriptor, 42.00000d, null );
+		MessageInterpolator.Context context = new MessageInterpolatorContext(
+				notNullDescriptor,
+				42.00000d,
+				null,
+				Collections.<String, Object>emptyMap()
+		);
 
 		String expected = "${formatter.foo('%1$.2f', validatedValue)}";
 		String actual = interpolatorUnderTest.interpolate(
@@ -231,6 +242,69 @@ public class ExpressionLanguageMessageInterpolationTest {
 				actual,
 				expected,
 				"Wrong substitution, no formatting should occur, because the wrong method name is used"
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-834")
+	public void testOpeningCurlyBraceInELExpression() {
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
+		String expected = "{";
+		String actual = interpolatorUnderTest.interpolate( "${1 > 0 ? '\\{' : '\\}'}", context );
+		assertEquals( actual, expected, "Curly braces are allowed in EL expressions, but need to be escaped" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-834")
+	public void testClosingCurlyBraceInELExpression() {
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
+		String expected = "}";
+		String actual = interpolatorUnderTest.interpolate( "${1 < 0 ? '\\{' : '\\}'}", context );
+		assertEquals( actual, expected, "Curly braces are allowed in EL expressions, but need to be escaped" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-834")
+	public void testCurlyBracesInELExpression() {
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
+		String expected = "a{b}d";
+		String actual = interpolatorUnderTest.interpolate( "${1 < 0 ? 'foo' : 'a\\{b\\}d'}", context );
+		assertEquals( actual, expected, "Curly braces are allowed in EL expressions, but need to be escaped" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-834")
+	public void testEscapedQuoteInELExpression() {
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
+		String expected = "\"";
+		String actual = interpolatorUnderTest.interpolate( "${ true ? \"\\\"\" : \"foo\"}", context );
+		assertEquals( actual, expected, "If quotes are used in EL expression literal quotes need to be escaped" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-834")
+	public void testSingleEscapedQuoteInELExpression() {
+		MessageInterpolator.Context context = createMessageInterpolatorContext( sizeDescriptor );
+
+		String expected = "'";
+		String actual = interpolatorUnderTest.interpolate( "${ false ? 'foo' : '\\''}", context );
+		assertEquals(
+				actual,
+				expected,
+				"If single quotes are used in EL expression literal single quotes need to be escaped"
+		);
+	}
+
+	private MessageInterpolatorContext createMessageInterpolatorContext(ConstraintDescriptorImpl<?> descriptor) {
+		return new MessageInterpolatorContext(
+				descriptor,
+				null,
+				null,
+				Collections.<String, Object>emptyMap()
 		);
 	}
 }

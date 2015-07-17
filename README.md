@@ -1,18 +1,22 @@
 # Hibernate Validator
 
+<<<<<<< HEAD
 *Version: 5.0.3.Final, 28.01.2014*
+=======
+*Version: 5.2.0.CR1, 22.05.2015*
+>>>>>>> upstream/master
 
 
 ## What is it?
 
-This is the reference implementation of [JSR-349 - Bean Validation 1.1](http://www.beanvalidation.org/).
+This is the reference implementation of [JSR-349 - Bean Validation 1.1](http://beanvalidation.org/).
 Bean Validation defines a metadata model and API for JavaBean as well as method validation.
 The default metadata source are annotations, with the ability to override and extend
 the meta-data through the use of XML validation descriptors.
 
 ## Documentation
 
-The documentation for this release is included in the _docs_ directory of the distribution package or can be accessed [online](http://www.hibernate.org/subprojects/validator/docs.html).
+The documentation for this release is included in the _docs_ directory of the distribution package or can be accessed [online](http://hibernate.org/validator/documentation/).
 
 ## Release Notes
 
@@ -30,15 +34,19 @@ the JBoss Logging API, an abstraction layer which supports several logging solut
 provided by the JDK) as implementation. Just add a supported logging library to the classpath (e.g. _log4j-&lt;version&gt;.jar_) and JBoss
 Logging will delegate any log requests to that provider.
 
-* Add the following to your Maven or Ivy dependency list (Hibernate Validator can be found in the [JBoss Maven repository](http://repository.jboss.org/nexus/content/groups/public-jboss)):
+* Add the following to your Maven or Ivy dependency list
 
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
+<<<<<<< HEAD
             <version>5.0.3.Final</version>
+=======
+            <version>5.2.0.CR1</version>
+>>>>>>> upstream/master
         </dependency>
 
-      You also need an API and implementation of the Unified Expression Language. This dependencies must be explicitly added in an SE environment.
+      You also need an API and implementation of the Unified Expression Language. These dependencies must be explicitly added in an SE environment.
       In an EE environment they are often already provided.
 
         <dependency>
@@ -59,7 +67,11 @@ extension by adding the following dependency:
         <dependency>
            <groupId>org.hibernate</groupId>
            <artifactId>hibernate-validator-cdi</artifactId>
+<<<<<<< HEAD
            <version>5.0.3.Final</version>
+=======
+           <version>5.2.0.CR1</version>
+>>>>>>> upstream/master
         </dependency>
 
 * _hibernate-validator-annotation-processor-&lt;version&gt;.jar_ is an optional jar which can be integrated with your build
@@ -74,22 +86,17 @@ the Apache Software License 2.0. Refer to license.txt for more information.
 ## Build from Source
 
 You can build Hibernate Validator from source by cloning the git repository git://github.com/hibernate/hibernate-validator.git.
-You will also need a JDK 6 or 7 and Maven 3. With these prerequisites in place you can compile the source via
+You will also need a JDK 8 and Maven 3 (>= 3.0.3). With these prerequisites in place you can compile the source via
 
-    mvn clean install -s settings-example.xml
+    mvn clean install
 
-The documentation module requires an additional tool called po2xml. If you don't have po2xml installed you can
-skip the building of the documentation via:
-
-    mvn clean install -DdisableDocumentationBuild=true -s settings-example.xml
-
-There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://community.jboss.org/wiki/ContributingtoHibernateValidator).
+There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://hibernate.org/validator/contribute/).
 
 ## Hibernate Validator URLs
 
-* [Home Page](http://validator.hibernate.org)
+* [Home Page](http://hibernate.org/validator/)
 * [Bean Validation Home](http://beanvalidation.org)
-* [Downloads](http://www.hibernate.org/subprojects/validator/download.html)
-* [Mailing Lists](http://www.hibernate.org/community/mailinglists.html)
-* [Source Code](git://github.com/hibernate/hibernate-validator.git)
-* [Issue Tracking](http://opensource.atlassian.com/projects/hibernate/browse/HV)
+* [Downloads](http://hibernate.org/validator/downloads/)
+* [Mailing Lists](http://hibernate.org/community/)
+* [Issue Tracking](https://hibernate.atlassian.net/browse/HV)
+* [Continuous Integration](https://hibernate-validator.ci.cloudbees.com/) [![Build Status](https://hibernate-validator.ci.cloudbees.com/buildStatus/icon?job=HV-5-MASTER)](https://hibernate-validator.ci.cloudbees.com/view/Hibernate%20Validator%205/job/HV-5-MASTER/)

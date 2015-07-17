@@ -1,34 +1,28 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.engine;
+
+import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.MethodValidationConfiguration;
+import org.hibernate.validator.spi.time.TimeProvider;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
-
-import org.hibernate.validator.HibernateValidatorContext;
-import org.hibernate.validator.MethodValidationConfiguration;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
  * @author Chris Beckey cbeckey@paypal.com
  */
@@ -40,9 +34,10 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private TraversableResolver traversableResolver;
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private ParameterNameProvider parameterNameProvider;
-
 	private boolean failFast;
 	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfigurationImpl();
+	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
+	private TimeProvider timeProvider;
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
 		this.validatorFactory = validatorFactory;
@@ -50,6 +45,11 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.traversableResolver = validatorFactory.getTraversableResolver();
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		this.parameterNameProvider = validatorFactory.getParameterNameProvider();
+		this.failFast = validatorFactory.isFailFast();
+		this.validatedValueHandlers = new ArrayList<ValidatedValueUnwrapper<?>>(
+				validatorFactory.getValidatedValueHandlers()
+		);
+		this.timeProvider = validatorFactory.getTimeProvider();
 	}
 
 	@Override
@@ -103,9 +103,24 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
-	public HibernateValidatorContext setMethodValidationConfiguration(
-			MethodValidationConfiguration methodValidationConfiguration) {
+	public HibernateValidatorContext setMethodValidationConfiguration(MethodValidationConfiguration methodValidationConfiguration) {
 		this.methodValidationConfiguration = methodValidationConfiguration;
+		return this;
+	}
+
+	public HibernateValidatorContext addValidationValueHandler(ValidatedValueUnwrapper<?> handler) {
+		this.validatedValueHandlers.add( handler );
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorContext timeProvider(TimeProvider timeProvider) {
+		if ( timeProvider == null ) {
+			this.timeProvider = validatorFactory.getTimeProvider();
+		}
+		else {
+			this.timeProvider = timeProvider;
+		}
 		return this;
 	}
 
@@ -117,7 +132,9 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
-				methodValidationConfiguration
+				methodValidationConfiguration,
+				validatedValueHandlers,
+				timeProvider
 		);
 	}
 }

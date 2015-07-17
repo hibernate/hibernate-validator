@@ -35,6 +35,11 @@ maven-eclipse.xml
 # NetBeans specific files/directories
 .nbattrs
 
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
 # Miscellaneous
 *.log
 .clover
+.DS_Store

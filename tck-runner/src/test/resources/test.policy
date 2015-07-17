@@ -1,0 +1,116 @@
+/**
+ * Policy file for running the Bean Validation TCK within a security manager.
+ *
+ * The goal if this is to make sure that all SM-relevant APIs are invoked by Hibernate Validator using privileged
+ * actions so it can be used within an SM enabled, only giving the required permissions to Hibernate Validator but not
+ * other code which uses it.
+ *
+ * For that purpose this test set up puts one frame onto the call stack (via {@code DelegatingExecutor}) whose
+ * protection domain (target/classes) has no permissions assigned at all. That way any missing privileged actions in
+ * Hibernate Validator would lead to an access control exception. All the other domains involved in tests (e.g.
+ * Arquillian or TestNG) are assigned with "all permissions" to keep this set-up manageable. As the privilege-less
+ * DelegatingExecutor frame is located in the stack very close to the actual code under test, it is ensured that
+ * any possible privileged blocks within these domains will not conceal any missing privileged blocks in Hibernate
+ * Validator (only one Arquillian class and the BV TCK domain are located in between and both don't use any privileged
+ * actions).
+ */
+
+/* =============================================== */
+/* Hibernate Validator engine and its dependencies */
+/* =============================================== */
+
+// Used during builds which obtain "engine" from the local repo, e.g. mvn clean install -pl tck-runner
+
+// replace with this when debugging in the IDE with workspace resolution
+// grant codeBase "file:/<project-dir>/engine/target/classes/" {
+grant codeBase "file:${localRepository}/org/hibernate/hibernate-validator/${project.version}/hibernate-validator-${project.version}.jar" {
+    permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+    permission java.lang.RuntimePermission "accessDeclaredMembers";
+
+    // JAXB
+    permission java.util.PropertyPermission "mapAnyUriToUri", "read";
+};
+
+// Used during aggregator builds also building "engine", e.g. mvn clean install -pl tck-runner -am
+
+grant codeBase "file:${basedir}/../engine/target/hibernate-validator-${project.version}.jar" {
+    permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+    permission java.lang.RuntimePermission "accessDeclaredMembers";
+
+    // JAXB
+    permission java.util.PropertyPermission "mapAnyUriToUri", "read";
+};
+
+grant codeBase "file:${localRepository}/com/fasterxml/classmate/-" {
+    permission java.lang.RuntimePermission "accessDeclaredMembers";
+};
+
+grant codeBase "file:${localRepository}/org/jboss/logging/jboss-logging/-" {
+    permission java.util.PropertyPermission "org.jboss.logging.provider", "read";
+};
+
+/* =================== */
+/* Bean Validation API */
+/* =================== */
+
+grant codeBase "file:${localRepository}/javax/validation/validation-api/-" {
+    permission java.io.FilePermission "<<ALL FILES>>", "read";
+};
+
+/* =================== */
+/* Bean Validation TCK */
+/* =================== */
+
+grant codeBase "file:${localRepository}/org/hibernate/beanvalidation/tck/-" {
+    permission java.security.AllPermission;
+};
+
+/* ========== */
+/* TCK Runner */
+/* ========== */
+
+// Ideally, this domain should have no permissions at all; Only specifically enabling some API calls done by the BV TCK
+// tests (which do not use privileged actions for these)
+grant codeBase "file:${project.build.directory}/classes" {
+    permission java.util.PropertyPermission "validation.provider", "read";
+    permission java.io.FilePermission "${localRepository}/org/hibernate/beanvalidation/tck/beanvalidation-tck-tests/${tck.version}/beanvalidation-tck-tests-${tck.version}.jar", "read";
+    permission java.util.PropertyPermission "user.language", "write";
+};
+
+grant codeBase "file:${project.build.directory}/test-classes" {
+    permission java.security.AllPermission;
+};
+
+/* ===================== */
+/* Arquillian/ShrinkWrap */
+/* ===================== */
+
+grant codeBase "file:${localRepository}/org/jboss/arquillian/-" {
+    permission java.security.AllPermission;
+};
+
+grant codeBase "file:${localRepository}/org/jboss/shrinkwrap/-" {
+    permission java.security.AllPermission;
+};
+
+/* ======= */
+/* TestNG  */
+/* ======= */
+
+grant codeBase "file:${localRepository}/org/testng/testng/-" {
+    permission java.security.AllPermission;
+};
+
+// Dependency of TestNG
+grant codeBase "file:${localRepository}/org/beanshell/-" {
+    permission java.security.AllPermission;
+};
+
+/* ========= */
+/* Surefire  */
+/* ========= */
+
+grant codeBase "file:${localRepository}/org/apache/maven/surefire/-" {
+    permission java.security.AllPermission;
+};
+

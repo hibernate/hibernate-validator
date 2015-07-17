@@ -1,40 +1,31 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.xml;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.util.List;
-import javax.validation.Payload;
-import javax.validation.ValidationException;
-import javax.xml.bind.JAXBElement;
-
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
+
+import javax.validation.Payload;
+import javax.validation.ValidationException;
+import javax.xml.bind.JAXBElement;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.List;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
@@ -43,25 +34,30 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  *
  * @author Hardy Ferentschik
  */
-public class MetaConstraintBuilder {
+class MetaConstraintBuilder {
 	private static final Log log = LoggerFactory.make();
 
 	private static final String MESSAGE_PARAM = "message";
 	private static final String GROUPS_PARAM = "groups";
 	private static final String PAYLOAD_PARAM = "payload";
 
-	private MetaConstraintBuilder() {
+	private final ClassLoadingHelper classLoadingHelper;
+	private final ConstraintHelper constraintHelper;
+
+	MetaConstraintBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper) {
+		this.classLoadingHelper = classLoadingHelper;
+		this.constraintHelper = constraintHelper;
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <A extends Annotation> MetaConstraint<A> buildMetaConstraint(ConstraintLocation constraintLocation,
+	<A extends Annotation> MetaConstraint<A> buildMetaConstraint(ConstraintLocation constraintLocation,
 																			   ConstraintType constraint,
 																			   java.lang.annotation.ElementType type,
 																			   String defaultPackage,
-																			   ConstraintHelper constraintHelper) {
+																			   ConstraintDescriptorImpl.ConstraintType constraintType) {
 		Class<A> annotationClass;
 		try {
-			annotationClass = (Class<A>) ReflectionHelper.loadClass( constraint.getAnnotation(), defaultPackage );
+			annotationClass = (Class<A>) classLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage );
 		}
 		catch ( ValidationException e ) {
 			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
@@ -93,13 +89,13 @@ public class MetaConstraintBuilder {
 		// we set initially ConstraintOrigin.DEFINED_LOCALLY for all xml configured constraints
 		// later we will make copies of this constraint descriptor when needed and adjust the ConstraintOrigin
 		ConstraintDescriptorImpl<A> constraintDescriptor = new ConstraintDescriptorImpl<A>(
-				constraintLocation.getMember(), annotation, constraintHelper, type, ConstraintOrigin.DEFINED_LOCALLY
+				constraintHelper, constraintLocation.getMember(), annotation, type, constraintType
 		);
 
 		return new MetaConstraint<A>( constraintDescriptor, constraintLocation );
 	}
 
-	private static <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage) {
+	private <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage) {
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( returnType );
 		for ( ElementType elementType : annotationType.getElement() ) {
 			String name = elementType.getName();
@@ -117,14 +113,14 @@ public class MetaConstraintBuilder {
 	}
 
 	private static <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
-		Method m = ReflectionHelper.getMethod( annotationClass, name );
+		Method m = run( GetMethod.action( annotationClass, name ) );
 		if ( m == null ) {
 			throw log.getAnnotationDoesNotContainAParameterException( annotationClass.getName(), name );
 		}
 		return m.getReturnType();
 	}
 
-	private static Object getElementValue(ElementType elementType, Class<?> returnType, String defaultPackage) {
+	private Object getElementValue(ElementType elementType, Class<?> returnType, String defaultPackage) {
 		removeEmptyContentElements( elementType );
 
 		boolean isArray = returnType.isArray();
@@ -153,7 +149,7 @@ public class MetaConstraintBuilder {
 		elementType.getContent().removeAll( contentToDelete );
 	}
 
-	private static Object getSingleValue(Serializable serializable, Class<?> returnType, String defaultPackage) {
+	private Object getSingleValue(Serializable serializable, Class<?> returnType, String defaultPackage) {
 
 		Object returnValue;
 		if ( serializable instanceof String ) {
@@ -173,7 +169,7 @@ public class MetaConstraintBuilder {
 			try {
 				@SuppressWarnings("unchecked")
 				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
-				returnValue = MetaConstraintBuilder.buildAnnotation( annotationType, annotationClass, defaultPackage );
+				returnValue = buildAnnotation( annotationType, annotationClass, defaultPackage );
 			}
 			catch ( ClassCastException e ) {
 				throw log.getUnexpectedParameterValueException( e );
@@ -186,7 +182,7 @@ public class MetaConstraintBuilder {
 
 	}
 
-	private static Object convertStringToReturnType(Class<?> returnType, String value, String defaultPackage) {
+	private Object convertStringToReturnType(Class<?> returnType, String value, String defaultPackage) {
 		Object returnValue;
 		if ( returnType.getName().equals( byte.class.getName() ) ) {
 			try {
@@ -249,7 +245,7 @@ public class MetaConstraintBuilder {
 			returnValue = value;
 		}
 		else if ( returnType.getName().equals( Class.class.getName() ) ) {
-			returnValue = ReflectionHelper.loadClass( value, defaultPackage, MetaConstraintBuilder.class );
+			returnValue = classLoadingHelper.loadClass( value, defaultPackage );
 		}
 		else {
 			try {
@@ -264,27 +260,27 @@ public class MetaConstraintBuilder {
 		return returnValue;
 	}
 
-	private static Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
+	private Class<?>[] getGroups(GroupsType groupsType, String defaultPackage) {
 		if ( groupsType == null ) {
 			return new Class[] { };
 		}
 
 		List<Class<?>> groupList = newArrayList();
 		for ( String groupClass : groupsType.getValue() ) {
-			groupList.add( ReflectionHelper.loadClass( groupClass, defaultPackage ) );
+			groupList.add( classLoadingHelper.loadClass( groupClass, defaultPackage ) );
 		}
 		return groupList.toArray( new Class[groupList.size()] );
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
+	private Class<? extends Payload>[] getPayload(PayloadType payloadType, String defaultPackage) {
 		if ( payloadType == null ) {
 			return new Class[] { };
 		}
 
 		List<Class<? extends Payload>> payloadList = newArrayList();
 		for ( String groupClass : payloadType.getValue() ) {
-			Class<?> payload = ReflectionHelper.loadClass( groupClass, defaultPackage );
+			Class<?> payload = classLoadingHelper.loadClass( groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
 				throw log.getWrongPayloadClassException( payload.getName() );
 			}
@@ -294,6 +290,14 @@ public class MetaConstraintBuilder {
 		}
 		return payloadList.toArray( new Class[payloadList.size()] );
 	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
 }
-
-

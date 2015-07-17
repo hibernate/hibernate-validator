@@ -1,24 +1,10 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.engine;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
@@ -27,6 +13,10 @@ import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethods
 import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineParameterConstraints;
 import org.hibernate.validator.internal.metadata.aggregated.rule.ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine;
 import org.hibernate.validator.internal.metadata.aggregated.rule.VoidMethodsMustNotBeReturnValueConstrained;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A class that maintains the configuration for method validation.
@@ -83,18 +73,18 @@ implements MethodValidationConfiguration {
 	public Set<Class<? extends MethodConfigurationRule>> getConfiguredRuleSet() {
 		HashSet<Class<? extends MethodConfigurationRule>> result = new HashSet<Class<? extends MethodConfigurationRule>>();
 		
-		if(! this.isAllowOverridingMethodAlterParameterConstraint())
+		if( ! this.isAllowOverridingMethodAlterParameterConstraint() )
 			result.add( OverridingMethodMustNotAlterParameterConstraints.class );
-		if(! this.isAllowParallelMethodsDefineParameterConstraints())
+		if( ! this.isAllowParallelMethodsDefineParameterConstraints() )
 			result.add( ParallelMethodsMustNotDefineParameterConstraints.class );
 		
 		result.add( VoidMethodsMustNotBeReturnValueConstrained.class );
 		
-		if(! this.isAllowMultipleCascadedValidationOnReturnValues())
+		if( ! this.isAllowMultipleCascadedValidationOnReturnValues() )
 			result.add( ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine.class );
 		
 		result.add( ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue.class );
 		
-		return Collections.unmodifiableSet(result);
+		return Collections.unmodifiableSet( result );
 	}
 }

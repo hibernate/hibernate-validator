@@ -1,19 +1,9 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat Middleware LLC, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.ap.util;
 
 import java.util.ArrayList;
@@ -38,6 +28,7 @@ import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
 import org.hibernate.validator.ap.util.TypeNames.HibernateValidatorTypes;
+import org.hibernate.validator.ap.util.TypeNames.Java8DateTime;
 import org.hibernate.validator.ap.util.TypeNames.JodaTypes;
 
 /**
@@ -46,7 +37,7 @@ import org.hibernate.validator.ap.util.TypeNames.JodaTypes;
  * whether a given annotation is allowed to be declared at a given element.
  *
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class ConstraintHelper {
 
@@ -79,7 +70,7 @@ public class ConstraintHelper {
 	 * The type of an annotation with respect to the BV API.
 	 *
 	 * @author Gunnar Morling
-	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+	 * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
 	 */
 	public enum AnnotationType {
 
@@ -169,6 +160,12 @@ public class ConstraintHelper {
 				JodaTypes.READABLE_PARTIAL,
 				JodaTypes.READABLE_INSTANT
 		);
+		registerAllowedTypesForBuiltInConstraint(
+				BeanValidationTypes.FUTURE,
+				Java8DateTime.CHRONO_ZONED_DATE_TIME,
+				Java8DateTime.OFFSET_DATE_TIME,
+				Java8DateTime.INSTANT
+		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_NULL, Object.class );
@@ -178,6 +175,12 @@ public class ConstraintHelper {
 				BeanValidationTypes.PAST,
 				JodaTypes.READABLE_PARTIAL,
 				JodaTypes.READABLE_INSTANT
+		);
+		registerAllowedTypesForBuiltInConstraint(
+				BeanValidationTypes.PAST,
+				Java8DateTime.CHRONO_ZONED_DATE_TIME,
+				Java8DateTime.OFFSET_DATE_TIME,
+				Java8DateTime.INSTANT
 		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PATTERN, String.class );
 		registerAllowedTypesForBuiltInConstraint(
@@ -200,6 +203,9 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.EMAIL, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.LENGTH, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_CHECK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.LUHN_CHECK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_10_CHECK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_11_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NOT_BLANK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SAFE_HTML, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SCRIPT_ASSERT, Object.class );
@@ -725,7 +731,7 @@ public class ConstraintHelper {
 
 		for ( AnnotationMirror oneAnnotationMirror : annotationMirrors ) {
 
-			AnnotationType annotationType = getAnnotationType(oneAnnotationMirror);
+			AnnotationType annotationType = getAnnotationType( oneAnnotationMirror );
 
 			if ( annotationType == AnnotationType.CONSTRAINT_ANNOTATION ) {
 				composingConstraints.add( oneAnnotationMirror );

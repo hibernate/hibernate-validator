@@ -1,35 +1,10 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.aggregated;
-
-import java.lang.annotation.ElementType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.validation.ElementKind;
-import javax.validation.groups.Default;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ConstructorDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -54,6 +29,23 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
+import javax.validation.ElementKind;
+import javax.validation.groups.Default;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ConstructorDescriptor;
+import javax.validation.metadata.MethodType;
+import javax.validation.metadata.PropertyDescriptor;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Member;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -65,8 +57,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
- * @author Chris Beckey cbeckey@paypal.com
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
@@ -166,6 +157,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( propertyMetaData.isCascading() ) {
 				cascadedProperties.add( propertyMetaData );
 			}
+			else {
+				allMetaConstraints.addAll( propertyMetaData.getTypeArgumentsConstraints() );
+			}
 
 			allMetaConstraints.addAll( propertyMetaData.getConstraints() );
 		}
@@ -198,6 +192,17 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public Class<T> getBeanClass() {
 		return beanClass;
+	}
+
+	@Override
+	public boolean hasConstraints() {
+		if ( beanDescriptor.isBeanConstrained()
+				|| !beanDescriptor.getConstrainedConstructors().isEmpty()
+				|| !beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER ).isEmpty() ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -351,7 +356,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		for ( Class<?> clazz : classAndInterfaces ) {
 			for ( MetaConstraint<?> metaConstraint : allMetaConstraints ) {
-				if ( metaConstraint.getLocation().getBeanClass().equals( clazz ) ) {
+				if ( metaConstraint.getLocation().getDeclaringClass().equals( clazz ) ) {
 					constraints.add( metaConstraint );
 				}
 			}
@@ -502,6 +507,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<BuilderDelegate> builders) {
+			// HV-890 Not adding meta-data for private super-type methods to the meta-data of this bean;
+			// It is not needed and it may conflict with sub-type methods of the same signature
+			if ( constrainableElement.getKind() == ConstrainedElementKind.METHOD ) {
+				Member member = ((ConstrainedExecutable) constrainableElement).getExecutable().getMember();
+				if ( beanClass != member.getDeclaringClass() && Modifier.isPrivate( member.getModifiers() ) ) {
+					return;
+				}
+			}
+
 			for ( BuilderDelegate builder : builders ) {
 				boolean foundBuilder = builder.add( constrainableElement );
 

@@ -1,104 +1,109 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.lang.reflect.Method;
-
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
+import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.ReflectionHelper;
+
+import javax.validation.ParameterNameProvider;
+import java.util.Collections;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public final class ParameterConstraintMappingContextImpl
-		extends ConstraintMappingContextImplBase
+final class ParameterConstraintMappingContextImpl
+		extends CascadableConstraintMappingContextImplBase<ParameterConstraintMappingContext>
 		implements ParameterConstraintMappingContext {
 
-	private static final Log log = LoggerFactory.make();
-
-	private final Method method;
+	private final ExecutableConstraintMappingContextImpl executableContext;
 	private final int parameterIndex;
 
-	public ParameterConstraintMappingContextImpl(Class<?> beanClass, Method method, int parameterIndex, ConstraintMappingContext mapping) {
+	ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
+		super( executableContext.getTypeContext().getConstraintMapping() );
 
-		super( beanClass, mapping );
-
-		if ( parameterIndex < 0 || parameterIndex >= method.getParameterTypes().length ) {
-			throw log.getInvalidMethodParameterIndexException( method.getName() );
-		}
-
-		this.method = method;
+		this.executableContext = executableContext;
 		this.parameterIndex = parameterIndex;
 	}
 
+	@Override
+	protected ParameterConstraintMappingContext getThis() {
+		return this;
+	}
+
+	@Override
 	public ParameterConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-
-		mapping.addMethodConstraintConfig(
+		super.addConstraint(
 				ConfiguredConstraint.forParameter(
-						definition, method, parameterIndex
+						definition,
+						executableContext.getExecutable(),
+						parameterIndex
 				)
 		);
 		return this;
 	}
 
-	/**
-	 * Marks the currently selected method parameter as cascadable.
-	 *
-	 * @return Returns itself for method chaining.
-	 */
-	public ParameterConstraintMappingContext valid() {
-		mapping.addMethodCascadeConfig(
-				new ExecutableConstraintLocation(
-						method, parameterIndex
-				)
-		);
-		return this;
-	}
-
-	/**
-	 * Changes the parameter for which added constraints apply.
-	 *
-	 * @param index The parameter index.
-	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
-	 */
+	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
-		return new ParameterConstraintMappingContextImpl(
-				beanClass, method, index, mapping
-		);
+		return executableContext.parameter( index );
 	}
 
-	/**
-	 * Defines constraints on the return value of the current method.
-	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
-	 */
+	@Override
+	public CrossParameterConstraintMappingContext crossParameter() {
+		return executableContext.crossParameter();
+	}
+
+	@Override
 	public ReturnValueConstraintMappingContext returnValue() {
-		return new ReturnValueConstraintMappingContextImpl(
-				beanClass, method, mapping
+		return executableContext.returnValue();
+	}
+
+	@Override
+	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
+		return executableContext.getTypeContext().constructor( parameterTypes );
+	}
+
+	@Override
+	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
+		return executableContext.getTypeContext().method( name, parameterTypes );
+	}
+
+	public ConstrainedParameter build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+		// TODO HV-919 Support specification of type parameter constraints via XML and API
+		return new ConstrainedParameter(
+				ConfigurationSource.API,
+				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex ),
+				ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex ),
+				parameterIndex,
+				executableContext.getExecutable().getParameterNames( parameterNameProvider ).get( parameterIndex ),
+				getConstraints( constraintHelper ),
+				Collections.<MetaConstraint<?>>emptySet(),
+				groupConversions,
+				isCascading,
+				unwrapMode()
 		);
 	}
 
+	@Override
+	protected ConstraintType getConstraintType() {
+		return ConstraintType.GENERIC;
+	}
 }

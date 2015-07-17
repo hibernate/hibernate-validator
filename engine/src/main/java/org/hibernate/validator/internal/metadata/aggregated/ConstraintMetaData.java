@@ -1,27 +1,18 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.reflect.Type;
-import java.util.List;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+
 import javax.validation.ElementKind;
 import javax.validation.metadata.ElementDescriptor;
-
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * An aggregated view of the constraint related meta data for a given bean/type
@@ -57,14 +48,14 @@ public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 	/**
 	 * Whether this meta data object is marked for cascaded validation or not.
 	 *
-	 * @return <code>True</code> if this object is marked for cascaded validation, <code>false</code> otherwise.
+	 * @return {@code true}if this object is marked for cascaded validation, {@code false} otherwise.
 	 */
 	boolean isCascading();
 
 	/**
 	 * Whether this meta data object is constrained by any means or not.
 	 *
-	 * @return <code>True</code> if this object is marked for cascaded validation or has any constraints, <code>false</code> otherwise.
+	 * @return {@code true} if this object is marked for cascaded validation or has any constraints, {@code false} otherwise.
 	 */
 	boolean isConstrained();
 
@@ -83,4 +74,10 @@ public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 	 */
 	ElementDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence);
 
+	/**
+	 * Defines how the validated values needs to be treated in case there is a potential unrapper specified for its type
+	 *
+	 * @return the {@code ValidatedValueUnwrapMode} to be used for this constraint.
+	 */
+	UnwrapMode unwrapMode();
 }

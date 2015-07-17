@@ -1,0 +1,2 @@
+org.hibernate.validator.test.constraintvalidator.MustMatchValidator
+org.hibernate.validator.test.constraintvalidator.MustNotMatchValidator

@@ -1,23 +1,18 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.time.TimeProvider;
+
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderDefinedContext;
@@ -27,30 +22,33 @@ import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.No
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeContextBuilder;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ConstraintDescriptor;
-
-import org.hibernate.validator.internal.engine.path.MessageAndPath;
-import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public class ConstraintValidatorContextImpl implements ConstraintValidatorContext {
+public class ConstraintValidatorContextImpl implements HibernateConstraintValidatorContext {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final List<String> parameterNameProvider;
-	private final List<MessageAndPath> messageAndPaths = newArrayList( 3 );
+	private final Map<String, Object> expressionVariables = newHashMap();
+	private final List<String> methodParameterNames;
+	private final TimeProvider timeProvider;
+	private final List<ConstraintViolationCreationContext> constraintViolationCreationContexts = newArrayList( 3 );
 	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
 
-	public ConstraintValidatorContextImpl(List<String> parameterNames, PathImpl propertyPath, ConstraintDescriptor<?> constraintDescriptor) {
-		this.parameterNameProvider = parameterNames;
+	public ConstraintValidatorContextImpl(List<String> methodParameterNames, TimeProvider timeProvider, PathImpl propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor) {
+		this.methodParameterNames = methodParameterNames;
+		this.timeProvider = timeProvider;
 		this.basePath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
@@ -68,7 +66,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	@Override
 	public final ConstraintViolationBuilder buildConstraintViolationWithTemplate(String messageTemplate) {
 		return new ConstraintViolationBuilderImpl(
-				parameterNameProvider,
+				methodParameterNames,
 				messageTemplate,
 				PathImpl.createCopy( basePath )
 		);
@@ -77,28 +75,52 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 	@Override
 	public <T> T unwrap(Class<T> type) {
 		//allow unwrapping into public super types
-		if ( type.isAssignableFrom( ConstraintValidatorContext.class ) ) {
+		if ( type.isAssignableFrom( HibernateConstraintValidatorContext.class ) ) {
 			return type.cast( this );
 		}
 		throw log.getTypeNotSupportedForUnwrappingException( type );
+	}
+
+	@Override
+	public HibernateConstraintValidatorContext addExpressionVariable(String name, Object value) {
+		Contracts.assertNotNull( name, "null is not a valid value" );
+		this.expressionVariables.put( name, value );
+		return this;
+	}
+
+	@Override
+	public TimeProvider getTimeProvider() {
+		return timeProvider;
 	}
 
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {
 		return constraintDescriptor;
 	}
 
-	public final List<MessageAndPath> getMessageAndPathList() {
-		if ( defaultDisabled && messageAndPaths.size() == 0 ) {
+	public final List<ConstraintViolationCreationContext> getConstraintViolationCreationContexts() {
+		if ( defaultDisabled && constraintViolationCreationContexts.size() == 0 ) {
 			throw log.getAtLeastOneCustomMessageMustBeCreatedException();
 		}
 
-		List<MessageAndPath> returnedMessageAndPaths = new ArrayList<MessageAndPath>( messageAndPaths );
+		List<ConstraintViolationCreationContext> returnedConstraintViolationCreationContexts = new ArrayList<ConstraintViolationCreationContext>(
+				constraintViolationCreationContexts
+		);
 		if ( !defaultDisabled ) {
-			returnedMessageAndPaths.add(
-					new MessageAndPath( getDefaultConstraintMessageTemplate(), basePath )
+			Map<String, Object> parameterMapCopy = newHashMap();
+			parameterMapCopy.putAll( expressionVariables );
+			returnedConstraintViolationCreationContexts.add(
+					new ConstraintViolationCreationContext(
+							getDefaultConstraintMessageTemplate(),
+							basePath,
+							parameterMapCopy
+					)
 			);
 		}
-		return returnedMessageAndPaths;
+		return returnedConstraintViolationCreationContexts;
+	}
+
+	public List<String> getMethodParameterNames() {
+		return methodParameterNames;
 	}
 
 	private abstract class NodeBuilderBase {
@@ -106,23 +128,31 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 		protected PathImpl propertyPath;
 
 		protected NodeBuilderBase(String template, PathImpl path) {
-			messageTemplate = template;
-			propertyPath = path;
+			this.messageTemplate = template;
+			this.propertyPath = path;
 		}
 
 		public ConstraintValidatorContext addConstraintViolation() {
-			messageAndPaths.add( new MessageAndPath( messageTemplate, propertyPath ) );
+			Map<String, Object> parameterMapCopy = newHashMap();
+			parameterMapCopy.putAll( expressionVariables );
+			constraintViolationCreationContexts.add(
+					new ConstraintViolationCreationContext(
+							messageTemplate,
+							propertyPath,
+							parameterMapCopy
+					)
+			);
 			return ConstraintValidatorContextImpl.this;
 		}
 	}
 
 	private class ConstraintViolationBuilderImpl extends NodeBuilderBase implements ConstraintViolationBuilder {
 
-		private final List<String> parameterNames;
+		private final List<String> methodParameterNames;
 
-		private ConstraintViolationBuilderImpl(List<String> parameterNames, String template, PathImpl path) {
+		private ConstraintViolationBuilderImpl(List<String> methodParameterNames, String template, PathImpl path) {
 			super( template, path );
-			this.parameterNames = parameterNames;
+			this.methodParameterNames = methodParameterNames;
 		}
 
 		@Override
@@ -152,7 +182,7 @@ public class ConstraintValidatorContextImpl implements ConstraintValidatorContex
 			}
 
 			dropLeafNodeIfRequired();
-			propertyPath.addParameterNode( parameterNames.get( index ), index );
+			propertyPath.addParameterNode( methodParameterNames.get( index ), index );
 
 			return new NodeBuilder( messageTemplate, propertyPath );
 		}

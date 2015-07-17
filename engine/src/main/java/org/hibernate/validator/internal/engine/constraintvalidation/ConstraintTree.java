@@ -1,35 +1,27 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
-
-import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintViolation;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
-import org.hibernate.validator.internal.engine.path.MessageAndPath;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintViolation;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;
@@ -44,9 +36,12 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Hardy Ferentschik
  * @author Federico Mancini
  * @author Dag Hovland
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2012 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2012 SERLI
  */
 public class ConstraintTree<A extends Annotation> {
+
+	private static final String TYPE_USE = "TYPE_USE";
+
 	private static final Log log = LoggerFactory.make();
 
 	private final ConstraintTree<?> parent;
@@ -86,7 +81,8 @@ public class ConstraintTree<A extends Annotation> {
 		return descriptor;
 	}
 
-	public final <T> boolean validateConstraints(ValidationContext<T> executionContext, ValueContext<?, ?> valueContext) {
+	public final <T> boolean validateConstraints(ValidationContext<T> executionContext,
+			ValueContext<?, ?> valueContext) {
 		Set<ConstraintViolation<T>> constraintViolations = newHashSet();
 		validateConstraints( executionContext, valueContext, constraintViolations );
 		if ( !constraintViolations.isEmpty() ) {
@@ -96,17 +92,17 @@ public class ConstraintTree<A extends Annotation> {
 		return true;
 	}
 
-	private <T, V> void validateConstraints(ValidationContext<T> executionContext,
-											ValueContext<?, V> valueContext,
-											Set<ConstraintViolation<T>> constraintViolations) {
+	private <T, V> void validateConstraints(ValidationContext<T> validationContext,
+			ValueContext<?, V> valueContext,
+			Set<ConstraintViolation<T>> constraintViolations) {
 		CompositionResult compositionResult = validateComposingConstraints(
-				executionContext, valueContext, constraintViolations
+				validationContext, valueContext, constraintViolations
 		);
 
 		Set<ConstraintViolation<T>> localViolations;
 
 		// After all children are validated the actual ConstraintValidator of the constraint itself is executed
-		if ( mainConstraintNeedsEvaluation( executionContext, constraintViolations ) ) {
+		if ( mainConstraintNeedsEvaluation( validationContext, constraintViolations ) ) {
 
 			if ( log.isTraceEnabled() ) {
 				log.tracef(
@@ -116,22 +112,20 @@ public class ConstraintTree<A extends Annotation> {
 				);
 			}
 
+			// find the right constraint validator
+			ConstraintValidator<A, V> validator = getInitializedConstraintValidator( validationContext, valueContext );
+
 			// create a constraint validator context
 			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
-					executionContext.getParameterNames(), valueContext.getPropertyPath(), descriptor
+					validationContext.getParameterNames(),
+					validationContext.getTimeProvider(),
+					valueContext.getPropertyPath(),
+					descriptor
 			);
-
-			// get the initialized validator
-			ConstraintValidator<A, V> validator = executionContext.getConstraintValidatorManager()
-					.getInitializedValidator(
-							valueContext.getTypeOfAnnotatedElement(),
-							descriptor,
-							executionContext.getConstraintValidatorFactory()
-					);
 
 			// validate
 			localViolations = validateSingleConstraint(
-					executionContext,
+					validationContext,
 					valueContext,
 					constraintValidatorContext,
 					validator
@@ -152,14 +146,178 @@ public class ConstraintTree<A extends Annotation> {
 
 		if ( !passesCompositionTypeRequirement( constraintViolations, compositionResult ) ) {
 			prepareFinalConstraintViolations(
-					executionContext, valueContext, constraintViolations, localViolations
+					validationContext, valueContext, constraintViolations, localViolations
 			);
 		}
 	}
 
-	private <T> boolean mainConstraintNeedsEvaluation(ValidationContext<T> executionContext, Set<ConstraintViolation<T>> constraintViolations) {
-		// there is no validator for the main constraints
-		if ( descriptor.getMatchingConstraintValidatorClasses().isEmpty() ) {
+	private <T, V> ConstraintValidator<A, V> getInitializedConstraintValidator(ValidationContext<T> validationContext,
+			ValueContext<?, V> valueContext) {
+		Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
+		@SuppressWarnings("unchecked")
+		ValidatedValueUnwrapper<V> validatedValueUnwrapper = (ValidatedValueUnwrapper<V>) validationContext
+				.getValidatedValueUnwrapper( validatedValueType );
+
+		// AUTOMATIC mode, need to determine which types of constraint validators are available
+		if ( valueContext.getUnwrapMode().equals( UnwrapMode.AUTOMATIC ) ) {
+			return getConstraintValidatorInstanceForAutomaticUnwrapping(
+					validationContext,
+					valueContext
+			);
+		}
+		// TYPE_USE requires implicitly unwrapping
+		else if ( valueContext.getUnwrapMode().equals( UnwrapMode.UNWRAP )
+				|| TYPE_USE.equals( valueContext.getElementType().name() ) ) {
+			return getInitializedValidatorInstanceForWrappedInstance(
+					validationContext,
+					valueContext,
+					validatedValueType,
+					validatedValueUnwrapper
+			);
+
+		}
+		// UnwrapMode.SKIP_UNWRAP
+		else {
+			return getConstraintValidatorNoUnwrapping( validationContext, valueContext );
+		}
+	}
+
+	private <T, V> ConstraintValidator<A, V> getInitializedValidatorInstanceForWrappedInstance(ValidationContext<T> validationContext, ValueContext<?, V> valueContext, Type validatedValueType, ValidatedValueUnwrapper<V> validatedValueUnwrapper) {
+		// make sure that unwrapper is set
+		if ( validatedValueUnwrapper == null ) {
+			throw log.getNoUnwrapperFoundForTypeException(
+					valueContext.getDeclaredTypeOfValidatedElement()
+							.toString()
+			);
+		}
+
+		valueContext.setValidatedValueHandler( validatedValueUnwrapper );
+		validatedValueType = validatedValueUnwrapper.getValidatedValueType( validatedValueType );
+
+		ConstraintValidator<A, V> validator = validationContext.getConstraintValidatorManager()
+				.getInitializedValidator(
+						validatedValueType,
+						descriptor,
+						validationContext.getConstraintValidatorFactory()
+				);
+
+		if ( validator == null ) {
+			throwExceptionForNullValidator( validatedValueType, valueContext.getPropertyPath().asString() );
+		}
+
+		return validator;
+	}
+
+	private void throwExceptionForNullValidator(Type validatedValueType, String path) {
+		if ( descriptor.getConstraintType() == ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER ) {
+			throw log.getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArrayException(
+					descriptor.getAnnotationType()
+							.getName()
+			);
+		}
+		else {
+			String className = validatedValueType.toString();
+			if ( validatedValueType instanceof Class ) {
+				Class<?> clazz = (Class<?>) validatedValueType;
+				if ( clazz.isArray() ) {
+					className = clazz.getComponentType().toString() + "[]";
+				}
+				else {
+					className = clazz.getName();
+				}
+			}
+			throw log.getNoValidatorFoundForTypeException( descriptor.getAnnotationType().getName(), className, path );
+		}
+	}
+
+	private <T, V> ConstraintValidator<A, V> getConstraintValidatorInstanceForAutomaticUnwrapping(
+			ValidationContext<T> validationContext,
+			ValueContext<?, V> valueContext
+	) {
+		Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
+		@SuppressWarnings("unchecked")
+		ValidatedValueUnwrapper<V> validatedValueUnwrapper = (ValidatedValueUnwrapper<V>) validationContext
+				.getValidatedValueUnwrapper( validatedValueType );
+
+		// no unwrapper, get a validator for the validated type
+		if ( validatedValueUnwrapper == null ) {
+			return getConstraintValidatorNoUnwrapping( validationContext, valueContext );
+		}
+
+		// there is an unwrapper - need to find out for which type (wrapper or wrapped value there
+		// are constraint validators available
+		ConstraintValidator<A, V> validatorForWrappedValue = validationContext.getConstraintValidatorManager()
+				.getInitializedValidator(
+						validatedValueUnwrapper.getValidatedValueType( validatedValueType ),
+						descriptor,
+						validationContext.getConstraintValidatorFactory()
+				);
+
+
+		ConstraintValidator<A, V> validatorForWrapper = validationContext.getConstraintValidatorManager()
+				.getInitializedValidator(
+						valueContext.getDeclaredTypeOfValidatedElement(),
+						descriptor,
+						validationContext.getConstraintValidatorFactory()
+				);
+
+		// validator for wrapper and wrapped value is ambiguous -> exception!
+		if ( validatorForWrappedValue != null && validatorForWrapper != null ) {
+			throw log.getConstraintValidatorExistsForWrapperAndWrappedValueException(
+					valueContext.getPropertyPath().toString(),
+					descriptor.getAnnotationType().getName(),
+					validatedValueUnwrapper.getClass().getName()
+			);
+		}
+
+		// neither a validator for wrapper not wrapped value -> exception!
+		if ( validatorForWrappedValue == null && validatorForWrapper == null ) {
+			throw log.getNoValidatorFoundForTypeException(
+					descriptor.getAnnotationType().getName(),
+					validatedValueType.toString(),
+					valueContext.getPropertyPath().toString()
+			);
+		}
+
+		// we have a validator for the wrapped value
+		// -> make sure the unwrapper is set and return proper validator
+		if ( validatorForWrappedValue != null ) {
+			valueContext.setValidatedValueHandler( validatedValueUnwrapper );
+			return validatorForWrappedValue;
+		}
+		else {
+			// there is only a validator for the wrapper type
+			// -> make sure the value handler is unset and return validator for wrapper type
+			valueContext.setValidatedValueHandler( null );
+			return validatorForWrapper;
+		}
+	}
+
+	private <T, V> ConstraintValidator<A, V> getConstraintValidatorNoUnwrapping(ValidationContext<T> validationContext,
+			ValueContext<?, V> valueContext) {
+		// make sure no unwrapper is set
+		valueContext.setValidatedValueHandler( null );
+
+		Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
+		ConstraintValidator<A, V> validator = validationContext.getConstraintValidatorManager()
+				.getInitializedValidator(
+						validatedValueType,
+						descriptor,
+						validationContext.getConstraintValidatorFactory()
+				);
+
+		if ( validator == null ) {
+			throwExceptionForNullValidator( validatedValueType, valueContext.getPropertyPath().asString() );
+		}
+
+		return validator;
+	}
+
+	private <T> boolean mainConstraintNeedsEvaluation(ValidationContext<T> executionContext,
+			Set<ConstraintViolation<T>> constraintViolations) {
+		// we are dealing with a composing constraint with no validator for the main constraint
+		if ( !descriptor.getComposingConstraints().isEmpty() && descriptor.getMatchingConstraintValidatorClasses()
+				.isEmpty() ) {
 			return false;
 		}
 
@@ -185,7 +343,10 @@ public class ConstraintTree<A extends Annotation> {
 	 * @param constraintViolations used to accumulate constraint violations
 	 * @param localViolations set of constraint violations of top level constraint
 	 */
-	private <T> void prepareFinalConstraintViolations(ValidationContext<T> executionContext, ValueContext<?, ?> valueContext, Set<ConstraintViolation<T>> constraintViolations, Set<ConstraintViolation<T>> localViolations) {
+	private <T> void prepareFinalConstraintViolations(ValidationContext<T> executionContext,
+			ValueContext<?, ?> valueContext,
+			Set<ConstraintViolation<T>> constraintViolations,
+			Set<ConstraintViolation<T>> localViolations) {
 		if ( reportAsSingleViolation() ) {
 			// We clear the current violations list anyway
 			constraintViolations.clear();
@@ -196,9 +357,12 @@ public class ConstraintTree<A extends Annotation> {
 			// using the error message in the annotation declaration at top level.
 			if ( localViolations.isEmpty() ) {
 				final String message = (String) getDescriptor().getAttributes().get( "message" );
-				MessageAndPath messageAndPath = new MessageAndPath( message, valueContext.getPropertyPath() );
+				ConstraintViolationCreationContext constraintViolationCreationContext = new ConstraintViolationCreationContext(
+						message,
+						valueContext.getPropertyPath()
+				);
 				ConstraintViolation<T> violation = executionContext.createConstraintViolation(
-						valueContext, messageAndPath, descriptor
+						valueContext, constraintViolationCreationContext, descriptor
 				);
 				constraintViolations.add( violation );
 			}
@@ -225,10 +389,11 @@ public class ConstraintTree<A extends Annotation> {
 	 * @return Returns an instance of {@code CompositionResult} relevant for boolean composition of constraints
 	 */
 	private <T> CompositionResult validateComposingConstraints(ValidationContext<T> executionContext,
-															   ValueContext<?, ?> valueContext,
-															   Set<ConstraintViolation<T>> constraintViolations) {
+			ValueContext<?, ?> valueContext,
+			Set<ConstraintViolation<T>> constraintViolations) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
-		for ( ConstraintTree<?> tree : getChildren() ) {
+		List<ConstraintTree<?>> children = getChildren();
+		for ( ConstraintTree<?> tree : children ) {
 			Set<ConstraintViolation<T>> tmpViolations = newHashSet();
 			tree.validateConstraints( executionContext, valueContext, tmpViolations );
 			constraintViolations.addAll( tmpViolations );
@@ -273,12 +438,14 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private <T, V> Set<ConstraintViolation<T>> validateSingleConstraint(ValidationContext<T> executionContext,
-																		ValueContext<?, V> valueContext,
-																		ConstraintValidatorContextImpl constraintValidatorContext,
-																		ConstraintValidator<A, V> validator) {
+			ValueContext<?, ?> valueContext,
+			ConstraintValidatorContextImpl constraintValidatorContext,
+			ConstraintValidator<A, V> validator) {
 		boolean isValid;
 		try {
-			isValid = validator.isValid( valueContext.getCurrentValidatedValue(), constraintValidatorContext );
+			@SuppressWarnings("unchecked")
+			V validatedValue = (V) valueContext.getCurrentValidatedValue();
+			isValid = validator.isValid( validatedValue, constraintValidatorContext );
 		}
 		catch ( RuntimeException e ) {
 			throw log.getExceptionDuringIsValidCallException( e );
@@ -295,8 +462,8 @@ public class ConstraintTree<A extends Annotation> {
 
 	/**
 	 * @return {@code} true if the current constraint should be reported as single violation, {@code false otherwise}.
-	 *         When using negation, we only report the single top-level violation, as
-	 *         it is hard, especially for ALL_FALSE to give meaningful reports
+	 * When using negation, we only report the single top-level violation, as
+	 * it is hard, especially for ALL_FALSE to give meaningful reports
 	 */
 	private boolean reportAsSingleViolation() {
 		return getDescriptor().isReportAsSingleViolation()

@@ -1,39 +1,10 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.test.cfg;
-
-import java.lang.annotation.ElementType;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.GroupDefinitionException;
-import javax.validation.GroupSequence;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -47,24 +18,50 @@ import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.RangeDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.group.GroupSequenceProvider;
-import org.hibernate.validator.internal.cfg.DefaultConstraintMapping;
-import org.hibernate.validator.internal.cfg.context.ConstraintMappingContext;
+import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.GroupDefinitionException;
+import javax.validation.GroupSequence;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.groups.Default;
+import java.lang.annotation.ElementType;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Set;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 /**
  * Unit test for {@link ConstraintMapping} et al.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class ConstraintMappingTest {
 	private HibernateValidatorConfiguration config;
@@ -75,7 +72,6 @@ public class ConstraintMappingTest {
 		config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 		mapping = (DefaultConstraintMapping) config.createConstraintMapping();
 	}
-
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
@@ -94,11 +90,10 @@ public class ConstraintMappingTest {
 				.property( "numberOfHelpers", FIELD )
 				.constraint( new MinDef().value( 1 ) );
 
-		ConstraintMappingContext context = mapping.getContext();
-
-		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
-		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 1 );
-		assertTrue( context.getMethodConstraintConfig().get( Marathon.class ).size() == 1 );
+		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
+		assertNotNull( beanConfiguration );
+		assertEquals( getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size(), 1 );
+		assertEquals( getConstrainedExecutable( beanConfiguration, "getName" ).getConstraints().size(), 1 );
 	}
 
 	@Test
@@ -107,13 +102,12 @@ public class ConstraintMappingTest {
 				.property( "name", METHOD )
 				.constraint( new GenericConstraintDef<NotNull>( NotNull.class ) )
 				.property( "numberOfHelpers", FIELD )
-				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 1 ) );
+				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 1L ) );
 
-		ConstraintMappingContext context = mapping.getContext();
-
-		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
-		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 1 );
-		assertTrue( context.getMethodConstraintConfig().get( Marathon.class ).size() == 1 );
+		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
+		assertNotNull( beanConfiguration );
+		assertEquals( getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size(), 1 );
+		assertEquals( getConstrainedExecutable( beanConfiguration, "getName" ).getConstraints().size(), 1 );
 	}
 
 	@Test
@@ -121,12 +115,11 @@ public class ConstraintMappingTest {
 		mapping.type( Marathon.class )
 				.property( "numberOfHelpers", FIELD )
 				.constraint( new MinDef().value( 1 ) )
-				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 1 ) );
+				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 2L ) );
 
-		ConstraintMappingContext context = mapping.getContext();
-
-		assertTrue( context.getConstraintConfig().containsKey( Marathon.class ) );
-		assertTrue( context.getConstraintConfig().get( Marathon.class ).size() == 2 );
+		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
+		assertNotNull( beanConfiguration );
+		assertEquals( getConstrainedField( beanConfiguration, "numberOfHelpers" ).getConstraints().size(), 2 );
 	}
 
 	@Test
@@ -231,6 +224,50 @@ public class ConstraintMappingTest {
 		violations = validator.validate( marathon );
 		assertNumberOfViolations( violations, 1 );
 		assertConstraintViolation( violations.iterator().next(), "must be true" );
+	}
+
+	@Test
+	public void testValidWithGroupConversion() {
+		mapping.type( Marathon.class )
+				.property( "runners", METHOD )
+				.valid()
+				.convertGroup( Default.class ).to( Foo.class )
+				.type( Runner.class )
+				.property( "paidEntryFee", FIELD )
+				.constraint( new AssertTrueDef().groups( Foo.class ) );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "New York Marathon" );
+
+		marathon.addRunner( new Runner() );
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon );
+		assertNumberOfViolations( violations, 1 );
+		assertConstraintViolation( violations.iterator().next(), "must be true" );
+	}
+
+	@Test
+	public void testValidWithSeveralGroupConversions() {
+		mapping.type( Marathon.class )
+				.property( "runners", METHOD )
+				.valid()
+				.convertGroup( Default.class ).to( Foo.class )
+				.convertGroup( Bar.class ).to( Default.class )
+				.type( Runner.class )
+				.property( "paidEntryFee", FIELD )
+				.constraint( new AssertTrueDef().groups( Foo.class ) )
+				.constraint( new AssertTrueDef().message( "really, it must be true" ) );
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Marathon marathon = new Marathon();
+		marathon.setName( "New York Marathon" );
+
+		marathon.addRunner( new Runner() );
+		Set<ConstraintViolation<Marathon>> violations = validator.validate( marathon, Default.class, Bar.class );
+		assertNumberOfViolations( violations, 2 );
+		assertCorrectConstraintViolationMessages( violations, "must be true", "really, it must be true" );
 	}
 
 	@Test(
@@ -470,7 +507,49 @@ public class ConstraintMappingTest {
 		);
 	}
 
+	private <T> BeanConfiguration<T> getBeanConfiguration(Class<T> type) {
+		Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations(
+				new ConstraintHelper(),
+				new DefaultParameterNameProvider()
+		);
+
+		for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
+			if ( beanConfiguration.getBeanClass() == type ) {
+				@SuppressWarnings("unchecked")
+				BeanConfiguration<T> configuration = (BeanConfiguration<T>) beanConfiguration;
+				return configuration;
+			}
+		}
+
+		return null;
+	}
+
+	private ConstrainedField getConstrainedField(BeanConfiguration<?> beanConfiguration, String fieldName) {
+		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
+			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD &&
+					constrainedElement.getLocation().getMember().getName().equals( fieldName ) ) {
+				return (ConstrainedField) constrainedElement;
+			}
+		}
+
+		return null;
+	}
+
+	private ConstrainedExecutable getConstrainedExecutable(BeanConfiguration<?> beanConfiguration, String executableName) {
+		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
+			if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD &&
+					constrainedElement.getLocation().getMember().getName().equals( executableName ) ) {
+				return (ConstrainedExecutable) constrainedElement;
+			}
+		}
+
+		return null;
+	}
+
 	private interface Foo {
+	}
+
+	private interface Bar {
 	}
 
 	@GroupSequence({ Foo.class, A.class })

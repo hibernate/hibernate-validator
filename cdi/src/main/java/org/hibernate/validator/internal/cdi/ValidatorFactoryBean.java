@@ -1,33 +1,24 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.cdi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Set;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.Any;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
-import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.BootstrapConfiguration;
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
@@ -37,32 +28,41 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
-import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
+ * A {@link Bean} representing a {@link ValidatorFactory}. There is one instance of this type representing the default
+ * validator factory and optionally another instance representing the HV validator factory in case the default provider
+ * is not HV.
+ *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 public class ValidatorFactoryBean implements Bean<ValidatorFactory>, PassivationCapable {
-	private final BeanManager beanManager;
-	private final Set<Annotation> qualifiers;
-	private final Set<DestructibleBeanInstance<?>> destructibleResources;
 
-	public ValidatorFactoryBean(BeanManager beanManager, Set<Annotation> qualifiers) {
+	private final BeanManager beanManager;
+	private final Set<DestructibleBeanInstance<?>> destructibleResources;
+	private final ValidationProviderHelper validationProviderHelper;
+	private final Set<Type> types;
+
+	public ValidatorFactoryBean(BeanManager beanManager, ValidationProviderHelper validationProviderHelper) {
 		this.beanManager = beanManager;
-		this.destructibleResources = CollectionHelper.newHashSet();
-		this.qualifiers = CollectionHelper.newHashSet();
-		this.qualifiers.addAll( qualifiers );
-		this.qualifiers.add(
-				new AnnotationLiteral<Any>() {
-				}
+		this.destructibleResources = newHashSet( 4 );
+		this.validationProviderHelper = validationProviderHelper;
+		this.types = Collections.unmodifiableSet(
+				CollectionHelper.<Type>newHashSet(
+						ClassHierarchyHelper.getHierarchy( validationProviderHelper.getValidatorFactoryBeanClass() )
+				)
 		);
 	}
 
 	@Override
 	public Class<?> getBeanClass() {
-		return ValidatorFactoryImpl.class;
+		return validationProviderHelper.getValidatorFactoryBeanClass();
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	@Override
 	public Set<Annotation> getQualifiers() {
-		return qualifiers;
+		return validationProviderHelper.getQualifiers();
 	}
 
 	@Override
@@ -92,11 +92,6 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	@Override
 	public Set<Type> getTypes() {
-		Set<Type> types = CollectionHelper.newHashSet();
-
-		types.add( ValidatorFactory.class );
-		types.add( Object.class );
-
 		return types;
 	}
 
@@ -112,8 +107,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	@Override
 	public ValidatorFactory create(CreationalContext<ValidatorFactory> ctx) {
-		Configuration<?> config = Validation.byProvider( org.hibernate.validator.HibernateValidator.class )
-				.configure();
+		Configuration<?> config = getConfiguration();
 
 		config.constraintValidatorFactory( createConstraintValidatorFactory( config ) );
 		config.messageInterpolator( createMessageInterpolator( config ) );
@@ -140,9 +134,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) ReflectionHelper.loadClass(
-				messageInterpolatorFqcn,
-				this.getClass()
+		Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) run(
+				LoadClass.action(
+						messageInterpolatorFqcn,
+						null
+				)
 		);
 
 		return createInstance( messageInterpolatorClass );
@@ -157,9 +153,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<TraversableResolver> traversableResolverClass = (Class<TraversableResolver>) ReflectionHelper.loadClass(
-				traversableResolverFqcn,
-				this.getClass()
+		Class<TraversableResolver> traversableResolverClass = (Class<TraversableResolver>) run(
+				LoadClass.action(
+						traversableResolverFqcn,
+						null
+				)
 		);
 
 		return createInstance( traversableResolverClass );
@@ -174,9 +172,11 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<ParameterNameProvider> parameterNameProviderClass = (Class<ParameterNameProvider>) ReflectionHelper.loadClass(
-				parameterNameProviderFqcn,
-				this.getClass()
+		Class<ParameterNameProvider> parameterNameProviderClass = (Class<ParameterNameProvider>) run(
+				LoadClass.action(
+						parameterNameProviderFqcn,
+						null
+				)
 		);
 
 		return createInstance( parameterNameProviderClass );
@@ -192,11 +192,12 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<ConstraintValidatorFactory>) ReflectionHelper
-				.loadClass(
+		Class<ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<ConstraintValidatorFactory>) run(
+				LoadClass.action(
 						constraintValidatorFactoryFqcn,
-						this.getClass()
-				);
+						null
+				)
+		);
 
 		return createInstance( constraintValidatorFactoryClass );
 	}
@@ -207,8 +208,29 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		return destructibleInstance.getInstance();
 	}
 
-    @Override
-    public String getId() {
-        return ValidatorFactoryBean.class.getName();
-    }
+	private Configuration<?> getConfiguration() {
+		return validationProviderHelper.isDefaultProvider() ?
+				Validation.byDefaultProvider().configure() :
+				Validation.byProvider( org.hibernate.validator.HibernateValidator.class ).configure();
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	@Override
+	public String getId() {
+		return ValidatorFactoryBean.class.getName() + "_" + ( validationProviderHelper.isDefaultProvider() ? "default" : "hv" );
+	}
+
+	@Override
+	public String toString() {
+		return "ValidatorFactoryBean [id=" + getId() + "]";
+	}
 }

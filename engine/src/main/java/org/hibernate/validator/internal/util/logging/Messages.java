@@ -1,18 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.util.logging;
 
@@ -84,8 +74,16 @@ public interface Messages {
 	@Message(value = "The created instance must not be null.", format = Message.Format.NO_FORMAT)
 	String validatedConstructorCreatedInstanceMustNotBeNull();
 
-	@Message(value = "The input stream for #addMappging() cannot be null.")
+	@Message(value = "The input stream for #addMapping() cannot be null.")
 	String inputStreamCannotBeNull();
+
+	@Message(value = "Constraints on the parameters of constructors of non-static inner classes " +
+			"are not supported if those parameters have a generic type due to JDK bug JDK-5087240.")
+	String constraintOnConstructorOfNonStaticInnerClass();
+
+	@Message(value = "Custom parameterized types with more than one type argument are not supported and " +
+			"will not be checked for type use constraints.")
+	String parameterizedTypesWithMoreThanOneTypeArgument();
 }
 
 

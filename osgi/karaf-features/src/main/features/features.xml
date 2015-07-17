@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0"
+    name="hibernate-validator-osgi-features"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.0">
+
+    <feature name="hibernate-validator" version="${project.version}">
+        <bundle>mvn:org.hibernate/hibernate-validator/${project.version}</bundle>
+        <bundle>mvn:javax.validation/validation-api/${bv.api.version}</bundle>
+
+        <!--
+            As of JBoss Logging 3.2.1.Final, there is non-optional dependency to some Log4j 2 packages; Therefore we
+            are overriding the Import-Package header to make this optional
+        -->
+        <bundle>wrap:mvn:org.jboss.logging/jboss-logging/${jboss.logging.version}$overwrite=merge&amp;Bundle-SymbolicName=org.hibernate.org.jboss.logging&amp;Import-Package=org.apache.log4j;resolution:=optional,org.apache.logging.log4j;version="[2.0,3)";resolution:=optional,org.apache.logging.log4j.message;version="[2.0,3)";resolution:=optional,org.apache.logging.log4j.spi;version="[2.0,3)";resolution:=optional,org.jboss.logmanager;version="[1.5,2)";resolution:=optional,org.slf4j;version="[1.7,2)";resolution:=optional,org.slf4j.spi;version="[1.7,2)";resolution:=optional</bundle>
+        <bundle>mvn:com.fasterxml/classmate/${classmate.version}</bundle>
+        <bundle>mvn:javax.el/javax.el-api/${javax.el.version}</bundle>
+        <bundle>mvn:org.glassfish.web/javax.el/${javax.el.version}</bundle>
+        <bundle>wrap:mvn:com.thoughtworks.paranamer:paranamer:${paranamer.version}</bundle>
+        <bundle>org.jsoup:jsoup:${jsoup.version}</bundle>
+        <bundle>joda-time:joda-time:${joda-time.version}</bundle>
+    </feature>
+</features>

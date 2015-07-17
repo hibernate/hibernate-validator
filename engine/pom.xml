@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ JBoss, Home of Professional Open Source
-  ~ Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-  ~ by the @authors tag. See the copyright.txt in the distribution for a
-  ~ full listing of individual contributors.
+  ~ Hibernate Validator, declare and validate application constraints
   ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -21,7 +11,7 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>5.0.4-RELAX</version>
+        <version>5.2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -33,7 +23,7 @@
     <distributionManagement>
         <site>
             <id>site</id>
-            <url>http://validator.hibernate.org</url>
+            <url>http://hibernate.org/validator</url>
         </site>
     </distributionManagement>
 
@@ -67,6 +57,19 @@
             <artifactId>javax.el</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-processor</artifactId>
+            <!--
+            HV-963
+            This is actually not a dependency which is needed at runtime, however,
+            Maven does not have a compile time only scope. The dependency is needed to
+            run the JBoss Logging annotation processor as part of the main compilation.
+            Trying different setups via compiler plugin local dependencies or extensions
+            all fail. See also http://stackoverflow.com/questions/14322904/maven-3-how-to-add-annotation-processor-dependency
+            -->
+            <scope>provided</scope>
+        </dependency>
 
         <!--
         Optional dependencies
@@ -86,6 +89,11 @@
             <artifactId>jsoup</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.paranamer</groupId>
+            <artifactId>paranamer</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!--
         Test dependencies
@@ -93,6 +101,11 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator-test-utils</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -133,6 +146,7 @@
                 <filtering>true</filtering>
                 <directory>src/test/resources</directory>
                 <includes>
+                    <include>META-INF/services/*</include>
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
                 </includes>
@@ -168,12 +182,12 @@
                 </dependencies>
             </plugin>
             <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -195,20 +209,6 @@
                             </archive>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>test-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>testing</classifier>
-                            <classesDirectory>${project.build.testOutputDirectory}</classesDirectory>
-                            <includes>
-                                <include>org/hibernate/validator/testutil/**</include>
-                            </includes>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -220,21 +220,27 @@
                             javax.persistence.*;version="[2.0.0,3.0.0)";resolution:=optional,
                             javax.validation.*;version="[1.0.0,2.0.0)",
                             javax.xml.*;version="0",
-                            javax.el.*;version="[2.0.0,4.0.0)",
+                            javax.el.*;version="[2.0.0,4.0.0)";resolution:=optional,
                             org.xml.sax.*;version="0",
                             org.jboss.logging.*;version="[3.1.0,4.0.0)",
-                            com.fasterxml.classmate.*;version="${classmate.version}",
+                            com.fasterxml.classmate.*;version="[${classmate.version},2.0.0)",
                             org.joda.time.*;version="[1.6.0,2.0.0)";resolution:=optional,
-                            org.jsoup.*;version="[1.5.2,2.0.0)";resolution:=optional
+                            org.jsoup.*;version="[1.5.2,2.0.0)";resolution:=optional,
+                            com.thoughtworks.paranamer.*;version="[2.5.5,3.0.0)";resolution:=optional
                         </Import-Package>
                         <Export-Package>
                             org.hibernate.validator;version="${project.version}",
                             org.hibernate.validator.cfg.*;version="${project.version}",
                             org.hibernate.validator.constraints.*;version="${project.version}",
+                            org.hibernate.validator.constraintvalidation.*;version="${project.version}",
+                            org.hibernate.validator.constraintvalidators.*;version="${project.version}",
                             org.hibernate.validator.group;version="${project.version}",
                             org.hibernate.validator.messageinterpolation;version="${project.version}",
+                            org.hibernate.validator.parameternameprovider;version="${project.version}",
+                            org.hibernate.validator.path;version="${project.version}",
                             org.hibernate.validator.resourceloading;version="${project.version}",
-                            org.hibernate.validator.spi.*;version="${project.version}"
+                            org.hibernate.validator.spi.*;version="${project.version}",
+                            org.hibernate.validator.valuehandling;version="${project.version}",
                         </Export-Package>
                     </instructions>
                 </configuration>
@@ -288,19 +294,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>http://docs.oracle.com/javase/6/docs/api</link>
-                        <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api/</link>
-                    </links>
-                    <packagesheader>Hibernate Validator Packages</packagesheader>
-                    <doctitle>Hibernate Validator ${project.version}</doctitle>
-                    <windowtitle>Hibernate Validator ${project.version}</windowtitle>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -1,26 +1,17 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.raw;
+
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 import java.util.Map;
 import java.util.Set;
-
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 /**
  * Represents a (potentially) constrained Java element such as a type, field or
@@ -55,7 +46,7 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 * @author Gunnar Morling
 	 */
 	public enum ConstrainedElementKind {
-		TYPE, FIELD, CONSTRUCTOR, METHOD, PARAMETER
+		TYPE, FIELD, CONSTRUCTOR, METHOD, PARAMETER, TYPE_USE
 	}
 
 	/**
@@ -77,7 +68,7 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 * element.
 	 *
 	 * @return A set with this constrained element's constraints. May be empty,
-	 *         but never <code>null</code>.
+	 *         but never {@code null}.
 	 */
 	Set<MetaConstraint<?>> getConstraints();
 
@@ -108,4 +99,15 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 *         <code>false</code> otherwise.
 	 */
 	boolean isConstrained();
+
+	/**
+	 * Determines how to handle unwrapping of validated values. Per default unwrapping occurs automatically
+	 * based on the validated type and registered {@code ValidatedValueUnwrapper}s. It can also be explcitly configured
+	 * using {@code UnwrapValidatedValue}.
+	 *
+	 * @return Returns the unwrapping mode for this constrained element.
+	 * @see org.hibernate.validator.valuehandling.UnwrapValidatedValue
+	 * @see org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper
+	 */
+	UnwrapMode unwrapMode();
 }

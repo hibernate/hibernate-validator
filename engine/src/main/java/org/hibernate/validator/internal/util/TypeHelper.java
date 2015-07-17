@@ -17,6 +17,10 @@
  */
 package org.hibernate.validator.internal.util;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.ConstraintValidator;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -32,10 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.validation.ConstraintValidator;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -288,7 +288,9 @@ public final class TypeHelper {
 	}
 
 	/**
+	 * @param annotationType The annotation type.
 	 * @param validators List of constraint validator classes (for a given constraint).
+	 * @param <A> the type of the annotation
 	 *
 	 * @return Return a Map&lt;Class, Class&lt;? extends ConstraintValidator&gt;&gt; where the map
 	 *         key is the type the validator accepts and value the validator class itself.

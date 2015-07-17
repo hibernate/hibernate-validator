@@ -1,49 +1,20 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.validation.GroupSequence;
-import javax.validation.ParameterNameProvider;
-import javax.validation.Valid;
-import javax.validation.groups.ConvertGroup;
-
 import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.location.BeanConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.CrossParameterConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -59,15 +30,38 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructors;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredFields;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+
+import javax.validation.GroupSequence;
+import javax.validation.ParameterNameProvider;
+import javax.validation.Valid;
+import javax.validation.groups.ConvertGroup;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
-import static org.hibernate.validator.internal.util.ReflectionHelper.getMethods;
-import static org.hibernate.validator.internal.util.ReflectionHelper.newInstance;
 
 /**
  * {@code MetaDataProvider} which reads the metadata from annotations which is the default configuration source.
@@ -82,14 +76,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	static final int DEFAULT_INITIAL_CAPACITY = 16;
 
-	private final ConstraintHelper constraintHelper;
-	private final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
-	private final AnnotationProcessingOptions annotationProcessingOptions;
-	private final ParameterNameProvider parameterNameProvider;
+	protected final ConstraintHelper constraintHelper;
+	protected final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
+	protected final AnnotationProcessingOptions annotationProcessingOptions;
+	protected final ParameterNameProvider parameterNameProvider;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
-									  ParameterNameProvider parameterNameProvider,
-									  AnnotationProcessingOptions annotationProcessingOptions) {
+			ParameterNameProvider parameterNameProvider,
+			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
 		this.parameterNameProvider = parameterNameProvider;
 		this.annotationProcessingOptions = annotationProcessingOptions;
@@ -150,7 +144,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			ConstrainedType classLevelMetaData =
 					new ConstrainedType(
 							ConfigurationSource.ANNOTATION,
-							new BeanConstraintLocation( beanClass ),
+							ConstraintLocation.forClass( beanClass ),
 							classLevelConstraints
 					);
 			constrainedElements.add( classLevelMetaData );
@@ -175,23 +169,24 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		if ( groupSequenceProviderAnnotation != null ) {
 			@SuppressWarnings("unchecked")
-			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass = (Class<? extends DefaultGroupSequenceProvider<? super T>>) groupSequenceProviderAnnotation
-					.value();
+			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass =
+					(Class<? extends DefaultGroupSequenceProvider<? super T>>) groupSequenceProviderAnnotation.value();
 			return newGroupSequenceProviderClassInstance( beanClass, providerClass );
 		}
 
 		return null;
 	}
 
-	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass, Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
-		Method[] providerMethods = getMethods( providerClass );
+	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<T> beanClass,
+			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
+		Method[] providerMethods = run( GetMethods.action( providerClass ) );
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
 					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
 
-				return newInstance(
-						providerClass, "the default group sequence provider"
+				return run(
+						NewInstance.action( providerClass, "the default group sequence provider" )
 				);
 			}
 		}
@@ -219,7 +214,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private Set<ConstrainedElement> getFieldMetaData(Class<?> beanClass) {
 		Set<ConstrainedElement> propertyMetaData = newHashSet();
 
-		for ( Field field : ReflectionHelper.getDeclaredFields( beanClass ) ) {
+		for ( Field field : run( GetDeclaredFields.action( beanClass ) ) ) {
 			// HV-172
 			if ( Modifier.isStatic( field.getModifiers() ) ||
 					annotationProcessingOptions.areMemberConstraintsIgnoredFor( field ) ||
@@ -245,14 +240,32 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 
 		boolean isCascading = field.isAnnotationPresent( Valid.class );
+		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForMember( field );
+
+		boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
+		UnwrapMode unwrapMode = unwrapMode( field, typeArgumentAnnotated );
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
-				new BeanConstraintLocation( field ),
+				ConstraintLocation.forProperty( field ),
 				constraints,
+				typeArgumentsConstraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				unwrapMode
 		);
+	}
+
+	private UnwrapMode unwrapMode(Field field, boolean typeArgumentAnnotated) {
+		boolean notIterable = !ReflectionHelper.isIterable( ReflectionHelper.typeOf( field ) );
+		UnwrapValidatedValue unwrapValidatedValue = field.getAnnotation( UnwrapValidatedValue.class );
+		return unwrapMode( typeArgumentAnnotated, notIterable, unwrapValidatedValue );
+	}
+
+	private UnwrapMode unwrapMode(ExecutableElement executable, boolean typeArgumentAnnotated) {
+		boolean notIterable = !ReflectionHelper.isIterable( ReflectionHelper.typeOf( executable.getMember() ) );
+		UnwrapValidatedValue unwrapValidatedValue = executable.getAccessibleObject().getAnnotation( UnwrapValidatedValue.class );
+		return unwrapMode( typeArgumentAnnotated, notIterable, unwrapValidatedValue );
 	}
 
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
@@ -264,9 +277,30 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraints;
 	}
 
+	private UnwrapMode unwrapMode(boolean typeArgumentAnnotated, boolean notIterable, UnwrapValidatedValue unwrapValidatedValue) {
+		if ( unwrapValidatedValue == null && typeArgumentAnnotated && notIterable ) {
+			/*
+			 * Optional<@NotNull String> exampleValue
+			 */
+			return UnwrapMode.UNWRAP;
+		}
+		else if ( unwrapValidatedValue != null ) {
+			/*
+			 * @UnwrapValidatedValue(false) Optional<@NotNull String> exampleValue
+			 */
+			return unwrapValidatedValue.value() ? UnwrapMode.UNWRAP : UnwrapMode.SKIP_UNWRAP;
+		}
+		/*
+		 * @NotNull Optional<String> exampleValue
+		 *
+		 * @NotNull String otherExampleValue
+		 */
+		return UnwrapMode.AUTOMATIC;
+	}
+
 	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
 		List<ExecutableElement> declaredConstructors = ExecutableElement.forConstructors(
-				ReflectionHelper.getDeclaredConstructors( clazz )
+				run( GetDeclaredConstructors.action( clazz ) )
 		);
 
 		return getMetaData( declaredConstructors );
@@ -274,7 +308,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private Set<ConstrainedExecutable> getMethodMetaData(Class<?> clazz) {
 		List<ExecutableElement> declaredMethods = ExecutableElement.forMethods(
-				ReflectionHelper.getDeclaredMethods( clazz )
+				run( GetDeclaredMethods.action( clazz ) )
 		);
 
 		return getMetaData( declaredMethods );
@@ -303,7 +337,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @param executable The executable element to check for constraints annotations.
 	 *
 	 * @return A meta data object describing the constraints specified for the
-	 *         given element.
+	 * given element.
 	 */
 	private ConstrainedExecutable findExecutableMetaData(ExecutableElement executable) {
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
@@ -329,14 +363,21 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		Set<MetaConstraint<?>> returnValueConstraints;
+		Set<MetaConstraint<?>> typeArgumentsConstraints;
 		Map<Class<?>, Class<?>> groupConversions;
 		boolean isCascading;
+
+		UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable.getMember() ) ) {
 			returnValueConstraints = Collections.emptySet();
+			typeArgumentsConstraints = Collections.<MetaConstraint<?>>emptySet();
 			groupConversions = Collections.emptyMap();
 			isCascading = false;
 		}
 		else {
+			typeArgumentsConstraints = findTypeAnnotationConstraintsForMember( executable.getMember() );
+			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
+			unwrapMode = unwrapMode( executable, typeArgumentAnnotated );
 			returnValueConstraints = convertToMetaConstraints(
 					executableConstraints.get( ConstraintType.GENERIC ),
 					executable
@@ -350,12 +391,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.ANNOTATION,
-				new ExecutableConstraintLocation( executable ),
+				ConstraintLocation.forReturnValue( executable ),
 				parameterConstraints,
 				crossParameterConstraints,
 				returnValueConstraints,
+				typeArgumentsConstraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				unwrapMode
 		);
 	}
 
@@ -394,6 +437,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			boolean parameterIsCascading = false;
 			String parameterName = parameterNames.get( i );
 			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
+			Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 			ConvertGroup groupConversion = null;
 			ConvertGroup.List groupConversionList = null;
 
@@ -401,51 +445,69 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				metaData.add(
 						new ConstrainedParameter(
 								ConfigurationSource.ANNOTATION,
-								new ExecutableConstraintLocation( executable, i ),
+								ConstraintLocation.forParameter( executable, i ),
+								ReflectionHelper.typeOf( executable, i ),
+								i,
 								parameterName,
 								parameterConstraints,
+								typeArgumentsConstraints,
 								getGroupConversions( groupConversion, groupConversionList ),
-								false
+								false,
+								UnwrapMode.AUTOMATIC
 						)
 				);
 				i++;
 				continue;
 			}
 
+			UnwrapValidatedValue unwrapValidatedValue = null;
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
-				//1. collect constraints if this annotation is a constraint annotation
-				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						executable.getMember(), parameterAnnotation, ElementType.PARAMETER
-				);
-				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
-					parameterConstraints.add(
-							createParameterMetaConstraint(
-									executable, i, constraintDescriptorImpl
-							)
-					);
-				}
-
-				//2. mark parameter as cascading if this annotation is the @Valid annotation
+				//1. mark parameter as cascading if this annotation is the @Valid annotation
 				if ( parameterAnnotation.annotationType().equals( Valid.class ) ) {
 					parameterIsCascading = true;
 				}
-				//3. determine group conversions
+
+				//2. determine group conversions
 				else if ( parameterAnnotation.annotationType().equals( ConvertGroup.class ) ) {
 					groupConversion = (ConvertGroup) parameterAnnotation;
 				}
 				else if ( parameterAnnotation.annotationType().equals( ConvertGroup.List.class ) ) {
 					groupConversionList = (ConvertGroup.List) parameterAnnotation;
 				}
+
+				//3. unwrapping required?
+				else if ( parameterAnnotation.annotationType().equals( UnwrapValidatedValue.class ) ) {
+					unwrapValidatedValue = (UnwrapValidatedValue) parameterAnnotation;
+				}
+
+				//4. collect constraints if this annotation is a constraint annotation
+				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
+						executable.getMember(), parameterAnnotation, ElementType.PARAMETER
+				);
+				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
+					parameterConstraints.add(
+							createParameterMetaConstraint( executable, i, constraintDescriptorImpl )
+					);
+				}
 			}
+
+			typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable.getMember(), i );
+			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
+			boolean notIterable = !ReflectionHelper.isIterable( ReflectionHelper.typeOf( executable, i ) );
+			UnwrapMode unwrapMode = unwrapMode( typeArgumentAnnotated, notIterable, unwrapValidatedValue );
 
 			metaData.add(
 					new ConstrainedParameter(
 							ConfigurationSource.ANNOTATION,
-							new ExecutableConstraintLocation( executable, i ),
+							ConstraintLocation.forParameter( executable, i ),
+							ReflectionHelper.typeOf( executable, i ),
+							i,
 							parameterName,
 							parameterConstraints,
+							typeArgumentsConstraints,
 							getGroupConversions( groupConversion, groupConversionList ),
-							parameterIsCascading
+							parameterIsCascading,
+							unwrapMode
 					)
 			);
 			i++;
@@ -491,15 +553,17 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Examines the given annotation to see whether it is a single- or multi-valued constraint annotation.
 	 *
+	 * @param member The member to check for constraints annotations
 	 * @param annotation The annotation to examine
 	 * @param type the element type on which the annotation/constraint is placed on
+	 * @param <A> the annotation type
 	 *
 	 * @return A list of constraint descriptors or the empty list in case <code>annotation</code> is neither a
-	 *         single nor multi-valued annotation.
+	 * single nor multi-valued annotation.
 	 */
-	private <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
-																							   A annotation,
-																							   ElementType type) {
+	protected <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
+			A annotation,
+			ElementType type) {
 		List<ConstraintDescriptorImpl<?>> constraintDescriptors = newArrayList();
 
 		List<Annotation> constraints = newArrayList();
@@ -508,7 +572,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			constraints.add( annotation );
 		}
 		else if ( constraintHelper.isMultiValueConstraint( annotationType ) ) {
-			constraints.addAll( constraintHelper.getMultiValueConstraints( annotation ) );
+			constraints.addAll( constraintHelper.getConstraintsFromMultiValueConstraint( annotation ) );
 		}
 
 		for ( Annotation constraint : constraints ) {
@@ -557,40 +621,75 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass,
-																		  ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( declaringClass ) );
+			ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<A>( descriptor, ConstraintLocation.forClass( declaringClass ) );
 	}
 
-	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member,
-																		  ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new BeanConstraintLocation( member ) );
+	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<A>( descriptor, ConstraintLocation.forProperty( member ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(ExecutableElement member,
-																				   int parameterIndex,
-																				   ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member, parameterIndex ) );
+			int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<A>(
+				descriptor,
+				ConstraintLocation.forParameter( member, parameterIndex )
+		);
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member,
-																					 ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new ExecutableConstraintLocation( member ) );
+			ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<A>( descriptor, ConstraintLocation.forReturnValue( member ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(ExecutableElement member,
-																						ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, new CrossParameterConstraintLocation( member ) );
+			ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<A>( descriptor, ConstraintLocation.forCrossParameter( member ) );
 	}
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Member member,
-																						 A annotation,
-																						 ElementType type) {
+			A annotation,
+			ElementType type) {
 		return new ConstraintDescriptorImpl<A>(
+				constraintHelper,
 				member,
 				annotation,
-				constraintHelper,
-				type,
-				ConstraintOrigin.DEFINED_LOCALLY
+				type
 		);
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	/**
+	 * Finds type arguments constraints for fields and methods return values.
+	 *
+	 * @param member the field or method
+	 *
+	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
+	 */
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForMember(Member member) {
+		// To be extended by subclasses
+		return Collections.<MetaConstraint<?>>emptySet();
+	}
+
+	/**
+	 * Finds type arguments constraints for parameters.
+	 *
+	 * @param member the method
+	 * @param i the parameter index
+	 *
+	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
+	 */
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Member member, int i) {
+		// To be extended by subclasses
+		return Collections.emptySet();
 	}
 }

@@ -1,69 +1,70 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.lang.reflect.Method;
-
 import org.hibernate.validator.cfg.ConstraintDef;
+import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
+import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method return value.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public final class ReturnValueConstraintMappingContextImpl
-		extends ConstraintMappingContextImplBase
+final class ReturnValueConstraintMappingContextImpl
+		extends CascadableConstraintMappingContextImplBase<ReturnValueConstraintMappingContext>
 		implements ReturnValueConstraintMappingContext {
 
-	private final Method method;
+	private final ExecutableConstraintMappingContextImpl executableContext;
 
-	public ReturnValueConstraintMappingContextImpl(Class<?> beanClass, Method method, ConstraintMappingContext mapping) {
-		super( beanClass, mapping );
-		this.method = method;
+	ReturnValueConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
+		super( executableContext.getTypeContext().getConstraintMapping() );
+		this.executableContext = executableContext;
 	}
 
+	@Override
+	protected ReturnValueConstraintMappingContext getThis() {
+		return this;
+	}
+
+	@Override
 	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		mapping.addMethodConstraintConfig( ConfiguredConstraint.forReturnValue( definition, method ) );
+		super.addConstraint( ConfiguredConstraint.forExecutable( definition, executableContext.getExecutable() ) );
 		return this;
 	}
 
-	/**
-	 * Marks the current property as cascadable.
-	 *
-	 * @return Returns itself for method chaining.
-	 */
-	public ReturnValueConstraintMappingContext valid() {
-		mapping.addMethodCascadeConfig( new ExecutableConstraintLocation( method ) );
-		return this;
-	}
-
-	/**
-	 * Changes the parameter for which added constraints apply.
-	 *
-	 * @param index The parameter index.
-	 *
-	 * @return Returns a new {@code ConstraintsForTypeMethodElement} instance allowing method chaining.
-	 */
+	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
-		return new ParameterConstraintMappingContextImpl( beanClass, method, index, mapping );
+		return executableContext.parameter( index );
+	}
+
+	@Override
+	public CrossParameterConstraintMappingContext crossParameter() {
+		return executableContext.crossParameter();
+	}
+
+	@Override
+	public MethodConstraintMappingContext method(String name, Class<?>... parameterTypes) {
+		return executableContext.getTypeContext().method( name, parameterTypes );
+	}
+
+	@Override
+	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
+		return executableContext.getTypeContext().constructor( parameterTypes );
+	}
+
+	@Override
+	protected ConstraintType getConstraintType() {
+		return ConstraintType.GENERIC;
 	}
 }

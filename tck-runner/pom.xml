@@ -1,19 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ JBoss, Home of Professional Open Source
-  ~ Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-  ~ by the @authors tag. See the copyright.txt in the distribution for a
-  ~ full listing of individual contributors.
+  ~ Hibernate Validator, declare and validate application constraints
   ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -21,20 +11,18 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>5.0.4-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>hibernate-validator-tck-runner</artifactId>
 
     <name>Hibernate Validator TCK Runner</name>
-    <description>Aggregates dependencies and runs the JSR-303 TCK</description>
+    <description>Aggregates dependencies and runs the JSR-349 TCK</description>
     <properties>
-        <tck.version>1.1.0.Final</tck.version>
-        <tck.suite.file>src/test/resources/tck-tests-without-RI-and-AS-failures.xml</tck.suite.file>
-        <arquillian.version>1.0.0.Final</arquillian.version>
-        <jbossas.version>7.1.1.Final</jbossas.version>
-        <jbossTargetDir>${project.build.directory}/jboss-as-${jbossas.version}</jbossTargetDir>
+        <tck.version>1.1.4.Final</tck.version>
+        <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
+        <wildflyTargetDir>${project.build.directory}/wildfly-${wildfly.version}</wildflyTargetDir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>
         <remote.debug />
     </properties>
@@ -73,17 +61,21 @@
             <groupId>org.hibernate.beanvalidation.tck</groupId>
             <artifactId>beanvalidation-tck-tests</artifactId>
             <version>${tck.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jboss.test-audit</groupId>
+                    <artifactId>jboss-test-audit-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.testng</groupId>
             <artifactId>arquillian-testng-container</artifactId>
-            <version>${arquillian.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.protocol</groupId>
             <artifactId>arquillian-protocol-servlet</artifactId>
-            <version>${arquillian.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -179,7 +171,8 @@
                 </property>
             </activation>
             <properties>
-                <arquillian.protocol>Local</arquillian.protocol>
+                <!-- The properties "arquillian.protocol" and "surefire.argLine" are set based on this setting via GMaven-->
+                <with-security-manager>true</with-security-manager>
             </properties>
             <dependencies>
                 <dependency>
@@ -190,6 +183,26 @@
             </dependencies>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>configure-properties</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <source><![CDATA[
+                                        project.properties['arquillian.protocol'] = Boolean.valueOf(pom.properties['with-security-manager']) ? 'LocalSecurityManagerTesting' : 'Local';
+                                        project.properties['surefire.argLine'] = Boolean.valueOf(pom.properties['with-security-manager']) ? '-Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Djava.security.debug=access' : '';
+                                        ]]>
+                                    </source>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
@@ -204,6 +217,7 @@
                                     <value>true</value>
                                 </property>
                             </systemProperties>
+                            <argLine>${surefire.argLine}</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -217,9 +231,7 @@
                 </property>
             </activation>
             <properties>
-                <remote.debug>-Xnoagent -Djava.compiler=NONE -Xdebug
-                    -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005
-                </remote.debug>
+                <remote.debug>-Xnoagent -Djava.compiler=NONE -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005</remote.debug>
             </properties>
         </profile>
         <profile>
@@ -234,9 +246,9 @@
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.jboss.as</groupId>
-                    <artifactId>jboss-as-arquillian-container-managed</artifactId>
-                    <version>${jbossas.version}</version>
+                    <groupId>org.wildfly</groupId>
+                    <artifactId>wildfly-arquillian-container-managed</artifactId>
+                    <version>${wildfly.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -254,10 +266,10 @@
                                 <configuration>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>org.jboss.as</groupId>
-                                            <artifactId>jboss-as-dist</artifactId>
-                                            <version>${jbossas.version}</version>
-                                            <type>zip</type>
+                                            <groupId>org.wildfly</groupId>
+                                            <artifactId>wildfly-dist</artifactId>
+                                            <version>${wildfly.version}</version>
+                                            <type>tar.gz</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${project.build.directory}</outputDirectory>
                                         </artifactItem>
@@ -265,34 +277,14 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>copy-beanvalidation-api</id>
+                                <id>copy-hv-snapshot</id>
                                 <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
                                     <outputDirectory>
-                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/javax/validation/api/main
-                                    </outputDirectory>
-                                    <stripVersion>false</stripVersion>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>javax.validation</groupId>
-                                            <artifactId>validation-api</artifactId>
-                                            <destFileName>validation-api-${bv.api.version}.jar</destFileName>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>copy-hv</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>
-                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/org/hibernate/validator/main
+                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/main
                                     </outputDirectory>
                                     <stripVersion>false</stripVersion>
                                     <artifactItems>
@@ -304,20 +296,20 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>copy-classmate</id>
+                                <id>copy-hv-cdi-snapshot</id>
                                 <phase>process-test-resources</phase>
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
                                     <outputDirectory>
-                                        ${project.build.directory}/jboss-as-${jbossas.version}/modules/com/fasterxml/classmate/main
+                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/cdi/main
                                     </outputDirectory>
                                     <stripVersion>false</stripVersion>
                                     <artifactItems>
                                         <artifactItem>
-                                            <groupId>com.fasterxml</groupId>
-                                            <artifactId>classmate</artifactId>
+                                            <groupId>org.hibernate</groupId>
+                                            <artifactId>hibernate-validator-cdi</artifactId>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
@@ -329,15 +321,13 @@
                         <artifactId>gmaven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>copy-modules</id>
+                                <id>update-modules</id>
                                 <phase>generate-test-resources</phase>
                                 <goals>
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
-                                    <source>
-                                        ${pom.basedir}/src/script/setupAsModules.groovy
-                                    </source>
+                                    <source>${pom.basedir}/src/script/setupModules.groovy</source>
                                 </configuration>
                             </execution>
                         </executions>

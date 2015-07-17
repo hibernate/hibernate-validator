@@ -1,26 +1,19 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2010, Red Hat Middleware LLC, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.raw;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+
+import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -31,45 +24,90 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Gunnar Morling
  */
 public class ConstrainedParameter extends AbstractConstrainedElement {
+
+	private final Type type;
 	private final String name;
+	private final int index;
+	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+
+	public ConstrainedParameter(ConfigurationSource source,
+								ConstraintLocation location,
+								Type type,
+								int index,
+								String name) {
+		this(
+				source,
+				location,
+				type,
+				index,
+				name,
+				Collections.<MetaConstraint<?>>emptySet(),
+				Collections.<MetaConstraint<?>>emptySet(),
+				Collections.<Class<?>, Class<?>>emptyMap(),
+				false,
+				UnwrapMode.AUTOMATIC
+		);
+	}
 
 	/**
 	 * Creates a new parameter meta data object.
 	 *
 	 * @param source The source of meta data.
 	 * @param location The location of the represented method parameter.
+	 * @param type the parameter type
+	 * @param index the index of the parameter
 	 * @param name The name of the represented parameter.
 	 * @param constraints The constraints of the represented method parameter, if
 	 * any.
+	 * @param typeArgumentsConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented method parameter, if any.
 	 * @param isCascading Whether a cascaded validation of the represented method
 	 * parameter shall be performed or not.
+	 * @param unwrapMode Determines how the value of the parameter must be handled in regards to
+	 * unwrapping prior to validation.
 	 */
 	public ConstrainedParameter(ConfigurationSource source,
-								ExecutableConstraintLocation location,
+								ConstraintLocation location,
+								Type type,
+								int index,
 								String name,
 								Set<MetaConstraint<?>> constraints,
+								Set<MetaConstraint<?>> typeArgumentsConstraints,
 								Map<Class<?>, Class<?>> groupConversions,
-								boolean isCascading) {
+								boolean isCascading,
+								UnwrapMode unwrapMode) {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,
 				location,
 				constraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				unwrapMode
 		);
 
+		this.type = type;
 		this.name = name;
+		this.index = index;
+		this.typeArgumentsConstraints = typeArgumentsConstraints != null ? Collections.unmodifiableSet(
+				typeArgumentsConstraints
+		) : Collections.<MetaConstraint<?>>emptySet();
 	}
 
-	@Override
-	public ExecutableConstraintLocation getLocation() {
-		return (ExecutableConstraintLocation) super.getLocation();
+	public Type getType() {
+		return type;
 	}
 
-	public String getParameterName() {
+	public String getName() {
 		return name;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
+		return this.typeArgumentsConstraints;
 	}
 
 	/**
@@ -84,7 +122,6 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		ConfigurationSource mergedSource = ConfigurationSource.max( source, other.source );
 
 		String mergedName;
-
 		if ( source.getPriority() > other.source.getPriority() ) {
 			mergedName = name;
 		}
@@ -92,8 +129,20 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 			mergedName = other.name;
 		}
 
+		// TODO - Is this the right way of handling the merge of unwrapMode? (HF)
+		UnwrapMode mergedUnwrapMode;
+		if ( source.getPriority() > other.source.getPriority() ) {
+			mergedUnwrapMode = unwrapMode;
+		}
+		else {
+			mergedUnwrapMode = other.unwrapMode;
+		}
+
 		Set<MetaConstraint<?>> mergedConstraints = newHashSet( constraints );
 		mergedConstraints.addAll( other.constraints );
+
+		Set<MetaConstraint<?>> mergedTypeArgumentsConstraints = newHashSet( typeArgumentsConstraints );
+		mergedTypeArgumentsConstraints.addAll( other.typeArgumentsConstraints );
 
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );
@@ -101,10 +150,14 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		return new ConstrainedParameter(
 				mergedSource,
 				getLocation(),
+				type,
+				index,
 				mergedName,
 				mergedConstraints,
+				mergedTypeArgumentsConstraints,
 				mergedGroupConversions,
-				isCascading || other.isCascading
+				isCascading || other.isCascading,
+				mergedUnwrapMode
 		);
 	}
 
@@ -122,5 +175,40 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 		return "ParameterMetaData [location=" + getLocation() + "], name=" + name + "], constraints=["
 				+ constraintsAsString + "], isCascading=" + isCascading() + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + index;
+		result = prime * result + ( ( getLocation().getMember() == null ) ? 0 : getLocation().getMember().hashCode() );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( !super.equals( obj ) ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ConstrainedParameter other = (ConstrainedParameter) obj;
+		if ( index != other.index ) {
+			return false;
+		}
+		if ( getLocation().getMember() == null ) {
+			if ( other.getLocation().getMember() != null ) {
+				return false;
+			}
+		}
+		else if ( !getLocation().getMember().equals( other.getLocation().getMember() ) ) {
+			return false;
+		}
+		return true;
 	}
 }

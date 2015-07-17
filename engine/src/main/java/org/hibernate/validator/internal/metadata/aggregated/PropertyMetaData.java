@@ -1,32 +1,12 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Type;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.validation.ElementKind;
-import javax.validation.metadata.GroupConversionDescriptor;
-
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
@@ -36,8 +16,23 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.ElementKind;
+import javax.validation.metadata.GroupConversionDescriptor;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Represents the constraint related meta data for a JavaBeans property.
@@ -55,6 +50,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  * @author Gunnar Morling
  */
 public class PropertyMetaData extends AbstractConstraintMetaData implements Cascadable {
+	private static final Log log = LoggerFactory.make();
 
 	/**
 	 * The member marked as cascaded (either field or getter). Used to retrieve
@@ -66,18 +62,26 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 	private final GroupConversionHelper groupConversionHelper;
 
+	/**
+	 * Type arguments constraints for this property
+	 */
+	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+
 	private PropertyMetaData(String propertyName,
 							 Type type,
 							 Set<MetaConstraint<?>> constraints,
+							 Set<MetaConstraint<?>> typeArgumentsConstraints,
 							 Map<Class<?>, Class<?>> groupConversions,
-							 Member cascadingMember) {
+							 Member cascadingMember,
+							 UnwrapMode unwrapMode) {
 		super(
 				propertyName,
 				type,
 				constraints,
 				ElementKind.PROPERTY,
 				cascadingMember != null,
-				cascadingMember != null || !constraints.isEmpty()
+				cascadingMember != null || !constraints.isEmpty() || !typeArgumentsConstraints.isEmpty(),
+				unwrapMode
 		);
 
 		if ( cascadingMember != null ) {
@@ -89,13 +93,13 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			this.elementType = ElementType.TYPE;
 		}
 
+		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}
 
-	@Override
-	public Object getValue(Object parent) {
-		return ReflectionHelper.getValue( cascadingMember, parent );
+	public Member getCascadingMember() {
+		return cascadingMember;
 	}
 
 	@Override
@@ -111,6 +115,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 	@Override
 	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
 		return groupConversionHelper.asDescriptors();
+	}
+
+	@Override
+	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
+		return this.typeArgumentsConstraints;
 	}
 
 	@Override
@@ -163,12 +172,15 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		private final String propertyName;
 		private final Type propertyType;
 		private Member cascadingMember;
+		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
+		private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
+		private boolean unwrapModeExplicitlyConfigured = false;
 
 		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedField.getLocation().getMember() );
-			this.propertyType = ( (Field) constrainedField.getLocation().getMember() ).getGenericType();
+			this.propertyType = ReflectionHelper.typeOf( constrainedField.getLocation().getMember() );
 			add( constrainedField );
 		}
 
@@ -184,7 +196,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			super( beanClass, constraintHelper );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getLocation().getMember() );
-			this.propertyType = constrainedMethod.getLocation().typeOfAnnotatedElement();
+			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getLocation().getMember() );
 			add( constrainedMethod );
 		}
 
@@ -207,12 +219,42 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 		@Override
 		public void add(ConstrainedElement constrainedElement) {
-
 			super.add( constrainedElement );
+
+			// HV-925
+			// Trying to detect inconsistent value unwrapping configuration between a property field and its getter.
+			// If a field or getter explicitly uses @UnwrapValidatedValue, the corresponding getter / field needs to either
+			// not use @UnwrapValidatedValue or use the same value for the annotation.
+			UnwrapMode newUnwrapMode = constrainedElement.unwrapMode();
+			if ( unwrapModeExplicitlyConfigured ) {
+				if ( !UnwrapMode.AUTOMATIC.equals( newUnwrapMode ) && !newUnwrapMode.equals( unwrapMode ) ) {
+					throw log.getInconsistentValueUnwrappingConfigurationBetweenFieldAndItsGetterException(
+							propertyName,
+							getBeanClass().getName()
+					);
+				}
+			}
+			else {
+				if ( !UnwrapMode.AUTOMATIC.equals( newUnwrapMode ) ) {
+					unwrapMode = constrainedElement.unwrapMode();
+					unwrapModeExplicitlyConfigured = true;
+				}
+			}
+
+			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
+				typeArgumentsConstraints.addAll( ( (ConstrainedField) constrainedElement ).getTypeArgumentsConstraints() );
+			}
+			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
+				typeArgumentsConstraints.addAll( ( (ConstrainedExecutable) constrainedElement ).getTypeArgumentsConstraints() );
+			}
 
 			if ( constrainedElement.isCascading() && cascadingMember == null ) {
 				cascadingMember = constrainedElement.getLocation().getMember();
 			}
+		}
+
+		public UnwrapMode unwrapMode() {
+			return unwrapMode;
 		}
 
 		@Override
@@ -221,8 +263,10 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 					propertyName,
 					propertyType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
+					typeArgumentsConstraints,
 					getGroupConversions(),
-					cascadingMember
+					cascadingMember,
+					unwrapMode()
 			);
 		}
 

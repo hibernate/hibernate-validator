@@ -1,19 +1,9 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.cdi;
 
 import java.lang.annotation.Annotation;
@@ -26,6 +16,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
@@ -59,42 +50,70 @@ import org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * A CDI portable extension which registers beans for {@link ValidatorFactory} and {@link Validator}.
+ * A CDI portable extension which integrates Bean Validation with CDI. It registers the following objects:
+ * <ul>
+ * <li>
+ * Beans for {@link ValidatorFactory} and {@link Validator} representing default validator factory and validator as
+ * configured via {@code META-INF/validation.xml}. These beans will have the {@code Default} qualifier and in addition
+ * the {@code HibernateValidator} qualifier if Hibernate Validator is the default validation provider.</li>
+ * <li>In case Hibernate Validator is <em>not</em> the default provider, another pair of beans will be registered in
+ * addition which are qualified with the {@code HibernateValidator} qualifier.</li>
+ * </ul>
+ * Neither of these beans will be registered in case there is already another bean with the same type and qualifier(s),
+ * e.g. registered by another portable extension or the application itself.
  *
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
 public class ValidationExtension implements Extension {
+
 	private static final Log log = LoggerFactory.make();
+
 	private static final EnumSet<ExecutableType> ALL_EXECUTABLE_TYPES =
 			EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS, ExecutableType.GETTER_METHODS );
 	private static final EnumSet<ExecutableType> DEFAULT_EXECUTABLE_TYPES =
 			EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS );
 
+	@SuppressWarnings("serial")
+	private final Annotation defaultQualifier = new AnnotationLiteral<Default>() {
+	};
+
+	@SuppressWarnings("serial")
+	private final Annotation hibernateValidatorQualifier = new AnnotationLiteral<HibernateValidator>() {
+	};
+
 	private final ExecutableHelper executableHelper;
+
+	/**
+	 * Used for identifying constrained classes
+	 */
 	private final Validator validator;
+	private final ValidatorFactory validatorFactory;
 	private final Set<ExecutableType> globalExecutableTypes;
 	private final boolean isExecutableValidationEnabled;
-	private boolean validatorRegisteredUnderDefaultQualifier;
-	private boolean validatorRegisteredUnderHibernateQualifier;
+
+	private Bean<?> defaultValidatorFactoryBean;
+	private Bean<?> hibernateValidatorFactoryBean;
+
+	private Bean<?> defaultValidatorBean;
+	private Bean<?> hibernateValidatorBean;
 
 	public ValidationExtension() {
-		validatorRegisteredUnderDefaultQualifier = false;
-		validatorRegisteredUnderHibernateQualifier = false;
-
 		Configuration<?> config = Validation.byDefaultProvider().configure();
 		BootstrapConfiguration bootstrap = config.getBootstrapConfiguration();
 		globalExecutableTypes = bootstrap.getDefaultValidatedExecutableTypes();
 		isExecutableValidationEnabled = bootstrap.isExecutableValidationEnabled();
-		validator = config.buildValidatorFactory().getValidator();
-		executableHelper = new ExecutableHelper();
+		validatorFactory = config.buildValidatorFactory();
+		validator = validatorFactory.getValidator();
+
+		executableHelper = new ExecutableHelper( new TypeResolutionHelper() );
 	}
 
 	/**
@@ -103,7 +122,8 @@ public class ValidationExtension implements Extension {
 	 * @param beforeBeanDiscoveryEvent event fired before the bean discovery process starts
 	 * @param beanManager the bean manager.
 	 */
-	public void beforeBeanDiscovery(@Observes BeforeBeanDiscovery beforeBeanDiscoveryEvent, final BeanManager beanManager) {
+	public void beforeBeanDiscovery(@Observes BeforeBeanDiscovery beforeBeanDiscoveryEvent,
+			final BeanManager beanManager) {
 		Contracts.assertNotNull( beforeBeanDiscoveryEvent, "The BeforeBeanDiscovery event cannot be null" );
 		Contracts.assertNotNull( beanManager, "The BeanManager cannot be null" );
 
@@ -113,8 +133,7 @@ public class ValidationExtension implements Extension {
 	}
 
 	/**
-	 * Registers the Hibernate specific {@code ValidatorFactory} and {@code Validator}. The qualifiers used for registration
-	 * depend on which other beans have already registered these type of beans.
+	 * Registers beans for {@code ValidatorFactory} and {@code Validator} if not yet present.
 	 *
 	 * @param afterBeanDiscoveryEvent event fired after the bean discovery phase.
 	 * @param beanManager the bean manager.
@@ -123,18 +142,44 @@ public class ValidationExtension implements Extension {
 		Contracts.assertNotNull( afterBeanDiscoveryEvent, "The AfterBeanDiscovery event cannot be null" );
 		Contracts.assertNotNull( beanManager, "The BeanManager cannot be null" );
 
-		Set<Annotation> missingQualifiers = determineMissingQualifiers();
-		if ( missingQualifiers.isEmpty() ) {
-			return;
+		ValidationProviderHelper defaultProviderHelper = ValidationProviderHelper.forDefaultProvider( validatorFactory );
+		ValidationProviderHelper hvProviderHelper = ValidationProviderHelper.forHibernateValidator();
+
+		// register default VF if none has been provided by the application or another PE
+		if ( defaultValidatorFactoryBean == null ) {
+			defaultValidatorFactoryBean = new ValidatorFactoryBean( beanManager, defaultProviderHelper );
+			if ( hibernateValidatorFactoryBean == null && defaultProviderHelper.isHibernateValidator() ) {
+				hibernateValidatorFactoryBean = defaultValidatorFactoryBean;
+			}
+			afterBeanDiscoveryEvent.addBean( defaultValidatorFactoryBean );
 		}
 
-		afterBeanDiscoveryEvent.addBean( new ValidatorFactoryBean( beanManager, missingQualifiers ) );
-		afterBeanDiscoveryEvent.addBean( new ValidatorBean( beanManager, missingQualifiers ) );
+		// register VF with @HibernateValidator qualifier in case it hasn't been contributed by the application and the
+		// default VF registered by ourselves isn't for Hibernate Validator
+		if ( hibernateValidatorFactoryBean == null ) {
+			hibernateValidatorFactoryBean = new ValidatorFactoryBean( beanManager, hvProviderHelper );
+			afterBeanDiscoveryEvent.addBean( hibernateValidatorFactoryBean );
+		}
+
+		// register default validator if required
+		if ( defaultValidatorBean == null ) {
+			defaultValidatorBean = new ValidatorBean( beanManager, defaultValidatorFactoryBean, defaultProviderHelper );
+			if ( hibernateValidatorBean == null && defaultProviderHelper.isHibernateValidator() ) {
+				hibernateValidatorBean = defaultValidatorBean;
+			}
+			afterBeanDiscoveryEvent.addBean( defaultValidatorBean );
+		}
+
+		// register validator with @HibernateValidator if required
+		if ( hibernateValidatorBean == null ) {
+			hibernateValidatorBean = new ValidatorBean( beanManager, hibernateValidatorFactoryBean, hvProviderHelper );
+			afterBeanDiscoveryEvent.addBean( hibernateValidatorBean );
+		}
 	}
 
 	/**
-	 * Watches the {@code ProcessBean} event in order to determine whether and under which qualifiers {@code ValidatorFactory}s
-	 * and {@code Validator}s get registered.
+	 * Watches the {@code ProcessBean} event in order to determine whether beans for {@code ValidatorFactory} and
+	 * {@code Validator} already have been registered by some other component.
 	 *
 	 * @param processBeanEvent event fired for each enabled bean.
 	 */
@@ -142,18 +187,21 @@ public class ValidationExtension implements Extension {
 		Contracts.assertNotNull( processBeanEvent, "The ProcessBean event cannot be null" );
 
 		Bean<?> bean = processBeanEvent.getBean();
-		if ( !bean.getTypes().contains( ValidatorFactory.class ) && !bean.getTypes().contains( Validator.class ) ) {
-			return;
-		}
-		if ( bean instanceof ValidatorFactoryBean || bean instanceof ValidatorBean ) {
-			return;
-		}
-		for ( Annotation annotation : bean.getQualifiers() ) {
-			if ( HibernateValidator.class.equals( annotation.annotationType() ) ) {
-				validatorRegisteredUnderHibernateQualifier = true;
+
+		if ( bean.getTypes().contains( ValidatorFactory.class ) || bean instanceof ValidatorFactoryBean ) {
+			if ( bean.getQualifiers().contains( defaultQualifier ) ) {
+				defaultValidatorFactoryBean = bean;
 			}
-			if ( Default.class.equals( annotation.annotationType() ) ) {
-				validatorRegisteredUnderDefaultQualifier = true;
+			if ( bean.getQualifiers().contains( hibernateValidatorQualifier ) ) {
+				hibernateValidatorFactoryBean = bean;
+			}
+		}
+		else if ( bean.getTypes().contains( Validator.class ) || bean instanceof ValidatorBean ) {
+			if ( bean.getQualifiers().contains( defaultQualifier ) ) {
+				defaultValidatorBean = bean;
+			}
+			if ( bean.getQualifiers().contains( hibernateValidatorQualifier ) ) {
+				hibernateValidatorBean = bean;
 			}
 		}
 	}
@@ -162,6 +210,7 @@ public class ValidationExtension implements Extension {
 	 * Used to register the method validation interceptor bindings.
 	 *
 	 * @param processAnnotatedTypeEvent event fired for each annotated type
+	 * @param <T> the annotated type
 	 */
 	public <T> void processAnnotatedType(@Observes @WithAnnotations({
 			Constraint.class,
@@ -176,16 +225,8 @@ public class ValidationExtension implements Extension {
 		}
 
 		AnnotatedType<T> type = processAnnotatedTypeEvent.getAnnotatedType();
-		Class<?> clazz = type.getJavaClass();
+		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables( type );
 
-		EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( clazz );
-
-		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( clazz );
-		Set<AnnotatedCallable<? super T>> constrainedCallables = determineConstrainedCallables(
-				type,
-				beanDescriptor,
-				classLevelExecutableTypes
-		);
 		if ( !constrainedCallables.isEmpty() ) {
 			ValidationEnabledAnnotatedType<T> wrappedType = new ValidationEnabledAnnotatedType<T>(
 					type,
@@ -195,30 +236,29 @@ public class ValidationExtension implements Extension {
 		}
 	}
 
-	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type,
-																				BeanDescriptor beanDescriptor,
-																				EnumSet<ExecutableType> classLevelExecutableTypes) {
+	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type) {
 		Set<AnnotatedCallable<? super T>> callables = newHashSet();
+		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( type.getJavaClass() );
 
-		determineConstrainedConstructors( type, beanDescriptor, classLevelExecutableTypes, callables );
-		determineConstrainedMethod( type, beanDescriptor, callables );
+		determineConstrainedConstructors( type, beanDescriptor, callables );
+		determineConstrainedMethods( type, beanDescriptor, callables );
 
 		return callables;
 	}
 
-	private <T> void determineConstrainedMethod(AnnotatedType<T> type,
-												BeanDescriptor beanDescriptor,
-												Set<AnnotatedCallable<? super T>> callables) {
-		List<Method> overriddenAndImplementedMethods = ClassHierarchyHelper.getAllMethods( type.getJavaClass() );
+	private <T> void determineConstrainedMethods(AnnotatedType<T> type, BeanDescriptor beanDescriptor, Set<AnnotatedCallable<? super T>> callables) {
+		List<Method> overriddenAndImplementedMethods = InheritedMethodsHelper.getAllMethods( type.getJavaClass() );
+
 		for ( AnnotatedMethod<? super T> annotatedMethod : type.getMethods() ) {
 			Method method = annotatedMethod.getJavaMember();
 
-			// if the method implements an interface we need to use the configuration of the interface
-			method = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );
 			boolean isGetter = ReflectionHelper.isGetterMethod( method );
 
-			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( method.getDeclaringClass() );
-			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnMethod( method, isGetter );
+			// obtain @ValidateOnExecution from the top-most method in the hierarchy
+			Method methodForExecutableTypeRetrieval = replaceWithOverriddenOrInterfaceMethod( method, overriddenAndImplementedMethods );
+
+			EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( methodForExecutableTypeRetrieval.getDeclaringClass() );
+			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnMethod( methodForExecutableTypeRetrieval, isGetter );
 
 			ExecutableType currentExecutableType = isGetter ? ExecutableType.GETTER_METHODS : ExecutableType.NON_GETTER_METHODS;
 
@@ -242,8 +282,10 @@ public class ValidationExtension implements Extension {
 		}
 	}
 
-	private <T> void determineConstrainedConstructors(AnnotatedType<T> type, BeanDescriptor beanDescriptor, EnumSet<ExecutableType> classLevelExecutableTypes, Set<AnnotatedCallable<? super T>> callables) {
-		// no special inheritance rules to consider for constructors
+	private <T> void determineConstrainedConstructors(AnnotatedType<T> type, BeanDescriptor beanDescriptor, Set<AnnotatedCallable<? super T>> callables) {
+		Class<?> clazz = type.getJavaClass();
+		EnumSet<ExecutableType> classLevelExecutableTypes = executableTypesDefinedOnType( clazz );
+
 		for ( AnnotatedConstructor<T> annotatedConstructor : type.getConstructors() ) {
 			Constructor<?> constructor = annotatedConstructor.getJavaMember();
 			EnumSet<ExecutableType> memberLevelExecutableType = executableTypesDefinedOnConstructor( constructor );
@@ -271,8 +313,8 @@ public class ValidationExtension implements Extension {
 	}
 
 	private boolean veto(EnumSet<ExecutableType> classLevelExecutableTypes,
-						 EnumSet<ExecutableType> memberLevelExecutableType,
-						 ExecutableType currentExecutableType) {
+			EnumSet<ExecutableType> memberLevelExecutableType,
+			ExecutableType currentExecutableType) {
 		if ( !memberLevelExecutableType.isEmpty() ) {
 			return !memberLevelExecutableType.contains( currentExecutableType )
 					&& !memberLevelExecutableType.contains( ExecutableType.IMPLICIT );
@@ -284,32 +326,6 @@ public class ValidationExtension implements Extension {
 		}
 
 		return !globalExecutableTypes.contains( currentExecutableType );
-	}
-
-	/**
-	 * The set of qualifier this extension should bind its {@code ValidatorFactory} and {@code Validator}
-	 * under. This set is based on the observed registered beans via the {@code ProcessBean} event.
-	 *
-	 * @return Returns the set of qualifier this extension should bind its {@code ValidatorFactory} and {@code Validator}
-	 *         under.
-	 */
-	private Set<Annotation> determineMissingQualifiers() {
-		Set<Annotation> annotations = newHashSet( 2 );
-
-		if ( !validatorRegisteredUnderDefaultQualifier ) {
-			annotations.add(
-					new AnnotationLiteral<Default>() {
-					}
-			);
-		}
-
-		if ( !validatorRegisteredUnderHibernateQualifier ) {
-			annotations.add(
-					new AnnotationLiteral<HibernateValidator>() {
-					}
-			);
-		}
-		return annotations;
 	}
 
 	private EnumSet<ExecutableType> executableTypesDefinedOnType(Class<?> clazz) {
@@ -376,7 +392,7 @@ public class ValidationExtension implements Extension {
 			executableTypes.remove( ExecutableType.NONE );
 		}
 
-		// 10.1.2 od spec - A list containing ALL and other types of executables is equivalent to a list containing only ALL
+		// 10.1.2 of spec - A list containing ALL and other types of executables is equivalent to a list containing only ALL
 		if ( executableTypes.contains( ExecutableType.ALL ) ) {
 			executableTypes = ALL_EXECUTABLE_TYPES;
 		}

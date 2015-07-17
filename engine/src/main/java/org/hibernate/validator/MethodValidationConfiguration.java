@@ -1,40 +1,23 @@
-/*
-* JBoss, Home of Professional Open Source
-* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+/**
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 
 package org.hibernate.validator;
 
-import java.util.Set;
-
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
 
-/**
- * these properties modify the behavior of the Validator with respect to 
- * Specification section 4.5.5.
- * In particular: "Out of the box, a conforming Bean Validation provider must throw a 
- * ConstraintDeclarationException when discovering that any of these rules are violated. 
- * In addition providers may implement alternative, potentially more liberal, approaches 
- * for handling constrained methods in inheritance hierarchies. Possible means for activating 
- * such alternative behavior include provider-specific configuration properties or annotations. 
- * Note that client code relying on such alternative behavior is not portable between Bean 
- * Validation providers."
- * 
- * @author Chris Beckey cbeckey@paypal.com
+import java.util.Set;
+
+/*
+ * Hibernate Validator, declare and validate application constraints
  *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
+
 public interface MethodValidationConfiguration {
 	/**
 	 * Define whether overriding methods that override constraints should throw a ConstraintDefinitionException. The

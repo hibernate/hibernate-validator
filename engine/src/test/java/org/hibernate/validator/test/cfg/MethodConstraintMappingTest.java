@@ -1,33 +1,10 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.test.cfg;
-
-import java.lang.annotation.ElementType;
-import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -35,9 +12,25 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.groups.Default;
+import java.lang.annotation.ElementType;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertNull;
@@ -46,9 +39,8 @@ import static org.testng.Assert.fail;
 /**
  * Tests the definition of method constraints with the programmatic API.
  *
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-@Test
 public class MethodConstraintMappingTest {
 	private HibernateValidatorConfiguration config;
 	private GreetingService wrappedObject;
@@ -80,6 +72,36 @@ public class MethodConstraintMappingTest {
 		}
 		catch ( ConstraintViolationException e ) {
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
+			assertCorrectPropertyPaths( e, "greet.<return value>.message" );
+		}
+	}
+
+	@Test
+	public void testCascadingMethodReturnDefinitionWithGroupConversion() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", User.class )
+				.returnValue()
+				.valid()
+				.convertGroup( Default.class ).to( TestGroup.class )
+				.type( Message.class )
+				.property( "message", ElementType.FIELD )
+				.constraint(
+						new NotNullDef()
+								.message( "message must not be null" )
+								.groups( TestGroup.class )
+				);
+
+		config.addMapping( mapping );
+
+		GreetingService service = getValidatingProxy( wrappedObject, config.buildValidatorFactory().getValidator() );
+
+		try {
+			service.greet( new User( "foo" ) );
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( ConstraintViolationException e ) {
+			assertCorrectConstraintViolationMessages( e, "message must not be null" );
 			assertCorrectPropertyPaths( e, "greet.<return value>.message" );
 		}
 	}
@@ -121,7 +143,7 @@ public class MethodConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: A valid parameter index has to be specified for method 'greet'"
+			expectedExceptionsMessageRegExp = "HV000056.*"
 	)
 	public void testCascadingDefinitionOnInvalidMethodParameter() {
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -583,6 +605,69 @@ public class MethodConstraintMappingTest {
 		assertCorrectPropertyPaths( violations, "user.name" );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-769")
+	public void shouldDetermineConstraintTargetForReturnValueConstraint() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class, String.class )
+				.returnValue()
+				.constraint(
+						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+								GenericAndCrossParameterConstraint.class
+						)
+				);
+		config.addMapping( mapping );
+
+		Validator validator = config.buildValidatorFactory().getValidator();
+		GreetingService service = getValidatingProxy( wrappedObject, validator );
+
+		try {
+			service.greet( null, null );
+			fail( "Expected exception wasn't thrown" );
+		}
+		catch ( ConstraintViolationException cve ) {
+			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
+					pathWith().method( "greet" ).returnValue()
+			);
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-642")
+	public void crossParameterConstraint() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "greet", String.class, String.class )
+				.crossParameter()
+				.constraint(
+						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+								GenericAndCrossParameterConstraint.class
+						)
+				);
+		config.addMapping( mapping );
+
+		try {
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
+			service.greet( "", "" );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch ( ConstraintViolationException e ) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "default message"
+			);
+			assertCorrectPropertyPaths( e, "greet.<cross-parameter>" );
+		}
+	}
+
+	private interface TestGroup {
+	}
+
 	public class User {
 
 		@NotNull
@@ -599,7 +684,6 @@ public class MethodConstraintMappingTest {
 
 	public class Message {
 
-		@SuppressWarnings("unused")
 		@NotNull
 		private final String message;
 

@@ -1,43 +1,37 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import javax.validation.ElementKind;
-import javax.validation.constraints.NotNull;
-import javax.validation.groups.Default;
-
-import org.joda.time.DateMidnight;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.test.internal.metadata.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
+import org.joda.time.DateMidnight;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import javax.validation.ElementKind;
+import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Collections;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
@@ -55,9 +49,15 @@ public class ExecutableMetaDataTest {
 
 	@BeforeMethod
 	public void setupBeanMetaData() {
-		beanMetaData = new BeanMetaDataManager( new ConstraintHelper(), new ExecutableHelper() ).getBeanMetaData(
-				CustomerRepositoryExt.class
+
+		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+				new ConstraintHelper(),
+				new ExecutableHelper(new TypeResolutionHelper()),
+				new DefaultParameterNameProvider(),
+				Collections.<MetaDataProvider>emptyList()
 		);
+
+		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepositoryExt.class );
 	}
 
 	@Test
@@ -205,6 +205,30 @@ public class ExecutableMetaDataTest {
 		);
 
 		assertThat( constructorMetaData.getIdentifier() ).isEqualTo( "CustomerRepositoryExt[class java.lang.String]" );
+	}
+
+	@Test
+	public void requiresUnwrappingForMethod() throws Exception {
+		Method method = CustomerRepositoryExt.class.getMethod( "methodRequiringUnwrapping" );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
+				ExecutableElement.forMethod(
+						method
+				)
+		);
+
+		assertEquals( methodMetaData.unwrapMode(), UnwrapMode.UNWRAP );
+	}
+
+	@Test
+	public void requiresUnwrappingForConstructor() throws Exception {
+		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( long.class );
+		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor(
+				ExecutableElement.forConstructor(
+						constructor
+				)
+		);
+
+		assertEquals( constructorMetaData.unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
 	@Test
@@ -386,6 +410,7 @@ public class ExecutableMetaDataTest {
 		assertFalse( methodMetaData.isConstrained() );
 		assertThat( methodMetaData ).isEmpty();
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
+		assertEquals( methodMetaData.unwrapMode(), UnwrapMode.AUTOMATIC );
 
 		assertThat( methodMetaData.getParameterMetaData( 0 ).isConstrained() ).isFalse();
 		assertThat( methodMetaData.getParameterMetaData( 0 ).isCascading() ).isFalse();

@@ -1,23 +1,16 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.internal.metadata;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
+import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import org.joda.time.DateMidnight;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -27,11 +20,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
-
-import org.joda.time.DateMidnight;
-
-import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
-import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.TYPE;
@@ -68,6 +58,10 @@ public class CustomerRepositoryExt extends CustomerRepository {
 
 	@Valid
 	public CustomerRepositoryExt(DateMidnight start, DateMidnight end) {
+	}
+
+	@UnwrapValidatedValue
+	public CustomerRepositoryExt(long l) {
 	}
 
 	@Override

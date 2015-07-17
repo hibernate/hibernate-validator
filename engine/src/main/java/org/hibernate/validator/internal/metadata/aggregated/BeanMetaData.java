@@ -1,29 +1,19 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.aggregated;
-
-import java.util.List;
-import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.metadata.BeanDescriptor;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Interface defining the meta data about the constraints defined in a given bean.
@@ -37,6 +27,13 @@ public interface BeanMetaData<T> extends Validatable {
 	 * @return the class of the bean.
 	 */
 	Class<T> getBeanClass();
+
+	/**
+	 * Returns {@code true} if the bean class for this bean meta data has any constraints at all, {@code false} otherwise.
+	 *
+	 * @return {@code true} if the bean class for this bean meta data has any constraints at all, {@code false} otherwise.
+	 */
+	boolean hasConstraints();
 
 	/**
 	 * @return an instance of {@code ElementDescriptor} describing the bean this meta data applies for.

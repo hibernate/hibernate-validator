@@ -1,32 +1,21 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.constraints.br;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.hibernate.validator.constraints.Mod11Check;
+import org.hibernate.validator.constraints.Mod11Check.List;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
-
-import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.ModCheck.List;
-import org.hibernate.validator.constraints.ModCheck.ModType;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
@@ -42,15 +31,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Pattern(regexp = "[0-9]{12}")
 @List({
-		@ModCheck(modType = ModType.MOD11,
-				checkDigitPosition = 10,
-				multiplier = 9,
-				endIndex = 8),
-		@ModCheck(modType = ModType.MOD11,
-				checkDigitPosition = 11,
-				multiplier = 9,
+		@Mod11Check(threshold = 9,
+				endIndex = 7,
+				checkDigitIndex = 10),
+		@Mod11Check(threshold = 9,
 				startIndex = 8,
-				endIndex = 11)
+				endIndex = 10,
+				checkDigitIndex = 11)
 })
 @ReportAsSingleViolation
 @Documented
@@ -58,7 +45,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 public @interface TituloEleitoral {
-	String message() default "{org.hibernate.validator.constraints.br.TituloEleitor.message}";
+	String message() default "{org.hibernate.validator.constraints.br.TituloEleitoral.message}";
 
 	Class<?>[] groups() default { };
 

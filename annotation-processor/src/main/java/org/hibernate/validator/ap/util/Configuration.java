@@ -1,19 +1,9 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.ap.util;
 
 import java.text.MessageFormat;
@@ -66,6 +56,8 @@ public class Configuration {
 
 	/**
 	 * Returns the diagnosticKind to be used when reporting failing constraint checks.
+	 *
+	 * @return the diagnosticKind to be used when reporting failing constraint checks
 	 */
 	public Kind getDiagnosticKind() {
 		return diagnosticKind;
@@ -73,6 +65,8 @@ public class Configuration {
 
 	/**
 	 * Whether logging information shall be put out in a verbose way or not.
+	 *
+	 * @return {@code true} if logging information shall be put out in a verbose, {@code false} otherwise
 	 */
 	public boolean isVerbose() {
 		return verbose;
@@ -81,6 +75,8 @@ public class Configuration {
 	/**
 	 * Whether method constraints are allowed at any method (<code>true</code>) or only
 	 * getter methods (<code>false</code>).
+	 *
+	 * @return {@code true} if method constraints are allowed on any method, {code false} if only on getter methods
 	 */
 	public boolean methodConstraintsSupported() {
 		return methodConstraintsSupported;

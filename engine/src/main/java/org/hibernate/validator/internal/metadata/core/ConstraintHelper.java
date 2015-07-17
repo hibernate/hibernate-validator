@@ -1,28 +1,89 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.core;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ConcurrentMap;
+import org.hibernate.validator.constraints.ConstraintComposition;
+import org.hibernate.validator.constraints.EAN;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.LuhnCheck;
+import org.hibernate.validator.constraints.Mod10Check;
+import org.hibernate.validator.constraints.Mod11Check;
+import org.hibernate.validator.constraints.ModCheck;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraints.br.CNPJ;
+import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.internal.constraintvalidators.bv.AssertFalseValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMaxValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMaxValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForCalendar;
+import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForChronoZonedDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForInstant;
+import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForOffsetDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadableInstant;
+import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadablePartial;
+import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForCalendar;
+import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoZonedDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForInstant;
+import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForOffsetDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadableInstant;
+import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadablePartial;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArray;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfBoolean;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfByte;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfChar;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfDouble;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfInt;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfLong;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForMap;
+import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.Version;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
+import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
@@ -42,63 +103,19 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
-
-import org.hibernate.validator.constraints.ConstraintComposition;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.SafeHtml;
-import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.constraints.URL;
-import org.hibernate.validator.internal.constraintvalidators.AssertFalseValidator;
-import org.hibernate.validator.internal.constraintvalidators.AssertTrueValidator;
-import org.hibernate.validator.internal.constraintvalidators.DecimalMaxValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.DecimalMaxValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.DecimalMinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.DecimalMinValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.DigitsValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.DigitsValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.EmailValidator;
-import org.hibernate.validator.internal.constraintvalidators.FutureValidatorForCalendar;
-import org.hibernate.validator.internal.constraintvalidators.FutureValidatorForDate;
-import org.hibernate.validator.internal.constraintvalidators.FutureValidatorForReadableInstant;
-import org.hibernate.validator.internal.constraintvalidators.FutureValidatorForReadablePartial;
-import org.hibernate.validator.internal.constraintvalidators.LengthValidator;
-import org.hibernate.validator.internal.constraintvalidators.MaxValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.MaxValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.MinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.MinValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.ModCheckValidator;
-import org.hibernate.validator.internal.constraintvalidators.NotBlankValidator;
-import org.hibernate.validator.internal.constraintvalidators.NotNullValidator;
-import org.hibernate.validator.internal.constraintvalidators.NullValidator;
-import org.hibernate.validator.internal.constraintvalidators.PastValidatorForCalendar;
-import org.hibernate.validator.internal.constraintvalidators.PastValidatorForDate;
-import org.hibernate.validator.internal.constraintvalidators.PastValidatorForReadableInstant;
-import org.hibernate.validator.internal.constraintvalidators.PastValidatorForReadablePartial;
-import org.hibernate.validator.internal.constraintvalidators.PatternValidator;
-import org.hibernate.validator.internal.constraintvalidators.SafeHtmlValidator;
-import org.hibernate.validator.internal.constraintvalidators.ScriptAssertValidator;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForArray;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForArraysOfBoolean;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForArraysOfByte;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForArraysOfChar;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForArraysOfDouble;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForArraysOfFloat;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForArraysOfInt;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForArraysOfLong;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForCollection;
-import org.hibernate.validator.internal.constraintvalidators.SizeValidatorForMap;
-import org.hibernate.validator.internal.constraintvalidators.URLValidator;
-import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
@@ -117,127 +134,101 @@ public class ConstraintHelper {
 	private static final Log log = LoggerFactory.make();
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
 
-	private final ConcurrentMap<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints = newConcurrentHashMap();
+	// immutable
+	private final Map<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints;
+
 	private final ValidatorClassMap validatorClasses = new ValidatorClassMap();
 
 	public ConstraintHelper() {
-		List<Class<? extends ConstraintValidator<?, ?>>> constraintList = newArrayList();
-		constraintList.add( AssertFalseValidator.class );
-		builtinConstraints.put( AssertFalse.class, constraintList );
+		Map<Class<? extends Annotation>, List<? extends Class<?>>> tmpConstraints = newHashMap();
 
-		constraintList = newArrayList();
-		constraintList.add( AssertTrueValidator.class );
-		builtinConstraints.put( AssertTrue.class, constraintList );
+		putConstraint( tmpConstraints, AssertFalse.class, AssertFalseValidator.class );
+		putConstraint( tmpConstraints, AssertTrue.class, AssertTrueValidator.class );
+		putConstraint( tmpConstraints, CNPJ.class, CNPJValidator.class );
+		putConstraint( tmpConstraints, CPF.class, CPFValidator.class );
 
-		constraintList = newArrayList();
-		constraintList.add( DecimalMaxValidatorForNumber.class );
-		constraintList.add( DecimalMaxValidatorForCharSequence.class );
-		builtinConstraints.put( DecimalMax.class, constraintList );
+		putConstraints( tmpConstraints, DecimalMax.class, DecimalMaxValidatorForNumber.class, DecimalMaxValidatorForCharSequence.class );
+		putConstraints( tmpConstraints, DecimalMin.class, DecimalMinValidatorForNumber.class, DecimalMinValidatorForCharSequence.class );
+		putConstraints( tmpConstraints, Digits.class, DigitsValidatorForCharSequence.class, DigitsValidatorForNumber.class );
 
-		constraintList = newArrayList();
-		constraintList.add( DecimalMinValidatorForNumber.class );
-		constraintList.add( DecimalMinValidatorForCharSequence.class );
-		builtinConstraints.put( DecimalMin.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( DigitsValidatorForCharSequence.class );
-		constraintList.add( DigitsValidatorForNumber.class );
-		builtinConstraints.put( Digits.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( FutureValidatorForCalendar.class );
-		constraintList.add( FutureValidatorForDate.class );
+		List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = newArrayList( 11 );
+		futureValidators.add( FutureValidatorForCalendar.class );
+		futureValidators.add( FutureValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
-			constraintList.add( FutureValidatorForReadableInstant.class );
-			constraintList.add( FutureValidatorForReadablePartial.class );
+			futureValidators.add( FutureValidatorForReadableInstant.class );
+			futureValidators.add( FutureValidatorForReadablePartial.class );
 		}
-		builtinConstraints.put( Future.class, constraintList );
+		if ( Version.getJavaRelease() >= 8 ) {
+			// Java 8 date/time API validators
+			futureValidators.add( FutureValidatorForChronoZonedDateTime.class );
+			futureValidators.add( FutureValidatorForInstant.class );
+			futureValidators.add( FutureValidatorForOffsetDateTime.class );
+		}
+		putConstraints( tmpConstraints, Future.class, futureValidators );
 
-		constraintList = newArrayList();
-		constraintList.add( MaxValidatorForNumber.class );
-		constraintList.add( MaxValidatorForCharSequence.class );
-		builtinConstraints.put( Max.class, constraintList );
+		putConstraints( tmpConstraints, Max.class, MaxValidatorForNumber.class, MaxValidatorForCharSequence.class );
+		putConstraints( tmpConstraints, Min.class, MinValidatorForNumber.class, MinValidatorForCharSequence.class );
+		putConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
+		putConstraint( tmpConstraints, Null.class, NullValidator.class );
 
-		constraintList = newArrayList();
-		constraintList.add( MinValidatorForNumber.class );
-		constraintList.add( MinValidatorForCharSequence.class );
-		builtinConstraints.put( Min.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( NotNullValidator.class );
-		builtinConstraints.put( NotNull.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( NullValidator.class );
-		builtinConstraints.put( Null.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( PastValidatorForCalendar.class );
-		constraintList.add( PastValidatorForDate.class );
+		List<Class<? extends ConstraintValidator<Past, ?>>> pastValidators = newArrayList( 11 );
+		pastValidators.add( PastValidatorForCalendar.class );
+		pastValidators.add( PastValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
-			constraintList.add( PastValidatorForReadableInstant.class );
-			constraintList.add( PastValidatorForReadablePartial.class );
+			pastValidators.add( PastValidatorForReadableInstant.class );
+			pastValidators.add( PastValidatorForReadablePartial.class );
 		}
-		builtinConstraints.put( Past.class, constraintList );
+		if ( Version.getJavaRelease() >= 8 ) {
+			// Java 8 date/time API validators
+			pastValidators.add( PastValidatorForChronoZonedDateTime.class );
+			pastValidators.add( PastValidatorForInstant.class );
+			pastValidators.add( PastValidatorForOffsetDateTime.class );
+		}
+		putConstraints( tmpConstraints, Past.class, pastValidators );
 
-		constraintList = newArrayList();
-		constraintList.add( PatternValidator.class );
-		builtinConstraints.put( Pattern.class, constraintList );
+		putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
 
-		constraintList = newArrayList();
-		constraintList.add( SizeValidatorForCharSequence.class );
-		constraintList.add( SizeValidatorForCollection.class );
-		constraintList.add( SizeValidatorForArray.class );
-		constraintList.add( SizeValidatorForMap.class );
-		constraintList.add( SizeValidatorForArraysOfBoolean.class );
-		constraintList.add( SizeValidatorForArraysOfByte.class );
-		constraintList.add( SizeValidatorForArraysOfChar.class );
-		constraintList.add( SizeValidatorForArraysOfDouble.class );
-		constraintList.add( SizeValidatorForArraysOfFloat.class );
-		constraintList.add( SizeValidatorForArraysOfInt.class );
-		constraintList.add( SizeValidatorForArraysOfLong.class );
-		builtinConstraints.put( Size.class, constraintList );
+		List<Class<? extends ConstraintValidator<Size, ?>>> sizeValidators = newArrayList( 11 );
+		sizeValidators.add( SizeValidatorForCharSequence.class );
+		sizeValidators.add( SizeValidatorForCollection.class );
+		sizeValidators.add( SizeValidatorForArray.class );
+		sizeValidators.add( SizeValidatorForMap.class );
+		sizeValidators.add( SizeValidatorForArraysOfBoolean.class );
+		sizeValidators.add( SizeValidatorForArraysOfByte.class );
+		sizeValidators.add( SizeValidatorForArraysOfChar.class );
+		sizeValidators.add( SizeValidatorForArraysOfDouble.class );
+		sizeValidators.add( SizeValidatorForArraysOfFloat.class );
+		sizeValidators.add( SizeValidatorForArraysOfInt.class );
+		sizeValidators.add( SizeValidatorForArraysOfLong.class );
 
-		constraintList = newArrayList();
-		constraintList.add( EmailValidator.class );
-		builtinConstraints.put( Email.class, constraintList );
+		putConstraints( tmpConstraints, Size.class, sizeValidators );
 
-		constraintList = newArrayList();
-		constraintList.add( LengthValidator.class );
-		builtinConstraints.put( Length.class, constraintList );
+		putConstraint( tmpConstraints, EAN.class, EANValidator.class );
+		putConstraint( tmpConstraints, Email.class, EmailValidator.class );
+		putConstraint( tmpConstraints, Length.class, LengthValidator.class );
+		putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
+		putConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
+		putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
+		putConstraint( tmpConstraints, Mod11Check.class, Mod11CheckValidator.class );
+		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
+		putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
+		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
+		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
+		putConstraint( tmpConstraints, URL.class, URLValidator.class );
 
-		constraintList = newArrayList();
-		constraintList.add( ModCheckValidator.class );
-		builtinConstraints.put( ModCheck.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( NotBlankValidator.class );
-		builtinConstraints.put( NotBlank.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( SafeHtmlValidator.class );
-		builtinConstraints.put( SafeHtml.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( ScriptAssertValidator.class );
-		builtinConstraints.put( ScriptAssert.class, constraintList );
-
-		constraintList = newArrayList();
-		constraintList.add( URLValidator.class );
-		builtinConstraints.put( URL.class, constraintList );
+		this.builtinConstraints = Collections.unmodifiableMap( tmpConstraints );
 	}
 
-	private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getBuiltInConstraints(Class<A> annotationClass) {
-		//safe cause all CV for a given annotation A are CV<A, ?>
-		@SuppressWarnings("unchecked")
-		final List<Class<? extends ConstraintValidator<A, ?>>> builtInList = (List<Class<? extends ConstraintValidator<A, ?>>>) builtinConstraints
-				.get( annotationClass );
+	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<? extends Class<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType) {
+		validators.put( constraintType, Collections.singletonList( validatorType ) );
+	}
 
-		if ( builtInList == null || builtInList.size() == 0 ) {
-			throw log.getUnableToFindAnnotationConstraintsException( annotationClass );
-		}
+	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<? extends Class<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType1, Class<? extends ConstraintValidator<A, ?>> validatorType2) {
+		validators.put( constraintType, Collections.unmodifiableList( Arrays.<Class<?>>asList( validatorType1, validatorType2 ) ) );
+	}
 
-		return builtInList;
+	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<? extends Class<?>>> validators, Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorTypes) {
+		validators.put( constraintType, Collections.unmodifiableList( validatorTypes ) );
 	}
 
 	private boolean isBuiltinConstraint(Class<? extends Annotation> annotationType) {
@@ -257,6 +248,7 @@ public class ConstraintHelper {
 	 * The result is cached internally.
 	 *
 	 * @param annotationType The constraint annotation type.
+	 * @param <A> the type of the annotation
 	 *
 	 * @return The validator classes for the given type.
 	 */
@@ -287,6 +279,7 @@ public class ConstraintHelper {
 	 *
 	 * @param annotationType The annotation of interest.
 	 * @param validationTarget The target, either annotated element or parameters.
+	 * @param <A> the type of the annotation
 	 *
 	 * @return A list with matching validator classes.
 	 */
@@ -323,6 +316,7 @@ public class ConstraintHelper {
 	 * @param annotationType The constraint annotation type
 	 * @param definitionClasses The validators to register
 	 * @param keepDefaultClasses Whether any default validators should be kept or not
+	 * @param <A> the type of the annotation
 	 */
 	public <A extends Annotation> void putValidatorClasses(Class<A> annotationType,
 														   List<Class<? extends ConstraintValidator<A, ?>>> definitionClasses,
@@ -349,7 +343,7 @@ public class ConstraintHelper {
 	 */
 	public boolean isMultiValueConstraint(Class<? extends Annotation> annotationType) {
 		boolean isMultiValueConstraint = false;
-		final Method method = ReflectionHelper.getMethod( annotationType, "value" );
+		final Method method = run( GetMethod.action( annotationType, "value" ) );
 		if ( method != null ) {
 			Class<?> returnType = method.getReturnType();
 			if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
@@ -367,37 +361,25 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks whether a given annotation is a multi value constraint and returns the contained constraints if so.
+	 * Returns the constraints which are part of the given multi-value constraint.
+	 * <p>
+	 * Invoke {@link #isMultiValueConstraint(Class)} prior to calling this method to check whether a given constraint
+	 * actually is a multi-value constraint.
 	 *
-	 * @param annotation the annotation to check.
+	 * @param multiValueConstraint the multi-value constraint annotation from which to retrieve the contained constraints
+	 * @param <A> the type of the annotation
 	 *
-	 * @return A list of constraint annotations or the empty list if <code>annotation</code> is not a multi constraint
-	 *         annotation.
+	 * @return A list of constraint annotations, may be empty but never {@code null}.
 	 */
-	public <A extends Annotation> List<Annotation> getMultiValueConstraints(A annotation) {
-		List<Annotation> annotationList = newArrayList();
-		try {
-			final Method method = ReflectionHelper.getMethod( annotation.getClass(), "value" );
-			if ( method != null ) {
-				Class<?> returnType = method.getReturnType();
-				if ( returnType.isArray() && returnType.getComponentType().isAnnotation() ) {
-					Annotation[] annotations = (Annotation[]) method.invoke( annotation );
-					for ( Annotation a : annotations ) {
-						Class<? extends Annotation> annotationType = a.annotationType();
-						if ( isConstraintAnnotation( annotationType ) || isBuiltinConstraint( annotationType ) ) {
-							annotationList.add( a );
-						}
-					}
-				}
-			}
-		}
-		catch ( IllegalAccessException iae ) {
-			// ignore
-		}
-		catch ( InvocationTargetException ite ) {
-			// ignore
-		}
-		return annotationList;
+	public <A extends Annotation> List<Annotation> getConstraintsFromMultiValueConstraint(A multiValueConstraint) {
+		Annotation[] annotations = run(
+				GetAnnotationParameter.action(
+						multiValueConstraint,
+						"value",
+						Annotation[].class
+				)
+		);
+		return Arrays.asList( annotations );
 	}
 
 	/**
@@ -429,7 +411,7 @@ public class ConstraintHelper {
 	}
 
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
-		final Method[] methods = ReflectionHelper.getDeclaredMethods( annotationType );
+		final Method[] methods = run( GetDeclaredMethods.action( annotationType ) );
 		for ( Method m : methods ) {
 			if ( m.getName().startsWith( "valid" ) && !m.getName().equals( VALIDATION_APPLIES_TO ) ) {
 				throw log.getConstraintParametersCannotStartWithValidException();
@@ -439,7 +421,7 @@ public class ConstraintHelper {
 
 	private void assertPayloadParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotationType, PAYLOAD );
+			final Method method = run( GetMethod.action( annotationType, PAYLOAD ) );
 			if ( method == null ) {
 				throw log.getConstraintWithoutMandatoryParameterException( PAYLOAD, annotationType.getName() );
 			}
@@ -455,7 +437,7 @@ public class ConstraintHelper {
 
 	private void assertGroupsParameterExists(Class<? extends Annotation> annotationType) {
 		try {
-			final Method method = ReflectionHelper.getMethod( annotationType, GROUPS );
+			final Method method = run( GetMethod.action( annotationType, GROUPS ) );
 			if ( method == null ) {
 				throw log.getConstraintWithoutMandatoryParameterException( GROUPS, annotationType.getName() );
 			}
@@ -470,7 +452,7 @@ public class ConstraintHelper {
 	}
 
 	private void assertMessageParameterExists(Class<? extends Annotation> annotationType) {
-		final Method method = ReflectionHelper.getMethod( annotationType, MESSAGE );
+		final Method method = run( GetMethod.action( annotationType, MESSAGE ) );
 		if ( method == null ) {
 			throw log.getConstraintWithoutMandatoryParameterException( MESSAGE, annotationType.getName() );
 		}
@@ -488,7 +470,7 @@ public class ConstraintHelper {
 				annotationType,
 				ValidationTarget.PARAMETERS
 		).isEmpty();
-		final Method method = ReflectionHelper.getMethod( annotationType, VALIDATION_APPLIES_TO );
+		final Method method = run( GetMethod.action( annotationType, VALIDATION_APPLIES_TO ) );
 
 		if ( hasGenericValidators && hasCrossParameterValidator ) {
 			if ( method == null ) {
@@ -515,16 +497,8 @@ public class ConstraintHelper {
 		return annotationType == ConstraintComposition.class;
 	}
 
-	private boolean isJodaTimeInClasspath() {
-		boolean isInClasspath;
-		try {
-			ReflectionHelper.loadClass( JODA_TIME_CLASS_NAME, this.getClass() );
-			isInClasspath = true;
-		}
-		catch ( ValidationException e ) {
-			isInClasspath = false;
-		}
-		return isInClasspath;
+	private static boolean isJodaTimeInClasspath() {
+		return isClassPresent( JODA_TIME_CLASS_NAME );
 	}
 
 	/**
@@ -536,17 +510,41 @@ public class ConstraintHelper {
 	 *         {@link Constraint#validatedBy()} or the list of validators for
 	 *         built-in constraints.
 	 */
+	@SuppressWarnings("unchecked")
 	private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getDefaultValidatorClasses(Class<A> annotationType) {
-		if ( isBuiltinConstraint( annotationType ) ) {
-			return getBuiltInConstraints( annotationType );
+		//safe cause all CV for a given annotation A are CV<A, ?>
+		final List<Class<? extends ConstraintValidator<A, ?>>> builtInValidators = (List<Class<? extends ConstraintValidator<A, ?>>>) builtinConstraints
+				.get( annotationType );
+
+		if ( builtInValidators != null ) {
+			return builtInValidators;
 		}
-		else {
-			@SuppressWarnings("unchecked")
-			Class<? extends ConstraintValidator<A, ?>>[] validatedBy = (Class<? extends ConstraintValidator<A, ?>>[]) annotationType
-					.getAnnotation( Constraint.class )
-					.validatedBy();
-			return Arrays.asList( validatedBy );
+
+		Class<? extends ConstraintValidator<A, ?>>[] validatedBy = (Class<? extends ConstraintValidator<A, ?>>[]) annotationType
+				.getAnnotation( Constraint.class )
+				.validatedBy();
+
+		return Arrays.asList( validatedBy );
+	}
+
+	private static boolean isClassPresent(String className) {
+		try {
+			run( LoadClass.action( className, ConstraintHelper.class.getClassLoader() ) );
+			return true;
 		}
+		catch ( ValidationException e ) {
+			return false;
+		}
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**

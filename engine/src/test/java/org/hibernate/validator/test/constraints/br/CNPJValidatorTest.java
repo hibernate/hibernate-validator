@@ -1,48 +1,56 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.constraints.br;
-
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 public class CNPJValidatorTest {
+	private Validator validator;
+
+	@BeforeMethod
+	public void setUp() {
+		validator = getValidator();
+	}
+
 	@Test
 	@TestForIssue(jiraKey = "HV-491")
-	public void testCorrectFormattedCNPJWithReportAsSingleViolation() {
-		Set<ConstraintViolation<Company>> violations = ValidatorUtil.getValidator().validate(
-				new Company( "91.509.901/0001-69" )
-		);
+	public void correct_cnpj_with_separator_validates() {
+		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "91.509.901/0001-69" ) );
+		assertNumberOfViolations( violations, 0 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-933")
+	public void correct_cnpj_without_separator_validates() {
+		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "91509901000169" ) );
 		assertNumberOfViolations( violations, 0 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-491")
-	public void testIncorrectFormattedCNPJWithReportAsSingleViolation() {
-		Set<ConstraintViolation<Company>> violations = ValidatorUtil.getValidator().validate(
-				new Company( "ABCDEF" )
-		);
+	public void incorrect_cnpj_with_separator_creates_constraint_violation() {
+		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "91.509.901/0001-60" ) );
+		assertNumberOfViolations( violations, 1 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-933")
+	public void incorrect_cnpj_without_separator_creates_constraint_violation() {
+		Set<ConstraintViolation<Company>> violations = validator.validate( new Company( "91509901000160" ) );
 		assertNumberOfViolations( violations, 1 );
 	}
 

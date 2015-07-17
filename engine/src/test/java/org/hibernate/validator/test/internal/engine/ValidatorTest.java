@@ -1,24 +1,18 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.internal.engine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.internal.engine.ValidatorImpl;
+import org.hibernate.validator.testutil.CountValidationCalls;
+import org.hibernate.validator.testutil.CountValidationCallsValidator;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -29,14 +23,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.executable.ExecutableValidator;
 import javax.validation.metadata.BeanDescriptor;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.internal.engine.ValidatorImpl;
-import org.hibernate.validator.testutil.CountValidationCalls;
-import org.hibernate.validator.testutil.CountValidationCallsValidator;
-import org.hibernate.validator.testutil.TestForIssue;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
@@ -48,7 +38,7 @@ import static org.testng.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class ValidatorTest {
 	@Test
@@ -213,6 +203,15 @@ public class ValidatorTest {
 		assertSame( asObject, validator );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-596")
+	public void testValidateValueWithNestedPath() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<X>> constraintViolations = validator.validateValue( X.class, "list[0].foo", null );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "list[0].foo" );
+	}
+
 	class A {
 		@NotNull
 		String b;
@@ -323,5 +322,19 @@ public class ValidatorTest {
 		public String getFoo() {
 			return m_foo;
 		}
+	}
+
+	class X {
+		@Valid
+		List<Z> list = new ArrayList<Z>();
+
+		public void addZ(Z z) {
+			list.add( z );
+		}
+	}
+
+	class Z {
+		@NotNull
+		String foo;
 	}
 }

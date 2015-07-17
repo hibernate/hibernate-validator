@@ -1,23 +1,29 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.util.logging;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.jboss.logging.BasicLogger;
+import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.LogMessage;
+import org.jboss.logging.annotations.Message;
+import org.jboss.logging.annotations.MessageLogger;
+
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.ConstraintDefinitionException;
+import javax.validation.ConstraintTarget;
+import javax.validation.ElementKind;
+import javax.validation.GroupDefinitionException;
+import javax.validation.Path;
+import javax.validation.UnexpectedTypeException;
+import javax.validation.ValidationException;
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -27,33 +33,20 @@ import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintDefinitionException;
-import javax.validation.ConstraintTarget;
-import javax.validation.ElementKind;
-import javax.validation.GroupDefinitionException;
-import javax.validation.Path;
-import javax.validation.UnexpectedTypeException;
-import javax.validation.ValidationException;
-import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
 
-import org.jboss.logging.BasicLogger;
-import org.jboss.logging.Cause;
-import org.jboss.logging.LogMessage;
-import org.jboss.logging.Message;
-import org.jboss.logging.MessageLogger;
-
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
 /**
- * The logger interface for JBoss Logging.
+ * The Hibernate Validator logger interface for JBoss Logging.
+ * <p>
+ * <b>Note</b>:<br>
+ * New log messages must always use a new (incremented) message id. Don't re-use of existing message ids, even
+ * if a given log method is not used anymore. Unused messages can be deleted.
+ * </p>
  *
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2012 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2012 SERLI
  */
 @MessageLogger(projectCode = "HV")
 public interface Log extends BasicLogger {
@@ -91,10 +84,6 @@ public interface Log extends BasicLogger {
 	void unableToCloseInputStream();
 
 	@LogMessage(level = WARN)
-	@Message(id = 9, value = "Unable to load provider class %s.")
-	void unableToLoadProviderClass(String providerName);
-
-	@LogMessage(level = WARN)
 	@Message(id = 10, value = "Unable to close input stream for %s.")
 	void unableToCloseXMLFileInputStream(String fileName);
 
@@ -108,11 +97,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 13, value = "The class %1$s does not have a property '%2$s' with access %3$s.")
 	ValidationException getUnableToFindPropertyWithAccessException(Class<?> beanClass, String property, ElementType elementType);
 
-	@Message(id = 14, value = "Type %1$s doesn't have a method %2$s(%3$s).")
-	IllegalArgumentException getUnableToFindMethodException(Class<?> beanClass, String name, String parametersType);
-
-	@Message(id = 15, value = "A valid parameter index has to be specified for method '%s'")
-	IllegalArgumentException getInvalidMethodParameterIndexException(String methodName);
+	@Message(id = 14, value = "Type %1$s doesn't have a method %2$s.")
+	IllegalArgumentException getUnableToFindMethodException(Class<?> beanClass, String method);
 
 	@Message(id = 16, value = "%s does not represent a valid BigDecimal format.")
 	IllegalArgumentException getInvalidBigDecimalFormatException(String value, @Cause NumberFormatException e);
@@ -156,8 +142,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 29, value = "Constraint factory returned null when trying to create instance of %s.")
 	ValidationException getConstraintFactoryMustNotReturnNullException(String validatorClassName);
 
-	@Message(id = 30, value = "No validator could be found for type: %s.")
-	UnexpectedTypeException getNoValidatorFoundForTypeException(String className);
+	@Message(id = 30,
+			value = "No validator could be found for constraint '%s' validating type '%s'. Check configuration for '%s'")
+	UnexpectedTypeException getNoValidatorFoundForTypeException(String constraintType,
+			String validatedValueType,
+			String path);
 
 	@Message(id = 31,
 			value = "There are multiple validator classes which could validate the type %1$s. The validator classes are: %2$s.")
@@ -237,27 +226,15 @@ public interface Log extends BasicLogger {
 	@Message(id = 55, value = "The default group sequence provider defined for %s has the wrong type")
 	GroupDefinitionException getWrongDefaultGroupSequenceProviderTypeException(String beanClassName);
 
-	@Message(id = 56, value = "Method %1$s doesn't have a parameter with index %2$d.")
-	IllegalArgumentException getInvalidMethodParameterIndexException(String method, int index);
-
-	@Message(id = 57, value = "Unable to find constraints for  %s.")
-	ValidationException getUnableToFindAnnotationConstraintsException(Class<? extends Annotation> annotationClass);
-
-	@Message(id = 58, value = "Unable to read annotation attributes: %s.")
-	ValidationException getUnableToReadAnnotationAttributesException(Class<? extends Annotation> annotationClass, @Cause Exception e);
+	@Message(id = 56, value = "Method or constructor %1$s doesn't have a parameter with index %2$d.")
+	IllegalArgumentException getInvalidExecutableParameterIndexException(String executable, int index);
 
 	@Message(id = 59, value = "Unable to retrieve annotation parameter value.")
 	ValidationException getUnableToRetrieveAnnotationParameterValueException(@Cause Exception e);
 
-	@Message(id = 60, value = "Multiple definitions of default group sequence provider.")
-	GroupDefinitionException getMultipleDefinitionOfDefaultGroupSequenceProviderException();
-
-	@Message(id = 61, value = "Multiple definitions of default group sequence.")
-	GroupDefinitionException getMultipleDefinitionOfDefaultGroupSequenceException();
-
 	@Message(id = 62,
-			value = "Method %1$s has %2$s parameters, but the passed list of parameter meta data has a size of %3$s.")
-	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(ExecutableElement executableElement, int nbParameters, int listSize);
+			value = "Method or constructor %1$s has %2$s parameters, but the passed list of parameter meta data has a size of %3$s.")
+	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(String executableName, int nbParameters, int listSize);
 
 	@Message(id = 63, value = "Unable to instantiate %s.")
 	ValidationException getUnableToInstantiateException(String className, @Cause Exception e);
@@ -271,12 +248,6 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToLoadClassException(String className);
 
 	ValidationException getUnableToLoadClassException(String className, @Cause Exception e);
-
-	@Message(id = 66, value = "Unable to instantiate Bean Validation provider %s.")
-	ValidationException getUnableToInstantiateBeanValidationProviderException(List<String> providerName, @Cause Exception e);
-
-	@Message(id = 67, value = "Unable to read %s.")
-	ValidationException getUnableToReadServicesFileException(String servicesFileName, @Cause Exception e);
 
 	@Message(id = 68, value = "Start index cannot be negative: %d.")
 	IllegalArgumentException getStartIndexCannotBeNegativeException(int startIndex);
@@ -376,7 +347,7 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToInstantiateValidationProviderClassException(String providerClassName, @Cause Exception e);
 
 	@Message(id = 100, value = "Unable to parse %s.")
-	ValidationException getUnableToParseValidationXmlFileException(String file, @Cause JAXBException e);
+	ValidationException getUnableToParseValidationXmlFileException(String file, @Cause Exception e);
 
 	@Message(id = 101, value = "%s is not an annotation.")
 	ValidationException getIsNotAnAnnotationException(String annotationClassName);
@@ -423,13 +394,10 @@ public interface Log extends BasicLogger {
 	ValidationException getWrongPayloadClassException(String payloadClassName);
 
 	@Message(id = 115, value = "Error parsing mapping file.")
-	ValidationException getErrorParsingMappingFileException(@Cause JAXBException e);
+	ValidationException getErrorParsingMappingFileException(@Cause Exception e);
 
 	@Message(id = 116, value = "%s")
 	IllegalArgumentException getIllegalArgumentException(String message);
-
-	@Message(id = 117, value = "Invalid value for property %s: %s")
-	ValidationException getInvalidPropertyValueException(String propertyName, String propertyValue, @Cause Exception e);
 
 	@Message(id = 118, value = "Unable to cast %s (with element kind %s) to %s")
 	ClassCastException getUnableToNarrowNodeTypeException(String actualDescriptorType, ElementKind kind, String expectedDescriptorType);
@@ -459,10 +427,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 127, value = "Found group conversion using a group sequence as source: %s.")
 	ConstraintDeclarationException getGroupConversionForSequenceException(Class<?> from);
 
-	@Message(id = 128,
-			value = "Annotation type %s is no constraint annotation. It needs to be annotated with @Constraint or @CrossParameterConstraint.")
-	ConstraintDefinitionException getAnnotationIsNoConstraintTypeException(Class<? extends Annotation> annotationType);
-
 	@LogMessage(level = WARN)
 	@Message(id = 129, value = "EL expression '%s' references an unknown property")
 	void unknownPropertyInExpressionLanguage(String expression, @Cause Exception e);
@@ -480,7 +444,7 @@ public interface Log extends BasicLogger {
 	ConstraintDeclarationException getVoidMethodsMustNotBeConstrainedException(Member member);
 
 	@Message(id = 133, value = "%1$s does not contain a constructor with the parameter types %2$s.")
-	ValidationException getBeanDoesNotContainConstructorException(String beanClassName, List<Class<?>> parameterTypes);
+	ValidationException getBeanDoesNotContainConstructorException(String beanClassName, String parameterTypes);
 
 	@Message(id = 134, value = "Unable to load parameter of type '%1$s' in %2$s.")
 	ValidationException getInvalidParameterTypeException(String type, String beanClassName);
@@ -500,10 +464,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 139,
 			value = "The constraint '%1$s' defines multiple cross parameter validators. Only one is allowed.")
 	ConstraintDefinitionException getMultipleCrossParameterValidatorClassesException(String constraint);
-
-	@Message(id = 140,
-			value = "The constraint %1$s has both generic and cross-parameter validators, but does not specify the parameter 'validationAppliesTo'")
-	ConstraintDefinitionException getGenericAndCrossParameterValidatorWithoutConstraintTargetException(String constraint);
 
 	@Message(id = 141,
 			value = "The constraint %1$s used ConstraintTarget#IMPLICIT where the target cannot be inferred.")
@@ -530,11 +490,11 @@ public interface Log extends BasicLogger {
 	ValidationException getConstrainedElementConfiguredMultipleTimesException(String location);
 
 	@LogMessage(level = WARN)
-	@Message(id = 148, value = "An exception ocurred during evaluation of EL expression '%s'")
+	@Message(id = 148, value = "An exception occurred during evaluation of EL expression '%s'")
 	void evaluatingExpressionLanguageExpressionCausedException(String expression, @Cause Exception e);
 
-	@Message(id = 149, value = "An exception occured during message interpolation")
-	ValidationException getExceptionOcurredDuringMessageInterpolationException(@Cause Exception e);
+	@Message(id = 149, value = "An exception occurred during message interpolation")
+	ValidationException getExceptionOccurredDuringMessageInterpolationException(@Cause Exception e);
 
 	@Message(id = 150,
 			value = "The constraint '%s' defines multiple validators for the type '%s'. Only one is allowed.")
@@ -604,4 +564,86 @@ public interface Log extends BasicLogger {
 	@Message(id = 167,
 			value = "A given constraint definition can only be overridden in one mapping file. %1$s is overridden in multiple files")
 	ValidationException getOverridingConstraintDefinitionsInMultipleMappingFilesException(String constraintClass);
+
+	@Message(id = 168,
+			value = "The message descriptor '%1$s' contains an unbalanced meta character '%2$c' parameter.")
+	MessageDescriptorFormatException getNonTerminatedParameterException(String messageDescriptor, char character);
+
+	@Message(id = 169,
+			value = "The message descriptor '%1$s' has nested parameters.")
+	MessageDescriptorFormatException getNestedParameterException(String messageDescriptor);
+
+	@Message(id = 170, value = "No JSR-223 scripting engine could be bootstrapped for language \"%s\".")
+	ConstraintDeclarationException getCreationOfScriptExecutorFailedException(String languageName, @Cause Exception e);
+
+	@Message(id = 171, value = "%s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName);
+
+	@Message(id = 172,
+			value = "Property \"%2$s\" of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String propertyName);
+
+	@Message(id = 173,
+			value = "Method %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String method);
+
+	@Message(id = 174,
+			value = "Parameter %3$s of method or constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String executable, int parameterIndex);
+
+	@Message(id = 175,
+			value = "The return value of method or constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String executable);
+
+	@Message(id = 176,
+			value = "Constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String constructor);
+
+	@Message(id = 177,
+			value = "Cross-parameter constraints for the method or constructor %2$s of type %1$s are declared more than once via the programmatic constraint declaration API.")
+	ValidationException getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(String beanClassName, String executable);
+
+	@Message(id = 178, value = "Multiplier cannot be negative: %d.")
+	IllegalArgumentException getMultiplierCannotBeNegativeException(int multiplier);
+
+	@Message(id = 179, value = "Weight cannot be negative: %d.")
+	IllegalArgumentException getWeightCannotBeNegativeException(int weight);
+
+	@Message(id = 180, value = "'%c' is not a digit nor a letter.")
+	IllegalArgumentException getTreatCheckAsIsNotADigitNorALetterException(int weight);
+
+	@Message(id = 181,
+			value = "Wrong number of parameters. Method or constructor %1$s expects %2$d parameters, but got %3$d.")
+	IllegalArgumentException getInvalidParameterCountForExecutableException(String executable, int expectedParameterCount, int actualParameterCount);
+
+	@Message(id = 182, value = "No validation value unwrapper is registered for type '%1$s'.")
+	ValidationException getNoUnwrapperFoundForTypeException(String typeName);
+
+	@Message(id = 183,
+			value = "Unable to load 'javax.el.ExpressionFactory'. Check that you have the EL dependencies on the classpath, or use ParameterMessageInterpolator instead")
+	ValidationException getMissingELDependenciesException();
+
+	@LogMessage(level = WARN)
+	@Message(id = 184, value = "ParameterMessageInterpolator has been chosen, EL interpolation will not be supported")
+	void creationOfParameterMessageInterpolation();
+
+	@LogMessage(level = WARN)
+	@Message(id = 185, value = "Message contains EL expression: %1s, which is unsupported with chosen Interpolator")
+	void getElUnsupported(String expression);
+
+	@Message(id = 186,
+			value = "The constraint of type '%2$s' defined on '%1$s' has multiple matching constraint validators which is due to an additional value handler of type '%3$s'. It is unclear which value needs validating. Clarify configuration via @UnwrapValidatedValue.")
+	UnexpectedTypeException getConstraintValidatorExistsForWrapperAndWrappedValueException(String property, String constraint, String valueHandler);
+
+	@Message(id = 187,
+			value = "When using type annotation constraints on parameterized iterables or map @Valid must be used. Check %s#%s")
+	ValidationException getTypeAnnotationConstraintOnIterableRequiresUseOfValidAnnotationException(String declaringClass, String name);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = 188, value = "Parameterized type with more than one argument is not supported: %s")
+	void parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported(String type);
+
+	@Message(id = 189,
+			value = "The configuration of value unwrapping for property '%s' of bean '%s' is inconsistent between the field and its getter.")
+	ConstraintDeclarationException getInconsistentValueUnwrappingConfigurationBetweenFieldAndItsGetterException(String property, String clazz);
 }

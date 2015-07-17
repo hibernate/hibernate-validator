@@ -1,0 +1,19 @@
+[[validator-further-reading]]
+== Further reading
+
+Last but not least, a few pointers to further information.
+
+A great source for examples is the Bean Validation TCK which is available for anonymous access on
+link:$$https://github.com/beanvalidation/beanvalidation-tck$$[GitHub]. In particular the TCK's
+link:$$https://github.com/beanvalidation/beanvalidation-tck/tree/1.1.0.Final/tests$$[tests] might be
+of interest. link:$$http://beanvalidation.org/1.1/spec/1.1.0.cr3$$[The JSR 349] specification itself
+is also a great way to deepen your understanding of Bean Validation resp. Hibernate Validator.
+
+If you have any further questions to Hibernate Validator or want to share some of your use cases
+have a look at the link:$$http://community.jboss.org/en/hibernate/validator$$[Hibernate Validator
+Wiki] and the link:$$https://forum.hibernate.org/viewforum.php?f=9$$[Hibernate Validator Forum].
+
+In case you would like to report a bug use
+link:$$http://opensource.atlassian.com/projects/hibernate/browse/HV$$[Hibernate's Jira] instance.
+Feedback is always welcome!
+

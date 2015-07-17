@@ -1,21 +1,29 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import org.hibernate.validator.MethodValidationConfiguration;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.ElementKind;
+import javax.validation.metadata.ParameterDescriptor;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,30 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ElementKind;
-import javax.validation.metadata.ParameterDescriptor;
-
-import org.hibernate.validator.MethodValidationConfiguration;
-import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
-import org.hibernate.validator.internal.metadata.aggregated.rule.OverridingMethodMustNotAlterParameterConstraints;
-import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue;
-import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineParameterConstraints;
-import org.hibernate.validator.internal.metadata.aggregated.rule.ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine;
-import org.hibernate.validator.internal.metadata.aggregated.rule.VoidMethodsMustNotBeReturnValueConstrained;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -87,23 +71,26 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 	private ExecutableMetaData(
 			String name,
-			Class<?> returnType,
+			Type returnType,
 			Class<?>[] parameterTypes,
 			ElementKind kind,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
+			Set<MetaConstraint<?>> typeArgumentsConstraints,
 			Map<Class<?>, Class<?>> returnValueGroupConversions,
 			boolean isCascading,
 			boolean isConstrained,
-			boolean isGetter) {
+			boolean isGetter,
+			UnwrapMode unwrapMode) {
 		super(
 				name,
 				returnType,
 				returnValueConstraints,
 				kind,
 				isCascading,
-				isConstrained
+				isConstrained,
+				unwrapMode
 		);
 
 		this.parameterTypes = parameterTypes;
@@ -113,8 +100,10 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,
 				returnValueConstraints,
+				typeArgumentsConstraints,
 				isCascading,
-				returnValueGroupConversions
+				returnValueGroupConversions,
+				unwrapMode
 		);
 		this.isGetter = isGetter;
 	}
@@ -128,7 +117,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 */
 	public ParameterMetaData getParameterMetaData(int parameterIndex) {
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaDataList.size() - 1 ) {
-			throw log.getInvalidMethodParameterIndexException( getName(), parameterIndex );
+			throw log.getInvalidExecutableParameterIndexException(
+					ExecutableElement.getExecutableAsString(
+							getType().toString() + "#" + getName(),
+							parameterTypes
+					), parameterTypes.length
+			);
 		}
 
 		return parameterMetaDataList.get( parameterIndex );
@@ -256,7 +250,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * Creates new {@link ExecutableMetaData} instances.
 	 *
 	 * @author Gunnar Morling
-	 * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+	 * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
 	 */
 	public static class Builder extends MetaDataBuilder {
 		/**
@@ -264,9 +258,10 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 */
 		private final ConstrainedElement.ConstrainedElementKind kind;
 		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
-		private final ExecutableConstraintLocation location;
+		private ExecutableElement executable;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private final Set<MethodConfigurationRule> rules;
+		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 		private boolean isConstrained = false;
 		private final MethodValidationConfiguration methodValidationConfiguration;
 
@@ -283,6 +278,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		/**
 		 * Creates a new builder based on the given executable meta data.
 		 *
+		 * @param beanClass the bean class
 		 * @param constrainedExecutable The base executable for this builder. This is the lowest
 		 * executable with a given signature within a type hierarchy.
 		 * @param constraintHelper the constraint helper
@@ -298,7 +294,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 			this.executableHelper = executableHelper;
 			kind = constrainedExecutable.getKind();
-			location = constrainedExecutable.getLocation();
+			executable = constrainedExecutable.getExecutable();
 			add( constrainedExecutable );
 			
 			this.methodValidationConfiguration = methodValidationConfiguration;
@@ -307,13 +303,13 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			// Build the rules that will be enforced through the metadata created here
 			for(Class<? extends MethodConfigurationRule> ruleClass : this.methodValidationConfiguration.getConfiguredRuleSet() ) {
 				try {
-					this.rules.add(ruleClass.newInstance());
+					this.rules.add( ruleClass.newInstance() );
 				} 
-				catch (InstantiationException e) {
-					throw new IllegalArgumentException("Failed to create " + ruleClass.getName() + " with error " + e.toString());
+				catch ( InstantiationException e ) {
+					throw new IllegalArgumentException( "Failed to create " + ruleClass.getName() + " with error " + e.toString() );
 				} 
-				catch (IllegalAccessException e) {
-					throw new IllegalArgumentException("Failed to create " + ruleClass.getName() + " with error " + e.toString());
+				catch ( IllegalAccessException e ) {
+					throw new IllegalArgumentException( "Failed to create " + ruleClass.getName() + " with error " + e.toString() );
 				}
 			}
 		}
@@ -324,15 +320,17 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				return false;
 			}
 
-			ExecutableElement executableElement = ( (ConstrainedExecutable) constrainedElement ).getLocation()
-					.getExecutableElement();
+			ExecutableElement executableElement = ( (ConstrainedExecutable) constrainedElement ).getExecutable();
 
 			//are the locations equal (created by different builders) or
 			//does one of the executables override the other one?
-			return
-					location.getExecutableElement().equals( executableElement ) ||
-							executableHelper.overrides( location.getExecutableElement(), executableElement ) ||
-							executableHelper.overrides( executableElement, location.getExecutableElement() );
+			//return
+			//		location.getExecutableElement().equals( executableElement ) ||
+			//				executableHelper.overrides( location.getExecutableElement(), executableElement ) ||
+			//				executableHelper.overrides( executableElement, location.getExecutableElement() );
+			return executable.equals( executableElement ) ||
+					executableHelper.overrides( executable, executableElement ) ||
+					executableHelper.overrides( executableElement, executable );
 		}
 
 		@Override
@@ -343,8 +341,15 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
+			typeArgumentsConstraints.addAll( constrainedExecutable.getTypeArgumentsConstraints() );
 
 			addToExecutablesByDeclaringType( constrainedExecutable );
+
+			// keep the "lowest" executable in hierarchy to make sure any type parameters declared on super-types (and
+			// used in overridden methods) are resolved for the specific sub-type we are interested in
+			if ( executable != null && executableHelper.overrides( constrainedExecutable.getExecutable(), executable ) ) {
+				executable = constrainedExecutable.getExecutable();
+			}
 		}
 
 		/**
@@ -354,7 +359,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * @param executable The executable to merge.
 		 */
 		private void addToExecutablesByDeclaringType(ConstrainedExecutable executable) {
-			Class<?> beanClass = executable.getLocation().getBeanClass();
+			Class<?> beanClass = executable.getLocation().getDeclaringClass();
 			ConstrainedExecutable mergedExecutable = executablesByDeclaringType.get( beanClass );
 
 			if ( mergedExecutable != null ) {
@@ -371,20 +376,20 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		public ExecutableMetaData build() {
 			assertCorrectnessOfConfiguration();
 
-			ExecutableElement executableElement = location.getExecutableElement();
-
 			return new ExecutableMetaData(
-					executableElement.getSimpleName(),
-					executableElement.getReturnType(),
-					executableElement.getParameterTypes(),
+					executable.getSimpleName(),
+					ReflectionHelper.typeOf( executable.getMember() ),
+					executable.getParameterTypes(),
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
+					typeArgumentsConstraints,
 					getGroupConversions(),
 					isCascading(),
 					isConstrained,
-					executableElement.isGetterMethod()
+					executable.isGetterMethod(),
+					unwrapMode()
 			);
 		}
 
@@ -399,14 +404,13 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			List<ParameterMetaData.Builder> parameterBuilders = null;
 
 			for ( ConstrainedExecutable oneExecutable : constrainedExecutables ) {
-
 				if ( parameterBuilders == null ) {
 					parameterBuilders = newArrayList();
 
 					for ( ConstrainedParameter oneParameter : oneExecutable.getAllParameterMetaData() ) {
 						parameterBuilders.add(
 								new ParameterMetaData.Builder(
-										location.getBeanClass(),
+										executable.getMember().getDeclaringClass(),
 										oneParameter,
 										constraintHelper
 								)
@@ -444,8 +448,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * on the overridden method.
 		 * </p>
 		 *
-		 * @throws ConstraintDeclarationException In case any of the rules mandated by the specification is
-		 * violated.
+		 * @throws javax.validation.ConstraintDeclarationException In case any of the rules mandated by the
+		 * specification are violated.
 		 */
 		private void assertCorrectnessOfConfiguration() {
 			for ( Entry<Class<?>, ConstrainedExecutable> entry : executablesByDeclaringType.entrySet() ) {

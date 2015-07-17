@@ -1,24 +1,18 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 
 package org.hibernate.validator;
 
+import org.hibernate.validator.spi.time.TimeProvider;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidatorContext;
 
@@ -28,16 +22,25 @@ import javax.validation.ValidatorContext;
  * provided by {@link ValidatorContext}.
  *
  * @author Emmanuel Bernard
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
- * @author Chris Beckey cbeckey@paypal.com
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Gunnar Morling
  */
 public interface HibernateValidatorContext extends ValidatorContext {
 
+	@Override
 	HibernateValidatorContext messageInterpolator(MessageInterpolator messageInterpolator);
 
+	@Override
 	HibernateValidatorContext traversableResolver(TraversableResolver traversableResolver);
 
+	@Override
 	HibernateValidatorContext constraintValidatorFactory(ConstraintValidatorFactory factory);
+
+	/**
+	 * @since 5.2
+	 */
+	@Override
+	HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider);
 
 	/**
 	 * En- or disables the fail fast mode. When fail fast is enabled the validation
@@ -54,4 +57,33 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 * See Sec 4.5.5 of validation spec V 1.1
 	 */
 	HibernateValidatorContext setMethodValidationConfiguration(MethodValidationConfiguration methodValidationConfiguration);
+
+	/**
+	 * Registers the given validated value unwrapper with the bootstrapped validator. When validating an element which
+	 * is of a type supported by the unwrapper and which is annotated with
+	 * {@link org.hibernate.validator.valuehandling.UnwrapValidatedValue}, the unwrapper will be applied to retrieve the
+	 * value to validate.
+	 *
+	 * @param handler the unwrapper to register
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @hv.experimental This API is considered experimental and may change in future revisions
+	 */
+	HibernateValidatorContext addValidationValueHandler(ValidatedValueUnwrapper<?> handler);
+
+	/**
+	 * Registers the given time provider with the bootstrapped validator. This provider will be used to obtain the
+	 * current time when validating {@code @Future} and {@code @Past} constraints. If not set or if {@code null} is
+	 * passed as a parameter, the time provider of the {@link javax.validation.ValidatorFactory} is used.
+	 *
+	 * @param timeProvider
+	 *            the time provider to register.
+	 *
+	 * @return {@code this} following the chaining method pattern
+	 *
+	 * @hv.experimental This API is considered experimental and may change in future revisions
+	 * @since 5.2
+	 */
+	HibernateValidatorContext timeProvider(TimeProvider timeProvider);
 }

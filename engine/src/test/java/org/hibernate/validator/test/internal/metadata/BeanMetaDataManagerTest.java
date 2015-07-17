@@ -1,37 +1,35 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.internal.metadata;
+
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
-import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
@@ -39,40 +37,87 @@ import static org.testng.Assert.fail;
  */
 public class BeanMetaDataManagerTest {
 	private static final Log log = LoggerFactory.make();
-	// high enough to force a OutOfMemoryError in case references are not freed
-	private static final int MAX_ENTITY_COUNT = 100000;
+	private static final int LOOP_COUNT = 100000;
+	private static final int ARRAY_ALLOCATION_SIZE = 100000;
 
-	@Test
+	private BeanMetaDataManager metaDataManager;
+
+	@BeforeMethod
+	public void setUpBeanMetaDataManager() {
+		metaDataManager = new BeanMetaDataManager(
+				new ConstraintHelper(),
+				new ExecutableHelper( new TypeResolutionHelper() ),
+				new DefaultParameterNameProvider(),
+				Collections.<MetaDataProvider>emptyList()
+		);
+	}
+
+	@Test(enabled = false, description = "Disabled as it shows false failures too often. Run on demand if required")
 	public void testBeanMetaDataCanBeGarbageCollected() throws Exception {
-		BeanMetaDataManager metaDataManager = new BeanMetaDataManager( new ConstraintHelper(), new ExecutableHelper() );
-
 		Class<?> lastIterationsBean = null;
 		int totalCreatedMetaDataInstances = 0;
 		int cachedBeanMetaDataInstances = 0;
-		for ( int i = 0; i < MAX_ENTITY_COUNT; i++ ) {
-			Class<?> c = new CustomClassLoader().loadClass( Fubar.class.getName() );
-			BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );
-			assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
-			lastIterationsBean = meta.getBeanClass();
-			totalCreatedMetaDataInstances++;
-			cachedBeanMetaDataInstances = metaDataManager.numberOfCachedBeanMetaDataInstances();
 
-			if ( cachedBeanMetaDataInstances < totalCreatedMetaDataInstances ) {
-				log.debug( "Garbage collection occurred and some metadata instances got garbage collected!" );
-				log.debug( "totalCreatedMetaDataInstances:" + totalCreatedMetaDataInstances );
-				log.debug( "cachedBeanMetaDataInstances:" + cachedBeanMetaDataInstances );
-				break;
+		try {
+			// help along the OutOfMemoryError by allocating extra memory and holding on to it in this list
+			List<Object> memoryConsumer = new ArrayList<Object>();
+			for ( int i = 0; i < LOOP_COUNT; i++ ) {
+				Class<?> c = new CustomClassLoader().loadClass( Engine.class.getName() );
+				BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );
+				assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
+				lastIterationsBean = meta.getBeanClass();
+				totalCreatedMetaDataInstances++;
+				cachedBeanMetaDataInstances = metaDataManager.numberOfCachedBeanMetaDataInstances();
+
+				if ( cachedBeanMetaDataInstances < totalCreatedMetaDataInstances ) {
+					log.debug( "Garbage collection occurred and some metadata instances got garbage collected!" );
+					log.debug( "totalCreatedMetaDataInstances:" + totalCreatedMetaDataInstances );
+					log.debug( "cachedBeanMetaDataInstances:" + cachedBeanMetaDataInstances );
+					break;
+				}
+				memoryConsumer.add( new long[ARRAY_ALLOCATION_SIZE] );
 			}
 		}
+		catch ( OutOfMemoryError e ) {
+			log.debug( "Out of memory error occurred." );
+			log.debug( "totalCreatedMetaDataInstances:" + totalCreatedMetaDataInstances );
+			log.debug( "cachedBeanMetaDataInstances:" + cachedBeanMetaDataInstances );
+		}
 
-		if ( cachedBeanMetaDataInstances >= totalCreatedMetaDataInstances ) {
+		// Before an OutOfMemoryError occurs soft references should be collected. If not all, at least some
+		// of the cached instances should have been released.
+		if ( !( cachedBeanMetaDataInstances < totalCreatedMetaDataInstances ) ) {
 			fail( "Metadata instances should be garbage collectible" );
 		}
 	}
 
-	public static class Fubar {
-		@NotNull
-		Object o;
+	@Test
+	public void testIsConstrainedForConstrainedEntity() {
+		assertTrue( metaDataManager.isConstrained( Engine.class ) );
+	}
+
+	@Test
+	public void testIsConstrainedForUnConstrainedEntity() {
+		assertFalse( metaDataManager.isConstrained( UnconstrainedEntity.class ) );
+	}
+
+	@Test
+	public void testGetMetaDataForConstrainedEntity() {
+		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( Engine.class );
+		assertTrue( beanMetaData instanceof BeanMetaDataImpl );
+		assertTrue( beanMetaData.hasConstraints() );
+	}
+
+	@Test
+	public void testGetMetaDataForUnConstrainedEntity() {
+		assertFalse( metaDataManager.isConstrained( UnconstrainedEntity.class ) );
+
+		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( UnconstrainedEntity.class );
+		assertTrue(
+				beanMetaData instanceof BeanMetaDataImpl,
+				"#getBeanMetaData should always return a valid BeanMetaData instance. Returned class: " + beanMetaData.getClass()
+		);
+		assertFalse( beanMetaData.hasConstraints() );
 	}
 
 	public class CustomClassLoader extends ClassLoader {
@@ -113,8 +158,7 @@ public class BeanMetaDataManagerTest {
 
 			try {
 				String classPath = ClassLoader.getSystemResource(
-						className.replace( '.', File.separatorChar )
-								+ ".class"
+						className.replace( '.', '/' ) + ".class"
 				).getFile();
 				classByte = loadClassData( classPath );
 				result = defineClass( className, classByte, 0, classByte.length, null );
@@ -136,5 +180,9 @@ public class BeanMetaDataManagerTest {
 			dis.close();
 			return buff;
 		}
+	}
+
+	public static class UnconstrainedEntity {
+		private String foo;
 	}
 }

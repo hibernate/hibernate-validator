@@ -1,25 +1,19 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.facets;
 
-import java.lang.annotation.ElementType;
-import java.util.Set;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Type;
+import java.util.Set;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
@@ -39,7 +33,7 @@ public interface Cascadable {
 	 * @param originalGroup The group to convert.
 	 *
 	 * @return The converted group. Will be the original group itself in case no
-	 *         conversion is to be performed.
+	 * conversion is to be performed.
 	 */
 	Class<?> convertGroup(Class<?> originalGroup);
 
@@ -48,20 +42,16 @@ public interface Cascadable {
 	 * group conversions of this cascadable.
 	 *
 	 * @return A set with group conversion descriptors. May be empty, but never
-	 *         {@code null}.
+	 * {@code null}.
 	 */
 	Set<GroupConversionDescriptor> getGroupConversionDescriptors();
 
-	ElementType getElementType();
-
 	/**
-	 * Retrieves the value of this element from the given object.
+	 * Returns the element type of the cascadable.
 	 *
-	 * @param parent The object to retrieve the value from.
-	 *
-	 * @return This element's value.
+	 * @return Returns the element type of the cascadable.
 	 */
-	Object getValue(Object parent);
+	ElementType getElementType();
 
 	/**
 	 * Returns the name of this cascadable element.
@@ -76,4 +66,27 @@ public interface Cascadable {
 	 * @return The kind of this cascadable.
 	 */
 	ElementKind getKind();
+
+	/**
+	 * Returns the type arguments constraints for this cascadable.
+	 *
+	 * @return the type arguments constraints for this cascadable, or an empty set if no constrained type arguments are
+	 * found
+	 */
+	Set<MetaConstraint<?>> getTypeArgumentsConstraints();
+
+	/**
+	 * Defines how the validated values needs to be treated in case there is a potential unwrapper specified for its type
+	 *
+	 * @return the {@code ValidatedValueUnwrapMode} to be used for this constraint.
+	 */
+	UnwrapMode unwrapMode();
+
+	/**
+	 * Returns the data type of this cascadable, e.g. the type of a bean property or the
+	 * return type of a method.
+	 *
+	 * @return This cascadable type.
+	 */
+	Type getType();
 }

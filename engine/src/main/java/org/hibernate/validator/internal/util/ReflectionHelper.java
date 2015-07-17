@@ -1,24 +1,15 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.util;
 
-import java.beans.Introspector;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -28,35 +19,13 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.ConstructorInstance;
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.GetConstructor;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructors;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredFields;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
-import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
-import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
-
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Some reflection utility methods. Where necessary calls will be performed as {@code PrivilegedAction} which is necessary
@@ -64,41 +33,20 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
- * @author Kevin Pollet <kevin.pollet@serli.com> (C) 2011 SERLI
+ * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public final class ReflectionHelper {
-
-	private static final String PACKAGE_SEPARATOR = ".";
-	private static final String ARRAY_CLASS_NAME_PREFIX = "[L";
-	private static final String ARRAY_CLASS_NAME_SUFFIX = ";";
 
 	private static final String PROPERTY_ACCESSOR_PREFIX_GET = "get";
 	private static final String PROPERTY_ACCESSOR_PREFIX_IS = "is";
 	private static final String PROPERTY_ACCESSOR_PREFIX_HAS = "has";
-	private static final String[] PROPERTY_ACCESSOR_PREFIXES = {
+	public static final String[] PROPERTY_ACCESSOR_PREFIXES = {
 			PROPERTY_ACCESSOR_PREFIX_GET,
 			PROPERTY_ACCESSOR_PREFIX_IS,
 			PROPERTY_ACCESSOR_PREFIX_HAS
 	};
 
 	private static final Log log = LoggerFactory.make();
-
-	private static final Map<String, Class<?>> PRIMITIVE_NAME_TO_PRIMITIVE;
-	static {
-		Map<String, Class<?>> tmpMap = newHashMap( 9 );
-
-		tmpMap.put( boolean.class.getName(), boolean.class );
-		tmpMap.put( char.class.getName(), char.class );
-		tmpMap.put( double.class.getName(), double.class );
-		tmpMap.put( float.class.getName(), float.class );
-		tmpMap.put( long.class.getName(), long.class );
-		tmpMap.put( int.class.getName(), int.class );
-		tmpMap.put( short.class.getName(), short.class );
-		tmpMap.put( byte.class.getName(), byte.class );
-		tmpMap.put( Void.TYPE.getName(), Void.TYPE );
-
-		PRIMITIVE_NAME_TO_PRIMITIVE = Collections.unmodifiableMap( tmpMap );
-	}
 
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_TO_WRAPPER_TYPES;
 
@@ -142,81 +90,9 @@ public final class ReflectionHelper {
 	private ReflectionHelper() {
 	}
 
-	public static ClassLoader getClassLoaderFromContext() {
-		return run( GetClassLoader.fromContext() );
-	}
-
-	public static ClassLoader getClassLoaderFromClass(Class<?> clazz) {
-		return run( GetClassLoader.fromClass( clazz ) );
-	}
-
-	public static Class<?> loadClass(String className, Class<?> caller) {
-		return run( LoadClass.action( className, caller ) );
-	}
-
-	public static Class<?> loadClass(String className, String defaultPackage) {
-		return loadClass( className, defaultPackage, ReflectionHelper.class );
-	}
-
-	public static Class<?> loadClass(String className, String defaultPackage, Class<?> caller) {
-		if( PRIMITIVE_NAME_TO_PRIMITIVE.containsKey( className )) {
-		   return PRIMITIVE_NAME_TO_PRIMITIVE.get( className );
-		}
-
-		StringBuilder fullyQualifiedClass = new StringBuilder();
-		String tmpClassName = className;
-		if ( isArrayClassName( className ) ) {
-			fullyQualifiedClass.append( ARRAY_CLASS_NAME_PREFIX );
-			tmpClassName = getArrayElementClassName( className );
-		}
-
-		if ( isQualifiedClass( tmpClassName ) ) {
-			fullyQualifiedClass.append( tmpClassName );
-		}
-		else {
-			fullyQualifiedClass.append( defaultPackage );
-			fullyQualifiedClass.append( PACKAGE_SEPARATOR );
-			fullyQualifiedClass.append( tmpClassName );
-		}
-
-		if ( isArrayClassName( className ) ) {
-			fullyQualifiedClass.append( ARRAY_CLASS_NAME_SUFFIX );
-		}
-
-		return loadClass( fullyQualifiedClass.toString(), caller );
-	}
-
-	private static boolean isArrayClassName(String className) {
-		return className.startsWith( ARRAY_CLASS_NAME_PREFIX ) && className.endsWith( ARRAY_CLASS_NAME_SUFFIX );
-	}
-
-	private static String getArrayElementClassName(String className) {
-		return className.substring( 2, className.length() - 1 );
-	}
-
-	private static boolean isQualifiedClass(String clazz) {
-		return clazz.contains( PACKAGE_SEPARATOR );
-	}
-
-	public static <T> Constructor<T> getConstructor(Class<T> clazz, Class<?>... params) {
-		return run( GetConstructor.action( clazz, params ) );
-	}
-
-	public static <T> T newInstance(Class<T> clazz, String message) {
-		return run( NewInstance.action( clazz, message ) );
-	}
-
-	public static <T> T newConstructorInstance(Constructor<T> constructor, Object... initArgs) {
-		return run( ConstructorInstance.action( constructor, initArgs ) );
-	}
-
-	public static <T> T getAnnotationParameter(Annotation annotation, String parameterName, Class<T> type) {
-		return run( GetAnnotationParameter.action( annotation, parameterName, type ) );
-	}
-
 	/**
 	 * Returns the JavaBeans property name of the given member.
-	 * </p>
+	 * <p>
 	 * For fields, the field name will be returned. For getter methods, the
 	 * decapitalized property name will be returned, with the "get", "is" or "has"
 	 * prefix stripped off. Getter methods are methods
@@ -247,7 +123,7 @@ public final class ReflectionHelper {
 			String methodName = member.getName();
 			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
 				if ( methodName.startsWith( prefix ) ) {
-					name = Introspector.decapitalize( methodName.substring( prefix.length() ) );
+					name = StringHelper.decapitalize( methodName.substring( prefix.length() ) );
 				}
 			}
 		}
@@ -294,42 +170,6 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Returns the member with the given name and type.
-	 *
-	 * @param clazz The class from which to retrieve the member. Cannot be {@code null}.
-	 * @param property The property name without "is", "get" or "has". Cannot be {@code null} or empty.
-	 * @param elementType The element type. Either {@code ElementType.FIELD} or {@code ElementType METHOD}.
-	 *
-	 * @return the member which matching the name and type or {@code null} if no such member exists.
-	 */
-	public static Member getMember(Class<?> clazz, String property, ElementType elementType) {
-		Contracts.assertNotNull( clazz, MESSAGES.classCannotBeNull() );
-
-		if ( property == null || property.length() == 0 ) {
-			throw log.getPropertyNameCannotBeNullOrEmptyException();
-		}
-
-		if ( !( ElementType.FIELD.equals( elementType ) || ElementType.METHOD.equals( elementType ) ) ) {
-			throw log.getElementTypeHasToBeFieldOrMethodException();
-		}
-
-		Member member = null;
-		if ( ElementType.FIELD.equals( elementType ) ) {
-			member = run( GetDeclaredField.action( clazz, property ) );
-		}
-		else {
-			String methodName = property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
-			for ( String prefix : PROPERTY_ACCESSOR_PREFIXES ) {
-				member = run( GetMethod.action( clazz, prefix + methodName ) );
-				if ( member != null ) {
-					break;
-				}
-			}
-		}
-		return member;
-	}
-
-	/**
 	 * @param member The <code>Member</code> instance for which to retrieve the type.
 	 *
 	 * @return Returns the <code>Type</code> of the given <code>Field</code> or <code>Method</code>.
@@ -366,7 +206,14 @@ public final class ReflectionHelper {
 	 * @return The erased type.
 	 */
 	public static Type typeOf(ExecutableElement executable, int parameterIndex) {
-		Type type = executable.getGenericParameterTypes()[parameterIndex];
+		Type[] genericParameterTypes = executable.getGenericParameterTypes();
+
+		// getGenericParameterTypes() doesn't return synthetic parameters; in this case fall back to getParameterTypes()
+		if ( parameterIndex >= genericParameterTypes.length ) {
+			genericParameterTypes = executable.getParameterTypes();
+		}
+
+		Type type = genericParameterTypes[parameterIndex];
 
 		if ( type instanceof TypeVariable ) {
 			type = TypeHelper.getErasedType( type );
@@ -403,10 +250,6 @@ public final class ReflectionHelper {
 		catch ( InvocationTargetException e ) {
 			throw log.getUnableToAccessMemberException( method.getName(), e );
 		}
-	}
-
-	public static void setAccessibility(Member member) {
-		run( SetAccessibility.action( member ) );
 	}
 
 	/**
@@ -493,7 +336,7 @@ public final class ReflectionHelper {
 	/**
 	 * Tries to retrieve the indexed value from the specified object.
 	 *
-	 * @param value The object from which to retrieve the indexed value. The object has to be non <code>null</null> and
+	 * @param value The object from which to retrieve the indexed value. The object has to be non <code>null</code> and
 	 * either a collection or array.
 	 * @param index The index. The index does not have to be numerical. <code>value</code> could also be a map in which
 	 * case the index could also be a string key.
@@ -548,114 +391,6 @@ public final class ReflectionHelper {
 		Map<?, ?> map = (Map<?, ?>) value;
 		//noinspection SuspiciousMethodCalls
 		return map.get( key );
-	}
-
-	/**
-	 * Returns the declared field with the specified name or {@code null} if it does not exist.
-	 *
-	 * @param clazz The class to check.
-	 * @param fieldName The field name.
-	 *
-	 * @return Returns the declared field with the specified name or {@code null} if it does not exist.
-	 */
-	public static Field getDeclaredField(Class<?> clazz, String fieldName) {
-		return run( GetDeclaredField.action( clazz, fieldName ) );
-	}
-
-	/**
-	 * Returns the fields of the specified class.
-	 *
-	 * @param clazz The class for which to retrieve the fields.
-	 *
-	 * @return Returns the fields for this class.
-	 */
-	public static Field[] getDeclaredFields(Class<?> clazz) {
-		return run( GetDeclaredFields.action( clazz ) );
-	}
-
-	/**
-	 * Returns the method with the specified property name or {@code null} if it does not exist. This method will
-	 * prepend  'is' and 'get' to the property name and capitalize the first letter.
-	 *
-	 * @param clazz The class to check.
-	 * @param methodName The property name.
-	 *
-	 * @return Returns the method with the specified property or {@code null} if it does not exist.
-	 */
-	public static Method getMethodFromPropertyName(Class<?> clazz, String methodName) {
-		return run( GetMethodFromPropertyName.action( clazz, methodName ) );
-	}
-
-	/**
-	 * Returns the method with the specified name or {@code null} if it does not exist.
-	 *
-	 * @param clazz The class to check.
-	 * @param methodName The method name.
-	 *
-	 * @return Returns the method with the specified property or {@code null} if it does not exist.
-	 */
-	public static Method getMethod(Class<?> clazz, String methodName) {
-		return run( GetMethod.action( clazz, methodName ) );
-	}
-
-	/**
-	 * Returns the declared method with the specified name and parameter types or {@code null} if
-	 * it does not exist.
-	 *
-	 * @param clazz The class to check.
-	 * @param methodName The method name.
-	 * @param parameterTypes The method parameter types.
-	 *
-	 * @return Returns the declared method with the specified name or {@code null} if it does not exist.
-	 */
-	public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-		return run( GetDeclaredMethod.action( clazz, methodName, parameterTypes ) );
-	}
-
-	/**
-	 * Returns the declared methods of the specified class.
-	 *
-	 * @param clazz The class for which to retrieve the methods.
-	 *
-	 * @return Returns the declared methods for this class.
-	 */
-	public static Method[] getDeclaredMethods(Class<?> clazz) {
-		return run( GetDeclaredMethods.action( clazz ) );
-	}
-
-	/**
-	 * Returns the methods of the specified class (include inherited methods).
-	 *
-	 * @param clazz The class for which to retrieve the methods.
-	 *
-	 * @return Returns the methods for this class.
-	 */
-	public static Method[] getMethods(Class<?> clazz) {
-		return run( GetMethods.action( clazz ) );
-	}
-
-	/**
-	 * Returns the declared constructors of the specified class.
-	 *
-	 * @param clazz The class for which to retrieve the constructors.
-	 *
-	 * @return Returns the declared constructors for this class.
-	 */
-	public static Constructor<?>[] getDeclaredConstructors(Class<?> clazz) {
-		return run( GetDeclaredConstructors.action( clazz ) );
-	}
-
-	/**
-	 * Executes the given privileged action either directly or with privileges
-	 * enabled, depending on whether a security manager is around or not.
-	 *
-	 * @param <T> The return type of the privileged action to run.
-	 * @param action The action to run.
-	 *
-	 * @return The result of the privileged action's execution.
-	 */
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**

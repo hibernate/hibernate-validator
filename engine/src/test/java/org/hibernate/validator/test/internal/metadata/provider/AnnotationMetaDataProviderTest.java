@@ -1,32 +1,31 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.internal.metadata.provider;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
+import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
+import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import org.joda.time.DateMidnight;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Payload;
@@ -35,38 +34,26 @@ import javax.validation.constraints.NotNull;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
-
-import org.joda.time.DateMidnight;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
-import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
-import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
-import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.testutil.TestForIssue;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Unit test for {@link AnnotationMetaDataProvider}.
  *
  * @author Gunnar Morling
  */
-public class AnnotationMetaDataProviderTest {
+public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTestBase {
 
 	private AnnotationMetaDataProvider provider;
 
@@ -85,10 +72,7 @@ public class AnnotationMetaDataProviderTest {
 
 		assertThat( beanConfigurations ).hasSize( 2 );
 
-		ConstrainedExecutable constructor = findConstrainedExecutable(
-				beanConfigurations,
-				Foo.class.getConstructor( String.class )
-		);
+		ConstrainedExecutable constructor = findConstrainedConstructor( beanConfigurations, Foo.class, String.class );
 
 		assertThat( constructor.getKind() ).isEqualTo( ConstrainedElementKind.CONSTRUCTOR );
 		assertThat( constructor.isConstrained() ).isTrue();
@@ -107,9 +91,12 @@ public class AnnotationMetaDataProviderTest {
 				Calendar.class
 		);
 
-		ConstrainedExecutable createEvent = findConstrainedExecutable(
+		ConstrainedExecutable createEvent = findConstrainedMethod(
 				beanConfigurations,
-				Calendar.class.getMethod( "createEvent", DateMidnight.class, DateMidnight.class )
+				Calendar.class,
+				"createEvent",
+				DateMidnight.class,
+				DateMidnight.class
 		);
 
 		//then
@@ -128,7 +115,6 @@ public class AnnotationMetaDataProviderTest {
 						DateMidnight.class
 				)
 		);
-		assertThat( location.getElementType() ).isEqualTo( ElementType.METHOD );
 
 		MetaConstraint<?> constraint = createEvent.getCrossParameterConstraints().iterator().next();
 
@@ -137,7 +123,7 @@ public class AnnotationMetaDataProviderTest {
 						.getAnnotation()
 						.annotationType()
 		).isEqualTo( ConsistentDateParameters.class );
-		assertThat( constraint.getLocation().typeOfAnnotatedElement() ).isEqualTo( Object[].class );
+		assertThat( constraint.getLocation().getTypeForValidatorResolution() ).isEqualTo( Object[].class );
 	}
 
 	@Test
@@ -151,7 +137,7 @@ public class AnnotationMetaDataProviderTest {
 	public void noGroupConversionOnField() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "mail" ) );
+		ConstrainedField field = findConstrainedField( beanConfigurations, User.class, "mail" );
 
 		//then
 		assertThat( field.getGroupConversions() ).isEmpty();
@@ -161,7 +147,7 @@ public class AnnotationMetaDataProviderTest {
 	public void singleGroupConversionOnField() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "phone" ) );
+		ConstrainedField field = findConstrainedField( beanConfigurations, User.class, "phone" );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -174,7 +160,7 @@ public class AnnotationMetaDataProviderTest {
 	public void multipleGroupConversionsOnField() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedField field = findConstrainedField( beanConfigurations, User.class.getDeclaredField( "address" ) );
+		ConstrainedField field = findConstrainedField( beanConfigurations, User.class, "address" );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -193,10 +179,7 @@ public class AnnotationMetaDataProviderTest {
 	public void noGroupConversionOnMethod() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
-				beanConfigurations,
-				User.class.getMethod( "getMail1" )
-		);
+		ConstrainedExecutable method = findConstrainedMethod( beanConfigurations, User.class, "getMail1" );
 
 		//then
 		assertThat( method.getGroupConversions() ).isEmpty();
@@ -206,10 +189,7 @@ public class AnnotationMetaDataProviderTest {
 	public void singleGroupConversionOnMethod() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
-				beanConfigurations,
-				User.class.getMethod( "getPhone1" )
-		);
+		ConstrainedExecutable method = findConstrainedMethod( beanConfigurations, User.class, "getPhone1" );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -222,10 +202,7 @@ public class AnnotationMetaDataProviderTest {
 	public void multipleGroupConversionsOnMethod() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
-				beanConfigurations,
-				User.class.getMethod( "getAddress1" )
-		);
+		ConstrainedExecutable method = findConstrainedMethod( beanConfigurations, User.class, "getAddress1" );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -239,9 +216,11 @@ public class AnnotationMetaDataProviderTest {
 	public void noGroupConversionOnParameter() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
+		ConstrainedExecutable method = findConstrainedMethod(
 				beanConfigurations,
-				User.class.getMethod( "setMail1", String.class )
+				User.class,
+				"setMail1",
+				String.class
 		);
 
 		//then
@@ -252,9 +231,11 @@ public class AnnotationMetaDataProviderTest {
 	public void singleGroupConversionOnParameter() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
+		ConstrainedExecutable method = findConstrainedMethod(
 				beanConfigurations,
-				User.class.getMethod( "setPhone1", PhoneNumber.class )
+				User.class,
+				"setPhone1",
+				PhoneNumber.class
 		);
 
 		//then
@@ -268,9 +249,11 @@ public class AnnotationMetaDataProviderTest {
 	public void multipleGroupConversionsOnParameter() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable method = findConstrainedExecutable(
+		ConstrainedExecutable method = findConstrainedMethod(
 				beanConfigurations,
-				User.class.getMethod( "setAddress1", Address.class )
+				User.class,
+				"setAddress1",
+				Address.class
 		);
 
 		//then
@@ -290,10 +273,7 @@ public class AnnotationMetaDataProviderTest {
 	public void singleGroupConversionOnConstructor() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable constructor = findConstrainedExecutable(
-				beanConfigurations,
-				User.class.getConstructor()
-		);
+		ConstrainedExecutable constructor = findConstrainedConstructor( beanConfigurations, User.class );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -306,10 +286,7 @@ public class AnnotationMetaDataProviderTest {
 	public void multipleGroupConversionsOnConstructorParameter() throws Exception {
 		//when
 		List<BeanConfiguration<? super User>> beanConfigurations = provider.getBeanConfigurationForHierarchy( User.class );
-		ConstrainedExecutable constructor = findConstrainedExecutable(
-				beanConfigurations,
-				User.class.getConstructor( Address.class )
-		);
+		ConstrainedExecutable constructor = findConstrainedConstructor( beanConfigurations, User.class, Address.class );
 
 		//then
 		Map<Class<?>, Class<?>> expected = newHashMap();
@@ -347,43 +324,110 @@ public class AnnotationMetaDataProviderTest {
 		provider.getBeanConfigurationForHierarchy( User3.class );
 	}
 
-	private ConstrainedField findConstrainedField(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Field field) {
-		return (ConstrainedField) findConstrainedElement( beanConfigurations, field );
+	@Test
+	@TestForIssue(jiraKey = "HV-819")
+	public void unwrapValidatedValueOnField() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
+
+		ConstrainedField constrainedField = findConstrainedField( beanConfigurations, GolfPlayer.class, "name" );
+
+		assertEquals( constrainedField.unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
-	private ConstrainedExecutable findConstrainedExecutable(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Method method) {
-		return (ConstrainedExecutable) findConstrainedElement( beanConfigurations, method );
+	@Test
+	@TestForIssue(jiraKey = "HV-925")
+	public void testAutomaticUnwrapValidatedValueOnField() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
+
+		ConstrainedField constrainedField = findConstrainedField( beanConfigurations, GolfPlayer.class, "nickname" );
+
+		assertEquals( constrainedField.unwrapMode(), UnwrapMode.AUTOMATIC );
 	}
 
-	private <T> ConstrainedExecutable findConstrainedExecutable(Iterable<BeanConfiguration<? super T>> beanConfigurations, Constructor<T> constructor) {
-		return (ConstrainedExecutable) findConstrainedElement( beanConfigurations, constructor );
+	@Test
+	@TestForIssue(jiraKey = "HV-819")
+	public void unwrapValidatedValueOnProperty() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
+
+		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
+				beanConfigurations,
+				GolfPlayer.class,
+				"getHandicap"
+		);
+
+		assertEquals( constrainedMethod.unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
-	private <T> ConstrainedType findConstrainedType(Iterable<BeanConfiguration<? super T>> beanConfigurations, Class<? super T> type) {
-		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
-			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
-				if ( constrainedElement.getLocation().getElementType() == ElementType.TYPE ) {
-					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
-					if ( constrainedType.getLocation().getBeanClass().equals( type ) ) {
-						return constrainedType;
-					}
-				}
-			}
-		}
+	@Test
+	@TestForIssue(jiraKey = "HV-925")
+	public void testSkipUnwrapValidatedValueOnProperty() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
 
-		throw new RuntimeException( "Found no constrained element for type " + type );
+		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
+				beanConfigurations,
+				GolfPlayer.class,
+				"getScore"
+		);
+
+		assertEquals( constrainedMethod.unwrapMode(), UnwrapMode.SKIP_UNWRAP );
 	}
 
-	private ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Member member) {
-		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
-			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
-				if ( constrainedElement.getLocation().getMember().equals( member ) ) {
-					return constrainedElement;
-				}
-			}
-		}
+	@Test
+	@TestForIssue(jiraKey = "HV-819")
+	public void unwrapValidatedValueOnMethod() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
 
-		throw new RuntimeException( "Found no constrained element for " + member );
+		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
+				beanConfigurations,
+				GolfPlayer.class,
+				"enterTournament"
+		);
+
+		assertEquals( constrainedMethod.unwrapMode(), UnwrapMode.UNWRAP );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-819")
+	public void unwrapValidatedValueOnConstructor() throws Exception {
+		@SuppressWarnings("rawtypes")
+		List<BeanConfiguration<? super Wrapper>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				Wrapper.class
+		);
+
+		ConstrainedExecutable constrainedConstructor = findConstrainedConstructor(
+				beanConfigurations,
+				Wrapper.class,
+				Object.class
+		);
+
+		assertEquals( constrainedConstructor.unwrapMode(), UnwrapMode.UNWRAP );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-819")
+	public void unwrapValidatedValueOnParameter() throws Exception {
+		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
+				GolfPlayer.class
+		);
+
+		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
+				beanConfigurations,
+				GolfPlayer.class,
+				"practice",
+				Wrapper.class
+		);
+
+		assertEquals( constrainedMethod.getParameterMetaData( 0 ).unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
 	private static class Foo {
@@ -535,5 +579,41 @@ public class AnnotationMetaDataProviderTest {
 		Class<? extends Payload>[] payload() default { };
 
 		String value();
+	}
+
+	private static class GolfPlayer {
+		private Wrapper<String> nickname;
+
+		@UnwrapValidatedValue
+		private Wrapper<String> name;
+
+		@UnwrapValidatedValue
+		public Wrapper<Double> getHandicap() {
+			return null;
+		}
+
+		@UnwrapValidatedValue(false)
+		public Wrapper<Double> getScore() {
+			return null;
+		}
+
+		@UnwrapValidatedValue
+		public Wrapper<Boolean> enterTournament() {
+			return null;
+		}
+
+		@SuppressWarnings("unused")
+		public void practice(@UnwrapValidatedValue Wrapper<Integer> numberOfBalls) {
+		}
+	}
+
+	private static class Wrapper<T> {
+		@SuppressWarnings("unused")
+		public T value;
+
+		@UnwrapValidatedValue
+		public Wrapper(T value) {
+			this.value = value;
+		}
 	}
 }

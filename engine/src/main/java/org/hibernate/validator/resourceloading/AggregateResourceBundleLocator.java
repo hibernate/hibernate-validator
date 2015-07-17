@@ -1,20 +1,13 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,  
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.resourceloading;
+
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,9 +19,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
-
 /**
  * A {@link ResourceBundleLocator} implementation that provides access
  * to multiple source {@link ResourceBundle}s by merging them into one
@@ -38,6 +28,7 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  */
 public class AggregateResourceBundleLocator extends DelegatingResourceBundleLocator {
 	private final List<String> bundleNames;
+	private final ClassLoader classLoader;
 
 	/**
 	 * Creates a locator that delivers a resource bundle merged from the given
@@ -65,27 +56,44 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 * source bundles.
 	 */
 	public AggregateResourceBundleLocator(List<String> bundleNames, ResourceBundleLocator delegate) {
-		super( delegate );
-
-		Contracts.assertValueNotNull( bundleNames, "bundleNames" );
-
-		List<String> tmpBundleNames = new ArrayList<String>();
-		tmpBundleNames.addAll( bundleNames );
-
-		this.bundleNames = Collections.unmodifiableList( tmpBundleNames );
+		this( bundleNames, delegate, null );
 	}
 
+	/**
+	 * Creates a locator that delivers a resource bundle merged from the given
+	 * list of source bundles.
+	 *
+	 * @param bundleNames A list with source bundle names. The returned bundle will
+	 * contain all keys from all source bundles. In case a key occurs
+	 * in multiple source bundles, the value will be taken from the
+	 * first bundle containing the key.
+	 * @param delegate A delegate resource bundle locator. The bundle returned by
+	 * this locator will be added to the aggregate bundle after all
+	 * source bundles.
+	 * @param classLoader The classloader to use for loading the bundle.
+	 * @since 5.2
+	 */
+	public AggregateResourceBundleLocator(List<String> bundleNames, ResourceBundleLocator delegate,
+			ClassLoader classLoader) {
+		super( delegate );
+		Contracts.assertValueNotNull( bundleNames, "bundleNames" );
+
+		this.bundleNames = Collections.unmodifiableList( bundleNames );
+		this.classLoader = classLoader;
+	}
+
+	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
 		List<ResourceBundle> sourceBundles = new ArrayList<ResourceBundle>();
 
-		for ( String oneBundleName : bundleNames ) {
-			ResourceBundleLocator oneLocator =
-					new PlatformResourceBundleLocator( oneBundleName );
+		for ( String bundleName : bundleNames ) {
+			ResourceBundleLocator resourceBundleLocator =
+					new PlatformResourceBundleLocator( bundleName, classLoader );
 
-			ResourceBundle oneBundle = oneLocator.getResourceBundle( locale );
+			ResourceBundle resourceBundle = resourceBundleLocator.getResourceBundle( locale );
 
-			if ( oneBundle != null ) {
-				sourceBundles.add( oneBundle );
+			if ( resourceBundle != null ) {
+				sourceBundles.add( resourceBundle );
 			}
 		}
 
@@ -100,13 +108,14 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 
 	/**
 	 * A {@link ResourceBundle} whose content is aggregated from multiple source bundles.
-	 * <p/>
+	 * <p>
 	 * This class is package-private for the sake of testability.
+	 * </p>
 	 *
 	 * @author Gunnar Morling
 	 */
 	public static class AggregateBundle extends ResourceBundle {
-		private Map<String, Object> contents = new HashMap<String, Object>();
+		private final Map<String, Object> contents = new HashMap<String, Object>();
 
 		/**
 		 * Creates a new AggregateBundle.
@@ -153,7 +162,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 	 */
 	private static class IteratorEnumeration<T> implements Enumeration<T> {
 
-		private Iterator<T> source;
+		private final Iterator<T> source;
 
 		/**
 		 * Creates a new IterationEnumeration.
@@ -169,10 +178,12 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 			this.source = source;
 		}
 
+		@Override
 		public boolean hasMoreElements() {
 			return source.hasNext();
 		}
 
+		@Override
 		public T nextElement() {
 			return source.next();
 		}

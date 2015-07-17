@@ -1,32 +1,20 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,  
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.core;
-
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Type;
-import java.util.Set;
 
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.util.Set;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to
@@ -80,7 +68,7 @@ public class MetaConstraint<A extends Annotation> {
 
 	public boolean validateConstraint(ValidationContext<?> executionContext, ValueContext<?, ?> valueContext) {
 		valueContext.setElementType( getElementType() );
-		valueContext.setTypeOfAnnotatedElement( typeOfAnnotatedElement() );
+		valueContext.setDeclaredTypeOfValidatedElement( location.getTypeForValidatorResolution() );
 
 		boolean validationResult = constraintTree.validateConstraints( executionContext, valueContext );
 		executionContext.markConstraintProcessed( valueContext.getCurrentBean(), valueContext.getPropertyPath(), this );
@@ -90,25 +78,6 @@ public class MetaConstraint<A extends Annotation> {
 
 	public ConstraintLocation getLocation() {
 		return location;
-	}
-
-	protected final Type typeOfAnnotatedElement() {
-		return location.typeOfAnnotatedElement();
-	}
-
-	/**
-	 * @param o the object from which to retrieve the value.
-	 *
-	 * @return Returns the value for this constraint from the specified object. Depending on the type either the value itself
-	 *         is returned of method or field access is used to access the value.
-	 */
-	public Object getValue(Object o) {
-		if ( location.getMember() == null ) {
-			return o;
-		}
-		else {
-			return ReflectionHelper.getValue( location.getMember(), o );
-		}
 	}
 
 	@Override

@@ -14,6 +14,10 @@
         <!-- Checks for imports -->
         <module name="AvoidStarImport"/>
         <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+        <module name="IllegalImport">
+            <property name="illegalPkgs" value="junit.framework"/>
+        </module>
 
         <!-- Modifier Checks  -->
         <module name="ModifierOrder"/>
@@ -39,6 +43,19 @@
         <module name="CovariantEquals"/>
         <module name="ArrayTypeStyle"/>
         <module name="DefaultComesLast"/>
+
+        <!-- Checks white spaces -->
+        <module name="TypecastParenPad" />
+        <module name="WhitespaceAfter">
+            <property name="tokens" value="TYPECAST" />
+        </module>
+        <module name="ParenPad">
+            <property name="tokens" value="CTOR_CALL, METHOD_CALL, SUPER_CTOR_CALL" />
+            <property name="option" value="space" />
+        </module>
     </module>
+
+    <!-- Checks that a file ends with a new line  -->
+    <module name="NewlineAtEndOfFile"/>
 
 </module>

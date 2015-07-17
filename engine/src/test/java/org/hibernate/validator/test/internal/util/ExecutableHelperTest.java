@@ -1,30 +1,20 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.internal.util;
+
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Date;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
@@ -38,7 +28,7 @@ import static org.testng.Assert.assertTrue;
  */
 public class ExecutableHelperTest {
 
-	private final ExecutableHelper overrideHelper = new ExecutableHelper();
+	private final ExecutableHelper executableHelper = new ExecutableHelper( new TypeResolutionHelper() );
 
 	@Test
 	@TestForIssue(jiraKey = "HV-818")
@@ -56,27 +46,25 @@ public class ExecutableHelperTest {
 		Method getStaticFooInteger = SubQax.class.getMethod( "getFoo", Integer.class );
 		Method getSuperTypeStaticFoo = Qax.class.getMethod( "getFoo" );
 
-		final ExecutableHelper overrideHelper = new ExecutableHelper();
+		assertTrue( executableHelper.overrides( getSubTypeBar, getBar ) );
+		assertTrue( executableHelper.overrides( getSubTypeBarString, getBarString ) );
 
-		assertTrue( overrideHelper.overrides( getSubTypeBar, getBar ) );
-		assertTrue( overrideHelper.overrides( getSubTypeBarString, getBarString ) );
+		assertFalse( executableHelper.overrides( getBar, getBarString ) );
+		assertFalse( executableHelper.overrides( getBar, getBarInteger ) );
+		assertFalse( executableHelper.overrides( getBarString, getBarInteger ) );
+		assertFalse( executableHelper.overrides( getSubTypeBar, getBarInteger ) );
+		assertFalse( executableHelper.overrides( getSubTypeBar, getBarString ) );
+		assertFalse( executableHelper.overrides( getSubTypeBarString, getBarInteger ) );
+		assertFalse( executableHelper.overrides( getSubTypeBarString, getBar ) );
+		assertFalse( executableHelper.overrides( getSubTypeBarString, getSubTypeBar ) );
 
-		assertFalse( overrideHelper.overrides( getBar, getBarString ) );
-		assertFalse( overrideHelper.overrides( getBar, getBarInteger ) );
-		assertFalse( overrideHelper.overrides( getBarString, getBarInteger ) );
-		assertFalse( overrideHelper.overrides( getSubTypeBar, getBarInteger ) );
-		assertFalse( overrideHelper.overrides( getSubTypeBar, getBarString ) );
-		assertFalse( overrideHelper.overrides( getSubTypeBarString, getBarInteger ) );
-		assertFalse( overrideHelper.overrides( getSubTypeBarString, getBar ) );
-		assertFalse( overrideHelper.overrides( getSubTypeBarString, getSubTypeBar ) );
-
-		assertFalse( overrideHelper.overrides( getStaticFoo, getStaticFooString ) );
-		assertFalse( overrideHelper.overrides( getStaticFoo, getStaticFooInteger ) );
-		assertFalse( overrideHelper.overrides( getStaticFooString, getStaticFooInteger ) );
-		assertFalse( overrideHelper.overrides( getFooLong, getStaticFoo ) );
-		assertFalse( overrideHelper.overrides( getFooLong, getStaticFooInteger ) );
-		assertFalse( overrideHelper.overrides( getFooLong, getStaticFooString ) );
-		assertFalse( overrideHelper.overrides( getStaticFoo, getSuperTypeStaticFoo ) );
+		assertFalse( executableHelper.overrides( getStaticFoo, getStaticFooString ) );
+		assertFalse( executableHelper.overrides( getStaticFoo, getStaticFooInteger ) );
+		assertFalse( executableHelper.overrides( getStaticFooString, getStaticFooInteger ) );
+		assertFalse( executableHelper.overrides( getFooLong, getStaticFoo ) );
+		assertFalse( executableHelper.overrides( getFooLong, getStaticFooInteger ) );
+		assertFalse( executableHelper.overrides( getFooLong, getStaticFooString ) );
+		assertFalse( executableHelper.overrides( getStaticFoo, getSuperTypeStaticFoo ) );
 	}
 
 	@Test
@@ -85,7 +73,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = Bar.class.getDeclaredMethod( "zap" );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ), ExecutableElement.forMethod( methodFromBase )
 				)
 		).isTrue();
@@ -97,7 +85,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = Baz.class.getDeclaredMethod( "zap" );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ), ExecutableElement.forMethod( methodFromBase )
 				)
 		).isTrue();
@@ -109,7 +97,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = Bar.class.getDeclaredMethod( "zap" );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromBase ),
 						ExecutableElement.forMethod( methodFromImpl )
 				)
@@ -122,7 +110,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = Bar.class.getDeclaredMethod( "zip" );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -135,7 +123,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = Bar.class.getDeclaredMethod( "zap", int.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -148,7 +136,7 @@ public class ExecutableHelperTest {
 		Method other = Baz.class.getDeclaredMethod( "zap" );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( other ),
 						ExecutableElement.forMethod( first )
 				)
@@ -161,7 +149,7 @@ public class ExecutableHelperTest {
 		Constructor<Bar> other = Bar.class.getConstructor();
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forConstructor( other ),
 						ExecutableElement.forConstructor( first )
 				)
@@ -174,7 +162,7 @@ public class ExecutableHelperTest {
 		Method other = Bar.class.getDeclaredMethod( "Foo" );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( other ),
 						ExecutableElement.forConstructor( first )
 				)
@@ -187,7 +175,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = SimpleServiceImpl1.class.getDeclaredMethod( "doSomething", Number.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -196,7 +184,7 @@ public class ExecutableHelperTest {
 		methodFromImpl = SimpleServiceImpl1.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -210,7 +198,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = SimpleServiceImpl2.class.getDeclaredMethod( "doSomething", Number.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -219,7 +207,7 @@ public class ExecutableHelperTest {
 		methodFromImpl = SimpleServiceImpl2.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -232,7 +220,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = GenericServiceImpl1.class.getDeclaredMethod( "doSomething", Number.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -241,7 +229,7 @@ public class ExecutableHelperTest {
 		methodFromImpl = GenericServiceImpl1.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -254,7 +242,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = GenericServiceImpl2.class.getDeclaredMethod( "doSomething", Number.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -263,7 +251,7 @@ public class ExecutableHelperTest {
 		methodFromImpl = GenericServiceImpl2.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl )
 						, ExecutableElement.forMethod( methodFromBase )
 				)
@@ -276,7 +264,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = GenericServiceImpl3.class.getDeclaredMethod( "doSomething", Number.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -285,7 +273,7 @@ public class ExecutableHelperTest {
 		methodFromImpl = GenericServiceImpl2.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -298,7 +286,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = ParameterizedSubType.class.getDeclaredMethod( "doSomething", Object.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -307,7 +295,7 @@ public class ExecutableHelperTest {
 		methodFromImpl = ParameterizedSubType.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -320,7 +308,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = GenericInterfaceImpl1.class.getDeclaredMethod( "doSomething", Number.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -329,7 +317,7 @@ public class ExecutableHelperTest {
 		methodFromImpl = GenericInterfaceImpl1.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl )
 						, ExecutableElement.forMethod( methodFromBase )
 				)
@@ -342,7 +330,7 @@ public class ExecutableHelperTest {
 		Method methodFromImpl = WildcardInterfaceImpl.class.getDeclaredMethod( "doSomething", Integer.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
@@ -351,11 +339,49 @@ public class ExecutableHelperTest {
 		methodFromImpl = WildcardInterfaceImpl.class.getDeclaredMethod( "doSomething", Long.class );
 
 		assertThat(
-				overrideHelper.overrides(
+				executableHelper.overrides(
 						ExecutableElement.forMethod( methodFromImpl ),
 						ExecutableElement.forMethod( methodFromBase )
 				)
 		).isFalse();
+	}
+
+	@Test
+	public void executableAsStringShouldReturnMethodNameWithBracesForParameterlessMethod() throws Exception {
+		assertEquals( ExecutableElement.getExecutableAsString( "foo" ), "foo()" );
+		assertEquals( ExecutableElement.forMethod( Foo.class.getMethod( "zap" ) ).getAsString(), "zap()" );
+		assertEquals( ExecutableElement.forConstructor( Bar.class.getConstructor() ).getAsString(), "Bar()" );
+	}
+
+	@Test
+	public void executableAsStringShouldReturnMethodNameWithSimpleParamerTypeNames() throws Exception {
+		assertEquals( ExecutableElement.getExecutableAsString( "foo", int.class, Foo.class ), "foo(int, Foo)" );
+		assertEquals(
+				ExecutableElement.forMethod( Bar.class.getMethod( "zap", int.class, Date.class ) ).getAsString(),
+				"zap(int, Date)"
+		);
+		assertEquals(
+				ExecutableElement.forConstructor( Bar.class.getConstructor( int.class, Date.class ) )
+						.getAsString(), "Bar(int, Date)"
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-861")
+	public void testBridgeMethodOverride() throws Exception {
+		Method setDataObjectBase = Node.class.getDeclaredMethod( "setData", Object.class );
+
+		Method setDataObject = MyNode.class.getDeclaredMethod( "setData", Object.class );
+		assertFalse(
+				executableHelper.overrides( setDataObject, setDataObjectBase ),
+				"MyNode#setData(Object) is the generated bridge method. It should be ignored."
+		);
+
+		Method setDataInteger = MyNode.class.getDeclaredMethod( "setData", Integer.class );
+		assertTrue(
+				executableHelper.overrides( setDataInteger, setDataObjectBase ),
+				"MyNode#setData(Integer) should override Node#setData(T)"
+		);
 	}
 
 	public abstract static class GenericServiceBase<T> {

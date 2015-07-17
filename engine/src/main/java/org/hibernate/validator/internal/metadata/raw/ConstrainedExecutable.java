@@ -1,33 +1,24 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2010, Red Hat Middleware LLC, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.raw;
 
-import java.lang.annotation.ElementType;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.metadata.ConstraintDescriptor;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.metadata.ConstraintDescriptor;
-
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
-import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -44,10 +35,14 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 	private static final Log log = LoggerFactory.make();
 
+	private final ExecutableElement executable;
+
 	/**
 	 * Constrained-related meta data for this executable's parameters.
 	 */
 	private final List<ConstrainedParameter> parameterMetaData;
+
+	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
 
 	private final boolean hasParameterConstraints;
 
@@ -58,24 +53,30 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 *
 	 * @param source The source of meta data.
 	 * @param location The location of the represented executable.
-	 * @param returnValueConstraints The return value constraints of the represented executable, if
-	 * any.
+	 * @param returnValueConstraints Type arguments constraints, if any.
+	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
 	 * return value shall be performed or not.
+	 * @param unwrapMode Whether the value of the executable's return value must be unwrapped prior to
+	 * validation or not.
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
-			ExecutableConstraintLocation location,
+			ConstraintLocation location,
 			Set<MetaConstraint<?>> returnValueConstraints,
-			boolean isCascading) {
+			Map<Class<?>, Class<?>> groupConversions,
+			boolean isCascading,
+			UnwrapMode unwrapMode) {
 		this(
 				source,
 				location,
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
-				Collections.<Class<?>, Class<?>>emptyMap(),
-				isCascading
+				Collections.<MetaConstraint<?>>emptySet(),
+				groupConversions,
+				isCascading,
+				unwrapMode
 		);
 	}
 
@@ -88,51 +89,55 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * with the number of parameters of the represented executable. So
 	 * this list may be empty (in case of a parameterless executable),
 	 * but never {@code null}.
+	 * @param crossParameterConstraints the cross parameter constraints
 	 * @param returnValueConstraints The return value constraints of the represented executable, if
+	 * any.
+	 * @param typeArgumentsConstraints The return value constraints of the represented executable, if
 	 * any.
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
 	 * return value shall be performed or not.
+	 * @param unwrapMode Determines how the value of the executable's return value must be handled in regards to
+	 * unwrapping prior to validation.
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
-			ExecutableConstraintLocation location,
+			ConstraintLocation location,
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
+			Set<MetaConstraint<?>> typeArgumentsConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
-			boolean isCascading) {
+			boolean isCascading,
+			UnwrapMode unwrapMode) {
 		super(
 				source,
-				location.getElementType() == ElementType.CONSTRUCTOR ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
+				( location.getMember() instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				location,
 				returnValueConstraints,
 				groupConversions,
-				isCascading
+				isCascading,
+				unwrapMode
 		);
 
-		ExecutableElement executable = location.getExecutableElement();
+		this.executable = ( location.getMember() instanceof Method ) ?
+				ExecutableElement.forMethod( (Method) location.getMember() ) :
+				ExecutableElement.forConstructor( (Constructor<?>) location.getMember() );
 
 		if ( parameterMetaData.size() != executable.getParameterTypes().length ) {
 			throw log.getInvalidLengthOfParameterMetaDataListException(
-					executable,
+					executable.getAsString(),
 					executable.getParameterTypes().length,
 					parameterMetaData.size()
 			);
 		}
 
+		this.typeArgumentsConstraints = typeArgumentsConstraints != null ? Collections.unmodifiableSet(
+				typeArgumentsConstraints
+		) : Collections.<MetaConstraint<?>>emptySet();
 		this.crossParameterConstraints = crossParameterConstraints;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
-
-		if ( isConstrained() ) {
-			ReflectionHelper.setAccessibility( executable.getMember() );
-		}
-	}
-
-	@Override
-	public ExecutableConstraintLocation getLocation() {
-		return (ExecutableConstraintLocation) super.getLocation();
 	}
 
 	/**
@@ -148,7 +153,10 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
-			throw log.getInvalidMethodParameterIndexException( getLocation().getMember().getName(), parameterIndex );
+			throw log.getInvalidExecutableParameterIndexException(
+					executable.getAsString(),
+					parameterIndex
+			);
 		}
 
 		return parameterMetaData.get( parameterIndex );
@@ -203,7 +211,15 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 *         otherwise.
 	 */
 	public boolean isGetterMethod() {
-		return getLocation().getExecutableElement().isGetterMethod();
+		return executable.isGetterMethod();
+	}
+
+	public ExecutableElement getExecutable() {
+		return executable;
+	}
+
+	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
+		return this.typeArgumentsConstraints;
 	}
 
 	@Override
@@ -276,8 +292,20 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedReturnValueConstraints = newHashSet( constraints );
 		mergedReturnValueConstraints.addAll( other.constraints );
 
+		Set<MetaConstraint<?>> mergedTypeArgumentsConstraints = newHashSet( typeArgumentsConstraints );
+		mergedTypeArgumentsConstraints.addAll( other.typeArgumentsConstraints );
+
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );
+
+		// TODO - Is this the right way of handling the merge of unwrapMode? (HF)
+		UnwrapMode mergedUnwrapMode;
+		if ( source.getPriority() > other.source.getPriority() ) {
+			mergedUnwrapMode = unwrapMode;
+		}
+		else {
+			mergedUnwrapMode = other.unwrapMode;
+		}
 
 		return new ConstrainedExecutable(
 				mergedSource,
@@ -285,8 +313,10 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				mergedParameterMetaData,
 				mergedCrossParameterConstraints,
 				mergedReturnValueConstraints,
+				mergedTypeArgumentsConstraints,
 				mergedGroupConversions,
-				isCascading || other.isCascading
+				isCascading || other.isCascading,
+				mergedUnwrapMode
 		);
 	}
 
@@ -298,5 +328,37 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		}
 
 		return descriptors;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result
+				+ ( ( executable == null ) ? 0 : executable.hashCode() );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( !super.equals( obj ) ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ConstrainedExecutable other = (ConstrainedExecutable) obj;
+		if ( executable == null ) {
+			if ( other.executable != null ) {
+				return false;
+			}
+		}
+		else if ( !executable.equals( other.executable ) ) {
+			return false;
+		}
+		return true;
 	}
 }

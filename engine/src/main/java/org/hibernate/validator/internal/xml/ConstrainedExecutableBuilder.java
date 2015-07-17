@@ -1,63 +1,74 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.xml;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.validation.ParameterNameProvider;
-import javax.validation.ValidationException;
-
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.CrossParameterConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.ExecutableConstraintLocation;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
+
+import javax.validation.ParameterNameProvider;
+import javax.validation.ValidationException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
- * Builder for constraint methods and constructors.
+ * Builder for constrained methods and constructors.
  *
  * @author Hardy Ferentschik
  */
-public class ConstrainedExecutableBuilder {
+class ConstrainedExecutableBuilder {
+
 	private static final Log log = LoggerFactory.make();
 
-	private ConstrainedExecutableBuilder() {
+	private final ClassLoadingHelper classLoadingHelper;
+	private final MetaConstraintBuilder metaConstraintBuilder;
+	private final GroupConversionBuilder groupConversionBuilder;
+	private final ConstrainedParameterBuilder constrainedParameterBuilder;
+	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
+
+	ConstrainedExecutableBuilder(ClassLoadingHelper classLoadingHelper, ParameterNameProvider parameterNameProvider,
+			MetaConstraintBuilder metaConstraintBuilder, GroupConversionBuilder groupConversionBuilder,
+			AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+		this.classLoadingHelper = classLoadingHelper;
+		this.metaConstraintBuilder = metaConstraintBuilder;
+		this.groupConversionBuilder = groupConversionBuilder;
+		this.constrainedParameterBuilder = new ConstrainedParameterBuilder(
+				metaConstraintBuilder,
+				parameterNameProvider,
+				groupConversionBuilder,
+				annotationProcessingOptions
+		);
+		this.annotationProcessingOptions = annotationProcessingOptions;
 	}
 
-	public static Set<ConstrainedExecutable> buildMethodConstrainedExecutable(List<MethodType> methods,
+	Set<ConstrainedExecutable> buildMethodConstrainedExecutable(List<MethodType> methods,
 																			  Class<?> beanClass,
-																			  String defaultPackage,
-																			  ParameterNameProvider parameterNameProvider,
-																			  ConstraintHelper constraintHelper,
-																			  AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+																			  String defaultPackage) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<Method> alreadyProcessedMethods = newArrayList();
 		for ( MethodType methodType : methods ) {
@@ -70,10 +81,12 @@ public class ConstrainedExecutableBuilder {
 
 			String methodName = methodType.getName();
 
-			final Method method = ReflectionHelper.getDeclaredMethod(
-					beanClass,
-					methodName,
-					parameterTypes.toArray( new Class[parameterTypes.size()] )
+			final Method method = run(
+					GetDeclaredMethod.action(
+							beanClass,
+							methodName,
+							parameterTypes.toArray( new Class[parameterTypes.size()] )
+					)
 			);
 
 			if ( method == null ) {
@@ -106,10 +119,7 @@ public class ConstrainedExecutableBuilder {
 					methodType.getParameter(),
 					methodType.getCrossParameter(),
 					methodType.getReturnValue(),
-					methodExecutableElement,
-					constraintHelper,
-					parameterNameProvider,
-					annotationProcessingOptions
+					methodExecutableElement
 			);
 
 			constrainedExecutables.add( constrainedExecutable );
@@ -117,12 +127,9 @@ public class ConstrainedExecutableBuilder {
 		return constrainedExecutables;
 	}
 
-	public static Set<ConstrainedExecutable> buildConstructorConstrainedExecutable(List<ConstructorType> constructors,
+	Set<ConstrainedExecutable> buildConstructorConstrainedExecutable(List<ConstructorType> constructors,
 																				   Class<?> beanClass,
-																				   String defaultPackage,
-																				   ParameterNameProvider parameterNameProvider,
-																				   ConstraintHelper constraintHelper,
-																				   AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+																				   String defaultPackage) {
 		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
 		List<Constructor<?>> alreadyProcessedConstructors = newArrayList();
 		for ( ConstructorType constructorType : constructors ) {
@@ -133,13 +140,18 @@ public class ConstrainedExecutableBuilder {
 					defaultPackage
 			);
 
-			final Constructor<?> constructor = ReflectionHelper.getConstructor(
-					beanClass,
-					constructorParameterTypes.toArray( new Class[constructorParameterTypes.size()] )
+			final Constructor<?> constructor = run(
+					GetDeclaredConstructor.action(
+							beanClass,
+							constructorParameterTypes.toArray( new Class[constructorParameterTypes.size()] )
+					)
 			);
 
 			if ( constructor == null ) {
-				throw log.getBeanDoesNotContainConstructorException( beanClass.getName(), constructorParameterTypes );
+				throw log.getBeanDoesNotContainConstructorException(
+						beanClass.getName(),
+						StringHelper.join( constructorParameterTypes, ", " )
+				);
 			}
 			if ( alreadyProcessedConstructors.contains( constructor ) ) {
 				throw log.getConstructorIsDefinedTwiceInMappingXmlForBeanException(
@@ -166,39 +178,28 @@ public class ConstrainedExecutableBuilder {
 					constructorType.getParameter(),
 					constructorType.getCrossParameter(),
 					constructorType.getReturnValue(),
-					constructorExecutableElement,
-					constraintHelper,
-					parameterNameProvider,
-					annotationProcessingOptions
+					constructorExecutableElement
 			);
 			constrainedExecutables.add( constrainedExecutable );
 		}
 		return constrainedExecutables;
 	}
 
-	private static ConstrainedExecutable parseExecutableType(String defaultPackage,
+	private ConstrainedExecutable parseExecutableType(String defaultPackage,
 															 List<ParameterType> parameterTypeList,
 															 CrossParameterType crossParameterType,
 															 ReturnValueType returnValueType,
-															 ExecutableElement executableElement,
-															 ConstraintHelper constraintHelper,
-															 ParameterNameProvider parameterNameProvider,
-															 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
-		List<ConstrainedParameter> parameterMetaData = ConstrainedParameterBuilder.buildConstrainedParameters(
+															 ExecutableElement executableElement) {
+		List<ConstrainedParameter> parameterMetaData = constrainedParameterBuilder.buildConstrainedParameters(
 				parameterTypeList,
 				executableElement,
-				defaultPackage,
-				constraintHelper,
-				parameterNameProvider,
-				annotationProcessingOptions
+				defaultPackage
 		);
 
 		Set<MetaConstraint<?>> crossParameterConstraints = parseCrossParameterConstraints(
 				defaultPackage,
 				crossParameterType,
-				executableElement,
-				constraintHelper,
-				annotationProcessingOptions
+				executableElement
 		);
 
 		// parse the return value
@@ -209,45 +210,42 @@ public class ConstrainedExecutableBuilder {
 				executableElement,
 				returnValueConstraints,
 				groupConversions,
-				defaultPackage,
-				constraintHelper,
-				annotationProcessingOptions
+				defaultPackage
+
 		);
 
+		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedExecutable(
 				ConfigurationSource.XML,
-				new ExecutableConstraintLocation( executableElement ),
+				ConstraintLocation.forReturnValue( executableElement ),
 				parameterMetaData,
 				crossParameterConstraints,
 				returnValueConstraints,
+				Collections.<MetaConstraint<?>>emptySet(),
 				groupConversions,
-				isCascaded
+				isCascaded,
+				UnwrapMode.AUTOMATIC
 		);
 	}
 
-	private static Set<MetaConstraint<?>> parseCrossParameterConstraints(String defaultPackage,
+	private Set<MetaConstraint<?>> parseCrossParameterConstraints(String defaultPackage,
 																		 CrossParameterType crossParameterType,
-																		 ExecutableElement executableElement,
-																		 ConstraintHelper constraintHelper,
-																		 AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+																		 ExecutableElement executableElement) {
 
 		Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		if ( crossParameterType == null ) {
 			return crossParameterConstraints;
 		}
 
-
-		CrossParameterConstraintLocation constraintLocation = new CrossParameterConstraintLocation(
-				executableElement
-		);
+		ConstraintLocation constraintLocation = ConstraintLocation.forCrossParameter( executableElement );
 
 		for ( ConstraintType constraintType : crossParameterType.getConstraint() ) {
-			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+			MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 					constraintLocation,
 					constraintType,
 					executableElement.getElementType(),
 					defaultPackage,
-					constraintHelper
+					ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER
 			);
 			crossParameterConstraints.add( metaConstraint );
 		}
@@ -263,30 +261,28 @@ public class ConstrainedExecutableBuilder {
 		return crossParameterConstraints;
 	}
 
-	private static boolean parseReturnValueType(ReturnValueType returnValueType,
+	private boolean parseReturnValueType(ReturnValueType returnValueType,
 												ExecutableElement executableElement,
 												Set<MetaConstraint<?>> returnValueConstraints,
 												Map<Class<?>, Class<?>> groupConversions,
-												String defaultPackage,
-												ConstraintHelper constraintHelper,
-												AnnotationProcessingOptionsImpl annotationProcessingOptions) {
+												String defaultPackage) {
 		if ( returnValueType == null ) {
 			return false;
 		}
 
-		ExecutableConstraintLocation constraintLocation = new ExecutableConstraintLocation( executableElement );
-		for ( ConstraintType constraintType : returnValueType.getConstraint() ) {
-			MetaConstraint<?> metaConstraint = MetaConstraintBuilder.buildMetaConstraint(
+		ConstraintLocation constraintLocation = ConstraintLocation.forReturnValue( executableElement );
+		for ( ConstraintType constraint : returnValueType.getConstraint() ) {
+			MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 					constraintLocation,
-					constraintType,
+					constraint,
 					executableElement.getElementType(),
 					defaultPackage,
-					constraintHelper
+					ConstraintDescriptorImpl.ConstraintType.GENERIC
 			);
 			returnValueConstraints.add( metaConstraint );
 		}
 		groupConversions.putAll(
-				GroupConversionBuilder.buildGroupConversionMap(
+				groupConversionBuilder.buildGroupConversionMap(
 						returnValueType.getConvertGroup(),
 						defaultPackage
 				)
@@ -303,7 +299,7 @@ public class ConstrainedExecutableBuilder {
 		return returnValueType.getValid() != null;
 	}
 
-	private static List<Class<?>> createParameterTypes(List<ParameterType> parameterList,
+	private List<Class<?>> createParameterTypes(List<ParameterType> parameterList,
 													   Class<?> beanClass,
 													   String defaultPackage) {
 		List<Class<?>> parameterTypes = newArrayList();
@@ -311,7 +307,7 @@ public class ConstrainedExecutableBuilder {
 			String type = null;
 			try {
 				type = parameterType.getType();
-				Class<?> parameterClass = ReflectionHelper.loadClass( type, defaultPackage );
+				Class<?> parameterClass = classLoadingHelper.loadClass( type, defaultPackage );
 				parameterTypes.add( parameterClass );
 			}
 			catch ( ValidationException e ) {
@@ -321,6 +317,14 @@ public class ConstrainedExecutableBuilder {
 
 		return parameterTypes;
 	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
 }
-
-

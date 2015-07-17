@@ -1,36 +1,33 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
-import java.util.Set;
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
-import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
-import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.util.ExecutableHelper;
+import java.util.Collections;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
 
 /**
  * @author Gunnar Morling
@@ -41,7 +38,12 @@ public class PropertyMetaDataTest {
 
 	@BeforeMethod
 	public void setupBeanMetaDataManager() {
-		beanMetaDataManager = new BeanMetaDataManager( new ConstraintHelper(), new ExecutableHelper() );
+		beanMetaDataManager = new BeanMetaDataManager(
+				new ConstraintHelper(),
+				new ExecutableHelper( new TypeResolutionHelper() ),
+				new DefaultParameterNameProvider(),
+				Collections.<MetaDataProvider>emptyList()
+		);
 	}
 
 	@Test
@@ -61,6 +63,34 @@ public class PropertyMetaDataTest {
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")
 	public void groupConversionInHierarchyWithSameFrom() {
 		beanMetaDataManager.getBeanMetaData( User3.class ).getMetaDataFor( "addresses" );
+	}
+
+	@Test
+	public void unwrapValidatedValueGivenOnField() {
+		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( Customer.class ).getMetaDataFor( "name" );
+		assertEquals( property.unwrapMode(), UnwrapMode.UNWRAP );
+
+		property = beanMetaDataManager.getBeanMetaData( Customer.class ).getMetaDataFor( "age" );
+		assertEquals( property.unwrapMode(), UnwrapMode.AUTOMATIC );
+	}
+
+	@Test
+	public void unwrapValidatedValueGivenOnProperty() {
+		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( Customer.class ).getMetaDataFor( "firstName" );
+		assertEquals( property.unwrapMode(), UnwrapMode.UNWRAP );
+	}
+
+	@Test
+	public void unwrapValidatedValueGivenOnPropertyInSuperClass() {
+		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( RetailCustomer.class )
+				.getMetaDataFor( "firstName" );
+		assertEquals( property.unwrapMode(), UnwrapMode.UNWRAP );
+	}
+
+	@TestForIssue( jiraKey = "HV-925")
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000189.*")
+	public void inconsistent_unwrap_configuration_between_field_and_getter_throws_exception() {
+		beanMetaDataManager.getBeanMetaData( DiscountCustomer.class ).getMetaDataFor( "firstName" );
 	}
 
 	public interface Complete extends Default {
@@ -102,6 +132,37 @@ public class PropertyMetaDataTest {
 		})
 		public Set<Address> getAddresses() {
 			return super.getAddresses();
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private static class Customer {
+
+		@UnwrapValidatedValue
+		private String name;
+
+		private int age;
+
+		private String firstName;
+
+		@UnwrapValidatedValue
+		public String getFirstName() {
+			return firstName;
+		}
+	}
+
+	private static class RetailCustomer extends Customer {
+	}
+
+	@SuppressWarnings("unused")
+	private static class DiscountCustomer {
+
+		@UnwrapValidatedValue(false)
+		private String firstName;
+
+		@UnwrapValidatedValue
+		public String getFirstName() {
+			return firstName;
 		}
 	}
 }

@@ -1,18 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * Hibernate Validator, declare and validate application constraints
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.test.cfg;
 
@@ -35,7 +25,7 @@ public class Marathon implements Tournament {
 
 	private Date tournamentDate;
 
-	private List<Runner> runners;
+	private final List<Runner> runners;
 
 	public Marathon() {
 		runners = new ArrayList<Runner>();
@@ -49,6 +39,7 @@ public class Marathon implements Tournament {
 		this.name = name;
 	}
 
+	@Override
 	public Date getTournamentDate() {
 		return tournamentDate;
 	}
@@ -61,9 +52,8 @@ public class Marathon implements Tournament {
 		return runners;
 	}
 
-	public void addRunner(Runner runner) {
-		runners.add( runner );
+	public boolean addRunner(Runner runner) {
+		return runners.add( runner );
 	}
 }
-
 

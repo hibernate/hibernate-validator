@@ -1,21 +1,14 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.metadata.raw;
 
+import org.hibernate.validator.internal.util.ReflectionHelper;
+
+import javax.validation.ParameterNameProvider;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
@@ -25,9 +18,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
-import javax.validation.ParameterNameProvider;
-
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
@@ -88,17 +78,63 @@ public abstract class ExecutableElement {
 	public abstract String getSimpleName();
 
 	public abstract boolean isGetterMethod();
+	
+	public abstract String getIdentifier();
 
-	public String getIdentifier() {
-		return getSimpleName() + Arrays.toString( getParameterTypes() );
+	/**
+	 * Returns a string representation of this executable in the form {@code <name>(<parameterType 0> ...  <parameterType n>)},
+	 * e.g. for logging purposes.
+	 *
+	 * @return A string representation of the given executable.
+	 */
+	public String getAsString() {
+		return getExecutableAsString( getSimpleName(), getParameterTypes() );
+	}
+
+	@Override
+	public abstract boolean equals(Object obj);
+
+	@Override
+	public abstract int hashCode();
+
+	/**
+	 * Returns a string representation of an executable with the given name and parameter types in the form
+	 * {@code <name>(<parameterType 0> ...  <parameterType n>)}, e.g. for logging purposes.
+	 *
+	 * @param name the name of the executable
+	 * @param parameterTypes the types of the executable's parameters
+	 *
+	 * @return A string representation of the given executable.
+	 */
+	public static String getExecutableAsString(String name, Class<?>... parameterTypes) {
+		StringBuilder sb = new StringBuilder( name );
+		sb.append( "(" );
+
+		boolean isFirst = true;
+
+		for ( Class<?> parameterType : parameterTypes ) {
+			if ( !isFirst ) {
+				sb.append( ", " );
+			}
+			else {
+				isFirst = false;
+			}
+
+			sb.append( parameterType.getSimpleName() );
+		}
+
+		sb.append( ")" );
+		return sb.toString();
 	}
 
 	private static class ConstructorElement extends ExecutableElement {
 
 		private final Constructor<?> constructor;
+		private final String identifier;
 
 		private ConstructorElement(Constructor<?> method) {
 			this.constructor = method;
+			identifier = getSimpleName() + Arrays.toString( getParameterTypes() );
 		}
 
 		@Override
@@ -146,6 +182,11 @@ public abstract class ExecutableElement {
 		@Override
 		public AccessibleObject getAccessibleObject() {
 			return constructor;
+		}
+		
+		@Override
+		public String getIdentifier() {
+			return identifier;
 		}
 
 		@Override
@@ -232,10 +273,12 @@ public abstract class ExecutableElement {
 
 		private final Method method;
 		private final boolean isGetterMethod;
+		private final String identifier;
 
 		public MethodElement(Method method) {
 			this.method = method;
 			isGetterMethod = ReflectionHelper.isGetterMethod( method );
+			identifier = getSimpleName() + Arrays.toString( getParameterTypes() );
 		}
 
 		@Override
@@ -286,6 +329,11 @@ public abstract class ExecutableElement {
 		@Override
 		public boolean isGetterMethod() {
 			return isGetterMethod;
+		}
+		
+		@Override
+		public String getIdentifier() {
+			return identifier;
 		}
 
 		@Override

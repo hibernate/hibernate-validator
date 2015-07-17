@@ -1,29 +1,20 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.engine;
-
-import java.io.Serializable;
-import java.lang.annotation.ElementType;
-import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Path;
+import javax.validation.metadata.ConstraintDescriptor;
+import java.io.Serializable;
+import java.lang.annotation.ElementType;
+import java.util.Map;
 
 /**
  * @author Emmanuel Bernard
@@ -40,14 +31,26 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	private final Object leafBeanInstance;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final String messageTemplate;
+	private final Map<String, Object> expressionVariables;
 	private final Class<T> rootBeanClass;
 	private final ElementType elementType;
 	private final Object[] executableParameters;
 	private final Object executableReturnValue;
+	private final int hashCode;
 
-	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, T rootBean, Object leafBeanInstance, Object value, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType) {
+	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate,
+															   Map<String, Object> expressionVariables,
+															   String interpolatedMessage,
+															   Class<T> rootBeanClass,
+															   T rootBean,
+															   Object leafBeanInstance,
+															   Object value,
+															   Path propertyPath,
+															   ConstraintDescriptor<?> constraintDescriptor,
+															   ElementType elementType) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
+				expressionVariables,
 				interpolatedMessage,
 				rootBeanClass,
 				rootBean,
@@ -61,9 +64,20 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		);
 	}
 
-	public static <T> ConstraintViolation<T> forParameterValidation(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, T rootBean, Object leafBeanInstance, Object value, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType, Object[] executableParameters) {
+	public static <T> ConstraintViolation<T> forParameterValidation(String messageTemplate,
+																	Map<String, Object> expressionVariables,
+																	String interpolatedMessage,
+																	Class<T> rootBeanClass,
+																	T rootBean,
+																	Object leafBeanInstance,
+																	Object value,
+																	Path propertyPath,
+																	ConstraintDescriptor<?> constraintDescriptor,
+																	ElementType elementType,
+																	Object[] executableParameters) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
+				expressionVariables,
 				interpolatedMessage,
 				rootBeanClass,
 				rootBean,
@@ -77,9 +91,20 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		);
 	}
 
-	public static <T> ConstraintViolation<T> forReturnValueValidation(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, T rootBean, Object leafBeanInstance, Object value, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType, Object executableReturnValue) {
+	public static <T> ConstraintViolation<T> forReturnValueValidation(String messageTemplate,
+																	  Map<String, Object> expressionVariables,
+																	  String interpolatedMessage,
+																	  Class<T> rootBeanClass,
+																	  T rootBean,
+																	  Object leafBeanInstance,
+																	  Object value,
+																	  Path propertyPath,
+																	  ConstraintDescriptor<?> constraintDescriptor,
+																	  ElementType elementType,
+																	  Object executableReturnValue) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
+				expressionVariables,
 				interpolatedMessage,
 				rootBeanClass,
 				rootBean,
@@ -93,8 +118,20 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		);
 	}
 
-	private ConstraintViolationImpl(String messageTemplate, String interpolatedMessage, Class<T> rootBeanClass, T rootBean, Object leafBeanInstance, Object value, Path propertyPath, ConstraintDescriptor<?> constraintDescriptor, ElementType elementType, Object[] executableParameters, Object executableReturnValue) {
+	private ConstraintViolationImpl(String messageTemplate,
+			Map<String, Object> expressionVariables,
+			String interpolatedMessage,
+			Class<T> rootBeanClass,
+			T rootBean,
+			Object leafBeanInstance,
+			Object value,
+			Path propertyPath,
+			ConstraintDescriptor<?> constraintDescriptor,
+			ElementType elementType,
+			Object[] executableParameters,
+			Object executableReturnValue) {
 		this.messageTemplate = messageTemplate;
+		this.expressionVariables = expressionVariables;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
 		this.value = value;
@@ -105,6 +142,8 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		this.elementType = elementType;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
+		// pre-calculate hash code, the class is immutable and hashCode is needed often
+		this.hashCode = createHashCode();
 	}
 
 	@Override
@@ -115,6 +154,14 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	@Override
 	public final String getMessageTemplate() {
 		return messageTemplate;
+	}
+
+	/**
+	 *
+	 * @return the expression variables added using {@link org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl#addExpressionVariable(String, Object)}
+	 */
+	public Map<String, Object> getExpressionVariables() {
+		return expressionVariables;
 	}
 
 	@Override
@@ -166,7 +213,11 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	}
 
 	@Override
-	// IMPORTANT - some behaviour of Validator depends on the correct implementation of this equals method!
+	// IMPORTANT - some behaviour of Validator depends on the correct implementation of this equals method! (HF)
+
+	// Do not take expressionVariables into account here. If everything else matches, the two CV should be considered
+	// equals (and because of the scary comment above). After all, expressionVariables is just a hint about how we got
+	// to the actual CV. (NF)
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
@@ -210,16 +261,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 
 	@Override
 	public int hashCode() {
-		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
-		result = 31 * result + ( propertyPath != null ? propertyPath.hashCode() : 0 );
-		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
-		result = 31 * result + ( leafBeanInstance != null ? leafBeanInstance.hashCode() : 0 );
-		result = 31 * result + ( value != null ? value.hashCode() : 0 );
-		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
-		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
-		result = 31 * result + ( rootBeanClass != null ? rootBeanClass.hashCode() : 0 );
-		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
-		return result;
+		return hashCode;
 	}
 
 	@Override
@@ -232,5 +274,19 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		sb.append( ", messageTemplate='" ).append( messageTemplate ).append( '\'' );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	// Same as for equals, do not take expressionVariables into account here.
+	private int createHashCode() {
+		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
+		result = 31 * result + ( propertyPath != null ? propertyPath.hashCode() : 0 );
+		result = 31 * result + ( rootBean != null ? rootBean.hashCode() : 0 );
+		result = 31 * result + ( leafBeanInstance != null ? leafBeanInstance.hashCode() : 0 );
+		result = 31 * result + ( value != null ? value.hashCode() : 0 );
+		result = 31 * result + ( constraintDescriptor != null ? constraintDescriptor.hashCode() : 0 );
+		result = 31 * result + ( messageTemplate != null ? messageTemplate.hashCode() : 0 );
+		result = 31 * result + ( rootBeanClass != null ? rootBeanClass.hashCode() : 0 );
+		result = 31 * result + ( elementType != null ? elementType.hashCode() : 0 );
+		return result;
 	}
 }

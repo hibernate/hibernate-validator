@@ -1,41 +1,33 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat, Inc. and/or its affiliates, and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *       hibernate-validator/src/main/docbook/en-US/modules/integration.xml~
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.xml;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
+import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
+
+import javax.validation.BootstrapConfiguration;
+import javax.validation.executable.ExecutableType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.validation.BootstrapConfiguration;
-import javax.validation.executable.ExecutableType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-
-import org.hibernate.validator.internal.util.ResourceLoaderHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.
@@ -54,11 +46,15 @@ public class ValidationXmlParser {
 			1
 	);
 
-	private final XmlParserHelper xmlParserHelper = new XmlParserHelper();
+	private final ClassLoader externalClassLoader;
 
 	static {
 		SCHEMAS_BY_VERSION.put( "1.0", "META-INF/validation-configuration-1.0.xsd" );
 		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-configuration-1.1.xsd" );
+	}
+
+	public ValidationXmlParser(ClassLoader externalClassLoader) {
+		this.externalClassLoader = externalClassLoader;
 	}
 
 	/**
@@ -67,14 +63,19 @@ public class ValidationXmlParser {
 	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of {@code ConfigurationImpl.ValidationBootstrapParameters}.
 	 */
 	public final BootstrapConfiguration parseValidationXml() {
-		InputStream inputStream = getInputStream();
+		InputStream inputStream = getValidationXmlInputStream();
 		if ( inputStream == null ) {
 			return BootstrapConfigurationImpl.getDefaultBootstrapConfiguration();
 		}
 
 		try {
+			// HV-970 The parser helper is only loaded if there actually is a validation.xml file;
+			// this avoids accessing javax.xml.stream.* (which does not exist on Android) when not actually
+			// working with the XML configuration
+			XmlParserHelper xmlParserHelper = new XmlParserHelper();
+
 			String schemaVersion = xmlParserHelper.getSchemaVersion( VALIDATION_XML_FILE, inputStream );
-			Schema schema = getSchema( schemaVersion );
+			Schema schema = getSchema( xmlParserHelper, schemaVersion );
 			ValidationConfigType validationConfig = unmarshal( inputStream, schema );
 
 			return createBootstrapConfiguration( validationConfig );
@@ -84,9 +85,9 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private InputStream getInputStream() {
+	private InputStream getValidationXmlInputStream() {
 		log.debugf( "Trying to load %s for XML based Validator configuration.", VALIDATION_XML_FILE );
-		InputStream inputStream = ResourceLoaderHelper.getResettableInputStreamForPath( VALIDATION_XML_FILE );
+		InputStream inputStream = ResourceLoaderHelper.getResettableInputStreamForPath( VALIDATION_XML_FILE, externalClassLoader );
 
 		if ( inputStream != null ) {
 			return inputStream;
@@ -97,7 +98,7 @@ public class ValidationXmlParser {
 		}
 	}
 
-	private Schema getSchema(String schemaVersion) {
+	private Schema getSchema(XmlParserHelper xmlParserHelper, String schemaVersion) {
 		String schemaResource = SCHEMAS_BY_VERSION.get( schemaVersion );
 
 		if ( schemaResource == null ) {
@@ -111,14 +112,19 @@ public class ValidationXmlParser {
 		log.parsingXMLFile( VALIDATION_XML_FILE );
 
 		try {
-			JAXBContext jc = JAXBContext.newInstance( ValidationConfigType.class );
+			// JAXBContext#newInstance() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBContext jc = run( NewJaxbContext.action( ValidationConfigType.class ) );
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema( schema );
 			StreamSource stream = new StreamSource( inputStream );
-			JAXBElement<ValidationConfigType> root = unmarshaller.unmarshal( stream, ValidationConfigType.class );
+
+			// Unmashaller#unmarshal() requires several permissions internally and doesn't use any privileged blocks
+			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
+			JAXBElement<ValidationConfigType> root = run( Unmarshal.action( unmarshaller, stream, ValidationConfigType.class ) );
 			return root.getValue();
 		}
-		catch ( JAXBException e ) {
+		catch ( Exception e ) {
 			throw log.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
 		}
 	}
@@ -182,5 +188,15 @@ public class ValidationXmlParser {
 		executableTypes.addAll( validatedExecutables.getExecutableType() );
 
 		return executableTypes;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedExceptionAction<T> action) throws Exception {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

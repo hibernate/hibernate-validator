@@ -1,18 +1,8 @@
 <!--
-  ~ JBoss, Home of Professional Open Source
-  ~ Copyright 2011, Red Hat, Inc. and/or its affiliates, and individual contributors
-  ~ by the @authors tag. See the copyright.txt in the distribution for a
-  ~ full listing of individual contributors.
+  ~ Hibernate Validator, declare and validate application constraints
   ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -20,7 +10,7 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>5.0.4-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -32,6 +22,7 @@
     <properties>
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.javadoc.skip>false</maven.javadoc.skip>
     </properties>
 
     <dependencies>
@@ -77,6 +68,10 @@
             <artifactId>jsoup</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.thoughtworks.paranamer</groupId>
+            <artifactId>paranamer</artifactId>
+        </dependency>
+        <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
         </dependency>
@@ -88,6 +83,10 @@
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-annotations</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -98,16 +97,22 @@
                 <configuration>
                     <sourcepath>
                         ${basedir}/../engine/src/main/java;
-                        ${basedir}/../engine/target/generated-sources;
                         ${basedir}/../cdi/src/main/java;
                         ${basedir}/../annotation-processor/src/main/java
                     </sourcepath>
                     <links>
                         <link>http://docs.oracle.com/javase/6/docs/api</link>
-                        <link>http://docs.oracle.com/javaee/6/api</link>
+                        <link>http://docs.oracle.com/javaee/7/api</link>
                         <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api</link>
                         <link>http://docs.jboss.org/cdi/api/1.1-PFD</link>
                     </links>
+                    <tags>
+                        <tag>
+                            <name>hv.experimental</name>
+                            <placement>a</placement>
+                            <head>Experimental</head>
+                        </tag>
+                    </tags>
                     <packagesheader>Hibernate Validator Packages</packagesheader>
                     <doctitle>Hibernate Validator ${project.version}</doctitle>
                     <windowtitle>Hibernate Validator ${project.version}</windowtitle>

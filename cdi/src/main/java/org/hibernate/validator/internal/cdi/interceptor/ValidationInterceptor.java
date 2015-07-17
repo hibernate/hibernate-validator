@@ -1,19 +1,9 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.cdi.interceptor;
 
 import java.io.Serializable;
@@ -43,17 +33,18 @@ import javax.validation.executable.ExecutableValidator;
  */
 @MethodValidated
 @Interceptor
-@Priority(4800)
+@Priority(Interceptor.Priority.PLATFORM_AFTER + 800)
 public class ValidationInterceptor implements Serializable {
 
 	private static final long serialVersionUID = 604440259030722151L;
 
 	/**
 	 * The validator to be used for method validation.
-	 * <p/>
+	 * <p>
 	 * Although the concrete validator is not necessarily serializable (and HV's implementation indeed isn't) it is still
 	 * alright to have it as non-transient field here. Upon passivation not the validator itself will be serialized, but the
 	 * proxy injected here, which in turn is serializable.
+	 * </p>
 	 */
 	@Inject
 	private Validator validator;
@@ -86,7 +77,7 @@ public class ValidationInterceptor implements Serializable {
 
 		Object result = ctx.proceed();
 
-		violations = validator.forExecutables().validateReturnValue(
+		violations = executableValidator.validateReturnValue(
 				ctx.getTarget(),
 				ctx.getMethod(),
 				result
@@ -111,7 +102,6 @@ public class ValidationInterceptor implements Serializable {
 	 * in case at least one constraint violation occurred either during parameter or return value validation.
 	 */
 	@AroundConstruct
-	@SuppressWarnings("unchecked")
 	public void validateConstructorInvocation(InvocationContext ctx) throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
 		Set<ConstraintViolation<Object>> violations = executableValidator.validateConstructorParameters(

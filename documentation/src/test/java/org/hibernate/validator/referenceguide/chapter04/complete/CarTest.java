@@ -35,7 +35,7 @@ public class CarTest {
 				.next()
 				.getMessage();
 		assertEquals(
-				"The license plate must be between 2 and 14 characters long",
+				"The license plate 'A' must be between 2 and 14 characters long",
 				message
 		);
 

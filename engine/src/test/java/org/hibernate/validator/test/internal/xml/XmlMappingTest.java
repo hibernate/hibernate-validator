@@ -1,46 +1,39 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.test.internal.xml;
-
-import java.io.InputStream;
-import java.lang.annotation.ElementType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import javax.validation.BootstrapConfiguration;
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.executable.ExecutableType;
-import javax.validation.groups.Default;
-import javax.validation.metadata.MethodDescriptor;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.validation.BootstrapConfiguration;
+import javax.validation.Configuration;
+import javax.validation.ConstraintViolation;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
+import javax.validation.executable.ExecutableType;
+import javax.validation.groups.Default;
+import javax.validation.metadata.MethodDescriptor;
+import java.io.InputStream;
+import java.lang.annotation.ElementType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.testng.Assert.assertEquals;
 
@@ -49,6 +42,13 @@ import static org.testng.Assert.assertEquals;
  * @author Gunnar Morling
  */
 public class XmlMappingTest {
+
+	private static ValidationXmlTestHelper validationXmlTestHelper;
+
+	@BeforeClass
+	public static void setupValidationXmlTestHelper() {
+		validationXmlTestHelper = new ValidationXmlTestHelper( XmlMappingTest.class );
+	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-214")
@@ -191,7 +191,7 @@ public class XmlMappingTest {
 
 	@Test
 	public void testParameterNameProviderConfiguration() {
-		runWithCustomValidationXml(
+		validationXmlTestHelper.runWithCustomValidationXml(
 				"parameter-name-provider-validation.xml", new Runnable() {
 
 			@Override
@@ -220,7 +220,7 @@ public class XmlMappingTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-707")
 	public void shouldReturnDefaultExecutableTypesForValidationXmlWithoutTypesGiven() {
-		runWithCustomValidationXml(
+		validationXmlTestHelper.runWithCustomValidationXml(
 				"bv-1.0-validation.xml", new Runnable() {
 
 			@Override
@@ -257,7 +257,7 @@ public class XmlMappingTest {
 
 	@Test
 	public void testLoadingOfBv10ValidationXml() {
-		runWithCustomValidationXml(
+		validationXmlTestHelper.runWithCustomValidationXml(
 				"bv-1.0-validation.xml", new Runnable() {
 
 			@Override
@@ -282,7 +282,7 @@ public class XmlMappingTest {
 			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for META-INF/validation.xml: 2\\.0\\."
 	)
 	public void shouldFailToLoadValidationXmlWithUnsupportedVersion() {
-		runWithCustomValidationXml(
+		validationXmlTestHelper.runWithCustomValidationXml(
 				"unsupported-validation.xml", new Runnable() {
 
 			@Override
@@ -298,7 +298,7 @@ public class XmlMappingTest {
 			expectedExceptionsMessageRegExp = "HV000100: Unable to parse META-INF/validation.xml."
 	)
 	public void shouldFailToLoad10ValidationXmlWithParameterNameProvider() {
-		runWithCustomValidationXml(
+		validationXmlTestHelper.runWithCustomValidationXml(
 				"invalid-bv-1.0-validation.xml", new Runnable() {
 
 			@Override
@@ -309,33 +309,20 @@ public class XmlMappingTest {
 		);
 	}
 
-	/**
-	 * Executes the given runnable, using the specified file as replacement for
-	 * {@code META-INF/validation.xml}.
-	 *
-	 * @param validationXmlName The file to be used as validation.xml file.
-	 * @param runnable The runnable to execute.
-	 */
-	private void runWithCustomValidationXml(final String validationXmlName, Runnable runnable) {
-		ClassLoader previousContextCl = Thread.currentThread().getContextClassLoader();
+	@Test
+	@TestForIssue(jiraKey = "HV-836")
+	public void testCascadedValidation() {
+		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
+		configuration.addMapping( XmlMappingTest.class.getResourceAsStream( "cascaded-validation-mapping.xml" ) );
 
-		try {
-			Thread.currentThread().setContextClassLoader(
-					new ClassLoader( previousContextCl ) {
-						@Override
-						public InputStream getResourceAsStream(String name) {
-							if ( name.equals( "META-INF/validation.xml" ) ) {
-								return XmlMappingTest.class.getResourceAsStream( validationXmlName );
-							}
+		final ValidatorFactory validatorFactory = configuration.buildValidatorFactory();
+		final Validator validator = validatorFactory.getValidator();
 
-							return super.getResourceAsStream( name );
-						}
-					}
-			);
-			runnable.run();
-		}
-		finally {
-			Thread.currentThread().setContextClassLoader( previousContextCl );
-		}
+		System system = new System();
+		system.addPart( new Part() );
+		Set<ConstraintViolation<System>> violations = validator.validate( system );
+
+		assertEquals( violations.size(), 1 );
+		assertCorrectConstraintTypes( violations, NotNull.class );
 	}
 }

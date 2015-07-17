@@ -1,29 +1,16 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.util.classhierarchy;
 
-import java.lang.reflect.Method;
+import org.hibernate.validator.internal.util.Contracts;
+
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -46,6 +33,7 @@ public class ClassHierarchyHelper {
 	 *
 	 * @param clazz the class for which to retrieve the hierarchy
 	 * @param filters filters applying for the search
+	 * @param <T> the type of the class
 	 *
 	 * @return List of hierarchy classes. Will only contain those types matching
 	 *         the given filters. The list contains the given class itself, if
@@ -107,6 +95,7 @@ public class ClassHierarchyHelper {
 	 * are not contained.
 	 *
 	 * @param clazz the class for which to retrieve the implemented interfaces
+	 * @param <T> the type of the class
 	 *
 	 * @return Set of all interfaces implemented by the class represented by
 	 *         this hierarchy. The empty list is returned if it does not
@@ -127,27 +116,5 @@ public class ClassHierarchyHelper {
 			classes.add( currentInterfaceCasted );
 			getImplementedInterfaces( currentInterfaceCasted, classes );
 		}
-	}
-
-	/**
-	 * Get a list of all methods wich the given class declares, implements,
-	 * overrides or inherits. Methods are added by adding first all methods of
-	 * the class itself and its implemented interfaces, then the super class and
-	 * its interfaces, etc.
-	 *
-	 * @param clazz the class for which to retrieve the methods
-	 *
-	 * @return set of all methods of the given class
-	 */
-	public static List<Method> getAllMethods(Class<?> clazz) {
-		Contracts.assertNotNull( clazz );
-
-		List<Method> methods = newArrayList();
-
-		for ( Class<?> hierarchyClass : getHierarchy( clazz ) ) {
-			Collections.addAll( methods, ReflectionHelper.getMethods( hierarchyClass ) );
-		}
-
-		return methods;
 	}
 }

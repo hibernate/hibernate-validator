@@ -1,25 +1,15 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.engine.path;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.Path.BeanNode;
@@ -29,10 +19,9 @@ import javax.validation.Path.MethodNode;
 import javax.validation.Path.ParameterNode;
 import javax.validation.Path.PropertyNode;
 import javax.validation.Path.ReturnValueNode;
-
-import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Immutable implementation of a {@code Path.Node}.
@@ -41,8 +30,9 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 public class NodeImpl
-		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Serializable {
+		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, org.hibernate.validator.path.PropertyNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
+	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
 
 	private static final Log log = LoggerFactory.make();
 
@@ -60,16 +50,18 @@ public class NodeImpl
 	private final int hashCode;
 
 	//type-specific attributes
-	private final List<Class<?>> parameterTypes;
+	private final Class<?>[] parameterTypes;
 	private final Integer parameterIndex;
+	private final Object value;
 
 	private String asString;
 
-	private NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementKind kind, List<Class<?>> parameterTypes, Integer parameterIndex) {
+	private NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes, Integer parameterIndex, Object value) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
 		this.key = key;
+		this.value = value;
 		this.isIterable = indexable;
 		this.kind = kind;
 		this.parameterTypes = parameterTypes;
@@ -86,7 +78,8 @@ public class NodeImpl
 				null,
 				null,
 				ElementKind.PROPERTY,
-				Collections.<Class<?>>emptyList(),
+				EMPTY_CLASS_ARRAY,
+				null,
 				null
 		);
 	}
@@ -99,8 +92,9 @@ public class NodeImpl
 				null,
 				null,
 				ElementKind.PARAMETER,
-				Collections.<Class<?>>emptyList(),
-				parameterIndex
+				EMPTY_CLASS_ARRAY,
+				parameterIndex,
+				null
 		);
 	}
 
@@ -112,17 +106,18 @@ public class NodeImpl
 				null,
 				null,
 				ElementKind.CROSS_PARAMETER,
-				Collections.<Class<?>>emptyList(),
+				EMPTY_CLASS_ARRAY,
+				null,
 				null
 		);
 	}
 
-	public static NodeImpl createMethodNode(String name, NodeImpl parent, List<Class<?>> parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null );
+	public static NodeImpl createMethodNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
+		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null );
 	}
 
-	public static NodeImpl createConstructorNode(String name, NodeImpl parent, List<Class<?>> parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null );
+	public static NodeImpl createConstructorNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
+		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null );
 	}
 
 	public static NodeImpl createBeanNode(NodeImpl parent) {
@@ -133,7 +128,8 @@ public class NodeImpl
 				null,
 				null,
 				ElementKind.BEAN,
-				Collections.<Class<?>>emptyList(),
+				EMPTY_CLASS_ARRAY,
+				null,
 				null
 		);
 	}
@@ -146,7 +142,8 @@ public class NodeImpl
 				null,
 				null,
 				ElementKind.RETURN_VALUE,
-				Collections.<Class<?>>emptyList(),
+				EMPTY_CLASS_ARRAY,
+				null,
 				null
 		);
 	}
@@ -160,7 +157,8 @@ public class NodeImpl
 				null,
 				node.kind,
 				node.parameterTypes,
-				node.parameterIndex
+				node.parameterIndex,
+				node.value
 
 		);
 	}
@@ -174,7 +172,8 @@ public class NodeImpl
 				null,
 				node.kind,
 				node.parameterTypes,
-				node.parameterIndex
+				node.parameterIndex,
+				node.value
 		);
 	}
 
@@ -187,7 +186,22 @@ public class NodeImpl
 				key,
 				node.kind,
 				node.parameterTypes,
-				node.parameterIndex
+				node.parameterIndex,
+				node.value
+		);
+	}
+
+	public static NodeImpl setPropertyValue(NodeImpl node, Object value) {
+		return new NodeImpl(
+				node.name,
+				node.parent,
+				node.isIterable,
+				node.index,
+				node.key,
+				node.kind,
+				node.parameterTypes,
+				node.parameterIndex,
+				value
 		);
 	}
 
@@ -241,7 +255,7 @@ public class NodeImpl
 				( kind == ElementKind.CROSS_PARAMETER && nodeType == CrossParameterNode.class ) ||
 				( kind == ElementKind.METHOD && nodeType == MethodNode.class ) ||
 				( kind == ElementKind.PARAMETER && nodeType == ParameterNode.class ) ||
-				( kind == ElementKind.PROPERTY && nodeType == PropertyNode.class ) ||
+				( kind == ElementKind.PROPERTY && ( nodeType == PropertyNode.class || nodeType == org.hibernate.validator.path.PropertyNode.class ) ) ||
 				( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class ) ) {
 			return nodeType.cast( this );
 		}
@@ -251,7 +265,7 @@ public class NodeImpl
 
 	@Override
 	public List<Class<?>> getParameterTypes() {
-		return new ArrayList<Class<?>>( parameterTypes );
+		return Arrays.asList( parameterTypes );
 	}
 
 	@Override
@@ -261,6 +275,11 @@ public class NodeImpl
 				"getParameterIndex() may only be invoked for nodes of ElementKind.PARAMETER."
 		);
 		return parameterIndex.intValue();
+	}
+
+	@Override
+	public Object getValue() {
+		return value;
 	}
 
 	@Override

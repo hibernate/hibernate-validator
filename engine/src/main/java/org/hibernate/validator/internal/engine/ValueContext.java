@@ -1,30 +1,22 @@
 /*
-* JBoss, Home of Professional Open Source
-* Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
-* by the @authors tag. See the copyright.txt in the distribution for a
-* full listing of individual contributors.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* http://www.apache.org/licenses/LICENSE-2.0
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
 package org.hibernate.validator.internal.engine;
 
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Type;
-import javax.validation.ElementKind;
-import javax.validation.groups.Default;
-
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
+import javax.validation.ElementKind;
+import javax.validation.groups.Default;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Type;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -67,9 +59,19 @@ public class ValueContext<T, V> {
 	private ElementType elementType;
 
 	/**
-	 * The type of annotated element.
+	 * The declared type of validated value.
 	 */
-	private Type typeOfAnnotatedElement;
+	private Type declaredTypeOfValidatedElement;
+
+	/**
+	 * An optional value unwrapper for the current value
+	 */
+	private ValidatedValueUnwrapper<V> validatedValueHandler;
+
+	/**
+	 * Enum specifying how to handle validated values
+	 */
+	private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
@@ -108,8 +110,14 @@ public class ValueContext<T, V> {
 		return currentValidatable;
 	}
 
-	public final V getCurrentValidatedValue() {
-		return currentValue;
+	/**
+	 * Returns the current value to be validated. If a {@link ValidatedValueUnwrapper} has been set, the value will be
+	 * retrieved via that handler.
+	 *
+	 * @return the current value to be validated
+	 */
+	public final Object getCurrentValidatedValue() {
+		return validatedValueHandler != null ? validatedValueHandler.handleValidatedValue( currentValue ) : currentValue;
 	}
 
 	public final void setPropertyPath(PathImpl propertyPath) {
@@ -157,6 +165,7 @@ public class ValueContext<T, V> {
 	}
 
 	public final void setCurrentValidatedValue(V currentValue) {
+		propertyPath.setLeafNodeValue( currentValue );
 		this.currentValue = currentValue;
 	}
 
@@ -172,12 +181,18 @@ public class ValueContext<T, V> {
 		this.elementType = elementType;
 	}
 
-	public final Type getTypeOfAnnotatedElement() {
-		return typeOfAnnotatedElement;
+	/**
+	 * Returns the declared (static) type of the currently validated element. If a {@link ValidatedValueUnwrapper} has
+	 * been set, the type will be retrieved via that handler.
+	 *
+	 * @return the declared type of the currently validated element
+	 */
+	public final Type getDeclaredTypeOfValidatedElement() {
+		return declaredTypeOfValidatedElement;
 	}
 
-	public final void setTypeOfAnnotatedElement(Type typeOfAnnotatedElement) {
-		this.typeOfAnnotatedElement = typeOfAnnotatedElement;
+	public final void setDeclaredTypeOfValidatedElement(Type declaredTypeOfValidatedElement) {
+		this.declaredTypeOfValidatedElement = declaredTypeOfValidatedElement;
 	}
 
 	@Override
@@ -190,8 +205,24 @@ public class ValueContext<T, V> {
 		sb.append( ", currentGroup=" ).append( currentGroup );
 		sb.append( ", currentValue=" ).append( currentValue );
 		sb.append( ", elementType=" ).append( elementType );
-		sb.append( ", typeOfAnnotatedElement=" ).append( typeOfAnnotatedElement );
+		sb.append( ", typeOfValidatedValue=" ).append( declaredTypeOfValidatedElement );
 		sb.append( '}' );
 		return sb.toString();
+	}
+
+	public void setValidatedValueHandler(ValidatedValueUnwrapper<V> handler) {
+		this.validatedValueHandler = handler;
+	}
+
+	public ValidatedValueUnwrapper<V> getValidatedValueHandler() {
+		return validatedValueHandler;
+	}
+
+	public UnwrapMode getUnwrapMode() {
+		return unwrapMode;
+	}
+
+	public void setUnwrapMode(UnwrapMode unwrapMode) {
+		this.unwrapMode = unwrapMode;
 	}
 }
