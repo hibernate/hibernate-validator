@@ -302,6 +302,14 @@ Note that no explicit interceptor binding is required, instead the required meth
 interceptor will automatically be registered for all managed beans with constrained methods and
 constructors.
 
+[NOTE]
+====
+The interceptor `org.hibernate.validator.internal.cdi.interceptor.ValidationInterceptor` is
+registered by `org.hibernate.validator.internal.cdi.ValidationExtension`. This happens implicitly
+within a Java EE 7 runtime environment or explicitly by adding the _hibernate-validator-cdi_ artifact
+- see <<section-getting-started-cdi>>
+====
+
 You can see an example in <<example-cdi-method-validation>>.
 
 [[example-cdi-method-validation]]
@@ -374,7 +382,8 @@ the `@NotNull` constraint on the method `RentalStation#getAvailableCars()` in
 You have the following options to configure which types of executables are validated upon
 invocation:
 
-* Configure the executable types globally via the XML descriptor __META-INF/validation.xml__; see <<section-configuration-validation-xml>> for an example
+* Configure the executable types globally via the XML descriptor __META-INF/validation.xml__;
+see <<section-configuration-validation-xml>> for an example
 
 * Use the `@ValidateOnExecution` annotation on the executable or type level
 
