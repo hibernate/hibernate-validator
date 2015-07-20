@@ -1,6 +1,19 @@
 Hibernate Validator Changelog
 =============================
 
+5.2.0.Final (20.07.2015)
+-------------------------
+
+** Bug
+    * [HV-992] - Documentation not very clear: do I need interceptor to trigger method validation?
+    * [HV-1004] - CnpjValidator validation is failing for a valid cnpj
+    * [HV-1005] - @Email incorrectly flags emails with 64 character length local-part as invalid
+
+** Improvement
+    * [HV-984] - Further documentation review and improvements
+    * [HV-999] - Update to Bean Validation TCK 1.1.4
+
+
 5.2.0.CR1 (22.05.2015)
 -------------------------
 

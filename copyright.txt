@@ -5,6 +5,7 @@ Brent Douglas
 Carlos Vara
 Dag Hovland
 Davide Marchignoli
+Denis Tiago
 Doug Lea
 Emmanuel Bernard
 Efthymis Sarbanis
