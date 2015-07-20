@@ -31,9 +31,11 @@ import static java.util.regex.Pattern.CASE_INSENSITIVE;
  * @author Hardy Ferentschik
  */
 public class EmailValidator implements ConstraintValidator<Email, CharSequence> {
-	private static String ATOM = "[a-z0-9!#$%&'*+/=?^_`{|}~-]";
-	private static String DOMAIN = ATOM + "+(\\." + ATOM + "+)*";
-	private static String IP_DOMAIN = "\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\]";
+	private static final String ATOM = "[a-z0-9!#$%&'*+/=?^_`{|}~-]";
+	private static final String DOMAIN = ATOM + "+(\\." + ATOM + "+)*";
+	private static final String IP_DOMAIN = "\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\]";
+	private static final int MAX_LOCAL_PART_LENGTH = 64;
+	private static final int MAX_DOMAIN_PART_LENGTH = 255;
 
 	/**
 	 * Regular expression for the local part of an email address (everything before '@')
@@ -69,29 +71,50 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 		}
 
 		// if we have a trailing dot in local or domain part we have an invalid email address.
-		// the regular expression match would take care of this, but IDN.toASCII drops trailing the trailing '.'
+		// the regular expression match would take care of this, but IDN.toASCII drops the trailing '.'
 		// (imo a bug in the implementation)
 		if ( emailParts[0].endsWith( "." ) || emailParts[1].endsWith( "." ) ) {
 			return false;
 		}
 
-		if ( !matchPart( emailParts[0], localPattern ) ) {
+		if ( !matchPart( emailParts[0], localPattern, MAX_LOCAL_PART_LENGTH ) ) {
 			return false;
 		}
 
-		return matchPart( emailParts[1], domainPattern );
+		return matchPart( emailParts[1], domainPattern, MAX_DOMAIN_PART_LENGTH );
 	}
 
-	private boolean matchPart(String part, Pattern pattern) {
+	private boolean matchPart(String part, Pattern pattern, int maxLength) {
+		String asciiString;
 		try {
-			part = IDN.toASCII( part );
+			asciiString = toAscii( part );
 		}
 		catch ( IllegalArgumentException e ) {
-			// occurs when the label is too long (>63, even though it should probably be 64 - see http://www.rfc-editor.org/errata_search.php?rfc=3696,
-			// practically that should not be a problem)
 			return false;
 		}
-		Matcher matcher = pattern.matcher( part );
+
+		if ( asciiString.length() > maxLength ) {
+			return false;
+		}
+
+		Matcher matcher = pattern.matcher( asciiString );
 		return matcher.matches();
+	}
+
+	private String toAscii(String unicodeString) throws IllegalArgumentException {
+		String asciiString = "";
+		int start = 0;
+		int end = unicodeString.length() <= 63 ? unicodeString.length() : 63;
+		while ( true ) {
+			// IDN.toASCII only supports a max "label" length of 63 characters. Need to chunk the input in these sizes
+			asciiString += IDN.toASCII( unicodeString.substring( start, end ) );
+			if ( end == unicodeString.length() ) {
+				break;
+			}
+			start = end;
+			end = start + 63 > unicodeString.length() ? unicodeString.length() : start + 63;
+		}
+
+		return asciiString;
 	}
 }

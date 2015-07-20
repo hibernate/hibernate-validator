@@ -29,6 +29,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * @author Hardy Ferentschik
@@ -150,6 +151,43 @@ public class EmailValidatorTest {
 		isInvalidEmail( "validation@hibernate.com@" );
 		isInvalidEmail( "validation@hibernate.com@@" );
 		isInvalidEmail( "validation@hibernate.com@@@" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1005")
+	public void testEmailWith64CharacterLocalPartIsValid() {
+		// Local part should allow up to 64 octets: https://tools.ietf.org/html/rfc5321#section-4.5.3.1.1
+		isValidEmail( stringOfLength( 64 ) + "@foo.com" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1005")
+	public void testEmailWith65CharacterLocalPartIsInvalid() {
+		isInvalidEmail( stringOfLength( 65 ) + "@foo.com" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1005")
+	public void testEmailWith255CharacterDomainPartIsValid() {
+		// Domain part should allow up to 255
+		isValidEmail( "foo@" + stringOfLength( 251 ) + ".com" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1005")
+	public void testEmailWith256CharacterDomainPartIsInvalid() {
+		// Domain part should allow up to 255
+		isInvalidEmail( "foo@" + stringOfLength( 252 ) + ".com" );
+	}
+
+	private String stringOfLength(int length) {
+		StringBuilder builder = new StringBuilder();
+		for ( int i = 0; i < length; i++ ) {
+			builder.append( 'a' );
+		}
+		String s = builder.toString();
+		assertEquals( length, s.getBytes().length );
+		return s;
 	}
 
 	private void assertOrgAddressesAreNotValid(Set<ConstraintViolation<EmailContainer>> violations) {
