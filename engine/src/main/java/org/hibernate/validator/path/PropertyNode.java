@@ -14,7 +14,7 @@ package org.hibernate.validator.path;
 public interface PropertyNode extends javax.validation.Path.PropertyNode {
 
 	/**
-	 * Returns the value of the bean property represented by this node.
+	 * @return Returns the value of the bean property represented by this node.
 	 */
 	Object getValue();
 }
