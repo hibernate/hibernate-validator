@@ -6,16 +6,15 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.validationorder;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.validation.GroupDefinitionException;
-import javax.validation.groups.Default;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.engine.groups.DefaultValidationOrder;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
+import org.testng.annotations.Test;
+
+import javax.validation.GroupDefinitionException;
+import javax.validation.groups.Default;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.testng.FileAssert.fail;
 

@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import org.hibernate.validator.internal.engine.path.PathImpl;
+
 import java.util.Collections;
 import java.util.Map;
-
-import org.hibernate.validator.internal.engine.path.PathImpl;
 
 /**
  * Container class for the information needed to create a constraint violation.

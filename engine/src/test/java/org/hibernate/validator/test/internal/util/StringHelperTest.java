@@ -6,11 +6,10 @@
  */
 package org.hibernate.validator.test.internal.util;
 
-import java.util.Arrays;
-
+import org.hibernate.validator.internal.util.StringHelper;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.util.StringHelper;
+import java.util.Arrays;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;

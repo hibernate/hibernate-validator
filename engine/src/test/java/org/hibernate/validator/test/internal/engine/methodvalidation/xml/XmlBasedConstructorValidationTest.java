@@ -6,14 +6,13 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
-import javax.validation.Configuration;
-import javax.validation.ValidatorFactory;
-
-import org.testng.annotations.BeforeMethod;
-
 import org.hibernate.validator.test.internal.engine.methodvalidation.AbstractConstructorValidationTest;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeMethod;
+
+import javax.validation.Configuration;
+import javax.validation.ValidatorFactory;
 
 /**
  * Tests for XML configured constructor validation.

@@ -6,9 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.conversion;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import org.testng.annotations.Test;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
@@ -18,8 +17,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
-
-import org.testng.annotations.Test;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;

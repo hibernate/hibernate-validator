@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<validation-config
+        xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.0.xsd">
+    <default-provider>org.hibernate.validator.HibernateValidator</default-provider>
+
+    <property name="hibernate.validator.allow_parameter_constraint_override">true</property>
+    <property name="hibernate.validator.allow_multiple_cascaded_validation_on_result">true</property>
+    <property name="hibernate.validator.allow_parallel_method_parameter_constraint">true</property>
+    <property name="hibernate.validator.fail_fast">true</property>
+</validation-config>

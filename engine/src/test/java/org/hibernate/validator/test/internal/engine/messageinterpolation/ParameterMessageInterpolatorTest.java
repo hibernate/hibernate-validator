@@ -6,18 +6,17 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.Size;
-
 import org.apache.log4j.Logger;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.constraints.Size;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;

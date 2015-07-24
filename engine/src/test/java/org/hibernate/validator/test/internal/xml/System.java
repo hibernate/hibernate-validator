@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.Valid;
 
 /**
  * @author Hardy Ferentschik

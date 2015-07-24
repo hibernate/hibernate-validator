@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.engine.resolver;
 
-import java.lang.annotation.ElementType;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 import javax.persistence.Persistence;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import java.lang.annotation.ElementType;
 
 /**
  * An implementation of {@code TraversableResolver} which is aware of JPA 2 and utilizes {@code PersistenceUtil} to get

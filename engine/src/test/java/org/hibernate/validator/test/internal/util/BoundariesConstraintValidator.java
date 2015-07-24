@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.internal.util;
 
-import java.lang.annotation.Annotation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.lang.annotation.Annotation;
 
 /**
  * @author Emmanuel Bernard

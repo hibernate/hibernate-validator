@@ -6,19 +6,18 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-
-import java.util.Set;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.executable.ExecutableValidator;
+import java.util.Set;
 
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 
 /**
  * Test for making sure a validated sub-type method can have different constraints than a private super-type method with

@@ -6,15 +6,14 @@
  */
 package org.hibernate.validator.test.constraints.composition.validationtarget;
 
-import java.lang.reflect.Method;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.executable.ExecutableValidator;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
 import org.testng.annotations.Test;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.executable.ExecutableValidator;
+import java.lang.reflect.Method;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 

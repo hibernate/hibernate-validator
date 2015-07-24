@@ -6,10 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import java.util.Iterator;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
+import org.hibernate.validator.constraints.SafeHtml;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,7 +14,9 @@ import org.jsoup.parser.Parser;
 import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
 
-import org.hibernate.validator.constraints.SafeHtml;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import java.util.Iterator;
 
 /**
  * Validate that the string does not contain malicious code.

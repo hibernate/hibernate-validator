@@ -17,6 +17,11 @@
  */
 package org.hibernate.validator.test.internal.util;
 
+import org.hibernate.validator.internal.util.TypeHelper;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintValidator;
 import java.io.Serializable;
 import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationHandler;
@@ -33,12 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ConstraintValidator;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.util.TypeHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.testng.Assert.assertEquals;

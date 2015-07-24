@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import java.util.Collections;
-import java.util.List;
-import javax.validation.ConstraintValidator;
-
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.Mod11Check.ProcessingDirection;
 import org.hibernate.validator.internal.util.ModUtil;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.ConstraintValidator;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Mod11 Check Digit validator

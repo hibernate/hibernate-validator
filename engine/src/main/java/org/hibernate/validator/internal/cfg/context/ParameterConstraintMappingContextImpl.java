@@ -6,9 +6,6 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.util.Collections;
-import javax.validation.ParameterNameProvider;
-
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
@@ -22,6 +19,9 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+
+import javax.validation.ParameterNameProvider;
+import java.util.Collections;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.

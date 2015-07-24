@@ -6,14 +6,13 @@
  */
 package org.hibernate.validator.parameternameprovider;
 
+import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+
+import javax.validation.ParameterNameProvider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
-
-import javax.validation.ParameterNameProvider;
-
-import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 

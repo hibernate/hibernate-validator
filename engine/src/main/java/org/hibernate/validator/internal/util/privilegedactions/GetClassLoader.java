@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
-import java.security.PrivilegedAction;
-
 import org.hibernate.validator.internal.util.Contracts;
+
+import java.security.PrivilegedAction;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 

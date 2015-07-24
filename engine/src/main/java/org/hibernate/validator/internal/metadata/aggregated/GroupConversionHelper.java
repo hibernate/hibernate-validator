@@ -6,16 +6,16 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import org.hibernate.validator.internal.metadata.descriptor.GroupConversionDescriptorImpl;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.GroupSequence;
+import javax.validation.metadata.GroupConversionDescriptor;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import javax.validation.GroupSequence;
-import javax.validation.metadata.GroupConversionDescriptor;
-
-import org.hibernate.validator.internal.metadata.descriptor.GroupConversionDescriptorImpl;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 

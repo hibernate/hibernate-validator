@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
+import org.joda.time.DateMidnight;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
-
-import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling

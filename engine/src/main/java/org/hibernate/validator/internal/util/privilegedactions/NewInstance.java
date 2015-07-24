@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
-import java.security.PrivilegedAction;
-
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import java.security.PrivilegedAction;
 
 /**
  * Execute instance creation as privileged action.

@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.cfg;
 
+import javax.validation.Payload;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.Payload;
 
 /**
  * Base class for all constraint definition types. Each sub type represents a

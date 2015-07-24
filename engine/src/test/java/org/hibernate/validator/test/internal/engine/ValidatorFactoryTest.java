@@ -6,14 +6,13 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
+import org.testng.annotations.Test;
+
 import javax.validation.Validation;
 import javax.validation.ValidationException;
 import javax.validation.ValidatorFactory;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.HibernateValidatorFactory;
-import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 
 import static org.testng.Assert.assertSame;
 

@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.internal.metadata.facets;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+
+import javax.validation.ElementKind;
+import javax.validation.metadata.GroupConversionDescriptor;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.util.Set;
-import javax.validation.ElementKind;
-import javax.validation.metadata.GroupConversionDescriptor;
-
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties

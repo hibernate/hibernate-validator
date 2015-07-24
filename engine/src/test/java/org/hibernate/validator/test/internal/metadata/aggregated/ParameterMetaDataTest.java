@@ -6,20 +6,6 @@
  */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import javax.validation.ParameterNameProvider;
-import javax.validation.constraints.NotNull;
-import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ValidateOnExecution;
-import javax.validation.groups.Default;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -35,6 +21,19 @@ import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import javax.validation.ParameterNameProvider;
+import javax.validation.constraints.NotNull;
+import javax.validation.executable.ExecutableType;
+import javax.validation.executable.ValidateOnExecution;
+import javax.validation.groups.Default;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;

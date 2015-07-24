@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.lang.reflect.Type;
-import java.util.List;
-import javax.validation.ElementKind;
-import javax.validation.metadata.ElementDescriptor;
-
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+
+import javax.validation.ElementKind;
+import javax.validation.metadata.ElementDescriptor;
+import java.lang.reflect.Type;
+import java.util.List;
 
 /**
  * An aggregated view of the constraint related meta data for a given bean/type

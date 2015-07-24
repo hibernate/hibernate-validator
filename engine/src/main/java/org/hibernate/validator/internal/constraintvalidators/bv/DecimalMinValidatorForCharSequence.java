@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
-import java.math.BigDecimal;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.DecimalMin;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import java.math.BigDecimal;
 
 /**
  * @author Hardy Ferentschik

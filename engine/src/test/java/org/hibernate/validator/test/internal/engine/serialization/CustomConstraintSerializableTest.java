@@ -6,16 +6,15 @@
  */
 package org.hibernate.validator.test.internal.engine.serialization;
 
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 
 /**

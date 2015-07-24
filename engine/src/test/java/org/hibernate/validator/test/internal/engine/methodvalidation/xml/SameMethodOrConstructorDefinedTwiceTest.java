@@ -6,13 +6,12 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
-import javax.validation.Configuration;
-import javax.validation.ValidationException;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
+import javax.validation.Configuration;
+import javax.validation.ValidationException;
 
 /**
  * @author Hardy Ferentschik

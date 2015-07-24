@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import javax.validation.constraints.AssertFalse;
-
 import org.hibernate.validator.cfg.ConstraintDef;
+
+import javax.validation.constraints.AssertFalse;
 
 /**
  * @author Hardy Ferentschik

@@ -6,9 +6,16 @@
  */
 package org.hibernate.validator.test.internal.bootstrap;
 
-import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.Set;
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
+import org.hibernate.validator.internal.engine.ConfigurationImpl;
+import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -19,17 +26,9 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.executable.ExecutableValidator;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
-import org.hibernate.validator.internal.engine.ConfigurationImpl;
-import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
-import org.hibernate.validator.testutil.TestForIssue;
+import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;

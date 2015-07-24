@@ -6,9 +6,7 @@
  */
 package org.hibernate.validator.test.constraints.composition.validationtarget;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.hibernate.validator.test.constraints.composition.validationtarget.AlwaysFailingConstraint.AlwaysFailingConstraintValidator;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
@@ -18,8 +16,9 @@ import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
-
-import org.hibernate.validator.test.constraints.composition.validationtarget.AlwaysFailingConstraint.AlwaysFailingConstraintValidator;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;

@@ -6,11 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -18,11 +17,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.Validator;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

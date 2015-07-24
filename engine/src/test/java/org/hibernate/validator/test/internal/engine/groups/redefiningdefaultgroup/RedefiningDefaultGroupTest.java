@@ -6,16 +6,16 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.redefiningdefaultgroup;
 
-import java.util.Set;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
 import javax.validation.Validator;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.groups.Default;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;

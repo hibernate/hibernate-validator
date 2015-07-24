@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation;
 
+import org.hibernate.validator.test.internal.xml.mixedconfiguration.ICompetition;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.test.internal.xml.mixedconfiguration.ICompetition;
 
 public abstract class Competition implements ICompetition {
 

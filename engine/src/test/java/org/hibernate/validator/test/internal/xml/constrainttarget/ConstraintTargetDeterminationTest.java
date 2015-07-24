@@ -6,14 +6,13 @@
  */
 package org.hibernate.validator.test.internal.xml.constrainttarget;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;

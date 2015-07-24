@@ -6,20 +6,19 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.Test;
-import org.hibernate.validator.testutil.TestForIssue;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;

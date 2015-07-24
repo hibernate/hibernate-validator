@@ -6,24 +6,23 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
-import java.util.List;
-import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.constraints.NotNull;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.MethodDescriptor;
-import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.metadata.Scope;
-
-import org.joda.time.DateMidnight;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerExtension;
 import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.joda.time.DateMidnight;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.constraints.NotNull;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.ParameterDescriptor;
+import javax.validation.metadata.Scope;
+import java.util.List;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;

@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.engine.path;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import javax.validation.ElementKind;
 import javax.validation.Path;
@@ -19,10 +19,9 @@ import javax.validation.Path.MethodNode;
 import javax.validation.Path.ParameterNode;
 import javax.validation.Path.PropertyNode;
 import javax.validation.Path.ReturnValueNode;
-
-import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Immutable implementation of a {@code Path.Node}.

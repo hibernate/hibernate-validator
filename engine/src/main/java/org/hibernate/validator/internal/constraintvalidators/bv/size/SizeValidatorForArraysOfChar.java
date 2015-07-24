@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
-import java.lang.reflect.Array;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Size;
+import java.lang.reflect.Array;
 
 /**
  * @author Hardy Ferentschik

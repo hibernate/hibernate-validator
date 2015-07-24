@@ -6,13 +6,12 @@
  */
 package org.hibernate.validator.test.internal.util.annotationfactory;
 
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.testng.annotations.Test;
+
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 import static org.testng.Assert.assertEquals;
 

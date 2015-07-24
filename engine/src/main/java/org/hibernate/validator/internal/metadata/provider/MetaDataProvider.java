@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.util.List;
-
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+
+import java.util.List;
 
 /**
  * A provider for constraint related meta data such as constraints, default

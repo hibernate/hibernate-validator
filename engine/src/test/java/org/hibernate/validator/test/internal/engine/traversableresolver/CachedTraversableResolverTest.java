@@ -6,9 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
-import java.lang.annotation.ElementType;
-import java.util.HashSet;
-import java.util.Set;
+import org.testng.annotations.Test;
+
 import javax.validation.Configuration;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
@@ -16,8 +15,9 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
-
-import org.testng.annotations.Test;
+import java.lang.annotation.ElementType;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.testng.Assert.fail;
 

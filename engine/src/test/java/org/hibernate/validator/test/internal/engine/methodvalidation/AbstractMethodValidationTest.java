@@ -6,23 +6,6 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ElementKind;
-import javax.validation.Path;
-import javax.validation.Path.ParameterNode;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-
-import org.joda.time.DateMidnight;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Address;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
@@ -32,6 +15,22 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithConstrainedVoidMethodImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.RepositoryBase;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.joda.time.DateMidnight;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ElementKind;
+import javax.validation.Path;
+import javax.validation.Path.ParameterNode;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;

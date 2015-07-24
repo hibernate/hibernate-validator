@@ -6,12 +6,11 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.conversion;
 
-import javax.validation.Configuration;
-import javax.validation.ValidatorFactory;
-
+import org.hibernate.validator.testutil.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;
 
-import org.hibernate.validator.testutil.ValidatorUtil;
+import javax.validation.Configuration;
+import javax.validation.ValidatorFactory;
 
 /**
  * Integrative test for XML configured group conversion.

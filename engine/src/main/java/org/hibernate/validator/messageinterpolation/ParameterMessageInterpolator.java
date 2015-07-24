@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
-import java.util.Locale;
-
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.engine.messageinterpolation.ParameterTermResolver;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import java.util.Locale;
 
 /**
  * Resource bundle message interpolator, it does not support EL expression

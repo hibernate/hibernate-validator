@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.util.annotationfactory;
 
+import org.hibernate.validator.internal.util.privilegedactions.ConstructorInstance;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -13,10 +17,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
-import org.hibernate.validator.internal.util.privilegedactions.ConstructorInstance;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
 
 /**
  * Creates live annotations (actually {@link AnnotationProxy} instances) from {@code AnnotationDescriptor}s.

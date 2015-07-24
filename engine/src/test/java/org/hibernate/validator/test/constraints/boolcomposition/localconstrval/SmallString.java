@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.test.constraints.boolcomposition.localconstrval;
 
-import java.lang.annotation.Retention;
+import org.hibernate.validator.constraints.ConstraintComposition;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.constraints.ConstraintComposition;
+import java.lang.annotation.Retention;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;

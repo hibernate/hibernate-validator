@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.validation.ConstraintValidatorContext;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * ModCheckBase contains all shared methods and options used by Mod Check Validators

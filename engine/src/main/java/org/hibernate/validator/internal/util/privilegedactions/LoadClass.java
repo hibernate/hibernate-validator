@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
-import java.security.PrivilegedAction;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import java.security.PrivilegedAction;
 
 /**
  * Loads a class specified by name.

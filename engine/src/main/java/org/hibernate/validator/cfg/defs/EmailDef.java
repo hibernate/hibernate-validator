@@ -7,10 +7,10 @@
 
 package org.hibernate.validator.cfg.defs;
 
-import javax.validation.constraints.Pattern;
-
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.constraints.Email;
+
+import javax.validation.constraints.Pattern;
 
 /**
  * @author Hardy Ferentschik

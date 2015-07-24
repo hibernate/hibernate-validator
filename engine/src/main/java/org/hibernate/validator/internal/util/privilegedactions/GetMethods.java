@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
-import java.security.PrivilegedAction;
 import java.lang.reflect.Method;
+import java.security.PrivilegedAction;
 
 /**
  * Returns the methods of the specified class (include inherited methods).

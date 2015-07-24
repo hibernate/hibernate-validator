@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator;
 
-import javax.validation.Configuration;
-
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
+import javax.validation.Configuration;
 
 /**
  * Uniquely identifies Hibernate Validator in the Bean Validation bootstrap
@@ -22,6 +22,7 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Hardy Ferentschik
+ * @author Chris Beckey cbeckey@paypal.com
  */
 public interface HibernateValidatorConfiguration extends Configuration<HibernateValidatorConfiguration> {
 	/**
@@ -29,6 +30,27 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * Accepts {@code true} or {@code false}. Defaults to {@code false}.
 	 */
 	String FAIL_FAST = "hibernate.validator.fail_fast";
+
+	/**
+	 * Property corresponding to the {@link MethodValidationConfiguration#allowOverridingMethodAlterParameterConstraint} method.
+	 * Accepts {@code true} or {@code false}. 
+	 * Defaults to {@code false}.
+	 */
+	String ALLOW_PARAMETER_CONSTRAINT_OVERRIDE = "hibernate.validator.allow_parameter_constraint_override";
+	
+	/**
+	 * Property corresponding to the {@link MethodValidationConfiguration#allowMultipleCascadedValidationOnReturnValues} method.
+	 * Accepts {@code true} or {@code false}. 
+	 * Defaults to {@code false}.
+	 */
+	String ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT = "hibernate.validator.allow_multiple_cascaded_validation_on_result";
+
+	/**
+	 * Property corresponding to the {@link MethodValidationConfiguration#allowParallelMethodsDefineParameterConstraints} method.
+	 * Accepts {@code true} or {@code false}. 
+	 * Defaults to {@code false}.
+	 */
+	String ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS = "hibernate.validator.allow_parallel_method_parameter_constraint";
 
 	/**
 	 * Property corresponding to the {@link #addValidatedValueHandler(ValidatedValueUnwrapper)} method. Accepts a String
@@ -122,6 +144,26 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @return {@code this} following the chaining method pattern
 	 */
 	HibernateValidatorConfiguration failFast(boolean failFast);
+	boolean getFailFast();
+	
+	/**
+	 * The properties contained in this property modify the behavior of the Validator with respect to 
+	 * Specification section 4.5.5.
+	 * In particular: "Out of the box, a conforming Bean Validation provider must throw a 
+	 * ConstraintDeclarationException when discovering that any of these rules are violated. 
+	 * In addition providers may implement alternative, potentially more liberal, approaches 
+	 * for handling constrained methods in inheritance hierarchies. Possible means for activating 
+	 * such alternative behavior include provider-specific configuration properties or annotations. 
+	 * Note that client code relying on such alternative behavior is not portable between Bean 
+	 * Validation providers."
+	 * The getter method is not required for operation but it is available for convenience in
+	 * testing.
+	 * @param mvc the MethodValidationConfiguration instance
+	 * @return {@code this} following the chaining method pattern
+	 * @since 5.2
+	 */
+	HibernateValidatorConfiguration setMethodValidationConfiguration(MethodValidationConfiguration mvc);
+	MethodValidationConfiguration getMethodValidationConfiguration();
 
 	/**
 	 * Registers the given validated value unwrapper with the bootstrapped validator factory. When validating an element

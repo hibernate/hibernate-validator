@@ -6,10 +6,9 @@
  */
 package org.hibernate.validator.internal.metadata;
 
-import java.util.EnumSet;
-import java.util.List;
-import javax.validation.ParameterNameProvider;
-
+import org.hibernate.validator.MethodValidationConfiguration;
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.MethodValidationConfigurationImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
@@ -18,13 +17,18 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
-import org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.Version;
+
+import javax.validation.ParameterNameProvider;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
@@ -47,7 +51,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * </p>
  *
  * @author Gunnar Morling
- */
+*/
 public class BeanMetaDataManager {
 	/**
 	 * The default initial capacity for this cache.
@@ -86,6 +90,24 @@ public class BeanMetaDataManager {
 	private final ExecutableHelper executableHelper;
 
 	/**
+	 * the three properties in this field affect the invocation of rules associated to section 4.5.5
+	 * of the V1.1 specification.  By default they are all false, if true they allow
+	 * for relaxation of the Liskov Substitution Principal.
+	 */
+	private final MethodValidationConfiguration methodValidationConfiguration;
+	
+	/**
+	 * Creates a new {@code BeanMetaDataManager}. {@link DefaultParameterNameProvider} is used as parameter name
+	 * provider, no meta data providers besides the annotation-based providers are used.
+	 *
+	 * @param constraintHelper the constraint helper
+	 * @param executableHelper the executable helper
+	 */
+	public BeanMetaDataManager(ConstraintHelper constraintHelper, ExecutableHelper executableHelper) {
+		this( constraintHelper, executableHelper, new DefaultParameterNameProvider(), Collections.<MetaDataProvider>emptyList() );
+	}
+
+	/**
 	 * Creates a new {@code BeanMetaDataManager}.
 	 *
 	 * @param constraintHelper the constraint helper
@@ -94,14 +116,26 @@ public class BeanMetaDataManager {
 	 * @param optionalMetaDataProviders optional meta data provider used on top of the annotation based provider
 	 */
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
-							   ExecutableHelper executableHelper,
-							   ParameterNameProvider parameterNameProvider,
-							   List<MetaDataProvider> optionalMetaDataProviders) {
+			   ExecutableHelper executableHelper,
+			   ParameterNameProvider parameterNameProvider,
+			   List<MetaDataProvider> optionalMetaDataProviders) {
+		this( constraintHelper, executableHelper,
+				parameterNameProvider, optionalMetaDataProviders, 
+				new MethodValidationConfigurationImpl() );
+	}
+	
+	public BeanMetaDataManager(ConstraintHelper constraintHelper,
+			ExecutableHelper executableHelper,
+			ParameterNameProvider parameterNameProvider,
+			List<MetaDataProvider> optionalMetaDataProviders,
+			MethodValidationConfiguration methodValidationConfiguration) {
 		this.constraintHelper = constraintHelper;
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
 		this.executableHelper = executableHelper;
 
+		this.methodValidationConfiguration = methodValidationConfiguration;
+		
 		this.beanMetaDataCache = new ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>>(
 				DEFAULT_INITIAL_CAPACITY,
 				DEFAULT_LOAD_FACTOR,
@@ -157,7 +191,8 @@ public class BeanMetaDataManager {
 	 * @return A bean meta data object for the given type.
 	 */
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
-		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, executableHelper, clazz );
+		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance(
+				constraintHelper, executableHelper, clazz, methodValidationConfiguration);
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {

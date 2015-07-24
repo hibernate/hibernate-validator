@@ -6,9 +6,8 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation;
 
-import java.util.Arrays;
-
 import javax.validation.MessageInterpolator.Context;
+import java.util.Arrays;
 
 /**
  * Resolves given parameter.

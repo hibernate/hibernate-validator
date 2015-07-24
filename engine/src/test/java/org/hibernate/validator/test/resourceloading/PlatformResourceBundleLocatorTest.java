@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.test.resourceloading;
 
+import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -17,11 +21,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;

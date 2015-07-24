@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 
 /**
  * Helper methods for loading resource files

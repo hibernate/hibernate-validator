@@ -6,21 +6,20 @@
  */
 package org.hibernate.validator.internal.engine.resolver;
 
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
-
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+
+import javax.validation.Path;
+import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * A JPA 2 aware {@code TraversableResolver}.

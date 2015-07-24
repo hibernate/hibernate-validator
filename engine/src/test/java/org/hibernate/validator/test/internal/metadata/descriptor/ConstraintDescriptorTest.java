@@ -6,11 +6,8 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.Set;
+import org.testng.annotations.Test;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
@@ -25,8 +22,11 @@ import javax.validation.metadata.CrossParameterDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.MethodType;
 import javax.validation.metadata.PropertyDescriptor;
-
-import org.testng.annotations.Test;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.Set;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;

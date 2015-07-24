@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.engine;
 
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
-
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
@@ -31,7 +30,6 @@ import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
-
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -146,7 +144,12 @@ public class ValidationContext<T> {
 	 * Whether or not validation should fail on the first constraint violation.
 	 */
 	private final boolean failFast;
+	
 
+	/**
+	 * The constructor for all ValidationContext
+	 * 
+	 */
 	private final TimeProvider timeProvider;
 
 	private ValidationContext(ConstraintValidatorManager constraintValidatorManager,

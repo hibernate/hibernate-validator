@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
@@ -13,9 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Allows us to proxy the Hibernate Validator built-in {@code ValidationMessages.properties}.

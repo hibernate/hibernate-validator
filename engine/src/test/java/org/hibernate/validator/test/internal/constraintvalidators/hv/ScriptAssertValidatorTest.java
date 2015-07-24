@@ -6,17 +6,16 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import java.util.Date;
-import java.util.GregorianCalendar;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintValidator;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.ConstraintValidator;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

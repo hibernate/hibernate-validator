@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import java.util.Map;
-import javax.script.ScriptException;
-
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluator;
 import org.hibernate.validator.internal.util.scriptengine.ScriptEvaluatorFactory;
+
+import javax.script.ScriptException;
+import java.util.Map;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 

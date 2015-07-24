@@ -6,19 +6,19 @@
  */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import org.hibernate.validator.internal.util.Contracts;
+
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ConstructorDescriptor;
+import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.MethodType;
+import javax.validation.metadata.PropertyDescriptor;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ConstructorDescriptor;
-import javax.validation.metadata.MethodDescriptor;
-import javax.validation.metadata.MethodType;
-import javax.validation.metadata.PropertyDescriptor;
-
-import org.hibernate.validator.internal.util.Contracts;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;

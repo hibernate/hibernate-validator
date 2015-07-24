@@ -6,6 +6,16 @@
  */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import org.hibernate.validator.internal.engine.groups.Group;
+import org.hibernate.validator.internal.engine.groups.ValidationOrder;
+import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.internal.util.TypeHelper;
+
+import javax.validation.groups.Default;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.Scope;
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
@@ -15,16 +25,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.validation.groups.Default;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.Scope;
-
-import org.hibernate.validator.internal.engine.groups.Group;
-import org.hibernate.validator.internal.engine.groups.ValidationOrder;
-import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.internal.util.TypeHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;

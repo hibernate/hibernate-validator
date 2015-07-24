@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Check that a character sequence's (e.g. string) trimmed length is not empty.

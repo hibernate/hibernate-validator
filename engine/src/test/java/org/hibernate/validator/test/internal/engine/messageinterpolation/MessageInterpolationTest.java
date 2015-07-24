@@ -6,14 +6,12 @@
  */
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
-import java.io.ByteArrayInputStream;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import javax.validation.Configuration;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -25,13 +23,14 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
-import org.hibernate.validator.testutil.TestForIssue;
+import java.io.ByteArrayInputStream;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

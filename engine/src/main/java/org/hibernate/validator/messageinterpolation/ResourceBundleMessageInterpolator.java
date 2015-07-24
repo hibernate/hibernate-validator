@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
-import java.util.Locale;
-
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+
+import java.util.Locale;
 
 /**
  * Resource bundle backed message interpolator.

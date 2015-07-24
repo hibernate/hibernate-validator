@@ -6,15 +6,14 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import java.util.Set;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.ValidatorUtil;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;

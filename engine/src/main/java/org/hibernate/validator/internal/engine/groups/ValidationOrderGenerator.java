@@ -6,17 +6,17 @@
  */
 package org.hibernate.validator.internal.engine.groups;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.GroupSequence;
+import javax.validation.groups.Default;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.validation.GroupSequence;
-import javax.validation.groups.Default;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Helper class used to order groups and sequences into the right order for validation.

@@ -6,16 +6,15 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
+import javax.validation.Validation;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import javax.validation.Validation;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;

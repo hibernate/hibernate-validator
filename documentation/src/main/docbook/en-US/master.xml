@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+ ~ JBoss, Home of Professional Open Source
+ ~ Copyright 2009, Red Hat, Inc. and/or its affiliates, and individual contributors
+ ~ by the @authors tag. See the copyright.txt in the distribution for a
+ ~ full listing of individual contributors.
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~ http://www.apache.org/licenses/LICENSE-2.0
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+--><!-- This document was created with Syntext Serna Free. --><!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "hv.ent">
+%BOOK_ENTITIES;
+]>
+<book xmlns:xi="http://www.w3.org/2001/XInclude">
+  <bookinfo>
+    <title>Hibernate Validator</title>
+    <subtitle>JSR 349 Reference Implementation</subtitle>
+    <subtitle>Reference Guide</subtitle>
+    <releaseinfo>&version;</releaseinfo>
+    <pubdate>&today;</pubdate>
+    <productnumber>&version;</productnumber>
+    <copyright>
+      <year>&copyrightYear;</year>
+      <holder>&copyrightHolder;</holder>
+    </copyright>
+    <authorgroup>
+      <author>
+        <firstname>Hardy</firstname>
+        <surname>Ferentschik</surname>
+      </author>
+      <author>
+        <firstname>Gunnar</firstname>
+        <surname>Morling</surname>
+      </author>
+      <othercredit class="translator" lang="zh-CN">
+        <firstname>Shaozhuang</firstname>
+        <surname>Liu</surname>
+        <email>stliu@hibernate.org</email>
+      </othercredit>
+    </authorgroup>
+  </bookinfo>
+  <toc/>
+  <xi:include href="modules/preface.xml"/>
+  <xi:include href="modules/getting-started.xml"/>
+  <xi:include href="modules/bean-constraints.xml"/>
+  <xi:include href="modules/method-constraints.xml"/>
+  <xi:include href="modules/message-interpolation.xml"/>
+  <xi:include href="modules/groups.xml"/>
+  <xi:include href="modules/custom-constraints.xml"/>
+  <xi:include href="modules/xml-configuration.xml"/>
+  <xi:include href="modules/bootstrapping.xml"/>
+  <xi:include href="modules/metadata-api.xml"/>
+  <xi:include href="modules/integration.xml"/>
+  <xi:include href="modules/custom-options.xml"/>
+  <xi:include href="modules/annotation-processor.xml"/>
+  <xi:include href="modules/further-reading.xml"/>
+</book>

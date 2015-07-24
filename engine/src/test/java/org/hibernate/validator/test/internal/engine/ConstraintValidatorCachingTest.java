@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
 import javax.validation.Configuration;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -24,14 +24,13 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
-import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
-import org.hibernate.validator.testutil.TestForIssue;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.FIELD;

@@ -6,9 +6,12 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.time.TimeProvider;
 
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
@@ -19,13 +22,9 @@ import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.No
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeContextBuilder;
 import javax.validation.ElementKind;
 import javax.validation.metadata.ConstraintDescriptor;
-
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.time.TimeProvider;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;

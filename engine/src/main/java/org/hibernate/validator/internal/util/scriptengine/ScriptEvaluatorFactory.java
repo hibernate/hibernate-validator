@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.util.scriptengine;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 

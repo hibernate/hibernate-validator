@@ -7,14 +7,14 @@
 
 package org.hibernate.validator;
 
+import org.hibernate.validator.spi.time.TimeProvider;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidatorContext;
-
-import org.hibernate.validator.spi.time.TimeProvider;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * Represents a Hibernate Validator specific context that is used to create
@@ -51,6 +51,12 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 * @return {@code this} following the chaining method pattern
 	 */
 	HibernateValidatorContext failFast(boolean failFast);
+
+	/**
+	 * Sets the behavior of the Validator with respect to parameter constraints
+	 * See Sec 4.5.5 of validation spec V 1.1
+	 */
+	HibernateValidatorContext setMethodValidationConfiguration(MethodValidationConfiguration methodValidationConfiguration);
 
 	/**
 	 * Registers the given validated value unwrapper with the bootstrapped validator. When validating an element which

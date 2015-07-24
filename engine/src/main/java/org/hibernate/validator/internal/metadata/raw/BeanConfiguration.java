@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+
 import java.util.List;
 import java.util.Set;
-
-import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 

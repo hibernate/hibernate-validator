@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.util.Contracts;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 

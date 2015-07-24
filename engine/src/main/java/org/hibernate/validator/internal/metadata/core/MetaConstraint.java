@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.internal.metadata.core;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.util.Set;
-
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.util.Set;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to

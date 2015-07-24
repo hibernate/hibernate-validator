@@ -6,16 +6,15 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import javax.validation.Configuration;
 import javax.validation.Validator;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.MethodDescriptor;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.testng.Assert.assertNotNull;
 

@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
-import javax.validation.constraints.Size;
-
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+
+import javax.validation.constraints.Size;
 
 /**
  * @author Gunnar Morling

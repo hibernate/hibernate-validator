@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.resourceloading;
 
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
  * Abstract base for all {@link ResourceBundleLocator} implementations, that

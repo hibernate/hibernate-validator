@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
-import java.security.PrivilegedAction;
 import java.lang.reflect.Field;
+import java.security.PrivilegedAction;
 
 /**
  * Returns the fields of the specified class.

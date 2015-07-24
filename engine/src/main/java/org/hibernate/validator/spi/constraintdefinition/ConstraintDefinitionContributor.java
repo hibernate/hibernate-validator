@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.spi.constraintdefinition;
 
-import java.lang.annotation.Annotation;
 import javax.validation.ConstraintValidator;
+import java.lang.annotation.Annotation;
 
 /**
  * A {@code ConstraintDefinitionContributor} allows for the contribution of custom constraint validator instances.

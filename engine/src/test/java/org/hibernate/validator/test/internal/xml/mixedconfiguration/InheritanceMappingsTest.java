@@ -6,22 +6,21 @@
  */
 package org.hibernate.validator.test.internal.xml.mixedconfiguration;
 
-import java.lang.annotation.Annotation;
-import java.util.Set;
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.Competition;
 import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.Fixture;
 import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.PersonCompetition;
 import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.TeamCompetition;
 import org.hibernate.validator.testutil.DummyTraversableResolver;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
+import javax.validation.Configuration;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
+import java.lang.annotation.Annotation;
+import java.util.Set;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.FileAssert.fail;

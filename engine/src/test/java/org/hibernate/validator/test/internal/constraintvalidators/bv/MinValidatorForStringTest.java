@@ -6,12 +6,6 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
@@ -19,6 +13,11 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescrip
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

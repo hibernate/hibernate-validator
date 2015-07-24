@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.util.scriptengine;
 
-import java.util.Map;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
+import java.util.Map;
 
 /**
  * A wrapper around JSR 223 {@link ScriptEngine}s. This class is thread-safe.

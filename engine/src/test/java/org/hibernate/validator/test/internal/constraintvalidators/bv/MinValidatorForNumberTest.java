@@ -6,19 +6,18 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import javax.validation.ConstraintValidator;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

@@ -6,16 +6,15 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
-import java.util.List;
-import java.util.Map;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
+import org.joda.time.DateMidnight;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-
-import org.joda.time.DateMidnight;
-
-import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Gunnar Morling

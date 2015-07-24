@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.constraintdefinition;
 
+import javax.validation.ConstraintValidator;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.ConstraintValidator;
 
 /**
  * Type-safe wrapper class for a constraint annotation and its potential list of constraint validators.

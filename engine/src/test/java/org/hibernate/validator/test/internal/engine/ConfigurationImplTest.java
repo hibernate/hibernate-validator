@@ -6,19 +6,18 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.ElementType;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
 import javax.validation.Configuration;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.ValidatorFactory;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.testutil.TestForIssue;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.ElementType;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertNotNull;

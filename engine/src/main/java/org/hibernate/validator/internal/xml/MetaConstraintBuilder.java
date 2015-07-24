@@ -6,17 +6,6 @@
  */
 package org.hibernate.validator.internal.xml;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.List;
-import javax.validation.Payload;
-import javax.validation.ValidationException;
-import javax.xml.bind.JAXBElement;
-
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -26,6 +15,17 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
+
+import javax.validation.Payload;
+import javax.validation.ValidationException;
+import javax.xml.bind.JAXBElement;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.List;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 

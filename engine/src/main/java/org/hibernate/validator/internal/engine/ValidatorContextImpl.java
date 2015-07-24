@@ -6,24 +6,25 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.MethodValidationConfiguration;
+import org.hibernate.validator.spi.time.TimeProvider;
+import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
-
-import org.hibernate.validator.HibernateValidatorContext;
-import org.hibernate.validator.spi.time.TimeProvider;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
+ * @author Chris Beckey cbeckey@paypal.com
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
 
@@ -34,6 +35,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private ParameterNameProvider parameterNameProvider;
 	private boolean failFast;
+	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfigurationImpl();
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 	private TimeProvider timeProvider;
 
@@ -101,6 +103,11 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext setMethodValidationConfiguration(MethodValidationConfiguration methodValidationConfiguration) {
+		this.methodValidationConfiguration = methodValidationConfiguration;
+		return this;
+	}
+
 	public HibernateValidatorContext addValidationValueHandler(ValidatedValueUnwrapper<?> handler) {
 		this.validatedValueHandlers.add( handler );
 		return this;
@@ -125,6 +132,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
+				methodValidationConfiguration,
 				validatedValueHandlers,
 				timeProvider
 		);

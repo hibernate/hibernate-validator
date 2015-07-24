@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.internal.metadata.descriptor;
 
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.CrossParameterDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Describes a validated constructor or method.

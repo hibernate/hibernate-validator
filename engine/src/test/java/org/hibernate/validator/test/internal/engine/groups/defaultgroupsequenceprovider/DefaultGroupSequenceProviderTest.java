@@ -6,22 +6,21 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.defaultgroupsequenceprovider;
 
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.group.GroupSequenceProvider;
+import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.GroupDefinitionException;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.GroupDefinitionException;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.group.GroupSequenceProvider;
-import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;

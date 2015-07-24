@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.resourceloading;
 
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -15,9 +18,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-
-import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
  * A {@link ResourceBundleLocator} implementation that provides access

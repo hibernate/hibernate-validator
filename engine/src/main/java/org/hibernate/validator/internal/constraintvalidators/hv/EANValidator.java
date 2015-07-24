@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import org.hibernate.validator.constraints.EAN;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-import org.hibernate.validator.constraints.EAN;
 
 /**
  * Checks that a given character sequence (e.g. string) is a valid EAN barcode.

@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
+
 import java.util.Collections;
 import java.util.List;
-
-import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 

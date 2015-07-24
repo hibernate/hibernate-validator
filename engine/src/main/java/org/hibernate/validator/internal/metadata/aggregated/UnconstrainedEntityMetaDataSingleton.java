@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.util.List;
-import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.metadata.BeanDescriptor;
-
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.metadata.BeanDescriptor;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A dummy implementation of {@code BeanMetaData} used as a placeholder for unconstrained types.

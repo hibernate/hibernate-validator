@@ -6,15 +6,14 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import javax.validation.constraints.Pattern;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.MyCustomStringImpl;
-import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.testutil.MyCustomStringImpl;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
+import javax.validation.constraints.Pattern;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

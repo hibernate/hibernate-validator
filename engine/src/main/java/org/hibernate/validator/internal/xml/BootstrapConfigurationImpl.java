@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import javax.validation.BootstrapConfiguration;
+import javax.validation.executable.ExecutableType;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.BootstrapConfiguration;
-import javax.validation.executable.ExecutableType;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;

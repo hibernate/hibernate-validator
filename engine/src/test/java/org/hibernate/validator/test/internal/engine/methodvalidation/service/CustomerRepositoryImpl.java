@@ -6,21 +6,20 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
+import org.joda.time.DateMidnight;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-
-import org.joda.time.DateMidnight;
-
-import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.TYPE;

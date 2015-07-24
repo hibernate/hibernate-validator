@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
-import java.time.Instant;
-
+import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForInstant;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForInstant;
+
+import java.time.Instant;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;

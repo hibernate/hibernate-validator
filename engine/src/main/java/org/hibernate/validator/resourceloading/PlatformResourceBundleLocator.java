@@ -6,6 +6,12 @@
  */
 package org.hibernate.validator.resourceloading;
 
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.GetResources;
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.jboss.logging.Logger;
+
 import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
@@ -17,13 +23,6 @@ import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
-
-import org.jboss.logging.Logger;
-
-import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.GetResources;
-import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 

@@ -6,8 +6,9 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
-import java.util.List;
-import java.util.Set;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
 import javax.validation.Configuration;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -15,10 +16,8 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.MethodType;
 import javax.validation.metadata.ParameterDescriptor;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.ValidatorUtil;
+import java.util.List;
+import java.util.Set;
 
 import static org.testng.AssertJUnit.assertTrue;
 

@@ -6,6 +6,18 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
+import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
+
+import javax.validation.BootstrapConfiguration;
+import javax.validation.executable.ExecutableType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
@@ -16,19 +28,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import javax.validation.BootstrapConfiguration;
-import javax.validation.executable.ExecutableType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
-import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.

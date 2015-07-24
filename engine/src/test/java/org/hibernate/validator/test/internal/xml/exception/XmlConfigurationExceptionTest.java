@@ -6,13 +6,12 @@
  */
 package org.hibernate.validator.test.internal.xml.exception;
 
-import javax.validation.Configuration;
-import javax.validation.ValidationException;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
+import javax.validation.Configuration;
+import javax.validation.ValidationException;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

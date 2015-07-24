@@ -6,18 +6,17 @@
  */
 package org.hibernate.validator.test.constraintvalidator;
 
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.UnexpectedTypeException;
-import javax.validation.Validator;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.engine.ServiceLoaderBasedConstraintDefinitionContributor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.UnexpectedTypeException;
+import javax.validation.Validator;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;

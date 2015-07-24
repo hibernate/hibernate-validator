@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import java.util.List;
-import javax.validation.ConstraintValidator;
-
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.internal.util.ModUtil;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.ConstraintValidator;
+import java.util.List;
 
 /**
  * Mod10 (Luhn algorithm implementation) Check validator

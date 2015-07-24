@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import javax.validation.constraints.Future;
-
 import org.hibernate.validator.cfg.ConstraintDef;
+
+import javax.validation.constraints.Future;
 
 /**
  * @author Hardy Ferentschik

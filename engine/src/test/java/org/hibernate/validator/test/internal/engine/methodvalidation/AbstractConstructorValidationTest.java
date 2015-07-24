@@ -6,17 +6,16 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import java.util.Set;
+import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
+import org.testng.annotations.Test;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.executable.ExecutableValidator;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
-import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
-import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeKinds;

@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.metadata.core;
 
-import java.lang.reflect.Member;
-import java.util.Map;
-
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import java.lang.reflect.Member;
+import java.util.Map;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 

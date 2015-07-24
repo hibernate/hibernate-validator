@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
-import java.security.PrivilegedAction;
-
 import com.fasterxml.classmate.ResolvedTypeWithMembers;
 import com.fasterxml.classmate.members.ResolvedMethod;
+
+import java.security.PrivilegedAction;
 
 /**
  * Returns the member methods - with resolved type parameters - of a given type.

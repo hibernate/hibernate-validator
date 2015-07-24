@@ -6,11 +6,15 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
-import java.io.InputStream;
-import java.lang.annotation.ElementType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.SizeDef;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidationXmlTestHelper;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.validation.BootstrapConfiguration;
 import javax.validation.Configuration;
@@ -22,16 +26,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableType;
 import javax.validation.groups.Default;
 import javax.validation.metadata.MethodDescriptor;
-
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.defs.SizeDef;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidationXmlTestHelper;
-import org.hibernate.validator.testutil.ValidatorUtil;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import java.io.InputStream;
+import java.lang.annotation.ElementType;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;

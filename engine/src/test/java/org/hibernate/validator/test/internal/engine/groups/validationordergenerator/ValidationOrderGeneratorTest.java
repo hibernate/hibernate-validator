@@ -6,25 +6,24 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.validationordergenerator;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import org.hibernate.validator.internal.engine.groups.Group;
+import org.hibernate.validator.internal.engine.groups.Sequence;
+import org.hibernate.validator.internal.engine.groups.ValidationOrder;
+import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
+import org.hibernate.validator.test.internal.engine.groups.validationorder.First;
+import org.hibernate.validator.test.internal.engine.groups.validationorder.Last;
+import org.hibernate.validator.test.internal.engine.groups.validationorder.Second;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
 import javax.validation.GroupDefinitionException;
 import javax.validation.GroupSequence;
 import javax.validation.ValidationException;
 import javax.validation.groups.Default;
-
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.engine.groups.Group;
-import org.hibernate.validator.internal.engine.groups.ValidationOrder;
-import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.groups.Sequence;
-import org.hibernate.validator.test.internal.engine.groups.validationorder.First;
-import org.hibernate.validator.test.internal.engine.groups.validationorder.Last;
-import org.hibernate.validator.test.internal.engine.groups.validationorder.Second;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 

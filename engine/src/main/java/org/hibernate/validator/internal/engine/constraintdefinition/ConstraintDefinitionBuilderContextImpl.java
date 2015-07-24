@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.internal.engine.constraintdefinition;
 
-import java.lang.annotation.Annotation;
-import java.util.List;
-import javax.validation.ConstraintValidator;
-
 import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor.ConstraintDefinitionBuilder;
 import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor.ConstraintDefinitionBuilderContext;
+
+import javax.validation.ConstraintValidator;
+import java.lang.annotation.Annotation;
+import java.util.List;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 

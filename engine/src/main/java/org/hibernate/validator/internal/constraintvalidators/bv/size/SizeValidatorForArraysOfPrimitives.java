@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
-import javax.validation.constraints.Size;
-
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.constraints.Size;
 
 /**
  * Check that the length of an array is between <i>min</i> and <i>max</i>

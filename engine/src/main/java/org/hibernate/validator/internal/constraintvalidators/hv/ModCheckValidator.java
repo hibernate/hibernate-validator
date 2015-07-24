@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import java.util.List;
-import javax.validation.ConstraintValidator;
-
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.ModCheck.ModType;
 import org.hibernate.validator.internal.util.ModUtil;
+
+import javax.validation.ConstraintValidator;
+import java.util.List;
 
 /**
  * Mod check validator for MOD10 and MOD11 algorithms

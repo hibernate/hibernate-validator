@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
+import javax.el.FunctionMapper;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import javax.el.FunctionMapper;
 
 /**
  * @author Hardy Ferentschik

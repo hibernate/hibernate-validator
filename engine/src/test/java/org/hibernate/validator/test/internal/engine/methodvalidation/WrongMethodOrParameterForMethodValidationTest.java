@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import java.lang.reflect.Method;
-import javax.validation.executable.ExecutableValidator;
-
 import org.hibernate.validator.test.internal.bootstrap.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.testutil.ValidatorUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import javax.validation.executable.ExecutableValidator;
+import java.lang.reflect.Method;
 
 /**
  * @author Hardy Ferentschik

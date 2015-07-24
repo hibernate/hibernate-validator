@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
-import java.time.chrono.ChronoZonedDateTime;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Past;
-
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 import org.hibernate.validator.spi.time.TimeProvider;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.Past;
+import java.time.chrono.ChronoZonedDateTime;
 
 /**
  * Check that the {@code java.time.chrono.ChronoZonedDateTime} passed is in the past.

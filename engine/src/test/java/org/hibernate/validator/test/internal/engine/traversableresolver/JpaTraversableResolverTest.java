@@ -6,17 +6,16 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
-import java.util.Set;
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
+
+import javax.validation.Configuration;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import java.util.Set;
 
 import static org.testng.Assert.assertTrue;
 

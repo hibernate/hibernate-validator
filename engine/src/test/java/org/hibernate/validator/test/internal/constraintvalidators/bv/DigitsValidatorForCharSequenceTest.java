@@ -6,16 +6,15 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import javax.validation.constraints.Digits;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.MyCustomStringImpl;
-import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForCharSequence;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.hibernate.validator.testutil.MyCustomStringImpl;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.validation.constraints.Digits;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

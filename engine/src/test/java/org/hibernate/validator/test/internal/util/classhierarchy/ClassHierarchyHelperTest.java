@@ -6,12 +6,11 @@
  */
 package org.hibernate.validator.test.internal.util.classhierarchy;
 
-import java.util.List;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
+import org.testng.annotations.Test;
+
+import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 

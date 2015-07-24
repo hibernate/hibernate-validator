@@ -6,16 +6,6 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
-import java.lang.annotation.ElementType;
-import java.util.Set;
-import javax.validation.Validator;
-import javax.validation.metadata.BeanDescriptor;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.ElementDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.test.internal.metadata.ChildWithAtValid;
 import org.hibernate.validator.test.internal.metadata.ChildWithoutAtValid;
 import org.hibernate.validator.test.internal.metadata.ChildWithoutAtValid2;
@@ -24,6 +14,15 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.Order;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
+import javax.validation.Validator;
+import javax.validation.metadata.BeanDescriptor;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.ElementDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
+import java.lang.annotation.ElementType;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertEquals;

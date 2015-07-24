@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import javax.validation.ParameterNameProvider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
-import javax.validation.ParameterNameProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 

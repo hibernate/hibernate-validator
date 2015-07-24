@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import javax.validation.metadata.CrossParameterDescriptor;
 import java.util.List;
 import java.util.Set;
-import javax.validation.metadata.CrossParameterDescriptor;
 
 /**
  * Describes cross-parameters.

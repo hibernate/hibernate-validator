@@ -6,15 +6,14 @@
  */
 package org.hibernate.validator.test.constraints;
 
-import java.util.List;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.ValidationException;
+import java.util.List;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathsAreEqual;
 import static org.testng.Assert.assertEquals;

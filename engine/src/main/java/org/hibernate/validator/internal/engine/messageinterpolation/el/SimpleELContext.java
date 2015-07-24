@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
-import java.lang.reflect.Method;
 import javax.el.ArrayELResolver;
 import javax.el.BeanELResolver;
 import javax.el.CompositeELResolver;
@@ -17,6 +16,7 @@ import javax.el.MapELResolver;
 import javax.el.ResourceBundleELResolver;
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
+import java.lang.reflect.Method;
 
 /**
  * @author Hardy Ferentschik

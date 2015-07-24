@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.internal.engine.groups;
 
+import javax.validation.GroupDefinitionException;
 import java.util.Iterator;
 import java.util.List;
-import javax.validation.GroupDefinitionException;
 
 /**
  * Interface defining the methods needed to execute groups and sequences in the right order.

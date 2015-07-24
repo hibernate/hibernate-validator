@@ -6,10 +6,6 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -17,6 +13,10 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;

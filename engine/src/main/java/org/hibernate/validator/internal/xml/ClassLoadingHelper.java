@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.internal.xml;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Map;
 
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * A helper for loading classes by names, as given in XML constraint mappings. Given names can be the names of primitive

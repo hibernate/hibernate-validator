@@ -6,23 +6,22 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
-import java.io.InputStream;
-import java.util.List;
-import java.util.Set;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.ValidationException;
-import javax.validation.constraints.DecimalMin;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.xml.XmlMappingParser;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.ValidationException;
+import javax.validation.constraints.DecimalMin;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.testng.Assert.assertEquals;

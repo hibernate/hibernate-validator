@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.constraintvalidators;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.hibernate.validator.constraints.URL;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-import org.hibernate.validator.constraints.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Validate that the character sequence (e.g. string) is a valid URL using a regular expression.

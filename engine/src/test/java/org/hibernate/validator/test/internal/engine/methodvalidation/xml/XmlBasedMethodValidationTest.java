@@ -6,12 +6,11 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.xml;
 
-import javax.validation.Configuration;
-
-import org.testng.annotations.BeforeMethod;
-
 import org.hibernate.validator.test.internal.engine.methodvalidation.AbstractMethodValidationTest;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeMethod;
+
+import javax.validation.Configuration;
 
 /**
  * @author Hardy Ferentschik

@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.defaultgroupsequenceprovider;
 
-import javax.validation.constraints.Pattern;
-
-import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.group.GroupSequenceProvider;
+
+import javax.validation.constraints.Pattern;
 
 /**
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI

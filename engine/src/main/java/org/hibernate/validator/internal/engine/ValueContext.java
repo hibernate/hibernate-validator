@@ -6,18 +6,17 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Type;
-
-import javax.validation.ElementKind;
-import javax.validation.groups.Default;
-
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
+import javax.validation.ElementKind;
+import javax.validation.groups.Default;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Type;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or

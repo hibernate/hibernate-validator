@@ -6,35 +6,6 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import java.lang.annotation.ElementType;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.ConstraintViolation;
-import javax.validation.ElementKind;
-import javax.validation.MessageInterpolator;
-import javax.validation.ParameterNameProvider;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
-import javax.validation.Validator;
-import javax.validation.executable.ExecutableValidator;
-import javax.validation.groups.Default;
-import javax.validation.metadata.BeanDescriptor;
-
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -68,6 +39,35 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
+import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ConstraintViolation;
+import javax.validation.ElementKind;
+import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
+import javax.validation.Path;
+import javax.validation.TraversableResolver;
+import javax.validation.Validator;
+import javax.validation.executable.ExecutableValidator;
+import javax.validation.groups.Default;
+import javax.validation.metadata.BeanDescriptor;
+import java.lang.annotation.ElementType;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -132,6 +132,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final ParameterNameProvider parameterNameProvider;
 
+	/**
+	 *
+	 */
 	private final TimeProvider timeProvider;
 
 	/**
@@ -154,6 +157,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final ConcurrentMap<Member, Member> accessibleMembers;
 
+	/**
+	 *
+	 * @param constraintValidatorFactory
+	 * @param messageInterpolator
+	 * @param traversableResolver
+	 * @param beanMetaDataManager
+	 * @param parameterNameProvider
+	 * @param constraintValidatorManager
+	 * @param failFast
+	 */
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 			MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
@@ -174,7 +187,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.validatedValueHandlers = validatedValueHandlers;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
-
+		
 		validationOrderGenerator = new ValidationOrderGenerator();
 
 		this.accessibleMembers = new ConcurrentReferenceHashMap<Member, Member>(
@@ -331,6 +344,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( type.isAssignableFrom( Validator.class ) ) {
 			return type.cast( this );
 		}
+		
 		throw log.getTypeNotSupportedForUnwrappingException( type );
 	}
 
@@ -1126,7 +1140,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					ExecutableElement.getExecutableAsString(
 							executableMetaData.getType().toString() + "#" + executableMetaData.getName(),
 							executableMetaData.getParameterTypes()
-					), parameterValues.length, executableMetaData.getParameterTypes().length
+					), executableMetaData.getParameterTypes().length, parameterValues.length		// mod CTB 17Jul2015 - actual and expected parameters were reversed
 			);
 		}
 

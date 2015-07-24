@@ -6,18 +6,17 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
-import java.util.List;
-import java.util.Set;
+import org.hibernate.validator.test.internal.metadata.Customer;
+import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
+import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.ValidB2BRepository;
+import org.testng.annotations.Test;
+
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.test.internal.metadata.Customer;
-import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
-import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.ValidB2BRepository;
+import java.util.List;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ValidatorUtil.getConstructorDescriptor;

@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Alaa Nassef

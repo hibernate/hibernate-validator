@@ -6,12 +6,11 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
-import java.security.PrivilegedExceptionAction;
-
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
+import java.security.PrivilegedExceptionAction;
 
 /**
  * Unmarshals the given source.

@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.validation.Valid;
-import javax.validation.groups.ConvertGroup;
-
 import org.hibernate.validator.test.internal.metadata.Order.OrderBasic;
 import org.hibernate.validator.test.internal.metadata.Order.OrderComplex;
+
+import javax.validation.Valid;
+import javax.validation.groups.ConvertGroup;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Hardy Ferentschik

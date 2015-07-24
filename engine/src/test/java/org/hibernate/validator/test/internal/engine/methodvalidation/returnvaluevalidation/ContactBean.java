@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.returnvaluevalidation;
 
-import javax.validation.constraints.Pattern;
-
 import org.hibernate.validator.constraints.Email;
+
+import javax.validation.constraints.Pattern;
 
 /**
  * @author Hardy Ferentschik

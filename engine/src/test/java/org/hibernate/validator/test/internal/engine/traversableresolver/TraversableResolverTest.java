@@ -6,23 +6,22 @@
  */
 package org.hibernate.validator.test.internal.engine.traversableresolver;
 
-import java.lang.annotation.ElementType;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.Valid;
 import javax.validation.Validator;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import java.lang.annotation.ElementType;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 

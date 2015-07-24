@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import org.hibernate.validator.constraints.Email;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 import java.net.IDN;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
-import org.hibernate.validator.constraints.Email;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 

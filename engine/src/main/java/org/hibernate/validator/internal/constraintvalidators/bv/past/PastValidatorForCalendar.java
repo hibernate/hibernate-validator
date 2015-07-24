@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.past;
 
-import java.util.Calendar;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.spi.time.TimeProvider;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
-
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.spi.time.TimeProvider;
+import java.util.Calendar;
 
 /**
  * Check that the <code>java.util.Calendar</code> passed to be validated is in the

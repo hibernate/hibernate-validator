@@ -6,10 +6,13 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.internal.engine.ValidatorImpl;
+import org.hibernate.validator.testutil.CountValidationCalls;
+import org.hibernate.validator.testutil.CountValidationCallsValidator;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -20,14 +23,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.executable.ExecutableValidator;
 import javax.validation.metadata.BeanDescriptor;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.internal.engine.ValidatorImpl;
-import org.hibernate.validator.testutil.CountValidationCalls;
-import org.hibernate.validator.testutil.CountValidationCallsValidator;
-import org.hibernate.validator.testutil.TestForIssue;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
@@ -89,7 +88,7 @@ public class ValidatorTest {
 	public void testValidatePropertyWithCurrencySymbol() {
 		Validator validator = getValidator();
 		Ticket testInstance = new Ticket();
-		Set<ConstraintViolation<Ticket>> constraintViolations = validator.validateProperty( testInstance, "€price" );
+		Set<ConstraintViolation<Ticket>> constraintViolations = validator.validateProperty( testInstance, "price" );
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
 
@@ -99,7 +98,7 @@ public class ValidatorTest {
 		Validator validator = getValidator();
 		Ticket testInstance = new Ticket();
 		Set<ConstraintViolation<Ticket>> constraintViolations = validator.validateValue(
-				Ticket.class, "€price", testInstance.€price
+				Ticket.class, "price", testInstance.price
 		);
 		assertNumberOfViolations( constraintViolations, 1 );
 	}
@@ -272,7 +271,7 @@ public class ValidatorTest {
 
 	class Ticket {
 		@NotNull
-		Float €price;
+		Float price;
 	}
 
 	interface TestGroup {

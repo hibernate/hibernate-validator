@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv.br;
 
-import java.util.regex.Pattern;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import java.util.regex.Pattern;
 
 /**
  * @author Hardy Ferentschik

@@ -6,14 +6,6 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintViolation;
-
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
@@ -22,6 +14,14 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintViolation;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;

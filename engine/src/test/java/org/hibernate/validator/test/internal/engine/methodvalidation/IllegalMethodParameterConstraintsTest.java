@@ -6,15 +6,14 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
+import org.joda.time.DateMidnight;
+import org.testng.annotations.Test;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.joda.time.DateMidnight;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 

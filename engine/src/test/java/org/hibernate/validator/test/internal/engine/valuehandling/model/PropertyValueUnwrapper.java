@@ -6,12 +6,11 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
-import java.lang.reflect.Type;
-
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
-
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
+import java.lang.reflect.Type;
 
 /**
  * @author Gunnar Morling

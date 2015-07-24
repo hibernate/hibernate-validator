@@ -6,17 +6,16 @@
  */
 package org.hibernate.validator.test.internal.metadata.core;
 
-import java.lang.reflect.Method;
-import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+import javax.validation.constraints.NotNull;
+import java.lang.reflect.Method;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static org.testng.Assert.assertEquals;

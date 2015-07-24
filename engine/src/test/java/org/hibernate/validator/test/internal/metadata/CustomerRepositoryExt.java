@@ -6,8 +6,10 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
+import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import org.joda.time.DateMidnight;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -18,11 +20,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
-
-import org.joda.time.DateMidnight;
-import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
-import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.TYPE;

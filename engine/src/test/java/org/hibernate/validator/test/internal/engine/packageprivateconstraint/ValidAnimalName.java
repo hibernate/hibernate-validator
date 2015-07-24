@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.packageprivateconstraint;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;

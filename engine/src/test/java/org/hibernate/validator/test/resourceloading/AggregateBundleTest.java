@@ -6,16 +6,15 @@
  */
 package org.hibernate.validator.test.resourceloading;
 
+import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator.AggregateBundle;
+import org.testng.annotations.Test;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.util.Set;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator.AggregateBundle;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;

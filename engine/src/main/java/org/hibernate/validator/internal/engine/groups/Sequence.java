@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.engine.groups;
 
-import java.util.List;
-import javax.validation.GroupSequence;
-
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.GroupSequence;
+import java.util.List;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 

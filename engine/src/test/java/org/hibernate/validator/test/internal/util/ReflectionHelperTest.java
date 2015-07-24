@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.test.internal.util;
 
+import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -16,11 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeSet;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;

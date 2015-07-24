@@ -6,6 +6,13 @@
  */
 package org.hibernate.validator.internal.engine.path;
 
+import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.ElementKind;
+import javax.validation.Path;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,14 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.validation.ElementKind;
-import javax.validation.Path;
-
-import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
-import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 

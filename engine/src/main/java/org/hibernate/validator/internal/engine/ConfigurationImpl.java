@@ -6,28 +6,8 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.validation.BootstrapConfiguration;
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.MessageInterpolator;
-import javax.validation.ParameterNameProvider;
-import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
-import javax.validation.ValidationProviderResolver;
-import javax.validation.ValidatorFactory;
-import javax.validation.spi.BootstrapState;
-import javax.validation.spi.ConfigurationState;
-import javax.validation.spi.ValidationProvider;
-
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.MethodValidationConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
@@ -49,6 +29,26 @@ import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionCont
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
+import javax.validation.BootstrapConfiguration;
+import javax.validation.ConstraintValidatorFactory;
+import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
+import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
+import javax.validation.ValidationProviderResolver;
+import javax.validation.ValidatorFactory;
+import javax.validation.spi.BootstrapState;
+import javax.validation.spi.ConfigurationState;
+import javax.validation.spi.ValidationProvider;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -81,6 +81,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final ValidationBootstrapParameters validationBootstrapParameters;
 	private boolean ignoreXmlConfiguration = false;
 	private final Set<InputStream> configurationStreams = CollectionHelper.newHashSet();
+	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfigurationImpl();
 	private BootstrapConfiguration bootstrapConfiguration;
 
 	// HV-specific options
@@ -200,6 +201,23 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public final HibernateValidatorConfiguration failFast(boolean failFast) {
 		this.failFast = failFast;
 		return this;
+	}
+
+	@Override
+	public HibernateValidatorConfiguration setMethodValidationConfiguration(MethodValidationConfiguration mvc) {
+		// the MethodValidationConfiguration cannot be null, it will cause NPE later if it is
+		if(mvc != null)
+			this.methodValidationConfiguration = mvc;
+		else if ( log.isDebugEnabled() ) {
+			log.warn( "Attempt to set the MethodValidationConfiguration to null is being ignored." );
+		}
+
+		return this;
+	}
+
+	@Override
+	public MethodValidationConfiguration getMethodValidationConfiguration() {
+		return this.methodValidationConfiguration;
 	}
 
 	@Override

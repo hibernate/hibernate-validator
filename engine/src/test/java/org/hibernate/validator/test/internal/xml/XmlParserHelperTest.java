@@ -6,10 +6,9 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import org.hibernate.validator.internal.xml.XmlParserHelper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.xml.XmlParserHelper;
 
 import static org.fest.assertions.Assertions.assertThat;
 

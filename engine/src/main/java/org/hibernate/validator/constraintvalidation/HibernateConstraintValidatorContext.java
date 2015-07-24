@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.constraintvalidation;
 
-import javax.validation.ConstraintValidatorContext;
-
 import org.hibernate.validator.spi.time.TimeProvider;
+
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * A custom {@link ConstraintValidatorContext} which allows to set additional message parameters for

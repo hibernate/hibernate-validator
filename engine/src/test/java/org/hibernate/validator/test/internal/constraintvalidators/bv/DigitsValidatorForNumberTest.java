@@ -6,16 +6,16 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv;
 
-import java.math.BigDecimal;
-import javax.validation.constraints.Digits;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForNumber;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
+import org.testng.annotations.Test;
+
+import javax.validation.constraints.Digits;
+import java.math.BigDecimal;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Alaa Nassef

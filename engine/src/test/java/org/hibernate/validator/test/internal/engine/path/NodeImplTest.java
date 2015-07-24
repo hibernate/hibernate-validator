@@ -6,16 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.path;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.hibernate.validator.path.PropertyNode;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
@@ -29,10 +22,16 @@ import javax.validation.Validator;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.path.PropertyNode;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

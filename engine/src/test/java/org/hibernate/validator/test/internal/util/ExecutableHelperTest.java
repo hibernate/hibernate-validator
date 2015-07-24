@@ -6,16 +6,15 @@
  */
 package org.hibernate.validator.test.internal.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.Date;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Date;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;

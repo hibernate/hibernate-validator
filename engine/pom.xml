@@ -258,12 +258,38 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>${basedir}/src/test/suite/unit-tests.xml</suiteXmlFile>
-                    </suiteXmlFiles>
-                    <parallel>methods</parallel>
-                    <threadCount>4</threadCount>
-                </configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+                <executions>
+                	<execution>
+                		<id>cfg-tests</id>
+                		<phase>test</phase>
+                		<goals><goal>test</goal></goals>
+                		<configuration>
+							<skipTests>${skipTests}</skipTests>
+		                    <suiteXmlFiles>
+		                        <suiteXmlFile>${basedir}/src/test/suite/cfg-tests.xml</suiteXmlFile>
+		                    </suiteXmlFiles>
+							<additionalClasspathElements>
+								<additionalClasspathElement>${basedir}/src/cfgtest/resources</additionalClasspathElement>
+							</additionalClasspathElements>
+                			<reportsDirectory>${basedir}/target/surefire-reports-cfg/</reportsDirectory>
+                		</configuration>
+                	</execution>
+                	<execution>
+                		<id>unit-tests</id>
+                		<phase>test</phase>
+                		<goals><goal>test</goal></goals>
+                		<configuration>
+							<skipTests>${skipTests}</skipTests>
+		                    <suiteXmlFiles>
+		                        <suiteXmlFile>${basedir}/src/test/suite/unit-tests.xml</suiteXmlFile>
+		                    </suiteXmlFiles>
+		                    <parallel>methods</parallel>
+		                    <threadCount>4</threadCount>
+                		</configuration>
+                	</execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

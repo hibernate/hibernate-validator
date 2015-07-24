@@ -6,6 +6,15 @@
  */
 package org.hibernate.validator.test.parameternameprovider;
 
+import com.thoughtworks.paranamer.AnnotationParanamer;
+import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.executable.ExecutableValidator;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,16 +22,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.executable.ExecutableValidator;
-
-import com.thoughtworks.paranamer.AnnotationParanamer;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
-import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;

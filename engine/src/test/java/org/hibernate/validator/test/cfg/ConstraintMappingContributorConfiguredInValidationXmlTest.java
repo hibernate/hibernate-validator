@@ -6,26 +6,25 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-
-import java.util.Set;
+import org.hibernate.validator.cfg.defs.AssertTrueDef;
+import org.hibernate.validator.cfg.defs.MinDef;
+import org.hibernate.validator.cfg.defs.NotNullDef;
+import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidationXmlTestHelper;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.Set;
 
-import org.hibernate.validator.cfg.defs.AssertTrueDef;
-import org.hibernate.validator.cfg.defs.MinDef;
-import org.hibernate.validator.cfg.defs.NotNullDef;
-import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
-import org.testng.annotations.Test;
-import org.hibernate.validator.testutil.ValidationXmlTestHelper;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 
 /**
  * Tests the contribution of constraint mappings via a contributor configured in {@code META-INF/validation.xml}.

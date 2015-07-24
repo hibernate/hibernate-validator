@@ -6,13 +6,12 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;

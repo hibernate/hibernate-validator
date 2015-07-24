@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Max;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * Check that the number being validated is less than or equal to the maximum

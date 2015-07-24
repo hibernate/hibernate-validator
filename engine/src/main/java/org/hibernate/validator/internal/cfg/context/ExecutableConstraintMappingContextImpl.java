@@ -6,13 +6,6 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-
-import javax.validation.ParameterNameProvider;
-
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
@@ -30,6 +23,12 @@ import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.ParameterNameProvider;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 

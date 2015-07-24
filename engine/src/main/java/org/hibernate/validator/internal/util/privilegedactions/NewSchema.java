@@ -6,13 +6,12 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
-import java.net.URL;
-import java.security.PrivilegedExceptionAction;
+import org.xml.sax.SAXException;
 
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
-import org.xml.sax.SAXException;
+import java.net.URL;
+import java.security.PrivilegedExceptionAction;
 
 /**
  * Loads a given XML schema.

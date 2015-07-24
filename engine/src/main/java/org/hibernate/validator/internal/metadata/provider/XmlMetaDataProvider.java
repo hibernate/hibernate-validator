@@ -6,16 +6,16 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.io.InputStream;
-import java.util.Set;
-import javax.validation.ParameterNameProvider;
-
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.xml.XmlMappingParser;
+
+import javax.validation.ParameterNameProvider;
+import java.io.InputStream;
+import java.util.Set;
 
 /**
  * A {@link MetaDataProvider} providing constraint related meta data based on

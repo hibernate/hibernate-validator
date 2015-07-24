@@ -6,10 +6,6 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.util.Set;
-
-import javax.validation.ParameterNameProvider;
-
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -18,6 +14,9 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.ParameterNameProvider;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 

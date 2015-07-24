@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.valuehandling;
 
-import java.util.Optional;
-
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+
+import java.util.Optional;
 
 /**
  * Unwraps an {@code Optional} and returns the wrapped value and type. Empty {@code Optional} value is returned as

@@ -6,6 +6,23 @@
  */
 package org.hibernate.validator.internal.util.logging;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.jboss.logging.BasicLogger;
+import org.jboss.logging.annotations.Cause;
+import org.jboss.logging.annotations.LogMessage;
+import org.jboss.logging.annotations.Message;
+import org.jboss.logging.annotations.MessageLogger;
+
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.ConstraintDefinitionException;
+import javax.validation.ConstraintTarget;
+import javax.validation.ElementKind;
+import javax.validation.GroupDefinitionException;
+import javax.validation.Path;
+import javax.validation.UnexpectedTypeException;
+import javax.validation.ValidationException;
+import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
@@ -16,24 +33,6 @@ import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintDefinitionException;
-import javax.validation.ConstraintTarget;
-import javax.validation.ElementKind;
-import javax.validation.GroupDefinitionException;
-import javax.validation.Path;
-import javax.validation.UnexpectedTypeException;
-import javax.validation.ValidationException;
-import javax.xml.stream.XMLStreamException;
-
-import org.jboss.logging.BasicLogger;
-import org.jboss.logging.annotations.Cause;
-import org.jboss.logging.annotations.LogMessage;
-import org.jboss.logging.annotations.Message;
-import org.jboss.logging.annotations.MessageLogger;
-
-import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.INFO;

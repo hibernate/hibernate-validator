@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.serialization;
 
-import java.io.Serializable;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * @author Hardy Ferentschik

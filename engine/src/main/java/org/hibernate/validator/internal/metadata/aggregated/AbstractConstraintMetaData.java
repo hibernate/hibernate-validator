@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+
+import javax.validation.ElementKind;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
-import javax.validation.ElementKind;
-
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 

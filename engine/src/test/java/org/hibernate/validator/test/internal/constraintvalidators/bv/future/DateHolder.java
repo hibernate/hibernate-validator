@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.future;
 
-import java.util.Calendar;
-import java.util.Date;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Past;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author Hardy Ferentschik

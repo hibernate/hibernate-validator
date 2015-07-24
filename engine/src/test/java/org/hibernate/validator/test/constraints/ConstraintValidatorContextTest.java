@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.test.constraints;
 
-import java.lang.annotation.Retention;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -24,13 +24,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 import javax.validation.executable.ExecutableValidator;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import java.lang.annotation.Retention;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;

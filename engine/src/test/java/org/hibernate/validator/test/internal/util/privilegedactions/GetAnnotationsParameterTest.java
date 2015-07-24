@@ -6,19 +6,18 @@
  */
 package org.hibernate.validator.test.internal.util.privilegedactions;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-
-import java.lang.annotation.Annotation;
+import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
+import org.testng.annotations.Test;
 
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
+import java.lang.annotation.Annotation;
 
-import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * Unit test for {@link GetAnnotationsParameter}.

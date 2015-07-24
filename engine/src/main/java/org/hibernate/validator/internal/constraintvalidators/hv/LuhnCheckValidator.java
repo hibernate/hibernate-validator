@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import java.util.List;
-import javax.validation.ConstraintValidator;
-
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.internal.util.ModUtil;
+
+import javax.validation.ConstraintValidator;
+import java.util.List;
 
 /**
  * Luhn algorithm checksum validator

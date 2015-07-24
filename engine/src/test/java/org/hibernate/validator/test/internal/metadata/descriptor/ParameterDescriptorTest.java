@@ -6,23 +6,22 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
-import java.util.Set;
-import javax.validation.constraints.NotNull;
-import javax.validation.groups.Default;
-import javax.validation.metadata.ConstraintDescriptor;
-import javax.validation.metadata.GroupConversionDescriptor;
-import javax.validation.metadata.ParameterDescriptor;
-import javax.validation.metadata.Scope;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtComplex;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.groups.Default;
+import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.GroupConversionDescriptor;
+import javax.validation.metadata.ParameterDescriptor;
+import javax.validation.metadata.Scope;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
 import static org.hibernate.validator.testutil.ValidatorUtil.getParameterDescriptor;

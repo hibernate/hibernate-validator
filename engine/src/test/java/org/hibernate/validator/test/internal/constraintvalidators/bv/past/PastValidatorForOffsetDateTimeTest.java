@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-
+import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForOffsetDateTime;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForOffsetDateTime;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;

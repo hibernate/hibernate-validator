@@ -6,19 +6,18 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import com.fasterxml.classmate.ResolvedType;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.privilegedactions.GetConstraintValidatorList;
+import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
+
+import javax.validation.ConstraintValidator;
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.validation.ConstraintValidator;
-
-import com.fasterxml.classmate.ResolvedType;
-
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.privilegedactions.GetConstraintValidatorList;
-import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 

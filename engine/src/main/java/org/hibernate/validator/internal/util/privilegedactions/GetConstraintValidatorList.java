@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
+import javax.validation.ConstraintValidator;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -13,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
-import javax.validation.ConstraintValidator;
 
 /**
  * @author Hardy Ferentschik

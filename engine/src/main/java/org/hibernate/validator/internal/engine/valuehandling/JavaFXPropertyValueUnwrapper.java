@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.engine.valuehandling;
 
 import javafx.beans.value.ObservableValue;
-
 import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 

@@ -6,14 +6,13 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
-import java.util.Collections;
-import java.util.List;
-import javax.validation.ParameterNameProvider;
-
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import javax.validation.ParameterNameProvider;
+import java.util.Collections;
+import java.util.List;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.testng.Assert.assertEquals;

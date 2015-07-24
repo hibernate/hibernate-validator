@@ -6,16 +6,16 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
-import java.util.List;
-import java.util.Map;
+import org.hibernate.validator.constraints.ParameterScriptAssert;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+import org.hibernate.validator.internal.util.Contracts;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
-
-import org.hibernate.validator.constraints.ParameterScriptAssert;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.hibernate.validator.internal.util.Contracts;
+import java.util.List;
+import java.util.Map;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;

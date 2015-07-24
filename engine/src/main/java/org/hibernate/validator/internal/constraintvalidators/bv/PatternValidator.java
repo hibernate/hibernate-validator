@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv;
 
-import java.util.regex.Matcher;
-import java.util.regex.PatternSyntaxException;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Pattern;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import java.util.regex.Matcher;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * @author Hardy Ferentschik

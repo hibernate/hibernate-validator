@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
-import java.util.Map;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import java.util.Map;
 
 /**
  * Check that a string's length is between min and max.

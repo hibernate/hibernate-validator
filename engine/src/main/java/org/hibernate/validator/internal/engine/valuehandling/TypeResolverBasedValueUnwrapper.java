@@ -6,13 +6,12 @@
  */
 package org.hibernate.validator.internal.engine.valuehandling;
 
-import java.lang.reflect.Type;
-
 import com.fasterxml.classmate.ResolvedType;
 import com.fasterxml.classmate.TypeResolver;
-
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+
+import java.lang.reflect.Type;
 
 /**
  * Base class for {@link ValidatedValueUnwrapper}s based on ClassMate's type resolver.

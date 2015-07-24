@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.resourceloading;
 
+import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
  * A {@link ResourceBundleLocator} implementation that wraps around another

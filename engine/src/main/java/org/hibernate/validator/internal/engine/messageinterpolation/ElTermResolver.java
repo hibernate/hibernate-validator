@@ -6,20 +6,19 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation;
 
-import java.util.Locale;
-import java.util.Map;
+import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
+import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver;
+import org.hibernate.validator.internal.engine.messageinterpolation.el.SimpleELContext;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
 import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
 import javax.validation.MessageInterpolator;
-
-import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
-import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver;
-import org.hibernate.validator.internal.engine.messageinterpolation.el.SimpleELContext;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Resolver for the el expressions.

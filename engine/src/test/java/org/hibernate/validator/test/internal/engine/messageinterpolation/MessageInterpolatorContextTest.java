@@ -7,8 +7,12 @@
 
 package org.hibernate.validator.test.internal.engine.messageinterpolation;
 
-import java.util.Collections;
-import java.util.Set;
+import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
+import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
@@ -19,12 +23,8 @@ import javax.validation.constraints.Size;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
-
-import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
-import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
-import org.testng.annotations.Test;
+import java.util.Collections;
+import java.util.Set;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;

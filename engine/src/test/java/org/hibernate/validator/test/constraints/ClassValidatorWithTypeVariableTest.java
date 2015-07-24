@@ -6,18 +6,17 @@
  */
 package org.hibernate.validator.test.constraints;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.ValidatorUtil;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;

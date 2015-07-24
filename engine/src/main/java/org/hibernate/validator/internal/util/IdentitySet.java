@@ -1,4 +1,4 @@
-/*
+/**
  * Hibernate Validator, declare and validate application constraints
  *
  * License: Apache License, Version 2.0

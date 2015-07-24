@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.test.internal.util;
 
+import org.hibernate.validator.internal.util.IdentitySet;
+import org.testng.annotations.Test;
+
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.testng.Assert.assertTrue;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.util.IdentitySet;
 
 /**
  * @author Hardy Ferentschik

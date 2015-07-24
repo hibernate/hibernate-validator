@@ -6,17 +6,6 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import javax.validation.GroupDefinitionException;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import javax.validation.metadata.BeanDescriptor;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -25,6 +14,16 @@ import org.hibernate.validator.cfg.defs.AssertFalseDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import javax.validation.GroupDefinitionException;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+import javax.validation.metadata.BeanDescriptor;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;

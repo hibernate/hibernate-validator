@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.Set;
-
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+
+import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.Set;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 

@@ -6,19 +6,19 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import javax.validation.metadata.ConstraintDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.metadata.ConstraintDescriptor;
-
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -257,8 +257,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		int i = 0;
 		for ( ConstrainedParameter parameter : parameterMetaData ) {
 			ConstrainedParameter otherParameter = other.getParameterMetaData( i );
-			if ( parameter.isCascading != otherParameter.isCascading || !getDescriptors( parameter.getConstraints() )
-					.equals( getDescriptors( otherParameter.getConstraints() ) ) ) {
+			if ( parameter.isCascading != otherParameter.isCascading 
+				|| !getDescriptors( parameter.getConstraints() ).equals( getDescriptors( otherParameter.getConstraints() ) ) ) {
 				return false;
 			}
 			i++;

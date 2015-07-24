@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.util.classhierarchy;
 
+import org.hibernate.validator.internal.util.Contracts;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
-import org.hibernate.validator.internal.util.Contracts;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;

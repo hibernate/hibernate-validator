@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import java.util.Map;
-import javax.validation.metadata.ConstraintDescriptor;
-
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
+
+import javax.validation.metadata.ConstraintDescriptor;
+import java.util.Map;
 
 /**
  * Implementation of the context used during message interpolation.

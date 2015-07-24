@@ -6,12 +6,11 @@
  */
 package org.hibernate.validator.test.internal.metadata.location;
 
-import java.lang.reflect.Member;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
+import java.lang.reflect.Member;
 
 import static org.testng.Assert.assertEquals;
 

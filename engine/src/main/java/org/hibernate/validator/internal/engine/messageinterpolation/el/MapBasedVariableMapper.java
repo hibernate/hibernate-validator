@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
+import javax.el.ValueExpression;
+import javax.el.VariableMapper;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import javax.el.ValueExpression;
-import javax.el.VariableMapper;
 
 /**
  * @author Hardy Ferentschik

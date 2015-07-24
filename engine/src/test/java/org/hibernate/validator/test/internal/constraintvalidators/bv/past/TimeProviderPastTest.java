@@ -6,17 +6,8 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import javax.validation.constraints.Past;
-
+import org.hibernate.validator.spi.time.TimeProvider;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.joda.time.DateTime;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
@@ -24,8 +15,16 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.spi.time.TimeProvider;
-import org.hibernate.validator.testutil.TestForIssue;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.constraints.Past;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;

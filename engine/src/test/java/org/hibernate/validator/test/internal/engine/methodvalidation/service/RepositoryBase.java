@@ -6,11 +6,11 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
+import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 
 /**
  * @author Gunnar Morling

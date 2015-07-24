@@ -6,10 +6,9 @@
  */
 package org.hibernate.validator.internal.util.privilegedactions;
 
-import java.security.PrivilegedExceptionAction;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import java.security.PrivilegedExceptionAction;
 
 /**
  * Returns a new {@link JAXBContext} for the given class.

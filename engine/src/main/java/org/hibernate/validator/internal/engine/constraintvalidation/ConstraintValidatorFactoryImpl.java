@@ -6,13 +6,12 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
-
-import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * Default {@code ConstraintValidatorFactory} using a no-arg constructor.

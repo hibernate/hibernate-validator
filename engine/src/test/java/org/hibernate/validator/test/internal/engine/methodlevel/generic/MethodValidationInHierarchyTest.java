@@ -6,13 +6,12 @@
  */
 package org.hibernate.validator.test.internal.engine.methodlevel.generic;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;

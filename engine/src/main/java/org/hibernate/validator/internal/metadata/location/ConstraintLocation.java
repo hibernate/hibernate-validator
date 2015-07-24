@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.Member;
-import java.lang.reflect.Type;
-
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
+
+import java.lang.reflect.Member;
+import java.lang.reflect.Type;
 
 /**
  * Provides information related to the location a constraint is declared on (e.g. a bean, field or method parameter).

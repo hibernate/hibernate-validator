@@ -6,10 +6,15 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import org.hibernate.validator.constraints.ScriptAssert;
+import org.hibernate.validator.test.internal.metadata.Customer;
+import org.hibernate.validator.test.internal.metadata.CustomerRepository;
+import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
+import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.joda.time.DateMidnight;
+import org.testng.annotations.Test;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -20,16 +25,10 @@ import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.MethodType;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
-
-import org.joda.time.DateMidnight;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.test.internal.metadata.Customer;
-import org.hibernate.validator.test.internal.metadata.CustomerRepository;
-import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
-import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
-import org.hibernate.validator.testutil.TestForIssue;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;

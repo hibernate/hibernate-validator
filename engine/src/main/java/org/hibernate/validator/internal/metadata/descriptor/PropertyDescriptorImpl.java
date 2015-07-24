@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import javax.validation.metadata.GroupConversionDescriptor;
+import javax.validation.metadata.PropertyDescriptor;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import javax.validation.metadata.GroupConversionDescriptor;
-import javax.validation.metadata.PropertyDescriptor;
 
 /**
  * Describes a validated property.

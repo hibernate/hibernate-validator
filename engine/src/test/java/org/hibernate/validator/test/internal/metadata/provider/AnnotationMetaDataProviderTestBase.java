@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.test.internal.metadata.provider;
 
-import java.lang.reflect.Member;
-
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+
+import java.lang.reflect.Member;
 
 /**
  * @author Gunnar Morling
