@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import java.io.InputStream;
+import javax.xml.stream.XMLEventReader;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -29,10 +32,12 @@ public class XmlParserHelperTest {
 
 	@Test
 	public void shouldRetrieveVersionFor11ValidationXml() {
+		InputStream in = XmlParserHelperTest.class.getResourceAsStream( "parameter-name-provider-validation.xml" );
+		XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "META-INF/validation.xml", in );
 
 		String version = xmlParserHelper.getSchemaVersion(
 				"META-INF/validation.xml",
-				XmlParserHelperTest.class.getResourceAsStream( "parameter-name-provider-validation.xml" )
+				xmlEventReader
 		);
 
 		assertThat( version ).isEqualTo( "1.1" );
@@ -40,10 +45,12 @@ public class XmlParserHelperTest {
 
 	@Test
 	public void shouldRetrieveVersionFor10ValidationXml() {
+		InputStream in = XmlParserHelperTest.class.getResourceAsStream( "bv-1.0-validation.xml" );
+		XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "META-INF/validation.xml", in );
 
 		String version = xmlParserHelper.getSchemaVersion(
 				"META-INF/validation.xml",
-				XmlParserHelperTest.class.getResourceAsStream( "bv-1.0-validation.xml" )
+				xmlEventReader
 		);
 
 		assertThat( version ).isEqualTo( "1.0" );

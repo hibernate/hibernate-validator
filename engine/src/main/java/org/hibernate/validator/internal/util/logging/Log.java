@@ -5,14 +5,11 @@
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.util.logging;
-
-import java.io.IOException;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
@@ -204,15 +201,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 48, value = "Unable to expand group sequence.")
 	GroupDefinitionException getUnableToExpandGroupSequenceException();
-
-	@Message(id = 49, value = "The given index must be between %1$s and %2$s.")
-	IndexOutOfBoundsException getInvalidIndexException(String lowerBound, String upperBound);
-
-	@Message(id = 50, value = "Missing format string in template: %s.")
-	ValidationException getMissingFormatStringInTemplateException(String expression);
-
-	@Message(id = 51, value = "Invalid format: %s.")
-	ValidationException getInvalidFormatException(String message, @Cause IllegalFormatException e);
 
 	@Message(id = 52,
 			value = "Default group sequence and default group sequence provider cannot be defined at the same time.")
@@ -415,9 +403,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 122, value = "Unsupported schema version for %s: %s.")
 	ValidationException getUnsupportedSchemaVersionException(String file, String version);
-
-	@Message(id = 123, value = "Unable to parse %s.")
-	ValidationException getUnableToResetXmlInputStreamException(String file, @Cause IOException e);
 
 	@Message(id = 124, value = "Found multiple group conversions for source group %s: %s.")
 	ConstraintDeclarationException getMultipleGroupConversionsForSameSourceException(Class<?> from, Set<Class<?>> tos);
@@ -647,4 +632,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 189,
 			value = "The configuration of value unwrapping for property '%s' of bean '%s' is inconsistent between the field and its getter.")
 	ConstraintDeclarationException getInconsistentValueUnwrappingConfigurationBetweenFieldAndItsGetterException(String property, String clazz);
+
+	@Message(id = 190, value = "Unable to parse %s.")
+	ValidationException getUnableToCreateXMLEventReader(String file, @Cause Exception e);
 }

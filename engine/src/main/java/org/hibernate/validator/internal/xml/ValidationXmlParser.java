@@ -22,7 +22,7 @@ import javax.validation.executable.ExecutableType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.stream.XMLEventReader;
 import javax.xml.validation.Schema;
 
 import org.hibernate.validator.internal.util.logging.Log;
@@ -74,10 +74,11 @@ public class ValidationXmlParser {
 			// this avoids accessing javax.xml.stream.* (which does not exist on Android) when not actually
 			// working with the XML configuration
 			XmlParserHelper xmlParserHelper = new XmlParserHelper();
+			XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( VALIDATION_XML_FILE, inputStream );
 
-			String schemaVersion = xmlParserHelper.getSchemaVersion( VALIDATION_XML_FILE, inputStream );
+			String schemaVersion = xmlParserHelper.getSchemaVersion( VALIDATION_XML_FILE, xmlEventReader );
 			Schema schema = getSchema( xmlParserHelper, schemaVersion );
-			ValidationConfigType validationConfig = unmarshal( inputStream, schema );
+			ValidationConfigType validationConfig = unmarshal( xmlEventReader, schema );
 
 			return createBootstrapConfiguration( validationConfig );
 		}
@@ -109,7 +110,7 @@ public class ValidationXmlParser {
 		return xmlParserHelper.getSchema( schemaResource );
 	}
 
-	private ValidationConfigType unmarshal(InputStream inputStream, Schema schema) {
+	private ValidationConfigType unmarshal(XMLEventReader xmlEventReader, Schema schema) {
 		log.parsingXMLFile( VALIDATION_XML_FILE );
 
 		try {
@@ -118,11 +119,10 @@ public class ValidationXmlParser {
 			JAXBContext jc = run( NewJaxbContext.action( ValidationConfigType.class ) );
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
 			unmarshaller.setSchema( schema );
-			StreamSource stream = new StreamSource( inputStream );
 
 			// Unmashaller#unmarshal() requires several permissions internally and doesn't use any privileged blocks
 			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
-			JAXBElement<ValidationConfigType> root = run( Unmarshal.action( unmarshaller, stream, ValidationConfigType.class ) );
+			JAXBElement<ValidationConfigType> root = run( Unmarshal.action( unmarshaller, xmlEventReader, ValidationConfigType.class ) );
 			return root.getValue();
 		}
 		catch ( Exception e ) {

@@ -104,7 +104,8 @@ public class ConfigurationImplTest {
 		}
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000123.*")
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000190.*")
+	// UnableToDetermineSchemaVersionException
 	@TestForIssue(jiraKey = "HV-563")
 	public void testReusableConfigurationWithClosedInputStream() throws Exception {
 		final Configuration<HibernateValidatorConfiguration> configuration = getConfiguration();

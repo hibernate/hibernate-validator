@@ -6,12 +6,10 @@
  */
 package org.hibernate.validator.internal.xml;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +23,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.stream.XMLEventReader;
 import javax.xml.validation.Schema;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
@@ -131,14 +129,21 @@ public class XmlMappingParser {
 
 			Set<String> alreadyProcessedConstraintDefinitions = newHashSet();
 			for ( InputStream in : mappingStreams ) {
-				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", in );
+				// check whether mark is supported, if so we can reset the stream in order to allow reuse of Configuration
+				boolean markSupported = in.markSupported();
+				if ( markSupported ) {
+					in.mark( Integer.MAX_VALUE );
+				}
+
+				XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", in );
+				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", xmlEventReader );
 				String schemaResourceName = getSchemaResourceName( schemaVersion );
 				Schema schema = xmlParserHelper.getSchema( schemaResourceName );
 
 				Unmarshaller unmarshaller = jc.createUnmarshaller();
 				unmarshaller.setSchema( schema );
 
-				ConstraintMappingsType mapping = getValidationConfig( in, unmarshaller );
+				ConstraintMappingsType mapping = getValidationConfig( xmlEventReader, unmarshaller );
 				String defaultPackage = mapping.getDefaultPackage();
 
 				parseConstraintDefinitions(
@@ -148,54 +153,23 @@ public class XmlMappingParser {
 				);
 
 				for ( BeanType bean : mapping.getBean() ) {
-					Class<?> beanClass = classLoadingHelper.loadClass( bean.getClazz(), defaultPackage );
-					checkClassHasNotBeenProcessed( processedClasses, beanClass );
-
-					// update annotation ignores
-					annotationProcessingOptions.ignoreAnnotationConstraintForClass(
-							beanClass,
-							bean.getIgnoreAnnotations()
+					processBeanType(
+							constrainedTypeBuilder,
+							constrainedFieldBuilder,
+							constrainedExecutableBuilder,
+							constrainedGetterBuilder,
+							defaultPackage,
+							bean
 					);
+				}
 
-					ConstrainedType constrainedType = constrainedTypeBuilder.buildConstrainedType(
-							bean.getClassType(),
-							beanClass,
-							defaultPackage
-					);
-					if ( constrainedType != null ) {
-						addConstrainedElement( beanClass, constrainedType );
+				if ( markSupported ) {
+					try {
+						in.reset();
 					}
-
-					Set<ConstrainedField> constrainedFields = constrainedFieldBuilder.buildConstrainedFields(
-							bean.getField(),
-							beanClass,
-							defaultPackage
-					);
-					addConstrainedElements( beanClass, constrainedFields );
-
-					Set<ConstrainedExecutable> constrainedGetters = constrainedGetterBuilder.buildConstrainedGetters(
-							bean.getGetter(),
-							beanClass,
-							defaultPackage
-
-					);
-					addConstrainedElements( beanClass, constrainedGetters );
-
-					Set<ConstrainedExecutable> constrainedConstructors = constrainedExecutableBuilder.buildConstructorConstrainedExecutable(
-							bean.getConstructor(),
-							beanClass,
-							defaultPackage
-					);
-					addConstrainedElements( beanClass, constrainedConstructors );
-
-					Set<ConstrainedExecutable> constrainedMethods = constrainedExecutableBuilder.buildMethodConstrainedExecutable(
-							bean.getMethod(),
-							beanClass,
-							defaultPackage
-					);
-					addConstrainedElements( beanClass, constrainedMethods );
-
-					processedClasses.add( beanClass );
+					catch ( IOException e ) {
+						log.debug( "Unable to reset input stream." );
+					}
 				}
 			}
 		}
@@ -223,6 +197,57 @@ public class XmlMappingParser {
 
 	public final List<Class<?>> getDefaultSequenceForClass(Class<?> beanClass) {
 		return defaultSequences.get( beanClass );
+	}
+
+	private void processBeanType(ConstrainedTypeBuilder constrainedTypeBuilder, ConstrainedFieldBuilder constrainedFieldBuilder, ConstrainedExecutableBuilder constrainedExecutableBuilder, ConstrainedGetterBuilder constrainedGetterBuilder, String defaultPackage, BeanType bean) {
+		Class<?> beanClass = classLoadingHelper.loadClass( bean.getClazz(), defaultPackage );
+		checkClassHasNotBeenProcessed( processedClasses, beanClass );
+
+		// update annotation ignores
+		annotationProcessingOptions.ignoreAnnotationConstraintForClass(
+				beanClass,
+				bean.getIgnoreAnnotations()
+		);
+
+		ConstrainedType constrainedType = constrainedTypeBuilder.buildConstrainedType(
+				bean.getClassType(),
+				beanClass,
+				defaultPackage
+		);
+		if ( constrainedType != null ) {
+			addConstrainedElement( beanClass, constrainedType );
+		}
+
+		Set<ConstrainedField> constrainedFields = constrainedFieldBuilder.buildConstrainedFields(
+				bean.getField(),
+				beanClass,
+				defaultPackage
+		);
+		addConstrainedElements( beanClass, constrainedFields );
+
+		Set<ConstrainedExecutable> constrainedGetters = constrainedGetterBuilder.buildConstrainedGetters(
+				bean.getGetter(),
+				beanClass,
+				defaultPackage
+
+		);
+		addConstrainedElements( beanClass, constrainedGetters );
+
+		Set<ConstrainedExecutable> constrainedConstructors = constrainedExecutableBuilder.buildConstructorConstrainedExecutable(
+				bean.getConstructor(),
+				beanClass,
+				defaultPackage
+		);
+		addConstrainedElements( beanClass, constrainedConstructors );
+
+		Set<ConstrainedExecutable> constrainedMethods = constrainedExecutableBuilder.buildMethodConstrainedExecutable(
+				bean.getMethod(),
+				beanClass,
+				defaultPackage
+		);
+		addConstrainedElements( beanClass, constrainedMethods );
+
+		processedClasses.add( beanClass );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -312,36 +337,19 @@ public class XmlMappingParser {
 		}
 	}
 
-	private ConstraintMappingsType getValidationConfig(InputStream in, Unmarshaller unmarshaller) {
+	private ConstraintMappingsType getValidationConfig(XMLEventReader xmlEventReader, Unmarshaller unmarshaller) {
 		ConstraintMappingsType constraintMappings;
 		try {
-			// check whether mark is supported, if so we can reset the stream in order to allow reuse of Configuration
-			boolean markSupported = in.markSupported();
-			if ( markSupported ) {
-				in.mark( Integer.MAX_VALUE );
-			}
-
-			StreamSource stream = new StreamSource( new CloseIgnoringInputStream( in ) );
-
 			// Unmashaller#unmarshal() requires several permissions internally and doesn't use any privileged blocks
 			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
 			JAXBElement<ConstraintMappingsType> root = run(
 					Unmarshal.action(
 							unmarshaller,
-							stream,
+							xmlEventReader,
 							ConstraintMappingsType.class
 					)
 			);
 			constraintMappings = root.getValue();
-
-			if ( markSupported ) {
-				try {
-					in.reset();
-				}
-				catch ( IOException e ) {
-					log.debug( "Unable to reset input stream." );
-				}
-			}
 		}
 		catch ( Exception e ) {
 			throw log.getErrorParsingMappingFileException( e );
@@ -365,10 +373,6 @@ public class XmlMappingParser {
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
-
 	private <T> T run(PrivilegedExceptionAction<T> action) throws JAXBException {
 		try {
 			return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
@@ -378,18 +382,6 @@ public class XmlMappingParser {
 		}
 		catch ( Exception e ) {
 			throw log.getErrorParsingMappingFileException( e );
-		}
-	}
-
-	// JAXB closes the underlying input stream
-	private static class CloseIgnoringInputStream extends FilterInputStream {
-		public CloseIgnoringInputStream(InputStream in) {
-			super( in );
-		}
-
-		@Override
-		public void close() {
-			// do nothing
 		}
 	}
 }

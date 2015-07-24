@@ -14,7 +14,6 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -72,21 +71,15 @@ public class XmlParserHelper {
 	 * represented by the "version" attribute of the root element of the stream.
 	 *
 	 * @param resourceName The name of the represented XML resource.
-	 * @param xmlInputStream An input stream representing an XML resource. Must support the
-	 * {@link InputStream#mark(int)} and {@link InputStream#reset()}
-	 * methods.
+	 * @param xmlEventReader An STAX event reader
 	 *
 	 * @return The value of the "version" attribute. For compatibility with BV
 	 *         1.0, "1.0" will be returned if the given stream doesn't have a
 	 *         "version" attribute.
 	 */
-	public String getSchemaVersion(String resourceName, InputStream xmlInputStream) {
-		Contracts.assertNotNull( xmlInputStream, MESSAGES.parameterMustNotBeNull( "xmlInputStream" ) );
-
-		xmlInputStream.mark( READ_LIMIT );
-
+	public String getSchemaVersion(String resourceName, XMLEventReader xmlEventReader) {
+		Contracts.assertNotNull( xmlEventReader, MESSAGES.parameterMustNotBeNull( "xmlEventReader" ) );
 		try {
-			XMLEventReader xmlEventReader = createXmlEventReader( xmlInputStream );
 			StartElement rootElement = getRootElement( xmlEventReader );
 
 			return getVersionValue( rootElement );
@@ -94,13 +87,14 @@ public class XmlParserHelper {
 		catch ( XMLStreamException e ) {
 			throw log.getUnableToDetermineSchemaVersionException( resourceName, e );
 		}
-		finally {
-			try {
-				xmlInputStream.reset();
-			}
-			catch ( IOException e ) {
-				throw log.getUnableToResetXmlInputStreamException( resourceName, e );
-			}
+	}
+
+	public synchronized XMLEventReader createXmlEventReader(String resourceName, InputStream xmlStream) {
+		try {
+			return xmlInputFactory.createXMLEventReader( xmlStream );
+		}
+		catch ( Exception e ) {
+			throw log.getUnableToCreateXMLEventReader( resourceName, e );
 		}
 	}
 
@@ -114,18 +108,13 @@ public class XmlParserHelper {
 	}
 
 	private StartElement getRootElement(XMLEventReader xmlEventReader) throws XMLStreamException {
-		while ( xmlEventReader.hasNext() ) {
-			XMLEvent nextEvent = xmlEventReader.nextEvent();
-			if ( nextEvent.isStartElement() ) {
-				return nextEvent.asStartElement();
-			}
+		XMLEvent event = xmlEventReader.peek();
+		while ( event != null && !event.isStartElement() ) {
+			xmlEventReader.nextEvent();
+			event = xmlEventReader.peek();
 		}
 
-		return null;
-	}
-
-	private synchronized XMLEventReader createXmlEventReader(InputStream xmlStream) throws XMLStreamException {
-		return xmlInputFactory.createXMLEventReader( xmlStream );
+		return event == null ?  null : event.asStartElement();
 	}
 
 	/**
