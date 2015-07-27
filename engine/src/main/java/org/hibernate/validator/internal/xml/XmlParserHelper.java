@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.xml;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.security.AccessController;
@@ -14,6 +13,7 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
@@ -54,14 +54,6 @@ public class XmlParserHelper {
 	// class loader in Wildfly. See HV-842
 	private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
-	/**
-	 * Read limit for the buffered input stream. Resetting the stream after
-	 * reading the version attribute will fail, if this has required reading
-	 * more bytes than this limit (1MB) from the stream. Practically, this
-	 * should never happen.
-	 */
-	private static final int READ_LIMIT = 1024 * 1024;
-
 	private static final ConcurrentMap<String, Schema> schemaCache = new ConcurrentHashMap<String, Schema>(
 			NUMBER_OF_SCHEMAS
 	);
@@ -69,6 +61,9 @@ public class XmlParserHelper {
 	/**
 	 * Retrieves the schema version applying for the given XML input stream as
 	 * represented by the "version" attribute of the root element of the stream.
+	 * <p>
+	 * The given reader will be advanced to the root element of the given XML
+	 * structure. It can be used for unmarshalling from there.
 	 *
 	 * @param resourceName The name of the represented XML resource.
 	 * @param xmlEventReader An STAX event reader
