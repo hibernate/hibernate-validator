@@ -1,6 +1,13 @@
 Hibernate Validator Changelog
 =============================
 
+5.2.1.Final (30.07.2015)
+-------------------------
+
+** Bug
+    * [HV-1007] - Unable to parse validation.xml with IBM JDK
+
+
 5.2.0.Final (20.07.2015)
 -------------------------
 
@@ -615,13 +622,13 @@ Hibernate Validator Changelog
     * [HV-484] - Refactor package organisation to clearly separate spi, public and private APIs - part 1 (internal packages)
     * [HV-496] - Include Hibernate Validator test classes in a different classifier
     * [HV-505] - Update tck runner to run against AS 7.0.0.Final
-    * [HV-510] - Upgrade BV TCK dependency to 1.0.6.GA 
+    * [HV-510] - Upgrade BV TCK dependency to 1.0.6.GA
     * [HV-528] - Compilation fails with JDK 7 due to incompatabilites of JAXB versions
     * [HV-530] - Explain propagation of redefined default groups across associated instances annotated with @Valid
     * [HV-534] - Consider removing the shading plug-in
     * [HV-536] - Upgrade JSoup dependency
     * [HV-540] - Remove repository settings from the master pom
-    * [HV-544] - Create a integration test moodule 
+    * [HV-544] - Create a integration test moodule
 
 4.2.0.Final (20.06.2011)
 ----------------------
