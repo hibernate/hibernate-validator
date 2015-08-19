@@ -55,6 +55,13 @@ public class SafeHtmlValidatorTest {
 	}
 
 	@Test
+	public void testInvalidIncompleteImgTagWithScriptIncluded() {
+		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
+
+		assertFalse( getSafeHtmlValidator().isValid( "<img src=asdf onerror=\"alert(1)\" x=", null ) );
+	}
+
+	@Test
 	public void testValid() throws Exception {
 		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
 

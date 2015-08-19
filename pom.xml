@@ -87,7 +87,7 @@
         <classmate.version>1.1.0</classmate.version>
         <paranamer.version>2.5.5</paranamer.version>
         <joda-time.version>2.1</joda-time.version>
-        <jsoup.version>1.8.1</jsoup.version>
+        <jsoup.version>1.8.3</jsoup.version>
         <wildfly.version>8.2.0.Final</wildfly.version>
         <arquillian.version>1.0.2.Final</arquillian.version>
         <slf4j.version>1.7.2</slf4j.version>
