@@ -68,9 +68,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	private final boolean isGetter;
 
 	/**
-	 * An identifier for storing this object in maps etc.
+	 * Set of identifier for storing this object in maps etc. Will only contain more than one entry in case this method
+	 * overrides a super type method with generic parameters, in which case the signature of the super-type and the
+	 * sub-type method will differ.
 	 */
-	private final String identifier;
+	private final Set<String> identifiers;
 
 	private final ReturnValueMetaData returnValueMetaData;
 
@@ -79,6 +81,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Type returnType,
 			Class<?>[] parameterTypes,
 			ElementKind kind,
+			Set<String> identifiers,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
@@ -101,7 +104,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.parameterTypes = parameterTypes;
 		this.parameterMetaDataList = Collections.unmodifiableList( parameterMetaData );
 		this.crossParameterConstraints = Collections.unmodifiableSet( crossParameterConstraints );
-		this.identifier = name + Arrays.toString( parameterTypes );
+		this.identifiers = identifiers;
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,
 				returnValueConstraints,
@@ -143,8 +146,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 *
 	 * @return An identifier for this meta data object.
 	 */
-	public String getIdentifier() {
-		return identifier;
+	public Set<String> getIdentifiers() {
+		return identifiers;
 	}
 
 	/**
@@ -272,6 +275,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				)
 		);
 
+		private final Set<String> identifiers = newHashSet();
+
 		/**
 		 * Either CONSTRUCTOR or METHOD.
 		 */
@@ -330,6 +335,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			super.add( constrainedElement );
 			ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
 
+			identifiers.add( constrainedExecutable.getExecutable().getIdentifier() );
+
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
@@ -373,6 +380,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					ReflectionHelper.typeOf( executable.getMember() ),
 					executable.getParameterTypes(),
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
+					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( executable.getIdentifier() ) : identifiers,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),

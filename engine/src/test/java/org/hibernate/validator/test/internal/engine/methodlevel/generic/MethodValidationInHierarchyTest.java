@@ -9,10 +9,9 @@ package org.hibernate.validator.test.internal.engine.methodlevel.generic;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
 
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
@@ -22,6 +21,7 @@ import static org.testng.Assert.fail;
  * @author Hardy Ferentschik
  */
 public class MethodValidationInHierarchyTest {
+
 	@Test
 	@TestForIssue(jiraKey = "HV-618")
 	public void testParameterConstraintAtGenericMethodFromBaseClassAreEvaluated() {
@@ -32,6 +32,26 @@ public class MethodValidationInHierarchyTest {
 
 		try {
 			service.configure( null );
+			fail( "Expected ConstraintViolationException wasn't thrown." );
+		}
+		catch ( ConstraintViolationException e ) {
+			assertEquals( e.getConstraintViolations().size(), 1 );
+
+			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+			assertEquals( constraintViolation.getMessage(), "may not be null" );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1011")
+	public void testParameterConstraintAtGenericMethodFromBaseClassOverriddenInSubClassAreEvaluated() {
+		Class<?>[] interfaces = new Class<?>[] { SimpleService.class };
+		SimpleService<?> service = getValidatingProxy(
+				new SimpleServiceImpl(), interfaces, ValidatorUtil.getValidator()
+		);
+
+		try {
+			service.doIt( null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
 		catch ( ConstraintViolationException e ) {

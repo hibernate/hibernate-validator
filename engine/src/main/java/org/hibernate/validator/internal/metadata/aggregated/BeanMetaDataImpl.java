@@ -79,10 +79,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final Set<MetaConstraint<?>> directMetaConstraints;
 
 	/**
-	 * Contains constrained related meta data for all methods and constructors
-	 * of the type represented by this bean meta data. Keyed by executable,
-	 * values are an aggregated view on each executable together with all the
-	 * executables from the inheritance hierarchy with the same signature.
+	 * Contains constrained related meta data for all methods and constructors of the type represented by this bean meta
+	 * data. Keyed by executable, values are an aggregated view on each executable together with all the executables
+	 * from the inheritance hierarchy with the same signature.
+	 * <p>
+	 * An entry will be stored once under the signature of the represented method and all the methods it overrides
+	 * (there will only be more than one entry in case of generics in the parameters, e.g. in case of a super-type
+	 * method {@code foo(T)} and an overriding sub-type method {@code foo(String)} two entries for the same executable
+	 * meta-data will be stored).
 	 */
 	private final Map<String, ExecutableMetaData> executableMetaDataMap;
 
@@ -291,13 +295,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( ExecutableMetaData executableMetaData : executableMetaDataMap.values() ) {
 			if ( executableMetaData.getKind() == ElementKind.METHOD
 					&& executableMetaData.isConstrained() ) {
-				constrainedMethodDescriptors.put(
-						executableMetaData.getIdentifier(),
-						executableMetaData.asDescriptor(
+				ExecutableDescriptorImpl descriptor = executableMetaData.asDescriptor(
 								defaultGroupSequenceIsRedefined(),
 								getDefaultGroupSequence( null )
-						)
-				);
+						);
+
+				for ( String identifier : executableMetaData.getIdentifiers() ) {
+					constrainedMethodDescriptors.put( identifier, descriptor );
+				}
 			}
 		}
 
@@ -310,7 +315,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		for ( ExecutableMetaData executableMetaData : executableMetaDataMap.values() ) {
 			if ( executableMetaData.getKind() == ElementKind.CONSTRUCTOR && executableMetaData.isConstrained() ) {
 				constrainedMethodDescriptors.put(
-						executableMetaData.getIdentifier(),
+						// constructors never override, so there will be exactly one identifier
+						executableMetaData.getIdentifiers().iterator().next(),
 						executableMetaData.asDescriptor(
 								defaultGroupSequenceIsRedefined(),
 								getDefaultGroupSequence( null )
@@ -366,13 +372,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	/**
-	 * Builds up the method meta data for this type
+	 * Builds up the method meta data for this type; each meta-data entry will be stored under signature of the
+	 * represented method and all the methods it overrides.
 	 */
 	private Map<String, ExecutableMetaData> byIdentifier(Set<ExecutableMetaData> executables) {
 		Map<String, ExecutableMetaData> theValue = newHashMap();
 
 		for ( ExecutableMetaData executableMetaData : executables ) {
-			theValue.put( executableMetaData.getIdentifier(), executableMetaData );
+			for ( String identifier : executableMetaData.getIdentifiers() ) {
+				theValue.put( identifier, executableMetaData );
+			}
 		}
 
 		return theValue;

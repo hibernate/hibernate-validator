@@ -13,4 +13,6 @@ import javax.validation.constraints.NotNull;
  */
 public interface SimpleService<C> {
 	void configure(@NotNull C config);
+
+	void doIt(@NotNull C config);
 }

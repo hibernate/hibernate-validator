@@ -10,13 +10,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.UUID;
+
 import javax.validation.ElementKind;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
-
-import org.joda.time.DateMidnight;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
@@ -33,6 +31,10 @@ import org.hibernate.validator.test.internal.metadata.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.joda.time.DateMidnight;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
@@ -46,11 +48,12 @@ import static org.testng.Assert.assertTrue;
  */
 public class ExecutableMetaDataTest {
 
+	private BeanMetaDataManager beanMetaDataManager;
 	private BeanMetaData<CustomerRepositoryExt> beanMetaData;
 
 	@BeforeMethod
 	public void setupBeanMetaData() {
-		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
+		beanMetaDataManager = new BeanMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new DefaultParameterNameProvider(),
@@ -178,7 +181,7 @@ public class ExecutableMetaDataTest {
 				)
 		);
 
-		assertThat( methodMetaData.getIdentifier() ).isEqualTo(
+		assertThat( methodMetaData.getIdentifiers() ).containsOnly(
 				"createCustomer[interface java.lang.CharSequence, class java.lang.String]"
 		);
 	}
@@ -192,7 +195,7 @@ public class ExecutableMetaDataTest {
 				)
 		);
 
-		assertThat( methodMetaData.getIdentifier() ).isEqualTo( "foo[]" );
+		assertThat( methodMetaData.getIdentifiers() ).containsOnly( "foo[]" );
 	}
 
 	@Test
@@ -204,7 +207,29 @@ public class ExecutableMetaDataTest {
 				)
 		);
 
-		assertThat( constructorMetaData.getIdentifier() ).isEqualTo( "CustomerRepositoryExt[class java.lang.String]" );
+		assertThat( constructorMetaData.getIdentifiers() ).containsOnly( "CustomerRepositoryExt[class java.lang.String]" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1011")
+	public void getIdentifierForOverridingGenericMethod() throws Exception {
+		Method method = JobRepositoryImpl.class.getMethod( "createJob", UUID.class );
+		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( JobRepositoryImpl.class );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor(
+				ExecutableElement.forMethod( method )
+		);
+
+		assertThat( methodMetaData.getIdentifiers() )
+			.describedAs( "Expecting super-type and sub-type method signatures" )
+			.containsOnly( "createJob[class java.lang.Object]", "createJob[class java.util.UUID]" );
+
+		method = JobRepository.class.getMethod( "createJob", Object.class );
+		beanMetaData = beanMetaDataManager.getBeanMetaData( JobRepository.class );
+		methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+
+		assertThat( methodMetaData.getIdentifiers() )
+			.describedAs( "Expecting only super-type method signature" )
+			.containsOnly( "createJob[class java.lang.Object]" );
 	}
 
 	@Test

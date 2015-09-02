@@ -4,14 +4,12 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.test.internal.engine.methodlevel.generic;
+package org.hibernate.validator.test.internal.metadata.aggregated;
 
 /**
- * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
-public class SimpleServiceImpl extends AbstractSimpleService<String> {
+public interface JobRepository<T> {
 
-	@Override
-	public void doIt(String config) {
-	}
+	void createJob(T id);
 }
