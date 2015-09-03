@@ -68,11 +68,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	private final boolean isGetter;
 
 	/**
-	 * Set of identifier for storing this object in maps etc. Will only contain more than one entry in case this method
+	 * Set of signatures for storing this object in maps etc. Will only contain more than one entry in case this method
 	 * overrides a super type method with generic parameters, in which case the signature of the super-type and the
 	 * sub-type method will differ.
 	 */
-	private final Set<String> identifiers;
+	private final Set<String> signatures;
 
 	private final ReturnValueMetaData returnValueMetaData;
 
@@ -81,7 +81,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Type returnType,
 			Class<?>[] parameterTypes,
 			ElementKind kind,
-			Set<String> identifiers,
+			Set<String> signatures,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
@@ -104,7 +104,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.parameterTypes = parameterTypes;
 		this.parameterMetaDataList = Collections.unmodifiableList( parameterMetaData );
 		this.crossParameterConstraints = Collections.unmodifiableSet( crossParameterConstraints );
-		this.identifiers = identifiers;
+		this.signatures = signatures;
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,
 				returnValueConstraints,
@@ -141,13 +141,15 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	/**
-	 * Returns an identifier for this meta data object, based on the represented
+	 * Returns the signature(s) of the method represented by this meta data object, based on the represented
 	 * executable's name and its parameter types.
 	 *
-	 * @return An identifier for this meta data object.
+	 * @return The signatures of this meta data object. Will only contain more than one element in case the represented
+	 * method represents a sub-type method overriding a super-type method using a generic type parameter in its
+	 * parameters.
 	 */
-	public Set<String> getIdentifiers() {
-		return identifiers;
+	public Set<String> getSignatures() {
+		return signatures;
 	}
 
 	/**
@@ -275,7 +277,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				)
 		);
 
-		private final Set<String> identifiers = newHashSet();
+		private final Set<String> signatures = newHashSet();
 
 		/**
 		 * Either CONSTRUCTOR or METHOD.
@@ -335,7 +337,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			super.add( constrainedElement );
 			ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
 
-			identifiers.add( constrainedExecutable.getExecutable().getIdentifier() );
+			signatures.add( constrainedExecutable.getExecutable().getSignature() );
 
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
@@ -380,7 +382,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					ReflectionHelper.typeOf( executable.getMember() ),
 					executable.getParameterTypes(),
 					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? ElementKind.CONSTRUCTOR : ElementKind.METHOD,
-					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( executable.getIdentifier() ) : identifiers,
+					kind == ConstrainedElement.ConstrainedElementKind.CONSTRUCTOR ? Collections.singleton( executable.getSignature() ) : signatures,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),

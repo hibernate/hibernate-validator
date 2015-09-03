@@ -180,7 +180,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		this.directMetaConstraints = getDirectConstraints();
 
-		this.executableMetaDataMap = Collections.unmodifiableMap( byIdentifier( executableMetaDataSet ) );
+		this.executableMetaDataMap = Collections.unmodifiableMap( bySignature( executableMetaDataSet ) );
 
 		this.beanDescriptor = new BeanDescriptorImpl(
 				beanClass,
@@ -236,7 +236,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@Override
 	public ExecutableMetaData getMetaDataFor(ExecutableElement executable) {
-		return executableMetaDataMap.get( executable.getIdentifier() );
+		return executableMetaDataMap.get( executable.getSignature() );
 	}
 
 	@Override
@@ -300,8 +300,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 								getDefaultGroupSequence( null )
 						);
 
-				for ( String identifier : executableMetaData.getIdentifiers() ) {
-					constrainedMethodDescriptors.put( identifier, descriptor );
+				for ( String signature : executableMetaData.getSignatures() ) {
+					constrainedMethodDescriptors.put( signature, descriptor );
 				}
 			}
 		}
@@ -316,7 +316,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( executableMetaData.getKind() == ElementKind.CONSTRUCTOR && executableMetaData.isConstrained() ) {
 				constrainedMethodDescriptors.put(
 						// constructors never override, so there will be exactly one identifier
-						executableMetaData.getIdentifiers().iterator().next(),
+						executableMetaData.getSignatures().iterator().next(),
 						executableMetaData.asDescriptor(
 								defaultGroupSequenceIsRedefined(),
 								getDefaultGroupSequence( null )
@@ -372,15 +372,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	/**
-	 * Builds up the method meta data for this type; each meta-data entry will be stored under signature of the
+	 * Builds up the method meta data for this type; each meta-data entry will be stored under the signature of the
 	 * represented method and all the methods it overrides.
 	 */
-	private Map<String, ExecutableMetaData> byIdentifier(Set<ExecutableMetaData> executables) {
+	private Map<String, ExecutableMetaData> bySignature(Set<ExecutableMetaData> executables) {
 		Map<String, ExecutableMetaData> theValue = newHashMap();
 
 		for ( ExecutableMetaData executableMetaData : executables ) {
-			for ( String identifier : executableMetaData.getIdentifiers() ) {
-				theValue.put( identifier, executableMetaData );
+			for ( String signature : executableMetaData.getSignatures() ) {
+				theValue.put( signature, executableMetaData );
 			}
 		}
 

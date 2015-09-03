@@ -7,11 +7,11 @@
 package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.MethodDescriptor;
@@ -19,6 +19,7 @@ import javax.validation.metadata.MethodType;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
@@ -68,7 +69,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 
 	@Override
 	public ConstructorDescriptor getConstraintsForConstructor(Class<?>... parameterTypes) {
-		return constrainedConstructors.get( getElementClass().getSimpleName() + Arrays.toString( parameterTypes ) );
+		return constrainedConstructors.get( ExecutableHelper.getSignature( getElementClass().getSimpleName(), parameterTypes ) );
 	}
 
 	@Override
@@ -109,8 +110,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 	@Override
 	public MethodDescriptor getConstraintsForMethod(String methodName, Class<?>... parameterTypes) {
 		Contracts.assertNotNull( methodName, MESSAGES.methodNameMustNotBeNull() );
-
-		return constrainedMethods.get( methodName + Arrays.toString( parameterTypes ) );
+		return constrainedMethods.get( ExecutableHelper.getSignature( methodName, parameterTypes ) );
 	}
 
 	@Override

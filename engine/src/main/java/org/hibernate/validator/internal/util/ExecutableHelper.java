@@ -12,6 +12,11 @@ import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetResolvedMemberMethods;
+
 import com.fasterxml.classmate.Filter;
 import com.fasterxml.classmate.MemberResolver;
 import com.fasterxml.classmate.ResolvedType;
@@ -19,11 +24,6 @@ import com.fasterxml.classmate.ResolvedTypeWithMembers;
 import com.fasterxml.classmate.TypeResolver;
 import com.fasterxml.classmate.members.RawMethod;
 import com.fasterxml.classmate.members.ResolvedMethod;
-
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetResolvedMemberMethods;
 
 /**
  * Provides shared functionality dealing with executables.
@@ -104,6 +104,22 @@ public final class ExecutableHelper {
 		}
 
 		return instanceMethodParametersResolveToSameTypes( subTypeMethod, superTypeMethod );
+	}
+
+	public static String getSignature(String name, Class<?>[] parameterTypes) {
+		int parameterCount = parameterTypes.length;
+
+		StringBuilder signature = new StringBuilder( name );
+		signature.append( "(" );
+		for ( int i = 0; i < parameterCount; i++ ) {
+			signature.append( parameterTypes[i].getName() );
+			if (i < parameterCount - 1 ) {
+				signature.append( "," );
+			}
+		}
+		signature.append( ")" );
+
+		return signature.toString();
 	}
 
 	/**

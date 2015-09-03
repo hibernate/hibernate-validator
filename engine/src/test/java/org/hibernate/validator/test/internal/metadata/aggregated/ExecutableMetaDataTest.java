@@ -181,8 +181,8 @@ public class ExecutableMetaDataTest {
 				)
 		);
 
-		assertThat( methodMetaData.getIdentifiers() ).containsOnly(
-				"createCustomer[interface java.lang.CharSequence, class java.lang.String]"
+		assertThat( methodMetaData.getSignatures() ).containsOnly(
+				"createCustomer(java.lang.CharSequence,java.lang.String)"
 		);
 	}
 
@@ -195,7 +195,7 @@ public class ExecutableMetaDataTest {
 				)
 		);
 
-		assertThat( methodMetaData.getIdentifiers() ).containsOnly( "foo[]" );
+		assertThat( methodMetaData.getSignatures() ).containsOnly( "foo()" );
 	}
 
 	@Test
@@ -207,7 +207,7 @@ public class ExecutableMetaDataTest {
 				)
 		);
 
-		assertThat( constructorMetaData.getIdentifiers() ).containsOnly( "CustomerRepositoryExt[class java.lang.String]" );
+		assertThat( constructorMetaData.getSignatures() ).containsOnly( "CustomerRepositoryExt(java.lang.String)" );
 	}
 
 	@Test
@@ -219,17 +219,17 @@ public class ExecutableMetaDataTest {
 				ExecutableElement.forMethod( method )
 		);
 
-		assertThat( methodMetaData.getIdentifiers() )
+		assertThat( methodMetaData.getSignatures() )
 			.describedAs( "Expecting super-type and sub-type method signatures" )
-			.containsOnly( "createJob[class java.lang.Object]", "createJob[class java.util.UUID]" );
+			.containsOnly( "createJob(java.lang.Object)", "createJob(java.util.UUID)" );
 
 		method = JobRepository.class.getMethod( "createJob", Object.class );
 		beanMetaData = beanMetaDataManager.getBeanMetaData( JobRepository.class );
 		methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
 
-		assertThat( methodMetaData.getIdentifiers() )
+		assertThat( methodMetaData.getSignatures() )
 			.describedAs( "Expecting only super-type method signature" )
-			.containsOnly( "createJob[class java.lang.Object]" );
+			.containsOnly( "createJob(java.lang.Object)" );
 	}
 
 	@Test
