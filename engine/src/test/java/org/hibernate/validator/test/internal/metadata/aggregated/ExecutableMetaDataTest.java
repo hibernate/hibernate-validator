@@ -230,6 +230,26 @@ public class ExecutableMetaDataTest {
 		assertThat( methodMetaData.getSignatures() )
 			.describedAs( "Expecting only super-type method signature" )
 			.containsOnly( "createJob(java.lang.Object)" );
+
+		method = SpecialJobRepositoryImpl.class.getMethod( "createJob", Object.class );
+		beanMetaData = beanMetaDataManager.getBeanMetaData( SpecialJobRepositoryImpl.class );
+		methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+
+		assertThat( methodMetaData.getSignatures() )
+			.describedAs( "Expecting method signatures from super-types" )
+			.containsOnly( "createJob(java.lang.Object)", "createJob(java.util.UUID)" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1011")
+	public void getIdentifierForOverloadedMethod() throws Exception {
+		Method method = SpecialJobRepositoryImpl.class.getMethod( "createJob", String.class );
+		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( SpecialJobRepositoryImpl.class );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+
+		assertThat( methodMetaData.getSignatures() )
+			.describedAs( "Expecting sub-type method signature which overloads but not overrides super-type methods" )
+			.containsOnly( "createJob(java.lang.String)" );
 	}
 
 	@Test
