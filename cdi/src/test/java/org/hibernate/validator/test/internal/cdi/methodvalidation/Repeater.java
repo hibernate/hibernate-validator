@@ -14,11 +14,11 @@ import javax.validation.executable.ValidateOnExecution;
  * @author Hardy Ferentschik
  */
 @ValidateOnExecution(type = { ExecutableType.NON_GETTER_METHODS, ExecutableType.GETTER_METHODS })
-public interface Repeater {
+public interface Repeater<T> {
 	String repeat(@NotNull String in);
 
 	@NotNull
-	String reverse(String in);
+	T reverse(T in);
 
 	@NotNull
 	String getHelloWorld();

@@ -12,7 +12,7 @@ import javax.validation.executable.ValidateOnExecution;
  * @author Hardy Ferentschik
  */
 @ValidateOnExecution
-public class DefaultRepeater implements Repeater {
+public class DefaultRepeater implements Repeater<String> {
 
 	@Override
 	public String repeat(String in) {

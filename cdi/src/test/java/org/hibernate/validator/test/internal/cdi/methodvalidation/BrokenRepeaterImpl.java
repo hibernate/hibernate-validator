@@ -10,6 +10,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -23,7 +24,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Broken
 @ValidateOnExecution
-public class BrokenRepeaterImpl implements Repeater {
+public class BrokenRepeaterImpl implements Repeater<String> {
 
 	@BrokenConstraint
 	BrokenRepeaterImpl() {
@@ -58,9 +59,11 @@ public class BrokenRepeaterImpl implements Repeater {
 
 		public class BrokenConstraintImpl implements ConstraintValidator<BrokenConstraint, Repeater> {
 
+			@Override
 			public void initialize(BrokenConstraint parameters) {
 			}
 
+			@Override
 			public boolean isValid(Repeater repeater, ConstraintValidatorContext constraintValidatorContext) {
 				return false;
 			}

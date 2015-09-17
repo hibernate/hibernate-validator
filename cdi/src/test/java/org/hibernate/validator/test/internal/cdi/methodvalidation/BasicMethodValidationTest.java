@@ -37,11 +37,11 @@ public class BasicMethodValidationTest {
 	}
 
 	@Inject
-	Repeater repeater;
+	Repeater<String> repeater;
 
 	@Inject
 	@Broken
-	Instance<Repeater> repeaterInstance;
+	Instance<Repeater<String>> repeaterInstance;
 
 	@Test
 	public void testConstructorValidation() throws Exception {
