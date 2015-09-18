@@ -495,12 +495,12 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	private boolean isJavaFxInClasspath() {
-		return isClassPresent( "javafx.application.Application" );
+		return isClassPresent( "javafx.application.Application", false );
 	}
 
-	private boolean isClassPresent(String className) {
+	private boolean isClassPresent(String className, boolean fallbackOnTCCL) {
 		try {
-			run( LoadClass.action( className, getClass().getClassLoader() ) );
+			run( LoadClass.action( className, getClass().getClassLoader(), fallbackOnTCCL ) );
 			return true;
 		}
 		catch ( ValidationException e ) {
