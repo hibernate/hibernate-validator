@@ -36,13 +36,23 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 
 	private final ClassLoader classLoader;
 
+	/**
+	 * when true, it will check the Thread Context ClassLoader when the class is not found in the provided one
+	 */
+	private final boolean fallbackOnTCCL;
+
 	public static LoadClass action(String className, ClassLoader classLoader) {
-		return new LoadClass( className, classLoader );
+		return new LoadClass( className, classLoader, true );
 	}
 
-	private LoadClass(String className, ClassLoader classLoader) {
+	public static LoadClass action(String className, ClassLoader classLoader, boolean fallbackOnTCCL) {
+		return new LoadClass( className, classLoader, fallbackOnTCCL );
+	}
+
+	private LoadClass(String className, ClassLoader classLoader, boolean fallbackOnTCCL) {
 		this.className = className;
 		this.classLoader = classLoader;
+		this.fallbackOnTCCL = fallbackOnTCCL;
 	}
 
 	@Override
@@ -67,21 +77,27 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 		catch ( RuntimeException e ) {
 			// ignore
 		}
-		try {
-			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-			if ( contextClassLoader != null ) {
-				return Class.forName( className, false, contextClassLoader );
+		if ( fallbackOnTCCL ) {
+			try {
+				ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+				if ( contextClassLoader != null ) {
+					return Class.forName( className, false, contextClassLoader );
+				}
+				else {
+					throw log.getUnableToLoadClassException( className );
+				}
 			}
-			else {
-				throw log.getUnableToLoadClassException( className );
+			catch ( ClassNotFoundException e ) {
+				throw log.getUnableToLoadClassException( className, e );
 			}
 		}
-		catch ( ClassNotFoundException e ) {
-			throw log.getUnableToLoadClassException( className, e );
+		else {
+			throw log.getUnableToLoadClassException( className );
 		}
 	}
 
 	private Class<?> loadNonValidatorClass() {
+		Exception exception = null;
 		try {
 			if ( classLoader != null ) {
 				return Class.forName( className, false, classLoader );
@@ -89,27 +105,34 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 		}
 		catch ( ClassNotFoundException e ) {
 			// ignore - try using the classloader of the caller first
+			exception = e;
 		}
 		catch ( RuntimeException e ) {
 			// ignore
+			exception = e;
 		}
-		try {
-			ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-			if ( contextClassLoader != null ) {
-				return Class.forName( className, false, contextClassLoader );
+		if ( fallbackOnTCCL ) {
+			try {
+				ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+				if ( contextClassLoader != null ) {
+					return Class.forName( className, false, contextClassLoader );
+				}
+			}
+			catch ( ClassNotFoundException e ) {
+				// ignore - try using the classloader of the caller first
+			}
+			catch ( RuntimeException e ) {
+				// ignore
+			}
+			try {
+				return Class.forName( className, true, LoadClass.class.getClassLoader() );
+			}
+			catch ( ClassNotFoundException e ) {
+				throw log.getUnableToLoadClassException( className, e );
 			}
 		}
-		catch ( ClassNotFoundException e ) {
-			// ignore - try using the classloader of the caller first
-		}
-		catch ( RuntimeException e ) {
-			// ignore
-		}
-		try {
-			return Class.forName( className, true, LoadClass.class.getClassLoader() );
-		}
-		catch ( ClassNotFoundException e ) {
-			throw log.getUnableToLoadClassException( className, e );
+		else {
+			throw log.getUnableToLoadClassException( className, exception );
 		}
 	}
 }
