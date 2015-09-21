@@ -385,6 +385,18 @@ public class ExecutableHelperTest {
 		);
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-862")
+	public void shouldTakeVisibilityIntoAccount() throws Exception {
+		Method superType = Literature.class.getDeclaredMethod( "getAuthor" );
+		Method subType = GreekLiterature.class.getDeclaredMethod( "getAuthor" );
+
+		assertFalse(
+				executableHelper.overrides( subType, superType ),
+				"Literature#getAuthor() is private. It should not be possible to override it."
+		);
+	}
+
 	public abstract static class GenericServiceBase<T> {
 		public abstract void doSomething(T t);
 	}
@@ -572,6 +584,20 @@ public class ExecutableHelperTest {
 		}
 
 		public static String getFoo(String param) {
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private static class Literature {
+		private String getAuthor() {
+			return null;
+		}
+	}
+
+	@SuppressWarnings("unused")
+	private static class GreekLiterature extends Literature {
+		public String getAuthor() {
 			return null;
 		}
 	}
