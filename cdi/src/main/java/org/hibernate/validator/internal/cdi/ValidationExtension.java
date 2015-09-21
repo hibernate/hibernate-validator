@@ -30,12 +30,9 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessBean;
-import javax.enterprise.inject.spi.WithAnnotations;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.validation.BootstrapConfiguration;
 import javax.validation.Configuration;
-import javax.validation.Constraint;
-import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -212,11 +209,7 @@ public class ValidationExtension implements Extension {
 	 * @param processAnnotatedTypeEvent event fired for each annotated type
 	 * @param <T> the annotated type
 	 */
-	public <T> void processAnnotatedType(@Observes @WithAnnotations({
-			Constraint.class,
-			Valid.class,
-			ValidateOnExecution.class
-	}) ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
+	public <T> void processAnnotatedType(@Observes ProcessAnnotatedType<T> processAnnotatedTypeEvent) {
 		Contracts.assertNotNull( processAnnotatedTypeEvent, "The ProcessAnnotatedType event cannot be null" );
 
 		// validation globally disabled
