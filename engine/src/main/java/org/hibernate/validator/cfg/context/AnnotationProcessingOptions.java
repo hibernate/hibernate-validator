@@ -13,10 +13,13 @@ package org.hibernate.validator.cfg.context;
  * @author Hardy Ferentschik
  */
 public interface AnnotationProcessingOptions<C extends AnnotationProcessingOptions<C>> {
+
 	/**
 	 * Specifies that annotations specified on the configured type or property should be ignored.
 	 *
 	 * @return Returns itself for method chaining.
+	 * @deprecated Use {@link AnnotationIgnoreOptions#ignoreAnnotations(boolean)} instead.
 	 */
+	@Deprecated
 	C ignoreAnnotations();
 }

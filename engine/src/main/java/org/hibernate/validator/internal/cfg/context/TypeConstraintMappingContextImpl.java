@@ -83,7 +83,12 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 	@Override
 	public TypeConstraintMappingContext<C> ignoreAnnotations() {
-		mapping.getAnnotationProcessingOptions().ignoreClassLevelConstraintAnnotations( beanClass, Boolean.TRUE );
+		return ignoreAnnotations( true );
+	}
+
+	@Override
+	public TypeConstraintMappingContext<C> ignoreAnnotations(boolean ignoreAnnotations) {
+		mapping.getAnnotationProcessingOptions().ignoreClassLevelConstraintAnnotations( beanClass, ignoreAnnotations );
 		return this;
 	}
 
@@ -153,7 +158,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			);
 		}
 
-		ExecutableConstraintMappingContextImpl context = new ExecutableConstraintMappingContextImpl( this, method );
+		MethodConstraintMappingContextImpl context = new MethodConstraintMappingContextImpl( this, method );
 		configuredMembers.add( method );
 		executableContexts.add( context );
 
@@ -178,7 +183,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 			);
 		}
 
-		ExecutableConstraintMappingContextImpl context = new ExecutableConstraintMappingContextImpl(
+		ConstructorConstraintMappingContextImpl context = new ConstructorConstraintMappingContextImpl(
 				this,
 				constructor
 		);
