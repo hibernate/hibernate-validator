@@ -10,16 +10,18 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Set;
+
 import javax.validation.Constraint;
+import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import javax.validation.metadata.ConstructorDescriptor;
+import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.MethodType;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -27,6 +29,8 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NullDef;
 import org.hibernate.validator.test.constraints.Object;
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -35,13 +39,16 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for {@link org.hibernate.validator.cfg.ConstraintMapping} et al.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 @Test
 public class ConstraintMappingWithAnnotationProcessingOptionsTest {
@@ -55,11 +62,19 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	@Test
 	public void testIgnoreAllAnnotationsOnType() {
 		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( Foo.class ).ignoreAllAnnotations();
+		mapping
+			.type( Foo.class )
+				.ignoreAllAnnotations()
+			.type( Doer.class )
+				.ignoreAllAnnotations();
+
 		config.addMapping( mapping );
 
 		Validator validator = config.buildValidatorFactory().getValidator();
 		assertFalse( validator.getConstraintsForClass( Foo.class ).isBeanConstrained() );
+
+		assertEquals( validator.getConstraintsForClass( Doer.class ).getConstrainedConstructors().size(), 0 );
+		assertEquals( validator.getConstraintsForClass( Doer.class ).getConstrainedMethods( MethodType.NON_GETTER ).size(), 0 );
 	}
 
 	@Test
@@ -114,6 +129,292 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		assertNumberOfViolations( violations, 0 );
 	}
 
+	@Test
+	public void testIgnoreAnnotationsOnMethod() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.method( "doSomething", String.class )
+				.ignoreAnnotations( true );
+		config.addMapping( mapping );
+
+		MethodDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForMethod( "doSomething", String.class );
+
+		assertNull( descriptor );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnTypeAndMethod() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.ignoreAnnotations( true )
+				.method( "doSomething", String.class )
+					.ignoreAnnotations( false );
+		config.addMapping( mapping );
+
+		MethodDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForMethod( "doSomething", String.class );
+
+		assertTrue( descriptor.hasConstrainedParameters() );
+		assertTrue( descriptor.hasConstrainedReturnValue() );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnMethodParameter() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.method( "doSomething", String.class )
+					.parameter( 0 )
+					.ignoreAnnotations( true );
+		config.addMapping( mapping );
+
+		MethodDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForMethod( "doSomething", String.class );
+
+		assertFalse( descriptor.hasConstrainedParameters() );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnMethodAndParameter() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+
+		mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.method( "doSomething", String.class )
+					.ignoreAnnotations( true )
+					.parameter( 0 )
+						.ignoreAnnotations( false );
+		config.addMapping( mapping );
+
+		MethodDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForMethod( "doSomething", String.class );
+
+		assertTrue( descriptor.hasConstrainedParameters(), "Setting given for parameter should take precedence" );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnCrossParameter() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.method( "doAnotherThing", String.class )
+					.crossParameter()
+					.ignoreAnnotations( true );
+		config.addMapping( mapping );
+
+		MethodDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForMethod( "doAnotherThing", String.class );
+
+		assertNull( descriptor );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnMethodAndCrossParameter() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+
+		mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.method( "doAnotherThing", String.class )
+					.ignoreAnnotations( true )
+					.crossParameter()
+						.ignoreAnnotations( false );
+		config.addMapping( mapping );
+
+		MethodDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForMethod( "doAnotherThing", String.class );
+
+		assertTrue( descriptor.hasConstrainedParameters(), "Setting given for cross-parameter should take precedence" );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnMethodReturnValue() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.method( "doSomething", String.class )
+					.returnValue()
+						.ignoreAnnotations( true );
+		config.addMapping( mapping );
+
+		MethodDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForMethod( "doSomething", String.class );
+
+		assertFalse( descriptor.hasConstrainedReturnValue() );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnMethodAndReturnValue() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.method( "doSomething", String.class )
+					.ignoreAnnotations( true )
+					.returnValue()
+						.ignoreAnnotations( false );
+		config.addMapping( mapping );
+
+		MethodDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForMethod( "doSomething", String.class );
+
+		assertTrue( descriptor.hasConstrainedReturnValue(), "Setting given for return value should take precedence" );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnConstructor() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.constructor( String.class )
+				.ignoreAnnotations( true );
+		config.addMapping( mapping );
+
+		ConstructorDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForConstructor( String.class );
+
+		assertNull( descriptor );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnTypeAndConstructor() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.ignoreAnnotations( true )
+				.constructor( String.class )
+					.ignoreAnnotations( false );
+		config.addMapping( mapping );
+
+		ConstructorDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForConstructor( String.class );
+
+		assertTrue( descriptor.hasConstrainedParameters() );
+		assertTrue( descriptor.hasConstrainedReturnValue() );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnConstructorParameter() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.constructor( String.class )
+					.parameter( 0 )
+					.ignoreAnnotations( true );
+		config.addMapping( mapping );
+
+		ConstructorDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForConstructor( String.class );
+
+		assertFalse( descriptor.hasConstrainedParameters() );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnConstructorAndParameter() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+
+		mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.constructor( String.class )
+					.ignoreAnnotations( true )
+					.parameter( 0 )
+						.ignoreAnnotations( false );
+		config.addMapping( mapping );
+
+		ConstructorDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForConstructor( String.class );
+
+		assertTrue( descriptor.hasConstrainedParameters(), "Setting given for parameter should take precedence" );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnConstructorCrossParameter() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.constructor( String.class, String.class )
+					.crossParameter()
+					.ignoreAnnotations( true );
+		config.addMapping( mapping );
+
+		ConstructorDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForConstructor( String.class, String.class );
+
+		assertNull( descriptor );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnConstructorAndCrossParameter() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+
+		mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.constructor( String.class, String.class )
+					.ignoreAnnotations( true )
+					.crossParameter()
+						.ignoreAnnotations( false );
+		config.addMapping( mapping );
+
+		ConstructorDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForConstructor( String.class, String.class );
+
+		assertTrue( descriptor.hasConstrainedParameters(), "Setting given for cross-parameter should take precedence" );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnConstructorReturnValue() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.constructor( String.class )
+					.returnValue()
+						.ignoreAnnotations( true );
+		config.addMapping( mapping );
+
+		ConstructorDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForConstructor( String.class );
+
+		assertFalse( descriptor.hasConstrainedReturnValue() );
+	}
+
+	@Test
+	public void testIgnoreAnnotationsOnConstructorAndReturnValue() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Doer.class )
+				.constructor( String.class )
+					.ignoreAnnotations( true )
+					.returnValue()
+						.ignoreAnnotations( false );
+		config.addMapping( mapping );
+
+		ConstructorDescriptor descriptor = config.buildValidatorFactory()
+				.getValidator()
+				.getConstraintsForClass( Doer.class )
+				.getConstraintsForConstructor( String.class );
+
+		assertTrue( descriptor.hasConstrainedReturnValue(), "Setting given for return value should take precedence" );
+	}
+
 	@SuppressWarnings( "unused" )
 	private static class Foo {
 		@NotNull
@@ -124,7 +425,26 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		}
 	}
 
-	@SuppressWarnings( "unused" )
+	private static class Doer {
+
+		@NotNull
+		public Doer(@NotNull String input) {
+		}
+
+		@GenericAndCrossParameterConstraint(validationAppliesTo=ConstraintTarget.PARAMETERS)
+		public Doer(String input1, String input2) {
+		}
+
+		@NotNull
+		public Object doSomething(@NotNull String input) {
+			return null;
+		}
+
+		@GenericAndCrossParameterConstraint(validationAppliesTo=ConstraintTarget.PARAMETERS)
+		public void doAnotherThing(String input) {
+		}
+	}
+
 	private static class Bar {
 		@NotNull
 		private String property;

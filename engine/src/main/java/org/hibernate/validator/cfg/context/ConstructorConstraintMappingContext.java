@@ -12,6 +12,6 @@ package org.hibernate.validator.cfg.context;
  *
  * @author Gunnar Morling
  */
-public interface ConstructorConstraintMappingContext extends ParameterTarget, CrossParameterTarget, ReturnValueTarget {
+public interface ConstructorConstraintMappingContext extends ParameterTarget, CrossParameterTarget, ReturnValueTarget, AnnotationIgnoreOptions<ConstructorConstraintMappingContext> {
 
 }

@@ -13,9 +13,7 @@ import java.util.List;
 
 import javax.validation.ParameterNameProvider;
 
-import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
-import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
@@ -40,18 +38,17 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
  */
-class ExecutableConstraintMappingContextImpl
-		implements ConstructorConstraintMappingContext, MethodConstraintMappingContext {
+abstract class ExecutableConstraintMappingContextImpl {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final TypeConstraintMappingContextImpl<?> typeContext;
-	private final ExecutableElement executable;
+	protected final TypeConstraintMappingContextImpl<?> typeContext;
+	protected final ExecutableElement executable;
 	private final ParameterConstraintMappingContextImpl[] parameterContexts;
 	private ReturnValueConstraintMappingContextImpl returnValueContext;
 	private CrossParameterConstraintMappingContextImpl crossParameterContext;
 
-	ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Constructor<?> constructor) {
+	<T> ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<T> typeContext, Constructor<T> constructor) {
 		this( typeContext, ExecutableElement.forConstructor( constructor ) );
 	}
 
@@ -65,7 +62,6 @@ class ExecutableConstraintMappingContextImpl
 		this.parameterContexts = new ParameterConstraintMappingContextImpl[executable.getParameterTypes().length];
 	}
 
-	@Override
 	public ParameterConstraintMappingContext parameter(int index) {
 		if ( index < 0 || index >= executable.getParameterTypes().length ) {
 			throw log.getInvalidExecutableParameterIndexException( executable.getAsString(), index );
@@ -86,7 +82,6 @@ class ExecutableConstraintMappingContextImpl
 		return context;
 	}
 
-	@Override
 	public CrossParameterConstraintMappingContext crossParameter() {
 		if ( crossParameterContext != null ) {
 			throw log.getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(
@@ -99,7 +94,6 @@ class ExecutableConstraintMappingContextImpl
 		return crossParameterContext;
 	}
 
-	@Override
 	public ReturnValueConstraintMappingContext returnValue() {
 		if ( returnValueContext != null ) {
 			throw log.getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(

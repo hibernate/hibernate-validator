@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.util.Collections;
+
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -57,6 +58,16 @@ final class ParameterConstraintMappingContextImpl
 						executableContext.getExecutable(),
 						parameterIndex
 				)
+		);
+		return this;
+	}
+
+	@Override
+	public ParameterConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
+		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnParameter(
+				executableContext.getExecutable().getMember(),
+				parameterIndex,
+				ignoreAnnotations
 		);
 		return this;
 	}

@@ -16,5 +16,6 @@ package org.hibernate.validator.cfg.context;
  */
 public interface ParameterConstraintMappingContext extends TypeTarget, CrossParameterTarget, ParameterTarget,
 		ReturnValueTarget, ConstructorTarget, MethodTarget, Constrainable<ParameterConstraintMappingContext>,
-		Cascadable<ParameterConstraintMappingContext>, Unwrapable<ParameterConstraintMappingContext> {
+		Cascadable<ParameterConstraintMappingContext>, Unwrapable<ParameterConstraintMappingContext>,
+		AnnotationIgnoreOptions<ParameterConstraintMappingContext> {
 }
