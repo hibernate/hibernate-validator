@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +20,6 @@ import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * Base implementation for {@link MetaDataProvider}s which cache the {@code BeanConfiguration} by class name.
@@ -32,9 +32,9 @@ public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvid
 	// cached against the fqcn of a class. not a class instance itself (HV-479)
 	private final Map<String, BeanConfiguration<?>> configuredBeans;
 
-	public MetaDataProviderKeyedByClassName(ConstraintHelper constraintHelper) {
+	public MetaDataProviderKeyedByClassName(ConstraintHelper constraintHelper, Map<String, BeanConfiguration<?>> configuredBeans) {
 		this.constraintHelper = constraintHelper;
-		this.configuredBeans = newHashMap();
+		this.configuredBeans = Collections.unmodifiableMap( configuredBeans );
 	}
 
 	@Override
@@ -51,17 +51,13 @@ public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvid
 		return configurations;
 	}
 
-	protected void addBeanConfiguration(Class<?> beanClass, BeanConfiguration<?> beanConfiguration) {
-		configuredBeans.put( beanClass.getName(), beanConfiguration );
-	}
-
 	@SuppressWarnings("unchecked")
 	protected <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
 		Contracts.assertNotNull( beanClass );
 		return (BeanConfiguration<T>) configuredBeans.get( beanClass.getName() );
 	}
 
-	protected <T> BeanConfiguration<T> createBeanConfiguration(ConfigurationSource source,
+	protected static <T> BeanConfiguration<T> createBeanConfiguration(ConfigurationSource source,
 															   Class<T> beanClass,
 															   Set<? extends ConstrainedElement> constrainedElements,
 															   List<Class<?>> defaultGroupSequence,

@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ParameterNameProvider;
@@ -31,17 +33,14 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	private static final Log log = LoggerFactory.make();
 
 	private final AnnotationProcessingOptions annotationProcessingOptions;
-	private final ParameterNameProvider parameterNameProvider;
 
 	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper,
 										ParameterNameProvider parameterNameProvider,
 										Set<DefaultConstraintMapping> constraintMappings) {
-		super( constraintHelper );
+		super( constraintHelper, createBeanConfigurations( constraintMappings, constraintHelper, parameterNameProvider ) );
 		Contracts.assertNotNull( constraintMappings );
-		this.parameterNameProvider = parameterNameProvider;
 
 		assertUniquenessOfConfiguredTypes( constraintMappings );
-		addAllBeanConfigurations( constraintMappings );
 		annotationProcessingOptions = mergeAnnotationProcessingOptions( constraintMappings );
 	}
 
@@ -59,17 +58,17 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		}
 	}
 
-	private void addAllBeanConfigurations(Set<DefaultConstraintMapping> mappings) {
+	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(Set<DefaultConstraintMapping> mappings, ConstraintHelper constraintHelper,
+			ParameterNameProvider parameterNameProvider) {
+		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<String, BeanConfiguration<?>>();
 		for ( DefaultConstraintMapping mapping : mappings ) {
-			Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations(
-					constraintHelper,
-					parameterNameProvider
-			);
+			Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations( constraintHelper, parameterNameProvider );
 
 			for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
-				addBeanConfiguration( beanConfiguration.getBeanClass(), beanConfiguration );
+				configuredBeans.put( beanConfiguration.getBeanClass().getName(), beanConfiguration );
 			}
 		}
+		return configuredBeans;
 	}
 
 	/**

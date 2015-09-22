@@ -7,7 +7,10 @@
 package org.hibernate.validator.internal.metadata.provider;
 
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
@@ -40,11 +43,23 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 							   ParameterNameProvider parameterNameProvider,
 							   Set<InputStream> mappingStreams,
 							   ClassLoader externalClassLoader) {
-		super( constraintHelper );
+		this( constraintHelper, createMappingParser( constraintHelper, parameterNameProvider, mappingStreams, externalClassLoader ) );
+	}
 
+	private XmlMetaDataProvider(ConstraintHelper constraintHelper, XmlMappingParser mappingParser) {
+		super( constraintHelper, createBeanConfigurations( mappingParser ) );
+		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
+	}
+
+	private static XmlMappingParser createMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider, Set<InputStream> mappingStreams,
+			ClassLoader externalClassLoader) {
 		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper, parameterNameProvider, externalClassLoader );
 		mappingParser.parse( mappingStreams );
+		return mappingParser;
+	}
 
+	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(XmlMappingParser mappingParser) {
+		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<String, BeanConfiguration<?>>();
 		for ( Class<?> clazz : mappingParser.getXmlConfiguredClasses() ) {
 			Set<ConstrainedElement> constrainedElements = mappingParser.getConstrainedElementsForClass( clazz );
 
@@ -55,13 +70,9 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 					mappingParser.getDefaultSequenceForClass( clazz ),
 					null
 			);
-			addBeanConfiguration(
-					clazz,
-					beanConfiguration
-			);
+			configuredBeans.put( clazz.getName(), beanConfiguration );
 		}
-
-		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
+		return configuredBeans;
 	}
 
 	@Override
