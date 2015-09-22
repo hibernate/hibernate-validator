@@ -103,6 +103,11 @@ public final class ExecutableHelper {
 			return false;
 		}
 
+		if ( !Modifier.isPublic( superTypeMethod.getModifiers() ) && !Modifier.isProtected( superTypeMethod.getModifiers() )
+				&& !superTypeMethod.getDeclaringClass().getPackage().equals( subTypeMethod.getDeclaringClass().getPackage() ) ) {
+			return false;
+		}
+
 		return instanceMethodParametersResolveToSameTypes( subTypeMethod, superTypeMethod );
 	}
 

@@ -15,6 +15,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.test.internal.util.classhierarchy.Novella;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -387,13 +388,25 @@ public class ExecutableHelperTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-862")
-	public void shouldTakeVisibilityIntoAccount() throws Exception {
+	public void shouldTakeVisibilityIntoAccountIfPrivate() throws Exception {
 		Method superType = Literature.class.getDeclaredMethod( "getAuthor" );
 		Method subType = GreekLiterature.class.getDeclaredMethod( "getAuthor" );
 
 		assertFalse(
-				executableHelper.overrides( subType, superType ),
+				executableHelper. overrides( subType, superType ),
 				"Literature#getAuthor() is private. It should not be possible to override it."
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-862")
+	public void shouldTakeVisibilityIntoAccountIfPackagePrivate() throws Exception {
+		Method superType = Literature.class.getDeclaredMethod( "getTitle" );
+		Method subType = Novella.class.getDeclaredMethod( "getTitle" );
+
+		assertFalse(
+				executableHelper.overrides( subType, superType ),
+				"Literature#getTitle() is package-private. It should not be possible to override it from a different package."
 		);
 	}
 
@@ -589,8 +602,12 @@ public class ExecutableHelperTest {
 	}
 
 	@SuppressWarnings("unused")
-	private static class Literature {
+	public static class Literature {
 		private String getAuthor() {
+			return null;
+		}
+
+		String getTitle() {
 			return null;
 		}
 	}
