@@ -32,7 +32,6 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
-import org.hibernate.validator.internal.engine.valuehandling.JavaFXPropertyValueUnwrapper;
 import org.hibernate.validator.internal.engine.valuehandling.OptionalValueUnwrapper;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
@@ -63,6 +62,8 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
+
+	private static final String JFX_UNWRAPPER_CLASS = "org.hibernate.validator.internal.engine.valuehandling.JavaFXPropertyValueUnwrapper";
 
 	static {
 		Version.touch();
@@ -114,7 +115,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.validationBootstrapParameters = new ValidationBootstrapParameters();
 		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
 		if ( isJavaFxInClasspath() ) {
-			validatedValueHandlers.add( new JavaFXPropertyValueUnwrapper( typeResolutionHelper ) );
+			validatedValueHandlers.add( createJavaFXUnwrapperClass( typeResolutionHelper ) );
 		}
 		if ( Version.getJavaRelease() >= 8 ) {
 			validatedValueHandlers.add( new OptionalValueUnwrapper( typeResolutionHelper ) );
@@ -130,6 +131,16 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 				typeResolutionHelper
 		);
 		this.addConstraintDefinitionContributor( defaultConstraintDefinitionContributor );
+	}
+
+	private ValidatedValueUnwrapper<?> createJavaFXUnwrapperClass(TypeResolutionHelper typeResolutionHelper) {
+		try {
+			Class<?> jfxUnwrapperClass = run( LoadClass.action( JFX_UNWRAPPER_CLASS, getClass().getClassLoader() ) );
+			return (ValidatedValueUnwrapper<?>) ( jfxUnwrapperClass.getConstructor( TypeResolutionHelper.class ).newInstance( typeResolutionHelper ) );
+		}
+		catch (Exception e) {
+			throw log.validatedValueUnwrapperCannotBeCreated( JFX_UNWRAPPER_CLASS, e );
+		}
 	}
 
 	@Override
