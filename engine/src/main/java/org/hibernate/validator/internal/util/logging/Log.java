@@ -635,4 +635,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 190, value = "Unable to parse %s.")
 	ValidationException getUnableToCreateXMLEventReader(String file, @Cause Exception e);
+
+	@Message(id = 191, value = "Error creating unwrapper: %s")
+	ValidationException validatedValueUnwrapperCannotBeCreated(String className, @Cause Exception e);
 }
