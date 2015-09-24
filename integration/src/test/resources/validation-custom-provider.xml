@@ -9,9 +9,5 @@
                    xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.0.xsd"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <!--
-        CustomValidatorFactoryInPersistenceUnitIT requires this config for passing; So if it passes we know
-        validation.xml is applied, in turn letting us know that the custom provider can be used successfully
-    -->
-    <constraint-mapping>META-INF/validation/constraints-magician.xml</constraint-mapping>
+    <default-provider>org.hibernate.validator.integration.util.MyValidationProvider</default-provider>
 </validation-config>
