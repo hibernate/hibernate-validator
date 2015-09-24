@@ -4,14 +4,10 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.integration.wildfly;
+package org.hibernate.validator.integration.wildfly.jpa;
 
-import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import javax.inject.Inject;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -21,22 +17,19 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.hibernate.validator.integration.util.IntegrationTestUtil;
-import org.hibernate.validator.integration.util.MyValidator;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
- * Tests the integration of Hibernate Validator in Wildfly
+ * Tests the usage of HV by JPA, applying a custom validation.xml. Also making sure that the VF is CDI-enabled.
  *
  * @author Hardy Ferentschik
+ * @author Gunnar Morling
  */
 @RunWith(Arquillian.class)
 public class CustomValidatorFactoryInPersistenceUnitIT {
@@ -48,13 +41,11 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap
 				.create( WebArchive.class, WAR_FILE_NAME )
-				.addClasses( User.class )
-				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar()
-								.as( JavaArchive.class )
-								.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" ) )
+				.addClasses( Magician.class, ValidMagicianName.class, MagicianService.class )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )
+				.addAsResource( "constraints-magician.xml", "META-INF/validation/constraints-magician.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
@@ -73,26 +64,35 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 		return new StringAsset( persistenceXml );
 	}
 
-	@PersistenceContext
-	EntityManager em;
+	@Inject
+	private MagicianService magicianService;
 
 	@Test
-	public void testValidatorFactoryPassedToPersistenceUnit() throws Exception {
-		log.debug( "Running testValidatorFactoryPassedToPersistenceUnit..." );
-		Map<String, Object> properties = em.getEntityManagerFactory().getProperties();
+	public void testValidatorFactoryPassedToPersistenceUnitIsCorrectlyConfigured() throws Exception {
+		log.debug( "Running testValidatorFactoryPassedToPersistenceUnitIsCorrectlyConfigured..." );
 
-		ValidatorFactory factory = (ValidatorFactory) properties.get( "javax.persistence.validation.factory" );
-		assertNotNull( "The validator factory should be contained in the EM properties", factory );
+		try {
+			magicianService.storeMagician();
+		}
+		catch(Exception e) {
+			Throwable rootException = getRootException( e );
+			assertEquals( ConstraintViolationException.class, rootException.getClass() );
 
-		Validator validator = factory.getValidator();
+			ConstraintViolationException constraintViolationException = (ConstraintViolationException) rootException;
+			assertEquals( 1, constraintViolationException.getConstraintViolations().size() );
+			assertEquals( "Invalid magician name", constraintViolationException.getConstraintViolations().iterator().next().getMessage() );
+		}
 
-		// Asserting the validator type as the VF is the wrapper type used within WildFly (LazyValidatorFactory)
-		assertTrue(
-				"The custom validator implementation as retrieved from the default provider configured in META-INF/validation.xml should be used but actually "
-						+ validator + " is used",
-				validator instanceof MyValidator
-		);
+		log.debug( "testValidatorFactoryPassedToPersistenceUnitIsCorrectlyConfigured completed" );
+	}
 
-		log.debug( "testValidatorFactoryPassedToPersistenceUnit completed" );
+	private Throwable getRootException(Throwable throwable) {
+		while ( true ) {
+			Throwable cause = throwable.getCause();
+			if ( cause == null ) {
+				return throwable;
+			}
+			throwable = cause;
+		}
 	}
 }
