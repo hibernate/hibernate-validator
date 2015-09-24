@@ -88,7 +88,7 @@
         <paranamer.version>2.5.5</paranamer.version>
         <joda-time.version>2.1</joda-time.version>
         <jsoup.version>1.8.3</jsoup.version>
-        <wildfly.version>8.2.0.Final</wildfly.version>
+        <wildfly.version>10.0.0.CR1</wildfly.version>
         <arquillian.version>1.0.2.Final</arquillian.version>
         <slf4j.version>1.7.2</slf4j.version>
         <jboss.logging.version>3.2.1.Final</jboss.logging.version>
@@ -241,9 +241,9 @@
                 <version>2.2.0.SP1</version>
             </dependency>
             <dependency>
-                <groupId>org.wildfly</groupId>
+                <groupId>org.wildfly.arquillian</groupId>
                 <artifactId>wildfly-arquillian-container-managed</artifactId>
-                <version>${wildfly.version}</version>
+                <version>1.0.1.Final</version>
                 <exclusions>
                     <exclusion>
                         <groupId>sun.jdk</groupId>
