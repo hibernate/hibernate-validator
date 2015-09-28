@@ -501,15 +501,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		private void addMetaDataToBuilder(ConstrainedElement constrainableElement, Set<BuilderDelegate> builders) {
-			// HV-890 Not adding meta-data for private super-type methods to the meta-data of this bean;
-			// It is not needed and it may conflict with sub-type methods of the same signature
-			if ( constrainableElement.getKind() == ConstrainedElementKind.METHOD ) {
-				Member member = ((ConstrainedExecutable) constrainableElement).getExecutable().getMember();
-				if ( beanClass != member.getDeclaringClass() && Modifier.isPrivate( member.getModifiers() ) ) {
-					return;
-				}
-			}
-
 			for ( BuilderDelegate builder : builders ) {
 				boolean foundBuilder = builder.add( constrainableElement );
 
@@ -568,12 +559,18 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				case CONSTRUCTOR:
 				case METHOD:
 					ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
-					methodBuilder = new ExecutableMetaData.Builder(
-							beanClass,
-							constrainedExecutable,
-							constraintHelper,
-							executableHelper
-					);
+					Member member = constrainedExecutable.getExecutable().getMember();
+
+					// HV-890 Not adding meta-data for private super-type methods to the method meta-data of this bean;
+					// It is not needed and it may conflict with sub-type methods of the same signature
+					if ( !Modifier.isPrivate( member.getModifiers() ) || beanClass == member.getDeclaringClass() ) {
+						methodBuilder = new ExecutableMetaData.Builder(
+								beanClass,
+								constrainedExecutable,
+								constraintHelper,
+								executableHelper
+						);
+					}
 
 					if ( constrainedExecutable.isGetterMethod() ) {
 						propertyBuilder = new PropertyMetaData.Builder(

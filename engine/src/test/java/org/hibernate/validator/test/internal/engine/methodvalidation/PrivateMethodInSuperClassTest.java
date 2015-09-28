@@ -11,6 +11,9 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertC
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
+import javax.validation.Validator;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.executable.ExecutableValidator;
@@ -27,20 +30,22 @@ import org.testng.annotations.Test;
  * @author Gunnar Morling
  *
  */
-@TestForIssue(jiraKey = "HV-890")
 public class PrivateMethodInSuperClassTest {
 
-	private ExecutableValidator validator;
+	private Validator validator;
+	private ExecutableValidator executableValidator;
 
 	@BeforeClass
 	public void setUp() {
-		validator = ValidatorUtil.getValidator().forExecutables();
+		validator = ValidatorUtil.getValidator();
+		executableValidator = validator.forExecutables();
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-890")
 	public void canValidateMethodWithSameSignatureAsPrivateMethodInSuperClass() throws Exception {
 		// Private method in the super-class
-		Set<? extends ConstraintViolation<?>> violations = validator.validateParameters(
+		Set<? extends ConstraintViolation<?>> violations = executableValidator.validateParameters(
 				new Mammal(),
 				Mammal.class.getDeclaredMethod( "eat", String.class ),
 				new Object[] { null }
@@ -49,7 +54,7 @@ public class PrivateMethodInSuperClassTest {
 		assertCorrectConstraintTypes( violations, NotNull.class );
 
 		// Public method in the sub-class; same signature but *not* overriding
-		violations = validator.validateParameters(
+		violations = executableValidator.validateParameters(
 				new GiantPanda(),
 				GiantPanda.class.getMethod( "eat", String.class ),
 				new Object[] { "fo" }
@@ -58,10 +63,29 @@ public class PrivateMethodInSuperClassTest {
 		assertCorrectConstraintTypes( violations, Size.class );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1018")
+	public void canValidateConstraintOnPrivateSuperTypeProperty() {
+		Set<ConstraintViolation<GiantPanda>> violations = validator.validate( new GiantPanda() );
+		assertCorrectConstraintTypes( violations, Min.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1018")
+	public void canValidateConstraintOnPrivateSuperTypePropertyReachedThroughCascadedValidation() {
+		Set<ConstraintViolation<FavoriteAnimalCollection>> violations = validator.validate( new FavoriteAnimalCollection() );
+		assertCorrectConstraintTypes( violations, Min.class );
+	}
+
 	public static class Mammal {
 
 		@SuppressWarnings("unused")
 		private void eat(@NotNull String food) {
+		}
+
+		@Min(0)
+		private long getAge() {
+			return -1;
 		}
 	}
 
@@ -69,5 +93,11 @@ public class PrivateMethodInSuperClassTest {
 
 		public void eat(@NotNull @Size(min=3) String food) {
 		}
+	}
+
+	public static class FavoriteAnimalCollection {
+
+		@Valid
+		Mammal favoriteAnimalNo1 = new GiantPanda();
 	}
 }
