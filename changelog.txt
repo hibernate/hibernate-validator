@@ -1,6 +1,27 @@
 Hibernate Validator Changelog
 =============================
 
+5.2.2.Final (29.09.2015)
+-------------------------
+
+** Bug
+    * [HV-862] - ExecutableHelper#overrides() should take visibilities into account
+    * [HV-891] - CDI extension doesn't trigger validation if a method parameter is of a type parameter type
+    * [HV-917] - Use map implementation safe for concurrent access in MetaDataProviderKeyedByClassName
+    * [HV-1011] - Generic Method is not recognized
+    * [HV-1012] - XSS vulnerability not caught by SafeHtml
+    * [HV-1017] - javafx detection uses TCCL but JavaFXPropertyValueUnwrapper does not
+    * [HV-1018] - NPE when validating an object tree whith a class whose parent has defined property constraints
+
+** Task
+    * [HV-1006] - Upgrade to WildFly 10
+
+** Improvement
+    * [HV-807] - Make annotation ignores configurable via API for executables
+    * [HV-995] - Add google analytics to the HTML documentation
+    * [HV-1016] - Let maven build support maven-color
+
+
 5.2.1.Final (30.07.2015)
 -------------------------
 
