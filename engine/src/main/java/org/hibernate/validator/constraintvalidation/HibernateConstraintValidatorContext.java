@@ -68,4 +68,6 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * @since 5.2
 	 */
 	TimeProvider getTimeProvider();
+
+	HibernateConstraintValidatorContext withInfo(Object info);
 }

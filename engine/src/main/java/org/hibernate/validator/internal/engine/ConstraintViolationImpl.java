@@ -6,21 +6,22 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.metadata.ConstraintDescriptor;
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.util.Map;
+import javax.validation.ConstraintViolation;
+import javax.validation.Path;
+import javax.validation.metadata.ConstraintDescriptor;
+
+import org.hibernate.validator.engine.HibernateConstraintViolation;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Serializable {
+public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<T>, Serializable {
 	private static final Log log = LoggerFactory.make();
 	private static final long serialVersionUID = -4970067626703103139L;
 
@@ -36,6 +37,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	private final ElementType elementType;
 	private final Object[] executableParameters;
 	private final Object executableReturnValue;
+	private final Object info;
 	private final int hashCode;
 
 	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate,
@@ -47,7 +49,8 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 															   Object value,
 															   Path propertyPath,
 															   ConstraintDescriptor<?> constraintDescriptor,
-															   ElementType elementType) {
+															   ElementType elementType,
+															   Object info) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				expressionVariables,
@@ -60,7 +63,8 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 				constraintDescriptor,
 				elementType,
 				null,
-				null
+				null,
+				info
 		);
 	}
 
@@ -74,7 +78,8 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 																	Path propertyPath,
 																	ConstraintDescriptor<?> constraintDescriptor,
 																	ElementType elementType,
-																	Object[] executableParameters) {
+																	Object[] executableParameters,
+																	Object info) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				expressionVariables,
@@ -87,7 +92,8 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 				constraintDescriptor,
 				elementType,
 				executableParameters,
-				null
+				null,
+				info
 		);
 	}
 
@@ -101,7 +107,8 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 																	  Path propertyPath,
 																	  ConstraintDescriptor<?> constraintDescriptor,
 																	  ElementType elementType,
-																	  Object executableReturnValue) {
+																	  Object executableReturnValue,
+																	  Object info) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				expressionVariables,
@@ -114,7 +121,8 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 				constraintDescriptor,
 				elementType,
 				null,
-				executableReturnValue
+				executableReturnValue,
+				info
 		);
 	}
 
@@ -129,7 +137,8 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 			ConstraintDescriptor<?> constraintDescriptor,
 			ElementType elementType,
 			Object[] executableParameters,
-			Object executableReturnValue) {
+			Object executableReturnValue,
+			Object info) {
 		this.messageTemplate = messageTemplate;
 		this.expressionVariables = expressionVariables;
 		this.interpolatedMessage = interpolatedMessage;
@@ -142,6 +151,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 		this.elementType = elementType;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
+		this.info = info;
 		// pre-calculate hash code, the class is immutable and hashCode is needed often
 		this.hashCode = createHashCode();
 	}
@@ -196,7 +206,7 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 
 	@Override
 	public <C> C unwrap(Class<C> type) {
-		if ( type.isAssignableFrom( ConstraintViolation.class ) ) {
+		if ( type.isAssignableFrom( HibernateConstraintViolation.class ) ) {
 			return type.cast( this );
 		}
 		throw log.getTypeNotSupportedForUnwrappingException( type );
@@ -210,6 +220,11 @@ public class ConstraintViolationImpl<T> implements ConstraintViolation<T>, Seria
 	@Override
 	public Object getExecutableReturnValue() {
 		return executableReturnValue;
+	}
+
+	@Override
+	public Object getInfo() {
+		return info;
 	}
 
 	@Override
