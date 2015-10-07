@@ -20,6 +20,7 @@ Gunnar Morling
 Hardy Ferentschik
 Henno Vermeulen
 Jason T. Greene
+Julien May
 Juraci Krohling
 Justin Nauman
 Kevin Pollet

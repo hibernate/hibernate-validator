@@ -20,15 +20,17 @@ public class ConstraintViolationCreationContext {
 	private final String message;
 	private final PathImpl propertyPath;
 	private final Map<String, Object> expressionVariables;
+	private final Object dynamicPayload;
 
 	public ConstraintViolationCreationContext(String message, PathImpl property) {
-		this( message, property, Collections.<String, Object>emptyMap() );
+		this( message, property, Collections.<String, Object>emptyMap(), null );
 	}
 
-	public ConstraintViolationCreationContext(String message, PathImpl property, Map<String, Object> expressionVariables) {
+	public ConstraintViolationCreationContext(String message, PathImpl property, Map<String, Object> expressionVariables, Object dynamicPayload) {
 		this.message = message;
 		this.propertyPath = property;
 		this.expressionVariables = expressionVariables;
+		this.dynamicPayload = dynamicPayload;
 	}
 
 	public final String getMessage() {
@@ -43,12 +45,17 @@ public class ConstraintViolationCreationContext {
 		return expressionVariables;
 	}
 
+	public Object getDynamicPayload() {
+		return dynamicPayload;
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "ConstraintViolationCreationContext{" );
 		sb.append( "message='" ).append( message ).append( '\'' );
 		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", messageParameters=" ).append( expressionVariables );
+		sb.append( ", dynamicPayload=" ).append( dynamicPayload );
 		sb.append( '}' );
 		return sb.toString();
 	}
