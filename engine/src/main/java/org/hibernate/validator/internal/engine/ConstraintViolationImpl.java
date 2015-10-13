@@ -206,6 +206,10 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 
 	@Override
 	public <C> C unwrap(Class<C> type) {
+		// Keep backward compatibility
+		if ( type.isAssignableFrom( ConstraintViolation.class ) ) {
+			return type.cast( this );
+		}
 		if ( type.isAssignableFrom( HibernateConstraintViolation.class ) ) {
 			return type.cast( this );
 		}
