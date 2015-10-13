@@ -307,7 +307,7 @@ public class ValidationContext<T> {
 		//same for expression variables
 		Map<String, Object> expressionVariables =
 				Collections.unmodifiableMap( constraintViolationCreationContext.getExpressionVariables() );
-		Object info = constraintViolationCreationContext.getInfo();
+		Object violationContext = constraintViolationCreationContext.getViolationContext();
 		if ( executableParameters != null ) {
 			return ConstraintViolationImpl.forParameterValidation(
 					messageTemplate,
@@ -321,7 +321,7 @@ public class ValidationContext<T> {
 					descriptor,
 					localContext.getElementType(),
 					executableParameters,
-					info
+					violationContext
 			);
 		}
 		else if ( executableReturnValue != null ) {
@@ -337,7 +337,7 @@ public class ValidationContext<T> {
 					descriptor,
 					localContext.getElementType(),
 					executableReturnValue,
-					info
+					violationContext
 			);
 		}
 		else {
@@ -352,7 +352,7 @@ public class ValidationContext<T> {
 					path,
 					descriptor,
 					localContext.getElementType(),
-					info
+					violationContext
 			);
 		}
 	}

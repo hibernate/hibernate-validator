@@ -20,17 +20,17 @@ public class ConstraintViolationCreationContext {
 	private final String message;
 	private final PathImpl propertyPath;
 	private final Map<String, Object> expressionVariables;
-	private final Object info;
+	private final Object violationContext;
 
 	public ConstraintViolationCreationContext(String message, PathImpl property) {
 		this( message, property, Collections.<String, Object>emptyMap(), null );
 	}
 
-	public ConstraintViolationCreationContext(String message, PathImpl property, Map<String, Object> expressionVariables, Object info) {
+	public ConstraintViolationCreationContext(String message, PathImpl property, Map<String, Object> expressionVariables, Object violationContext) {
 		this.message = message;
 		this.propertyPath = property;
 		this.expressionVariables = expressionVariables;
-		this.info = info;
+		this.violationContext = violationContext;
 	}
 
 	public final String getMessage() {
@@ -45,8 +45,8 @@ public class ConstraintViolationCreationContext {
 		return expressionVariables;
 	}
 
-	public Object getInfo() {
-		return info;
+	public Object getViolationContext() {
+		return violationContext;
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class ConstraintViolationCreationContext {
 		sb.append( "message='" ).append( message ).append( '\'' );
 		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", messageParameters=" ).append( expressionVariables );
-		sb.append( ", info=" ).append( info );
+		sb.append( ", violationContext=" ).append( violationContext );
 		sb.append( '}' );
 		return sb.toString();
 	}
