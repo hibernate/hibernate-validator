@@ -69,5 +69,5 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 */
 	TimeProvider getTimeProvider();
 
-	HibernateConstraintValidatorContext withInfo(Object info);
+	HibernateConstraintValidatorContext withViolationContext(Object violationContext);
 }

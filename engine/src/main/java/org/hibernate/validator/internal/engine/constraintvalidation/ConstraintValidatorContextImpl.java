@@ -44,7 +44,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
-	private Object info;
+	private Object violationContext;
 
 	public ConstraintValidatorContextImpl(List<String> methodParameterNames, TimeProvider timeProvider, PathImpl propertyPath,
 			ConstraintDescriptor<?> constraintDescriptor) {
@@ -95,8 +95,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	}
 
 	@Override
-	public HibernateConstraintValidatorContext withInfo(Object info) {
-		this.info = info;
+	public HibernateConstraintValidatorContext withViolationContext(Object violationContext) {
+		this.violationContext = violationContext;
 		return this;
 	}
 
@@ -120,7 +120,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 							getDefaultConstraintMessageTemplate(),
 							basePath,
 							parameterMapCopy,
-							info
+							violationContext
 					)
 			);
 		}
@@ -148,7 +148,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 							messageTemplate,
 							propertyPath,
 							parameterMapCopy,
-							info
+							violationContext
 					)
 			);
 			return ConstraintValidatorContextImpl.this;

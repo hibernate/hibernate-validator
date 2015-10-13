@@ -37,7 +37,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	private final ElementType elementType;
 	private final Object[] executableParameters;
 	private final Object executableReturnValue;
-	private final Object info;
+	private final Object violationContext;
 	private final int hashCode;
 
 	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate,
@@ -50,7 +50,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 															   Path propertyPath,
 															   ConstraintDescriptor<?> constraintDescriptor,
 															   ElementType elementType,
-															   Object info) {
+															   Object violationContext) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				expressionVariables,
@@ -64,7 +64,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				elementType,
 				null,
 				null,
-				info
+				violationContext
 		);
 	}
 
@@ -79,7 +79,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 																	ConstraintDescriptor<?> constraintDescriptor,
 																	ElementType elementType,
 																	Object[] executableParameters,
-																	Object info) {
+																	Object violationContext) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				expressionVariables,
@@ -93,7 +93,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				elementType,
 				executableParameters,
 				null,
-				info
+				violationContext
 		);
 	}
 
@@ -108,7 +108,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 																	  ConstraintDescriptor<?> constraintDescriptor,
 																	  ElementType elementType,
 																	  Object executableReturnValue,
-																	  Object info) {
+																	  Object violationContext) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
 				expressionVariables,
@@ -122,7 +122,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 				elementType,
 				null,
 				executableReturnValue,
-				info
+				violationContext
 		);
 	}
 
@@ -138,7 +138,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 			ElementType elementType,
 			Object[] executableParameters,
 			Object executableReturnValue,
-			Object info) {
+			Object violationContext) {
 		this.messageTemplate = messageTemplate;
 		this.expressionVariables = expressionVariables;
 		this.interpolatedMessage = interpolatedMessage;
@@ -151,7 +151,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		this.elementType = elementType;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
-		this.info = info;
+		this.violationContext = violationContext;
 		// pre-calculate hash code, the class is immutable and hashCode is needed often
 		this.hashCode = createHashCode();
 	}
@@ -223,8 +223,8 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	@Override
-	public Object getInfo() {
-		return info;
+	public Object getViolationContext() {
+		return violationContext;
 	}
 
 	@Override

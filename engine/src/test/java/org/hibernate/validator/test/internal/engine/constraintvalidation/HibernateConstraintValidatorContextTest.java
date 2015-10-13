@@ -109,7 +109,7 @@ public class HibernateConstraintValidatorContextTest {
 		@SuppressWarnings("unchecked")
 		HibernateConstraintViolation<Foo> hibernateConstraintViolation = constraintViolation.unwrap(HibernateConstraintViolation.class);
 
-		Assert.assertEquals(INVALID_KEYWORDS, hibernateConstraintViolation.getInfo());
+		Assert.assertEquals(INVALID_KEYWORDS, hibernateConstraintViolation.getViolationContext());
 	}
 
 	public class Foo {
@@ -154,7 +154,7 @@ public class HibernateConstraintValidatorContextTest {
 				hibernateContext.addExpressionVariable( "answer", "${foo}" );
 			}
 			else if ( question.equals( QUESTION_4 ) ) {
-				hibernateContext.withInfo(INVALID_KEYWORDS);
+				hibernateContext.withViolationContext(INVALID_KEYWORDS);
 			}
 			else {
 				tryingToIllegallyUseNullAttributeName( hibernateContext );
