@@ -43,7 +43,7 @@ public class HibernateConstraintValidatorContextTest {
 	private static final String QUESTION_3 = "This is a trick question";
 	private static final String QUESTION_4 = "What keywords are not allowed?";
 
-	private static final List<String> INVALID_KEYWORDS = Lists.newArrayList("foo", "bar", "baz");
+	private static final List<String> INVALID_KEYWORDS = Lists.newArrayList( "foo", "bar", "baz" );
 
 	@Test
 	@TestForIssue(jiraKey = "HV-701")
@@ -98,7 +98,7 @@ public class HibernateConstraintValidatorContextTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "BVAL-490")
+	@TestForIssue( jiraKey = "HV-1020")
 	public void testInfoExposedInHibernateConstraintViolation() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( QUESTION_4 ) );
@@ -107,9 +107,9 @@ public class HibernateConstraintValidatorContextTest {
 
 		ConstraintViolation<Foo> constraintViolation = constraintViolations.iterator().next();
 		@SuppressWarnings("unchecked")
-		HibernateConstraintViolation<Foo> hibernateConstraintViolation = constraintViolation.unwrap(HibernateConstraintViolation.class);
+		HibernateConstraintViolation<Foo> hibernateConstraintViolation = constraintViolation.unwrap( HibernateConstraintViolation.class );
 
-		Assert.assertEquals(INVALID_KEYWORDS, hibernateConstraintViolation.getViolationContext());
+		Assert.assertEquals( INVALID_KEYWORDS, hibernateConstraintViolation.getViolationContext() );
 	}
 
 	public class Foo {
@@ -154,7 +154,7 @@ public class HibernateConstraintValidatorContextTest {
 				hibernateContext.addExpressionVariable( "answer", "${foo}" );
 			}
 			else if ( question.equals( QUESTION_4 ) ) {
-				hibernateContext.withViolationContext(INVALID_KEYWORDS);
+				hibernateContext.withViolationContext( INVALID_KEYWORDS );
 			}
 			else {
 				tryingToIllegallyUseNullAttributeName( hibernateContext );
