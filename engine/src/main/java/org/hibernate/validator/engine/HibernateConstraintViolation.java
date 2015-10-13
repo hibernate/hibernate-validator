@@ -8,6 +8,14 @@ package org.hibernate.validator.engine;
 
 import javax.validation.ConstraintViolation;
 
+/**
+ * A custom {@link ConstraintViolation} which allows to get additional information for a constraint violation.
+ *
+ * @since 5.3
+ */
 public interface HibernateConstraintViolation<T> extends ConstraintViolation<T> {
+	/**
+	 * @return an object that further describes the violation or {@code null}.
+	 */
 	Object getViolationContext();
 }
