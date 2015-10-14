@@ -858,7 +858,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		);
 		valueContext.setCurrentValidatedValue( value );
 
-		if ( metaConstraints.size() == 0 ) {
+		if ( metaConstraints.size() == 0 && typeArgumentConstraints.size() == 0 ) {
 			return context.getFailingConstraints();
 		}
 
