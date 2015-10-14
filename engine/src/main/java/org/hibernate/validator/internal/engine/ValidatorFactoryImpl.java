@@ -64,6 +64,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static final Log log = LoggerFactory.make();
 
+	private static Boolean missingElDependencies;
+
 	/**
 	 * The default message interpolator for this factory.
 	 */
@@ -189,7 +191,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private static ClassLoader getExternalClassLoader(ConfigurationState configurationState) {
 		return ( configurationState instanceof ConfigurationImpl ) ? ( (ConfigurationImpl) configurationState ).getExternalClassLoader() : null;
 	}
-	
+
 	private static Set<DefaultConstraintMapping> getConstraintMappings(ConfigurationState configurationState, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings;
 
@@ -332,10 +334,16 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
 		// factory
 		if( messageInterpolator instanceof ResourceBundleMessageInterpolator ) {
-			try {
-				ResourceBundleMessageInterpolator.class.getClassLoader().loadClass( "javax.el.ExpressionFactory" );
+			if ( missingElDependencies == null ) {
+				try {
+					ResourceBundleMessageInterpolator.class.getClassLoader().loadClass( "javax.el.ExpressionFactory" );
+					missingElDependencies = false;
+				}
+				catch ( ClassNotFoundException e ) {
+					missingElDependencies = true;
+				}
 			}
-			catch ( ClassNotFoundException e ) {
+			if ( missingElDependencies ) {
 				throw log.getMissingELDependenciesException();
 			}
 		}
