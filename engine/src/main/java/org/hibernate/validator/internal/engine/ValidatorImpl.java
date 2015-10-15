@@ -805,7 +805,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			throw log.getInvalidPropertyPathException();
 		}
 
-		if ( metaConstraints.size() == 0 ) {
+		if ( metaConstraints.size() == 0 && typeUseConstraints.size() == 0) {
 			return context.getFailingConstraints();
 		}
 
