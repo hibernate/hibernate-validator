@@ -154,10 +154,10 @@ public class OptionalTypeAnnotationConstraintUsingValidatePropertyTest {
 
 	@Test
 	public void null_or_not_blank_type_on_optional_is_validated_for_blank_string() {
-		Model model = new Model();
+		ModelWithSingleTypeAnnotationConstraint model = new ModelWithSingleTypeAnnotationConstraint();
 		model.valueWithNullOrNotBlank = Optional.of( "" );
 
-		Set<ConstraintViolation<Model>> constraintViolations = validator.validateProperty(
+		Set<ConstraintViolation<ModelWithSingleTypeAnnotationConstraint>> constraintViolations = validator.validateProperty(
 				model,
 				"valueWithNullOrNotBlank"
 		);
@@ -234,5 +234,9 @@ public class OptionalTypeAnnotationConstraintUsingValidatePropertyTest {
 
 		@NullOrNotBlank(message = "reference")
 		String valueReference;
+	}
+
+	private static class ModelWithSingleTypeAnnotationConstraint {
+		Optional<@NullOrNotBlank(message = "type") String> valueWithNullOrNotBlank;
 	}
 }
