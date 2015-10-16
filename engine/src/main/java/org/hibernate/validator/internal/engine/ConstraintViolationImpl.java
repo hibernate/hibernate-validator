@@ -231,12 +231,16 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		return violationContext;
 	}
 
+	/**
+	 * IMPORTANT - some behaviour of Validator depends on the correct implementation of this equals method! (HF)
+	 *
+	 * {@code expressionVariables} and {@code violationContext} are not taken into account for equality. These
+	 * variables solely enrich the actual Constraint Violation with additional information e.g how we actually
+	 * got to this CV.
+	 *
+	 * @return true if the two ConstraintViolation's are considered equals; false otherwise
+	 */
 	@Override
-	// IMPORTANT - some behaviour of Validator depends on the correct implementation of this equals method! (HF)
-
-	// Do not take expressionVariables into account here. If everything else matches, the two CV should be considered
-	// equals (and because of the scary comment above). After all, expressionVariables is just a hint about how we got
-	// to the actual CV. (NF)
 	public boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
@@ -295,7 +299,9 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 		return sb.toString();
 	}
 
-	// Same as for equals, do not take expressionVariables into account here.
+	/**
+	 * @see #equals(Object) on which fields are taken into account
+	 */
 	private int createHashCode() {
 		int result = interpolatedMessage != null ? interpolatedMessage.hashCode() : 0;
 		result = 31 * result + ( propertyPath != null ? propertyPath.hashCode() : 0 );
