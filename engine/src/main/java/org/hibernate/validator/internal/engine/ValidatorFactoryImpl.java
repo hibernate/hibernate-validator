@@ -14,11 +14,11 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.spi.ConfigurationState;
 
@@ -28,7 +28,9 @@ import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionBuilderImpl;
+import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.time.DefaultTimeProvider;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
@@ -41,9 +43,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
-import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
-import org.hibernate.validator.internal.engine.time.DefaultTimeProvider;
 import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
@@ -336,10 +336,16 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		if( messageInterpolator instanceof ResourceBundleMessageInterpolator ) {
 			if ( missingElDependencies == null ) {
 				try {
-					ResourceBundleMessageInterpolator.class.getClassLoader().loadClass( "javax.el.ExpressionFactory" );
+					run(
+							LoadClass.action(
+									"javax.el.ExpressionFactory",
+									messageInterpolator.getClass().getClassLoader(),
+									false
+							)
+					);
 					missingElDependencies = false;
 				}
-				catch ( ClassNotFoundException e ) {
+				catch ( ValidationException e ) {
 					missingElDependencies = true;
 				}
 			}
