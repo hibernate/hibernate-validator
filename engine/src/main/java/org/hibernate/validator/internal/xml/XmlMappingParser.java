@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -129,13 +130,14 @@ public class XmlMappingParser {
 
 			Set<String> alreadyProcessedConstraintDefinitions = newHashSet();
 			for ( InputStream in : mappingStreams ) {
+
 				// check whether mark is supported, if so we can reset the stream in order to allow reuse of Configuration
 				boolean markSupported = in.markSupported();
 				if ( markSupported ) {
 					in.mark( Integer.MAX_VALUE );
 				}
 
-				XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", in );
+				XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
 				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", xmlEventReader );
 				String schemaResourceName = getSchemaResourceName( schemaVersion );
 				Schema schema = xmlParserHelper.getSchema( schemaResourceName );
@@ -382,6 +384,20 @@ public class XmlMappingParser {
 		}
 		catch ( Exception e ) {
 			throw log.getErrorParsingMappingFileException( e );
+		}
+	}
+
+	// HV-1025 - On some JVMs (eg the IBM JVM) the JAXB implementation closes the underlying input stream.
+	// To prevent this we wrap the input stream to be able to ignore the close event. It is the responsibility
+	// of the client API to close the stream (as per Bean Validation spec, see javax.validation.Configuration).
+	private static class CloseIgnoringInputStream extends FilterInputStream {
+		public CloseIgnoringInputStream(InputStream in) {
+			super( in );
+		}
+
+		@Override
+		public void close() {
+			// do nothing
 		}
 	}
 }
