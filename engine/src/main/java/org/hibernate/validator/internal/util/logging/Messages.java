@@ -84,6 +84,14 @@ public interface Messages {
 	@Message(value = "Custom parameterized types with more than one type argument are not supported and " +
 			"will not be checked for type use constraints.")
 	String parameterizedTypesWithMoreThanOneTypeArgument();
+
+	@Message(value = "Hibernate Validator cannot instantiate AggregateResourceBundle.CONTROL. " +
+			"This can happen most notably in a Google App Engine environment. " +
+			"A PlatformResourceBundleLocator without bundle aggregation was created. " +
+			"This only effects you in case you are using multiple ConstraintDefinitionContributor jars. " +
+			"ConstraintDefinitionContributors are a Hibernate Validator specific feature. All Bean Validation " +
+			"features work as expected. See also https://hibernate.atlassian.net/browse/HV-1023.")
+	String unableToUseResourceBundleAggregation();
 }
 
 
