@@ -302,6 +302,7 @@ public final class PathImpl implements Path, Serializable {
 
 	private PathImpl(List<Node> nodeList) {
 		this.nodeList = new ArrayList<Node>( nodeList );
+		this.hashCode = -1;
 	}
 
 	private static PathImpl parseProperty(String propertyName) {
