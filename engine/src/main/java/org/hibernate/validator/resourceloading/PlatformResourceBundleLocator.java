@@ -39,7 +39,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 
 	private static final Logger log = Logger.getLogger( PlatformResourceBundleLocator.class.getName() );
-	private static final boolean RESOURCE_BUNDLE_CONTROLE_INSTANTIABLE = determineAvailabilityOfResourceBundleControl();
+	private static final boolean RESOURCE_BUNDLE_CONTROL_INSTANTIABLE = determineAvailabilityOfResourceBundleControl();
 
 	private final String bundleName;
 	private final ClassLoader classLoader;
@@ -80,27 +80,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		this.bundleName = bundleName;
 		this.classLoader = classLoader;
 
-		this.aggregate = aggregate && RESOURCE_BUNDLE_CONTROLE_INSTANTIABLE;
-	}
-
-	/**
-	 *
-	 * In an Google App Engine environment bundle aggregation is not possible, since ResourceBundle.Control
-	 * is not on the list of white listed classes in this environment. See http://code.google.com/appengine/docs/java/jrewhitelist.html
-	 * to create AggregateResourceBundle.CONTROL proactively, if it fails skip resource aggregation.
-	 * <p>
-	 * Also see HV-1023.
-	 */
-	private static boolean determineAvailabilityOfResourceBundleControl() {
-		try {
-			@SuppressWarnings("unused")
-			ResourceBundle.Control dummyControl = AggregateResourceBundle.CONTROL;
-			return true;
-		}
-		catch ( NoClassDefFoundError e ) {
-			log.info( MESSAGES.unableToUseResourceBundleAggregation() );
-			return false;
-		}
+		this.aggregate = aggregate && RESOURCE_BUNDLE_CONTROL_INSTANTIABLE;
 	}
 
 	/**
@@ -181,6 +161,27 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	 */
 	private static <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	/**
+	 *
+	 * In an Google App Engine environment bundle aggregation is not possible, since ResourceBundle.Control
+	 * is not on the list of white listed classes in this environment.
+	 * to create AggregateResourceBundle.CONTROL proactively, if it fails skip resource aggregation.
+	 *
+	 * @see <a href="http://code.google.com/appengine/docs/java/jrewhitelist.html">JRE whitelist</a>
+	 * @see <a href="https://hibernate.atlassian.net/browse/HV-1023">HV-1023</a>
+	 */
+	private static boolean determineAvailabilityOfResourceBundleControl() {
+		try {
+			@SuppressWarnings("unused")
+			ResourceBundle.Control dummyControl = AggregateResourceBundle.CONTROL;
+			return true;
+		}
+		catch ( NoClassDefFoundError e ) {
+			log.info( MESSAGES.unableToUseResourceBundleAggregation() );
+			return false;
+		}
 	}
 
 	/**
