@@ -18,12 +18,11 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import org.jboss.logging.Logger;
-
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetResources;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
+import org.jboss.logging.Logger;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
@@ -38,8 +37,9 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Gunnar Morling
  */
 public class PlatformResourceBundleLocator implements ResourceBundleLocator {
+
 	private static final Logger log = Logger.getLogger( PlatformResourceBundleLocator.class.getName() );
-	private static Boolean resourceBundleControlInstantiable;
+	private static final boolean RESOURCE_BUNDLE_CONTROLE_INSTANTIABLE = determineAvailabilityOfResourceBundleControl();
 
 	private final String bundleName;
 	private final ClassLoader classLoader;
@@ -80,20 +80,27 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 		this.bundleName = bundleName;
 		this.classLoader = classLoader;
 
-		// HV-1023 In an Google App Engine environment bundle aggregation is not possible, since ResourceBundle.Control
-		// is not on the list of white listed classes in this environment. See http://code.google.com/appengine/docs/java/jrewhitelist.html
-		// Try to create AggregateResourceBundle.CONTROL proactively, if it fails skip resource aggregation
-		if ( resourceBundleControlInstantiable == null ) {
-			try {
-				ResourceBundle.Control dummyControl = AggregateResourceBundle.CONTROL;
-				resourceBundleControlInstantiable = true;
-			}
-			catch ( NoClassDefFoundError e ) {
-				resourceBundleControlInstantiable = false;
-				log.info( MESSAGES.unableToUseResourceBundleAggregation() );
-			}
+		this.aggregate = aggregate && RESOURCE_BUNDLE_CONTROLE_INSTANTIABLE;
+	}
+
+	/**
+	 *
+	 * In an Google App Engine environment bundle aggregation is not possible, since ResourceBundle.Control
+	 * is not on the list of white listed classes in this environment. See http://code.google.com/appengine/docs/java/jrewhitelist.html
+	 * to create AggregateResourceBundle.CONTROL proactively, if it fails skip resource aggregation.
+	 * <p>
+	 * Also see HV-1023.
+	 */
+	private static boolean determineAvailabilityOfResourceBundleControl() {
+		try {
+			@SuppressWarnings("unused")
+			ResourceBundle.Control dummyControl = AggregateResourceBundle.CONTROL;
+			return true;
 		}
-		this.aggregate = aggregate && resourceBundleControlInstantiable;
+		catch ( NoClassDefFoundError e ) {
+			log.info( MESSAGES.unableToUseResourceBundleAggregation() );
+			return false;
+		}
 	}
 
 	/**
