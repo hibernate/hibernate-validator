@@ -233,10 +233,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 64, value = "Unable to instantiate %1$s: %2$s.")
 	ValidationException getUnableToInstantiateException(String message, Class<?> clazz, @Cause Exception e);
 
-	@Message(id = 65, value = "Unable to load class: %s.")
-	ValidationException getUnableToLoadClassException(String className);
-
-	ValidationException getUnableToLoadClassException(String className, @Cause Exception e);
+	@Message(id = 65, value = "Unable to load class: %s from %s.")
+	ValidationException getUnableToLoadClassException(String className, ClassLoader loader, @Cause Exception e);
 
 	@Message(id = 68, value = "Start index cannot be negative: %d.")
 	IllegalArgumentException getStartIndexCannotBeNegativeException(int startIndex);
