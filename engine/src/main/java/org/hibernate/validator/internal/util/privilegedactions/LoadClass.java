@@ -68,14 +68,17 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 	// HV-363 - library internal classes are loaded via Class.forName first
 
 	private Class<?> loadClassInValidatorNameSpace() {
+        final Exception exception;
 		try {
 			return Class.forName( className, true, HibernateValidator.class.getClassLoader() );
 		}
 		catch ( ClassNotFoundException e ) {
 			//ignore -- try using the class loader of context first
+            exception = e;
 		}
 		catch ( RuntimeException e ) {
 			// ignore
+            exception = e;
 		}
 		if ( fallbackOnTCCL ) {
 			try {
@@ -84,7 +87,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 					return Class.forName( className, false, contextClassLoader );
 				}
 				else {
-					throw log.getUnableToLoadClassException( className );
+					throw log.getUnableToLoadClassException( className, exception );
 				}
 			}
 			catch ( ClassNotFoundException e ) {
@@ -92,7 +95,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 			}
 		}
 		else {
-			throw log.getUnableToLoadClassException( className );
+			throw log.getUnableToLoadClassException( className, exception );
 		}
 	}
 
