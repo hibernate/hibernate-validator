@@ -21,29 +21,32 @@ import org.testng.annotations.Test;
 public class LoadClassTest {
 	@Test
 	public void testException1() {
-		final LoadClass action = LoadClass.action("org.hibernate.validator.Dummy", null, false);
+		final LoadClass action = LoadClass.action( "org.hibernate.validator.Dummy", null, false );
 		try {
 			action.run();
-			fail("Should have thrown javax.validation.ValidationException");
-		} catch (ValidationException e) {
-			assertNotNull(e.getCause(), "HV-1026: cause not set");
+			fail( "Should have thrown javax.validation.ValidationException" );
+		}
+		catch (ValidationException e) {
+			assertNotNull( e.getCause(), "HV-1026: cause not set" );
 		}
 	}
 
 	@Test
 	public void testException2() {
-		final LoadClass action = LoadClass.action("org.hibernate.validator.Dummy", null, true);
+		final LoadClass action = LoadClass.action( "org.hibernate.validator.Dummy", null, true );
 		final ClassLoader current = currentThread().getContextClassLoader();
 		try {
-			currentThread().setContextClassLoader(null);
+			currentThread().setContextClassLoader( null );
 			try {
 				action.run();
-				fail("Should have thrown javax.validation.ValidationException");
-			} catch (ValidationException e) {
-				assertNotNull(e.getCause(), "HV-1026: cause not set");
+				fail( "Should have thrown javax.validation.ValidationException" );
 			}
-		} finally {
-			currentThread().setContextClassLoader(current);
+			catch (ValidationException e) {
+				assertNotNull( e.getCause(), "HV-1026: cause not set" );
+			}
+		}
+		finally {
+			currentThread().setContextClassLoader( current );
 		}
 	}
 }
