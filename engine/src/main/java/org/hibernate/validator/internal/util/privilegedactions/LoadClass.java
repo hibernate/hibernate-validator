@@ -68,6 +68,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 	// HV-363 - library internal classes are loaded via Class.forName first
 
 	private Class<?> loadClassInValidatorNameSpace() {
+        final ClassLoader loader = HibernateValidator.class.getClassLoader();
         final Exception exception;
 		try {
 			return Class.forName( className, true, HibernateValidator.class.getClassLoader() );
@@ -81,21 +82,21 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
             exception = e;
 		}
 		if ( fallbackOnTCCL ) {
-			try {
-				ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-				if ( contextClassLoader != null ) {
-					return Class.forName( className, false, contextClassLoader );
-				}
-				else {
-					throw log.getUnableToLoadClassException( className, exception );
-				}
-			}
-			catch ( ClassNotFoundException e ) {
-				throw log.getUnableToLoadClassException( className, e );
-			}
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            if ( contextClassLoader != null ) {
+                try {
+                    return Class.forName( className, false, contextClassLoader );
+                }
+                catch ( ClassNotFoundException e ) {
+                    throw log.getUnableToLoadClassException( className, contextClassLoader, e );
+                }
+            }
+            else {
+                throw log.getUnableToLoadClassException( className, loader, exception );
+            }
 		}
 		else {
-			throw log.getUnableToLoadClassException( className, exception );
+			throw log.getUnableToLoadClassException( className, loader, exception );
 		}
 	}
 
@@ -123,19 +124,21 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 			}
 			catch ( ClassNotFoundException e ) {
 				// ignore - try using the classloader of the caller first
+                // TODO: might be wise to somehow log this
 			}
 			catch ( RuntimeException e ) {
 				// ignore
 			}
+            final ClassLoader loader = LoadClass.class.getClassLoader();
 			try {
-				return Class.forName( className, true, LoadClass.class.getClassLoader() );
+				return Class.forName( className, true, loader );
 			}
 			catch ( ClassNotFoundException e ) {
-				throw log.getUnableToLoadClassException( className, e );
+				throw log.getUnableToLoadClassException( className, loader, e );
 			}
 		}
 		else {
-			throw log.getUnableToLoadClassException( className, exception );
+			throw log.getUnableToLoadClassException( className, classLoader, exception );
 		}
 	}
 }

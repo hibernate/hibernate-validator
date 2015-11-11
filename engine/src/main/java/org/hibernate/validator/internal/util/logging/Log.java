@@ -237,7 +237,11 @@ public interface Log extends BasicLogger {
 	@Message(id = 65, value = "Unable to load class: %s.")
 	ValidationException getUnableToLoadClassException(String className);
 
+    @Deprecated
 	ValidationException getUnableToLoadClassException(String className, @Cause Exception e);
+
+    @Message(id = 65, value = "Unable to load class: %s from %s.")
+    ValidationException getUnableToLoadClassException(String className, ClassLoader loader, @Cause Exception e);
 
 	@Message(id = 68, value = "Start index cannot be negative: %d.")
 	IllegalArgumentException getStartIndexCannotBeNegativeException(int startIndex);
