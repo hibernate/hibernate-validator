@@ -48,7 +48,7 @@ public class BeanConfiguration<T> {
 	public BeanConfiguration(
 			ConfigurationSource source,
 			Class<T> beanClass,
-			Set<? extends ConstrainedElement> constrainedElements,
+			Set<ConstrainedElement> constrainedElements,
 			List<Class<?>> defaultGroupSequence,
 			DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {
 

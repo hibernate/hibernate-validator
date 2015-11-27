@@ -78,10 +78,10 @@ public class ParameterScriptAssertValidatorTest {
 	public void shouldValidateParameterScriptAssertConstraintOnConstructor() throws Exception {
 		ExecutableValidator executableValidator = getValidator().forExecutables();
 
-		Constructor<?> constructor = CalendarServiceImpl.class.getConstructor( String.class );
+		Constructor<CalendarServiceImpl> constructor = CalendarServiceImpl.class.getConstructor( String.class );
 		Object[] parameterValues = new Object[] { "Foo" };
 
-		Set<ConstraintViolation<Object>> violations = executableValidator.validateConstructorParameters(
+		Set<ConstraintViolation<CalendarServiceImpl>> violations = executableValidator.validateConstructorParameters(
 				constructor,
 				parameterValues
 		);
