@@ -9,8 +9,8 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
+import java.util.HashSet;
+import java.util.Set;
 /**
  * Represents the constraint related meta data of the arguments of a method or
  * constructor.
@@ -19,10 +19,13 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class ValidatableParametersMetaData implements Validatable {
 
-	private final Iterable<Cascadable> cascadables;
+	private final HashSet<Cascadable> cascadables;
 
-	public ValidatableParametersMetaData(Iterable<? extends Cascadable> cascadables) {
-		this.cascadables = newHashSet( cascadables );
+	public ValidatableParametersMetaData(Set<ParameterMetaData> cascadables) {
+		this.cascadables = new HashSet<Cascadable>( cascadables.size() );
+		for ( ParameterMetaData pmd : cascadables ) {
+			this.cascadables.add( pmd );
+		}
 	}
 
 	@Override
