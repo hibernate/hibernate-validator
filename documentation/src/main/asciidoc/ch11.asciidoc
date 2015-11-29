@@ -111,7 +111,6 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/failfast/F
 Here the validated object actually fails to satisfy both the constraints declared on the `Car` class,
 yet the validation call yields only one `ConstraintViolation` since the fail fast mode is enabled.
 
-
 [NOTE]
 ====
 There is no guarantee in which order the constraints are evaluated, i.e. it is not deterministic
@@ -122,6 +121,68 @@ required, a deterministic evaluation order can be enforced using group sequences
 
 Refer to <<section-provider-specific-settings>> to learn about the different ways of enabling the
 fail fast mode when bootstrapping a validator.
+
+[[section-method-validation-prerequisite-relaxation]]
+=== Relaxation of requirements for method validation in class hierarchies
+
+The Bean Validation specification defines a set of preconditions which apply when defining
+constraints on methods within class hierarchies. These preconditions are defined in
+http://beanvalidation.org/1.1/spec/#constraintdeclarationvalidationprocess-methodlevelconstraints-inheritance[section 4.5.5]
+of the Bean Validation 1.1 specification. See also <<section-method-constraints-inheritance-hierarchies>>
+in this guide.
+
+As per specification a Bean Validation provider is allowed to relax these preconditions.
+With Hibernate Validator you can do this in one of two ways.
+
+First you can use the configuration properties _hibernate.validator.allow_parameter_constraint_override_,
+_hibernate.validator.allow_multiple_cascaded_validation_on_result_ and
+_hibernate.validator.allow_parallel_method_parameter_constraint_ in _validation.xml_. See example
+<<example-relaxing-method-validation-xml>>.
+
+
+[[example-relaxing-method-validation-xml]]
+.Configuring method validation behaviour in class hierarchies via properties
+====
+[source, XML]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<validation-config
+        xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.0.xsd">
+    <default-provider>org.hibernate.validator.HibernateValidator</default-provider>
+
+    <property name="hibernate.validator.allow_parameter_constraint_override">true</property>
+    <property name="hibernate.validator.allow_multiple_cascaded_validation_on_result">true</property>
+    <property name="hibernate.validator.allow_parallel_method_parameter_constraint">true</property>
+</validation-config>
+----
+====
+
+Alternatively these settings can be applied during programmatic bootstrapping.
+
+[[example-relaxing-method-validation]]
+.Configuring method validation behaviour in class hierarchies
+====
+[source, JAVA]
+----
+HibernateValidatorConfiguration configuration = Validation.byProvider(HibernateValidator.class).configure();
+
+configuration.allowMultipleCascadedValidationOnReturnValues(true)
+    .allowOverridingMethodAlterParameterConstraint(true)
+    .allowParallelMethodsDefineParameterConstraints(true);
+----
+====
+
+By default, all of these properties are false, implementing the default behavior as defined in the
+Bean Validation specification.
+
+[WARNING]
+====
+Changing the default behaviour for method validation will result in non specification conform and non
+portable application. Make sure to understand what you are doing and that your use case really
+requires changes to the default behaviour.
+====
 
 [[section-programmatic-api]]
 === Programmatic constraint declaration

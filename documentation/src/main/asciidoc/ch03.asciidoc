@@ -299,6 +299,7 @@ public class Garage {
 ----
 ====
 
+[[section-method-constraints-inheritance-hierarchies]]
 ==== Method constraints in inheritance hierarchies
 
 When declaring method constraints in inheritance hierarchies, it is important to be aware of the
@@ -448,6 +449,13 @@ The rules described in this section only apply to methods but not constructors. 
 constructors never override supertype constructors. Therefore, when validating the parameters or the
 return value of a constructor invocation only the constraints declared on the constructor itself
 apply, but never any constraints declared on supertype constructors.
+====
+
+[TIP]
+====
+Enforcement of these rules may be relaxed by setting the configuration parameters contained in
+the `MethodValidationConfiguration` property of the `HibernateValidatorConfiguration` before creating
+the `Validator` instance. See also <<section-method-validation-prerequisite-relaxation>>.
 ====
 
 [[section-validating-executable-constraints]]
