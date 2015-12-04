@@ -42,7 +42,7 @@ public class ValidationXmlTestHelper {
 					new ClassLoader( previousContextCl ) {
 						@Override
 						public InputStream getResourceAsStream(String name) {
-							if ( name.equals( "META-INF/validation.xml" ) ) {
+							if ( "META-INF/validation.xml".equals( name ) ) {
 								return clazz.getResourceAsStream( validationXmlName );
 							}
 
