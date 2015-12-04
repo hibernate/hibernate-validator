@@ -962,16 +962,16 @@ public class TypeHelperTest {
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			if ( method.getName().equals( "getBounds" ) ) {
-				return getBounds();
+			if ( "getBounds".equals( method.getName() ) ) {
+			 	return getBounds();
 			}
-			else if ( method.getName().equals( "getGenericDeclaration" ) ) {
+			else if ( "getGenericDeclaration".equals( method.getName() ) ) {
 				return getGenericDeclaration();
 			}
-			else if ( method.getName().equals( "getName" ) ) {
+			else if ( "getName".equals( method.getName() ) ) {
 				return getName();
 			}
-			else if ( method.getName().equals( "toString" ) ) {
+			else if ( "toString".equals( method.getName() ) ) {
 				return toString();
 			}
 			else {

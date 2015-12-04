@@ -219,7 +219,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		}
 
 		@Override
-		public void add(ConstrainedElement constrainedElement) {
+		public final void add(ConstrainedElement constrainedElement) {
 			super.add( constrainedElement );
 
 			// HV-925

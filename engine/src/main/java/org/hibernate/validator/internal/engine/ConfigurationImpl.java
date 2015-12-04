@@ -252,7 +252,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
-	public HibernateValidatorConfiguration addConstraintDefinitionContributor(ConstraintDefinitionContributor contributor) {
+	public final HibernateValidatorConfiguration addConstraintDefinitionContributor(ConstraintDefinitionContributor contributor) {
 		Contracts.assertNotNull( contributor, MESSAGES.parameterMustNotBeNull( "contributor" ) );
 		constraintDefinitionContributors.add( contributor );
 

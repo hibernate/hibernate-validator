@@ -102,7 +102,7 @@ public class TokenCollector {
 		terminateToken();
 	}
 
-	public void parse() throws MessageDescriptorFormatException {
+	public final void parse() throws MessageDescriptorFormatException {
 		currentParserState.start( this );
 	}
 

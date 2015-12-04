@@ -75,7 +75,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	}
 
 	@Override
-	public boolean isCascading() {
+	public final boolean isCascading() {
 		return isCascading;
 	}
 

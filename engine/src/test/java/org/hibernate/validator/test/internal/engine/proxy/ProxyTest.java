@@ -58,11 +58,11 @@ public class ProxyTest {
 		}
 
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			if ( method.getName().equals( "getInteger" ) ) {
+			if ( "getInteger".equals( method.getName() ) ) {
 				method.setAccessible( true );
 				return 0;
 			}
-			if ( method.getName().equals( "getString" ) ) {
+			if ( "getString".equals( method.getName() ) ) {
 				return "a";
 			}
 			return method.invoke( o, args );
