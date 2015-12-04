@@ -333,7 +333,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		}
 
 		@Override
-		public void add(ConstrainedElement constrainedElement) {
+		public final void add(ConstrainedElement constrainedElement) {
 			super.add( constrainedElement );
 			ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
 

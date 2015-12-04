@@ -319,7 +319,7 @@ public class NodeImpl
 		return builder.toString();
 	}
 
-	public int buildHashCode() {
+	public final int buildHashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ( ( index == null ) ? 0 : index.hashCode() );

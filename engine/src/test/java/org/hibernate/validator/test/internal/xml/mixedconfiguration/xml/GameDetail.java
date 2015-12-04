@@ -22,7 +22,7 @@ public class GameDetail {
 		return competition;
 	}
 
-	public void setCompetition(Competition competition) {
+	public final void setCompetition(Competition competition) {
 		this.competition = competition;
 	}
 }
