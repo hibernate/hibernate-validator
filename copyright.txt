@@ -5,6 +5,8 @@ Brent Douglas
 Carlos Vara
 Dag Hovland
 Davide Marchignoli
+Carlo de Wolf
+Christian Ivan
 Denis Tiago
 Doug Lea
 Emmanuel Bernard
@@ -22,6 +24,7 @@ Juraci Krohling
 Justin Nauman
 Kevin Pollet
 Khalid Alqinyah
+Lee KyoungIl
 Leonardo Loch Zanivan
 Lucas Pouzac
 Mark Hobson
