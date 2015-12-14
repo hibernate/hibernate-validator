@@ -85,6 +85,7 @@
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <org.codehaus.mojo.chronos.version>1.0-beta-3</org.codehaus.mojo.chronos.version>
+        <jsoup.version>1.8.3</jsoup.version>
     </properties>
 
     <dependencyManagement>
@@ -152,7 +153,7 @@
             <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
-                <version>1.6.1</version>
+                <version>${jsoup.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logging</groupId>

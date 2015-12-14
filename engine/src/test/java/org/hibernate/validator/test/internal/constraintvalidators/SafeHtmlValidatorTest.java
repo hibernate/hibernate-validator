@@ -57,6 +57,18 @@ public class SafeHtmlValidatorTest {
 	}
 
 	@Test
+	public void testInvalidIncompleteImgTagWithScriptIncluded() {
+		AnnotationDescriptor<SafeHtml> descriptor = new AnnotationDescriptor<SafeHtml>( SafeHtml.class );
+		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
+		SafeHtml p = AnnotationFactory.create( descriptor );
+
+		SafeHtmlValidator validator = new SafeHtmlValidator();
+		validator.initialize( p );
+
+		assertFalse( validator.isValid( "<img src=asdf onerror=\"alert(1)\" x=", null ) );
+	}
+
+	@Test
 	public void testValid() throws Exception {
 		AnnotationDescriptor<SafeHtml> descriptor = new AnnotationDescriptor<SafeHtml>( SafeHtml.class );
 		descriptor.setValue( "whitelistType", WhiteListType.BASIC );
