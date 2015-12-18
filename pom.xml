@@ -728,13 +728,13 @@
     </build>
 
     <ciManagement>
-        <system>Hudson</system>
-        <url>http://hudson.qa.jboss.com/hudson/job/beanvalidation</url>
+        <system>Jenkins</system>
+        <url>https://hibernate-validator.ci.cloudbees.com/</url>
     </ciManagement>
 
     <issueManagement>
         <system>JIRA</system>
-        <url>http://opensource.atlassian.com/projects/hibernate/browse/HV</url>
+        <url>https://hibernate.atlassian.net/projects/HV/summary</url>
     </issueManagement>
 
     <inceptionYear>2007</inceptionYear>
