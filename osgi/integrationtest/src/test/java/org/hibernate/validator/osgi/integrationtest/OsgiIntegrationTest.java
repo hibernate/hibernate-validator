@@ -11,15 +11,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import javax.el.ELException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.spi.ValidationProvider;
 
 import com.example.Customer;
+import com.example.CustomerDecimalMin;
 import com.example.ExampleConstraintValidatorFactory;
 import com.example.Order;
 import com.example.RetailOrder;
+import mockservice.MockService;
+import mockwhiteboard.MockWhiteboardDummy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +39,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.when;
@@ -179,6 +184,22 @@ public class OsgiIntegrationTest {
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "Not a valid retail order name", constraintViolations.iterator().next().getMessage() );
+	}
+
+	@Test
+	public void canObtainValidatorFactoryAndPerformValidationWithMinimalTccl() {
+		try {
+			Set<ConstraintViolation<CustomerDecimalMin>> validations = MockService.run( MockWhiteboardDummy.class.getClassLoader() );
+			assertEquals( 1, validations.size() );
+		}
+		catch ( ELException t ) {
+			// pax-exam fails to report this exception properly, I have no idea why.
+			t.printStackTrace();
+			for ( Throwable cause = t.getCause(); cause != null; cause = cause.getCause() ) {
+				cause.printStackTrace();
+			}
+			fail( "Exception validating: " + t.toString() );
+		}
 	}
 
 	public static class MyValidationProviderResolver implements ValidationProviderResolver {

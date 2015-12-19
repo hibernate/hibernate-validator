@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine.messageinterpolation;
 
 import java.util.Locale;
 
+import javax.el.ExpressionFactory;
 import javax.validation.MessageInterpolator;
 
 /**
@@ -37,11 +38,17 @@ public class InterpolationTerm {
 	 */
 	private final TermResolver resolver;
 
-	public InterpolationTerm(String expression, Locale locale) {
+	/**
+	 * Create an interpolation term for an expression.
+	 * @param expression the expression.
+	 * @param locale the locale.
+	 * @param expressionFactory the expression factory to use if the expression uses EL.
+     */
+	public InterpolationTerm(String expression, Locale locale, ExpressionFactory expressionFactory) {
 		this.expression = expression;
 		if ( isElExpression( expression ) ) {
 			this.type = InterpolationTermType.EL;
-			this.resolver = new ElTermResolver(locale);
+			this.resolver = new ElTermResolver(locale, expressionFactory);
 		}
 		else {
 			this.type = InterpolationTermType.PARAMETER;
