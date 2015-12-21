@@ -68,4 +68,19 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * @since 5.2
 	 */
 	TimeProvider getTimeProvider();
+
+	/**
+	 *
+	 * Allows to set an object that may further describe the violation.
+	 *
+	 * The user is responsible himself to ensure that this violation context is serializable in case the
+	 * {@code javax.validation.ConstraintViolation} has to be serialized.
+	 *
+	 * @param violationContext an object representing additional information about the violation
+	 *
+	 * @return a reference to itself to allow method chaining
+	 *
+	 * @since 5.3
+	 */
+	HibernateConstraintValidatorContext withViolationContext(Object violationContext);
 }

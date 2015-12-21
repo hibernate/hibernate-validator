@@ -6,8 +6,28 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.TypeResolver;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
+import java.lang.annotation.ElementType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ConstraintViolation;
+import javax.validation.MessageInterpolator;
+import javax.validation.ParameterNameProvider;
+import javax.validation.Path;
+import javax.validation.TraversableResolver;
+import javax.validation.ValidationException;
+import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
@@ -23,29 +43,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
-import javax.validation.ConstraintValidatorFactory;
-import javax.validation.ConstraintViolation;
-import javax.validation.MessageInterpolator;
-import javax.validation.ParameterNameProvider;
-import javax.validation.Path;
-import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
-import javax.validation.metadata.ConstraintDescriptor;
-
-import java.lang.annotation.ElementType;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
 
 /**
  * Context object keeping track of all required data for a validation call.
@@ -308,6 +307,7 @@ public class ValidationContext<T> {
 		//same for expression variables
 		Map<String, Object> expressionVariables =
 				Collections.unmodifiableMap( constraintViolationCreationContext.getExpressionVariables() );
+		Object violationContext = constraintViolationCreationContext.getViolationContext();
 		if ( executableParameters != null ) {
 			return ConstraintViolationImpl.forParameterValidation(
 					messageTemplate,
@@ -320,7 +320,8 @@ public class ValidationContext<T> {
 					path,
 					descriptor,
 					localContext.getElementType(),
-					executableParameters
+					executableParameters,
+					violationContext
 			);
 		}
 		else if ( executableReturnValue != null ) {
@@ -335,7 +336,8 @@ public class ValidationContext<T> {
 					path,
 					descriptor,
 					localContext.getElementType(),
-					executableReturnValue
+					executableReturnValue,
+					violationContext
 			);
 		}
 		else {
@@ -349,7 +351,8 @@ public class ValidationContext<T> {
 					localContext.getCurrentValidatedValue(),
 					path,
 					descriptor,
-					localContext.getElementType()
+					localContext.getElementType(),
+					violationContext
 			);
 		}
 	}

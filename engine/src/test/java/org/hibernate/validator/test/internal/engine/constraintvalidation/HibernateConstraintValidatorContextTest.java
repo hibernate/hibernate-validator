@@ -6,12 +6,17 @@
  */
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
-import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.junit.Assert;
-import org.testng.annotations.Test;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -19,16 +24,14 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.util.Map;
-import java.util.Set;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.engine.HibernateConstraintViolation;
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.junit.Assert;
+import org.testng.annotations.Test;
+import org.testng.collections.Lists;
 
 /**
  * @author Hardy Ferentschik
@@ -38,6 +41,9 @@ public class HibernateConstraintValidatorContextTest {
 	private static final String QUESTION_1 = "The answer to life?";
 	private static final String QUESTION_2 = "What is 1+1 and what is the answer to life?";
 	private static final String QUESTION_3 = "This is a trick question";
+	private static final String QUESTION_4 = "What keywords are not allowed?";
+
+	private static final List<String> INVALID_KEYWORDS = Lists.newArrayList( "foo", "bar", "baz" );
 
 	@Test
 	@TestForIssue(jiraKey = "HV-701")
@@ -91,6 +97,21 @@ public class HibernateConstraintValidatorContextTest {
 		Assert.assertEquals( 42, expressionVariables.get( "answer" ) );
 	}
 
+	@Test
+	@TestForIssue( jiraKey = "HV-1020")
+	public void testInfoExposedInHibernateConstraintViolation() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( QUESTION_4 ) );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+
+		ConstraintViolation<Foo> constraintViolation = constraintViolations.iterator().next();
+		@SuppressWarnings("unchecked")
+		HibernateConstraintViolation<Foo> hibernateConstraintViolation = constraintViolation.unwrap( HibernateConstraintViolation.class );
+
+		Assert.assertEquals( INVALID_KEYWORDS, hibernateConstraintViolation.getViolationContext() );
+	}
+
 	public class Foo {
 		@OracleConstraint
 		private final String question;
@@ -131,6 +152,9 @@ public class HibernateConstraintValidatorContextTest {
 			}
 			else if ( question.equals( QUESTION_3 ) ) {
 				hibernateContext.addExpressionVariable( "answer", "${foo}" );
+			}
+			else if ( question.equals( QUESTION_4 ) ) {
+				hibernateContext.withViolationContext( INVALID_KEYWORDS );
 			}
 			else {
 				tryingToIllegallyUseNullAttributeName( hibernateContext );
