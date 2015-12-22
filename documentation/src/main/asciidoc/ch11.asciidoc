@@ -395,6 +395,39 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/propertypa
 
 This is specifically useful to obtain the element of `Set` properties on the property path (e.g. `apartments` in the example) which otherwise could not be identified (unlike for `Map` and `List`, there is no key nor index in this case).
 
+[[section-dynamic-payload]]
+=== Dynamic payload as part of ConstraintViolation
+
+In some cases automatic processing of violations can be aided, if the constraint violation provides additional
+data - a so called dynamic payload. This dynamic payload could for example contain hints to the user on how to
+resolve the violation.
+
+Dynamic payloads can be set in <<validator-customconstraints,custom constraints>> using `HibernateConstraintValidatorContext`.
+This is shown in example <<example-constraint-validator-setting-dynamic-payload>> where the
+`javax.validation.ConstraintValidatorContext` is unwrapped to `HibernateConstraintValidatorContext` in order to call
+`withDynamicPayload`.
+
+[[example-constraint-validator-setting-dynamic-payload]]
+.ConstraintValidator implementation setting a dynamic payload
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/dynamicpayload/ValidPassengerCountValidator.java[tags=include]
+----
+====
+
+On the constraint violation processing side, a `javax.validation.ConstraintViolation` can then in turn be
+unwrapped to `HibernateConstraintViolation` in order to retrieve the dynamic payload for further processing.
+
+[[example-retrieving-dynamic-payload]]
+.Retrieval of a ConstraintViolations's dynamic payload
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/dynamicpayload/DynamicPayloadTest.java[tags=include]
+----
+====
+
 [[non-el-message-interpolator]]
 === `ParameterMessageInterpolator`
 
@@ -438,16 +471,26 @@ custom extensions for both of these interfaces.
 `HibernateConstraintValidatorContext` is a subtype of `ConstraintValidatorContext` which allows you to:
 
 * set arbitrary parameters for interpolation via the Expression Language message interpolation
-facility (see <<section-interpolation-with-message-expressions>>)
-* obtain the `TimeProvider` for getting the current time when validating the `Future` and `@Past` constraints
-(see <<section-time-provider>>)
-
-This is useful if you for instance would like to customize the message of the `@Future` constraint.
-By default the message just is "must be in the future". <<example-custom-message-parameter>> shows
+facility using `HibernateConstraintValidatorContext#addExpressionVariable(String, Object)`.
+For an example refer to <<example-custom-message-parameter>>.
++
+[NOTE]
+====
+Note that the parameters specified via `addExpressionVariable(String, Object)` are global and apply
+for all constraint violations created by this `isValid()` invocation. This includes the default
+constraint violation, but also all violations created by the `ConstraintViolationBuilder`. You can,
+however, update the parameters between invocations of
+`ConstraintViolationBuilder#addConstraintViolation()`.
+====
+* obtain the `TimeProvider` for getting the current time when validating `@Future` and `@Past` constraints
+(see also <<section-time-provider>>).
++
+This is useful if you want to customize the message of the `@Future` constraint.
+By default the message is just "must be in the future". <<example-custom-message-parameter>> shows
 how to include the current date in order to make the message more explicit.
-
++
 [[example-custom-message-parameter]]
-.Custom `@Future` validator with message parameters
+.Custom @Future validator with message parameters
 ====
 [source, JAVA]
 ----
@@ -483,20 +526,12 @@ public class MyFutureValidator implements ConstraintValidator<Future, Date> {
 }
 ----
 ====
-
-[NOTE]
-====
-Note that the parameters specified via `addExpressionVariable(String, Object)` are global and apply
-for all constraint violations created by this `isValid()` invocation. This includes the default
-constraint violation, but also all violations created by the `ConstraintViolationBuilder`. You can,
-however, update the parameters between invocations of
-`ConstraintViolationBuilder#addConstraintViolation()`.
-====
-
++
 [WARNING]
 ====
 This functionality is currently experimental and might change in future versions.
 ====
+* set an arbitrary dynamic payload - see <<section-dynamic-payload>>
 
 ==== `HibernateMessageInterpolatorContext`
 
@@ -886,7 +921,7 @@ validator factory still is referenced by application code.
 ====
 
 [[section-time-provider]]
-=== Time providers for `@Future` and `@Past`
+=== Time providers for @Future and @Past
 
 By default the current system time is used when validating the `@Future` and `@Past` constraints.
 In some cases it can be necessary though to work with another "logical" date rather than the system time,
