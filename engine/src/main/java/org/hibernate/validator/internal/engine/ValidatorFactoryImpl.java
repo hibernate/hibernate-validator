@@ -397,29 +397,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 			TimeProvider timeProvider,
 			MethodValidationConfiguration methodValidationConfiguration) {
-
-		// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
-		// factory
-		if ( messageInterpolator instanceof ResourceBundleMessageInterpolator ) {
-			if ( missingElDependencies == null ) {
-				try {
-					run(
-							LoadClass.action(
-									"javax.el.ExpressionFactory",
-									messageInterpolator.getClass().getClassLoader(),
-									false
-							)
-					);
-					missingElDependencies = false;
-				}
-				catch ( ValidationException e ) {
-					missingElDependencies = true;
-				}
-			}
-			if ( missingElDependencies ) {
-				throw log.getMissingELDependenciesException();
-			}
-		}
+		
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
 			beanMetaDataManager = new BeanMetaDataManager(

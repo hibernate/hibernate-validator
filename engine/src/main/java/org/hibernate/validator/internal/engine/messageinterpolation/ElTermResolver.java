@@ -43,14 +43,21 @@ public class ElTermResolver implements TermResolver {
 	/**
 	 * Factory for creating EL expressions
 	 */
-	private static final ExpressionFactory expressionFactory;
+	private final ExpressionFactory expressionFactory;
 
-	static {
-		expressionFactory = ExpressionFactory.newInstance();
-	}
-	
-	public ElTermResolver(Locale locale) {
+	/**
+	 * Construct the resolver. The expression factory has to be passed in to ensure that it is
+	 * set up early and to allow for application control.
+	 * @param locale the locale.
+	 * @param expressionFactory the expression factory.
+     */
+	public ElTermResolver(Locale locale, ExpressionFactory expressionFactory) {
 		this.locale = locale;
+		/*
+		 * This call to newInstance might throw. Bad news; error is not until call to validate for case where
+		 * EL is nonfunctional. Good news; cases that don't need EL don't get any exception.
+		 */
+		this.expressionFactory = expressionFactory != null ? expressionFactory : ExpressionFactory.newInstance();
 	}
 
 	@Override
