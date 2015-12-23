@@ -23,7 +23,8 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <pax.exam.version>4.0.0</pax.exam.version>
+        <pax.exam.version>4.7.0</pax.exam.version>
+        <pax.url.version>2.4.4</pax.url.version>
         <apache.karaf.version>3.0.3</apache.karaf.version>
     </properties>
 
@@ -46,6 +47,12 @@
             <type>pom</type>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Pax Exam -->
         <dependency>
@@ -60,7 +67,8 @@
             <version>${apache.karaf.version}</version>
             <type>tar.gz</type>
             <scope>test</scope>
-            <!-- We just need the archive, without downloading its gazillion of dependencies -->
+            <!-- We just need the archive, without downloading its gazillion of dependencies.
+             mvn dependency:tree seems to say that this isn't working. -->
             <exclusions>
                 <exclusion>
                     <artifactId>*</artifactId>
@@ -83,7 +91,13 @@
         <dependency>
             <groupId>org.ops4j.pax.url</groupId>
             <artifactId>pax-url-aether</artifactId>
-            <version>1.6.0</version>
+            <version>${pax.url.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>6.0.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -100,6 +114,11 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -129,6 +148,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <reuseForks>false</reuseForks>
+                </configuration>
             </plugin>
         </plugins>
     </build>

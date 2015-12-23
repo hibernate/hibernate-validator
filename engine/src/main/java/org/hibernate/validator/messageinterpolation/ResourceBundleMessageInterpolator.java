@@ -8,6 +8,8 @@ package org.hibernate.validator.messageinterpolation;
 
 import java.util.Locale;
 
+import javax.el.ExpressionFactory;
+
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
@@ -21,6 +23,9 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  * @author Adam Stawicki
  */
 public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolator {
+
+	private ExpressionFactory expressionFactory;
+
 	public ResourceBundleMessageInterpolator() {
 		super();
 	}
@@ -44,9 +49,14 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 		super( userResourceBundleLocator, null, cachingEnabled );
 	}
 
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled, ExpressionFactory expressionFactory) {
+		super( userResourceBundleLocator, null, cachingEnabled );
+		this.expressionFactory = expressionFactory;
+	}
+
 	@Override
 	public String interpolate(Context context, Locale locale, String term) {
-		InterpolationTerm expression = new InterpolationTerm( term, locale );
+		InterpolationTerm expression = new InterpolationTerm( term, locale, expressionFactory );
 		return expression.interpolate( context );
 	}
 }
