@@ -6,10 +6,12 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderDefinedContext;
@@ -27,9 +29,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.time.TimeProvider;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
@@ -45,6 +44,7 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
+	private Object dynamicPayload;
 
 	public ConstraintValidatorContextImpl(List<String> methodParameterNames, TimeProvider timeProvider, PathImpl propertyPath,
 			ConstraintDescriptor<?> constraintDescriptor) {
@@ -94,6 +94,12 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 		return timeProvider;
 	}
 
+	@Override
+	public HibernateConstraintValidatorContext withDynamicPayload(Object violationContext) {
+		this.dynamicPayload = violationContext;
+		return this;
+	}
+
 	public final ConstraintDescriptor<?> getConstraintDescriptor() {
 		return constraintDescriptor;
 	}
@@ -113,7 +119,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 					new ConstraintViolationCreationContext(
 							getDefaultConstraintMessageTemplate(),
 							basePath,
-							parameterMapCopy
+							parameterMapCopy,
+							dynamicPayload
 					)
 			);
 		}
@@ -140,7 +147,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 					new ConstraintViolationCreationContext(
 							messageTemplate,
 							propertyPath,
-							parameterMapCopy
+							parameterMapCopy,
+							dynamicPayload
 					)
 			);
 			return ConstraintValidatorContextImpl.this;
