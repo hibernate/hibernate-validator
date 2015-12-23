@@ -11,6 +11,8 @@ import java.util.Locale;
 import javax.el.ExpressionFactory;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -24,7 +26,20 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  */
 public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolator {
 
+	private static final Log LOG = LoggerFactory.make();
+
 	private ExpressionFactory expressionFactory;
+
+	// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
+	// factory type eagerly
+	static {
+		try {
+			ExpressionFactory.class.getName();
+		}
+		catch (NoClassDefFoundError e) {
+			throw LOG.getMissingELDependenciesException();
+		}
+	}
 
 	public ResourceBundleMessageInterpolator() {
 		super();
