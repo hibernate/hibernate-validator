@@ -73,7 +73,7 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 *
 	 * Allows to set an object that may further describe the violation.
 	 *
-	 * The user is responsible himself to ensure that this violation context is serializable in case the
+	 * The user is responsible himself to ensure that this payload is serializable in case the
 	 * {@code javax.validation.ConstraintViolation} has to be serialized.
 	 *
 	 * @param payload an object representing additional information about the violation
