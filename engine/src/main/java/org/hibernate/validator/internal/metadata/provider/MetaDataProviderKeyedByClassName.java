@@ -59,7 +59,7 @@ public abstract class MetaDataProviderKeyedByClassName implements MetaDataProvid
 
 	protected static <T> BeanConfiguration<T> createBeanConfiguration(ConfigurationSource source,
 															   Class<T> beanClass,
-															   Set<? extends ConstrainedElement> constrainedElements,
+															   Set<ConstrainedElement> constrainedElements,
 															   List<Class<?>> defaultGroupSequence,
 															   DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider) {
 		return new BeanConfiguration<T>(

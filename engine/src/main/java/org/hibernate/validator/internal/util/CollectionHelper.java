@@ -53,11 +53,11 @@ public final class CollectionHelper {
 		return new HashSet<T>( size );
 	}
 
-	public static <T> HashSet<T> newHashSet(Collection<? extends T> c) {
+	public static <T> HashSet<T> newHashSet(Collection<T> c) {
 		return new HashSet<T>( c );
 	}
 
-	public static <T> HashSet<T> newHashSet(Collection<? extends T> s1, Collection<? extends T> s2) {
+	public static <T> HashSet<T> newHashSet(Collection<T> s1, Collection<T> s2) {
 		HashSet<T> set = newHashSet( s1 );
 		set.addAll( s2 );
 		return set;
