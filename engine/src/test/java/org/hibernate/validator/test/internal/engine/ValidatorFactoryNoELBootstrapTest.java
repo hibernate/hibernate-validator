@@ -11,11 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import javax.validation.Validation;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -33,18 +33,15 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 		Object validation = clazz.newInstance();
 		Method m = clazz.getMethod( "buildDefaultValidatorFactory" );
-		
-		Object validatorFactory = m.invoke( validation );
-		Method getValidatorMethod = validatorFactory.getClass().getMethod( "getValidator" );
+
 		try {
-			getValidatorMethod.invoke( validatorFactory );
+			m.invoke( validation );
 			fail( "An exception should have been thrown" );
 		}
 		catch ( InvocationTargetException e ) {
-			Exception exceptionInValidation = (Exception) e.getTargetException();
 			assertTrue(
-					exceptionInValidation.getMessage().startsWith( "HV000183" ),
-					"Bootstrapping in Validation should threw an unexpected exception: " + exceptionInValidation.getMessage()
+					getRootCause( e ).getMessage().startsWith( "HV000183" ),
+					"Bootstrapping in Validation should threw an unexpected exception: " + e.getMessage()
 			);
 		}
 	}
@@ -112,5 +109,15 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 		buffer.flush();
 		return buffer.toByteArray();
+	}
+
+	private Throwable getRootCause(Throwable throwable) {
+		while ( true ) {
+			Throwable cause = throwable.getCause();
+			if ( cause == null ) {
+				return throwable;
+			}
+			throwable = cause;
+		}
 	}
 }

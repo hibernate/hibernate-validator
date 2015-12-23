@@ -14,11 +14,11 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.spi.ConfigurationState;
 
@@ -42,7 +42,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
-import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 import org.hibernate.validator.spi.time.TimeProvider;
@@ -63,8 +62,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static final Log log = LoggerFactory.make();
-
-	private static Boolean missingElDependencies;
 
 	/**
 	 * The default message interpolator for this factory.
@@ -330,29 +327,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			boolean failFast,
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 			TimeProvider timeProvider) {
-
-		// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
-		// factory
-		if( messageInterpolator instanceof ResourceBundleMessageInterpolator ) {
-			if ( missingElDependencies == null ) {
-				try {
-					run(
-							LoadClass.action(
-									"javax.el.ExpressionFactory",
-									messageInterpolator.getClass().getClassLoader(),
-									false
-							)
-					);
-					missingElDependencies = false;
-				}
-				catch ( ValidationException e ) {
-					missingElDependencies = true;
-				}
-			}
-			if ( missingElDependencies ) {
-				throw log.getMissingELDependenciesException();
-			}
-		}
 
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {

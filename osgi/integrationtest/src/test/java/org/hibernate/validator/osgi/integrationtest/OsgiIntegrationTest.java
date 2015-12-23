@@ -11,15 +11,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+
+import javax.el.ExpressionFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.spi.ValidationProvider;
 
-import com.example.Customer;
-import com.example.ExampleConstraintValidatorFactory;
-import com.example.Order;
-import com.example.RetailOrder;
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
+import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,8 +33,11 @@ import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorConfiguration;
+import com.example.Customer;
+import com.example.CustomerDecimalMin;
+import com.example.ExampleConstraintValidatorFactory;
+import com.example.Order;
+import com.example.RetailOrder;
 
 import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.exam.CoreOptions.maven;
@@ -179,6 +184,39 @@ public class OsgiIntegrationTest {
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "Not a valid retail order name", constraintViolations.iterator().next().getMessage() );
+	}
+
+	@Test
+	public void canUseExpressionLanguageInConstraintMessage() {
+		ExpressionFactory expressionFactory = buildExpressionFactory();
+
+		Set<ConstraintViolation<CustomerDecimalMin>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+				.providerResolver( new MyValidationProviderResolver() )
+				.configure()
+				.externalClassLoader( getClass().getClassLoader() )
+				.messageInterpolator( new ResourceBundleMessageInterpolator(
+						new PlatformResourceBundleLocator( ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES ),
+						true,
+						expressionFactory )
+				)
+				.buildValidatorFactory()
+				.getValidator()
+				.validate( new CustomerDecimalMin() );
+
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "must be greater than or equal to 1.00", constraintViolations.iterator().next().getMessage() );
+	}
+
+	private ExpressionFactory buildExpressionFactory() {
+		ClassLoader oldTccl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
+
+		try {
+			return ExpressionFactory.newInstance();
+		}
+		finally {
+			Thread.currentThread().setContextClassLoader( oldTccl );
+		}
 	}
 
 	public static class MyValidationProviderResolver implements ValidationProviderResolver {
