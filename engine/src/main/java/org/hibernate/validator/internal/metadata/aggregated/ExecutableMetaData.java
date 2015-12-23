@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
@@ -33,7 +34,6 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
@@ -273,7 +273,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
-		private final MethodValidationConfiguration methodValidationConfiguration;
 
 		/**
 		 * Holds a merged representation of the configurations for one method
@@ -304,22 +303,11 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			super( beanClass, constraintHelper );
 
 			this.executableHelper = executableHelper;
-			kind = constrainedExecutable.getKind();
-			executable = constrainedExecutable.getExecutable();
-			add( constrainedExecutable );
-			this.methodValidationConfiguration = methodValidationConfiguration;
+			this.kind = constrainedExecutable.getKind();
+			this.executable = constrainedExecutable.getExecutable();
+			this.rules = new HashSet<MethodConfigurationRule>( methodValidationConfiguration.getConfiguredRuleSet() );
 
-			// Build the rules that will be enforced through the metadata created here
-			this.rules = new HashSet<MethodConfigurationRule>();
-			for ( Class<? extends MethodConfigurationRule> ruleClass : this.methodValidationConfiguration.getConfiguredRuleSet() ) {
-				MethodConfigurationRule rule = run(
-						NewInstance.action(
-								ruleClass,
-								"Method configuration rule"
-						)
-				);
-				this.rules.add( rule );
-			}
+			add( constrainedExecutable );
 		}
 
 		@Override

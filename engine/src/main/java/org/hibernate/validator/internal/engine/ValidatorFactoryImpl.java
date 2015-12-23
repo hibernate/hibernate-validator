@@ -14,6 +14,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -361,10 +362,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	TimeProvider getTimeProvider() {
 		return timeProvider;
-	}
-
-	public MethodValidationConfiguration getMethodValidationConfiguration() {
-		return this.methodValidationConfiguration;
 	}
 
 	@Override

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
@@ -174,7 +175,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.validatedValueHandlers = validatedValueHandlers;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
-		
+
 		validationOrderGenerator = new ValidationOrderGenerator();
 
 		this.accessibleMembers = new ConcurrentReferenceHashMap<Member, Member>(
@@ -331,7 +332,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( type.isAssignableFrom( Validator.class ) ) {
 			return type.cast( this );
 		}
-		
+
 		throw log.getTypeNotSupportedForUnwrappingException( type );
 	}
 

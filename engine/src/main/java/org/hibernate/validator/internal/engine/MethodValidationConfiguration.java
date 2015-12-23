@@ -17,6 +17,8 @@ import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethods
 import org.hibernate.validator.internal.metadata.aggregated.rule.ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine;
 import org.hibernate.validator.internal.metadata.aggregated.rule.VoidMethodsMustNotBeReturnValueConstrained;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 /**
  * These properties modify the behavior of the {@code }Validator} with respect to the Bean Validation
  * specification section 4.5.5. In particular:
@@ -124,24 +126,24 @@ public class MethodValidationConfiguration {
 	 *
 	 * @return a set of method configuration rules based on this configuration state
 	 */
-	public Set<Class<? extends MethodConfigurationRule>> getConfiguredRuleSet() {
-		HashSet<Class<? extends MethodConfigurationRule>> result = new HashSet<Class<? extends MethodConfigurationRule>>();
+	public Set<MethodConfigurationRule> getConfiguredRuleSet() {
+		HashSet<MethodConfigurationRule> result = newHashSet();
 
 		if ( !this.isAllowOverridingMethodAlterParameterConstraint() ) {
-			result.add( OverridingMethodMustNotAlterParameterConstraints.class );
+			result.add( new OverridingMethodMustNotAlterParameterConstraints() );
 		}
 
 		if ( !this.isAllowParallelMethodsDefineParameterConstraints() ) {
-			result.add( ParallelMethodsMustNotDefineParameterConstraints.class );
+			result.add( new ParallelMethodsMustNotDefineParameterConstraints() );
 		}
 
-		result.add( VoidMethodsMustNotBeReturnValueConstrained.class );
+		result.add( new VoidMethodsMustNotBeReturnValueConstrained() );
 
 		if ( !this.isAllowMultipleCascadedValidationOnReturnValues() ) {
-			result.add( ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine.class );
+			result.add( new ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine() );
 		}
 
-		result.add( ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue.class );
+		result.add( new ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue() );
 
 		return Collections.unmodifiableSet( result );
 	}
