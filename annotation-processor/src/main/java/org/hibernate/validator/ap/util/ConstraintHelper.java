@@ -10,18 +10,25 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import javax.lang.model.util.TypeKindVisitor6;
 import javax.lang.model.util.Types;
@@ -110,6 +117,42 @@ public class ConstraintHelper {
 		 */
 		NO_CONSTRAINT_ANNOTATION
 	}
+
+	/**
+	 * Defines the object on which a validation is targeted.
+	 */
+	public enum AnnotationProcessorValidationTarget {
+		/**
+		 * The validation targets the parameters of a method/constructor.
+		 */
+		PARAMETERS,
+
+		/**
+		 * The validation targets the value on which it is annotated or the return type of a method/constructor.
+		 */
+		ANNOTATED_ELEMENT
+	}
+
+	/**
+	 * The validation target of a constraint annotation.
+	 */
+	public enum AnnotationProcessorConstraintTarget {
+		/**
+		 * Constraint applies to the parameters of a method or a constructor.
+		 */
+		PARAMETERS,
+
+		/**
+		 * Constraint applies to the return value of a method or a constructor.
+		 */
+		RETURN_VALUE,
+
+		/**
+		 * Discover the type when no ambiguity is present if neither on a method nor a constructor.
+		 */
+		IMPLICIT
+	}
+
 
 	/**
 	 * Contains the supported types for given constraints. Keyed by constraint
@@ -362,6 +405,118 @@ public class ConstraintHelper {
 		);
 	}
 
+	/**
+	 * Resolve the actual {@code AnnotationProcessorValidationTarget} of a constraint annotation, when applied to a method/constructor.
+	 * <p>
+	 * When the annotation supports multiple {@link AnnotationProcessorValidationTarget}s (i.e. it is both cross-parameter and generic), the actual target is resolved using the
+	 * 'validationAppliesTo()' attribute of the annotation.
+	 *
+	 * @param element  the method/constructor on which the annotation is applied
+	 * @param annotation  the constraint annotation
+	 * @return the resolved {@code AnnotationProcessorValidationTarget}, null if the target cannot be inferred
+	 */
+	public AnnotationProcessorValidationTarget resolveValidationTarget(ExecutableElement element, AnnotationMirror annotation) {
+		Set<AnnotationProcessorValidationTarget> allowedTargets = getSupportedValidationTargets( annotation.getAnnotationType() );
+
+		// assume that at least one target (AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT) is present
+
+		if(allowedTargets.size()==1) {
+			return allowedTargets.toArray( new AnnotationProcessorValidationTarget[1] )[0];
+		}
+
+		AnnotationProcessorConstraintTarget constrTarget = getConstraintTarget( annotation );
+		if(constrTarget==null) {
+			return null;
+		}
+
+		switch(constrTarget) {
+		case PARAMETERS:
+			return AnnotationProcessorValidationTarget.PARAMETERS;
+		case RETURN_VALUE:
+			return AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT;
+		case IMPLICIT:
+		default:
+			return resolveImplicitValidationTarget( element );
+		}
+	}
+
+	/**
+	 * Returns the set of {@code AnnotationProcessorValidationTarget} supported by the given constraint annotation type.
+	 * <p>
+	 * A constraint annotation can support {@link AnnotationProcessorValidationTarget#ANNOTATED_ELEMENT}, {@link AnnotationProcessorValidationTarget#PARAMETERS} or both.
+	 *
+	 * @param constraintAnnotationType  the constraint annotation type
+	 * @return the set of supported {@code AnnotationProcessorValidationTarget}s
+	 */
+	public Set<AnnotationProcessorValidationTarget> getSupportedValidationTargets(DeclaredType constraintAnnotationType) {
+
+		AnnotationMirror constraintMetaAnnotation = getConstraintMetaAnnotation( constraintAnnotationType );
+		List<? extends AnnotationValue> validatorClassReferences = getValidatorClassesFromConstraintMetaAnnotation( constraintMetaAnnotation );
+
+		EnumSet<AnnotationProcessorValidationTarget> supported = EnumSet.noneOf( AnnotationProcessorValidationTarget.class );
+
+		for ( AnnotationValue oneValidatorClassReference : validatorClassReferences ) {
+			supported.addAll( getSupportedValidationTargets( oneValidatorClassReference ) );
+		}
+
+		if(supported.isEmpty()) {
+			// case of built-in validation constraints
+			supported.add( AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT );
+		}
+
+		return supported;
+	}
+
+	/**
+	 * Check that a constraint has at most one cross-parameter validator that resolves to Object or Object[].
+	 *
+	 * @param constraintAnnotationType  the constraint type
+	 * @return {@code ConstraintCheckResult#MULTIPLE_VALIDATORS_FOUND} if the constraint has more than one cross-parameter validator,
+	 * 			{@code ConstraintCheckResult#DISALLOWED} if the constraint has one cross-parameter validator with a wrong generic type,
+	 * 			{@code ConstraintCheckResult#ALLOWED} otherwise
+	 */
+	public ConstraintCheckResult checkCrossParameterTypes(DeclaredType constraintAnnotationType) {
+
+		AnnotationMirror constraintMetaAnnotation = getConstraintMetaAnnotation( constraintAnnotationType );
+		List<? extends AnnotationValue> validatorClassReferences = getValidatorClassesFromConstraintMetaAnnotation( constraintMetaAnnotation );
+
+		AnnotationValue crossParameterValidator = null;
+		for ( AnnotationValue oneValidatorClassReference : validatorClassReferences ) {
+			Set<AnnotationProcessorValidationTarget> targets = getSupportedValidationTargets( oneValidatorClassReference );
+			if( targets.contains( AnnotationProcessorValidationTarget.PARAMETERS ) ) {
+				if(crossParameterValidator!=null) {
+					return ConstraintCheckResult.MULTIPLE_VALIDATORS_FOUND;
+				}
+				crossParameterValidator = oneValidatorClassReference;
+			}
+		}
+
+		if(crossParameterValidator!=null) {
+
+			// Cross-parameter contraints must accept Object or Object[] as validated type
+			final TypeMirror objectMirror = annotationApiHelper.getMirrorForType( Object.class );
+
+			TypeMirror type = determineSupportedType( crossParameterValidator );
+			Boolean supported = type.accept( new TypeKindVisitor6<Boolean, Void>() {
+				@Override
+				public Boolean visitArray(ArrayType t, Void p) {
+					return typeUtils.isSameType( t.getComponentType(), objectMirror );
+				}
+
+				@Override
+				public Boolean visitDeclared(DeclaredType t, Void p) {
+					return typeUtils.isSameType( t, objectMirror );
+				}
+			}, null );
+
+			if(!supported) {
+				return ConstraintCheckResult.DISALLOWED;
+			}
+		}
+
+		return ConstraintCheckResult.ALLOWED;
+	}
+
 	// ==================================
 	// private API below
 	// ==================================
@@ -531,7 +686,76 @@ public class ConstraintHelper {
 		return supportedTypes;
 	}
 
+	private AnnotationProcessorValidationTarget resolveImplicitValidationTarget(ExecutableElement e) {
+
+		if(e.getParameters().isEmpty()) {
+			return AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT;
+		}
+		else if(e.getReturnType().getKind()==TypeKind.VOID) {
+			return AnnotationProcessorValidationTarget.PARAMETERS;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Determines the {@code AnnotationProcessorConstraintTarget} of the annotation.
+	 *
+	 * @param annotation the cross-parameter annotation
+	 * @return the {@code AnnotationProcessorConstraintTarget}, if it defined using the 'validationAppliesTo()' attribute of the annotation, the default value if a valid 'validationAppliesTo()' attribute is defined, or null
+	 */
+	private AnnotationProcessorConstraintTarget getConstraintTarget(AnnotationMirror annotation) {
+
+		AnnotationValue validationAppliesTo = annotationApiHelper.getAnnotationValue( annotation, "validationAppliesTo" );
+		if(validationAppliesTo==null) {
+			// validationAppliesTo not found on the annotation
+
+			for(Element e : annotation.getAnnotationType().asElement().getEnclosedElements()) {
+
+				Boolean isValidationAppliesToMethod = e.accept( new ElementKindVisitor6<Boolean, Void>() {
+					@Override
+					public Boolean visitExecutableAsMethod(ExecutableElement e, Void p) {
+						if(e.getSimpleName().contentEquals( "validationAppliesTo" )) {
+							return true;
+						}
+						return false;
+					}
+				}, null );
+
+				if(Boolean.TRUE.equals( isValidationAppliesToMethod )) {
+					// validationAppliesTo method is present, so the default value is returned (IMPLICIT)
+					return AnnotationProcessorConstraintTarget.IMPLICIT;
+				}
+			}
+
+			// cannot find the ConstraintTarget
+			return null;
+		}
+
+		return validationAppliesTo.accept(
+			new SimpleAnnotationValueVisitor6<AnnotationProcessorConstraintTarget, Void>() {
+
+				private TypeMirror constraintTargetMirror = annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.CONSTRAINT_TARGET );
+
+				@Override
+				public AnnotationProcessorConstraintTarget visitEnumConstant(VariableElement c, Void p) {
+					if(typeUtils.isSameType( c.asType(), constraintTargetMirror )) {
+						return AnnotationProcessorConstraintTarget.valueOf( c.getSimpleName().toString() );
+					}
+					return null;
+				}
+
+			}, null
+		);
+	}
+
+
 	private Set<TypeMirror> determineSupportedTypes(DeclaredType constraintAnnotationType) {
+
+		return determineSupportedTypes( constraintAnnotationType, AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT );
+	}
+
+	private Set<TypeMirror> determineSupportedTypes(DeclaredType constraintAnnotationType, AnnotationProcessorValidationTarget target) {
 
 		//the Constraint meta-annotation at the type declaration, e.g. "@Constraint(validatedBy = CheckCaseValidator.class)"
 		AnnotationMirror constraintMetaAnnotation = getConstraintMetaAnnotation( constraintAnnotationType );
@@ -545,28 +769,20 @@ public class ConstraintHelper {
 
 		for ( AnnotationValue oneValidatorClassReference : validatorClassReferences ) {
 
-			TypeMirror supportedType = getSupportedType( oneValidatorClassReference );
-			supportedTypes.add( supportedType );
+			if(isValidationTargetSupported( oneValidatorClassReference, target )) {
+				TypeMirror supportedType = determineSupportedType( oneValidatorClassReference);
+				supportedTypes.add( supportedType );
+			}
 		}
 
 		return supportedTypes;
 	}
 
-	private TypeMirror getSupportedType(AnnotationValue oneValidatorClassReference) {
-
-		TypeMirror validatorType = oneValidatorClassReference.accept(
-				new SimpleAnnotationValueVisitor6<TypeMirror, Void>() {
-
-					@Override
-					public TypeMirror visitType(TypeMirror t, Void p) {
-						return t;
-					}
-				}, null
-		);
+	private TypeMirror determineSupportedType(AnnotationValue validatorClassReference) {
 
 		// contains the bindings of the type parameters from the implemented
 		// ConstraintValidator interface, e.g. "ConstraintValidator<CheckCase, String>"
-		TypeMirror constraintValidatorImplementation = getConstraintValidatorSuperType( validatorType );
+		TypeMirror constraintValidatorImplementation = getConstraintValidatorSuperType( validatorClassReference );
 
 		return constraintValidatorImplementation.accept(
 				new TypeKindVisitor6<TypeMirror, Void>() {
@@ -581,7 +797,76 @@ public class ConstraintHelper {
 		);
 	}
 
-	private TypeMirror getConstraintValidatorSuperType(TypeMirror type) {
+	private boolean isValidationTargetSupported(AnnotationValue oneValidatorClassReference, AnnotationProcessorValidationTarget target) {
+		return getSupportedValidationTargets( oneValidatorClassReference ).contains( target );
+	}
+
+	private Set<AnnotationProcessorValidationTarget> getSupportedValidationTargets(AnnotationValue oneValidatorClassReference) {
+		// determine the class that could contain the @SupportedValidationTarget annotation.
+		TypeMirror validatorClass = oneValidatorClassReference.accept(
+				new SimpleAnnotationValueVisitor6<TypeMirror, Void>() {
+
+					@Override
+					public TypeMirror visitType(TypeMirror t, Void p) {
+						return t;
+					}
+				}, null
+		);
+
+		DeclaredType validatorType = validatorClass.accept( new TypeKindVisitor6<DeclaredType, Void>() {
+			@Override
+			public DeclaredType visitDeclared(DeclaredType t, Void p) {
+				return t;
+			}
+		}, null );
+
+		DeclaredType supportedValidationTargetType = annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.SUPPORTED_VALIDATION_TARGET );
+
+		AnnotationMirror supportedTargetDecl = null;
+
+		for(AnnotationMirror mirr : validatorType.asElement().getAnnotationMirrors()) {
+			if(typeUtils.isSameType( mirr.getAnnotationType(), supportedValidationTargetType )) {
+				supportedTargetDecl = mirr;
+				break;
+			}
+		}
+
+		EnumSet<AnnotationProcessorValidationTarget> allowedTargets = EnumSet.noneOf( AnnotationProcessorValidationTarget.class );
+
+		if(supportedTargetDecl==null) {
+			// If @SupportedValidationTarget is not present, the ConstraintValidator targets the (returned) element annotated by the constraint.
+			allowedTargets.add( AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT );
+		}
+		else {
+			List<? extends AnnotationValue> values = annotationApiHelper.getAnnotationArrayValue( supportedTargetDecl, "value" );
+			for(AnnotationValue val : values) {
+				AnnotationProcessorValidationTarget target = val.accept( new SimpleAnnotationValueVisitor6<AnnotationProcessorValidationTarget, Void>() {
+					@Override
+					public AnnotationProcessorValidationTarget visitEnumConstant(VariableElement c, Void p) {
+						return AnnotationProcessorValidationTarget.valueOf( c.getSimpleName().toString() );
+					}
+				}, null );
+
+				allowedTargets.add( target );
+			}
+
+		}
+
+		return allowedTargets;
+	}
+
+
+	private TypeMirror getConstraintValidatorSuperType(AnnotationValue oneValidatorClassReference) {
+
+		TypeMirror type = oneValidatorClassReference.accept(
+				new SimpleAnnotationValueVisitor6<TypeMirror, Void>() {
+
+					@Override
+					public TypeMirror visitType(TypeMirror t, Void p) {
+						return t;
+					}
+				}, null
+		);
 
 		List<? extends TypeMirror> superTypes = typeUtils.directSupertypes( type );
 		List<TypeMirror> nextSuperTypes = CollectionHelper.newArrayList();
@@ -602,7 +887,7 @@ public class ConstraintHelper {
 		}
 
 		//HV-293: Actually this should never happen, as we can have only ConstraintValidator implementations
-		//here. The Eclipse JSR 269 implementation unfortunately doesn't always create the type hierarchy 
+		//here. The Eclipse JSR 269 implementation unfortunately doesn't always create the type hierarchy
 		//properly though.
 		//TODO GM: create and report an isolated test case
 		throw new IllegalStateException( "Expected type " + type + " to implement javax.validation.ConstraintValidator, but it doesn't." );

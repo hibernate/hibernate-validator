@@ -37,13 +37,8 @@ public class GetterCheck extends AbstractConstraintCheck {
 					)
 			);
 		}
-		else if ( !hasReturnValue( element ) ) {
-			return CollectionHelper.asSet(
-					new ConstraintCheckError(
-							element, annotation, "ONLY_NON_VOID_METHODS_MAY_BE_ANNOTATED"
-					)
-			);
-		}
+		
+		// HV-864: void methods support cross-parameter constraints. We do not enforce the check here.
 
 		return Collections.emptySet();
 	}
