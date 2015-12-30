@@ -20,6 +20,7 @@ public class TypeNames {
 		public static final String JAVAX_VALIDATION = "javax.validation";
 
 		public static final String CONSTRAINT = JAVAX_VALIDATION + ".Constraint";
+		public static final String CONSTRAINT_TARGET = JAVAX_VALIDATION + ".ConstraintTarget";
 		public static final String CONSTRAINT_VALIDATOR = JAVAX_VALIDATION + ".ConstraintValidator";
 		public static final String GROUP_SEQUENCE = JAVAX_VALIDATION + ".GroupSequence";
 		public static final String PAYLOAD = JAVAX_VALIDATION + ".Payload";
@@ -40,6 +41,10 @@ public class TypeNames {
 		public static final String PAST = JAVAX_VALIDATION_CONSTRAINTS + ".Past";
 		public static final String PATTERN = JAVAX_VALIDATION_CONSTRAINTS + ".Pattern";
 		public static final String SIZE = JAVAX_VALIDATION_CONSTRAINTS + ".Size";
+
+		public static final String CONSTRAINTVALIDATION = "javax.validation.constraintvalidation";
+
+		public static final String SUPPORTED_VALIDATION_TARGET = CONSTRAINTVALIDATION + ".SupportedValidationTarget";
 	}
 
 	public static class HibernateValidatorTypes {

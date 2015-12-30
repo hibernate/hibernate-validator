@@ -6,10 +6,13 @@
  */
 package org.hibernate.validator.ap;
 
-import java.io.File;
-import javax.tools.Diagnostic.Kind;
+import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
-import org.testng.annotations.Test;
+import java.io.File;
+
+import javax.tools.Diagnostic.Kind;
 
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalRetentionPolicies;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithIllegalTargets;
@@ -19,10 +22,21 @@ import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithWrong
 import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithoutValidator;
 import org.hibernate.validator.ap.testmodel.constrainttypes.DummyValidator;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ValidCustomerNumber;
+import org.hibernate.validator.ap.testmodel.crossparameters.DoubleValidatorConstraint;
+import org.hibernate.validator.ap.testmodel.crossparameters.GenericCrossParameterValidator;
+import org.hibernate.validator.ap.testmodel.crossparameters.GenericCrossParameterValidatorObjectArray;
+import org.hibernate.validator.ap.testmodel.crossparameters.GenericNormalValidator;
+import org.hibernate.validator.ap.testmodel.crossparameters.DoubleValidatorDummyValidator;
+import org.hibernate.validator.ap.testmodel.crossparameters.InvalidValidator;
+import org.hibernate.validator.ap.testmodel.crossparameters.InvalidValidatorConstraint;
+import org.hibernate.validator.ap.testmodel.crossparameters.ValidCrossParameterAndNormalConstraint;
+import org.hibernate.validator.ap.testmodel.crossparameters.ValidCrossParameterConstraint;
+import org.hibernate.validator.ap.testmodel.crossparameters.ValidCrossParameterConstraintWithObjectArrayValidator;
+import org.hibernate.validator.ap.testmodel.crossparameters.WrongValidationAppliesToConstraintWithInvalidDefault;
+import org.hibernate.validator.ap.testmodel.crossparameters.WrongValidationAppliesToConstraintWithInvalidReturnType;
+import org.hibernate.validator.ap.testmodel.crossparameters.WrongValidationAppliesToConstraintWithMissingAttribute;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
-
-import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
-import static org.testng.Assert.assertFalse;
+import org.testng.annotations.Test;
 
 /**
  * Test cases for {@link ConstraintValidationProcessor} testing the checking of constraint
@@ -153,6 +167,116 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				new DiagnosticExpectation( Kind.ERROR, 117 ),
 				new DiagnosticExpectation( Kind.ERROR, 132 )
 		);
+	}
+	
+	@Test
+	public void testThatConstraintAnnotationWithMultipleCrossParameterValidatorsCausesCompilationError() {
+
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( DoubleValidatorConstraint.class ),
+				compilerHelper.getSourceFile( GenericCrossParameterValidator.class ),
+				compilerHelper.getSourceFile( DoubleValidatorDummyValidator.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 23 )
+		);
+	}
+	
+	@Test
+	public void testThatConstraintAnnotationWithInvalidCrossParameterValidatorsCausesCompilationError() {
+
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( InvalidValidatorConstraint.class ),
+				compilerHelper.getSourceFile( InvalidValidator.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 23 )
+		);
+	}
+	
+	@Test
+	public void testThatCrossParameterConstraintWithInvalidDefaultInValidationAppliesToCausesCompilationError() {
+
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( WrongValidationAppliesToConstraintWithInvalidDefault.class ),
+				compilerHelper.getSourceFile( GenericCrossParameterValidator.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 24 )
+		);
+	}
+	
+	@Test
+	public void testThatCrossParameterConstraintWithInvalidReturnTypeInValidationAppliesToCausesCompilationError() {
+
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( WrongValidationAppliesToConstraintWithInvalidReturnType.class ),
+				compilerHelper.getSourceFile( GenericCrossParameterValidator.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 23 )
+		);
+	}
+	
+	@Test
+	public void testThatCrossParameterConstraintWithoutRequiredValidationAppliesToCausesCompilationError() {
+
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( WrongValidationAppliesToConstraintWithMissingAttribute.class ),
+				compilerHelper.getSourceFile( GenericCrossParameterValidator.class ),
+				compilerHelper.getSourceFile( GenericNormalValidator.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 26 )
+		);
+	}
+	
+	@Test
+	public void testThatValidCrossParameterConstraintsAreCompiledCorrectly() {
+
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ValidCrossParameterConstraint.class ),
+				compilerHelper.getSourceFile( ValidCrossParameterConstraintWithObjectArrayValidator.class ),
+				compilerHelper.getSourceFile( ValidCrossParameterAndNormalConstraint.class ),
+				compilerHelper.getSourceFile( GenericCrossParameterValidator.class ),
+				compilerHelper.getSourceFile( GenericCrossParameterValidatorObjectArray.class ),
+				compilerHelper.getSourceFile( GenericNormalValidator.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+
+		assertTrue( compilationResult );
 	}
 
 }

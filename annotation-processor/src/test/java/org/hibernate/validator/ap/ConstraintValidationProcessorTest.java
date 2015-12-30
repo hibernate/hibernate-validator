@@ -6,12 +6,15 @@
  */
 package org.hibernate.validator.ap;
 
+import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.io.File;
 import java.util.EnumSet;
+
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
@@ -39,6 +42,12 @@ import org.hibernate.validator.ap.testmodel.composedconstraint2.ComposingConstra
 import org.hibernate.validator.ap.testmodel.composedconstraint2.ComposingConstraint2ValidatorForCalendar;
 import org.hibernate.validator.ap.testmodel.composedconstraint2.ComposingConstraint2ValidatorForCollection;
 import org.hibernate.validator.ap.testmodel.composedconstraint2.FieldLevelValidationUsingComplexComposedConstraint;
+import org.hibernate.validator.ap.testmodel.crossparameters.GenericCrossParameterValidator;
+import org.hibernate.validator.ap.testmodel.crossparameters.GenericCrossParameterValidatorObjectArray;
+import org.hibernate.validator.ap.testmodel.crossparameters.GenericNormalValidator;
+import org.hibernate.validator.ap.testmodel.crossparameters.MethodLevelValidationUsingCrossParameterConstraints;
+import org.hibernate.validator.ap.testmodel.crossparameters.ValidCrossParameterAndNormalConstraint;
+import org.hibernate.validator.ap.testmodel.crossparameters.ValidCrossParameterConstraint;
 import org.hibernate.validator.ap.testmodel.customconstraints.CaseMode;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCase;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCaseValidator;
@@ -63,10 +72,7 @@ import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeVali
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSet;
 import org.hibernate.validator.ap.testutil.CompilerTestHelper.Library;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
-
-import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * Miscellaneous tests for {@link ConstraintValidationProcessor}.
@@ -541,5 +547,29 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		);
 
 		assertTrue( compilationResult, "Java 8 date/time API types fails at @Future/@Past." );
+	}
+	
+	@Test
+	public void crossParameterConstraintsAllowed() {
+
+		File[] sourceFiles = new File[] {
+				compilerHelper.getSourceFile( ValidCrossParameterAndNormalConstraint.class ),
+				compilerHelper.getSourceFile( ValidCrossParameterConstraint.class ),
+				compilerHelper.getSourceFile( MethodLevelValidationUsingCrossParameterConstraints.class ),
+				compilerHelper.getSourceFile( GenericCrossParameterValidatorObjectArray.class ),
+				compilerHelper.getSourceFile( GenericCrossParameterValidator.class ),
+				compilerHelper.getSourceFile( GenericNormalValidator.class )
+		};
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 41 ),
+				new DiagnosticExpectation( Kind.ERROR, 63 )
+		);
+		
 	}
 }
