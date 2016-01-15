@@ -1,6 +1,31 @@
 Hibernate Validator Changelog
 =============================
 
+5.3.0.Alpha1 (15.01.2016)
+-------------------------
+
+** New Feature
+    * [HV-872] - Implement optional relaxation of parameter validation consistent with Section 4.5.5
+    * [HV-1020] - ConstraintValidatorContext should allow to attach arbitrary context information to a ConstrainViolation
+
+** Bug
+    * [HV-864] - Cross-parameter constraint is disallowed by Annotation Processor
+    * [HV-1019] - Copying PathImpl results in hashCode==0
+    * [HV-1022] - Validator.validateValue does not work for JDK-8 TYPE_USE annotations
+    * [HV-1023] - Validator fails with Google App Engine due to use of restricted class java.util.ResourceBundle.Control
+    * [HV-1025] - Configuration streams not reusable on IBM JVM
+    * [HV-1035] - Wrong messages in Korean for NotNull and Null
+
+** Task
+    * [HV-1041] - Upgrade to jaxb2-maven-plugin 2.2
+    * [HV-1045] - Use WildFly 10.0.0.CR5 for integration tests and update to JodaTime 2.7
+
+** Improvement
+    * [HV-1021] - Monitor contention at ValidatorFactoryImpl
+    * [HV-1026] - Exceptions during execution of LoadClass don't provide enough context
+    * [HV-1037] - General code quality improvements
+    * [HV-1039] - Improve OSGi integration addressing class loading issues
+
 5.2.2.Final (29.09.2015)
 -------------------------
 
