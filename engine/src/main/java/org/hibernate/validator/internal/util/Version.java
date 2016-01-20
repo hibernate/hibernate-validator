@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.internal.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
@@ -13,6 +16,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2012 SERLI
  */
 public final class Version {
+	private static final Pattern JAVA_VERSION_PATTERN = Pattern.compile( "^(?:1\\.)?(\\d+)$" );
 	static {
 		LoggerFactory.make().version( getVersionString() );
 	}
@@ -30,10 +34,18 @@ public final class Version {
 	 * @return the Java release as an integer (e.g. 8 for Java 8)
 	 */
 	public static int getJavaRelease() {
-		// Will return something like 1.8
-		String[] specificationVersion = System.getProperty( "java.specification.version" ).split( "\\." );
+		// Will return something like 1.8 or 9
+		String vmVersionStr = System.getProperty( "java.specification.version" );
 
-		return Integer.parseInt( specificationVersion[1] );
+		Matcher matcher = JAVA_VERSION_PATTERN.matcher( vmVersionStr );  //match 1.<number> or <number>
+
+		if ( matcher.find() ) {
+			return Integer.valueOf( matcher.group( 1 ) );
+		}
+		else {
+			throw new RuntimeException("Unknown version of jvm " + vmVersionStr);
+		}
+
 	}
 
 	// helper class should not have a public constructor

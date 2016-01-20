@@ -114,3 +114,10 @@ grant codeBase "file:${localRepository}/org/apache/maven/surefire/-" {
     permission java.security.AllPermission;
 };
 
+
+/* ============= */
+/* jdk internal  */
+/* ============= */
+grant {
+    permission java.lang.RuntimePermission "accessClassInPackage.jdk.internal";
+};
