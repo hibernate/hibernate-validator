@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.GroupSequence;
 import javax.validation.ParameterNameProvider;
 import javax.validation.Valid;
@@ -564,6 +565,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	protected <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
 			A annotation,
 			ElementType type) {
+		// HV-1049 Methods of java.lang.Object (and potentially other JDK classes) are annotated with annotations such
+		// as jdk.internal.HotSpotIntrinsicCandidate on JDK 9; They cannot be constraint annotation so skip them right
+		// here, as for the proper check we'd need package access permission for "jdk.internal"
+		if ( annotation.annotationType().getPackage().getName().equals( "jdk.internal" ) ) {
+			return Collections.emptyList();
+		}
+
 		List<ConstraintDescriptorImpl<?>> constraintDescriptors = newArrayList();
 
 		List<Annotation> constraints = newArrayList();
