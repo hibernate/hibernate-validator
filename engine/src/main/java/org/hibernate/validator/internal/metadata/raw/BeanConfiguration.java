@@ -9,9 +9,8 @@ package org.hibernate.validator.internal.metadata.raw;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Represents the complete constraint related configuration of one Java type
@@ -54,7 +53,7 @@ public class BeanConfiguration<T> {
 
 		this.source = source;
 		this.beanClass = beanClass;
-		this.constrainedElements = newHashSet( constrainedElements );
+		this.constrainedElements = CollectionHelper.<ConstrainedElement>newHashSet( constrainedElements );
 		this.defaultGroupSequence = defaultGroupSequence;
 		this.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
 	}

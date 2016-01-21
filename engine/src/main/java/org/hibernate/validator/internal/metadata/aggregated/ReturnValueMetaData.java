@@ -59,7 +59,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 		);
 
 		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
-		this.cascadables = Collections.unmodifiableList( isCascading ? Arrays.asList( this ) : Collections.<Cascadable>emptyList() );
+		this.cascadables = Collections.unmodifiableList( isCascading ? Arrays.<Cascadable>asList( this ) : Collections.<Cascadable>emptyList() );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}

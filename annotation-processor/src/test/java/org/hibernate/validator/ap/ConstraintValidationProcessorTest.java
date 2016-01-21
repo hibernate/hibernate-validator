@@ -6,10 +6,6 @@
  */
 package org.hibernate.validator.ap;
 
-import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
 import java.io.File;
 import java.util.EnumSet;
 
@@ -74,6 +70,10 @@ import org.hibernate.validator.ap.testutil.CompilerTestHelper.Library;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 import org.testng.annotations.Test;
 
+import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 /**
  * Miscellaneous tests for {@link ConstraintValidationProcessor}.
  *
@@ -101,7 +101,6 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 	 */
 	@Test
 	public void hibernateValidatorProvidedCustomConstraints() {
-
 		File sourceFile = compilerHelper.getSourceFile( HibernateValidatorProvidedCustomConstraints.class );
 
 		boolean compilationResult =
@@ -110,7 +109,6 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 54 ),
 				new DiagnosticExpectation( Kind.ERROR, 55 ),
 				new DiagnosticExpectation( Kind.ERROR, 56 ),
 				new DiagnosticExpectation( Kind.ERROR, 57 ),
@@ -124,8 +122,8 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 65 ),
 				new DiagnosticExpectation( Kind.ERROR, 66 ),
 				new DiagnosticExpectation( Kind.ERROR, 67 ),
-				new DiagnosticExpectation( Kind.ERROR, 68 )
-
+				new DiagnosticExpectation( Kind.ERROR, 68 ),
+				new DiagnosticExpectation( Kind.ERROR, 69 )
 		);
 	}
 
@@ -532,8 +530,8 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 49 ),
-				new DiagnosticExpectation( Kind.ERROR, 50 )
+				new DiagnosticExpectation( Kind.ERROR, 50 ),
+				new DiagnosticExpectation( Kind.ERROR, 51 )
 		);
 	}
 
@@ -548,7 +546,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 
 		assertTrue( compilationResult, "Java 8 date/time API types fails at @Future/@Past." );
 	}
-	
+
 	@Test
 	public void crossParameterConstraintsAllowed() {
 
@@ -570,6 +568,6 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 41 ),
 				new DiagnosticExpectation( Kind.ERROR, 63 )
 		);
-		
+
 	}
 }
