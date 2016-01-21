@@ -17,16 +17,17 @@ import org.joda.time.LocalDate;
 import org.joda.time.ReadableInstant;
 import org.joda.time.ReadablePartial;
 
+@SuppressWarnings("deprecation")
 public class ModelWithJodaTypes {
 
 	@Past
 	@Future
 	public Date jdkDate;
-	
+
 	@Past
 	@Future
 	public GregorianCalendar jdkCalendar;
-	
+
 	@Past
 	@Future
 	public ReadableInstant jodaInstant;
@@ -34,7 +35,7 @@ public class ModelWithJodaTypes {
 	@Past
 	@Future
 	public DateMidnight jodaDateMidnight;
-	
+
 	@Past
 	@Future
 	public ReadablePartial jodaPartial;
@@ -42,12 +43,12 @@ public class ModelWithJodaTypes {
 	@Past
 	@Future
 	public LocalDate jodaLocalDate;
-	
+
 	/**
 	 * Not allowed.
 	 */
 	@Future
 	@Past
 	public String string;
-	
+
 }

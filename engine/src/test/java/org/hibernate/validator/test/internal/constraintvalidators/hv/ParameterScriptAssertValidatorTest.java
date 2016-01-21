@@ -10,15 +10,15 @@ import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.executable.ExecutableValidator;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
@@ -78,10 +78,10 @@ public class ParameterScriptAssertValidatorTest {
 	public void shouldValidateParameterScriptAssertConstraintOnConstructor() throws Exception {
 		ExecutableValidator executableValidator = getValidator().forExecutables();
 
-		Constructor<?> constructor = CalendarServiceImpl.class.getConstructor( String.class );
+		Constructor<CalendarServiceImpl> constructor = CalendarServiceImpl.class.getConstructor( String.class );
 		Object[] parameterValues = new Object[] { "Foo" };
 
-		Set<ConstraintViolation<Object>> violations = executableValidator.validateConstructorParameters(
+		Set<ConstraintViolation<CalendarServiceImpl>> violations = executableValidator.validateConstructorParameters(
 				constructor,
 				parameterValues
 		);
