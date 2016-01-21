@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
@@ -17,8 +18,16 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public final class Version {
 	private static final Pattern JAVA_VERSION_PATTERN = Pattern.compile( "^(?:1\\.)?(\\d+)$" );
+
+	private static Log LOG = LoggerFactory.make();
+
+	/**
+	 * "java.specification.version" will have a value like 1.8 or 9
+	 */
+	private static int JAVA_RELEASE = determineJavaRelease( System.getProperty( "java.specification.version" ) );
+
 	static {
-		LoggerFactory.make().version( getVersionString() );
+		LOG.version( getVersionString() );
 	}
 
 	public static String getVersionString() {
@@ -34,18 +43,21 @@ public final class Version {
 	 * @return the Java release as an integer (e.g. 8 for Java 8)
 	 */
 	public static int getJavaRelease() {
-		// Will return something like 1.8 or 9
-		String vmVersionStr = System.getProperty( "java.specification.version" );
+		return JAVA_RELEASE;
+	}
 
-		Matcher matcher = JAVA_VERSION_PATTERN.matcher( vmVersionStr );  //match 1.<number> or <number>
+	public static int determineJavaRelease(String specificationVersion) {
+		if ( specificationVersion != null && !specificationVersion.trim().isEmpty() ) {
+			Matcher matcher = JAVA_VERSION_PATTERN.matcher( specificationVersion );  //match 1.<number> or <number>
 
-		if ( matcher.find() ) {
-			return Integer.valueOf( matcher.group( 1 ) );
+			if ( matcher.find() ) {
+				return Integer.valueOf( matcher.group( 1 ) );
+			}
 		}
-		else {
-			throw new RuntimeException("Unknown version of jvm " + vmVersionStr);
-		}
 
+		// Cannot determine Java version; Assuming 1.6, not enabling the 1.8-only features
+		LOG.unknownJvmVersion( specificationVersion );
+		return 6;
 	}
 
 	// helper class should not have a public constructor

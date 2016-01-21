@@ -13,6 +13,7 @@ import java.lang.reflect.TypeVariable;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintTarget;
@@ -23,14 +24,13 @@ import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.xml.stream.XMLStreamException;
 
+import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
-
-import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
-import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.INFO;
@@ -636,4 +636,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 191, value = "Error creating unwrapper: %s")
 	ValidationException validatedValueUnwrapperCannotBeCreated(String className, @Cause Exception e);
+
+	@LogMessage(level = WARN)
+	@Message(id = 192, value = "Couldn't determine Java version from value %1s; Not enabling features requiring Java 8")
+	void unknownJvmVersion(String vmVersionStr);
 }
