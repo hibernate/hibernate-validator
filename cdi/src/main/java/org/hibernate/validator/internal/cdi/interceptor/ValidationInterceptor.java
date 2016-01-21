@@ -11,6 +11,7 @@ import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Set;
+
 import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.interceptor.AroundConstruct;
@@ -104,7 +105,7 @@ public class ValidationInterceptor implements Serializable {
 	@AroundConstruct
 	public void validateConstructorInvocation(InvocationContext ctx) throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
-		Set<ConstraintViolation<Object>> violations = executableValidator.validateConstructorParameters(
+		Set<? extends ConstraintViolation<?>> violations = executableValidator.validateConstructorParameters(
 				ctx.getConstructor(),
 				ctx.getParameters()
 		);

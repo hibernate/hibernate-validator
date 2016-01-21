@@ -58,7 +58,7 @@ public final class CollectionHelper {
 	}
 
 	public static <T> HashSet<T> newHashSet(Collection<? extends T> s1, Collection<? extends T> s2) {
-		HashSet<T> set = newHashSet( s1 );
+		HashSet<T> set = CollectionHelper.<T>newHashSet( s1 );
 		set.addAll( s2 );
 		return set;
 	}
