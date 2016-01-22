@@ -68,7 +68,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 	// HV-363 - library internal classes are loaded via Class.forName first
 	private Class<?> loadClassInValidatorNameSpace() {
 		final ClassLoader loader = HibernateValidator.class.getClassLoader();
-		final Exception exception;
+		Exception exception;
 		try {
 			return Class.forName( className, true, HibernateValidator.class.getClassLoader() );
 		}
