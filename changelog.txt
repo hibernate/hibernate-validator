@@ -1,6 +1,22 @@
 Hibernate Validator Changelog
 =============================
 
+5.2.3.Final (27.01.2016)
+------------------------
+
+** Bug
+    * [HV-1019] - Copying PathImpl results in hashCode==0
+    * [HV-1022] - Validator.validateValue does not work for JDK-8 TYPE_USE annotations
+    * [HV-1023] - Validator fails with Google App Engine due to use of restricted class java.util.ResourceBundle.Control
+    * [HV-1025] - Configuration streams not reusable on IBM JVM
+    * [HV-1035] - Wrong messages in Korean for NotNull and Null
+    * [HV-1048] - Correctly interpret version string returned by JDK 9
+    * [HV-1049] - Don't access annotations from "jdk.internal" package
+
+** Task
+    * [HV-1045] - Use WildFly 10.0.0.CR5 for integration tests and update to JodaTime 2.7
+
+
 5.2.2.Final (29.09.2015)
 -------------------------
 
