@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.internal.util.logging;
 
-import org.jboss.logging.Message;
-import org.jboss.logging.MessageBundle;
+import org.jboss.logging.annotations.Message;
+import org.jboss.logging.annotations.MessageBundle;
 
 /**
  * @author Hardy Ferentschik

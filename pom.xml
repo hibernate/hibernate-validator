@@ -93,7 +93,7 @@
         <slf4j.version>1.7.2</slf4j.version>
         <jboss.logging.version>3.3.0.Final</jboss.logging.version>
         <javax.el.version>2.2.4</javax.el.version>
-        <jboss.logging.processor.version>1.2.0.Final</jboss.logging.processor.version>
+        <jboss.logging.processor.version>2.0.1.Final</jboss.logging.processor.version>
     </properties>
 
     <prerequisites>
