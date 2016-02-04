@@ -1,3 +1,4 @@
+
 /*
 * JBoss, Home of Professional Open Source
 * Copyright 2012, Red Hat, Inc. and/or its affiliates, and individual contributors
@@ -20,15 +21,13 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertNotSame;
 import static org.testng.Assert.fail;
@@ -49,8 +48,8 @@ public class BeanMetaDataManagerTest {
 		int totalCreatedMetaDataInstances = 0;
 		int cachedBeanMetaDataInstances = 0;
 		for ( int i = 0; i < MAX_ENTITY_COUNT; i++ ) {
-			Class<?> c = new CustomClassLoader( Fubar.class.getName() ).loadClass( Fubar.class.getName() );
-			BeanMetaData meta = metaDataManager.getBeanMetaData( c );
+			Class<?> c = new CustomClassLoader().loadClass( Engine.class.getName() );
+			BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );
 			assertNotSame( meta.getBeanClass(), lastIterationsBean, "The classes should differ in each iteration" );
 			lastIterationsBean = meta.getBeanClass();
 			totalCreatedMetaDataInstances++;
@@ -69,22 +68,21 @@ public class BeanMetaDataManagerTest {
 		}
 	}
 
-	@SuppressWarnings("unused")
-	public static class Fubar {
-		@NotNull
-		Object o;
-	}
-
 	public class CustomClassLoader extends ClassLoader {
-		private final String className;
 
-		public CustomClassLoader(String className) {
+		/**
+		 * Classes from this name space will be loaded by this class loader, all
+		 * others will be loaded by the default loader.
+		 */
+		private static final String PACKAGE_PREFIX = "org.hibernate.validator.test";
+
+		public CustomClassLoader() {
 			super( CustomClassLoader.class.getClassLoader() );
-			this.className = className;
 		}
 
-		public Class loadClass(String className) throws ClassNotFoundException {
-			if ( this.className.equals( className ) ) {
+		@Override
+		public Class<?> loadClass(String className) throws ClassNotFoundException {
+			if ( className.startsWith( PACKAGE_PREFIX ) ) {
 				return myLoadClass( className, true );
 			}
 			else {
@@ -94,7 +92,7 @@ public class BeanMetaDataManagerTest {
 
 		protected Class<?> myLoadClass(String name, boolean resolve) throws ClassNotFoundException {
 			// make sure there is no parent delegation, instead call custom findClass
-			Class c = myFindClass( name );
+			Class<?> c = myFindClass( name );
 
 			if ( resolve ) {
 				resolveClass( c );
@@ -102,14 +100,13 @@ public class BeanMetaDataManagerTest {
 			return c;
 		}
 
-		public Class myFindClass(String className) {
-			byte classByte[];
-			Class result;
+		public Class<?> myFindClass(String className) {
+			byte[] classByte;
+			Class<?> result;
 
 			try {
 				String classPath = ClassLoader.getSystemResource(
-						className.replace( '.', File.separatorChar )
-								+ ".class"
+						className.replace( '.', '/' ) + ".class"
 				).getFile();
 				classByte = loadClassData( classPath );
 				result = defineClass( className, classByte, 0, classByte.length, null );
@@ -124,7 +121,7 @@ public class BeanMetaDataManagerTest {
 			File f;
 			f = new File( className );
 			int size = (int) f.length();
-			byte buff[] = new byte[size];
+			byte[] buff = new byte[size];
 			FileInputStream fis = new FileInputStream( f );
 			DataInputStream dis = new DataInputStream( fis );
 			dis.readFully( buff );
@@ -133,5 +130,3 @@ public class BeanMetaDataManagerTest {
 		}
 	}
 }
-
-
