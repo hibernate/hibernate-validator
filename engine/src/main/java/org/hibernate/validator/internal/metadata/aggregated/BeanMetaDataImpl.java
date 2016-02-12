@@ -10,7 +10,6 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +61,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private static final Log log = LoggerFactory.make();
+
+	/**
+	 * Represents the "sequence" of just Default.class.
+	 */
+	private static final List<Class<?>> DEFAULT_GROUP_SEQUENCE = Collections.<Class<?>>singletonList( Default.class );
 
 	/**
 	 * The root bean class for this meta data.
@@ -340,7 +344,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			setDefaultGroupSequence( defaultGroupSequence );
 		}
 		else {
-			setDefaultGroupSequence( Arrays.<Class<?>>asList( beanClass ) );
+			this.defaultGroupSequence = DEFAULT_GROUP_SEQUENCE;
 		}
 	}
 
