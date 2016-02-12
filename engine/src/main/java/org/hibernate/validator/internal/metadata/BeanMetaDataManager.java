@@ -9,10 +9,12 @@ package org.hibernate.validator.internal.metadata;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+
 import javax.validation.ParameterNameProvider;
 
-import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
+import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
@@ -89,13 +91,15 @@ public class BeanMetaDataManager {
 	 */
 	private final ExecutableHelper executableHelper;
 
+	private final ValidationOrderGenerator validationOrderGenerator = new ValidationOrderGenerator();
+
 	/**
 	 * the three properties in this field affect the invocation of rules associated to section 4.5.5
 	 * of the V1.1 specification.  By default they are all false, if true they allow
 	 * for relaxation of the Liskov Substitution Principal.
 	 */
 	private final MethodValidationConfiguration methodValidationConfiguration;
-	
+
 	/**
 	 * Creates a new {@code BeanMetaDataManager}. {@link DefaultParameterNameProvider} is used as parameter name
 	 * provider, no meta data providers besides the annotation-based providers are used.
@@ -125,7 +129,7 @@ public class BeanMetaDataManager {
 				new MethodValidationConfiguration()
 		);
 	}
-	
+
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
 			ExecutableHelper executableHelper,
 			ParameterNameProvider parameterNameProvider,
@@ -137,7 +141,7 @@ public class BeanMetaDataManager {
 		this.executableHelper = executableHelper;
 
 		this.methodValidationConfiguration = methodValidationConfiguration;
-		
+
 		this.beanMetaDataCache = new ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>>(
 				DEFAULT_INITIAL_CAPACITY,
 				DEFAULT_LOAD_FACTOR,
@@ -192,8 +196,8 @@ public class BeanMetaDataManager {
 	 * @return A bean meta data object for the given type.
 	 */
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
-		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( 
-				constraintHelper, executableHelper, clazz, methodValidationConfiguration);
+		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance(
+				constraintHelper, executableHelper, validationOrderGenerator, clazz, methodValidationConfiguration);
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {

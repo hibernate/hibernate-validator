@@ -38,8 +38,8 @@ import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
-import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
 import org.hibernate.validator.internal.engine.groups.Group;
+import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
@@ -468,7 +468,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		for ( Class<? super U> clazz : beanMetaData.getClassHierarchy() ) {
 			BeanMetaData<? super U> hostingBeanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
-			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+			Iterator<Sequence> defaultGroupSequence = hostingBeanMetaData.getDefaultValidationSequence( valueContext.getCurrentBean() );
+
 			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 
 			// if the current class redefined the default group sequence, this sequence has to be applied to all the class hierarchy.
@@ -477,31 +478,37 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			PathImpl currentPath = valueContext.getPropertyPath();
-			for ( Class<?> defaultSequenceMember : defaultGroupSequence ) {
-				valueContext.setCurrentGroup( defaultSequenceMember );
-				boolean validationSuccessful = true;
-				for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
-					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
-					// time. An interface can define more than one constraint, we have to check the class we are validating.
-					final Class<?> declaringClass = metaConstraint.getLocation().getDeclaringClass();
-					if ( declaringClass.isInterface() ) {
-						Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
-						if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
-							continue;
-						}
-						validatedInterfaces.put( declaringClass, clazz );
-					}
 
-					boolean tmp = validateConstraint( validationContext, valueContext, false, metaConstraint );
-					if ( shouldFailFast( validationContext ) ) {
-						return;
+			while ( defaultGroupSequence.hasNext() ) {
+				for ( GroupWithInheritance groupOfGroups : defaultGroupSequence.next() ) {
+					boolean validationSuccessful = true;
+
+					for ( Group defaultSequenceMember : groupOfGroups ) {
+						valueContext.setCurrentGroup( defaultSequenceMember.getDefiningClass() );
+						for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
+							// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
+							// time. An interface can define more than one constraint, we have to check the class we are validating.
+							final Class<?> declaringClass = metaConstraint.getLocation().getDeclaringClass();
+							if ( declaringClass.isInterface() ) {
+								Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
+								if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
+									continue;
+								}
+								validatedInterfaces.put( declaringClass, clazz );
+							}
+
+							boolean tmp = validateConstraint( validationContext, valueContext, false, metaConstraint );
+							if ( shouldFailFast( validationContext ) ) {
+								return;
+							}
+							validationSuccessful = validationSuccessful && tmp;
+							// reset property path
+							valueContext.setPropertyPath( currentPath );
+						}
 					}
-					validationSuccessful = validationSuccessful && tmp;
-					// reset property path
-					valueContext.setPropertyPath( currentPath );
-				}
-				if ( !validationSuccessful ) {
-					break;
+					if ( !validationSuccessful ) {
+						break;
+					}
 				}
 			}
 			validationContext.markCurrentBeanAsProcessed( valueContext );
@@ -996,55 +1003,61 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			BeanMetaData<? super U> hostingBeanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
 			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
-			List<Class<?>> defaultGroupSequence = hostingBeanMetaData.getDefaultGroupSequence( valueContext.getCurrentBean() );
+			Iterator<Sequence> defaultGroupSequence = hostingBeanMetaData.getDefaultValidationSequence( valueContext.getCurrentBean() );
 
 			if ( defaultGroupSequenceIsRedefined ) {
 				metaConstraints = hostingBeanMetaData.getMetaConstraints();
 			}
 
-			for ( Class<?> groupClass : defaultGroupSequence ) {
-				boolean validationSuccessful = true;
-				valueContext.setCurrentGroup( groupClass );
-				for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
-					// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
-					// time. An interface can define more than one constraint, we have to check the class we are validating.
-					final Class<?> declaringClass = metaConstraint.getLocation().getDeclaringClass();
-					if ( declaringClass.isInterface() ) {
-						Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
-						if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
-							continue;
+			while ( defaultGroupSequence.hasNext() ) {
+				for ( GroupWithInheritance groupOfGroups : defaultGroupSequence.next() ) {
+					boolean validationSuccessful = true;
+
+					for ( Group groupClass : groupOfGroups ) {
+						valueContext.setCurrentGroup( groupClass.getDefiningClass() );
+						for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
+							// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
+							// time. An interface can define more than one constraint, we have to check the class we are validating.
+							final Class<?> declaringClass = metaConstraint.getLocation().getDeclaringClass();
+							if ( declaringClass.isInterface() ) {
+								Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
+								if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
+									continue;
+								}
+								validatedInterfaces.put( declaringClass, clazz );
+							}
+
+							if ( constraintList.contains( metaConstraint ) ) {
+								boolean tmp = validateConstraint( validationContext, valueContext, true, metaConstraint );
+
+								validationSuccessful = validationSuccessful && tmp;
+								if ( shouldFailFast( validationContext ) ) {
+									return validationContext.getFailingConstraints()
+											.size() - numberOfConstraintViolationsBefore;
+								}
+							}
+
+							if ( typeUseConstraints.contains( metaConstraint ) ) {
+								boolean tmp = validatePropertyTypeConstraint(
+										validationContext,
+										valueContext,
+										true,
+										metaConstraint
+										);
+								validationSuccessful = validationSuccessful && tmp;
+								if ( shouldFailFast( validationContext ) ) {
+									return validationContext.getFailingConstraints()
+											.size() - numberOfConstraintViolationsBefore;
+								}
+							}
 						}
-						validatedInterfaces.put( declaringClass, clazz );
 					}
 
-					if ( constraintList.contains( metaConstraint ) ) {
-						boolean tmp = validateConstraint( validationContext, valueContext, true, metaConstraint );
-
-						validationSuccessful = validationSuccessful && tmp;
-						if ( shouldFailFast( validationContext ) ) {
-							return validationContext.getFailingConstraints()
-									.size() - numberOfConstraintViolationsBefore;
-						}
-					}
-
-					if ( typeUseConstraints.contains( metaConstraint ) ) {
-						boolean tmp = validatePropertyTypeConstraint(
-								validationContext,
-								valueContext,
-								true,
-								metaConstraint
-						);
-						validationSuccessful = validationSuccessful && tmp;
-						if ( shouldFailFast( validationContext ) ) {
-							return validationContext.getFailingConstraints()
-									.size() - numberOfConstraintViolationsBefore;
-						}
+					if ( !validationSuccessful ) {
+						break;
 					}
 				}
 
-				if ( !validationSuccessful ) {
-					break;
-				}
 			}
 			// all the hierarchy has been validated, stop validation.
 			if ( defaultGroupSequenceIsRedefined ) {

@@ -6,11 +6,14 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.BeanDescriptor;
 
+import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
@@ -59,6 +62,11 @@ public final class UnconstrainedEntityMetaDataSingleton<T> implements BeanMetaDa
 	@Override
 	public boolean defaultGroupSequenceIsRedefined() {
 		return false;
+	}
+
+	@Override
+	public Iterator<Sequence> getDefaultValidationSequence(T beanState) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
