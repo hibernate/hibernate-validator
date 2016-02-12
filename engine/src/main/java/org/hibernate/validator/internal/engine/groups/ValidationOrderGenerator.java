@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.GroupSequence;
 import javax.validation.groups.Default;
 
@@ -34,7 +35,7 @@ public class ValidationOrderGenerator {
 
 	public ValidationOrderGenerator() {
 		validationOrderForDefaultGroup = new DefaultValidationOrder();
-		validationOrderForDefaultGroup.insertGroup( new Group( Default.class ) );
+		validationOrderForDefaultGroup.insertGroup( Group.DEFAULT_GROUP );
 	}
 
 	/**
@@ -85,8 +86,7 @@ public class ValidationOrderGenerator {
 		DefaultValidationOrder validationOrder = new DefaultValidationOrder();
 		for ( Class<?> clazz : groups ) {
 			if ( Default.class.equals( clazz ) ) { // HV-621
-				Group group = new Group( clazz );
-				validationOrder.insertGroup( group );
+				validationOrder.insertGroup( Group.DEFAULT_GROUP );
 			}
 			else if ( isGroupSequence( clazz ) ) {
 				insertSequence( clazz, validationOrder );

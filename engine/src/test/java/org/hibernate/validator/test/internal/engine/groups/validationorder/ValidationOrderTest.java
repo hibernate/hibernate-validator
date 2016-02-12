@@ -8,14 +8,14 @@ package org.hibernate.validator.test.internal.engine.groups.validationorder;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.validation.GroupDefinitionException;
 import javax.validation.groups.Default;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.groups.DefaultValidationOrder;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
+import org.testng.annotations.Test;
 
 import static org.testng.FileAssert.fail;
 
@@ -29,7 +29,7 @@ public class ValidationOrderTest {
 		Group a = new Group( GroupA.class );
 		Group b = new Group( GroupB.class );
 		Group c = new Group( GroupC.class );
-		Group defaultGroup = new Group( Default.class );
+		Group defaultGroup = Group.DEFAULT_GROUP;
 
 		List<Group> sequence = new ArrayList<Group>();
 		sequence.add( a );
@@ -87,7 +87,7 @@ public class ValidationOrderTest {
 		Group a = new Group( GroupA.class );
 		Group b = new Group( GroupB.class );
 		Group c = new Group( GroupC.class );
-		Group defaultGroup = new Group( Default.class );
+		Group defaultGroup = Group.DEFAULT_GROUP;
 
 		List<Group> sequence = new ArrayList<Group>();
 		sequence.add( defaultGroup );
