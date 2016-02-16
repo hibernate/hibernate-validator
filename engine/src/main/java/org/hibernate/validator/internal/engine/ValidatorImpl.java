@@ -38,6 +38,7 @@ import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
+import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
@@ -424,20 +425,22 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
-			for ( Group group : sequence.getComposingGroups() ) {
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
 				int numberOfViolations = context.getFailingConstraints().size();
-				valueContext.setCurrentGroup( group.getDefiningClass() );
 
-				validateConstraintsForCurrentGroup( context, valueContext );
-				if ( shouldFailFast( context ) ) {
-					return context.getFailingConstraints();
+				for ( Group group : groupOfGroups ) {
+					valueContext.setCurrentGroup( group.getDefiningClass() );
+
+					validateConstraintsForCurrentGroup( context, valueContext );
+					if ( shouldFailFast( context ) ) {
+						return context.getFailingConstraints();
+					}
+
+					validateCascadedConstraints( context, valueContext );
+					if ( shouldFailFast( context ) ) {
+						return context.getFailingConstraints();
+					}
 				}
-
-				validateCascadedConstraints( context, valueContext );
-				if ( shouldFailFast( context ) ) {
-					return context.getFailingConstraints();
-				}
-
 				if ( context.getFailingConstraints().size() > numberOfViolations ) {
 					break;
 				}
@@ -828,13 +831,18 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
-			for ( Group group : sequence.getComposingGroups() ) {
-				valueContext.setCurrentGroup( group.getDefiningClass() );
-				int numberOfConstraintViolations = validatePropertyForCurrentGroup(
-						valueContext, context, metaConstraints, typeUseConstraints
-				);
-				if ( shouldFailFast( context ) ) {
-					return context.getFailingConstraints();
+
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
+				int numberOfConstraintViolations = 0;
+
+				for ( Group group : groupOfGroups ) {
+					valueContext.setCurrentGroup( group.getDefiningClass() );
+					numberOfConstraintViolations += validatePropertyForCurrentGroup(
+							valueContext, context, metaConstraints, typeUseConstraints
+					);
+					if ( shouldFailFast( context ) ) {
+						return context.getFailingConstraints();
+					}
 				}
 				if ( numberOfConstraintViolations > 0 ) {
 					break;
@@ -884,13 +892,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
-			for ( Group group : sequence.getComposingGroups() ) {
-				valueContext.setCurrentGroup( group.getDefiningClass() );
-				int numberOfConstraintViolations = validatePropertyForCurrentGroup(
-						valueContext, context, metaConstraints, typeArgumentConstraints
-				);
-				if ( shouldFailFast( context ) ) {
-					return context.getFailingConstraints();
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
+				int numberOfConstraintViolations = 0;
+				for ( Group group : groupOfGroups ) {
+					valueContext.setCurrentGroup( group.getDefiningClass() );
+					numberOfConstraintViolations += validatePropertyForCurrentGroup(
+							valueContext, context, metaConstraints, typeArgumentConstraints
+					);
+					if ( shouldFailFast( context ) ) {
+						return context.getFailingConstraints();
+					}
 				}
 				if ( numberOfConstraintViolations > 0 ) {
 					break;
@@ -1095,19 +1106,23 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
-			for ( Group group : sequence.getComposingGroups() ) {
-				int numberOfFailingConstraint = validateParametersForGroup(
-						validationContext, parameterValues, group
-				);
-				if ( shouldFailFast( validationContext ) ) {
-					return;
-				}
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
+				int numberOfFailingConstraint = 0;
 
-				cascadingValueContext.setCurrentGroup( group.getDefiningClass() );
-				validateCascadedConstraints( validationContext, cascadingValueContext );
+				for ( Group group : groupOfGroups ) {
+					numberOfFailingConstraint += validateParametersForGroup(
+							validationContext, parameterValues, group
+					);
+					if ( shouldFailFast( validationContext ) ) {
+						return;
+					}
 
-				if ( shouldFailFast( validationContext ) ) {
-					return;
+					cascadingValueContext.setCurrentGroup( group.getDefiningClass() );
+					validateCascadedConstraints( validationContext, cascadingValueContext );
+
+					if ( shouldFailFast( validationContext ) ) {
+						return;
+					}
 				}
 
 				if ( numberOfFailingConstraint > 0 ) {
@@ -1294,20 +1309,23 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
-			for ( Group group : sequence.getComposingGroups() ) {
-				int numberOfFailingConstraint = validateReturnValueForGroup(
-						context, bean, value, group
-				);
-				if ( shouldFailFast( context ) ) {
-					return;
-				}
-
-				if ( value != null ) {
-					cascadingValueContext.setCurrentGroup( group.getDefiningClass() );
-					validateCascadedConstraints( context, cascadingValueContext );
-
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
+				int numberOfFailingConstraint = 0;
+				for ( Group group : groupOfGroups ) {
+					numberOfFailingConstraint += validateReturnValueForGroup(
+							context, bean, value, group
+					);
 					if ( shouldFailFast( context ) ) {
 						return;
+					}
+
+					if ( value != null ) {
+						cascadingValueContext.setCurrentGroup( group.getDefiningClass() );
+						validateCascadedConstraints( context, cascadingValueContext );
+
+						if ( shouldFailFast( context ) ) {
+							return;
+						}
 					}
 				}
 
