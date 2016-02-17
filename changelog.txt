@@ -1,6 +1,14 @@
 Hibernate Validator Changelog
 =============================
 
+5.2.4.Final ( 17.02.2016)
+------------------------
+
+** Bug
+    * [HV-1055] - Default group sequence does not honour group hierarchy
+    * [HV-1057] - Group sequences don't honor inheritance relationships properly
+
+
 5.2.3.Final (27.01.2016)
 ------------------------
 
