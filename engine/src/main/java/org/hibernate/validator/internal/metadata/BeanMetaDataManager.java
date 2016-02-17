@@ -8,8 +8,10 @@ package org.hibernate.validator.internal.metadata;
 
 import java.util.EnumSet;
 import java.util.List;
+
 import javax.validation.ParameterNameProvider;
 
+import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
@@ -18,8 +20,8 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
-import org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
@@ -85,6 +87,8 @@ public class BeanMetaDataManager {
 	 */
 	private final ExecutableHelper executableHelper;
 
+	private final ValidationOrderGenerator validationOrderGenerator = new ValidationOrderGenerator();
+
 	/**
 	 * Creates a new {@code BeanMetaDataManager}.
 	 *
@@ -110,7 +114,6 @@ public class BeanMetaDataManager {
 				SOFT,
 				EnumSet.of( IDENTITY_COMPARISONS )
 		);
-
 
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders();
 		AnnotationMetaDataProvider defaultProvider = null;
@@ -157,7 +160,7 @@ public class BeanMetaDataManager {
 	 * @return A bean meta data object for the given type.
 	 */
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
-		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, executableHelper, clazz );
+		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, executableHelper, validationOrderGenerator, clazz );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {

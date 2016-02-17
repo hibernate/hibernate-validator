@@ -6,11 +6,14 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.BeanDescriptor;
 
+import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
@@ -62,6 +65,17 @@ public interface BeanMetaData<T> extends Validatable {
 	 * @return a list of classes representing the default group sequence.
 	 */
 	List<Class<?>> getDefaultGroupSequence(T beanState);
+
+	/**
+	 * Returns a {@link org.hibernate.validator.internal.engine.groups.ValidationOrder} representing the default
+	 * validation group sequence as configured through {@code @GroupSequence}/{@code @DefaultGroupSequenceProvider}. If
+	 * this bean type does not re-declare the default validation group sequence {@link org.hibernate.validator.internal.engine.groups.ValidationOrder#DEFAULT_SEQUENCE}
+	 * will be returned.
+	 */
+	// TODO: Ideally, a plain Sequence object should be returned here; I am using ValidationOrder for now to keep
+	// backporting to 4.3 manageable. The expansion of sequences/groups should be moved from ValidationOrder into
+	// Sequence and Group, respectively.
+	Iterator<Sequence> getDefaultValidationSequence(T beanState);
 
 	/**
 	 * @return {@code true} if the entity redefines the default group sequence, {@code false} otherwise.
