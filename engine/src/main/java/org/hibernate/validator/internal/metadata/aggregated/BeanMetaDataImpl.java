@@ -50,7 +50,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.partition;
@@ -120,7 +119,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * The default groups sequence for this bean class.
 	 */
-	private List<Class<?>> defaultGroupSequence = newArrayList();
+	private final List<Class<?>> defaultGroupSequence;
 
 	/**
 	 * The default group sequence provider.
@@ -128,9 +127,9 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * @see org.hibernate.validator.group.GroupSequenceProvider
 	 * @see DefaultGroupSequenceProvider
 	 */
-	private DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
+	private final DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
 
-	private ValidationOrder validationOrder;
+	private final ValidationOrder validationOrder;
 	/**
 	 * The class hierarchy for this class starting with the class itself going up the inheritance chain. Interfaces
 	 * are not included.
@@ -191,7 +190,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				Filters.excludeInterfaces()
 		);
 
-		setDefaultGroupSequenceOrProvider( defaultGroupSequence, defaultGroupSequenceProvider, validationOrderGenerator );
+		DefaultGroupSequenceContext<? super T> defaultGroupContext = getDefaultGroupSequenceData( beanClass, defaultGroupSequence, defaultGroupSequenceProvider, validationOrderGenerator );
+		this.defaultGroupSequenceProvider = defaultGroupContext.defaultGroupSequenceProvider;
+		this.defaultGroupSequence = Collections.unmodifiableList( defaultGroupContext.defaultGroupSequence );
+		this.validationOrder = defaultGroupContext.validationOrder;
 
 		this.directMetaConstraints = getDirectConstraints();
 
@@ -279,10 +281,10 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public List<Class<?>> getDefaultGroupSequence(T beanState) {
 		if ( hasDefaultGroupSequenceProvider() ) {
 			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanState );
-			return getValidDefaultGroupSequence( providerDefaultGroupSequence );
+			return getValidDefaultGroupSequence( beanClass, providerDefaultGroupSequence );
 		}
 
-		return Collections.unmodifiableList( defaultGroupSequence );
+		return defaultGroupSequence;
 	}
 
 	@Override
@@ -291,7 +293,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			List<Class<?>> providerDefaultGroupSequence = defaultGroupSequenceProvider.getValidationGroups( beanState );
 			return validationOrderGenerator.getDefaultValidationOrder(
 						beanClass,
-						getValidDefaultGroupSequence( providerDefaultGroupSequence )
+						getValidDefaultGroupSequence( beanClass, providerDefaultGroupSequence )
 					)
 					.getSequenceIterator();
 		}
@@ -382,23 +384,28 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return constrainedMethodDescriptors;
 	}
 
-	private void setDefaultGroupSequenceOrProvider(List<Class<?>> defaultGroupSequence, DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider, ValidationOrderGenerator validationOrderGenerator) {
+	private static <T> DefaultGroupSequenceContext<T> getDefaultGroupSequenceData(Class<?> beanClass, List<Class<?>> defaultGroupSequence, DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider, ValidationOrderGenerator validationOrderGenerator) {
 		if ( defaultGroupSequence != null && defaultGroupSequenceProvider != null ) {
 			throw log.getInvalidDefaultGroupSequenceDefinitionException();
 		}
 
+		DefaultGroupSequenceContext<T> context = new DefaultGroupSequenceContext<T>();
+
 		if ( defaultGroupSequenceProvider != null ) {
-			this.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
-			this.validationOrder = null;
+			context.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
+			context.defaultGroupSequence = Collections.emptyList();
+			context.validationOrder = null;
 		}
 		else if ( defaultGroupSequence != null && !defaultGroupSequence.isEmpty() ) {
-			setDefaultGroupSequence( defaultGroupSequence );
-			this.validationOrder = validationOrderGenerator.getDefaultValidationOrder( beanClass, this.defaultGroupSequence );
+			context.defaultGroupSequence = getValidDefaultGroupSequence( beanClass, defaultGroupSequence );
+			context.validationOrder = validationOrderGenerator.getDefaultValidationOrder( beanClass, context.defaultGroupSequence );
 		}
 		else {
-			this.defaultGroupSequence = DEFAULT_GROUP_SEQUENCE;
-			this.validationOrder = ValidationOrder.DEFAULT_SEQUENCE;
+			context.defaultGroupSequence = DEFAULT_GROUP_SEQUENCE;
+			context.validationOrder = ValidationOrder.DEFAULT_SEQUENCE;
 		}
+
+		return context;
 	}
 
 	private Set<MetaConstraint<?>> getClassLevelConstraints(Set<MetaConstraint<?>> constraints) {
@@ -444,11 +451,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return theValue;
 	}
 
-	private void setDefaultGroupSequence(List<Class<?>> groupSequence) {
-		defaultGroupSequence = getValidDefaultGroupSequence( groupSequence );
-	}
-
-	private List<Class<?>> getValidDefaultGroupSequence(List<Class<?>> groupSequence) {
+	private static List<Class<?>> getValidDefaultGroupSequence(Class<?> beanClass, List<Class<?>> groupSequence) {
 		List<Class<?>> validDefaultGroupSequence = new ArrayList<Class<?>>();
 
 		boolean groupSequenceContainsDefault = false;
@@ -719,5 +722,14 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 			return metaDataSet;
 		}
+	}
+
+	/**
+	 * Tuple for returning default group sequence, provider and validation order at once.
+	 */
+	private static class DefaultGroupSequenceContext<T> {
+		List<Class<?>> defaultGroupSequence;
+		DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
+		ValidationOrder validationOrder;
 	}
 }
