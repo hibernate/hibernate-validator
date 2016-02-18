@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.MessageInterpolator;
@@ -41,6 +42,7 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.groups.Group;
+import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
@@ -137,6 +139,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		);
 	}
 
+	@Override
 	public final <T> Set<ConstraintViolation<T>> validate(T object, Class<?>... groups) {
 
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
@@ -152,6 +155,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validateInContext( valueContext, validationContext, validationOrder );
 	}
 
+	@Override
 	public final <T> Set<ConstraintViolation<T>> validateProperty(T object, String propertyName, Class<?>... groups) {
 
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
@@ -170,6 +174,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validatePropertyInContext( context, PathImpl.createPathFromString( propertyName ), validationOrder );
 	}
 
+	@Override
 	public final <T> Set<ConstraintViolation<T>> validateValue(Class<T> beanType, String propertyName, Object value, Class<?>... groups) {
 
 		Contracts.assertNotNull( beanType, MESSAGES.beanTypeCannotBeNull() );
@@ -188,6 +193,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return validateValueInContext( context, value, PathImpl.createPathFromString( propertyName ), validationOrder );
 	}
 
+	@Override
 	public final <T> Set<MethodConstraintViolation<T>> validateParameter(T object, Method method, Object parameterValue, int parameterIndex, Class<?>... groups) {
 
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
@@ -213,6 +219,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return context.getFailingConstraints();
 	}
 
+	@Override
 	public final <T> Set<MethodConstraintViolation<T>> validateAllParameters(T object, Method method, Object[] parameterValues, Class<?>... groups) {
 
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
@@ -239,6 +246,7 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return context.getFailingConstraints();
 	}
 
+	@Override
 	public <T> Set<MethodConstraintViolation<T>> validateReturnValue(T object, Method method, Object returnValue, Class<?>... groups) {
 
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
@@ -259,14 +267,17 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		return context.getFailingConstraints();
 	}
 
+	@Override
 	public final BeanDescriptor getConstraintsForClass(Class<?> clazz) {
 		return beanMetaDataManager.getBeanMetaData( clazz ).getBeanDescriptor();
 	}
 
+	@Override
 	public final TypeDescriptor getConstraintsForType(Class<?> clazz) {
 		return beanMetaDataManager.getBeanMetaData( clazz ).getTypeDescriptor();
 	}
 
+	@Override
 	public final <T> T unwrap(Class<T> type) {
 		if ( type.isAssignableFrom( getClass() ) ) {
 			return type.cast( this );
@@ -338,20 +349,22 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
-			for ( Group group : sequence.getComposingGroups() ) {
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
 				int numberOfViolations = context.getFailingConstraints().size();
-				valueContext.setCurrentGroup( group.getDefiningClass() );
 
-				validateConstraintsForCurrentGroup( context, valueContext );
-				if ( shouldFailFast( context ) ) {
-					return context.getFailingConstraints();
+				for ( Group group : groupOfGroups ) {
+					valueContext.setCurrentGroup( group.getDefiningClass() );
+
+					validateConstraintsForCurrentGroup( context, valueContext );
+					if ( shouldFailFast( context ) ) {
+						return context.getFailingConstraints();
+					}
+
+					validateCascadedConstraints( context, valueContext );
+					if ( shouldFailFast( context ) ) {
+						return context.getFailingConstraints();
+					}
 				}
-
-				validateCascadedConstraints( context, valueContext );
-				if ( shouldFailFast( context ) ) {
-					return context.getFailingConstraints();
-				}
-
 				if ( context.getFailingConstraints().size() > numberOfViolations ) {
 					break;
 				}
@@ -670,13 +683,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
-			for ( Group group : sequence.getComposingGroups() ) {
-				valueContext.setCurrentGroup( group.getDefiningClass() );
-				int numberOfConstraintViolations = validatePropertyForCurrentGroup(
-						valueContext, context, metaConstraints
-				);
-				if ( shouldFailFast( context ) ) {
-					return context.getFailingConstraints();
+
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
+				int numberOfConstraintViolations = 0;
+
+				for ( Group group : groupOfGroups ) {
+					valueContext.setCurrentGroup( group.getDefiningClass() );
+					numberOfConstraintViolations += validatePropertyForCurrentGroup(
+							valueContext, context, metaConstraints
+					);
+					if ( shouldFailFast( context ) ) {
+						return context.getFailingConstraints();
+					}
 				}
 				if ( numberOfConstraintViolations > 0 ) {
 					break;
@@ -718,13 +736,17 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
-			for ( Group group : sequence.getComposingGroups() ) {
-				valueContext.setCurrentGroup( group.getDefiningClass() );
-				int numberOfConstraintViolations = validatePropertyForCurrentGroup(
-						valueContext, context, metaConstraints
-				);
-				if ( shouldFailFast( context ) ) {
-					return context.getFailingConstraints();
+
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
+				int numberOfConstraintViolations = 0;
+				for ( Group group : groupOfGroups ) {
+					valueContext.setCurrentGroup( group.getDefiningClass() );
+					numberOfConstraintViolations += validatePropertyForCurrentGroup(
+							valueContext, context, metaConstraints
+					);
+					if ( shouldFailFast( context ) ) {
+						return context.getFailingConstraints();
+					}
 				}
 				if ( numberOfConstraintViolations > 0 ) {
 					break;
@@ -889,13 +911,23 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
-			for ( Group group : sequence.getComposingGroups() ) {
-				int numberOfFailingConstraint = validateParametersForGroup(
-						validationContext, object, parameterValues, group
-				);
-				if ( shouldFailFast( validationContext ) ) {
-					return;
+
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
+				int numberOfFailingConstraint = 0;
+
+				for ( Group group : groupOfGroups ) {
+					numberOfFailingConstraint += validateParametersForGroup(
+							validationContext, object, parameterValues, group
+					);
+					if ( shouldFailFast( validationContext ) ) {
+						return;
+					}
+
+					if ( shouldFailFast( validationContext ) ) {
+						return;
+					}
 				}
+
 				if ( numberOfFailingConstraint > 0 ) {
 					break;
 				}
@@ -1047,13 +1079,18 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		Iterator<Sequence> sequenceIterator = validationOrder.getSequenceIterator();
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
-			for ( Group group : sequence.getComposingGroups() ) {
-				int numberOfFailingConstraint = validateReturnValueForGroup(
-						context, bean, value, group
-				);
-				if ( shouldFailFast( context ) ) {
-					return;
+
+			for ( GroupWithInheritance groupOfGroups : sequence ) {
+				int numberOfFailingConstraint = 0;
+				for ( Group group : groupOfGroups ) {
+					numberOfFailingConstraint += validateReturnValueForGroup(
+							context, bean, value, group
+					);
+					if ( shouldFailFast( context ) ) {
+						return;
+					}
 				}
+
 				if ( numberOfFailingConstraint > 0 ) {
 					break;
 				}
@@ -1320,10 +1357,10 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		member = getAccessible( member );
 
 		if ( member instanceof Method ) {
-			return ReflectionHelper.getValue( (Method) member, object );
+			return ReflectionHelper.getValue( member, object );
 		}
 		else if ( member instanceof Field ) {
-			return ReflectionHelper.getValue( (Field) member, object );
+			return ReflectionHelper.getValue( member, object );
 		}
 		return null;
 	}

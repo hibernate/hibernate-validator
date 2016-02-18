@@ -16,25 +16,28 @@
 */
 package org.hibernate.validator.internal.engine.groups;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
 import javax.validation.GroupSequence;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
  * Models a group sequence.
  *
  * @author Hardy Ferentschik
  */
-public class Sequence {
+public class Sequence implements Iterable<GroupWithInheritance> {
 	private static final Log log = LoggerFactory.make();
 
 	private final Class<?> sequence;
 	private List<Group> groups;
-	private boolean inheritedGroupsExpanded = false;
+	private List<GroupWithInheritance> expandedGroups;
 
 	public Sequence(Class<?> sequence, List<Group> groups) {
 		this.groups = groups;
@@ -50,17 +53,29 @@ public class Sequence {
 	}
 
 	public void expandInheritedGroups() {
-		if ( inheritedGroupsExpanded ) {
+		if ( expandedGroups != null ) {
 			return;
 		}
 
-		List<Group> expandedGroups = newArrayList();
+		expandedGroups = new ArrayList<GroupWithInheritance>();
+		ArrayList<Group> tmpGroups = new ArrayList<Group>();
+
 		for ( Group group : groups ) {
-			expandedGroups.add( group );
-			addInheritedGroups( group, expandedGroups );
+			HashSet<Group> groupsOfGroup = new HashSet<Group>();
+
+			groupsOfGroup.add( group );
+			addInheritedGroups( group, groupsOfGroup );
+
+			expandedGroups.add( new GroupWithInheritance( groupsOfGroup ) );
+			tmpGroups.addAll( groupsOfGroup );
 		}
-		groups = expandedGroups;
-		inheritedGroupsExpanded = true;
+
+		groups = tmpGroups;
+	}
+
+	@Override
+	public Iterator<GroupWithInheritance> iterator() {
+		return expandedGroups.iterator();
 	}
 
 	@Override
@@ -107,7 +122,7 @@ public class Sequence {
 	 * @param group the group for which the inherited groups need to be added to {@code expandedGroups}
 	 * @param expandedGroups The list into which to add all groups
 	 */
-	private void addInheritedGroups(Group group, List<Group> expandedGroups) {
+	private void addInheritedGroups(Group group, Set<Group> expandedGroups) {
 		for ( Class<?> inheritedGroup : group.getDefiningClass().getInterfaces() ) {
 			if ( isGroupSequence( inheritedGroup ) ) {
 				throw log.getSequenceDefinitionsNotAllowedException();
@@ -122,5 +137,3 @@ public class Sequence {
 		return clazz.getAnnotation( GroupSequence.class ) != null;
 	}
 }
-
-

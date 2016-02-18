@@ -17,12 +17,12 @@
 package org.hibernate.validator.test.internal.engine.groups.inheritance;
 
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.ValidatorUtil;
+import org.testng.annotations.Test;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
@@ -33,17 +33,16 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 public class GroupInheritanceTest {
 
 	/**
-	 * HV-288
+	 * HV-288, HV-1057.
 	 */
 	@Test
 	public void testGroupInheritanceWithinGroupSequence() {
 		Validator validator = ValidatorUtil.getValidator();
 		Try tryMe = new Try();
-		tryMe.field2 = "foo";
 		tryMe.field3 = "bar";
 
 		Set<ConstraintViolation<Try>> violations = validator.validate( tryMe, Try.GlobalCheck.class );
-		assertCorrectConstraintViolationMessages( violations, "field1" );
+		assertCorrectConstraintViolationMessages( violations, "field1", "field2" );
 	}
 
 	/**
