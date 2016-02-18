@@ -197,14 +197,35 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		this.executableMetaDataMap = Collections.unmodifiableMap( bySignature( executableMetaDataSet ) );
 
+		boolean defaultGroupSequenceIsRedefined = defaultGroupSequenceIsRedefined();
+		List<Class<?>> resolvedDefaultGroupSequence = getDefaultGroupSequence( null );
+
+		Map<String, PropertyDescriptor> propertyDescriptors = getConstrainedPropertiesAsDescriptors(
+				propertyMetaDataMap,
+				defaultGroupSequenceIsRedefined,
+				resolvedDefaultGroupSequence
+		);
+
+		Map<String, ExecutableDescriptorImpl> methodsDescriptors = getConstrainedMethodsAsDescriptors(
+				executableMetaDataMap,
+				defaultGroupSequenceIsRedefined,
+				resolvedDefaultGroupSequence
+		);
+
+		Map<String, ConstructorDescriptor> constructorsDescriptors = getConstrainedConstructorsAsDescriptors(
+				executableMetaDataMap,
+				defaultGroupSequenceIsRedefined,
+				resolvedDefaultGroupSequence
+		);
+
 		this.beanDescriptor = new BeanDescriptorImpl(
 				beanClass,
 				getClassLevelConstraintsAsDescriptors(),
-				getConstrainedPropertiesAsDescriptors(),
-				getConstrainedMethodsAsDescriptors(),
-				getConstrainedConstructorsAsDescriptors(),
-				defaultGroupSequenceIsRedefined(),
-				getDefaultGroupSequence( null )
+				propertyDescriptors,
+				methodsDescriptors,
+				constructorsDescriptors,
+				defaultGroupSequenceIsRedefined,
+				resolvedDefaultGroupSequence
 		);
 	}
 
@@ -301,7 +322,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return theValue;
 	}
 
-	private Map<String, PropertyDescriptor> getConstrainedPropertiesAsDescriptors() {
+	private static Map<String, PropertyDescriptor> getConstrainedPropertiesAsDescriptors(Map<String, PropertyMetaData> propertyMetaDataMap,
+			boolean defaultGroupSequenceIsRedefined, List<Class<?>> resolvedDefaultGroupSequence) {
 		Map<String, PropertyDescriptor> theValue = newHashMap();
 
 		for ( Entry<String, PropertyMetaData> entry : propertyMetaDataMap.entrySet() ) {
@@ -309,8 +331,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				theValue.put(
 						entry.getKey(),
 						entry.getValue().asDescriptor(
-								defaultGroupSequenceIsRedefined(),
-								getDefaultGroupSequence( null )
+								defaultGroupSequenceIsRedefined,
+								resolvedDefaultGroupSequence
 						)
 				);
 			}
@@ -319,15 +341,16 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return theValue;
 	}
 
-	private Map<String, ExecutableDescriptorImpl> getConstrainedMethodsAsDescriptors() {
+	private static Map<String, ExecutableDescriptorImpl> getConstrainedMethodsAsDescriptors(Map<String, ExecutableMetaData> executableMetaDataMap,
+			boolean defaultGroupSequenceIsRedefined, List<Class<?>> resolvedDefaultGroupSequence) {
 		Map<String, ExecutableDescriptorImpl> constrainedMethodDescriptors = newHashMap();
 
 		for ( ExecutableMetaData executableMetaData : executableMetaDataMap.values() ) {
 			if ( executableMetaData.getKind() == ElementKind.METHOD
 					&& executableMetaData.isConstrained() ) {
 				ExecutableDescriptorImpl descriptor = executableMetaData.asDescriptor(
-								defaultGroupSequenceIsRedefined(),
-								getDefaultGroupSequence( null )
+								defaultGroupSequenceIsRedefined,
+								resolvedDefaultGroupSequence
 						);
 
 				for ( String signature : executableMetaData.getSignatures() ) {
@@ -339,7 +362,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return constrainedMethodDescriptors;
 	}
 
-	private Map<String, ConstructorDescriptor> getConstrainedConstructorsAsDescriptors() {
+	private static Map<String, ConstructorDescriptor> getConstrainedConstructorsAsDescriptors(Map<String, ExecutableMetaData> executableMetaDataMap,
+			boolean defaultGroupSequenceIsRedefined, List<Class<?>> resolvedDefaultGroupSequence) {
 		Map<String, ConstructorDescriptor> constrainedMethodDescriptors = newHashMap();
 
 		for ( ExecutableMetaData executableMetaData : executableMetaDataMap.values() ) {
@@ -348,8 +372,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 						// constructors never override, so there will be exactly one identifier
 						executableMetaData.getSignatures().iterator().next(),
 						executableMetaData.asDescriptor(
-								defaultGroupSequenceIsRedefined(),
-								getDefaultGroupSequence( null )
+								defaultGroupSequenceIsRedefined,
+								resolvedDefaultGroupSequence
 						)
 				);
 			}
