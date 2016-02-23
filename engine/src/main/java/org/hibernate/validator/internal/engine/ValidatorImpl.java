@@ -392,48 +392,33 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
-			Iterator<Sequence> defaultGroupSequence = hostingBeanMetaData.getDefaultValidationSequence( valueContext.getCurrentBean() );
-			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
 
 			// if the current class redefined the default group sequence, this sequence has to be applied to all the class hierarchy.
 			if ( defaultGroupSequenceIsRedefined ) {
-				metaConstraints = hostingBeanMetaData.getMetaConstraints();
-			}
+				Iterator<Sequence> defaultGroupSequence = hostingBeanMetaData.getDefaultValidationSequence( valueContext.getCurrentBean() );
+				Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getMetaConstraints();
 
-			PathImpl currentPath = valueContext.getPropertyPath();
-			while ( defaultGroupSequence.hasNext() ) {
-				for ( GroupWithInheritance groupOfGroups : defaultGroupSequence.next() ) {
-					boolean validationSuccessful = true;
+				while ( defaultGroupSequence.hasNext() ) {
+					for ( GroupWithInheritance groupOfGroups : defaultGroupSequence.next() ) {
+						boolean validationSuccessful = true;
 
-					for ( Group defaultSequenceMember : groupOfGroups ) {
-						valueContext.setCurrentGroup( defaultSequenceMember.getDefiningClass() );
-						for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
-							// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
-							// time. An interface can define more than one constraint, we have to check the class we are validating.
-							final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
-							if ( declaringClass.isInterface() ) {
-								Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
-								if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
-									continue;
-								}
-								validatedInterfaces.put( declaringClass, clazz );
-							}
-
-							boolean tmp = validateConstraint(
-									validationContext, valueContext, metaConstraint
-									);
-							if ( shouldFailFast( validationContext ) ) {
-								return;
-							}
-							validationSuccessful = validationSuccessful && tmp;
-							valueContext.setPropertyPath( currentPath );
+						for ( Group defaultSequenceMember : groupOfGroups ) {
+							validationSuccessful = validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz,
+									metaConstraints, defaultSequenceMember );
 						}
-					}
-					if ( !validationSuccessful ) {
-						break;
+						if ( !validationSuccessful ) {
+							break;
+						}
 					}
 				}
 			}
+			// fast path in case the default group sequence hasn't been redefined
+			else {
+				Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
+				validateConstraintsForSingleDefaultGroupElement( validationContext, valueContext, validatedInterfaces, clazz, metaConstraints,
+						Group.DEFAULT_GROUP );
+			}
+
 			validationContext.markProcessed(
 					valueContext.getCurrentBean(),
 					valueContext.getCurrentGroup(),
@@ -445,6 +430,38 @@ public class ValidatorImpl implements Validator, MethodValidator {
 				break;
 			}
 		}
+	}
+
+	private <T, E extends ConstraintViolation<T>, U, V> boolean validateConstraintsForSingleDefaultGroupElement(ValidationContext<T, E> validationContext,
+			ValueContext<U, V> valueContext, final Map<Class<?>, Class<?>> validatedInterfaces, Class<?> clazz, Set<MetaConstraint<?>> metaConstraints,
+			Group defaultSequenceMember) {
+		boolean validationSuccessful = true;
+
+		valueContext.setCurrentGroup( defaultSequenceMember.getDefiningClass() );
+		PathImpl currentPath = valueContext.getPropertyPath();
+
+		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
+			// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
+			// time. An interface can define more than one constraint, we have to check the class we are validating.
+			final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
+			if ( declaringClass.isInterface() ) {
+				Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
+				if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
+					continue;
+				}
+				validatedInterfaces.put( declaringClass, clazz );
+			}
+
+			boolean tmp = validateConstraint(
+					validationContext, valueContext, metaConstraint
+					);
+			if ( shouldFailFast( validationContext ) ) {
+				return false;
+			}
+			validationSuccessful = validationSuccessful && tmp;
+			valueContext.setPropertyPath( currentPath );
+		}
+		return validationSuccessful;
 	}
 
 	private <T, U, V> void validateConstraintsForNonDefaultGroup(ValidationContext<T, ?> validationContext, ValueContext<U, V> valueContext) {
@@ -838,63 +855,80 @@ public class ValidatorImpl implements Validator, MethodValidator {
 		for ( Class<?> clazz : beanMetaData.getClassHierarchy() ) {
 			BeanMetaData<U> hostingBeanMetaData = (BeanMetaData<U>) beanMetaDataManager.getBeanMetaData( clazz );
 			boolean defaultGroupSequenceIsRedefined = hostingBeanMetaData.defaultGroupSequenceIsRedefined();
-			Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
-			Iterator<Sequence> defaultGroupSequence = hostingBeanMetaData.getDefaultValidationSequence( valueContext.getCurrentBean() );
 
 			if ( defaultGroupSequenceIsRedefined ) {
-				metaConstraints = hostingBeanMetaData.getMetaConstraints();
-			}
+				Iterator<Sequence> defaultGroupSequence = hostingBeanMetaData.getDefaultValidationSequence( valueContext.getCurrentBean() );
+				Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getMetaConstraints();
 
-			while ( defaultGroupSequence.hasNext() ) {
-				for ( GroupWithInheritance groupOfGroups : defaultGroupSequence.next() ) {
-					boolean validationSuccessful = true;
+				while ( defaultGroupSequence.hasNext() ) {
+					for ( GroupWithInheritance groupOfGroups : defaultGroupSequence.next() ) {
+						boolean validationSuccessful = true;
 
-					for ( Group groupClass : groupOfGroups ) {
-						valueContext.setCurrentGroup( groupClass.getDefiningClass() );
-						for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
-							// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
-							// time. An interface can define more than one constraint, we have to check the class we are validating.
-							final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
-							if ( declaringClass.isInterface() ) {
-								Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
-								if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
-									continue;
-								}
-								validatedInterfaces.put( declaringClass, clazz );
-							}
-
-							if ( constraintList.contains( metaConstraint )
-									&& isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-
-								if ( valueContext.getCurrentBean() != null ) {
-									@SuppressWarnings("unchecked")
-									V valueToValidate = (V) getValue(
-											metaConstraint.getLocation().getMember(),
-											valueContext.getCurrentBean()
-											);
-									valueContext.setCurrentValidatedValue( valueToValidate );
-								}
-								boolean tmp = metaConstraint.validateConstraint( validationContext, valueContext );
-								validationSuccessful = validationSuccessful && tmp;
-								if ( shouldFailFast( validationContext ) ) {
-									return validationContext.getFailingConstraints()
-											.size() - numberOfConstraintViolationsBefore;
-								}
-							}
+						for ( Group groupClass : groupOfGroups ) {
+							validationSuccessful = validatePropertyForSingleDefaultGroupElement( valueContext, validationContext, constraintList, validatedInterfaces, clazz,
+									metaConstraints, groupClass );
 						}
-					}
 
-					if ( !validationSuccessful ) {
-						break;
+						if ( !validationSuccessful ) {
+							break;
+						}
 					}
 				}
 			}
+			// fast path in case the default group sequence hasn't been redefined
+			else {
+				Set<MetaConstraint<?>> metaConstraints = hostingBeanMetaData.getDirectMetaConstraints();
+
+				validatePropertyForSingleDefaultGroupElement( valueContext, validationContext, constraintList, validatedInterfaces, clazz, metaConstraints,
+						Group.DEFAULT_GROUP );
+			}
+
 			// all the hierarchy has been validated, stop validation.
 			if ( defaultGroupSequenceIsRedefined ) {
 				break;
 			}
 		}
 		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
+	}
+
+	private <V, U, T> boolean validatePropertyForSingleDefaultGroupElement(ValueContext<U, V> valueContext, ValidationContext<T, ConstraintViolation<T>> validationContext,
+			List<MetaConstraint<?>> constraintList, final Map<Class<?>, Class<?>> validatedInterfaces, Class<?> clazz, Set<MetaConstraint<?>> metaConstraints,
+			Group groupClass) {
+		valueContext.setCurrentGroup( groupClass.getDefiningClass() );
+		boolean validationSuccessful =true;
+
+		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
+			// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
+			// time. An interface can define more than one constraint, we have to check the class we are validating.
+			final Class<?> declaringClass = metaConstraint.getLocation().getBeanClass();
+			if ( declaringClass.isInterface() ) {
+				Class<?> validatedForClass = validatedInterfaces.get( declaringClass );
+				if ( validatedForClass != null && !validatedForClass.equals( clazz ) ) {
+					continue;
+				}
+				validatedInterfaces.put( declaringClass, clazz );
+			}
+
+			if ( constraintList.contains( metaConstraint )
+					&& isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
+
+				if ( valueContext.getCurrentBean() != null ) {
+					@SuppressWarnings("unchecked")
+					V valueToValidate = (V) getValue(
+							metaConstraint.getLocation().getMember(),
+							valueContext.getCurrentBean()
+							);
+					valueContext.setCurrentValidatedValue( valueToValidate );
+				}
+				boolean tmp = metaConstraint.validateConstraint( validationContext, valueContext );
+				validationSuccessful = validationSuccessful && tmp;
+				if ( shouldFailFast( validationContext ) ) {
+					return false;
+				}
+			}
+		}
+
+		return validationSuccessful;
 	}
 
 	private <T> void validateParametersInContext(MethodValidationContext<T> validationContext, T object, Object[] parameterValues, ValidationOrder validationOrder) {
