@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl.BeanMetaDataBuilder;
@@ -88,6 +89,8 @@ public class BeanMetaDataManager {
 		this( constraintHelper, Arrays.asList( metaDataProviders ) );
 	}
 
+	private final ValidationOrderGenerator validationOrderGenerator = new ValidationOrderGenerator();
+
 	/**
 	 * @param constraintHelper the constraint helper
 	 * @param optionalMetaDataProviders optional meta data provider used on top of the annotation based provider
@@ -106,7 +109,6 @@ public class BeanMetaDataManager {
 				SOFT,
 				EnumSet.of( IDENTITY_COMPARISONS )
 		);
-
 
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders();
 		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
@@ -154,7 +156,7 @@ public class BeanMetaDataManager {
 	 * @return A bean meta data object for the given type.
 	 */
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
-		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, clazz );
+		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance( constraintHelper, validationOrderGenerator, clazz );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {

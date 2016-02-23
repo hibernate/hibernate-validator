@@ -17,12 +17,14 @@
 package org.hibernate.validator.internal.engine.groups;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import javax.validation.GroupSequence;
+import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -33,11 +35,25 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class Sequence implements Iterable<GroupWithInheritance> {
+
+	/**
+	 * An "anonymous" sequence with just a single contained element, {@code Default.class}.
+	 */
+	public static Sequence DEFAULT = new Sequence();
+
 	private static final Log log = LoggerFactory.make();
 
 	private final Class<?> sequence;
 	private List<Group> groups;
 	private List<GroupWithInheritance> expandedGroups;
+
+	private Sequence() {
+		this.sequence = Default.class;
+		this.groups = Collections.singletonList( Group.DEFAULT_GROUP );
+		this.expandedGroups = Collections.singletonList(
+				new GroupWithInheritance( Collections.singleton( Group.DEFAULT_GROUP ) )
+		);
+	}
 
 	public Sequence(Class<?> sequence, List<Group> groups) {
 		this.groups = groups;

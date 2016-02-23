@@ -77,7 +77,7 @@ public class ValidationOrderGenerator {
 				validationOrder.insertGroup( Group.DEFAULT_GROUP );
 			}
 			else if ( isGroupSequence( clazz ) ) {
-				insertSequence( clazz, validationOrder );
+				insertSequence( clazz, clazz.getAnnotation( GroupSequence.class ).value(), true, validationOrder );
 			}
 			else {
 				Group group = new Group( clazz );
@@ -86,6 +86,12 @@ public class ValidationOrderGenerator {
 			}
 		}
 
+		return validationOrder;
+	}
+
+	public ValidationOrder getDefaultValidationOrder(Class<?> clazz, List<Class<?>> defaultGroupSequence) {
+		DefaultValidationOrder validationOrder = new DefaultValidationOrder();
+		insertSequence( clazz, defaultGroupSequence.toArray( new Class<?>[0] ), false, validationOrder );
 		return validationOrder;
 	}
 
@@ -107,23 +113,25 @@ public class ValidationOrderGenerator {
 		}
 	}
 
-	private void insertSequence(Class<?> sequenceClass, DefaultValidationOrder validationOrder) {
-		Sequence sequence = resolvedSequences.get( sequenceClass );
+	private void insertSequence(Class<?> sequenceClass, Class<?>[] sequenceElements, boolean cache, DefaultValidationOrder validationOrder) {
+		Sequence sequence = cache ? resolvedSequences.get( sequenceClass ) : null;
 		if ( sequence == null ) {
-			sequence = resolveSequence( sequenceClass, new ArrayList<Class<?>>() );
+			sequence = resolveSequence( sequenceClass, sequenceElements, new ArrayList<Class<?>>() );
 			// we expand the inherited groups only after we determined whether the sequence is expandable
 			sequence.expandInheritedGroups();
 
 			// cache already resolved sequences
-			final Sequence cachedResolvedSequence = resolvedSequences.putIfAbsent( sequenceClass, sequence );
-			if ( cachedResolvedSequence != null ) {
-				sequence = cachedResolvedSequence;
+			if ( cache ) {
+				final Sequence cachedResolvedSequence = resolvedSequences.putIfAbsent( sequenceClass, sequence );
+				if ( cachedResolvedSequence != null ) {
+					sequence = cachedResolvedSequence;
+				}
 			}
 		}
 		validationOrder.insertSequence( sequence );
 	}
 
-	private Sequence resolveSequence(Class<?> sequenceClass, List<Class<?>> processedSequences) {
+	private Sequence resolveSequence(Class<?> sequenceClass, Class<?>[] sequenceElements, List<Class<?>> processedSequences) {
 		if ( processedSequences.contains( sequenceClass ) ) {
 			throw log.getCyclicDependencyInGroupsDefinitionException();
 		}
@@ -131,11 +139,9 @@ public class ValidationOrderGenerator {
 			processedSequences.add( sequenceClass );
 		}
 		List<Group> resolvedSequenceGroups = new ArrayList<Group>();
-		GroupSequence sequenceAnnotation = sequenceClass.getAnnotation( GroupSequence.class );
-		Class<?>[] sequenceArray = sequenceAnnotation.value();
-		for ( Class<?> clazz : sequenceArray ) {
+		for ( Class<?> clazz : sequenceElements ) {
 			if ( isGroupSequence( clazz ) ) {
-				Sequence tmpSequence = resolveSequence( clazz, processedSequences );
+				Sequence tmpSequence = resolveSequence( clazz, clazz.getAnnotation( GroupSequence.class ).value(), processedSequences );
 				addGroups( resolvedSequenceGroups, tmpSequence.getComposingGroups() );
 			}
 			else {

@@ -16,8 +16,10 @@
 */
 package org.hibernate.validator.internal.engine.groups;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.validation.GroupDefinitionException;
 
 /**
@@ -26,6 +28,36 @@ import javax.validation.GroupDefinitionException;
  * @author Hardy Ferentschik
  */
 public interface ValidationOrder {
+
+	/**
+	 * A {@link org.hibernate.validator.internal.engine.groups.ValidationOrder} which contains a single sequence which
+	 * in turn contains a single group, {@code Default}.
+	 */
+	ValidationOrder DEFAULT_SEQUENCE = new DefaultValidationOrder();
+
+	static class DefaultValidationOrder implements ValidationOrder {
+
+		private final List<Sequence> defaultSequences;
+
+		private DefaultValidationOrder() {
+			defaultSequences = Collections.singletonList( Sequence.DEFAULT );
+		}
+
+		@Override
+		public Iterator<Group> getGroupIterator() {
+			// Not using emptyIterator() to stay on 1.6 language level
+			return Collections.<Group>emptyList().iterator();
+		}
+
+		@Override
+		public Iterator<Sequence> getSequenceIterator() {
+			return defaultSequences.iterator();
+		}
+
+		@Override
+		public void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence) throws GroupDefinitionException {
+		}
+	}
 
 	public Iterator<Group> getGroupIterator();
 
