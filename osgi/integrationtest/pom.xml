@@ -23,9 +23,9 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <pax.exam.version>4.7.0</pax.exam.version>
-        <pax.url.version>2.4.4</pax.url.version>
-        <apache.karaf.version>3.0.3</apache.karaf.version>
+        <pax.exam.version>4.8.0</pax.exam.version>
+        <pax.url.version>2.4.7</pax.url.version>
+        <apache.karaf.version>3.0.6</apache.karaf.version>
     </properties>
 
     <dependencies>
