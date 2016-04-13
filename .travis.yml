@@ -1,0 +1,27 @@
+sudo: required
+dist: trusty
+language: java
+jdk:
+  - oraclejdk8
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+# might be useful to push reports to an S3 bucket
+#  artifacts:
+#    paths:
+#      - $(find $HOME -name surefire-reports | tr "\n" ":")
+#      - $(find $HOME -name failsafe-reports | tr "\n" ":")
+#  s3_region: 'us-west-2'
+cache:
+  directories:
+    - $HOME/.m2
+install:
+  # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
+  - mvn -N io.takari:maven:wrapper
+  - ./mvnw -v
+  # first run to download all the Maven dependencies without logging
+  - travis_wait ./mvnw -B -q -DskipTests=true install
+before_script:
+script:
+  - ./mvnw clean verify

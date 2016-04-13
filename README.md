@@ -80,6 +80,12 @@ You will also need a JDK 8 and Maven 3 (>= 3.0.3). With these prerequisites in p
 
 There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://hibernate.org/validator/contribute/).
 
+## Continuous Integration
+
+The [official Continuous Integration service for the project](https://hibernate-validator.ci.cloudbees.com/) is hosted at CloudBees.
+
+We provide a `.travis.yml` file so that you can enable CI for your GitHub fork by enabling the build in [your Travis CI account](https://travis-ci.org/).
+
 ## Hibernate Validator URLs
 
 * [Home Page](http://hibernate.org/validator/)
