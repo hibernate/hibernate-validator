@@ -18,13 +18,13 @@ import javax.validation.ParameterNameProvider;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
+import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 
 /**
  * Default implementation of {@link ConstraintMapping}.
@@ -109,13 +109,13 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 		return constraintContext;
 	}
 
-	public Set<ConstraintDefinitionContributor> getConstraintDefinitionContributors() {
-		Set<ConstraintDefinitionContributor> contributors = newHashSet();
+	public Set<ConstraintDefinitionContribution<?>> getConstraintDefinitionContributions() {
+		Set<ConstraintDefinitionContribution<?>> contributions = newHashSet();
 
 		for ( ConstraintDefinitionContextImpl<?> constraintContext : constraintContexts ) {
-			contributors.add( constraintContext.build() );
+			contributions.add( constraintContext.build() );
 		}
 
-		return contributors;
+		return contributions;
 	}
 }

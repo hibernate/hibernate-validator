@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter11.constraintdefinition;
+package org.hibernate.validator.referenceguide.chapter11.constraintapi;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -6,14 +6,14 @@ import javax.validation.ConstraintValidatorContext;
 /**
  * @author Hardy Ferentschik
  */
-public class ValidPassengerCountValidator implements ConstraintValidator<ValidPassengerCount, Car> {
+public class ValidPassengerCountValidator implements ConstraintValidator<ValidPassengerCount, Bus> {
 
 	@Override
 	public void initialize(ValidPassengerCount constraintAnnotation) {
 	}
 
 	@Override
-	public boolean isValid(Car car, ConstraintValidatorContext context) {
+	public boolean isValid(Bus car, ConstraintValidatorContext context) {
 		if ( car == null ) {
 			return true;
 		}

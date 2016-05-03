@@ -27,7 +27,6 @@ import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
-import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionBuilderImpl;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.time.DefaultTimeProvider;
@@ -43,7 +42,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
-import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
@@ -195,14 +193,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 							.isAllowParallelMethodsDefineParameterConstraints();
 
 			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
-
-			registerCustomConstraintValidators(
-					hibernateSpecificConfig,
-					constraintMappings,
-					properties,
-					externalClassLoader, constraintHelper
-			);
 		}
+		
+		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
 		tmpValidatedValueHandlers.addAll(
 				getPropertyConfiguredValidatedValueHandlers(
@@ -252,14 +245,20 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	private static Set<DefaultConstraintMapping> getConstraintMappings(ConfigurationState configurationState, ClassLoader externalClassLoader) {
-		Set<DefaultConstraintMapping> constraintMappings;
+		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
-		// programmatic config
+		
 		if ( configurationState instanceof ConfigurationImpl ) {
-			constraintMappings = ( (ConfigurationImpl) configurationState ).getProgrammaticMappings();
-		}
-		else {
-			constraintMappings = newHashSet();
+			ConfigurationImpl hibernateConfiguration = (ConfigurationImpl) configurationState;
+			
+			// default config
+			ConstraintMappingContributor defaultContributor = hibernateConfiguration.getDefaultConstraintMappingContributor();
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder();
+			defaultContributor.createConstraintMappings( builder );
+			constraintMappings.addAll( builder.mappings );
+			
+			// programmatic config
+			constraintMappings.addAll( hibernateConfiguration.getProgrammaticMappings() );
 		}
 
 		// XML
@@ -485,66 +484,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return handlers;
 	}
 
-	/**
-	 * Returns a list with {@link org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor} instances configured via the
-	 * {@link HibernateValidatorConfiguration#CONSTRAINT_DEFINITION_CONTRIBUTORS} property.
-	 *
-	 * @param properties the properties used to bootstrap the factory
-	 *
-	 * @return a list with property-configured {@link org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor}s. May be empty but never {@code null}.
-	 */
-	private static List<ConstraintDefinitionContributor> getPropertyConfiguredConstraintDefinitionContributors(
-			Map<String, String> properties, ClassLoader externalClassLoader) {
-		String propertyValue = properties.get( HibernateValidatorConfiguration.CONSTRAINT_DEFINITION_CONTRIBUTORS );
-
-		if ( propertyValue == null || propertyValue.isEmpty() ) {
-			return Collections.emptyList();
-		}
-
-		String[] constraintDefinitionContributorNames = propertyValue.split( "," );
-		List<ConstraintDefinitionContributor> constraintDefinitionContributors = newArrayList(
-				constraintDefinitionContributorNames.length
-		);
-
-		for ( String fqcn : constraintDefinitionContributorNames ) {
-			@SuppressWarnings("unchecked")
-			Class<ConstraintDefinitionContributor> contributorType = (Class<ConstraintDefinitionContributor>)
-					run( LoadClass.action( fqcn, externalClassLoader ) );
-			constraintDefinitionContributors.add(
-					run( NewInstance.action( contributorType, "constraint definition contributor class" ) )
-			);
-		}
-
-		return constraintDefinitionContributors;
-	}
-
-	private static void registerCustomConstraintValidators(ConfigurationImpl hibernateSpecificConfig,
-			Set<DefaultConstraintMapping> constraintMappings,
-			Map<String, String> properties, ClassLoader externalClassLoader,
+	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
 			ConstraintHelper constraintHelper) {
-		for ( ConstraintDefinitionContributor contributor : hibernateSpecificConfig.getConstraintDefinitionContributors() ) {
-			registerConstraintValidators( contributor, constraintHelper );
-		}
-		
 		for ( DefaultConstraintMapping constraintMapping : constraintMappings ) {
-			for (ConstraintDefinitionContributor contributor : constraintMapping.getConstraintDefinitionContributors() ) {
-				registerConstraintValidators( contributor, constraintHelper );
+			for (ConstraintDefinitionContribution<?> contribution : constraintMapping.getConstraintDefinitionContributions() ) {
+				processConstraintDefinitionContribution( contribution, constraintHelper );
 			}
-		}
-
-		for ( ConstraintDefinitionContributor contributor : getPropertyConfiguredConstraintDefinitionContributors(
-				properties, externalClassLoader
-		) ) {
-			registerConstraintValidators( contributor, constraintHelper );
-		}
-	}
-
-	private static void registerConstraintValidators(ConstraintDefinitionContributor contributor, ConstraintHelper constraintHelper) {
-		ConstraintDefinitionBuilderImpl builder = new ConstraintDefinitionBuilderImpl();
-		contributor.collectConstraintDefinitions( builder );
-
-		for ( ConstraintDefinitionContribution<?> constraintDefinitionContribution : builder.getConstraintValidatorContributions() ) {
-			processConstraintDefinitionContribution( constraintDefinitionContribution, constraintHelper );
 		}
 	}
 
