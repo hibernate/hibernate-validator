@@ -9,7 +9,7 @@ package org.hibernate.validator;
 import javax.validation.Configuration;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
+import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
@@ -57,14 +57,6 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * with the comma-separated fully-qualified names of one or more {@link ValidatedValueUnwrapper} implementations.
 	 */
 	String VALIDATED_VALUE_HANDLERS = "hibernate.validator.validated_value_handlers";
-
-	/**
-	 * Property corresponding to the {@link #addConstraintDefinitionContributor(org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor)}
-	 * method. Accepts a String with the comma-separated fully-qualified names of one or more {@link org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor} implementations.
-	 *
-	 * @since 5.2
-	 */
-	String CONSTRAINT_DEFINITION_CONTRIBUTORS = "hibernate.validator.constraint_definition_contributors";
 
 	/**
 	 * Property for configuring a constraint mapping contributor, allowing to set up one or more constraint mappings for
@@ -160,23 +152,11 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler);
 
 	/**
-	 * @return the default {@link org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor}. Never {@code null}.
+	 * @return the default {@link org.hibernate.validator.spi.cfg.ConstraintMappingContributor}. Never {@code null}.
 	 *
-	 * @since 5.2
+	 * @since 5.3
 	 */
-	ConstraintDefinitionContributor getDefaultConstraintDefinitionContributor();
-
-	/**
-	 * Registers the given {@code ConstraintDefinitionContributor} with the bootstrapped validator factory.
-	 *
-	 * @param contributor the {@code ConstraintDefinitionContributor} to register. Cannot be {@code null}.
-	 *
-	 * @return {@code this} following the chaining method pattern
-	 *
-	 * @hv.experimental This API is considered experimental and may change in future revisions
-	 * @since 5.2
-	 */
-	HibernateValidatorConfiguration addConstraintDefinitionContributor(ConstraintDefinitionContributor contributor);
+	ConstraintMappingContributor getDefaultConstraintMappingContributor();
 
 	/**
 	 * Sets the class loader to be used for loading user-provided resources:

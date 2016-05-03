@@ -13,6 +13,8 @@ import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.MaxDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
+import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.constraintvalidators.RegexpURLValidator;
 import org.junit.Test;
 
 import static java.lang.annotation.ElementType.FIELD;
@@ -134,6 +136,41 @@ public class ConstraintApiTest {
 			.type( RentalCar.class )
 				.defaultGroupSequenceProviderClass( RentalCarGroupSequenceProvider.class );
 		//end::defaultGroupSequence[]
+	}
+
+	@Test
+	public void constraintDefinition() {
+		HibernateValidatorConfiguration configuration = Validation
+				.byProvider( HibernateValidator.class )
+				.configure();
+
+		//tag::constraintDefinition[]
+		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+
+		constraintMapping
+				.constraint( ValidPassengerCount.class )
+				.validatedBy( ValidPassengerCountValidator.class );
+		//end::constraintDefinition[]
+
+		configuration.addMapping( constraintMapping );
+	}
+	
+	@Test
+	public void urlValidationOverride() {
+		HibernateValidatorConfiguration configuration = Validation
+			.byProvider( HibernateValidator.class )
+			.configure();
+
+		//tag::urlValidationOverride[]
+		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+
+		constraintMapping
+				.constraint( URL.class )
+				.includeExistingValidators( false )
+				.validatedBy( RegexpURLValidator.class );
+		//end::urlValidationOverride[]
+		
+		configuration.addMapping( constraintMapping );
 	}
 
 	public interface PersonDefault {

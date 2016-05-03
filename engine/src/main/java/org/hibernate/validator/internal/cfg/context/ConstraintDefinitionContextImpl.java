@@ -14,7 +14,8 @@ import java.util.Set;
 import javax.validation.ConstraintValidator;
 
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
-import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
+import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
+import org.hibernate.validator.internal.util.CollectionHelper;
 
 /**
  * Constraint definition context which allows to configure the validators to be used for a constraint's validation.
@@ -50,39 +51,11 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 		return this;
 	}
 	
-	ConstraintDefinitionContributor build() {
-		return new ConstraintDefinitionContributorImpl<A>(
+	@SuppressWarnings("unchecked")
+	ConstraintDefinitionContribution<A> build() {
+		return new ConstraintDefinitionContribution<A>(
 				annotationType,
-				includeExistingValidators,
-				validatorTypes );
-	}
-
-	private static final class ConstraintDefinitionContributorImpl<A extends Annotation>
-			implements ConstraintDefinitionContributor {
-
-		private final Class<A> annotationType;
-
-		private final boolean includeExistingValidators;
-
-		private final Set<Class<? extends ConstraintValidator<A, ?>>> validatorTypes;
-
-		private ConstraintDefinitionContributorImpl(Class<A> annotationType, boolean includeExistingValidators,
-				Set<Class<? extends ConstraintValidator<A, ?>>> validatorTypes) {
-			super();
-			this.annotationType = annotationType;
-			this.includeExistingValidators = includeExistingValidators;
-			this.validatorTypes = newHashSet( validatorTypes );
-		}
-
-		@Override
-		public void collectConstraintDefinitions(ConstraintDefinitionBuilder constraintDefinitionContributionBuilder) {
-			ConstraintDefinitionBuilderContext<A> context = constraintDefinitionContributionBuilder
-					.constraint( annotationType )
-					.includeExistingValidators( includeExistingValidators );
-
-			for ( Class<? extends ConstraintValidator<A, ?>> validatorTypes : validatorTypes ) {
-				context = context.validatedBy( validatorTypes );
-			}
-		}
+				CollectionHelper.newArrayList( validatorTypes ),
+				includeExistingValidators );
 	}
 }
