@@ -14,7 +14,7 @@ package org.hibernate.validator.cfg.context;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-public interface ParameterConstraintMappingContext extends TypeTarget, CrossParameterTarget, ParameterTarget,
+public interface ParameterConstraintMappingContext extends ConstraintMappingTarget, CrossParameterTarget, ParameterTarget,
 		ReturnValueTarget, ConstructorTarget, MethodTarget, Constrainable<ParameterConstraintMappingContext>,
 		Cascadable<ParameterConstraintMappingContext>, Unwrapable<ParameterConstraintMappingContext>,
 		AnnotationIgnoreOptions<ParameterConstraintMappingContext> {

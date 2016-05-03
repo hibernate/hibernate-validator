@@ -546,8 +546,8 @@ public interface Log extends BasicLogger {
 	ValidationException getValidateOnExecutionOnOverriddenOrInterfaceMethodException(Method m);
 
 	@Message(id = 167,
-			value = "A given constraint definition can only be overridden in one mapping file. %1$s is overridden in multiple files")
-	ValidationException getOverridingConstraintDefinitionsInMultipleMappingFilesException(String constraintClass);
+			value = "A given constraint definition can only be overridden once (either through a XML file or the programmatic API). %1$s is overridden in multiple XML files and/or API calls")
+	ValidationException getOverridingConstraintDefinitionsMultipleTimesException(String constraintClass);
 
 	@Message(id = 168,
 			value = "The message descriptor '%1$s' contains an unbalanced meta character '%2$c' parameter.")
@@ -640,4 +640,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = 192, value = "Couldn't determine Java version from value %1s; Not enabling features requiring Java 8")
 	void unknownJvmVersion(String vmVersionStr);
+
+	@Message(id = 193, value = "%s is configured more than once via the programmatic constraint definition API.")
+	ValidationException getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException(String annotationClassName);
 }

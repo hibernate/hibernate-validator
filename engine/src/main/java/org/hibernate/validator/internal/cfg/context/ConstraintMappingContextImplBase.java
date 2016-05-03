@@ -10,7 +10,6 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Set;
 
-import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -23,18 +22,13 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Gunnar Morling
  */
-abstract class ConstraintMappingContextImplBase {
+abstract class ConstraintMappingContextImplBase extends ConstraintContextImplBase {
 
-	protected final DefaultConstraintMapping mapping;
 	private final Set<ConfiguredConstraint<?>> constraints;
 
 	ConstraintMappingContextImplBase(DefaultConstraintMapping mapping) {
-		this.mapping = mapping;
+		super( mapping );
 		this.constraints = newHashSet();
-	}
-
-	public <C> TypeConstraintMappingContext<C> type(Class<C> type) {
-		return mapping.type( type );
 	}
 
 	/**

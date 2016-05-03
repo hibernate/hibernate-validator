@@ -139,6 +139,7 @@ public class ConstraintHelper {
 	private final Map<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints;
 
 	private final ValidatorClassMap validatorClasses = new ValidatorClassMap();
+	private ConcurrentMap<Class<? extends Annotation>, Object> overridenAnnotations = newConcurrentHashMap();
 
 	public ConstraintHelper() {
 		Map<Class<? extends Annotation>, List<? extends Class<?>>> tmpConstraints = newHashMap();
@@ -331,7 +332,13 @@ public class ConstraintHelper {
 			}
 		}
 
-		validatorClasses.put( annotationType, definitionClasses );
+		Object previousOverride = overridenAnnotations.putIfAbsent( annotationType, annotationType );
+		if ( previousOverride != null ) {
+			throw log.getOverridingConstraintDefinitionsMultipleTimesException( annotationType.getName() );
+		}
+		else {
+			validatorClasses.put( annotationType, definitionClasses );
+		}
 	}
 
 	/**

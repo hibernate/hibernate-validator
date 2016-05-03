@@ -162,6 +162,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			);
 		}
 
+		this.constraintMappings = Collections.unmodifiableSet(
+				getConstraintMappings(
+						configurationState,
+						externalClassLoader
+				)
+		);
+
 		Map<String, String> properties = configurationState.getProperties();
 
 		boolean tmpFailFast = false;
@@ -191,17 +198,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			registerCustomConstraintValidators(
 					hibernateSpecificConfig,
+					constraintMappings,
 					properties,
 					externalClassLoader, constraintHelper
 			);
 		}
-
-		this.constraintMappings = Collections.unmodifiableSet(
-				getConstraintMappings(
-						configurationState,
-						externalClassLoader
-				)
-		);
 
 		tmpValidatedValueHandlers.addAll(
 				getPropertyConfiguredValidatedValueHandlers(
@@ -518,9 +519,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	private static void registerCustomConstraintValidators(ConfigurationImpl hibernateSpecificConfig,
-			Map<String, String> properties, ClassLoader externalClassLoader, ConstraintHelper constraintHelper) {
+			Set<DefaultConstraintMapping> constraintMappings,
+			Map<String, String> properties, ClassLoader externalClassLoader,
+			ConstraintHelper constraintHelper) {
 		for ( ConstraintDefinitionContributor contributor : hibernateSpecificConfig.getConstraintDefinitionContributors() ) {
 			registerConstraintValidators( contributor, constraintHelper );
+		}
+		
+		for ( DefaultConstraintMapping constraintMapping : constraintMappings ) {
+			for (ConstraintDefinitionContributor contributor : constraintMapping.getConstraintDefinitionContributors() ) {
+				registerConstraintValidators( contributor, constraintHelper );
+			}
 		}
 
 		for ( ConstraintDefinitionContributor contributor : getPropertyConfiguredConstraintDefinitionContributors(
