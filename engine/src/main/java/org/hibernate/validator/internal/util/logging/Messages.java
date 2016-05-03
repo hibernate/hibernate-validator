@@ -92,6 +92,14 @@ public interface Messages {
 			"ConstraintDefinitionContributors are a Hibernate Validator specific feature. All Bean Validation " +
 			"features work as expected. See also https://hibernate.atlassian.net/browse/HV-1023.")
 	String unableToUseResourceBundleAggregation();
+
+	@Message(value = "The annotation type must not be null when creating a constraint definition.",
+			format = Message.Format.NO_FORMAT)
+	String annotationTypeMustNotBeNull();
+
+	@Message(value = "The annotation type must be annotated with @javax.validation.Constraint when creating a constraint definition.",
+			format = Message.Format.NO_FORMAT)
+	String annotationTypeMustBeAnnotatedWithConstraint();
 }
 
 
