@@ -128,6 +128,7 @@ public class XmlMappingParser {
 					annotationProcessingOptions
 			);
 
+			Set<String> alreadyProcessedConstraintDefinitions = newHashSet();
 			for ( InputStream in : mappingStreams ) {
 
 				// check whether mark is supported, if so we can reset the stream in order to allow reuse of Configuration
@@ -149,7 +150,8 @@ public class XmlMappingParser {
 
 				parseConstraintDefinitions(
 						mapping.getConstraintDefinition(),
-						defaultPackage
+						defaultPackage,
+						alreadyProcessedConstraintDefinitions
 				);
 
 				for ( BeanType bean : mapping.getBean() ) {
@@ -252,9 +254,16 @@ public class XmlMappingParser {
 
 	@SuppressWarnings("unchecked")
 	private void parseConstraintDefinitions(List<ConstraintDefinitionType> constraintDefinitionList,
-			String defaultPackage) {
+			String defaultPackage,
+			Set<String> alreadyProcessedConstraintDefinitions) {
 		for ( ConstraintDefinitionType constraintDefinition : constraintDefinitionList ) {
 			String annotationClassName = constraintDefinition.getAnnotation();
+			if ( alreadyProcessedConstraintDefinitions.contains( annotationClassName ) ) {
+				throw log.getOverridingConstraintDefinitionsInMultipleMappingFilesException( annotationClassName );
+			}
+			else {
+				alreadyProcessedConstraintDefinitions.add( annotationClassName );
+			}
 
 			Class<?> clazz = classLoadingHelper.loadClass( annotationClassName, defaultPackage );
 			if ( !clazz.isAnnotation() ) {

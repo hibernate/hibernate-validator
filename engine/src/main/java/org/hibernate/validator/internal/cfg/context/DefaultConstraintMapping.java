@@ -40,14 +40,14 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Set<Class<?>> configuredTypes;
 	private final Set<TypeConstraintMappingContextImpl<?>> typeContexts;
-	private final Set<Class<?>> configuredConstraints;
+	private final Set<Class<?>> definedConstraints;
 	private final Set<ConstraintDefinitionContextImpl<?>> constraintContexts;
 
 	public DefaultConstraintMapping() {
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.configuredTypes = newHashSet();
 		this.typeContexts = newHashSet();
-		this.configuredConstraints = newHashSet();
+		this.definedConstraints = newHashSet();
 		this.constraintContexts = newHashSet();
 	}
 
@@ -98,17 +98,18 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 		Contracts.assertTrue( annotationClass.isAnnotationPresent( Constraint.class ),
 				MESSAGES.annotationTypeMustBeAnnotatedWithConstraint() );
 
-		if ( configuredConstraints.contains( annotationClass ) ) {
+		if ( definedConstraints.contains( annotationClass ) ) {
+			// Fail fast for easy-to-detect definition conflicts; other conflicts are handled in ValidatorFactoryImpl
 			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( annotationClass.getName() );
 		}
 
 		ConstraintDefinitionContextImpl<A> constraintContext = new ConstraintDefinitionContextImpl<A>( this, annotationClass );
 		constraintContexts.add( constraintContext );
-		configuredConstraints.add( annotationClass );
+		definedConstraints.add( annotationClass );
 
 		return constraintContext;
 	}
-
+	
 	public Set<ConstraintDefinitionContribution<?>> getConstraintDefinitionContributions() {
 		Set<ConstraintDefinitionContribution<?>> contributions = newHashSet();
 

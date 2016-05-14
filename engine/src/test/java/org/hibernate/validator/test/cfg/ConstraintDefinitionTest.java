@@ -14,6 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
+import java.io.InputStream;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -161,7 +162,8 @@ public class ConstraintDefinitionTest {
 
 	@Test(
 			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000167:.*"
+			expectedExceptionsMessageRegExp = "HV[0-9]*:"
+					+ " .*\\$ConstraintAnnotation is configured more than once via the programmatic constraint definition API."
 	)
 	public void testMultipleDefinitionForSameConstraintOnDifferentConstraintMappings() {
 		mapping.constraintDefinition( ConstraintAnnotation.class )
@@ -175,6 +177,63 @@ public class ConstraintDefinitionTest {
 		config.addMapping( mapping ); 
 		config.addMapping( otherMapping );
 		config.buildValidatorFactory().getValidator();
+	}
+
+	@Test
+	public void testXmlConstraintDefinitionMergedWithProgrammaticConfiguration() {
+		final InputStream xmlMapping = ConstraintDefinitionTest.class.getResourceAsStream(
+				"ConstraintDefinitionTest_mapping.xml"
+		);
+		
+		config.addMapping( xmlMapping ); // Adds NonDefaultLongValidator and keeps default validators
+		
+		mapping.constraintDefinition( ConstraintAnnotation.class )
+				.validatedBy( NonDefaultShortValidator.class ); // Adds this on top of XML configuration
+		
+		config.addMapping( mapping ); 
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		// Defaults are untouched
+		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedStringFieldBean() );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectValidatorTypes( violations, DefaultStringValidator.class );
+
+		// XML configuration is taken into account
+		violations = validator.validate( new ConstrainedLongFieldBean() );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectValidatorTypes( violations, NonDefaultLongValidator.class );
+
+		// Programmatic configuration is also taken into account
+		violations = validator.validate( new ConstrainedShortFieldBean() );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectValidatorTypes( violations, NonDefaultShortValidator.class );
+	}
+
+	@Test
+	public void testXmlConstraintDefinitionOverriddenByProgrammaticConfiguration() {
+		final InputStream xmlMapping = ConstraintDefinitionTest.class.getResourceAsStream(
+				"ConstraintDefinitionTest_mapping.xml"
+		);
+		
+		config.addMapping( xmlMapping ); // Adds NonDefaultLongValidator and keeps default validators
+		
+		mapping.constraintDefinition( ConstraintAnnotation.class ) // Overrides XML configuration (and defaults)
+				.includeExistingValidators( false )
+				.validatedBy( NonDefaultIntegerValidator.class )
+				.validatedBy( OtherNonDefaultLongValidator.class ); 
+		
+		config.addMapping( mapping ); 
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		// Defaults are overridden
+		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedIntegerFieldBean() );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectValidatorTypes( violations, NonDefaultIntegerValidator.class );
+
+		// XML configuration is overridden by programmatic configuration
+		violations = validator.validate( new ConstrainedLongFieldBean() );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectValidatorTypes( violations, OtherNonDefaultLongValidator.class );
 	}
 
 	@Test(
@@ -287,6 +346,20 @@ public class ConstraintDefinitionTest {
 		 */
 	}
 
+	public static class OtherNonDefaultLongValidator extends StubValidator<Long> {
+		/*
+		 * Nothing special here: everything is in the parent class, which uses getClass() to enable derived
+		 * class-specific behavior.
+		 */
+	}
+
+	public static class NonDefaultShortValidator extends StubValidator<Short> {
+		/*
+		 * Nothing special here: everything is in the parent class, which uses getClass() to enable derived
+		 * class-specific behavior.
+		 */
+	}
+
 	private static class ConstrainedStringFieldBean {
 
 		@ConstraintAnnotation
@@ -303,6 +376,12 @@ public class ConstraintDefinitionTest {
 
 		@ConstraintAnnotation
 		private Long field;
+	}
+
+	private static class ConstrainedShortFieldBean {
+
+		@ConstraintAnnotation
+		private Short field;
 	}
 
 }
