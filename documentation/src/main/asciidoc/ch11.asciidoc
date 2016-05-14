@@ -185,9 +185,9 @@ requires changes to the default behaviour.
 ====
 
 [[section-programmatic-api]]
-=== Programmatic constraint declaration
+=== Programmatic constraint definition and declaration
 
-As per the Bean Validation specification, you can declare constraints using Java annotations and XML
+As per the Bean Validation specification, you can define and declare constraints using Java annotations and XML
 based constraint mappings.
 
 In addition, Hibernate Validator provides a fluent API which allows for the programmatic
@@ -801,7 +801,7 @@ This mechanism is also helpful when creating large multi-module applications: In
 messages into one single bundle, you can have one resource bundle per module containing only those messages of that module.
 
 [[section-programmatic-constraint-definition]]
-==== Constraint definitions via programmatic constraint declaration API
+==== Adding constraint definitions programmatically
 
 While the service loader approach works in many scenarios, but not in all (think for example
 OSGi where service files are not visible), there is yet another way of contributing constraint
@@ -809,7 +809,7 @@ definitions. You can use the programmatic constraint declaration API - see
 <<example-using-constraint-definition-api>>.
 
 [[example-using-constraint-definition-api]]
-.Using the programmatic constraint declaration API to register constraint definitions
+.Adding constraint definitions through the programmatic API
 ========
 [source, JAVA, indent=0]
 ----
