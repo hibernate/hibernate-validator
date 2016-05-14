@@ -40,12 +40,12 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * Unit test for {@link ConstraintMapping#constraint(Class)} et al.
+ * Unit test for {@link ConstraintMapping#constraintDefinition(Class)} et al.
  *
  * @author Yoann Rodiere
  */
 @TestForIssue( jiraKey = "HV-501")
-public class ValidatorConstraintMappingTest {
+public class ConstraintDefinitionTest {
 
 	private HibernateValidatorConfiguration config;
 	private DefaultConstraintMapping mapping;
@@ -61,7 +61,7 @@ public class ValidatorConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: The annotation type must not be null when creating a constraint definition."
 	)
 	public void testNullClass() {
-		mapping.constraint( null );
+		mapping.constraintDefinition( null );
 	}
 
 	@Test(
@@ -69,12 +69,12 @@ public class ValidatorConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV[0-9]*: The annotation type must be annotated with @javax.validation.Constraint when creating a constraint definition."
 	)
 	public void testNonConstraintAnnotation() {
-		mapping.constraint( NonConstraintAnnotation.class );
+		mapping.constraintDefinition( NonConstraintAnnotation.class );
 	}
 
 	@Test
 	public void testConstraintMapping() {
-		mapping.constraint( ConstraintAnnotation.class )
+		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.validatedBy( NonDefaultLongValidator.class );
 
 		config.addMapping( mapping );
@@ -87,7 +87,7 @@ public class ValidatorConstraintMappingTest {
 
 	@Test
 	public void testConstraintMappingDefaultsToIncludingExistingValidators() {
-		mapping.constraint( ConstraintAnnotation.class )
+		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.validatedBy( NonDefaultLongValidator.class );
 
 		config.addMapping( mapping );
@@ -100,7 +100,7 @@ public class ValidatorConstraintMappingTest {
 
 	@Test
 	public void testConstraintMappingIncludingExistingValidators() {
-		mapping.constraint( ConstraintAnnotation.class )
+		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.includeExistingValidators( true )
 				.validatedBy( NonDefaultLongValidator.class );
 
@@ -114,7 +114,7 @@ public class ValidatorConstraintMappingTest {
 
 	@Test
 	public void testConstraintMappingExcludingExistingValidators() {
-		mapping.constraint( ConstraintAnnotation.class )
+		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.includeExistingValidators( false )
 				.validatedBy( NonDefaultIntegerValidator.class );
 
@@ -128,7 +128,7 @@ public class ValidatorConstraintMappingTest {
 
 	@Test
 	public void testConstraintMappingIncludingExistingValidatorsThenExcludingThem() {
-		mapping.constraint( ConstraintAnnotation.class )
+		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.includeExistingValidators( true )
 				.validatedBy( NonDefaultLongValidator.class )
 				.includeExistingValidators( false )
@@ -152,9 +152,9 @@ public class ValidatorConstraintMappingTest {
 					+ " .*\\$ConstraintAnnotation is configured more than once via the programmatic constraint definition API."
 	)
 	public void testMultipleDefinitionForSameConstraintOnSameConstraintMapping() {
-		mapping.constraint( ConstraintAnnotation.class )
+		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.validatedBy( NonDefaultLongValidator.class )
-				.constraint( ConstraintAnnotation.class )
+				.constraintDefinition( ConstraintAnnotation.class )
 				.includeExistingValidators( false )
 				.validatedBy( NonDefaultIntegerValidator.class );
 	}
@@ -164,11 +164,11 @@ public class ValidatorConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV000167:.*"
 	)
 	public void testMultipleDefinitionForSameConstraintOnDifferentConstraintMappings() {
-		mapping.constraint( ConstraintAnnotation.class )
+		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.validatedBy( NonDefaultLongValidator.class );
 
 		ConstraintMapping otherMapping = config.createConstraintMapping();
-		otherMapping.constraint( ConstraintAnnotation.class )
+		otherMapping.constraintDefinition( ConstraintAnnotation.class )
 				.includeExistingValidators( false )
 				.validatedBy( NonDefaultIntegerValidator.class );
 		
@@ -182,7 +182,7 @@ public class ValidatorConstraintMappingTest {
 			expectedExceptionsMessageRegExp = "HV000150:.*"
 	)
 	public void testMultipleValidatorsForSameType() {
-		mapping.constraint( ConstraintAnnotation.class )
+		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.includeExistingValidators( true )
 				.validatedBy( NonDefaultIntegerValidator.class );
 		

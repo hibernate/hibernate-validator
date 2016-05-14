@@ -11,6 +11,6 @@ package org.hibernate.validator.cfg.context;
  *
  * @author Yoann Rodiere
  */
-public interface ConstraintMappingTarget extends TypeTarget, ConstraintTarget {
+public interface ConstraintMappingTarget extends TypeTarget, ConstraintDefinitionTarget {
 	
 }

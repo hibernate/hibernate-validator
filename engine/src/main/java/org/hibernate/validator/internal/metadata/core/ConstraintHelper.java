@@ -139,7 +139,13 @@ public class ConstraintHelper {
 	private final Map<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints;
 
 	private final ValidatorClassMap validatorClasses = new ValidatorClassMap();
-	private ConcurrentMap<Class<? extends Annotation>, Object> overridenAnnotations = newConcurrentHashMap();
+	
+	/**
+	 * Records whether or not the default constraint definition for an an annotation has been overridden by a user.
+	 * This allows to detect multiple overrides in different constraint mappings (which is forbidden), so that we can
+	 * throw an exception when that happens.
+	 */
+	private ConcurrentMap<Class<? extends Annotation>, Object> overriddenAnnotations = newConcurrentHashMap();
 
 	public ConstraintHelper() {
 		Map<Class<? extends Annotation>, List<? extends Class<?>>> tmpConstraints = newHashMap();
@@ -332,7 +338,7 @@ public class ConstraintHelper {
 			}
 		}
 
-		Object previousOverride = overridenAnnotations.putIfAbsent( annotationType, annotationType );
+		Object previousOverride = overriddenAnnotations.putIfAbsent( annotationType, annotationType );
 		if ( previousOverride != null ) {
 			throw log.getOverridingConstraintDefinitionsMultipleTimesException( annotationType.getName() );
 		}

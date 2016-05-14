@@ -148,7 +148,7 @@ public class ConstraintApiTest {
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
 		constraintMapping
-				.constraint( ValidPassengerCount.class )
+				.constraintDefinition( ValidPassengerCount.class )
 				.validatedBy( ValidPassengerCountValidator.class );
 		//end::constraintDefinition[]
 
@@ -165,7 +165,7 @@ public class ConstraintApiTest {
 		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
 
 		constraintMapping
-				.constraint( URL.class )
+				.constraintDefinition( URL.class )
 				.includeExistingValidators( false )
 				.validatedBy( RegexpURLValidator.class );
 		//end::urlValidationOverride[]

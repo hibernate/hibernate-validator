@@ -93,7 +93,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 	}
 
 	@Override
-	public <A extends Annotation> ConstraintDefinitionContext<A> constraint(Class<A> annotationClass) {
+	public <A extends Annotation> ConstraintDefinitionContext<A> constraintDefinition(Class<A> annotationClass) {
 		Contracts.assertNotNull( annotationClass, MESSAGES.annotationTypeMustNotBeNull() );
 		Contracts.assertTrue( annotationClass.isAnnotationPresent( Constraint.class ),
 				MESSAGES.annotationTypeMustBeAnnotatedWithConstraint() );
