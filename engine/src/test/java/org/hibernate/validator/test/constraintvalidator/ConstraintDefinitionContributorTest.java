@@ -6,24 +6,19 @@
  */
 package org.hibernate.validator.test.constraintvalidator;
 
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.internal.engine.ServiceLoaderBasedConstraintMappingContributor;
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
-
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Test related to constraint validator discovery.
@@ -45,19 +40,6 @@ public class ConstraintDefinitionContributorTest {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectConstraintTypes( constraintViolations, MustMatch.class );
-	}
-
-	@Test()
-	public void service_based_constraint_definition_contributor_is_configured_per_default() {
-		HibernateValidatorConfiguration hibernateValidatorConfiguration = ValidatorUtil.getConfiguration();
-
-		assertNotNull(
-				hibernateValidatorConfiguration.getDefaultConstraintMappingContributor(),
-				"There should be a default contributor"
-		);
-		assertTrue(
-				hibernateValidatorConfiguration.getDefaultConstraintMappingContributor() instanceof ServiceLoaderBasedConstraintMappingContributor
-		);
 	}
 
 	@Test
