@@ -94,11 +94,14 @@ public class ConstraintDefinitionTest {
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
+		/* Check that the default string validator was not lost when the new validator was set
+		 * (i.e. check that existing validators were actually included)
+		 */
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedStringFieldBean() );
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectValidatorTypes( violations, DefaultStringValidator.class );
 	}
-
+	
 	@Test
 	public void testConstraintMappingIncludingExistingValidators() {
 		mapping.constraintDefinition( ConstraintAnnotation.class )
@@ -108,6 +111,9 @@ public class ConstraintDefinitionTest {
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
+		/* Check that the default string validator was not lost when the new validator was set
+		 * (i.e. check that existing validators were actually included)
+		 */
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedStringFieldBean() );
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectValidatorTypes( violations, DefaultStringValidator.class );
@@ -243,6 +249,19 @@ public class ConstraintDefinitionTest {
 	public void testMultipleValidatorsForSameType() {
 		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.includeExistingValidators( true )
+				.validatedBy( NonDefaultIntegerValidator.class );
+		
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+		validator.validate( new ConstrainedIntegerFieldBean() );
+	}
+
+	@Test(
+			expectedExceptions = UnexpectedTypeException.class,
+			expectedExceptionsMessageRegExp = "HV000150:.*"
+	)
+	public void testMultipleValidatorsForSameTypeWithNoCallToIncludeExistingValidators() {
+		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.validatedBy( NonDefaultIntegerValidator.class );
 		
 		config.addMapping( mapping );
