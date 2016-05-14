@@ -76,7 +76,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final TraversableResolver defaultTraversableResolver;
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
-	private final ConstraintMappingContributor defaultConstraintMappingContributor;
+	private final ConstraintMappingContributor serviceLoaderBasedConstraintMappingContributor;
 
 	private ValidationProviderResolver providerResolver;
 	private final ValidationBootstrapParameters validationBootstrapParameters;
@@ -127,7 +127,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultMessageInterpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
-		this.defaultConstraintMappingContributor = new ServiceLoaderBasedConstraintMappingContributor(
+		this.serviceLoaderBasedConstraintMappingContributor = new ServiceLoaderBasedConstraintMappingContributor(
 				typeResolutionHelper
 		);
 	}
@@ -276,9 +276,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
-	@Override
-	public ConstraintMappingContributor getDefaultConstraintMappingContributor() {
-		return defaultConstraintMappingContributor;
+	public final ConstraintMappingContributor getServiceLoaderBasedConstraintMappingContributor() {
+		return serviceLoaderBasedConstraintMappingContributor;
 	}
 
 	@Override

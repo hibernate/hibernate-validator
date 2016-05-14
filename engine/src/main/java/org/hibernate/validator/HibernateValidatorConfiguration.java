@@ -9,7 +9,6 @@ package org.hibernate.validator;
 import javax.validation.Configuration;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
@@ -150,13 +149,6 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @hv.experimental This API is considered experimental and may change in future revisions
 	 */
 	HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler);
-
-	/**
-	 * @return the default {@link org.hibernate.validator.spi.cfg.ConstraintMappingContributor}. Never {@code null}.
-	 *
-	 * @since 5.3
-	 */
-	ConstraintMappingContributor getDefaultConstraintMappingContributor();
 
 	/**
 	 * Sets the class loader to be used for loading user-provided resources:

@@ -257,9 +257,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			constraintMappings.addAll( hibernateConfiguration.getProgrammaticMappings() );
 
 			// service loader based config
-			ConstraintMappingContributor defaultContributor = hibernateConfiguration.getDefaultConstraintMappingContributor();
+			ConstraintMappingContributor serviceLoaderBasedContributor =
+					hibernateConfiguration.getServiceLoaderBasedConstraintMappingContributor();
 			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
-			defaultContributor.createConstraintMappings( builder );
+			serviceLoaderBasedContributor.createConstraintMappings( builder );
 		}
 
 		// XML-defined constraint mapping contributor
