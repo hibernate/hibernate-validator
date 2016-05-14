@@ -214,7 +214,7 @@ public class URLValidatorTest {
 		ConstraintMapping constraintMapping = config.createConstraintMapping();
 
 		constraintMapping
-				.constraint( URL.class )
+				.constraintDefinition( URL.class )
 				.includeExistingValidators( false )
 				.validatedBy( RegexpURLValidator.class );
 		

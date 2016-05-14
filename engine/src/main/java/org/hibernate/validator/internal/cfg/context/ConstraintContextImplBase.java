@@ -29,8 +29,8 @@ abstract class ConstraintContextImplBase {
 		return mapping.type( type );
 	}
 
-	public <A extends Annotation> ConstraintDefinitionContext<A> constraint(Class<A> annotationClass) {
-		return mapping.constraint( annotationClass );
+	public <A extends Annotation> ConstraintDefinitionContext<A> constraintDefinition(Class<A> annotationClass) {
+		return mapping.constraintDefinition( annotationClass );
 	}
 
 }

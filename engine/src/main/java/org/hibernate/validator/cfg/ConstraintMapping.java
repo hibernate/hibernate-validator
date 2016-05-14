@@ -45,5 +45,5 @@ public interface ConstraintMapping {
 	 *
 	 * @return Instance allowing for defining validators to be executed for the specified constraint.
 	 */
-	<A extends Annotation> ConstraintDefinitionContext<A> constraint(Class<A> annotationClass);
+	<A extends Annotation> ConstraintDefinitionContext<A> constraintDefinition(Class<A> annotationClass);
 }

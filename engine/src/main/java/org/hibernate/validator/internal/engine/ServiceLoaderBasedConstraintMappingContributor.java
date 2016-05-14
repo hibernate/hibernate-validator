@@ -69,7 +69,7 @@ public class ServiceLoaderBasedConstraintMappingContributor implements Constrain
 			Class<?> constraintType,
 			List<Class<?>> validatorTypes) {
 		ConstraintDefinitionContext<A> context = constraintMapping
-				.constraint( (Class<A>) constraintType )
+				.constraintDefinition( (Class<A>) constraintType )
 				.includeExistingValidators( true );
 
 		for ( Class<?> validatorType : validatorTypes ) {

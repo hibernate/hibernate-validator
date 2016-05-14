@@ -9,12 +9,12 @@ package org.hibernate.validator.cfg.context;
 import java.lang.annotation.Annotation;
 
 /**
- * Facet of a constraint mapping creational context which allows to the select the constraint (annotation type) to
+ * Facet of a constraint definition creational context which allows to the select the constraint (annotation type) to
  * which the next operations shall apply.
  *
  * @author Yoann Rodiere
  */
-public interface ConstraintTarget {
+public interface ConstraintDefinitionTarget {
 	
 	/**
 	 * Selects the constraint (i.e. annotation type) to which the next operations shall apply. A given constraint
@@ -26,5 +26,5 @@ public interface ConstraintTarget {
 	 *
 	 * @return A creational context representing the selected constraint.
 	 */
-	<A extends Annotation> ConstraintDefinitionContext<A> constraint(Class<A> annotationType);
+	<A extends Annotation> ConstraintDefinitionContext<A> constraintDefinition(Class<A> annotationType);
 }
