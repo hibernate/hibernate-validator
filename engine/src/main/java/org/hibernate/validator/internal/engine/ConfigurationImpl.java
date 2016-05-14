@@ -247,7 +247,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
-	public final ConstraintMapping createConstraintMapping() {
+	public final DefaultConstraintMapping createConstraintMapping() {
 		return new DefaultConstraintMapping();
 	}
 
@@ -427,6 +427,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
 		return programmaticMappings;
 	}
+	
 
 	private boolean isSpecificProvider() {
 		return validationBootstrapParameters.getProvider() != null;

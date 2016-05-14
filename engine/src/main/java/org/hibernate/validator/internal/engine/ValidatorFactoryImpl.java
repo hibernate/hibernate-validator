@@ -247,21 +247,22 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private static Set<DefaultConstraintMapping> getConstraintMappings(ConfigurationState configurationState, ClassLoader externalClassLoader) {
 		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
 
-		
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateConfiguration = (ConfigurationImpl) configurationState;
-			
-			// default config
-			ConstraintMappingContributor defaultContributor = hibernateConfiguration.getDefaultConstraintMappingContributor();
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder();
-			defaultContributor.createConstraintMappings( builder );
-			constraintMappings.addAll( builder.mappings );
-			
+
 			// programmatic config
+			/* We add these first so that constraint mapping created through DefaultConstraintMappingBuilder will take
+			 * these programmatically defined mappings into account when checking for constraint definition uniqueness
+			 */
 			constraintMappings.addAll( hibernateConfiguration.getProgrammaticMappings() );
+
+			// service loader based config
+			ConstraintMappingContributor defaultContributor = hibernateConfiguration.getDefaultConstraintMappingContributor();
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
+			defaultContributor.createConstraintMappings( builder );
 		}
 
-		// XML
+		// XML-defined constraint mapping contributor
 		String constraintMappingContributorClassName = configurationState.getProperties()
 				.get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTOR );
 
@@ -278,10 +279,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 							"constraint mapping contributor class"
 					)
 			);
-			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder();
+			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
 			contributor.createConstraintMappings( builder );
-
-			constraintMappings.addAll( builder.mappings );
 		}
 
 		return constraintMappings;
@@ -486,18 +485,26 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
 			ConstraintHelper constraintHelper) {
+		Set<Class<?>> definedConstraints = newHashSet();
 		for ( DefaultConstraintMapping constraintMapping : constraintMappings ) {
 			for (ConstraintDefinitionContribution<?> contribution : constraintMapping.getConstraintDefinitionContributions() ) {
-				processConstraintDefinitionContribution( contribution, constraintHelper );
+				processConstraintDefinitionContribution( contribution, constraintHelper, definedConstraints );
 			}
 		}
 	}
 
-	private static <A extends Annotation> void processConstraintDefinitionContribution(ConstraintDefinitionContribution<A> constraintDefinitionContribution, ConstraintHelper constraintHelper) {
+	private static <A extends Annotation> void processConstraintDefinitionContribution(
+			ConstraintDefinitionContribution<A> constraintDefinitionContribution, ConstraintHelper constraintHelper,
+			Set<Class<?>> definedConstraints) {
+		Class<A> constraintType = constraintDefinitionContribution.getConstraintType();
+		if ( definedConstraints.contains( constraintType ) ) {
+			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( constraintType.getName() );
+		}
+		definedConstraints.add( constraintType );
 		constraintHelper.putValidatorClasses(
-				constraintDefinitionContribution.getConstraintType(),
+				constraintType,
 				constraintDefinitionContribution.getConstraintValidators(),
-				constraintDefinitionContribution.keepDefaults()
+				constraintDefinitionContribution.includeExisting()
 		);
 	}
 
@@ -516,8 +523,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private static class DefaultConstraintMappingBuilder
 			implements ConstraintMappingContributor.ConstraintMappingBuilder {
+		private final Set<DefaultConstraintMapping> mappings;
 
-		private final Set<DefaultConstraintMapping> mappings = newHashSet();
+		public DefaultConstraintMappingBuilder(Set<DefaultConstraintMapping> mappings) {
+			super();
+			this.mappings = mappings;
+		}
 
 		@Override
 		public ConstraintMapping addConstraintMapping() {
