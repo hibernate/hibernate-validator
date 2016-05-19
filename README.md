@@ -1,6 +1,6 @@
 # Hibernate Validator
 
-*Version: 4.3.2.Final, 25.07.2014*
+*Version: 4.3.3.Final, 19.05.2016*
 
 
 ## What is it?
@@ -17,7 +17,7 @@ is not based on JSR 303. This code can be accessed via [this](https://github.com
 
 ## Documentation
 
-The documentation for this release is included in the docs directory of distribution package or can be accessed [online](  http://www.hibernate.org/subprojects/validator/docs.html).
+The documentation for this release is included in the docs directory of distribution package or can be accessed [online](http://hibernate.org/validator/documentation/).
 
 ## Release Notes
 
@@ -40,7 +40,7 @@ Logging will delegate any log requests to that provider.
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>4.3.2.Final</version>
+            <version>4.3.3.Final</version>
         </dependency>
 
 
@@ -65,12 +65,12 @@ skip the building of the documentation via:
 
     mvn clean install -DdisableDocumentationBuild=true -s settings-example.xml
 
-There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://community.jboss.org/wiki/ContributingtoHibernateValidator).
+There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://hibernate.org/validator/contribute/).
 
 ## Hibernate Validator URLs
 
-* [Home Page](http://validator.hibernate.org)
+* [Home Page](http://hibernate.org/validator/)
 * [Downloads](http://www.hibernate.org/subprojects/validator/download.html)
-* [Mailing Lists](http://www.hibernate.org/community/mailinglists.html)
+* [Community Info](http://hibernate.org/community/)
 * [Source Code](git://github.com/hibernate/hibernate-validator.git)
-* [Issue Tracking](http://opensource.atlassian.com/projects/hibernate/browse/HV)
+* [Issue Tracking](https://hibernate.atlassian.net/projects/HV)

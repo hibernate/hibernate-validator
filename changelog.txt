@@ -1,6 +1,22 @@
 Hibernate Validator Changelog
 =============================
 
+4.3.3.Final (19.05.2016)
+------------------------
+
+** Bug
+    * [HV-665] - Consider concerned constraint in identity of constraint violations
+    * [HV-1012] - XSS vulnerability not caught by SafeHtml
+    * [HV-1055] - Default group sequence does not honour group hierarchy
+    * [HV-1057] - Group sequences don't honor inheritance relationships properly
+
+** Improvement
+
+    * [HV-927] - Upgrade TCK Runner to use latest JSR-303 TCK
+
+** Task
+    * [HV-916] - Disable BeanMetaDataManagerTest
+
 
 4.3.2.Final (25.07.2014)
 ------------------------
