@@ -1010,8 +1010,8 @@ regular expression (including regular expression flags) which
 the URL must match. Per default this constraint used the `java.net.URL` constructor to
 verify whether a given string represents a valid URL. A regular expression based version is also
 available - `RegexpURLValidator` - which can be configured via XML
-(see <<section-mapping-xml-constraints>>) or a `ConstraintDefinitionContributor`
-(see <<section-constraint-definition-contributor>>).
+(see <<section-mapping-xml-constraints>>) or the programmatic API
+(see <<section-programmatic-constraint-definition>>).
 |None
 
 |===============

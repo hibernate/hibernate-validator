@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter11.constraintdefinition;
+package org.hibernate.validator.referenceguide.chapter11.constraintapi;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

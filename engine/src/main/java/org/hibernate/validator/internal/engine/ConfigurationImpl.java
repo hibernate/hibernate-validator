@@ -14,6 +14,7 @@ import java.security.PrivilegedAction;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -42,7 +43,7 @@ import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
+import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
@@ -75,7 +76,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final TraversableResolver defaultTraversableResolver;
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
-	private final ConstraintDefinitionContributor defaultConstraintDefinitionContributor;
+	private final ConstraintMappingContributor serviceLoaderBasedConstraintMappingContributor;
 
 	private ValidationProviderResolver providerResolver;
 	private final ValidationBootstrapParameters validationBootstrapParameters;
@@ -86,7 +87,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private boolean failFast;
-	private final Set<ConstraintDefinitionContributor> constraintDefinitionContributors = newHashSet();
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
 	private ClassLoader externalClassLoader;
 	private TimeProvider timeProvider;
@@ -127,10 +127,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
 		this.defaultMessageInterpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
-		this.defaultConstraintDefinitionContributor = new ServiceLoaderBasedConstraintDefinitionContributor(
+		this.serviceLoaderBasedConstraintMappingContributor = new ServiceLoaderBasedConstraintMappingContributor(
 				typeResolutionHelper
 		);
-		this.addConstraintDefinitionContributor( defaultConstraintDefinitionContributor );
 	}
 
 	private ValidatedValueUnwrapper<?> createJavaFXUnwrapperClass(TypeResolutionHelper typeResolutionHelper) {
@@ -248,7 +247,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
-	public final ConstraintMapping createConstraintMapping() {
+	public final DefaultConstraintMapping createConstraintMapping() {
 		return new DefaultConstraintMapping();
 	}
 
@@ -277,21 +276,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
-	@Override
-	public ConstraintDefinitionContributor getDefaultConstraintDefinitionContributor() {
-		return defaultConstraintDefinitionContributor;
-	}
-
-	public Set<ConstraintDefinitionContributor> getConstraintDefinitionContributors() {
-		return constraintDefinitionContributors;
-	}
-
-	@Override
-	public final HibernateValidatorConfiguration addConstraintDefinitionContributor(ConstraintDefinitionContributor contributor) {
-		Contracts.assertNotNull( contributor, MESSAGES.parameterMustNotBeNull( "contributor" ) );
-		constraintDefinitionContributors.add( contributor );
-
-		return this;
+	public final ConstraintMappingContributor getServiceLoaderBasedConstraintMappingContributor() {
+		return serviceLoaderBasedConstraintMappingContributor;
 	}
 
 	@Override
@@ -440,6 +426,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
 		return programmaticMappings;
 	}
+	
 
 	private boolean isSpecificProvider() {
 		return validationBootstrapParameters.getProvider() != null;

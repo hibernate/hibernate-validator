@@ -19,14 +19,14 @@ import javax.validation.ConstraintValidator;
 public class ConstraintDefinitionContribution<A extends Annotation> {
 	private final Class<A> constraintType;
 	private final List<Class<? extends ConstraintValidator<A, ?>>> constraintValidators = new ArrayList<Class<? extends ConstraintValidator<A, ?>>>();
-	private final boolean keepDefaults;
+	private final boolean includeExisting;
 
 	public ConstraintDefinitionContribution(Class<A> constraintType,
 			List<Class<? extends ConstraintValidator<A, ?>>> constraintValidators,
-			boolean keepDefaults) {
+			boolean includeExisting) {
 		this.constraintType = constraintType;
 		this.constraintValidators.addAll( constraintValidators );
-		this.keepDefaults = keepDefaults;
+		this.includeExisting = includeExisting;
 	}
 
 	/**
@@ -48,13 +48,13 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 	}
 
 	/**
-	 * Whether or not the default constraint validators should be kept or not.
+	 * Whether or not the existing constraint validators should be kept or not.
 	 *
-	 * @return {@code true} if the default constraint validator instances for the constraint type wrapped by this
+	 * @return {@code true} if the existing constraint validators for the constraint type wrapped by this
 	 * instance should be kept, {@code false} otherwise.
 	 */
-	public boolean keepDefaults() {
-		return keepDefaults;
+	public boolean includeExisting() {
+		return includeExisting;
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 		return "ConstraintDefinitionContribution{" +
 				"constraintType=" + constraintType +
 				", constraintValidators=" + constraintValidators +
-				", keepDefaults=" + keepDefaults +
+				", includeExisting=" + includeExisting +
 				'}';
 	}
 }

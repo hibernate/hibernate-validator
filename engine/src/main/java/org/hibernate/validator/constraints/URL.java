@@ -40,22 +40,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * </p>
  * <p>
  * In case URLs with non default protocol handlers need to be validated, Hibernate Validator can be configured to use
- * a regular expression based URL validator only. This can be done programmatically via a {@code ConstraintDefinitionContributor}:
+ * a regular expression based URL validator only. This can be done programmatically via a {@code org.hibernate.validator.cfg.ConstraintMapping}:
  * <pre>
  * {@code
- * HibernateValidatorConfiguration configuration = Validation
- *         .byProvider( HibernateValidator.class )
- *         .configure();
+ * HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
  *
- * configuration.addConstraintDefinitionContributor(
- *     new ConstraintDefinitionContributor() {
- *         public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
- *             builder.constraint( URL.class )
- *                 .includeExistingValidators( false )
- *                 .validatedBy( RegexpURLValidator.class );
- *         }
- *     }
- * );
+ * ConstraintMapping constraintMapping = config.createConstraintMapping();
+ * constraintMapping
+ *     .constraintDefinition( URL.class )
+ *     .includeExistingValidators( false )
+ *     .validatedBy( RegexpURLValidator.class );
+ *
+ * config.addMapping( constraintMapping );
  * }
  * </pre>
  * or via a constraint mapping configuration:
@@ -76,7 +72,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * </pre>
  *
  * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">RFC2396</a>
- * @see org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor
+ * @see org.hibernate.validator.cfg.ConstraintMapping#constraintDefinition(Class)
  * @author Hardy Ferentschik
  */
 @Documented

@@ -27,7 +27,6 @@ import org.hibernate.validator.constraintvalidators.RegexpURLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
-import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidatorUtil;
@@ -212,16 +211,14 @@ public class URLValidatorTest {
 	public void url_validator_using_regexp_only_can_be_configured_via_constraint_definition_contributor() {
 		HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
 
-		config.addConstraintDefinitionContributor(
-				new ConstraintDefinitionContributor() {
-					@Override
-					public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
-						builder.constraint( URL.class )
-								.includeExistingValidators( false )
-								.validatedBy( RegexpURLValidator.class );
-					}
-				}
-		);
+		ConstraintMapping constraintMapping = config.createConstraintMapping();
+
+		constraintMapping
+				.constraintDefinition( URL.class )
+				.includeExistingValidators( false )
+				.validatedBy( RegexpURLValidator.class );
+		
+		config.addMapping( constraintMapping );
 
 		DelegatingConstraintValidatorFactory constraintValidatorFactory = new DelegatingConstraintValidatorFactory(
 				config.getDefaultConstraintValidatorFactory()

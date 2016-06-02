@@ -1,14 +1,14 @@
-package org.hibernate.validator.referenceguide.chapter11.constraintdefinition;
+package org.hibernate.validator.referenceguide.chapter11.constraintapi;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @ValidPassengerCount
-public class Car {
+public class Bus {
 	private final int seatCount;
 	private final List<Person> passengers;
 
-	public Car(int seatCount) {
+	public Bus(int seatCount) {
 		this.seatCount = seatCount;
 		this.passengers = new ArrayList<Person>( seatCount );
 	}

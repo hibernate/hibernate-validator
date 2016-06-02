@@ -19,7 +19,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  * @author Gunnar Morling
  */
 public interface TypeConstraintMappingContext<C> extends Constrainable<TypeConstraintMappingContext<C>>,
-		TypeTarget,
+		ConstraintMappingTarget,
 		PropertyTarget,
 		MethodTarget,
 		ConstructorTarget,

@@ -185,9 +185,9 @@ requires changes to the default behaviour.
 ====
 
 [[section-programmatic-api]]
-=== Programmatic constraint declaration
+=== Programmatic constraint definition and declaration
 
-As per the Bean Validation specification, you can declare constraints using Java annotations and XML
+As per the Bean Validation specification, you can define and declare constraints using Java annotations and XML
 based constraint mappings.
 
 In addition, Hibernate Validator provides a fluent API which allows for the programmatic
@@ -800,83 +800,40 @@ entries from all the bundles with this name found on the classpath in addition t
 This mechanism is also helpful when creating large multi-module applications: Instead of putting all the constraint
 messages into one single bundle, you can have one resource bundle per module containing only those messages of that module.
 
-[[section-constraint-definition-contributor]]
-==== Constraint definitions via `ConstraintDefinitionContributor`
+[[section-programmatic-constraint-definition]]
+==== Adding constraint definitions programmatically
 
 While the service loader approach works in many scenarios, but not in all (think for example
 OSGi where service files are not visible), there is yet another way of contributing constraint
-definitions. You can provide one or more implementations of `ConstraintDefinitionContributor` to
-`HibernateConfiguration` during bootstrapping of the `ValidatorFactory` - see
-<<example-using-constraint-definition-contributor>>.
+definitions. You can use the programmatic constraint declaration API - see
+<<example-using-constraint-definition-api>>.
 
-[[example-using-constraint-definition-contributor]]
-.Using `ConstraintDefinitionContributor` to register constraint definitions
-====
-[source, JAVA]
+[[example-using-constraint-definition-api]]
+.Adding constraint definitions through the programmatic API
+========
+[source, JAVA, indent=0]
 ----
-public class CarTest {
-
-	private static Validator validator;
-
-	public static class MyConstraintDefinitionContributor
-			implements ConstraintDefinitionContributor {
-
-		@Override
-		public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
-			builder.constraint( ValidPassengerCount.class )
-					.validatedBy( ValidPassengerCountValidator.class );
-		}
-	}
-
-	@BeforeClass
-	public static void setUpValidator() {
-
-		HibernateValidatorConfiguration configuration = Validation
-				.byProvider( HibernateValidator.class )
-				.configure();
-
-		ConstraintDefinitionContributor contributor = new MyConstraintDefinitionContributor();
-		configuration.addConstraintDefinitionContributor( contributor );
-
-		validator = configuration.buildValidatorFactory().getValidator();
-	}
-
-    // ...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraintapi/ConstraintApiTest.java[tags=constraintDefinition]
 ----
 ====
 
-Instead of programmatically registering `ConstraintDefinitionContributor` instances, the
-fully-qualified classnames of one or more implementations can be specified via the
-property `hibernate.validator.constraint_definition_contributors`. This can be useful when
+Instead of directly adding a constraint mapping to the configuration object, you may use a `ConstraintMappingContributor`
+as detailed in <<section-programmatic-api-contributor>>. This can be useful when
 configuring the default validator factory using _META-INF/validation.xml_ (see
 <<chapter-xml-configuration>>).
 
 [TIP]
 ====
-One use case for `ConstraintDefinitionContributor` is the ability to specify an alternative
+One use case for registering constraint definitions through the programmatic API is the ability to specify an alternative
 constraint validator for the `@URL` constraint. Historically, Hibernate Validator's default constraint
 validator for this constraint uses the `java.net.URL` constructor to validate an URL.
 However, there is also a purely regular expression based version available which can be configured using
 a `ConstraintDefinitionContributor`:
 
-.Using a `ConstraintDefinitionContributor` to register a regular expression based constraint definition for `@URL`
-[source, JAVA]
+.Using the programmatic constraint declaration API to register a regular expression based constraint definition for `@URL`
+[source, JAVA, indent=0]
 ----
-HibernateValidatorConfiguration configuration = Validation
-	.byProvider( HibernateValidator.class )
-	.configure();
-
-configuration.addConstraintDefinitionContributor(
-	new ConstraintDefinitionContributor() {
-		@Override
-		public void collectConstraintDefinitions(ConstraintDefinitionBuilder builder) {
-			builder.constraint( URL.class )
-				.includeExistingValidators( false )
-				.validatedBy( RegexpURLValidator.class );
-		}
-	}
-);
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraintapi/ConstraintApiTest.java[tags=urlValidationOverride]
 ----
 ====
 

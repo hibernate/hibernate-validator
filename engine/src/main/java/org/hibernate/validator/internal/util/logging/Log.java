@@ -640,4 +640,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = 192, value = "Couldn't determine Java version from value %1s; Not enabling features requiring Java 8")
 	void unknownJvmVersion(String vmVersionStr);
+
+	@Message(id = 193, value = "%s is configured more than once via the programmatic constraint definition API.")
+	ValidationException getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException(String annotationClassName);
 }

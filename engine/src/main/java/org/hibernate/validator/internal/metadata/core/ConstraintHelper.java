@@ -242,8 +242,10 @@ public class ConstraintHelper {
 	 *
 	 * <ul>
 	 * <li>{@link Constraint#validatedBy()},
-	 * <li>internally registered validators for built-in constraints and</li>
-	 * <li>XML configuration.</li>
+	 * <li>internally registered validators for built-in constraints</li>
+	 * <li>XML configuration and</li>
+	 * <li>programmatically registered validators (see
+	 * {@link org.hibernate.validator.cfg.ConstraintMapping#constraintDefinition(Class)}).</li>
 	 * </ul>
 	 *
 	 * The result is cached internally.
@@ -316,18 +318,16 @@ public class ConstraintHelper {
 	 *
 	 * @param annotationType The constraint annotation type
 	 * @param definitionClasses The validators to register
-	 * @param keepDefaultClasses Whether any default validators should be kept or not
+	 * @param keepExistingClasses Whether already-registered validators should be kept or not
 	 * @param <A> the type of the annotation
 	 */
 	public <A extends Annotation> void putValidatorClasses(Class<A> annotationType,
 														   List<Class<? extends ConstraintValidator<A, ?>>> definitionClasses,
-														   boolean keepDefaultClasses) {
-		if ( keepDefaultClasses ) {
-			List<Class<? extends ConstraintValidator<A, ?>>> defaultValidators = getDefaultValidatorClasses(
-					annotationType
-			);
-			for ( Class<? extends ConstraintValidator<A, ?>> defaultValidator : defaultValidators ) {
-				definitionClasses.add( 0, defaultValidator );
+														   boolean keepExistingClasses) {
+		if ( keepExistingClasses ) {
+			List<Class<? extends ConstraintValidator<A, ?>>> existingClasses = getAllValidatorClasses( annotationType );
+			if ( existingClasses != null ) {
+				definitionClasses.addAll( 0, existingClasses );
 			}
 		}
 

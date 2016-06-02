@@ -12,31 +12,34 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import javax.validation.ConstraintValidator;
 
 import com.fasterxml.classmate.ResolvedType;
 
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetConstraintValidatorList;
-import org.hibernate.validator.spi.constraintdefinition.ConstraintDefinitionContributor;
+import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * @author Hardy Ferentschik
  */
-public class ServiceLoaderBasedConstraintDefinitionContributor implements ConstraintDefinitionContributor {
+public class ServiceLoaderBasedConstraintMappingContributor implements ConstraintMappingContributor {
 	/**
 	 * Used for resolving type parameters. Thread-safe.
 	 */
 	private final TypeResolutionHelper typeResolutionHelper;
 
-	public ServiceLoaderBasedConstraintDefinitionContributor(TypeResolutionHelper typeResolutionHelper) {
+	public ServiceLoaderBasedConstraintMappingContributor(TypeResolutionHelper typeResolutionHelper) {
 		this.typeResolutionHelper = typeResolutionHelper;
 	}
 
 	@Override
-	public void collectConstraintDefinitions(ConstraintDefinitionBuilder constraintDefinitionContributionBuilder) {
+	public void createConstraintMappings(ConstraintMappingBuilder builder) {
 		Map<Class<?>, List<Class<?>>> customValidators = newHashMap();
 
 		// find additional constraint validators via the Java ServiceLoader mechanism
@@ -55,17 +58,18 @@ public class ServiceLoaderBasedConstraintDefinitionContributor implements Constr
 			validators.add( constraintValidatorClass );
 		}
 
+		ConstraintMapping constraintMapping = builder.addConstraintMapping();
 		for ( Map.Entry<Class<?>, List<Class<?>>> entry : customValidators.entrySet() ) {
-			registerConstraintDefinition( constraintDefinitionContributionBuilder, entry.getKey(), entry.getValue() );
+			registerConstraintDefinition( constraintMapping, entry.getKey(), entry.getValue() );
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> void registerConstraintDefinition(ConstraintDefinitionBuilder builder,
+	private <A extends Annotation> void registerConstraintDefinition(ConstraintMapping constraintMapping,
 			Class<?> constraintType,
 			List<Class<?>> validatorTypes) {
-		ConstraintDefinitionBuilderContext<A> context = builder
-				.constraint( (Class<A>) constraintType )
+		ConstraintDefinitionContext<A> context = constraintMapping
+				.constraintDefinition( (Class<A>) constraintType )
 				.includeExistingValidators( true );
 
 		for ( Class<?> validatorType : validatorTypes ) {

@@ -6,21 +6,25 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
+import java.lang.annotation.Annotation;
 import java.util.Set;
 
+import javax.validation.Constraint;
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
+import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Default implementation of {@link ConstraintMapping}.
@@ -36,11 +40,15 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Set<Class<?>> configuredTypes;
 	private final Set<TypeConstraintMappingContextImpl<?>> typeContexts;
+	private final Set<Class<?>> definedConstraints;
+	private final Set<ConstraintDefinitionContextImpl<?>> constraintContexts;
 
 	public DefaultConstraintMapping() {
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.configuredTypes = newHashSet();
 		this.typeContexts = newHashSet();
+		this.definedConstraints = newHashSet();
+		this.constraintContexts = newHashSet();
 	}
 
 	@Override
@@ -82,5 +90,33 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 		}
 
 		return configurations;
+	}
+
+	@Override
+	public <A extends Annotation> ConstraintDefinitionContext<A> constraintDefinition(Class<A> annotationClass) {
+		Contracts.assertNotNull( annotationClass, MESSAGES.annotationTypeMustNotBeNull() );
+		Contracts.assertTrue( annotationClass.isAnnotationPresent( Constraint.class ),
+				MESSAGES.annotationTypeMustBeAnnotatedWithConstraint() );
+
+		if ( definedConstraints.contains( annotationClass ) ) {
+			// Fail fast for easy-to-detect definition conflicts; other conflicts are handled in ValidatorFactoryImpl
+			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( annotationClass.getName() );
+		}
+
+		ConstraintDefinitionContextImpl<A> constraintContext = new ConstraintDefinitionContextImpl<A>( this, annotationClass );
+		constraintContexts.add( constraintContext );
+		definedConstraints.add( annotationClass );
+
+		return constraintContext;
+	}
+	
+	public Set<ConstraintDefinitionContribution<?>> getConstraintDefinitionContributions() {
+		Set<ConstraintDefinitionContribution<?>> contributions = newHashSet();
+
+		for ( ConstraintDefinitionContextImpl<?> constraintContext : constraintContexts ) {
+			contributions.add( constraintContext.build() );
+		}
+
+		return contributions;
 	}
 }
