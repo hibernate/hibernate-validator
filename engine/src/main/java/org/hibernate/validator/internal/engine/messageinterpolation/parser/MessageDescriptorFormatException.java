@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
-import javax.xml.bind.ValidationException;
+import javax.validation.ValidationException;
 
 /**
  * Exception thrown in case the message descriptor is invalid, for example unbalanced braces or escape characters
@@ -18,5 +18,3 @@ public class MessageDescriptorFormatException extends ValidationException {
 		super( s );
 	}
 }
-
-
