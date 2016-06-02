@@ -13,8 +13,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.validation.MessageInterpolator;
-import javax.xml.bind.ValidationException;
+import javax.validation.ValidationException;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
 import org.hibernate.validator.internal.engine.messageinterpolation.LocalizedMessage;
