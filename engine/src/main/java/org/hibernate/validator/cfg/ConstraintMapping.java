@@ -21,7 +21,7 @@ import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
  */
 public interface ConstraintMapping {
 	/**
-	 * Starts defining constraints on the specified bean class. Each bean class may only be configured once within all 
+	 * Starts defining constraints on the specified bean class. Each bean class may only be configured once within all
 	 * constraint mappings used for configuring one validator factory.
 	 *
 	 * @param <C> The type to be configured.
@@ -31,7 +31,7 @@ public interface ConstraintMapping {
 	 * @return Instance allowing for defining constraints on the specified class.
 	 */
 	<C> TypeConstraintMappingContext<C> type(Class<C> beanClass);
-	
+
 	/**
 	 * Starts defining {@link javax.validation.ConstraintValidator}s to be executed for the specified constraint (i.e. annotation class).
 	 * Each constraint may only be configured once within all constraint mappings used for configuring one validator
@@ -44,6 +44,7 @@ public interface ConstraintMapping {
 	 * of {@code type} or {@code annotation}.
 	 *
 	 * @return Instance allowing for defining validators to be executed for the specified constraint.
+	 * @since 5.3
 	 */
 	<A extends Annotation> ConstraintDefinitionContext<A> constraintDefinition(Class<A> annotationClass);
 }

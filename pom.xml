@@ -617,7 +617,7 @@
                     <artifactId>clirr-maven-plugin</artifactId>
                     <version>2.5</version>
                     <configuration>
-                        <comparisonVersion>5.2.1.Final</comparisonVersion>
+                        <comparisonVersion>5.2.4.Final</comparisonVersion>
                         <excludes>
                             <exclude>org/hibernate/validator/internal/**</exclude>
                         </excludes>

@@ -15,17 +15,19 @@ import java.util.Map;
 
 import javax.validation.ConstraintValidator;
 
-import com.fasterxml.classmate.ResolvedType;
-
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetConstraintValidatorList;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
+import com.fasterxml.classmate.ResolvedType;
+
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
+ * Contributor of constraint definitions discovered by the Java service loader mechanism.
+ *
  * @author Hardy Ferentschik
  */
 public class ServiceLoaderBasedConstraintMappingContributor implements ConstraintMappingContributor {
@@ -94,5 +96,3 @@ public class ServiceLoaderBasedConstraintMappingContributor implements Constrain
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
-
-

@@ -9,6 +9,7 @@ package org.hibernate.validator.constraints;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
 import javax.validation.Constraint;
 import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
@@ -43,7 +44,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * a regular expression based URL validator only. This can be done programmatically via a {@code org.hibernate.validator.cfg.ConstraintMapping}:
  * <pre>
  * {@code
- * HibernateValidatorConfiguration config = ValidatorUtil.getConfiguration( HibernateValidator.class );
+ * HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class )
+ *     .getConfiguration( HibernateValidator.class );
  *
  * ConstraintMapping constraintMapping = config.createConstraintMapping();
  * constraintMapping
@@ -89,18 +91,18 @@ public @interface URL {
 	Class<? extends Payload>[] payload() default { };
 
 	/**
-	 * @return the protocol (scheme) the annotated string must match, eg ftp or http.
+	 * @return the protocol (scheme) the annotated string must match, e.g. ftp or http.
 	 *         Per default any protocol is allowed
 	 */
 	String protocol() default "";
 
 	/**
-	 * @return the host the annotated string must match, eg localhost. Per default any host is allowed
+	 * @return the host the annotated string must match, e.g. localhost. Per default any host is allowed
 	 */
 	String host() default "";
 
 	/**
-	 * @return the port the annotated string must match, eg 80. Per default any port is allowed
+	 * @return the port the annotated string must match, e.g. 80. Per default any port is allowed
 	 */
 	int port() default -1;
 
