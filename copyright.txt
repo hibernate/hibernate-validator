@@ -40,3 +40,4 @@ Shelly McGowan
 Steve Ebersole
 Strong Liu
 Victor Rezende dos Santos
+Yoann Rodière
