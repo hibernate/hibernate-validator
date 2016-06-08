@@ -17,6 +17,7 @@ import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -29,7 +30,7 @@ import org.hibernate.validator.constraintvalidation.HibernateConstraintValidator
 import org.hibernate.validator.engine.HibernateConstraintViolation;
 import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.junit.Assert;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
 
@@ -93,8 +94,8 @@ public class HibernateConstraintValidatorContextTest {
 		ConstraintViolationImpl<Foo> constraintViolation = (ConstraintViolationImpl<Foo>) constraintViolations.iterator()
 				.next();
 		Map<String, Object> expressionVariables = constraintViolation.getExpressionVariables();
-		Assert.assertEquals( 1, expressionVariables.size() );
-		Assert.assertEquals( 42, expressionVariables.get( "answer" ) );
+		Assert.assertEquals( expressionVariables.size(), 1 );
+		Assert.assertEquals( expressionVariables.get( "answer" ), 42 );
 	}
 
 	@Test
@@ -111,7 +112,7 @@ public class HibernateConstraintValidatorContextTest {
 				HibernateConstraintViolation.class
 		);
 
-		Assert.assertEquals( INVALID_KEYWORDS, (List<String>) hibernateConstraintViolation.getDynamicPayload( List.class ) );
+		Assert.assertEquals( hibernateConstraintViolation.getDynamicPayload( List.class ), INVALID_KEYWORDS );
 	}
 
 	@Test
@@ -126,7 +127,7 @@ public class HibernateConstraintValidatorContextTest {
 		@SuppressWarnings("unchecked")
 		HibernateConstraintViolation<Foo> hibernateConstraintViolation = constraintViolation.unwrap( HibernateConstraintViolation.class );
 
-		Assert.assertEquals( null, hibernateConstraintViolation.getDynamicPayload( String.class ) );
+		Assert.assertNull( hibernateConstraintViolation.getDynamicPayload( String.class ) );
 	}
 
 	public class Foo {
