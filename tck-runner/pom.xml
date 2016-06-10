@@ -217,7 +217,7 @@
                                     <value>true</value>
                                 </property>
                             </systemProperties>
-                            <argLine>${surefire.argLine}</argLine>
+                            <argLine>${surefire.argLine} ${surefire.argline.extension}</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -335,7 +335,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <argLine>-Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager</argLine>
+                            <argLine>-Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager ${surefire.argline.extension}</argLine>
                             <forkMode>once</forkMode>
                             <systemPropertyVariables>
                                 <arquillian.launch>incontainer</arquillian.launch>
@@ -344,6 +344,15 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>jdk9</id>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <properties>
+                <tck.suite.file>${project.build.directory}/test-classes/tck-tests-jdk9.xml</tck.suite.file>
+            </properties>
         </profile>
     </profiles>
 </project>

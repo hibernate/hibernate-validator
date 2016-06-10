@@ -235,6 +235,7 @@
                     </suiteXmlFiles>
                     <parallel>methods</parallel>
                     <threadCount>4</threadCount>
+                    <argLine>${surefire.argline.extension}</argLine>
                 </configuration>
             </plugin>
             <plugin>
