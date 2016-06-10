@@ -12,7 +12,7 @@ import javax.validation.executable.ExecutableValidator;
 import org.hibernate.validator.test.internal.bootstrap.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepository;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

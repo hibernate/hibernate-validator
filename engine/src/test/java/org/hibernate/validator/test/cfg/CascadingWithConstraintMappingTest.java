@@ -26,7 +26,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 public class CascadingWithConstraintMappingTest {
 	private HibernateValidatorConfiguration config;

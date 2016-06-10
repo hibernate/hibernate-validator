@@ -8,7 +8,7 @@ package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
 import java.util.Date;
 
-import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 

@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.returnvaluevalidation;
 
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
+
 import javax.validation.ConstraintViolationException;
 import javax.validation.groups.Default;
 
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
-
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
+import org.hibernate.validator.testutils.ValidatorUtil;
 
 /**
  * @author Hardy Ferentschik

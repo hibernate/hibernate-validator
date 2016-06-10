@@ -13,7 +13,7 @@ import org.testng.annotations.BeforeMethod;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.AbstractConstructorValidationTest;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
 
 /**
  * Tests for XML configured constructor validation.

@@ -27,7 +27,7 @@ import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.hibernate.validator.testutil.ValidatorUtil.getMethodDescriptor;
+import static org.hibernate.validator.testutils.ValidatorUtil.getMethodDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

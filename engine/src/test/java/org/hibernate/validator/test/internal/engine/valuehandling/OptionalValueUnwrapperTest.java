@@ -27,7 +27,7 @@ import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 /**
  * Tests for {@link org.hibernate.validator.internal.engine.valuehandling.OptionalValueUnwrapper}.

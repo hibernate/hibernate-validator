@@ -9,9 +9,8 @@ package org.hibernate.validator.test.internal.engine.groups.conversion;
 import javax.validation.Configuration;
 import javax.validation.ValidatorFactory;
 
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;
-
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 /**
  * Integrative test for XML configured group conversion.

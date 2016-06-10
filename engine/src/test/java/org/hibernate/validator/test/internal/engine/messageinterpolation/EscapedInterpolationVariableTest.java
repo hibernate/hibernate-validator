@@ -20,7 +20,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 

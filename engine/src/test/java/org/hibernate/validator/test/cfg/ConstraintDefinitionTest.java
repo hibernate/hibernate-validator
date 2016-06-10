@@ -36,7 +36,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

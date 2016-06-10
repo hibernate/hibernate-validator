@@ -20,7 +20,7 @@ import org.hibernate.validator.test.internal.engine.groups.sequence.SequenceOfSe
 import org.hibernate.validator.test.internal.engine.groups.sequence.SequenceOfSequencesTest.AllConstraints.ComplexConstraints.ImmenselyComplexConstraints;
 import org.hibernate.validator.test.internal.engine.groups.sequence.SequenceOfSequencesTest.AllConstraints.ComplexConstraints.SomewhatComplexConstraints;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;

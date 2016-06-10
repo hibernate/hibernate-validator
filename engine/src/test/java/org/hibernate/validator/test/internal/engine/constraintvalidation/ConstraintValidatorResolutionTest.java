@@ -30,7 +30,7 @@ import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.TYPE;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 /**
  * @author Hardy Ferentschik

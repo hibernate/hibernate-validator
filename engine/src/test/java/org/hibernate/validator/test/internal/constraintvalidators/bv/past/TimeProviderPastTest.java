@@ -28,7 +28,7 @@ import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 /**
  * Test for using the {@code TimeProvider} contract in {@code @Past} validators.

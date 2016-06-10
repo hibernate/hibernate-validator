@@ -28,7 +28,7 @@ import org.hibernate.validator.test.internal.engine.valuehandling.model.Property
 import org.hibernate.validator.test.internal.engine.valuehandling.model.StringProperty;
 import org.hibernate.validator.test.internal.engine.valuehandling.model.UiInputValueUnwrapper;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
 
 import static org.testng.Assert.assertEquals;
 

@@ -8,7 +8,7 @@ package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

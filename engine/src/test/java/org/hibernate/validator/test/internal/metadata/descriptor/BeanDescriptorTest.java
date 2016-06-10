@@ -34,7 +34,7 @@ import org.hibernate.validator.testutil.TestForIssue;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.testutil.ValidatorUtil.getBeanDescriptor;
+import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;

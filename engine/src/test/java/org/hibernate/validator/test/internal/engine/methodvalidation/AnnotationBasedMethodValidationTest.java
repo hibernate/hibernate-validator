@@ -6,9 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;
-
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 /**
  * @author Hardy Ferentschik

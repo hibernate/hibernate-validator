@@ -18,7 +18,7 @@ import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 public class CPFValidatorTest {
 	private String[] invalidCPFs = {

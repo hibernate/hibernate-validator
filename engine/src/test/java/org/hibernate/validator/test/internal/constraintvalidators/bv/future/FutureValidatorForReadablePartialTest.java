@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.future;
 
-import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConstraintValidatorContext;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadablePartial;
 import org.joda.time.LocalDate;

@@ -28,7 +28,7 @@ import org.hibernate.validator.testutil.TestForIssue;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintTypes;
 import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
-import static org.hibernate.validator.testutil.ValidatorUtil.getMethodReturnValueDescriptor;
+import static org.hibernate.validator.testutils.ValidatorUtil.getMethodReturnValueDescriptor;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 

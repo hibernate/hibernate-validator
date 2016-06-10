@@ -16,9 +16,8 @@ import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.MethodType;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 import static org.testng.AssertJUnit.assertTrue;
 

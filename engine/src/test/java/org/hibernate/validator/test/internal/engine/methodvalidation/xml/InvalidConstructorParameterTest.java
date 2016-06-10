@@ -12,7 +12,7 @@ import javax.validation.ValidationException;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
 
 /**
  * @author Hardy Ferentschik

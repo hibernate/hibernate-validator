@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 /**
  * Test for cascaded validation of custom iterable and map types. For those, property-level and class-level constraints

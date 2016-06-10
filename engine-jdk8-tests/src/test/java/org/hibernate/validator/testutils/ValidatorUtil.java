@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.testutil;
+package org.hibernate.validator.testutils;
 
 import java.util.Locale;
 import javax.validation.Configuration;
@@ -14,6 +14,7 @@ import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.testutil.DummyTraversableResolver;
 
 /**
  * A helper providing useful functions for setting up validators.

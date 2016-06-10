@@ -13,7 +13,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
-import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertNotNull;
 
 /**

@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
-import org.testng.annotations.BeforeMethod;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import org.testng.annotations.BeforeMethod;
 
 /**
  * Tests for annotation configured constructor validation.

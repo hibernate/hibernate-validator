@@ -13,7 +13,7 @@ import javax.validation.Validator;
 import org.testng.annotations.Test;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 /**
  * @author Hardy Ferentschik
