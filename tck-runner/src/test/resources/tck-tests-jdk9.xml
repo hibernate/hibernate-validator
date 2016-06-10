@@ -1,0 +1,28 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="JSR-349-TCK" verbose="1">
+    <test name="JSR-349-TCK">
+
+        <method-selectors>
+            <method-selector>
+                <selector-class name="org.hibernate.beanvalidation.tck.util.IntegrationTestsMethodSelector"/>
+            </method-selector>
+        </method-selectors>
+
+        <packages>
+            <package name="org.hibernate.beanvalidation.tck.tests">
+            </package>
+        </packages>
+
+        <!-- TODO BVTCK-74 Re-enable -->
+        <classes>
+            <class name="org.hibernate.beanvalidation.tck.tests.messageinterpolation.MessageInterpolationTest">
+                <methods>
+                    <exclude name="testRecursiveMessageInterpolation" />
+                    <exclude name="testMessageInterpolationWithLocale" />
+                    <exclude name="testSuccessfulInterpolationOfValidationMessagesValue" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
