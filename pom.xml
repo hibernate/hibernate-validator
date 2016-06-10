@@ -569,11 +569,6 @@
                     <version>2.7</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.jboss.maven.plugins</groupId>
-                    <artifactId>maven-injection-plugin</artifactId>
-                    <version>1.0.2</version>
-                </plugin>
-                <plugin>
                     <groupId>org.zanata</groupId>
                     <artifactId>zanata-maven-plugin</artifactId>
                     <version>1.3</version>

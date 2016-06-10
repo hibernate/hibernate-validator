@@ -31,7 +31,7 @@ public final class Version {
 	}
 
 	public static String getVersionString() {
-		return "[WORKING]";
+		return Version.class.getPackage().getImplementationVersion();
 	}
 
 	public static void touch() {
