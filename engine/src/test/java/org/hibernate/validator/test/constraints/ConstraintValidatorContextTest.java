@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;

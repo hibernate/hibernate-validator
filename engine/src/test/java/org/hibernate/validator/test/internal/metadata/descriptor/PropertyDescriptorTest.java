@@ -21,7 +21,7 @@ import org.hibernate.validator.test.internal.metadata.Order.OrderBasic;
 import org.hibernate.validator.test.internal.metadata.Order.OrderComplex;
 
 import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
-import static org.hibernate.validator.testutil.ValidatorUtil.getPropertyDescriptor;
+import static org.hibernate.validator.testutils.ValidatorUtil.getPropertyDescriptor;
 
 /**
  * @author Gunnar Morling

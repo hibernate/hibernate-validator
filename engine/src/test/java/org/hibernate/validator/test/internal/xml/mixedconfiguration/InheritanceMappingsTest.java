@@ -21,7 +21,7 @@ import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.F
 import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.PersonCompetition;
 import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.TeamCompetition;
 import org.hibernate.validator.testutil.DummyTraversableResolver;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.FileAssert.fail;

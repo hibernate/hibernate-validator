@@ -27,8 +27,8 @@ import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.constraints.NotBlankTypeUse;
-import org.hibernate.validator.testutil.constraints.NotNullTypeUse;
+import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
+import org.hibernate.validator.testutils.constraints.NotNullTypeUse;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
@@ -42,7 +42,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertC
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 /**
  * Test combination of {@link Optional} and {@link UnwrapValidatedValue} on fields using validate property.

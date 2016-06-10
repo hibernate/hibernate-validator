@@ -27,8 +27,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.testutil.constraints.NotBlankTypeUse;
-import org.hibernate.validator.testutil.constraints.NotNullTypeUse;
+import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
+import org.hibernate.validator.testutils.constraints.NotNullTypeUse;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;

@@ -154,29 +154,6 @@
         </testResources>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <packageName>org.hibernate.validator.internal.xml</packageName>
-                    <extension>true</extension>
-                    <!-- Generate correct getters for Boolean properties -->
-                    <enableIntrospection>true</enableIntrospection>
-                    <!-- Makes sure the generated code is compatible with JAXB 2.1 which is what comes with Java 1.6 -->
-                    <target>2.1</target>
-                    <sources>
-                        <source>src/main/xsd/validation-configuration-1.1.xsd</source>
-                        <source>src/main/xsd/validation-mapping-1.1.xsd</source>
-                    </sources>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
@@ -258,6 +235,7 @@
                     </suiteXmlFiles>
                     <parallel>methods</parallel>
                     <threadCount>4</threadCount>
+                    <argLine>${surefire.argline.extension}</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -268,34 +246,42 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.jboss.maven.plugins</groupId>
-                <artifactId>maven-injection-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>bytecode</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <bytecodeInjections>
-                        <bytecodeInjection>
-                            <expression>${project.version}</expression>
-                            <targetMembers>
-                                <methodBodyReturn>
-                                    <className>org.hibernate.validator.internal.util.Version</className>
-                                    <methodName>getVersionString</methodName>
-                                </methodBodyReturn>
-                            </targetMembers>
-                        </bytecodeInjection>
-                    </bytecodeInjections>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>pre-jdk9</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>jaxb2-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>xjc</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <packageName>org.hibernate.validator.internal.xml</packageName>
+                            <extension>true</extension>
+                            <!-- Generate correct getters for Boolean properties -->
+                            <enableIntrospection>true</enableIntrospection>
+                            <!-- Makes sure the generated code is compatible with JAXB 2.1 which is what comes with Java 1.6 -->
+                            <target>2.1</target>
+                            <sources>
+                                <source>src/main/xsd/validation-configuration-1.1.xsd</source>
+                                <source>src/main/xsd/validation-mapping-1.1.xsd</source>
+                            </sources>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>jdk9</id>
             <activation>
@@ -304,38 +290,70 @@
             <build>
                 <plugins>
                     <plugin>
-                        <!-- TODO: The plug-in relies on some classes traditionally exposed via tools.jar -->
-                        <!-- Adding them here fixes that, but it should better be handled on the plug-in side -->
-                        <!-- See https://github.com/mojohaus/jaxb2-maven-plugin/issues/43 -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>generate-sources</phase>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="Creating target/generated-sources/jaxb"/>
+                                        <mkdir dir="./target/generated-sources/jaxb"/>
+                                    </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>jaxb2-maven-plugin</artifactId>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.glassfish.jaxb</groupId>
-                                <artifactId>codemodel</artifactId>
-                                <version>2.2.11</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>org.glassfish.jaxb</groupId>
-                                <artifactId>txw2</artifactId>
-                                <version>2.2.11</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>com.sun.xsom</groupId>
-                                <artifactId>xsom</artifactId>
-                                <version>20140925</version>
-                            </dependency>
-                            <dependency>
-                                <groupId>com.sun.istack</groupId>
-                                <version>2.21</version>
-                                <artifactId>istack-commons-runtime</artifactId>
-                            </dependency>
-                            <dependency>
-                                <groupId>com.sun.xml.bind.external</groupId>
-                                <artifactId>rngom</artifactId>
-                                <version>2.2.11</version>
-                            </dependency>
-                        </dependencies>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate schema types</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>xjc</executable>
+                            <arguments>
+                                <argument>-enableIntrospection</argument>
+                                <argument>-p</argument>
+                                <argument>org.hibernate.validator.internal.xml</argument>
+                                <argument>-extension</argument>
+                                <argument>-target</argument>
+                                <argument>2.1</argument>
+                                <argument>-d</argument>
+                                <argument>target/generated-sources/jaxb</argument>
+                                <argument>src/main/xsd/validation-configuration-1.1.xsd</argument>
+                                <argument>src/main/xsd/validation-mapping-1.1.xsd</argument>
+                                <argument>-b</argument>
+                                <argument>src/main/xjb/binding-customization.xjb</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>target/generated-sources/jaxb</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

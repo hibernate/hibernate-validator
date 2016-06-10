@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -15,8 +17,6 @@ import org.joda.time.DateMidnight;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
-
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
 
 /**
  * Integration test for {@link org.hibernate.validator.internal.engine.ValidatorImpl} and

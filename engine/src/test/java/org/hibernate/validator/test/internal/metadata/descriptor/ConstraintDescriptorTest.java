@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.testutil.ValidatorUtil.getBeanDescriptor;
+import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 

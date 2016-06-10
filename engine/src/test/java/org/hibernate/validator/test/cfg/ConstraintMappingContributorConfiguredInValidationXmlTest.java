@@ -23,9 +23,9 @@ import org.hibernate.validator.cfg.defs.MinDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
 import org.testng.annotations.Test;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
+import org.hibernate.validator.testutils.ValidatorUtil;
 
 /**
  * Tests the contribution of constraint mappings via a contributor configured in {@code META-INF/validation.xml}.

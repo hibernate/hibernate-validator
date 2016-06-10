@@ -21,9 +21,9 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidatingProxy;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import static org.testng.Assert.fail;
 
 /**

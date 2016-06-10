@@ -27,7 +27,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 

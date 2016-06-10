@@ -20,7 +20,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.ValidB2BRepository;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ValidatorUtil.getConstructorDescriptor;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConstructorDescriptor;
 
 /**
  * @author Gunnar Morling

@@ -6,14 +6,15 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
-import static org.hibernate.validator.testutil.ValidatorUtil.getConstraintValidatorContext;
-
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Partial;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static org.hibernate.validator.testutils.ValidatorUtil.getConstraintValidatorContext;
+
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadablePartial;
 
 /**

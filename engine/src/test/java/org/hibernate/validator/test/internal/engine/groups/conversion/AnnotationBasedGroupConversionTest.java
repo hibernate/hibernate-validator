@@ -6,9 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.conversion;
 
-import org.testng.annotations.BeforeMethod;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import org.testng.annotations.BeforeMethod;
 
 /**
  * Integrative test for annotation based group conversion.

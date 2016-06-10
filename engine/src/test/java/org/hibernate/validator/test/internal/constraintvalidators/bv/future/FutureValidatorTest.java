@@ -11,9 +11,9 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import static org.testng.Assert.assertEquals;
-import org.testng.annotations.Test;
 
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik

@@ -25,7 +25,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtComplex;
 
 import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
-import static org.hibernate.validator.testutil.ValidatorUtil.getParameterDescriptor;
+import static org.hibernate.validator.testutils.ValidatorUtil.getParameterDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

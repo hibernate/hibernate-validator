@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.testutil;
+package org.hibernate.validator.testutils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -26,6 +26,8 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.time.DefaultTimeProvider;
+import org.hibernate.validator.testutil.DummyTraversableResolver;
+import org.hibernate.validator.testutil.ValidationInvocationHandler;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 

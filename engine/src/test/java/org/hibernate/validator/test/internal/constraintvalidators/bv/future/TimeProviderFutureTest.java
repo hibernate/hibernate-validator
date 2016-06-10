@@ -32,7 +32,7 @@ import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 /**
  * Test for using the {@code TimeProvider} contract in {@code @Future} validators.

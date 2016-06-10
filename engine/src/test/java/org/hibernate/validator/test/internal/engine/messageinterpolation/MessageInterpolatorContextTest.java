@@ -23,7 +23,7 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
 import static org.easymock.EasyMock.createMock;

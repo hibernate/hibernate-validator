@@ -31,8 +31,8 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutil.ValidatorUtil;
-import org.hibernate.validator.testutil.constraints.NotBlankTypeUse;
+import org.hibernate.validator.testutils.ValidatorUtil;
+import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;

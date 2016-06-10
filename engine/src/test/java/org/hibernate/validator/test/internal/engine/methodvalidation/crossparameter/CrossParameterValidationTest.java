@@ -10,9 +10,8 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.Validator;
 
+import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.ValidatorUtil;
 
 /**
  * @author Hardy Ferentschik

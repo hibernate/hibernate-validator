@@ -22,16 +22,15 @@ import javax.validation.constraints.Min;
 import org.apache.log4j.Logger;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.constraints.NotBlankTypeUse;
-import org.hibernate.validator.testutil.constraints.NotNullTypeUse;
 import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
+import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
+import org.hibernate.validator.testutils.constraints.NotNullTypeUse;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ValidatorUtil.getValidator;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 /**
  * Tests Java 8 type use annotations.
