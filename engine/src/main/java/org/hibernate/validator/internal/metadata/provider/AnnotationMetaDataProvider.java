@@ -6,6 +6,12 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.partition;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
@@ -57,12 +63,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.CollectionHelper.partition;
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 
 /**
  * {@code MetaDataProvider} which reads the metadata from annotations which is the default configuration source.
@@ -565,10 +565,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	protected <A extends Annotation> List<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member,
 			A annotation,
 			ElementType type) {
-		// HV-1049 Methods of java.lang.Object (and potentially other JDK classes) are annotated with annotations such
-		// as jdk.internal.HotSpotIntrinsicCandidate on JDK 9; They cannot be constraint annotation so skip them right
+
+		// HV-1049 Ignore annotations from jdk.internal.*; They cannot be constraint annotations so skip them right
 		// here, as for the proper check we'd need package access permission for "jdk.internal"
-		if ( annotation.annotationType().getPackage().getName().equals( "jdk.internal" ) ) {
+		if ( isJdkInternalType( annotation ) ) {
 			return Collections.emptyList();
 		}
 
@@ -590,6 +590,11 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			constraintDescriptors.add( constraintDescriptor );
 		}
 		return constraintDescriptors;
+	}
+
+	private <A extends Annotation> boolean isJdkInternalType(A annotation) {
+		Package pakkage = annotation.annotationType().getPackage();
+		return pakkage != null && "jdk.internal".equals( pakkage.getName() );
 	}
 
 	private Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {
