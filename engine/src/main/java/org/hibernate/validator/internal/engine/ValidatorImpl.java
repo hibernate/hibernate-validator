@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
@@ -1129,12 +1128,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
 			for ( GroupWithInheritance groupOfGroups : sequence ) {
-				int numberOfFailingConstraint = 0;
+				int numberOfViolations = validationContext.getFailingConstraints().size();
 
 				for ( Group group : groupOfGroups ) {
-					numberOfFailingConstraint += validateParametersForGroup(
-							validationContext, parameterValues, group
-					);
+					validateParametersForGroup( validationContext, parameterValues, group );
 					if ( shouldFailFast( validationContext ) ) {
 						return;
 					}
@@ -1147,7 +1144,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					}
 				}
 
-				if ( numberOfFailingConstraint > 0 ) {
+				if ( validationContext.getFailingConstraints().size() > numberOfViolations ) {
 					break;
 				}
 			}
