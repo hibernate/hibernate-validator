@@ -34,7 +34,7 @@ public final class GetDeclaredField implements PrivilegedAction<Field> {
 			field.setAccessible( true );
 			return field;
 		}
-		catch ( NoSuchFieldException e ) {
+		catch (NoSuchFieldException e) {
 			return null;
 		}
 	}

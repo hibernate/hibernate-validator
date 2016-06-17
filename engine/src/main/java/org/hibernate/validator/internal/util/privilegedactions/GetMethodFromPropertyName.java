@@ -38,11 +38,11 @@ public final class GetMethodFromPropertyName implements PrivilegedAction<Method>
 			try {
 				return clazz.getMethod( "get" + fullMethodName );
 			}
-			catch ( NoSuchMethodException e ) {
+			catch (NoSuchMethodException e) {
 				return clazz.getMethod( "is" + fullMethodName );
 			}
 		}
-		catch ( NoSuchMethodException e ) {
+		catch (NoSuchMethodException e) {
 			return null;
 		}
 	}

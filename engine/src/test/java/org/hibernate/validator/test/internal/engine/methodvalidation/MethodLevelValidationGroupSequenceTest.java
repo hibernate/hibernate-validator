@@ -58,7 +58,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			customerRepository.constraintInDefaultGroup( null );
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
@@ -83,7 +83,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			customerRepository.constraintInLaterPartOfDefaultSequence( 1 );
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
@@ -111,7 +111,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			customerRepository.constraintInLaterPartOfDefaultSequenceAtDifferentParameters( 1, 2 );
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
@@ -134,7 +134,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			customerRepository.constraintInLaterPartOfGroupSequence( 1 );
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
@@ -164,7 +164,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			customerRepository.constraintInLaterPartOfGroupSequenceAtDifferentParameters( 1, 2 );
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
@@ -189,7 +189,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			customerRepository.constraintInDefaultGroupAtReturnValue();
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
@@ -214,7 +214,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			customerRepository.constraintsInAllPartOfDefaultSequence();
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
@@ -244,7 +244,7 @@ public class MethodLevelValidationGroupSequenceTest {
 			customerRepository.constraintsInAllPartsOfGroupSequence();
 			fail( "Expected MethodConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 
 			assertEquals( e.getConstraintViolations().size(), 1 );
 

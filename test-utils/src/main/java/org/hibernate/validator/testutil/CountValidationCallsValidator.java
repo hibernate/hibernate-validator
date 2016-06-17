@@ -28,9 +28,11 @@ public class CountValidationCallsValidator implements ConstraintValidator<CountV
 		return NUMBER_OF_VALIDATION_CALLS.get();
 	}
 
+	@Override
 	public void initialize(CountValidationCalls constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
 		NUMBER_OF_VALIDATION_CALLS.set( NUMBER_OF_VALIDATION_CALLS.get() + 1 );
 		return true;

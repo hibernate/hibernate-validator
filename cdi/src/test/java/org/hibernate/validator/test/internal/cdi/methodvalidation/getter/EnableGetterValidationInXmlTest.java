@@ -47,7 +47,7 @@ public class EnableGetterValidationInXmlTest {
 			foo.getFoo();
 			fail( "method validation should be enabled via validation.xml" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			// success
 		}
 	}

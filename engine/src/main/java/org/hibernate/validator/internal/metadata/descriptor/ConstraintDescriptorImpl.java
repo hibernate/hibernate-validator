@@ -437,7 +437,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 
 		// Now we are out of luck
-		if ( constraintType == null ){
+		if ( constraintType == null ) {
 			throw log.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType.getName() );
 		}
 
@@ -526,7 +526,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 					GetAnnotationParameter.action( annotation, ConstraintHelper.PAYLOAD, Class[].class )
 			);
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			//ignore people not defining payloads
 			payloadFromAnnotation = null;
 		}

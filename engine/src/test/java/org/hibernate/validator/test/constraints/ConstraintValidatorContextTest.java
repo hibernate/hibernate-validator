@@ -189,7 +189,7 @@ public class ConstraintValidatorContextTest {
 		try {
 			validator.validate( new Bar() );
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			throw e.getCause();
 		}
 	}
@@ -273,7 +273,7 @@ public class ConstraintValidatorContextTest {
 
 		Class<? extends Payload>[] payload() default { };
 
-		public static class Validator implements ConstraintValidator<MyClassLevelValidation, MyObject> {
+		class Validator implements ConstraintValidator<MyClassLevelValidation, MyObject> {
 			@Override
 			public void initialize(MyClassLevelValidation constraintAnnotation) {
 			}
@@ -305,7 +305,7 @@ public class ConstraintValidatorContextTest {
 
 		Class<? extends Payload>[] payload() default { };
 
-		public static class Validator implements ConstraintValidator<ClassLevelValidationAddingPropertyNodes, Foo> {
+		class Validator implements ConstraintValidator<ClassLevelValidationAddingPropertyNodes, Foo> {
 			@Override
 			public void initialize(ClassLevelValidationAddingPropertyNodes constraintAnnotation) {
 			}
@@ -362,7 +362,7 @@ public class ConstraintValidatorContextTest {
 
 		Class<? extends Payload>[] payload() default { };
 
-		public static class Validator
+		class Validator
 				implements ConstraintValidator<PropertyLevelValidationAddingBeanAndPropertyNodes, Address> {
 			@Override
 			public void initialize(PropertyLevelValidationAddingBeanAndPropertyNodes constraintAnnotation) {
@@ -429,7 +429,7 @@ public class ConstraintValidatorContextTest {
 		Class<? extends Payload>[] payload() default { };
 
 		@SupportedValidationTarget(ValidationTarget.PARAMETERS)
-		public static class Validator
+		class Validator
 				implements ConstraintValidator<CrossParameterValidationAddingParameterBeanAndPropertyNodes, java.lang.Object[]> {
 			@Override
 			public void initialize(CrossParameterValidationAddingParameterBeanAndPropertyNodes constraintAnnotation) {
@@ -469,7 +469,7 @@ public class ConstraintValidatorContextTest {
 
 		Class<? extends Payload>[] payload() default { };
 
-		public static class Validator
+		class Validator
 				implements ConstraintValidator<FieldLevelValidationAddingParameterNode, String> {
 			@Override
 			public void initialize(FieldLevelValidationAddingParameterNode constraintAnnotation) {

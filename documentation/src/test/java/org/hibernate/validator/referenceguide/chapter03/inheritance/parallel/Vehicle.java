@@ -6,3 +6,4 @@ public interface Vehicle {
 
 	void drive(@Max(75) int speedInMph);
 }
+

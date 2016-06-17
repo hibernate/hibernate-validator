@@ -33,6 +33,7 @@ public class ValidationInvocationHandler implements InvocationHandler {
 		this.groups = groups;
 	}
 
+	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		Set<ConstraintViolation<Object>> constraintViolations = validator.forExecutables().validateParameters(
 				wrapped,

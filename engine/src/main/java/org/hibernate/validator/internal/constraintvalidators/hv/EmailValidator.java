@@ -89,7 +89,7 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 		try {
 			asciiString = toAscii( part );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			return false;
 		}
 

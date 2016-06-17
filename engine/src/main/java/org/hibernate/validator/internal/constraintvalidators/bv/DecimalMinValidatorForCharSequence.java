@@ -28,7 +28,7 @@ public class DecimalMinValidatorForCharSequence implements ConstraintValidator<D
 		try {
 			this.minValue = new BigDecimal( minValue.value() );
 		}
-		catch ( NumberFormatException nfe ) {
+		catch (NumberFormatException nfe) {
 			throw log.getInvalidBigDecimalFormatException( minValue.value(), nfe );
 		}
 		this.inclusive = minValue.inclusive();
@@ -43,7 +43,7 @@ public class DecimalMinValidatorForCharSequence implements ConstraintValidator<D
 			int comparisonResult = new BigDecimal( value.toString() ).compareTo( minValue );
 			return inclusive ? comparisonResult >= 0 : comparisonResult > 0;
 		}
-		catch ( NumberFormatException nfe ) {
+		catch (NumberFormatException nfe) {
 			return false;
 		}
 	}

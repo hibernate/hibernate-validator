@@ -138,7 +138,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			return (ValidatedValueUnwrapper<?>) ( jfxUnwrapperClass.getConstructor( TypeResolutionHelper.class )
 					.newInstance( typeResolutionHelper ) );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw log.validatedValueUnwrapperCannotBeCreated( JFX_UNWRAPPER_CLASS, e );
 		}
 	}
@@ -330,7 +330,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 				try {
 					in.close();
 				}
-				catch ( IOException io ) {
+				catch (IOException io) {
 					log.unableToCloseInputStream();
 				}
 			}
@@ -426,7 +426,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
 		return programmaticMappings;
 	}
-	
+
 
 	private boolean isSpecificProvider() {
 		return validationBootstrapParameters.getProvider() != null;
@@ -525,7 +525,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			run( LoadClass.action( className, getClass().getClassLoader(), fallbackOnTCCL ) );
 			return true;
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			return false;
 		}
 	}

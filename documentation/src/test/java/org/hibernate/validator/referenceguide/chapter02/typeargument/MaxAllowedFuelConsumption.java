@@ -27,7 +27,7 @@ public @interface MaxAllowedFuelConsumption {
 
 	Class<? extends Payload>[] payload() default { };
 
-	public class MaxAllowedFuelConsumptionValidator implements ConstraintValidator<MaxAllowedFuelConsumption, Integer> {
+	class MaxAllowedFuelConsumptionValidator implements ConstraintValidator<MaxAllowedFuelConsumption, Integer> {
 
 		@Override
 		public void initialize(MaxAllowedFuelConsumption annotation) {

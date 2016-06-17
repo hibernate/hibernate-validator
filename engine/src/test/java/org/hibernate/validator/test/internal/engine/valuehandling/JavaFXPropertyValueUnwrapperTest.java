@@ -91,7 +91,7 @@ public class JavaFXPropertyValueUnwrapperTest {
 			validator.validate( new Bar1() );
 			fail( "Should have thrown an exception" );
 		}
-		catch ( UnexpectedTypeException e ) {
+		catch (UnexpectedTypeException e) {
 			assertTrue( e.getMessage().startsWith( "HV000186" ) );
 		}
 	}

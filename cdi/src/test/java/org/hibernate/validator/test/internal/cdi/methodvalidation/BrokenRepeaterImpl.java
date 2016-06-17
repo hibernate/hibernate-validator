@@ -57,7 +57,7 @@ public class BrokenRepeaterImpl implements Repeater<String> {
 		Class<? extends Payload>[] payload() default { };
 
 
-		public class BrokenConstraintImpl implements ConstraintValidator<BrokenConstraint, Repeater> {
+		class BrokenConstraintImpl implements ConstraintValidator<BrokenConstraint, Repeater> {
 
 			@Override
 			public void initialize(BrokenConstraint parameters) {

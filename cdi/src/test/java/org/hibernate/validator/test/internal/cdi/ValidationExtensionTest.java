@@ -67,7 +67,7 @@ public class ValidationExtensionTest {
 			extension.afterBeanDiscovery( afterBeanDiscoveryMock, null );
 			fail();
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			// success
 		}
 	}
@@ -78,7 +78,7 @@ public class ValidationExtensionTest {
 			extension.afterBeanDiscovery( null, beanManagerMock );
 			fail();
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			// success
 		}
 	}
@@ -89,7 +89,7 @@ public class ValidationExtensionTest {
 			extension.afterBeanDiscovery( null, null );
 			fail();
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			// success
 		}
 	}
@@ -210,7 +210,7 @@ public class ValidationExtensionTest {
 			extension.processAnnotatedType( null );
 			fail();
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			// success
 		}
 	}

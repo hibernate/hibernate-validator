@@ -148,7 +148,7 @@ public interface ConstraintsWithWrongPayloadAttribute {
 
 	}
 
-	public static class SamplePayload implements Payload {
+	class SamplePayload implements Payload {
 	}
 
 }

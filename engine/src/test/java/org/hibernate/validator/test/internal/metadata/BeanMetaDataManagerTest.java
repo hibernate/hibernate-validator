@@ -78,7 +78,7 @@ public class BeanMetaDataManagerTest {
 				memoryConsumer.add( new long[ARRAY_ALLOCATION_SIZE] );
 			}
 		}
-		catch ( OutOfMemoryError e ) {
+		catch (OutOfMemoryError e) {
 			log.debug( "Out of memory error occurred." );
 			log.debug( "totalCreatedMetaDataInstances:" + totalCreatedMetaDataInstances );
 			log.debug( "cachedBeanMetaDataInstances:" + cachedBeanMetaDataInstances );
@@ -164,7 +164,7 @@ public class BeanMetaDataManagerTest {
 				result = defineClass( className, classByte, 0, classByte.length, null );
 				return result;
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				return null;
 			}
 		}

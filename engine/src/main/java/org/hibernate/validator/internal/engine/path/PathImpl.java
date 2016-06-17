@@ -333,7 +333,7 @@ public final class PathImpl implements Path, Serializable {
 						Integer i = Integer.parseInt( indexOrKey );
 						path.setLeafNodeIndex( i );
 					}
-					catch ( NumberFormatException e ) {
+					catch (NumberFormatException e) {
 						path.setLeafNodeMapKey( indexOrKey );
 					}
 				}

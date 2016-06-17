@@ -41,7 +41,7 @@ public class EmptyExecutableTypeTest {
 		try {
 			assertNull( snafu.foo() );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			fail( "CDI method interceptor should not throw an exception" );
 		}
 	}

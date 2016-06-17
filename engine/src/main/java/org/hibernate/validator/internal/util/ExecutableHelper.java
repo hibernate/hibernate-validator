@@ -118,7 +118,7 @@ public final class ExecutableHelper {
 		signature.append( "(" );
 		for ( int i = 0; i < parameterCount; i++ ) {
 			signature.append( parameterTypes[i].getName() );
-			if (i < parameterCount - 1 ) {
+			if ( i < parameterCount - 1 ) {
 				signature.append( "," );
 			}
 		}
@@ -174,7 +174,7 @@ public final class ExecutableHelper {
 		}
 		// Putting this in as a safe guard for HV-861. In case the issue occurs again we will have some
 		// better information
-		catch ( ArrayIndexOutOfBoundsException e ) {
+		catch (ArrayIndexOutOfBoundsException e) {
 			log.debug(
 					"Error in ExecutableHelper#instanceMethodParametersResolveToSameTypes comparing "
 							+ subTypeMethod

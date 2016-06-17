@@ -147,7 +147,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 				);
 			}
 		}
-		catch ( MissingResourceException e ) {
+		catch (MissingResourceException e) {
 			log.trace( message );
 		}
 		return rb;
@@ -178,7 +178,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 			ResourceBundle.Control dummyControl = AggregateResourceBundle.CONTROL;
 			return true;
 		}
-		catch ( NoClassDefFoundError e ) {
+		catch (NoClassDefFoundError e) {
 			log.info( MESSAGES.unableToUseResourceBundleAggregation() );
 			return false;
 		}

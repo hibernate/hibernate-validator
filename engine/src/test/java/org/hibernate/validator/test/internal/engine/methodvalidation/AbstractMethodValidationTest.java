@@ -74,7 +74,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.findCustomerByName( null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 
 			Set<ConstraintViolation<?>> constraintViolations = e.getConstraintViolations();
 			assertNumberOfViolations( constraintViolations, 1 );
@@ -112,7 +112,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.findCustomerByAgeAndName( 30, null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -136,7 +136,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.findCustomerByAgeAndName( 1, null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 2 );
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
@@ -153,7 +153,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.persistCustomer( customer );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -182,7 +182,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.persistCustomer( customer );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -213,7 +213,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.cascadingMapParameter( customers );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -243,7 +243,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.cascadingIterableParameter( customers );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -272,7 +272,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.cascadingArrayParameter( null, customer );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -302,7 +302,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.findById( null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -320,7 +320,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.foo( null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -338,7 +338,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.bar( new Customer( null, null ) );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -362,7 +362,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.baz();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -385,7 +385,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.cascadingReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -411,7 +411,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.overriddenMethodWithCascadingReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -438,7 +438,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.cascadingIterableReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -464,7 +464,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.cascadingMapReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			Customer customer = new Customer( null );
 			Map<String, Customer> expectedReturnValue = newHashMap();
 			expectedReturnValue.put( "Bob", customer );
@@ -494,7 +494,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.cascadingArrayReturnValue();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -520,7 +520,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.overriddenMethodWithReturnValueConstraint();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
 					messagePrefix() + "must be greater than or equal to 5",
@@ -535,7 +535,7 @@ public abstract class AbstractMethodValidationTest {
 			repositoryBase.overriddenMethodWithReturnValueConstraint();
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertCorrectConstraintViolationMessages(
 					e.getConstraintViolations(),
 					messagePrefix() + "must be greater than or equal to 5",
@@ -581,7 +581,7 @@ public abstract class AbstractMethodValidationTest {
 			customerRepository.methodWithCrossParameterConstraint( startDate, endDate );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			//then
 			assertThat( e.getConstraintViolations() ).hasSize( 1 );
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();

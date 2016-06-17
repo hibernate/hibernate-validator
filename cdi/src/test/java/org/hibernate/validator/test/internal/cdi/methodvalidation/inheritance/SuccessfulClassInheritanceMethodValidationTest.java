@@ -44,7 +44,7 @@ public class SuccessfulClassInheritanceMethodValidationTest {
 			mi6.whisper( null );
 			fail( "Method invocation should have caused a ConstraintViolationException" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals(
 					e.getConstraintViolations()
 							.iterator()

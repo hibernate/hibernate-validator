@@ -95,7 +95,7 @@ public class Configuration {
 			try {
 				return Kind.valueOf( diagnosticKindFromOptions );
 			}
-			catch ( IllegalArgumentException e ) {
+			catch (IllegalArgumentException e) {
 				messager.printMessage(
 						Kind.WARNING, MessageFormat.format(
 						"The given value {0} is no valid diagnostic kind. {1} will be used.",

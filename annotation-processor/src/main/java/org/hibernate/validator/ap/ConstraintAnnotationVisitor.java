@@ -204,7 +204,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 			}
 			//HV-293: if single constraints can't be properly checked, report this and
 			//proceed with next constraints
-			catch ( Exception e ) {
+			catch (Exception e) {
 
 				if ( verbose ) {
 					messager.getDelegate()

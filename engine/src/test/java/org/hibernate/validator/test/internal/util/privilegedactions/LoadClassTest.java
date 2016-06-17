@@ -45,7 +45,7 @@ public class LoadClassTest {
 			action.run();
 			fail( "Should have thrown javax.validation.ValidationException" );
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			String expectedMessageId = "HV000065";
 			assertTrue(
 					"Wrong error message. Expected " + expectedMessageId + " ,but got " + e.getMessage(),

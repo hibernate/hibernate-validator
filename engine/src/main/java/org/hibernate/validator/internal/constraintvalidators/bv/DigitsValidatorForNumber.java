@@ -24,16 +24,18 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class DigitsValidatorForNumber implements ConstraintValidator<Digits, Number> {
 
 	private static final Log log = LoggerFactory.make();
-	
+
 	private int maxIntegerLength;
 	private int maxFractionLength;
 
+	@Override
 	public void initialize(Digits constraintAnnotation) {
 		this.maxIntegerLength = constraintAnnotation.integer();
 		this.maxFractionLength = constraintAnnotation.fraction();
 		validateParameters();
 	}
 
+	@Override
 	public boolean isValid(Number num, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( num == null ) {

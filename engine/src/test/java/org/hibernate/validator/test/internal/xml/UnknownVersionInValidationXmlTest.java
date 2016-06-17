@@ -28,7 +28,7 @@ public class UnknownVersionInValidationXmlTest {
 	/**
 	 * Tests requirement 8.1.4.c from the BV 1.1 spec.
 	 */
-	@Test(expectedExceptions=ValidationException.class, expectedExceptionsMessageRegExp="HV000122.*")
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000122.*")
 	public void testInvalidValidationXml() {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"validation-UnknownVersionInValidationXmlTest.xml", new Runnable() {

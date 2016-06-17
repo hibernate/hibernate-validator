@@ -47,7 +47,7 @@ public class ConstraintTargetDeterminationTest {
 			orderService.getNumberOfOrders( 42, true );
 			fail( "Expected exception wasn't thrown" );
 		}
-		catch ( ConstraintViolationException cve ) {
+		catch (ConstraintViolationException cve) {
 			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
 					pathWith().method( "getNumberOfOrders" ).returnValue()
 			);
@@ -61,7 +61,7 @@ public class ConstraintTargetDeterminationTest {
 			orderService.placeOrder( 42, "Best of Glen Closed", 3 );
 			fail( "Expected exception wasn't thrown" );
 		}
-		catch ( ConstraintViolationException cve ) {
+		catch (ConstraintViolationException cve) {
 			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
 					pathWith().method( "placeOrder" )
 							.crossParameter()
@@ -76,7 +76,7 @@ public class ConstraintTargetDeterminationTest {
 			orderService.cancelOrder( 42, "Item damaged" );
 			fail( "Expected exception wasn't thrown" );
 		}
-		catch ( ConstraintViolationException cve ) {
+		catch (ConstraintViolationException cve) {
 			assertThat( cve.getConstraintViolations() ).containsOnlyPaths(
 					pathWith().method( "cancelOrder" ).crossParameter(),
 					pathWith().method( "cancelOrder" ).crossParameter()

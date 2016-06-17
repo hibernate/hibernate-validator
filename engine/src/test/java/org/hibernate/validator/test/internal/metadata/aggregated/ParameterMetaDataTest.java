@@ -172,7 +172,8 @@ public class ParameterMetaDataTest {
 	private static class ServiceImpl implements Service {
 		@Override
 		@ValidateOnExecution(type = ExecutableType.NONE)
-		public void sayHello(String world) {}
+		public void sayHello(String world) {
+		}
 	}
 
 	public class SkewedParameterNameProvider implements ParameterNameProvider {

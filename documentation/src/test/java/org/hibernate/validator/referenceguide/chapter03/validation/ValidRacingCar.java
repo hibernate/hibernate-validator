@@ -25,7 +25,7 @@ public @interface ValidRacingCar {
 
 	Class<? extends Payload>[] payload() default { };
 
-	public static class Validator implements ConstraintValidator<ValidRacingCar, Car> {
+	class Validator implements ConstraintValidator<ValidRacingCar, Car> {
 
 		@Override
 		public void initialize(ValidRacingCar constraintAnnotation) {

@@ -63,7 +63,7 @@ public class GetAnnotationsParameterTest {
 			GetAnnotationParameter.action( testAnnotation, "message", Integer.class ).run();
 			fail();
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			assertTrue( e.getMessage().contains( "Wrong parameter type." ), "Wrong exception message" );
 		}
 
@@ -71,7 +71,7 @@ public class GetAnnotationsParameterTest {
 			GetAnnotationParameter.action( testAnnotation, "foo", Integer.class ).run();
 			fail();
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			assertTrue(
 					e.getMessage().contains( "The specified annotation defines no parameter" ),
 					"Wrong exception message"

@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Pattern.List;
 
 public class MultipleConstraintsOfSameType {
-	
+
 	@List(value = { @Pattern(regexp = ""), @Pattern(regexp = "") })
 	public String string;
 

@@ -47,7 +47,7 @@ public @interface AlwaysFailingConstraint {
 	ConstraintTarget validationAppliesTo() default ConstraintTarget.IMPLICIT;
 
 	@SupportedValidationTarget({ ValidationTarget.ANNOTATED_ELEMENT, ValidationTarget.PARAMETERS })
-	public static class AlwaysFailingConstraintValidator implements ConstraintValidator<AlwaysFailingConstraint, Object> {
+	class AlwaysFailingConstraintValidator implements ConstraintValidator<AlwaysFailingConstraint, Object> {
 
 		@Override
 		public void initialize(AlwaysFailingConstraint constraintAnnotation) {

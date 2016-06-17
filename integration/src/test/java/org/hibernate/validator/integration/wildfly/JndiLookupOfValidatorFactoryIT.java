@@ -56,7 +56,7 @@ public class JndiLookupOfValidatorFactoryIT {
 					factory.getValidator().getClass().getSimpleName()
 			);
 		}
-		catch( NamingException e ) {
+		catch (NamingException e) {
 			fail( "The default validator factory should be bound" );
 		}
 		log.debug( "testDefaultValidatorFactoryLookup completed" );

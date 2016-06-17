@@ -64,6 +64,7 @@
 
     <modules>
         <module>test-utils</module>
+        <module>build-config</module>
         <module>engine</module>
         <module>engine-jdk8-tests</module>
         <module>cdi</module>
@@ -77,7 +78,6 @@
     <properties>
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <checkstyle.header.file>src/main/build-config/java.header</checkstyle.header.file>
         <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
@@ -97,6 +97,8 @@
 
         <!-- Used to add further arguments to the arg line for specific profiles -->
         <surefire.argLine.extension></surefire.argLine.extension>
+
+        <puppycrawl.checkstyle.version>6.19</puppycrawl.checkstyle.version>
     </properties>
 
     <prerequisites>
@@ -346,14 +348,24 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>2.14</version>
+                    <version>2.17</version>
                     <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-validator-build-config</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
                         <!--
                              force SLF4J dependency to align
                              Maven internals and CheckStyle's
                              see https://github.com/jcgay/maven-color/wiki/Problems
                              If that causes problem, that can be removed
                              but maven-color won't work -->
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${puppycrawl.checkstyle.version}</version>
+                        </dependency>
                         <dependency>
                             <groupId>org.slf4j</groupId>
                             <artifactId>jcl-over-slf4j</artifactId>
@@ -366,23 +378,23 @@
                         </dependency>
                     </dependencies>
                     <configuration>
-                        <configLocation>src/main/build-config/checkstyle.xml</configLocation>
+                        <configLocation>checkstyle.xml</configLocation>
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
                         <violationSeverity>error</violationSeverity>
-                        <includeResources>false</includeResources>
+                        <includeResources>true</includeResources>
+                        <includeTestResources>false</includeTestResources>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
-                        <!-- These classes are imported from other sources and are not re-formatted.
-                        The tests use Java 8 type annotation syntax which is not supported yet by CheckStyle-->
+                        <resourceIncludes>**/*.xml,**/*.properties</resourceIncludes>
+                        <!-- These classes are either imported from other sources and re-formatted
+                        or generated or present significant reasons to not follow the rules. -->
                         <excludes>
                             **/org/hibernate/validator/internal/xml/*.java,
                             **/Log_$logger.java,
                             **/Messages_$bundle.java,
                             **/ConcurrentReferenceHashMap.java,
                             **/TypeHelper*.java,
-                            **/TypeAnnotationAwareMetaDataProviderTest.java,
-                            **/TypeAnnotationConstraintTest.java,
-                            **/UnwrapModesTest.java
+                            **/TckRunner.java
                         </excludes>
                     </configuration>
                     <executions>
@@ -390,7 +402,7 @@
                             <id>check-style</id>
                             <phase>verify</phase>
                             <goals>
-                                <goal>checkstyle</goal>
+                                <goal>check</goal>
                             </goals>
                         </execution>
                     </executions>

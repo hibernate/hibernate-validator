@@ -12,7 +12,7 @@ import javax.validation.MessageInterpolator.Context;
 
 /**
  * Resolves given parameter.
- * 
+ *
  * @author Hardy Ferentschik
  * @author Adam Stawicki
  */

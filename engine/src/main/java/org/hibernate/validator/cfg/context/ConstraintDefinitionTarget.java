@@ -15,7 +15,7 @@ import java.lang.annotation.Annotation;
  * @author Yoann Rodiere
  */
 public interface ConstraintDefinitionTarget {
-	
+
 	/**
 	 * Selects the constraint (i.e. annotation type) to which the next operations shall apply. A given constraint
 	 * may only be configured once.

@@ -247,13 +247,13 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 		try {
 			return run( GetDeclaredMethod.action( annotation.annotationType(), name ) ).invoke( annotation );
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
 		}
-		catch ( InvocationTargetException e ) {
+		catch (InvocationTargetException e) {
 			throw log.getUnableToRetrieveAnnotationParameterValueException( e );
 		}
 	}

@@ -47,7 +47,7 @@ class ScriptAssertContext {
 		try {
 			result = scriptEvaluator.evaluate( script, bindings );
 		}
-		catch ( ScriptException e ) {
+		catch (ScriptException e) {
 			throw log.getErrorDuringScriptExecutionException( script, e );
 		}
 
@@ -59,7 +59,7 @@ class ScriptAssertContext {
 			ScriptEvaluatorFactory evaluatorFactory = ScriptEvaluatorFactory.getInstance();
 			return evaluatorFactory.getScriptEvaluatorByLanguageName( languageName );
 		}
-		catch ( ScriptException e ) {
+		catch (ScriptException e) {
 			throw log.getCreationOfScriptExecutorFailedException( languageName, e );
 		}
 	}

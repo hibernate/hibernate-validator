@@ -10,12 +10,14 @@ import java.util.Collection;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection> {
+public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection<?>> {
 
+	@Override
 	public void initialize(Size constraintAnnotation) {
 	}
 
-	public boolean isValid(Collection object, ConstraintValidatorContext constraintContext) {
+	@Override
+	public boolean isValid(Collection<?> object, ConstraintValidatorContext constraintContext) {
 		return true;
 	}
 }

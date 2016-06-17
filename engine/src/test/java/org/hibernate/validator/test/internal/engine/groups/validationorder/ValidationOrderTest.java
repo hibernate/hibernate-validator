@@ -48,7 +48,7 @@ public class ValidationOrderTest {
 			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
-		catch ( GroupDefinitionException e ) {
+		catch (GroupDefinitionException e) {
 			// success
 		}
 
@@ -59,7 +59,7 @@ public class ValidationOrderTest {
 			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
-		catch ( GroupDefinitionException e ) {
+		catch (GroupDefinitionException e) {
 			// success
 		}
 
@@ -70,7 +70,7 @@ public class ValidationOrderTest {
 			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
-		catch ( GroupDefinitionException e ) {
+		catch (GroupDefinitionException e) {
 			// success
 		}
 
@@ -112,7 +112,7 @@ public class ValidationOrderTest {
 			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
-		catch ( GroupDefinitionException e ) {
+		catch (GroupDefinitionException e) {
 			// success
 		}
 
@@ -123,7 +123,7 @@ public class ValidationOrderTest {
 			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
-		catch ( GroupDefinitionException e ) {
+		catch (GroupDefinitionException e) {
 			// success
 		}
 
@@ -134,7 +134,7 @@ public class ValidationOrderTest {
 			chain.assertDefaultGroupSequenceIsExpandable( defaultSequence );
 			fail();
 		}
-		catch ( GroupDefinitionException e ) {
+		catch (GroupDefinitionException e) {
 			// success
 		}
 	}

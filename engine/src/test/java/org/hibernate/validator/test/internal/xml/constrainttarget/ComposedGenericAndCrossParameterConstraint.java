@@ -41,7 +41,7 @@ public @interface ComposedGenericAndCrossParameterConstraint {
 	ConstraintTarget validationAppliesTo() default ConstraintTarget.IMPLICIT;
 
 	@SupportedValidationTarget(value = { ValidationTarget.ANNOTATED_ELEMENT, ValidationTarget.PARAMETERS })
-	public static class GenericValidator
+	class GenericValidator
 			implements ConstraintValidator<ComposedGenericAndCrossParameterConstraint, Object> {
 
 		@Override

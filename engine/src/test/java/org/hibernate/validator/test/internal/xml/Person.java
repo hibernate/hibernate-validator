@@ -11,9 +11,9 @@ package org.hibernate.validator.test.internal.xml;
  */
 public interface Person {
 
-    String getFirstName();
+	String getFirstName();
 
-    String getMiddleName();
+	String getMiddleName();
 
-    String getLastName();
+	String getLastName();
 }

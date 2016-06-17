@@ -134,7 +134,7 @@ public class ValidationBootstrapParameters {
 				);
 				log.usingValidationProvider( providerFqcn );
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				throw log.getUnableToInstantiateValidationProviderClassException( providerFqcn, e );
 			}
 		}
@@ -150,7 +150,7 @@ public class ValidationBootstrapParameters {
 				messageInterpolator = run( NewInstance.action( messageInterpolatorClass, "message interpolator" ) );
 				log.usingMessageInterpolator( messageInterpolatorFqcn );
 			}
-			catch ( ValidationException e ) {
+			catch (ValidationException e) {
 				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorFqcn, e );
 			}
 		}
@@ -166,7 +166,7 @@ public class ValidationBootstrapParameters {
 				traversableResolver = run( NewInstance.action( clazz, "traversable resolver" ) );
 				log.usingTraversableResolver( traversableResolverFqcn );
 			}
-			catch ( ValidationException e ) {
+			catch (ValidationException e) {
 				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverFqcn, e );
 			}
 		}
@@ -182,7 +182,7 @@ public class ValidationBootstrapParameters {
 				constraintValidatorFactory = run( NewInstance.action( clazz, "constraint factory class" ) );
 				log.usingConstraintFactory( constraintFactoryFqcn );
 			}
-			catch ( ValidationException e ) {
+			catch (ValidationException e) {
 				throw log.getUnableToInstantiateConstraintFactoryClassException( constraintFactoryFqcn, e );
 			}
 		}
@@ -198,7 +198,7 @@ public class ValidationBootstrapParameters {
 				parameterNameProvider = run( NewInstance.action( clazz, "parameter name provider class" ) );
 				log.usingParameterNameProvider( parameterNameProviderFqcn );
 			}
-			catch ( ValidationException e ) {
+			catch (ValidationException e) {
 				throw log.getUnableToInstantiateParameterNameProviderClassException( parameterNameProviderFqcn, e );
 			}
 		}

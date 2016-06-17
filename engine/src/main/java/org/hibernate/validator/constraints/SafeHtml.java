@@ -90,7 +90,7 @@ public @interface SafeHtml {
 	/**
 	 * Defines default whitelist implementations.
 	 */
-	public enum WhiteListType {
+	enum WhiteListType {
 		/**
 		 * This whitelist allows only text nodes: all HTML will be stripped.
 		 */
@@ -104,7 +104,7 @@ public @interface SafeHtml {
 
 		/**
 		 * This whitelist allows a fuller range of text nodes:
-		 * <code>a, b, blockquote, br, cite, code, dd, dl, dt, em, i, li, ol, p, pre, q, small, span, strike, strong, sub, 
+		 * <code>a, b, blockquote, br, cite, code, dd, dl, dt, em, i, li, ol, p, pre, q, small, span, strike, strong, sub,
 		 * sup, u, ul</code>, and appropriate attributes.
 		 * <p>
 		 * Links (<code>a</code> elements) can point to <code>http, https, ftp, mailto</code>, and have an enforced
@@ -124,8 +124,8 @@ public @interface SafeHtml {
 
 		/**
 		 * This whitelist allows a full range of text and structural body HTML:
-		 * <code>a, b, blockquote, br, caption, cite, code, col, colgroup, dd, div, dl, dt, em, h1, h2, h3, h4, h5, h6, 
-		 * i, img, li, ol, p, pre, q, small, span, strike, strong, sub, sup, table, tbody, td, tfoot, th, thead, tr, u, 
+		 * <code>a, b, blockquote, br, caption, cite, code, col, colgroup, dd, div, dl, dt, em, h1, h2, h3, h4, h5, h6,
+		 * i, img, li, ol, p, pre, q, small, span, strike, strong, sub, sup, table, tbody, td, tfoot, th, thead, tr, u,
 		 * ul</code>
 		 * <p>
 		 * Links do not have an enforced <code>rel=nofollow</code> attribute, but you can add that if desired.

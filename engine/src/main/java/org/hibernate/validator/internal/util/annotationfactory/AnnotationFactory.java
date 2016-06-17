@@ -28,6 +28,9 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstr
  */
 public class AnnotationFactory {
 
+	private AnnotationFactory() {
+	}
+
 	public static <T extends Annotation> T create(AnnotationDescriptor<T> descriptor) {
 		@SuppressWarnings("unchecked")
 		Class<T> proxyClass = (Class<T>) Proxy.getProxyClass(
@@ -38,10 +41,10 @@ public class AnnotationFactory {
 		try {
 			return getProxyInstance( proxyClass, handler );
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			throw e;
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw new RuntimeException( e );
 		}
 	}

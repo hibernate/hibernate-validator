@@ -32,7 +32,7 @@ public final class GetDeclaredConstructor<T> implements PrivilegedAction<Constru
 		try {
 			return clazz.getDeclaredConstructor( params );
 		}
-		catch ( NoSuchMethodException e ) {
+		catch (NoSuchMethodException e) {
 			return null;
 		}
 	}

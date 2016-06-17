@@ -17,7 +17,8 @@ import javax.validation.groups.Default;
  */
 @GroupSequence( {Suit.class, Cloth.class })
 public class Suit {
-	@Max(value=50, groups = { Default.class, Cloth.class})
+
+	@Max(value = 50, groups = { Default.class, Cloth.class })
 	@Min(1)
 	private Integer size;
 	@Valid private Trousers trousers;

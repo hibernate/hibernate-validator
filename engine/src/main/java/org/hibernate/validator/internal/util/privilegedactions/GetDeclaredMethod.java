@@ -34,7 +34,7 @@ public final class GetDeclaredMethod implements PrivilegedAction<Method> {
 		try {
 			return clazz.getDeclaredMethod( methodName, parameterTypes );
 		}
-		catch ( NoSuchMethodException e ) {
+		catch (NoSuchMethodException e) {
 			return null;
 		}
 	}

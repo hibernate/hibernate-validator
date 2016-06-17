@@ -77,7 +77,7 @@ public class FailFastTest {
 			service.testMethod( " ", null );
 			fail();
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertNumberOfViolations( e.getConstraintViolations(), 3 );
 		}
 	}
@@ -107,7 +107,7 @@ public class FailFastTest {
 			service.testMethod( "a", null );
 			fail();
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 		}
 	}
@@ -145,7 +145,7 @@ public class FailFastTest {
 			service.testMethod( " ", null );
 			fail();
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 		}
 	}
@@ -188,7 +188,7 @@ public class FailFastTest {
 			service.testMethod( " ", null );
 			fail();
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertNumberOfViolations( e.getConstraintViolations(), 1 );
 		}
 	}

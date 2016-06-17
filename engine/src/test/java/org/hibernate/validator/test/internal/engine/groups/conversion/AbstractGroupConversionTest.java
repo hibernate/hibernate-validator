@@ -19,6 +19,8 @@ import javax.validation.constraints.Size;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.testng.annotations.Test;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
@@ -31,6 +33,8 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
  * @author Gunnar Morling
  */
 public abstract class AbstractGroupConversionTest {
+
+	private static final Log log = LoggerFactory.make();
 
 	protected Validator validator;
 
@@ -81,7 +85,7 @@ public abstract class AbstractGroupConversionTest {
 
 		violations = validator.validate( new User3(), Complete.class );
 		for ( ConstraintViolation<User3> constraintViolation : violations ) {
-			System.out.println( constraintViolation.getPropertyPath() );
+			log.info( constraintViolation.getPropertyPath() );
 		}
 		assertCorrectPropertyPaths( violations, "addresses[].doorCode", "addresses[].street1", "addresses[].zipCode" );
 	}

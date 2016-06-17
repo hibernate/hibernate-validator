@@ -34,7 +34,7 @@ public class MethodValidationInHierarchyTest {
 			service.configure( null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
@@ -54,7 +54,7 @@ public class MethodValidationInHierarchyTest {
 			service.doIt( null );
 			fail( "Expected ConstraintViolationException wasn't thrown." );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals( e.getConstraintViolations().size(), 1 );
 
 			ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();

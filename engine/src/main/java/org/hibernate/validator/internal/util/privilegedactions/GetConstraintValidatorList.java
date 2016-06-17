@@ -52,7 +52,7 @@ public class GetConstraintValidatorList implements PrivilegedAction<List<Constra
 			try {
 				constraintValidators.add( constraintValidatorIterator.next() );
 			}
-			catch ( ServiceConfigurationError e ) {
+			catch (ServiceConfigurationError e) {
 				// ignore, because it can happen when multiple
 				// services are present and some of them are not class loader
 				// compatible with our API.

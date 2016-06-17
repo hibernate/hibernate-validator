@@ -78,7 +78,7 @@ public class XmlMappingParserTest {
 			xmlMappingParser.parse( mappingStreams );
 			fail( "Constraint definitions for a given constraint can only be overridden once" );
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			assertTrue( e.getMessage().startsWith( "HV000167" ) );
 		}
 	}

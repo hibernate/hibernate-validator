@@ -431,7 +431,7 @@ public class ConstraintHelper {
 				throw log.getWrongDefaultValueForPayloadParameterException( annotationType.getName() );
 			}
 		}
-		catch ( ClassCastException e ) {
+		catch (ClassCastException e) {
 			throw log.getWrongTypeForPayloadParameterException( annotationType.getName(), e );
 		}
 	}
@@ -447,7 +447,7 @@ public class ConstraintHelper {
 				throw log.getWrongDefaultValueForGroupsParameterException( annotationType.getName() );
 			}
 		}
-		catch ( ClassCastException e ) {
+		catch (ClassCastException e) {
 			throw log.getWrongTypeForGroupsParameterException( annotationType.getName(), e );
 		}
 	}
@@ -533,7 +533,7 @@ public class ConstraintHelper {
 			run( LoadClass.action( className, ConstraintHelper.class.getClassLoader() ) );
 			return true;
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			return false;
 		}
 	}

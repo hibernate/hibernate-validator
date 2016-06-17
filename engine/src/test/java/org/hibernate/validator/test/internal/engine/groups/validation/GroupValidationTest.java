@@ -75,7 +75,7 @@ public class GroupValidationTest {
 
 		Class<? extends Payload>[] payload() default { };
 
-		public class FailOnSecondValidationCallValidator
+		class FailOnSecondValidationCallValidator
 				implements ConstraintValidator<FailOnSecondValidationCall, Object> {
 			private final AtomicInteger invocationCount = new AtomicInteger( 0 );
 

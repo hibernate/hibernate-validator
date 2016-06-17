@@ -21,12 +21,13 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class SizeValidatorForCharSequence implements ConstraintValidator<Size, CharSequence> {
-	
+
 	private static final Log log = LoggerFactory.make();
-	
+
 	private int min;
 	private int max;
 
+	@Override
 	public void initialize(Size parameters) {
 		min = parameters.min();
 		max = parameters.max();
@@ -42,6 +43,7 @@ public class SizeValidatorForCharSequence implements ConstraintValidator<Size, C
 	 * @return Returns <code>true</code> if the string is <code>null</code> or the length of <code>charSequence</code> between the specified
 	 *         <code>min</code> and <code>max</code> values (inclusive), <code>false</code> otherwise.
 	 */
+	@Override
 	public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {
 		if ( charSequence == null ) {
 			return true;

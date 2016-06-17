@@ -86,7 +86,7 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 					parameter.isAnnotationPresent( Valid.class )
 			);
 		}
-		catch ( ArrayIndexOutOfBoundsException ex ) {
+		catch (ArrayIndexOutOfBoundsException ex) {
 			log.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
 			return Collections.emptySet();
 		}

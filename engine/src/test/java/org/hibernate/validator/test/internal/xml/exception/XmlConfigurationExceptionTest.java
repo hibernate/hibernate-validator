@@ -33,7 +33,7 @@ public class XmlConfigurationExceptionTest {
 			configuration.buildValidatorFactory();
 			fail();
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			assertTrue( e.getMessage().startsWith( "HV000012" ) );
 			Throwable cause = e.getCause();
 			assertEquals(

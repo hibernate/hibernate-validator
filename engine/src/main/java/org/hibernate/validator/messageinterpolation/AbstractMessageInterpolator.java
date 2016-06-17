@@ -216,7 +216,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		try {
 			interpolatedMessage = interpolateMessage( message, context, defaultLocale );
 		}
-		catch ( MessageDescriptorFormatException e ) {
+		catch (MessageDescriptorFormatException e) {
 			log.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
@@ -228,7 +228,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		try {
 			interpolatedMessage = interpolateMessage( message, context, locale );
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			log.warn( e.getMessage() );
 		}
 		return interpolatedMessage;
@@ -406,7 +406,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 				parameterValue = parameterName;
 			}
 		}
-		catch ( MissingResourceException e ) {
+		catch (MissingResourceException e) {
 			// return parameter itself
 			parameterValue = parameterName;
 		}

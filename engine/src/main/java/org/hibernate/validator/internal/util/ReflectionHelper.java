@@ -235,7 +235,7 @@ public final class ReflectionHelper {
 		try {
 			return field.get( object );
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw log.getUnableToAccessMemberException( field.getName(), e );
 		}
 	}
@@ -244,10 +244,10 @@ public final class ReflectionHelper {
 		try {
 			return method.invoke( object );
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw log.getUnableToAccessMemberException( method.getName(), e );
 		}
-		catch ( InvocationTargetException e ) {
+		catch (InvocationTargetException e) {
 			throw log.getUnableToAccessMemberException( method.getName(), e );
 		}
 	}

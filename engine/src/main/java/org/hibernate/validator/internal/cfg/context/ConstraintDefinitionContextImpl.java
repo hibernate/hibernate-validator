@@ -29,11 +29,11 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 		implements ConstraintDefinitionContext<A> {
 
 	private final Class<A> annotationType;
-	
+
 	private boolean includeExistingValidators = true;
-	
+
 	private final Set<Class<? extends ConstraintValidator<A, ?>>> validatorTypes = newHashSet();
-	
+
 	ConstraintDefinitionContextImpl(DefaultConstraintMapping mapping, Class<A> annotationType) {
 		super( mapping );
 		this.annotationType = annotationType;
@@ -50,7 +50,7 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 		validatorTypes.add( validator );
 		return this;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	ConstraintDefinitionContribution<A> build() {
 		return new ConstraintDefinitionContribution<A>(

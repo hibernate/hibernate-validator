@@ -17,7 +17,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public abstract class SizeValidatorForArraysOfPrimitives {
-	
+
 	private  static final Log log = LoggerFactory.make();
 
 	protected int min;

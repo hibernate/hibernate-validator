@@ -266,10 +266,10 @@ public class AnnotationProxyTest {
 			try {
 				descriptor.setValue( method.getName(), method.invoke( annotation ) );
 			}
-			catch ( RuntimeException e ) {
+			catch (RuntimeException e) {
 				throw e;
 			}
-			catch ( Exception e ) {
+			catch (Exception e) {
 				throw new RuntimeException( e );
 			}
 		}

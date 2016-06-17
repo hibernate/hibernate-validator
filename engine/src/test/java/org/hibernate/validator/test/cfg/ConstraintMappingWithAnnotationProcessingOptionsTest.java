@@ -431,7 +431,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		public Doer(@NotNull String input) {
 		}
 
-		@GenericAndCrossParameterConstraint(validationAppliesTo=ConstraintTarget.PARAMETERS)
+		@GenericAndCrossParameterConstraint(validationAppliesTo = ConstraintTarget.PARAMETERS)
 		public Doer(String input1, String input2) {
 		}
 
@@ -440,7 +440,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 			return null;
 		}
 
-		@GenericAndCrossParameterConstraint(validationAppliesTo=ConstraintTarget.PARAMETERS)
+		@GenericAndCrossParameterConstraint(validationAppliesTo = ConstraintTarget.PARAMETERS)
 		public void doAnotherThing(String input) {
 		}
 	}

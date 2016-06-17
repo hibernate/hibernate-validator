@@ -19,6 +19,10 @@ import java.util.Set;
  */
 public class CollectionHelper {
 
+	private CollectionHelper() {
+		// Not allowed
+	}
+
 	public static <K, V> HashMap<K, V> newHashMap() {
 		return new HashMap<K, V>();
 	}

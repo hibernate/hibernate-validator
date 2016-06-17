@@ -34,7 +34,7 @@ public class MinValidatorForCharSequence implements ConstraintValidator<Min, Cha
 		try {
 			return new BigDecimal( value.toString() ).compareTo( minValue ) != -1;
 		}
-		catch ( NumberFormatException nfe ) {
+		catch (NumberFormatException nfe) {
 			return false;
 		}
 	}

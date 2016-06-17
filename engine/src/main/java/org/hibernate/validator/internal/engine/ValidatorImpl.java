@@ -832,7 +832,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			throw log.getInvalidPropertyPathException();
 		}
 
-		if ( metaConstraints.size() == 0 && typeUseConstraints.size() == 0) {
+		if ( metaConstraints.size() == 0 && typeUseConstraints.size() == 0 ) {
 			return context.getFailingConstraints();
 		}
 
@@ -1058,7 +1058,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			final Map<Class<?>, Class<?>> validatedInterfaces, Class<? super U> clazz, Set<MetaConstraint<?>> metaConstraints,
 			Group groupClass) {
 		valueContext.setCurrentGroup( groupClass.getDefiningClass() );
-		boolean validationSuccessful =true;
+		boolean validationSuccessful = true;
 
 		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 			// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
@@ -1619,7 +1619,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					type
 			);
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			throw log.getErrorDuringCallOfTraversableResolverIsReachableException( e );
 		}
 	}
@@ -1655,7 +1655,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					type
 			);
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			throw log.getErrorDuringCallOfTraversableResolverIsCascadableException( e );
 		}
 	}

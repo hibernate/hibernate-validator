@@ -51,7 +51,7 @@ public class LocalConstrValTest {
 		assertCorrectPropertyPaths( constraintViolations, "nickName" );
 
 		//nickName fails for violating @Size, but is reported as SingleViolation
-		//name fails for violating both Pattern and the test in LongStringValidator. In a way it is reported 
+		//name fails for violating both Pattern and the test in LongStringValidator. In a way it is reported
 		//both as single violation and as multiple violations (weird).
 		constraintViolations = currentValidator.validate(
 				new Person(

@@ -27,6 +27,10 @@ import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
  */
 class InheritedMethodsHelper {
 
+	private InheritedMethodsHelper() {
+		// Not allowed
+	}
+
 	/**
 	 * Get a list of all methods which the given class declares, implements,
 	 * overrides or inherits. Methods are added by adding first all methods of

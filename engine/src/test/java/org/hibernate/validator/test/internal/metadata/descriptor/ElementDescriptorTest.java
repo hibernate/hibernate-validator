@@ -82,7 +82,7 @@ public class ElementDescriptorTest {
 			constraintDescriptors.add( null );
 			fail( "Set should be immutable" );
 		}
-		catch ( UnsupportedOperationException e ) {
+		catch (UnsupportedOperationException e) {
 			// success
 		}
 
@@ -90,7 +90,7 @@ public class ElementDescriptorTest {
 			constraintDescriptors.remove( null );
 			fail( "Set should be immutable" );
 		}
-		catch ( UnsupportedOperationException e ) {
+		catch (UnsupportedOperationException e) {
 			// success
 		}
 	}

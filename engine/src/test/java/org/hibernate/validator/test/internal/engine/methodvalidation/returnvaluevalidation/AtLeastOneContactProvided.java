@@ -28,7 +28,7 @@ public @interface AtLeastOneContactProvided {
 
 	Class<? extends Payload>[] payload() default { };
 
-	public class AtLeastOneContactProvidedValidator
+	class AtLeastOneContactProvidedValidator
 			implements ConstraintValidator<AtLeastOneContactProvided, ContactBean> {
 
 		@Override

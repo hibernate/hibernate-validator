@@ -20,9 +20,9 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class SizeValidatorForCollection implements ConstraintValidator<Size, Collection<?>> {
-	
+
 	private  static final Log log = LoggerFactory.make();
-	
+
 	private int min;
 	private int max;
 

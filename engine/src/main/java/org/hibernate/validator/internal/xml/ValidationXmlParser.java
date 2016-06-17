@@ -125,7 +125,7 @@ public class ValidationXmlParser {
 			JAXBElement<ValidationConfigType> root = run( Unmarshal.action( unmarshaller, xmlEventReader, ValidationConfigType.class ) );
 			return root.getValue();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw log.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
 		}
 	}
@@ -134,7 +134,7 @@ public class ValidationXmlParser {
 		try {
 			inputStream.close();
 		}
-		catch ( IOException io ) {
+		catch (IOException io) {
 			log.unableToCloseXMLFileInputStream( VALIDATION_XML_FILE );
 		}
 	}

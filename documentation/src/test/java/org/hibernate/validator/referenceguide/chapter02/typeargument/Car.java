@@ -8,7 +8,7 @@ import javax.validation.Valid;
 
 public class Car {
 
-	public static enum FuelConsumption {
+	public enum FuelConsumption {
 		CITY,
 		HIGHWAY
 	}
@@ -39,3 +39,4 @@ public class Car {
 		this.gearBox = gearBox;
 	}
 }
+

@@ -106,7 +106,7 @@ public class ConstraintApiTest {
 						.valid()
 				.method( "drive", int.class )
 					.parameter( 0 )
-						.constraint( new MaxDef().value ( 75 ) )
+						.constraint( new MaxDef().value( 75 ) )
 				.method( "load", List.class, List.class )
 					.crossParameter()
 						.constraint( new GenericConstraintDef<LuggageCountMatchesPassengerCount>(
@@ -154,7 +154,7 @@ public class ConstraintApiTest {
 
 		configuration.addMapping( constraintMapping );
 	}
-	
+
 	@Test
 	public void urlValidationOverride() {
 		HibernateValidatorConfiguration configuration = Validation
@@ -169,7 +169,7 @@ public class ConstraintApiTest {
 				.includeExistingValidators( false )
 				.validatedBy( RegexpURLValidator.class );
 		//end::urlValidationOverride[]
-		
+
 		configuration.addMapping( constraintMapping );
 	}
 

@@ -99,7 +99,7 @@ public class CascadedValidationTest {
 			try {
 				latch.await();
 			}
-			catch ( InterruptedException e ) {
+			catch (InterruptedException e) {
 				e.printStackTrace();
 				return;
 			}

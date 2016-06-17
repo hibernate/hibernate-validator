@@ -15,7 +15,7 @@ import org.hibernate.validator.integration.cdi.service.PingService;
 /**
  * @author Hardy Ferentschik
  */
-public class ConstraintValidatorFactoryWithInjection implements ConstraintValidatorFactory{
+public class ConstraintValidatorFactoryWithInjection implements ConstraintValidatorFactory {
 	@Inject
 	private PingService pingService;
 

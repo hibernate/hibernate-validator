@@ -56,7 +56,7 @@ public class DigitsValidatorForCharSequence implements ConstraintValidator<Digit
 		try {
 			bd = new BigDecimal( charSequence.toString() );
 		}
-		catch ( NumberFormatException nfe ) {
+		catch (NumberFormatException nfe) {
 			return null;
 		}
 		return bd;

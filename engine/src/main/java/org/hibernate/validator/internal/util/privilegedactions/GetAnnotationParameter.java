@@ -49,13 +49,13 @@ public final class GetAnnotationParameter<T> implements PrivilegedAction<T> {
 				throw log.getWrongParameterTypeException( type.getName(), o.getClass().getName() );
 			}
 		}
-		catch ( NoSuchMethodException e ) {
+		catch (NoSuchMethodException e) {
 			throw log.getUnableToFindAnnotationParameterException( parameterName, e );
 		}
-		catch ( IllegalAccessException e ) {
+		catch (IllegalAccessException e) {
 			throw log.getUnableToGetAnnotationParameterException( parameterName, annotation.getClass().getName(), e );
 		}
-		catch ( InvocationTargetException e ) {
+		catch (InvocationTargetException e) {
 			throw log.getUnableToGetAnnotationParameterException( parameterName, annotation.getClass().getName(), e );
 		}
 	}

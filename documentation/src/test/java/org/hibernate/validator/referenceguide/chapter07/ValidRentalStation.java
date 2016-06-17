@@ -25,7 +25,7 @@ public @interface ValidRentalStation {
 
 	Class<? extends Payload>[] payload() default { };
 
-	public static class Validator
+	class Validator
 			implements ConstraintValidator<ValidRentalStation, Object[]> {
 
 		@Override

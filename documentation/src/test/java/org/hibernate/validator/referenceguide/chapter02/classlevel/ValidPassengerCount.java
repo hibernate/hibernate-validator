@@ -24,7 +24,7 @@ public @interface ValidPassengerCount {
 
 	Class<? extends Payload>[] payload() default { };
 
-	public static class Validator
+	class Validator
 			implements ConstraintValidator<ValidPassengerCount, Car> {
 
 		@Override

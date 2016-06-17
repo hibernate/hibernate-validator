@@ -12,11 +12,13 @@ import javax.validation.ConstraintValidatorContext;
 /**
  * @author Hardy Ferentschik
  */
-public class SerializableConstraintValidator implements ConstraintValidator<Serializable, java.io.Serializable > {
+public class SerializableConstraintValidator implements ConstraintValidator<Serializable, java.io.Serializable> {
 
+	@Override
 	public void initialize(Serializable annotation) {
 	}
 
+	@Override
 	public boolean isValid( java.io.Serializable value, ConstraintValidatorContext constraintValidatorContext) {
 		return true;
 	}

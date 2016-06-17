@@ -59,7 +59,7 @@ class MetaConstraintBuilder {
 		try {
 			annotationClass = (Class<A>) classLoadingHelper.loadClass( constraint.getAnnotation(), defaultPackage );
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			throw log.getUnableToLoadConstraintAnnotationClassException( constraint.getAnnotation(), e );
 		}
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<A>( annotationClass );
@@ -82,7 +82,7 @@ class MetaConstraintBuilder {
 		try {
 			annotation = AnnotationFactory.create( annotationDescriptor );
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
 		}
 
@@ -171,7 +171,7 @@ class MetaConstraintBuilder {
 				Class<Annotation> annotationClass = (Class<Annotation>) returnType;
 				returnValue = buildAnnotation( annotationType, annotationClass, defaultPackage );
 			}
-			catch ( ClassCastException e ) {
+			catch (ClassCastException e) {
 				throw log.getUnexpectedParameterValueException( e );
 			}
 		}
@@ -188,7 +188,7 @@ class MetaConstraintBuilder {
 			try {
 				returnValue = Byte.parseByte( value );
 			}
-			catch ( NumberFormatException e ) {
+			catch (NumberFormatException e) {
 				throw log.getInvalidNumberFormatException( "byte", e );
 			}
 		}
@@ -196,7 +196,7 @@ class MetaConstraintBuilder {
 			try {
 				returnValue = Short.parseShort( value );
 			}
-			catch ( NumberFormatException e ) {
+			catch (NumberFormatException e) {
 				throw log.getInvalidNumberFormatException( "short", e );
 			}
 		}
@@ -204,7 +204,7 @@ class MetaConstraintBuilder {
 			try {
 				returnValue = Integer.parseInt( value );
 			}
-			catch ( NumberFormatException e ) {
+			catch (NumberFormatException e) {
 				throw log.getInvalidNumberFormatException( "int", e );
 			}
 		}
@@ -212,7 +212,7 @@ class MetaConstraintBuilder {
 			try {
 				returnValue = Long.parseLong( value );
 			}
-			catch ( NumberFormatException e ) {
+			catch (NumberFormatException e) {
 				throw log.getInvalidNumberFormatException( "long", e );
 			}
 		}
@@ -220,7 +220,7 @@ class MetaConstraintBuilder {
 			try {
 				returnValue = Float.parseFloat( value );
 			}
-			catch ( NumberFormatException e ) {
+			catch (NumberFormatException e) {
 				throw log.getInvalidNumberFormatException( "float", e );
 			}
 		}
@@ -228,7 +228,7 @@ class MetaConstraintBuilder {
 			try {
 				returnValue = Double.parseDouble( value );
 			}
-			catch ( NumberFormatException e ) {
+			catch (NumberFormatException e) {
 				throw log.getInvalidNumberFormatException( "double", e );
 			}
 		}
@@ -253,7 +253,7 @@ class MetaConstraintBuilder {
 				Class<Enum> enumClass = (Class<Enum>) returnType;
 				returnValue = Enum.valueOf( enumClass, value );
 			}
-			catch ( ClassCastException e ) {
+			catch (ClassCastException e) {
 				throw log.getInvalidReturnTypeException( returnType, e );
 			}
 		}

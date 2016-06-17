@@ -21,7 +21,7 @@ import javax.validation.Payload;
 /**
  * @author Gunnar Morling
  */
-@Constraint(validatedBy ={})
+@Constraint(validatedBy = {})
 @Documented
 @Target({ METHOD, FIELD, TYPE })
 @Retention(RUNTIME)
