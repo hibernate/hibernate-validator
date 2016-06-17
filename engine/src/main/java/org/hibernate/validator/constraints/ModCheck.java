@@ -88,7 +88,7 @@ public @interface ModCheck {
 		ModCheck[] value();
 	}
 
-	public enum ModType {
+	enum ModType {
 		/**
 		 * Represents a MOD10 algorithm (Also known as Luhn algorithm)
 		 */

@@ -17,28 +17,28 @@ public class FieldLevelValidationUsingComplexComposedConstraint {
 
 	@ComposedConstraint
 	public String string;
-	
+
 	@ComposedConstraint
 	public List<?> list;
-	
+
 	/**
 	 * Allowed
 	 */
 	@ComposedConstraint
 	public GregorianCalendar gregorianCalendar;
-	
+
 	@ComposedConstraint
 	public Collection<?> collection;
-	
+
 	/**
 	 * Allowed
 	 */
 	@ComposedConstraint
 	public ArrayList<?> arrayList;
-	
+
 	@ComposedConstraint
 	public Calendar calendar;
-		
+
 	/**
 	 * Not allowed.
 	 */

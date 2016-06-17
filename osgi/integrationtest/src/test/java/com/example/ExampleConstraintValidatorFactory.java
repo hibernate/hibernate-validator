@@ -24,7 +24,7 @@ public class ExampleConstraintValidatorFactory implements ConstraintValidatorFac
 		try {
 			return key.newInstance();
 		}
-		catch ( InstantiationException | IllegalAccessException e ) {
+		catch (InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException( e );
 		}
 		finally {

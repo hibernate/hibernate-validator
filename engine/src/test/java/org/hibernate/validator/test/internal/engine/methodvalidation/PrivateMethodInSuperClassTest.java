@@ -91,7 +91,7 @@ public class PrivateMethodInSuperClassTest {
 
 	public static class GiantPanda extends Mammal {
 
-		public void eat(@NotNull @Size(min=3) String food) {
+		public void eat(@NotNull @Size(min = 3) String food) {
 		}
 	}
 

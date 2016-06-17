@@ -10,51 +10,52 @@ package org.hibernate.validator.test.internal.xml;
  * @author Hardy Ferentschik
  */
 public class Customer implements Person {
-    private String firstName;
-    private String middleName;
-    private String lastName;
 
-    private String customerId;
+	private String firstName;
+	private String middleName;
+	private String lastName;
 
-    private String password;
+	private String customerId;
 
-    public String getFirstName() {
-	return this.firstName;
-    }
+	private String password;
 
-    public void setFirstName(final String firstName) {
-	this.firstName = firstName;
-    }
+	public String getFirstName() {
+		return this.firstName;
+	}
 
-    public String getMiddleName() {
-	return this.middleName;
-    }
+	public void setFirstName(final String firstName) {
+		this.firstName = firstName;
+	}
 
-    public void setMiddleName(final String middleName) {
-	this.middleName = middleName;
-    }
+	public String getMiddleName() {
+		return this.middleName;
+	}
 
-    public String getLastName() {
-	return this.lastName;
-    }
+	public void setMiddleName(final String middleName) {
+		this.middleName = middleName;
+	}
 
-    public void setLastName(final String lastName) {
-	this.lastName = lastName;
-    }
+	public String getLastName() {
+		return this.lastName;
+	}
 
-    public String getCustomerId() {
-	return this.customerId;
-    }
+	public void setLastName(final String lastName) {
+		this.lastName = lastName;
+	}
 
-    public void setCustomerId(final String customerId) {
-	this.customerId = customerId;
-    }
+	public String getCustomerId() {
+		return this.customerId;
+	}
 
-    public String getPassword() {
-	return this.password;
-    }
+	public void setCustomerId(final String customerId) {
+		this.customerId = customerId;
+	}
 
-    public void setPassword(final String password) {
-	this.password = password;
-    }
+	public String getPassword() {
+		return this.password;
+	}
+
+	public void setPassword(final String password) {
+		this.password = password;
+	}
 }

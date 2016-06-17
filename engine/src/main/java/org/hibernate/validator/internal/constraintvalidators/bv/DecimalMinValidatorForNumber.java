@@ -33,7 +33,7 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 		try {
 			this.minValue = new BigDecimal( minValue.value() );
 		}
-		catch ( NumberFormatException nfe ) {
+		catch (NumberFormatException nfe) {
 			throw log.getInvalidBigDecimalFormatException( minValue.value(), nfe );
 		}
 		this.inclusive = minValue.inclusive();

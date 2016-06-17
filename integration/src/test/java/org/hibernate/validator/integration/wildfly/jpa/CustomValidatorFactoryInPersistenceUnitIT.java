@@ -74,7 +74,7 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 		try {
 			magicianService.storeMagician();
 		}
-		catch(Exception e) {
+		catch (Exception e) {
 			Throwable rootException = getRootException( e );
 			assertEquals( ConstraintViolationException.class, rootException.getClass() );
 

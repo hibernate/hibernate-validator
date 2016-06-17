@@ -40,7 +40,7 @@ public @interface GenericAndCrossParameterConstraint {
 	ConstraintTarget validationAppliesTo() default ConstraintTarget.IMPLICIT;
 
 	@SupportedValidationTarget(value = { ValidationTarget.ANNOTATED_ELEMENT, ValidationTarget.PARAMETERS })
-	public static class GenericValidator implements ConstraintValidator<GenericAndCrossParameterConstraint, Object> {
+	class GenericValidator implements ConstraintValidator<GenericAndCrossParameterConstraint, Object> {
 
 		@Override
 		public void initialize(GenericAndCrossParameterConstraint parameters) {

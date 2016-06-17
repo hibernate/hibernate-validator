@@ -27,7 +27,7 @@ import javax.validation.Payload;
 
 	Class<? extends Payload>[] payload() default {};
 
-	public class BookBusinessRulesValidator implements ConstraintValidator<BookBusinessRules, Object> {
+	class BookBusinessRulesValidator implements ConstraintValidator<BookBusinessRules, Object> {
 
 		@Override
 		public void initialize(BookBusinessRules constraintAnnotation) {

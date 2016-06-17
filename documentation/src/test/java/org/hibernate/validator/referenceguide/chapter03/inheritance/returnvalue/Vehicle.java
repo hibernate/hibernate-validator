@@ -8,3 +8,4 @@ public interface Vehicle {
 	@NotNull
 	List<Person> getPassengers();
 }
+

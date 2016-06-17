@@ -34,7 +34,7 @@ public @interface ValidMagicianName {
 	Class<?>[] groups() default { };
 	Class<? extends Payload>[] payload() default { };
 
-	public static class ValidMagicianNameValidator implements ConstraintValidator<ValidMagicianName, String> {
+	class ValidMagicianNameValidator implements ConstraintValidator<ValidMagicianName, String> {
 
 		@Inject
 		private ErrorNameProvider errorNameProvider;
@@ -54,7 +54,7 @@ public @interface ValidMagicianName {
 	}
 
 	@ApplicationScoped
-	public static class ErrorNameProvider {
+	class ErrorNameProvider {
 
 		String getErrorName() {
 			return "Invalid magician name";

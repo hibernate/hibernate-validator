@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Resolver for the el expressions.
- * 
+ *
  * @author Hardy Ferentschik
  * @author Adam Stawicki
  */
@@ -68,13 +68,13 @@ public class ElTermResolver implements TermResolver {
 			ValueExpression valueExpression = bindContextValues( expression, context, elContext );
 			resolvedExpression = (String) valueExpression.getValue( elContext );
 		}
-		catch ( PropertyNotFoundException pnfe ) {
+		catch (PropertyNotFoundException pnfe) {
 			log.unknownPropertyInExpressionLanguage( expression, pnfe );
 		}
-		catch ( ELException e ) {
+		catch (ELException e) {
 			log.errorInExpressionLanguage( expression, e );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			log.evaluatingExpressionLanguageExpressionCausedException( expression, e );
 		}
 

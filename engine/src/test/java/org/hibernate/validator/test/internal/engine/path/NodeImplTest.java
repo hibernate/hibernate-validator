@@ -245,7 +245,7 @@ public class NodeImplTest {
 		assertEquals( node.getKind(), ElementKind.PROPERTY, "unexpected node kind" );
 		assertEquals( node.getName(), "number" );
 		assertEquals( node.as( PropertyNode.class ).getValue(), 11 );
-		assertEquals( node.getIndex(), Integer.valueOf ( 2 ) );
+		assertEquals( node.getIndex(), Integer.valueOf( 2 ) );
 
 		assertFalse( nodeIterator.hasNext() );
 	}
@@ -430,7 +430,7 @@ public class NodeImplTest {
 
 	static class Person {
 
-		@Size(min=5)
+		@Size(min = 5)
 		String name;
 
 		Person(String name) {

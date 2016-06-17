@@ -21,6 +21,10 @@ import static org.fest.assertions.Formatting.format;
  */
 public class DescriptorAssert {
 
+	private DescriptorAssert() {
+		// Not allowed
+	}
+
 	public static GroupConversionDescriptorSetAssert assertThat(Set<GroupConversionDescriptor> groupConversions) {
 		return new GroupConversionDescriptorSetAssert( groupConversions );
 	}

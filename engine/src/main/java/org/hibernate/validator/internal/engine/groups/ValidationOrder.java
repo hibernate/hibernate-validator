@@ -41,7 +41,7 @@ public interface ValidationOrder {
 	 */
 	ValidationOrder DEFAULT_SEQUENCE = new DefaultValidationOrder();
 
-	static class DefaultValidationOrder implements ValidationOrder {
+	class DefaultValidationOrder implements ValidationOrder {
 
 		private final List<Sequence> defaultSequences;
 

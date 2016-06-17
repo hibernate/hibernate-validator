@@ -12,7 +12,7 @@ public class FieldLevelValidationUsingCustomConstraints {
 
 	@CheckCase(CaseMode.UPPER)
 	public String string;
-	
+
 	/**
 	 * Not allowed.
 	 */

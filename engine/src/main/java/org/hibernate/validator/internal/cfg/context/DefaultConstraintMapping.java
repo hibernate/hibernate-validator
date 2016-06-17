@@ -109,7 +109,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 
 		return constraintContext;
 	}
-	
+
 	public Set<ConstraintDefinitionContribution<?>> getConstraintDefinitionContributions() {
 		Set<ConstraintDefinitionContribution<?>> contributions = newHashSet();
 

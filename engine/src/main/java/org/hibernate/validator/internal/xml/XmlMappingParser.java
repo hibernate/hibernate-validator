@@ -169,13 +169,13 @@ public class XmlMappingParser {
 					try {
 						in.reset();
 					}
-					catch ( IOException e ) {
+					catch (IOException e) {
 						log.debug( "Unable to reset input stream." );
 					}
 				}
 			}
 		}
-		catch ( JAXBException e ) {
+		catch (JAXBException e) {
 			throw log.getErrorParsingMappingFileException( e );
 		}
 	}
@@ -353,7 +353,7 @@ public class XmlMappingParser {
 			);
 			constraintMappings = root.getValue();
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw log.getErrorParsingMappingFileException( e );
 		}
 		return constraintMappings;
@@ -379,10 +379,10 @@ public class XmlMappingParser {
 		try {
 			return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 		}
-		catch ( JAXBException e ) {
+		catch (JAXBException e) {
 			throw e;
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw log.getErrorParsingMappingFileException( e );
 		}
 	}

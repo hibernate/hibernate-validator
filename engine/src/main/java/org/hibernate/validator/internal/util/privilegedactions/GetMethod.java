@@ -32,7 +32,7 @@ public final class GetMethod implements PrivilegedAction<Method> {
 		try {
 			return clazz.getMethod( methodName );
 		}
-		catch ( NoSuchMethodException e ) {
+		catch (NoSuchMethodException e) {
 			return null;
 		}
 	}

@@ -41,7 +41,7 @@ public class GetterValidationOnlyTest {
 		try {
 			assertNull( onlyGetterValidated.foo() );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			fail( "CDI method interceptor should not throw an exception" );
 		}
 	}
@@ -52,7 +52,7 @@ public class GetterValidationOnlyTest {
 			onlyGetterValidated.getFoo();
 			fail( "CDI method interceptor should throw an exception" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			// success
 		}
 	}

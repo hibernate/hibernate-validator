@@ -42,7 +42,7 @@ public class CachedTraversableResolverTest {
 		try {
 			v.validate( suit, Default.class, Cloth.class );
 		}
-		catch ( IllegalStateException e ) {
+		catch (IllegalStateException e) {
 			fail( "Traversable Called several times for a given object" );
 		}
 
@@ -50,7 +50,7 @@ public class CachedTraversableResolverTest {
 		try {
 			v.validateProperty( suit, "size", Default.class, Cloth.class );
 		}
-		catch ( IllegalStateException e ) {
+		catch (IllegalStateException e) {
 			fail( "Traversable Called several times for a given object" );
 		}
 
@@ -58,7 +58,7 @@ public class CachedTraversableResolverTest {
 		try {
 			v.validateValue( Suit.class, "size", 2, Default.class, Cloth.class );
 		}
-		catch ( IllegalStateException e ) {
+		catch (IllegalStateException e) {
 			fail( "Traversable Called several times for a given object" );
 		}
 	}

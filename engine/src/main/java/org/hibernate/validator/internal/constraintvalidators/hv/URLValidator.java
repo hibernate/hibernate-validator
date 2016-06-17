@@ -35,7 +35,7 @@ public class URLValidator implements ConstraintValidator<org.hibernate.validator
 		try {
 			url = new java.net.URL( value.toString() );
 		}
-		catch ( MalformedURLException e ) {
+		catch (MalformedURLException e) {
 			return false;
 		}
 

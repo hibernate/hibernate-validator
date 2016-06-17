@@ -25,6 +25,10 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class ClassHierarchyHelper {
 
+	private ClassHierarchyHelper() {
+		// Not allowed
+	}
+
 	/**
 	 * Gets the elements of the hierarchy of the given class which match the
 	 * given filters. Classes are added by starting with the class itself and

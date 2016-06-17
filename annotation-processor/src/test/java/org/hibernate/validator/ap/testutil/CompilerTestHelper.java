@@ -199,7 +199,7 @@ public class CompilerTestHelper {
 			fileManager.setLocation( StandardLocation.CLASS_PATH, getDependenciesAsFiles( dependencies ) );
 			fileManager.setLocation( StandardLocation.CLASS_OUTPUT, Arrays.asList( PROCESSOR_OUT_DIR ) );
 		}
-		catch ( IOException e ) {
+		catch (IOException e) {
 			throw new RuntimeException( e );
 		}
 
@@ -255,6 +255,6 @@ public class CompilerTestHelper {
 	public static File getTargetDir() {
 		// target/test-classes
 		String targetClassesDir = CompilerTestHelper.class.getProtectionDomain().getCodeSource().getLocation().getFile();
-		return new File ( targetClassesDir ).getParentFile();
+		return new File( targetClassesDir ).getParentFile();
 	}
 }

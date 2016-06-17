@@ -142,10 +142,10 @@ public class ConfigurationFilePropertiesTest {
 					field.setAccessible( true );
 					return (T) field.get( subject );
 				}
-				catch ( IllegalArgumentException e ) {
+				catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				}
-				catch ( IllegalAccessException e ) {
+				catch (IllegalAccessException e) {
 					e.printStackTrace();
 				}
 				finally {

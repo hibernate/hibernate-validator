@@ -14,4 +14,4 @@ import javax.validation.Valid;
 class Item {
 	@Valid
 	Interval interval;
-} 
+}

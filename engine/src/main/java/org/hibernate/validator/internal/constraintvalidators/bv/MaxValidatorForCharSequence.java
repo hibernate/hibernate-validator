@@ -34,7 +34,7 @@ public class MaxValidatorForCharSequence implements ConstraintValidator<Max, Cha
 		try {
 			return new BigDecimal( value.toString() ).compareTo( maxValue ) != 1;
 		}
-		catch ( NumberFormatException nfe ) {
+		catch (NumberFormatException nfe) {
 			return false;
 		}
 	}

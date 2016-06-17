@@ -45,7 +45,7 @@ public class DisableExecutableValidationInXmlTest {
 		try {
 			repeater.reverse( null );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			fail( "CDI method interception should be disabled" );
 		}
 	}

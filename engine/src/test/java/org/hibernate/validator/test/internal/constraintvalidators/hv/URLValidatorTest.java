@@ -217,7 +217,7 @@ public class URLValidatorTest {
 				.constraintDefinition( URL.class )
 				.includeExistingValidators( false )
 				.validatedBy( RegexpURLValidator.class );
-		
+
 		config.addMapping( constraintMapping );
 
 		DelegatingConstraintValidatorFactory constraintValidatorFactory = new DelegatingConstraintValidatorFactory(

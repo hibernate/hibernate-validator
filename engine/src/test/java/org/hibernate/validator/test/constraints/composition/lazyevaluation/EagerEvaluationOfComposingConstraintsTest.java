@@ -51,7 +51,7 @@ public class EagerEvaluationOfComposingConstraintsTest {
 	@Constraint(validatedBy = MyComposedConstraintValidator.class)
 	@Target({ METHOD, FIELD, TYPE })
 	@Retention(RUNTIME)
-	@InvocationCounting.List(value = { @InvocationCounting(message="foo"), @InvocationCounting(message="bar") })
+	@InvocationCounting.List(value = { @InvocationCounting(message = "foo"), @InvocationCounting(message = "bar") })
 	public @interface MyComposedConstraint {
 		String message() default "my composed constraint failed";
 

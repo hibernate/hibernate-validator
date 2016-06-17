@@ -27,6 +27,7 @@ public class GetterCheck extends AbstractConstraintCheck {
 		this.methodConstraintsSupported  = methodConstraintsSupported;
 	}
 
+	@Override
 	public Set<ConstraintCheckError> checkMethod(ExecutableElement element,
 												 AnnotationMirror annotation) {
 
@@ -37,7 +38,7 @@ public class GetterCheck extends AbstractConstraintCheck {
 					)
 			);
 		}
-		
+
 		// HV-864: void methods support cross-parameter constraints. We do not enforce the check here.
 
 		return Collections.emptySet();

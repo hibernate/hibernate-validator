@@ -45,7 +45,7 @@ public class ParameterScriptAssertValidatorTest {
 			calendar.createEvent( endDate, startDate );
 			fail( "Expected exception wasn't raised" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertCorrectConstraintViolationMessages( e, "script expression \"arg0 < arg1\" didn't evaluate to true" );
 		}
 	}
@@ -66,7 +66,7 @@ public class ParameterScriptAssertValidatorTest {
 			calendar.createEvent( endDate, startDate, "Meeting" );
 			fail( "Expected exception wasn't raised" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertCorrectConstraintViolationMessages(
 					e,
 					"script expression \"param0 < param1\" didn't evaluate to true"

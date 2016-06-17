@@ -111,7 +111,7 @@ public class RootResolver extends ELResolver {
 			returnValue = formatterWrapper.format( (String) params[0], formattingParameters );
 			context.setPropertyResolved( true );
 		}
-		catch ( IllegalFormatException e ) {
+		catch (IllegalFormatException e) {
 			throw new ELException( "Error in Formatter#format call", e );
 		}
 

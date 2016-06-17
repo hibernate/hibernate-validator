@@ -51,7 +51,7 @@ public class InjectingConstraintValidatorFactoryTest {
 			new InjectingConstraintValidatorFactory( null );
 			fail();
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			// success
 		}
 	}

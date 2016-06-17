@@ -257,7 +257,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		int i = 0;
 		for ( ConstrainedParameter parameter : parameterMetaData ) {
 			ConstrainedParameter otherParameter = other.getParameterMetaData( i );
-			if ( parameter.isCascading != otherParameter.isCascading 
+			if ( parameter.isCascading != otherParameter.isCascading
 				|| !getDescriptors( parameter.getConstraints() ).equals( getDescriptors( otherParameter.getConstraints() ) ) ) {
 				return false;
 			}

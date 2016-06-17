@@ -743,7 +743,7 @@ public final class ConstraintViolationAssert {
 					Integer i = Integer.parseInt( indexOrKey );
 					node.setIndex( i );
 				}
-				catch ( NumberFormatException e ) {
+				catch (NumberFormatException e) {
 					node.setKey( indexOrKey );
 				}
 			}

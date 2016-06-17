@@ -20,7 +20,7 @@ public final class LoggerFactory {
 	}
 
 	// private constructor to avoid instantiation
-	private LoggerFactory(){
+	private LoggerFactory() {
 	}
 }
 

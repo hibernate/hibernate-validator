@@ -32,9 +32,11 @@ public class MessageLoggedAssertionLogger extends AppenderSkeleton {
 		}
 	}
 
+	@Override
 	public void close() {
 	}
 
+	@Override
 	public boolean requiresLayout() {
 		return false;
 	}

@@ -14,5 +14,6 @@ import java.util.UUID;
 public class JobRepositoryImpl implements JobRepository<UUID> {
 
 	@Override
-	public void createJob(UUID id) {}
+	public void createJob(UUID id) {
+	}
 }

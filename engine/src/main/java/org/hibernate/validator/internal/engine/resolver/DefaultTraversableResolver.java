@@ -66,7 +66,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 		try {
 			persistenceClass = run( LoadClass.action( PERSISTENCE_CLASS_NAME, this.getClass().getClassLoader() ) );
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			log.debugf(
 					"Cannot find %s on classpath. Assuming non JPA 2 environment. All properties will per default be traversable.",
 					PERSISTENCE_CLASS_NAME
@@ -91,7 +91,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 			Object persistence = run( NewInstance.action( persistenceClass, "persistence provider" ) );
 			ReflectionHelper.getValue( persistenceUtilGetter, persistence );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			log.debugf(
 					"Unable to invoke %s.%s. Inconsistent JPA environment. All properties will per default be traversable.",
 					PERSISTENCE_CLASS_NAME,
@@ -115,7 +115,7 @@ public class DefaultTraversableResolver implements TraversableResolver {
 					"Instantiated JPA aware TraversableResolver of type %s.", JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME
 			);
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			log.debugf(
 					"Unable to load or instantiate JPA aware resolver %s. All properties will per default be traversable.",
 					JPA_AWARE_TRAVERSABLE_RESOLVER_CLASS_NAME

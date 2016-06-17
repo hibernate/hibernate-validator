@@ -56,7 +56,7 @@ public @interface EAN {
 		EAN[] value();
 	}
 
-	public enum Type {
+	enum Type {
 		EAN13,
 		EAN8
 	}

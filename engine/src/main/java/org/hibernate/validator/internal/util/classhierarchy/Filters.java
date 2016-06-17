@@ -17,6 +17,10 @@ public class Filters {
 	private static final Filter PROXY_FILTER = new WeldProxyFilter();
 	private static final Filter INTERFACES_FILTER = new InterfacesFilter();
 
+	private Filters() {
+		// Not allowed
+	}
+
 	/**
 	 * Returns a filter which excludes interfaces.
 	 *

@@ -49,7 +49,7 @@ public class GenericParameterTypeValidationUnitIT {
 			bean.genericArg( null );
 			fail( "@NotNull constraint should be violated" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
 			assertTrue( "Unexpected number of constraint violations", violations.size() == 1 );
 			ConstraintViolation<?> constraintViolation = violations.iterator().next();
@@ -67,7 +67,7 @@ public class GenericParameterTypeValidationUnitIT {
 			billingService.getBillingAmount( "some order" );
 			fail( "@Min constraint should be violated" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
 			assertTrue( "Unexpected number of constraint violations", violations.size() == 1 );
 			ConstraintViolation<?> constraintViolation = violations.iterator().next();

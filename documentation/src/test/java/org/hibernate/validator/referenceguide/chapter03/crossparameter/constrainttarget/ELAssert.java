@@ -35,7 +35,7 @@ public @interface ELAssert {
 			ValidationTarget.PARAMETERS,
 			ValidationTarget.ANNOTATED_ELEMENT
 	})
-	public static class Validator
+	class Validator
 			implements ConstraintValidator<ELAssert, Object[]> {
 
 		@Override

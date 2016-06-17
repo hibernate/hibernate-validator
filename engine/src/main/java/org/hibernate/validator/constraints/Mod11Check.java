@@ -125,7 +125,7 @@ public @interface Mod11Check {
 		Mod11Check[] value();
 	}
 
-	public enum ProcessingDirection {
+	enum ProcessingDirection {
 		RIGHT_TO_LEFT,
 		LEFT_TO_RIGHT
 	}

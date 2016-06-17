@@ -91,7 +91,7 @@ class ConfiguredConstraint<A extends Annotation> {
 		try {
 			return AnnotationFactory.create( annotationDescriptor );
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
 		}
 	}

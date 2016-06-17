@@ -46,7 +46,7 @@ public class MultipleInterfaceInheritanceMethodValidationTest {
 			shipmentService.getShipment();
 			fail( "Method invocation should have caused a ConstraintViolationException" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			assertEquals(
 					e.getConstraintViolations()
 							.iterator()

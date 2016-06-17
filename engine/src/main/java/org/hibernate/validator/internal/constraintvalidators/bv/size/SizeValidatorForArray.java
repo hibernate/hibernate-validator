@@ -20,12 +20,13 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class SizeValidatorForArray implements ConstraintValidator<Size, Object[]> {
-	
+
 	private static final Log log = LoggerFactory.make();
 
 	private int min;
 	private int max;
 
+	@Override
 	public void initialize(Size parameters) {
 		min = parameters.min();
 		max = parameters.max();
@@ -42,6 +43,7 @@ public class SizeValidatorForArray implements ConstraintValidator<Size, Object[]
 	 *         <code>array</code> is between the specified <code>min</code> and <code>max</code> values (inclusive),
 	 *         <code>false</code> otherwise.
 	 */
+	@Override
 	public boolean isValid(Object[] array, ConstraintValidatorContext constraintValidatorContext) {
 		if ( array == null ) {
 			return true;

@@ -38,7 +38,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 			m.invoke( validation );
 			fail( "An exception should have been thrown" );
 		}
-		catch ( InvocationTargetException e ) {
+		catch (InvocationTargetException e) {
 			assertTrue(
 					getRootCause( e ).getMessage().startsWith( "HV000183" ),
 					"Bootstrapping in Validation should threw an unexpected exception: " + e.getMessage()
@@ -89,7 +89,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 			try {
 				classData = loadClassData( className );
 			}
-			catch ( IOException e ) {
+			catch (IOException e) {
 				throw new RuntimeException();
 			}
 			return defineClass( className, classData, 0, classData.length, null );

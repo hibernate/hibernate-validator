@@ -101,7 +101,7 @@ public class ConstraintDefinitionTest {
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectValidatorTypes( violations, DefaultStringValidator.class );
 	}
-	
+
 	@Test
 	public void testConstraintMappingIncludingExistingValidators() {
 		mapping.constraintDefinition( ConstraintAnnotation.class )
@@ -147,7 +147,7 @@ public class ConstraintDefinitionTest {
 		Set<? extends ConstraintViolation<?>> violations = validator.validate( new ConstrainedLongFieldBean() );
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectValidatorTypes( violations, NonDefaultLongValidator.class );
-		
+
 		violations = validator.validate( new ConstrainedIntegerFieldBean() );
 		assertNumberOfViolations( violations, 1 );
 		assertCorrectValidatorTypes( violations, NonDefaultIntegerValidator.class );
@@ -179,8 +179,8 @@ public class ConstraintDefinitionTest {
 		otherMapping.constraintDefinition( ConstraintAnnotation.class )
 				.includeExistingValidators( false )
 				.validatedBy( NonDefaultIntegerValidator.class );
-		
-		config.addMapping( mapping ); 
+
+		config.addMapping( mapping );
 		config.addMapping( otherMapping );
 		config.buildValidatorFactory().getValidator();
 	}
@@ -190,13 +190,13 @@ public class ConstraintDefinitionTest {
 		final InputStream xmlMapping = ConstraintDefinitionTest.class.getResourceAsStream(
 				"ConstraintDefinitionTest_mapping.xml"
 		);
-		
+
 		config.addMapping( xmlMapping ); // Adds NonDefaultLongValidator and keeps default validators
-		
+
 		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.validatedBy( NonDefaultShortValidator.class ); // Adds this on top of XML configuration
-		
-		config.addMapping( mapping ); 
+
+		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
 		// Defaults are untouched
@@ -220,15 +220,15 @@ public class ConstraintDefinitionTest {
 		final InputStream xmlMapping = ConstraintDefinitionTest.class.getResourceAsStream(
 				"ConstraintDefinitionTest_mapping.xml"
 		);
-		
+
 		config.addMapping( xmlMapping ); // Adds NonDefaultLongValidator and keeps default validators
-		
+
 		mapping.constraintDefinition( ConstraintAnnotation.class ) // Overrides XML configuration (and defaults)
 				.includeExistingValidators( false )
 				.validatedBy( NonDefaultIntegerValidator.class )
-				.validatedBy( OtherNonDefaultLongValidator.class ); 
-		
-		config.addMapping( mapping ); 
+				.validatedBy( OtherNonDefaultLongValidator.class );
+
+		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 
 		// Defaults are overridden
@@ -250,7 +250,7 @@ public class ConstraintDefinitionTest {
 		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.includeExistingValidators( true )
 				.validatedBy( NonDefaultIntegerValidator.class );
-		
+
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		validator.validate( new ConstrainedIntegerFieldBean() );
@@ -263,7 +263,7 @@ public class ConstraintDefinitionTest {
 	public void testMultipleValidatorsForSameTypeWithNoCallToIncludeExistingValidators() {
 		mapping.constraintDefinition( ConstraintAnnotation.class )
 				.validatedBy( NonDefaultIntegerValidator.class );
-		
+
 		config.addMapping( mapping );
 		Validator validator = config.buildValidatorFactory().getValidator();
 		validator.validate( new ConstrainedIntegerFieldBean() );
@@ -314,7 +314,7 @@ public class ConstraintDefinitionTest {
 		 * message.
 		 * <p>
 		 * This is useful for testing purposes.
-		 * 
+		 *
 		 * @param validator The validator class
 		 * @return The uniquely identifying message for this validator
 		 */

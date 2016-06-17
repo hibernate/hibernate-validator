@@ -49,7 +49,7 @@ public class ValidationOfInheritedMethodTest {
 			greeter.greet( "how are you" );
 			fail( "CDI method interceptor should throw an exception" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			// success
 		}
 	}
@@ -59,7 +59,7 @@ public class ValidationOfInheritedMethodTest {
 		try {
 			assertNull( encryptor.encrypt( "top secret" ) );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			fail( "Encryptor#encrypt should not be validated, because it is explicitly excluded from executable validation" );
 		}
 	}

@@ -72,10 +72,10 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 		try {
 			return Class.forName( className, true, HibernateValidator.class.getClassLoader() );
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			exception = e;
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			exception = e;
 		}
 		if ( fallbackOnTCCL ) {
@@ -84,7 +84,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 				try {
 					return Class.forName( className, false, contextClassLoader );
 				}
-				catch ( ClassNotFoundException e ) {
+				catch (ClassNotFoundException e) {
 					throw log.getUnableToLoadClassException( className, contextClassLoader, e );
 				}
 			}
@@ -104,10 +104,10 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 				return Class.forName( className, false, classLoader );
 			}
 		}
-		catch ( ClassNotFoundException e ) {
+		catch (ClassNotFoundException e) {
 			exception = e;
 		}
-		catch ( RuntimeException e ) {
+		catch (RuntimeException e) {
 			exception = e;
 		}
 		if ( fallbackOnTCCL ) {
@@ -117,18 +117,18 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 					return Class.forName( className, false, contextClassLoader );
 				}
 			}
-			catch ( ClassNotFoundException e ) {
+			catch (ClassNotFoundException e) {
 				// ignore - try using the classloader of the caller first
 				// TODO: might be wise to somehow log this
 			}
-			catch ( RuntimeException e ) {
+			catch (RuntimeException e) {
 				// ignore
 			}
 			final ClassLoader loader = LoadClass.class.getClassLoader();
 			try {
 				return Class.forName( className, true, loader );
 			}
-			catch ( ClassNotFoundException e ) {
+			catch (ClassNotFoundException e) {
 				throw log.getUnableToLoadClassException( className, loader, e );
 			}
 		}

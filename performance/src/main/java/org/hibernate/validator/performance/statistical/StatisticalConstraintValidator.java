@@ -17,14 +17,17 @@ public class StatisticalConstraintValidator implements ConstraintValidator<Annot
 	private static final float FAILURE_RATE = 0.25f;
 
 	public static final ThreadLocal<Counter> threadLocalCounter = new ThreadLocal<Counter>() {
+		@Override
 		protected Counter initialValue() {
 			return new Counter();
 		}
 	};
 
+	@Override
 	public void initialize(Annotation constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
 		return threadLocalCounter.get().incrementCount();
 	}

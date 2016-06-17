@@ -79,7 +79,7 @@ public class XmlParserHelper {
 
 			return getVersionValue( rootElement );
 		}
-		catch ( XMLStreamException e ) {
+		catch (XMLStreamException e) {
 			throw log.getUnableToDetermineSchemaVersionException( resourceName, e );
 		}
 	}
@@ -88,7 +88,7 @@ public class XmlParserHelper {
 		try {
 			return xmlInputFactory.createXMLEventReader( xmlStream );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			throw log.getUnableToCreateXMLEventReader( resourceName, e );
 		}
 	}
@@ -147,7 +147,7 @@ public class XmlParserHelper {
 		try {
 			schema = run( NewSchema.action( sf, schemaUrl ) );
 		}
-		catch ( Exception e ) {
+		catch (Exception e) {
 			log.unableToCreateSchema( schemaResource, e.getMessage() );
 		}
 		return schema;

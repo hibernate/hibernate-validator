@@ -29,7 +29,7 @@ public class InvalidXmlConfigurationTest {
 	/**
 	 * Tests requirement 8.a from the BV 1.1 spec.
 	 */
-	@Test(expectedExceptions=ValidationException.class, expectedExceptionsMessageRegExp="HV000100.*")
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000100.*")
 	public void testInvalidValidationXml() {
 		validationXmlTestHelper.runWithCustomValidationXml(
 				"validation-InvalidXmlConfigurationTest.xml", new Runnable() {

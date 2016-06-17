@@ -67,7 +67,7 @@ public class MinValidatorForStringTest {
 			constraint.initialize( m );
 			fail();
 		}
-		catch ( IllegalArgumentException e ) {
+		catch (IllegalArgumentException e) {
 			// success
 		}
 	}

@@ -30,7 +30,7 @@ public interface ConstraintDefinitionContext<A extends Annotation> extends Const
 	 * @return This context for method chaining.
 	 */
 	ConstraintDefinitionContext<A> includeExistingValidators(boolean includeExistingValidators);
-	
+
 	/**
 	 * Adds a new validator to validate this constraint.
 	 *

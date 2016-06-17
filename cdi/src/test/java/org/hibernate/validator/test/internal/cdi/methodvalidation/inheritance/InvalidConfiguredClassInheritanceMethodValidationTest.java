@@ -51,7 +51,7 @@ public class InvalidConfiguredClassInheritanceMethodValidationTest {
 							"method and adds @ValidateOnExecution "
 			);
 		}
-		catch ( ValidationException e ) {
+		catch (ValidationException e) {
 			assertTrue( e.getMessage().startsWith( "HV000166" ) );
 		}
 	}

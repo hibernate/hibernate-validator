@@ -168,7 +168,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				new DiagnosticExpectation( Kind.ERROR, 132 )
 		);
 	}
-	
+
 	@Test
 	public void testThatConstraintAnnotationWithMultipleCrossParameterValidatorsCausesCompilationError() {
 
@@ -187,7 +187,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				new DiagnosticExpectation( Kind.ERROR, 23 )
 		);
 	}
-	
+
 	@Test
 	public void testThatConstraintAnnotationWithInvalidCrossParameterValidatorsCausesCompilationError() {
 
@@ -205,7 +205,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				new DiagnosticExpectation( Kind.ERROR, 23 )
 		);
 	}
-	
+
 	@Test
 	public void testThatCrossParameterConstraintWithInvalidDefaultInValidationAppliesToCausesCompilationError() {
 
@@ -223,7 +223,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				new DiagnosticExpectation( Kind.ERROR, 24 )
 		);
 	}
-	
+
 	@Test
 	public void testThatCrossParameterConstraintWithInvalidReturnTypeInValidationAppliesToCausesCompilationError() {
 
@@ -241,7 +241,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				new DiagnosticExpectation( Kind.ERROR, 23 )
 		);
 	}
-	
+
 	@Test
 	public void testThatCrossParameterConstraintWithoutRequiredValidationAppliesToCausesCompilationError() {
 
@@ -260,7 +260,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				new DiagnosticExpectation( Kind.ERROR, 26 )
 		);
 	}
-	
+
 	@Test
 	public void testThatValidCrossParameterConstraintsAreCompiledCorrectly() {
 

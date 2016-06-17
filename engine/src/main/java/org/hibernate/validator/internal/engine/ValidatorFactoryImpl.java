@@ -194,7 +194,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
 		}
-		
+
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
 		tmpValidatedValueHandlers.addAll(
@@ -393,7 +393,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 			TimeProvider timeProvider,
 			MethodValidationConfiguration methodValidationConfiguration) {
-		
+
 		BeanMetaDataManager beanMetaDataManager;
 		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
 			beanMetaDataManager = new BeanMetaDataManager(
@@ -488,7 +488,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ConstraintHelper constraintHelper) {
 		Set<Class<?>> definedConstraints = newHashSet();
 		for ( DefaultConstraintMapping constraintMapping : constraintMappings ) {
-			for (ConstraintDefinitionContribution<?> contribution : constraintMapping.getConstraintDefinitionContributions() ) {
+			for ( ConstraintDefinitionContribution<?> contribution : constraintMapping.getConstraintDefinitionContributions() ) {
 				processConstraintDefinitionContribution( contribution, constraintHelper, definedConstraints );
 			}
 		}

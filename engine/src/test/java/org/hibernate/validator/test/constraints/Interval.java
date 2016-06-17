@@ -9,8 +9,9 @@ package org.hibernate.validator.test.constraints;
 /**
  * @author Hardy Ferentschik
  */
-@StartLessThanEnd 
+@StartLessThanEnd
 class Interval {
-  int start;
-  int end;
-} 
+
+	int start;
+	int end;
+}

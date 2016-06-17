@@ -31,7 +31,7 @@ public class DecimalMaxValidatorForCharSequence implements ConstraintValidator<D
 		try {
 			this.maxValue = new BigDecimal( maxValue.value() );
 		}
-		catch ( NumberFormatException nfe ) {
+		catch (NumberFormatException nfe) {
 			throw log.getInvalidBigDecimalFormatException( maxValue.value(), nfe );
 		}
 		this.inclusive = maxValue.inclusive();
@@ -46,7 +46,7 @@ public class DecimalMaxValidatorForCharSequence implements ConstraintValidator<D
 			int comparisonResult = new BigDecimal( value.toString() ).compareTo( maxValue );
 			return inclusive ? comparisonResult <= 0 : comparisonResult < 0;
 		}
-		catch ( NumberFormatException nfe ) {
+		catch (NumberFormatException nfe) {
 			return false;
 		}
 	}

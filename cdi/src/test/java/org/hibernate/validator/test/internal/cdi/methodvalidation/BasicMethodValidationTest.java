@@ -49,7 +49,7 @@ public class BasicMethodValidationTest {
 			repeaterInstance.get();
 			fail( "CDI method interceptor should have thrown an exception" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			// success
 		}
 	}
@@ -60,7 +60,7 @@ public class BasicMethodValidationTest {
 			repeater.reverse( null );
 			fail( "CDI method interceptor should have thrown an exception" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			// success
 		}
 	}
@@ -71,7 +71,7 @@ public class BasicMethodValidationTest {
 			repeater.repeat( null );
 			fail( "CDI method interceptor should have thrown an exception" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			// success
 		}
 	}
@@ -82,7 +82,7 @@ public class BasicMethodValidationTest {
 			repeater.getHelloWorld();
 			fail( "CDI method interceptor should have thrown an exception" );
 		}
-		catch ( ConstraintViolationException e ) {
+		catch (ConstraintViolationException e) {
 			// success
 		}
 	}

@@ -477,7 +477,7 @@ public class ConstructorConstraintMappingTest {
 
 		Class<? extends Payload>[] payload() default { };
 
-		public class Validator implements ConstraintValidator<ValidGreetingService, GreetingService> {
+		class Validator implements ConstraintValidator<ValidGreetingService, GreetingService> {
 
 			@Override
 			public void initialize(ValidGreetingService constraintAnnotation) {

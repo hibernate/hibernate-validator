@@ -37,7 +37,7 @@ public @interface PostCodeList {
 
 	Class<? extends Payload>[] payload() default {};
 
-	public class PostCodeListValidatorForNumber
+	class PostCodeListValidatorForNumber
 			implements ConstraintValidator<PostCodeList, Collection<? extends Number>> {
 		@Override
 		public void initialize(PostCodeList constraintAnnotation) {
@@ -49,7 +49,7 @@ public @interface PostCodeList {
 		}
 	}
 
-	public class PostCodeListValidatorForString implements ConstraintValidator<PostCodeList, Collection<String>> {
+	class PostCodeListValidatorForString implements ConstraintValidator<PostCodeList, Collection<String>> {
 		@Override
 		public void initialize(PostCodeList constraintAnnotation) {
 		}

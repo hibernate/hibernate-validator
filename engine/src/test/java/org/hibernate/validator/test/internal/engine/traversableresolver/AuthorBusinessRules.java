@@ -27,7 +27,7 @@ public @interface AuthorBusinessRules {
 
 	Class<? extends Payload>[] payload() default {};
 
-	public class AuthorBusinessRulesValidator implements ConstraintValidator<AuthorBusinessRules, Object> {
+	class AuthorBusinessRulesValidator implements ConstraintValidator<AuthorBusinessRules, Object> {
 
 		@Override
 		public void initialize(AuthorBusinessRules constraintAnnotation) {

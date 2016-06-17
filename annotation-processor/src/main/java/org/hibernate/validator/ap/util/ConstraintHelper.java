@@ -420,23 +420,23 @@ public class ConstraintHelper {
 
 		// assume that at least one target (AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT) is present
 
-		if(allowedTargets.size()==1) {
+		if ( allowedTargets.size() == 1 ) {
 			return allowedTargets.toArray( new AnnotationProcessorValidationTarget[1] )[0];
 		}
 
 		AnnotationProcessorConstraintTarget constrTarget = getConstraintTarget( annotation );
-		if(constrTarget==null) {
+		if ( constrTarget == null ) {
 			return null;
 		}
 
-		switch(constrTarget) {
-		case PARAMETERS:
-			return AnnotationProcessorValidationTarget.PARAMETERS;
-		case RETURN_VALUE:
-			return AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT;
-		case IMPLICIT:
-		default:
-			return resolveImplicitValidationTarget( element );
+		switch ( constrTarget ) {
+			case PARAMETERS:
+				return AnnotationProcessorValidationTarget.PARAMETERS;
+			case RETURN_VALUE:
+				return AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT;
+			case IMPLICIT:
+			default:
+				return resolveImplicitValidationTarget( element );
 		}
 	}
 
@@ -459,7 +459,7 @@ public class ConstraintHelper {
 			supported.addAll( getSupportedValidationTargets( oneValidatorClassReference ) );
 		}
 
-		if(supported.isEmpty()) {
+		if ( supported.isEmpty() ) {
 			// case of built-in validation constraints
 			supported.add( AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT );
 		}
@@ -483,15 +483,15 @@ public class ConstraintHelper {
 		AnnotationValue crossParameterValidator = null;
 		for ( AnnotationValue oneValidatorClassReference : validatorClassReferences ) {
 			Set<AnnotationProcessorValidationTarget> targets = getSupportedValidationTargets( oneValidatorClassReference );
-			if( targets.contains( AnnotationProcessorValidationTarget.PARAMETERS ) ) {
-				if(crossParameterValidator!=null) {
+			if ( targets.contains( AnnotationProcessorValidationTarget.PARAMETERS ) ) {
+				if ( crossParameterValidator != null ) {
 					return ConstraintCheckResult.MULTIPLE_VALIDATORS_FOUND;
 				}
 				crossParameterValidator = oneValidatorClassReference;
 			}
 		}
 
-		if(crossParameterValidator!=null) {
+		if ( crossParameterValidator != null ) {
 
 			// Cross-parameter contraints must accept Object or Object[] as validated type
 			final TypeMirror objectMirror = annotationApiHelper.getMirrorForType( Object.class );
@@ -509,7 +509,7 @@ public class ConstraintHelper {
 				}
 			}, null );
 
-			if(!supported) {
+			if ( !supported ) {
 				return ConstraintCheckResult.DISALLOWED;
 			}
 		}
@@ -688,10 +688,10 @@ public class ConstraintHelper {
 
 	private AnnotationProcessorValidationTarget resolveImplicitValidationTarget(ExecutableElement e) {
 
-		if(e.getParameters().isEmpty()) {
+		if ( e.getParameters().isEmpty() ) {
 			return AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT;
 		}
-		else if(e.getReturnType().getKind()==TypeKind.VOID) {
+		else if ( e.getReturnType().getKind() == TypeKind.VOID ) {
 			return AnnotationProcessorValidationTarget.PARAMETERS;
 		}
 
@@ -707,22 +707,22 @@ public class ConstraintHelper {
 	private AnnotationProcessorConstraintTarget getConstraintTarget(AnnotationMirror annotation) {
 
 		AnnotationValue validationAppliesTo = annotationApiHelper.getAnnotationValue( annotation, "validationAppliesTo" );
-		if(validationAppliesTo==null) {
+		if ( validationAppliesTo == null ) {
 			// validationAppliesTo not found on the annotation
 
-			for(Element e : annotation.getAnnotationType().asElement().getEnclosedElements()) {
+			for ( Element e : annotation.getAnnotationType().asElement().getEnclosedElements() ) {
 
 				Boolean isValidationAppliesToMethod = e.accept( new ElementKindVisitor6<Boolean, Void>() {
 					@Override
 					public Boolean visitExecutableAsMethod(ExecutableElement e, Void p) {
-						if(e.getSimpleName().contentEquals( "validationAppliesTo" )) {
+						if ( e.getSimpleName().contentEquals( "validationAppliesTo" ) ) {
 							return true;
 						}
 						return false;
 					}
 				}, null );
 
-				if(Boolean.TRUE.equals( isValidationAppliesToMethod )) {
+				if ( Boolean.TRUE.equals( isValidationAppliesToMethod ) ) {
 					// validationAppliesTo method is present, so the default value is returned (IMPLICIT)
 					return AnnotationProcessorConstraintTarget.IMPLICIT;
 				}
@@ -739,7 +739,7 @@ public class ConstraintHelper {
 
 				@Override
 				public AnnotationProcessorConstraintTarget visitEnumConstant(VariableElement c, Void p) {
-					if(typeUtils.isSameType( c.asType(), constraintTargetMirror )) {
+					if ( typeUtils.isSameType( c.asType(), constraintTargetMirror ) ) {
 						return AnnotationProcessorConstraintTarget.valueOf( c.getSimpleName().toString() );
 					}
 					return null;
@@ -769,7 +769,7 @@ public class ConstraintHelper {
 
 		for ( AnnotationValue oneValidatorClassReference : validatorClassReferences ) {
 
-			if(isValidationTargetSupported( oneValidatorClassReference, target )) {
+			if ( isValidationTargetSupported( oneValidatorClassReference, target ) ) {
 				TypeMirror supportedType = determineSupportedType( oneValidatorClassReference);
 				supportedTypes.add( supportedType );
 			}
@@ -824,8 +824,8 @@ public class ConstraintHelper {
 
 		AnnotationMirror supportedTargetDecl = null;
 
-		for(AnnotationMirror mirr : validatorType.asElement().getAnnotationMirrors()) {
-			if(typeUtils.isSameType( mirr.getAnnotationType(), supportedValidationTargetType )) {
+		for ( AnnotationMirror mirr : validatorType.asElement().getAnnotationMirrors() ) {
+			if ( typeUtils.isSameType( mirr.getAnnotationType(), supportedValidationTargetType ) ) {
 				supportedTargetDecl = mirr;
 				break;
 			}
@@ -833,13 +833,13 @@ public class ConstraintHelper {
 
 		EnumSet<AnnotationProcessorValidationTarget> allowedTargets = EnumSet.noneOf( AnnotationProcessorValidationTarget.class );
 
-		if(supportedTargetDecl==null) {
+		if ( supportedTargetDecl == null ) {
 			// If @SupportedValidationTarget is not present, the ConstraintValidator targets the (returned) element annotated by the constraint.
 			allowedTargets.add( AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT );
 		}
 		else {
 			List<? extends AnnotationValue> values = annotationApiHelper.getAnnotationArrayValue( supportedTargetDecl, "value" );
-			for(AnnotationValue val : values) {
+			for ( AnnotationValue val : values ) {
 				AnnotationProcessorValidationTarget target = val.accept( new SimpleAnnotationValueVisitor6<AnnotationProcessorValidationTarget, Void>() {
 					@Override
 					public AnnotationProcessorValidationTarget visitEnumConstant(VariableElement c, Void p) {
@@ -1005,7 +1005,7 @@ public class ConstraintHelper {
 
 		Set<AnnotationMirror> composingConstraints = composingConstraintsByConstraints.get( key );
 
-		if( composingConstraints != null ) {
+		if ( composingConstraints != null ) {
 			return composingConstraints;
 		}
 

@@ -21,7 +21,7 @@ public class InvocationCounter {
 
 	public synchronized void incrementCount(Object o) {
 		Integer count = countsPerInstance.get( o );
-		if(count == null) {
+		if ( count == null ) {
 			countsPerInstance.put( o, 1 );
 		}
 		else {

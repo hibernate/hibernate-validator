@@ -35,7 +35,7 @@ public @interface LuggageCountMatchesPassengerCount {
 			ValidationTarget.PARAMETERS,
 			ValidationTarget.ANNOTATED_ELEMENT
 	})
-	public static class Validator
+	class Validator
 			implements ConstraintValidator<LuggageCountMatchesPassengerCount, Object[]> {
 
 		@Override

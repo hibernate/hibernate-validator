@@ -20,6 +20,7 @@ import java.lang.annotation.Target;
  * @author Gunnar Morling
  *
  */
-@Retention(value=RetentionPolicy.CLASS)
-@Target(value={ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.TYPE})
-public @interface IgnoreJava6Requirement {}
+@Retention(value = RetentionPolicy.CLASS)
+@Target(value = { ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.TYPE })
+public @interface IgnoreJava6Requirement {
+}

@@ -9,4 +9,5 @@ package org.hibernate.validator.test.internal.engine.groups.defaultgroupwithinhe
 /**
  * @author Gunnar Morling
  */
-public interface Max extends Min {}
+public interface Max extends Min {
+}

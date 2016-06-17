@@ -310,7 +310,7 @@ class ConstrainedExecutableBuilder {
 				Class<?> parameterClass = classLoadingHelper.loadClass( type, defaultPackage );
 				parameterTypes.add( parameterClass );
 			}
-			catch ( ValidationException e ) {
+			catch (ValidationException e) {
 				throw log.getInvalidParameterTypeException( type, beanClass.getName() );
 			}
 		}

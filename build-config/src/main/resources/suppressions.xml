@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<!DOCTYPE suppressions PUBLIC
+    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+<suppressions>
+    <!-- ignore everything but the header checks for xml files-->
+    <suppress files=".*\.xml" checks="^((?!Header).)*$" />
+    <suppress files="[\\/]generated-sources[\\/]" checks=".*"/>
+    <suppress files=".*\.properties" checks=".*"/>
+    <suppress files="[\\/]documentation[\\/]src[\\/]test[\\/]java[\\/]org[\\/]hibernate[\\/]validator[\\/]referenceguide[\\/]" checks="(RegexpHeader|AvoidStarImport)" />
+</suppressions>
