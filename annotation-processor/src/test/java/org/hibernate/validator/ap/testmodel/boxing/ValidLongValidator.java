@@ -10,9 +10,11 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class ValidLongValidator implements ConstraintValidator<ValidLong, Long> {
+	@Override
 	public void initialize(ValidLong constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(Long object, ConstraintValidatorContext constraintContext) {
 		return true;
 	}

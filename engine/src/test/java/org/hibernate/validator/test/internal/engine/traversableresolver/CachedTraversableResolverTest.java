@@ -76,6 +76,7 @@ public class CachedTraversableResolverTest {
 			return true;
 		}
 
+		@Override
 		public boolean isReachable(Object traversableObject,
 								   Path.Node traversableProperty,
 								   Class<?> rootBeanType,
@@ -88,6 +89,7 @@ public class CachedTraversableResolverTest {
 			);
 		}
 
+		@Override
 		public boolean isCascadable(Object traversableObject,
 									Path.Node traversableProperty,
 									Class<?> rootBeanType,

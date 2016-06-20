@@ -28,12 +28,14 @@ public class DigitsValidatorForCharSequence implements ConstraintValidator<Digit
 	private int maxIntegerLength;
 	private int maxFractionLength;
 
+	@Override
 	public void initialize(Digits constraintAnnotation) {
 		this.maxIntegerLength = constraintAnnotation.integer();
 		this.maxFractionLength = constraintAnnotation.fraction();
 		validateParameters();
 	}
 
+	@Override
 	public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( charSequence == null ) {

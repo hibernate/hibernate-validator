@@ -13,9 +13,11 @@ import javax.validation.ConstraintValidatorContext;
  * @author Hardy Ferentschik
  */
 public class DummyEmailValidator implements ConstraintValidator<Email, String> {
+	@Override
 	public void initialize(Email annotation) {
 	}
 
+	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
 		return false;
 	}

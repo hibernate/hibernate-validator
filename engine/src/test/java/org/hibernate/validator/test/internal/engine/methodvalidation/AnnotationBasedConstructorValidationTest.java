@@ -16,6 +16,7 @@ import org.testng.annotations.BeforeMethod;
  * @author Hardy Ferentschik
  */
 public class AnnotationBasedConstructorValidationTest extends AbstractConstructorValidationTest {
+	@Override
 	@BeforeMethod
 	public void setUp() {
 		this.executableValidator = getValidator().forExecutables();

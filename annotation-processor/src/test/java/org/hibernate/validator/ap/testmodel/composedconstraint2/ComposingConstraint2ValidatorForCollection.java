@@ -12,9 +12,11 @@ import javax.validation.ConstraintValidatorContext;
 
 public class ComposingConstraint2ValidatorForCollection
 		implements ConstraintValidator<ComposingConstraint2, Collection<?>> {
+	@Override
 	public void initialize(ComposingConstraint2 constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(Collection<?> object, ConstraintValidatorContext constraintContext) {
 		return true;
 	}

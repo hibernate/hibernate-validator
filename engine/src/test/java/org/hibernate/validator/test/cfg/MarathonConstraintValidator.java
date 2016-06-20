@@ -16,10 +16,12 @@ import javax.validation.ConstraintValidatorContext;
 public class MarathonConstraintValidator implements ConstraintValidator<MarathonConstraint, Marathon> {
 	private int minRunners;
 
+	@Override
 	public void initialize(MarathonConstraint constraintAnnotation) {
 		minRunners = constraintAnnotation.minRunner();
 	}
 
+	@Override
 	public boolean isValid(Marathon m, ConstraintValidatorContext context) {
 		return m.getRunners().size() >= minRunners;
 	}

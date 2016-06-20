@@ -31,6 +31,7 @@ public class MethodAnnotationCheck extends AbstractConstraintCheck {
 		this.constraintHelper = constraintHelper;
 	}
 
+	@Override
 	public Set<ConstraintCheckError> checkMethod(ExecutableElement element,
 			AnnotationMirror annotation) {
 

@@ -10,9 +10,11 @@ import javax.validation.ConstraintValidatorContext;
 
 public class CustomConstraintValidator extends AbstractCustomConstraintValidator {
 
+	@Override
 	public void initialize(CustomConstraint constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(String object, ConstraintValidatorContext constraintContext) {
 		return true;
 	}

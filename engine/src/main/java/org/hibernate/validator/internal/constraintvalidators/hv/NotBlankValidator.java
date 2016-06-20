@@ -18,6 +18,7 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 public class NotBlankValidator implements ConstraintValidator<NotBlank, CharSequence> {
 
+	@Override
 	public void initialize(NotBlank annotation) {
 	}
 
@@ -30,6 +31,7 @@ public class NotBlankValidator implements ConstraintValidator<NotBlank, CharSequ
 	 * @return Returns <code>true</code> if the string is <code>null</code> or the length of <code>charSequence</code> between the specified
 	 *         <code>min</code> and <code>max</code> values (inclusive), <code>false</code> otherwise.
 	 */
+	@Override
 	public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {
 		if ( charSequence == null ) {
 			return true;

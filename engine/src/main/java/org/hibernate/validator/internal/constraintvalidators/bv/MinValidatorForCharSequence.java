@@ -22,10 +22,12 @@ public class MinValidatorForCharSequence implements ConstraintValidator<Min, Cha
 
 	private BigDecimal minValue;
 
+	@Override
 	public void initialize(Min minValue) {
 		this.minValue = BigDecimal.valueOf( minValue.value() );
 	}
 
+	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( value == null ) {

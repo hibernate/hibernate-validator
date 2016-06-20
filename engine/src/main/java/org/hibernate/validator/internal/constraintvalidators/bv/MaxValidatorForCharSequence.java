@@ -22,10 +22,12 @@ public class MaxValidatorForCharSequence implements ConstraintValidator<Max, Cha
 
 	private BigDecimal maxValue;
 
+	@Override
 	public void initialize(Max maxValue) {
 		this.maxValue = BigDecimal.valueOf( maxValue.value() );
 	}
 
+	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( value == null ) {

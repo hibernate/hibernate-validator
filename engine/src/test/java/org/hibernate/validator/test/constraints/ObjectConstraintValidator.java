@@ -14,9 +14,11 @@ import javax.validation.ConstraintValidatorContext;
  */
 public class ObjectConstraintValidator implements ConstraintValidator<org.hibernate.validator.test.constraints.Object, java.lang.Object> {
 
+	@Override
 	public void initialize(org.hibernate.validator.test.constraints.Object annotation) {
 	}
 
+	@Override
 	public boolean isValid(java.lang.Object value, ConstraintValidatorContext constraintValidatorContext) {
 		return true;
 	}

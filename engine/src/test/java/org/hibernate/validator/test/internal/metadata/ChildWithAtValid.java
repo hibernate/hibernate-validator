@@ -14,6 +14,7 @@ import javax.validation.Valid;
  */
 public class ChildWithAtValid extends ParentWithoutAtValid {
 
+	@Override
 	@Valid
 	public Order getOrder() {
 		return null;

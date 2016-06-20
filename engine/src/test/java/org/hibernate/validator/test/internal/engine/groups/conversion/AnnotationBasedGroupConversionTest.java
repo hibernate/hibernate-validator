@@ -16,6 +16,7 @@ import org.testng.annotations.BeforeMethod;
  * @author Hardy Ferentschik
  */
 public class AnnotationBasedGroupConversionTest extends AbstractGroupConversionTest {
+	@Override
 	@BeforeMethod
 	public void setupValidator() {
 		validator = getValidator();

@@ -24,6 +24,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 
 	private java.util.regex.Pattern pattern;
 
+	@Override
 	public void initialize(Pattern parameters) {
 		Pattern.Flag[] flags = parameters.flags();
 		int intFlag = 0;
@@ -39,6 +40,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 		}
 	}
 
+	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null ) {
 			return true;

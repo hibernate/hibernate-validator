@@ -23,14 +23,17 @@ import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
  */
 public class HibernateValidator implements ValidationProvider<HibernateValidatorConfiguration> {
 
+	@Override
 	public HibernateValidatorConfiguration createSpecializedConfiguration(BootstrapState state) {
 		return HibernateValidatorConfiguration.class.cast( new ConfigurationImpl( this ) );
 	}
 
+	@Override
 	public Configuration<?> createGenericConfiguration(BootstrapState state) {
 		return new ConfigurationImpl( state );
 	}
 
+	@Override
 	public ValidatorFactory buildValidatorFactory(ConfigurationState configurationState) {
 		return new ValidatorFactoryImpl( configurationState );
 	}

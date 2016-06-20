@@ -16,6 +16,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  */
 public class QuxDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Qux> {
 
+	@Override
 	public List<Class<?>> getValidationGroups(Qux object) {
 		return null;
 	}

@@ -24,10 +24,12 @@ public class MinValidatorForNumber implements ConstraintValidator<Min, Number> {
 
 	private long minValue;
 
+	@Override
 	public void initialize(Min minValue) {
 		this.minValue = minValue.value();
 	}
 
+	@Override
 	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
 		// null values are valid
 		if ( value == null ) {

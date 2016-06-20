@@ -31,6 +31,7 @@ public final class GetClassLoader implements PrivilegedAction<ClassLoader> {
 		this.clazz = clazz;
 	}
 
+	@Override
 	public ClassLoader run() {
 		if ( clazz != null ) {
 			return clazz.getClassLoader();

@@ -27,6 +27,7 @@ public class SizeValidatorForArraysOfFloat extends SizeValidatorForArraysOfPrimi
 	 *         <code>array</code> is between the specified <code>min</code> and <code>max</code> values (inclusive),
 	 *         <code>false</code> otherwise.
 	 */
+	@Override
 	public boolean isValid(float[] array, ConstraintValidatorContext constraintValidatorContext) {
 		if ( array == null ) {
 			return true;

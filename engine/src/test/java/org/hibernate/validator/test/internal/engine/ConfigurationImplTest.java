@@ -126,10 +126,12 @@ public class ConfigurationImplTest {
 
 	private static class TestTraversableResolver implements TraversableResolver {
 
+		@Override
 		public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 			return true;
 		}
 
+		@Override
 		public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 			return true;
 		}

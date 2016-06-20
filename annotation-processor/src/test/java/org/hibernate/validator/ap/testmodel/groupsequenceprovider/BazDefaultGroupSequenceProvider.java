@@ -15,5 +15,6 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
 public interface BazDefaultGroupSequenceProvider extends DefaultGroupSequenceProvider<Baz> {
+	@Override
 	List<Class<?>> getValidationGroups(GroupSequenceProviderDefinition.Baz object);
 }

@@ -233,6 +233,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this.methodValidationConfiguration.isAllowMultipleCascadedValidationOnReturnValues();
 	}
 
+	@Override
 	public HibernateValidatorConfiguration allowParallelMethodsDefineParameterConstraints(boolean allow) {
 		this.methodValidationConfiguration.allowParallelMethodsDefineParameterConstraints( allow );
 		return this;

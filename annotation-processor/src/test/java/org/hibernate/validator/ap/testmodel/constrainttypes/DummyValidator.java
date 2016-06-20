@@ -15,10 +15,12 @@ import javax.validation.ConstraintValidatorContext;
  */
 public class DummyValidator implements ConstraintValidator<Annotation, Object> {
 
+	@Override
 	public void initialize(Annotation constraintAnnotation) {
 		throw new UnsupportedOperationException( "Not implemented" );
 	}
 
+	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
 		throw new UnsupportedOperationException( "Not implemented" );
 	}

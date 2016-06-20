@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
  */
 public class ChildWithoutAtValid2 extends ParentWithoutAtValid {
 
+	@Override
 	@NotNull
 	public Order getOrder() {
 		return null;

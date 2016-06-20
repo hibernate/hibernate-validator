@@ -20,12 +20,14 @@ public class URLValidator implements ConstraintValidator<org.hibernate.validator
 	private String host;
 	private int port;
 
+	@Override
 	public void initialize(org.hibernate.validator.constraints.URL url) {
 		this.protocol = url.protocol();
 		this.host = url.host();
 		this.port = url.port();
 	}
 
+	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null || value.length() == 0 ) {
 			return true;

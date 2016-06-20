@@ -57,6 +57,7 @@ public class ProxyTest {
 			this.o = o;
 		}
 
+		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			if ( "getInteger".equals( method.getName() ) ) {
 				method.setAccessible( true );

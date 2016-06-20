@@ -27,6 +27,7 @@ public class CachingTraversableResolverForSingleValidation implements Traversabl
 		this.delegate = delegate;
 	}
 
+	@Override
 	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		TraversableHolder currentLH = new TraversableHolder(
 				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
@@ -55,6 +56,7 @@ public class CachingTraversableResolverForSingleValidation implements Traversabl
 		return cachedLH.isReachable;
 	}
 
+	@Override
 	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		TraversableHolder currentLH = new TraversableHolder(
 				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType

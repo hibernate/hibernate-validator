@@ -37,10 +37,12 @@ public final class DefaultValidationOrder implements ValidationOrder {
 	 */
 	private Map<Class<?>, Sequence> sequenceMap = newHashMap();
 
+	@Override
 	public Iterator<Group> getGroupIterator() {
 		return groupList.iterator();
 	}
 
+	@Override
 	public Iterator<Sequence> getSequenceIterator() {
 		return sequenceMap.values().iterator();
 	}
@@ -78,6 +80,7 @@ public final class DefaultValidationOrder implements ValidationOrder {
 	 * @throws javax.validation.GroupDefinitionException in case {@code defaultGroupSequence} cannot be expanded into one of the group sequences
 	 * which need to be validated
 	 */
+	@Override
 	public void assertDefaultGroupSequenceIsExpandable(List<Class<?>> defaultGroupSequence)
 			throws GroupDefinitionException {
 		for ( Map.Entry<Class<?>, Sequence> entry : sequenceMap.entrySet() ) {

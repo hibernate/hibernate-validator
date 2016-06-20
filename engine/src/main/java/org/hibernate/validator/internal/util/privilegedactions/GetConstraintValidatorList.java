@@ -30,6 +30,7 @@ public class GetConstraintValidatorList implements PrivilegedAction<List<Constra
 		}
 	}
 
+	@Override
 	public List<ConstraintValidator<?, ?>> run() {
 		// Option #1: try first context class loader
 		ClassLoader classloader = Thread.currentThread().getContextClassLoader();

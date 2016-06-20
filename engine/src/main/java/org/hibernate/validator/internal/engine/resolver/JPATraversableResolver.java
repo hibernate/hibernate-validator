@@ -26,6 +26,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 public class JPATraversableResolver implements TraversableResolver {
 	private static final Log log = LoggerFactory.make();
 
+	@Override
 	public final boolean isReachable(Object traversableObject,
 									 Path.Node traversableProperty,
 									 Class<?> rootBeanType,
@@ -46,6 +47,7 @@ public class JPATraversableResolver implements TraversableResolver {
 		return Persistence.getPersistenceUtil().isLoaded( traversableObject, traversableProperty.getName() );
 	}
 
+	@Override
 	public final boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
 		return true;
 	}

@@ -22,6 +22,7 @@ public abstract class BoundariesConstraintValidator<T extends Annotation> implem
 		this.high = high;
 	}
 
+	@Override
 	public boolean isValid(Integer value, ConstraintValidatorContext constraintValidatorContext) {
 		return value >= low && value <= high;
 	}

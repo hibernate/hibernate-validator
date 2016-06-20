@@ -12,9 +12,11 @@ import javax.validation.ConstraintValidatorContext;
 
 public class ComposingConstraint1ValidatorForGregorianCalendar
 		implements ConstraintValidator<ComposingConstraint1, GregorianCalendar> {
+	@Override
 	public void initialize(ComposingConstraint1 constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(GregorianCalendar object, ConstraintValidatorContext constraintContext) {
 		return true;
 	}

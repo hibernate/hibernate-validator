@@ -33,6 +33,7 @@ public final class NewInstance<T> implements PrivilegedAction<T> {
 		this.message = message;
 	}
 
+	@Override
 	public T run() {
 		try {
 			return clazz.newInstance();

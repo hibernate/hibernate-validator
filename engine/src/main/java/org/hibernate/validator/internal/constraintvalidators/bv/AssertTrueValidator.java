@@ -17,9 +17,11 @@ import javax.validation.constraints.AssertTrue;
  */
 public class AssertTrueValidator implements ConstraintValidator<AssertTrue, Boolean> {
 
+	@Override
 	public void initialize(AssertTrue constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(Boolean bool, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		return bool == null || bool;

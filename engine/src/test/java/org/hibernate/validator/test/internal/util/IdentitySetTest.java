@@ -30,6 +30,7 @@ public class IdentitySetTest {
 		Object o1 = new Object() {
 			int counter = 0;
 
+			@Override
 			public int hashCode() {
 				return counter++;
 			}
@@ -51,6 +52,7 @@ public class IdentitySetTest {
 		Object o2 = new Object() {
 			int counter = 0;
 
+			@Override
 			public int hashCode() {
 				return counter++;
 			}

@@ -33,6 +33,7 @@ public class CachingResourceBundleLocator extends DelegatingResourceBundleLocato
 		super( delegate );
 	}
 
+	@Override
 	public ResourceBundle getResourceBundle(Locale locale) {
 		ResourceBundle cachedResourceBundle = bundleCache.get( locale );
 		if ( cachedResourceBundle == null ) {

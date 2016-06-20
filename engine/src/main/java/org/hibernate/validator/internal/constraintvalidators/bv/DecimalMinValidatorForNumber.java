@@ -29,6 +29,7 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 	private BigDecimal minValue;
 	private boolean inclusive;
 
+	@Override
 	public void initialize(DecimalMin minValue) {
 		try {
 			this.minValue = new BigDecimal( minValue.value() );
@@ -39,6 +40,7 @@ public class DecimalMinValidatorForNumber implements ConstraintValidator<Decimal
 		this.inclusive = minValue.inclusive();
 	}
 
+	@Override
 	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
 
 		// null values are valid

@@ -16,6 +16,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  */
 public class DynamicGroupSequenceProvider implements DefaultGroupSequenceProvider<User> {
 
+	@Override
 	public List<Class<?>> getValidationGroups(User user) {
 		List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
 		defaultGroupSequence.add( User.class );

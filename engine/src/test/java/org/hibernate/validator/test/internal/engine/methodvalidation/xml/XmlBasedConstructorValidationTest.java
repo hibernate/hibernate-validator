@@ -22,6 +22,7 @@ import org.hibernate.validator.testutils.ValidatorUtil;
  */
 @TestForIssue(jiraKey = "HV-373")
 public class XmlBasedConstructorValidationTest extends AbstractConstructorValidationTest {
+	@Override
 	@BeforeMethod
 	public void setUp() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();

@@ -11,10 +11,12 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 public class ComposingConstraint1ValidatorForList implements ConstraintValidator<ComposingConstraint1, List<?>> {
+	@Override
 	public void initialize(ComposingConstraint1 constraintAnnotation) {
 
 	}
 
+	@Override
 	public boolean isValid(List<?> object, ConstraintValidatorContext constraintContext) {
 		return true;
 	}

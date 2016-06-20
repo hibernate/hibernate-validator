@@ -25,6 +25,7 @@ public final class SetAccessibility implements PrivilegedAction<Object> {
 		this.member = member;
 	}
 
+	@Override
 	public Object run() {
 		( (AccessibleObject) member ).setAccessible( true );
 		return member;

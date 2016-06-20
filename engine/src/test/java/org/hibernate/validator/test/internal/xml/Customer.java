@@ -19,6 +19,7 @@ public class Customer implements Person {
 
 	private String password;
 
+	@Override
 	public String getFirstName() {
 		return this.firstName;
 	}
@@ -27,6 +28,7 @@ public class Customer implements Person {
 		this.firstName = firstName;
 	}
 
+	@Override
 	public String getMiddleName() {
 		return this.middleName;
 	}
@@ -35,6 +37,7 @@ public class Customer implements Person {
 		this.middleName = middleName;
 	}
 
+	@Override
 	public String getLastName() {
 		return this.lastName;
 	}

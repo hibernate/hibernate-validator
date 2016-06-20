@@ -16,5 +16,6 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  */
 public abstract class FooBarDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<FooBar> {
 
+	@Override
 	public abstract List<Class<?>> getValidationGroups(FooBar object);
 }

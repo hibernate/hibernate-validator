@@ -26,6 +26,7 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>>
 	private int min;
 	private int max;
 
+	@Override
 	public void initialize(Size parameters) {
 		min = parameters.min();
 		max = parameters.max();
@@ -42,6 +43,7 @@ public class SizeValidatorForMap implements ConstraintValidator<Size, Map<?, ?>>
 	 *         is between the specified <code>min</code> and <code>max</code> values (inclusive),
 	 *         <code>false</code> otherwise.
 	 */
+	@Override
 	public boolean isValid(Map<?, ?> map, ConstraintValidatorContext constraintValidatorContext) {
 		if ( map == null ) {
 			return true;

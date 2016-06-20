@@ -14,6 +14,7 @@ public class MyNode extends Node<Integer> {
 		super( data );
 	}
 
+	@Override
 	public void setData(Integer data) {
 		super.setData( data );
 	}

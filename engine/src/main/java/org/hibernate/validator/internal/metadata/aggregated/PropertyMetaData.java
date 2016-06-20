@@ -254,6 +254,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			}
 		}
 
+		@Override
 		public UnwrapMode unwrapMode() {
 			return unwrapMode;
 		}

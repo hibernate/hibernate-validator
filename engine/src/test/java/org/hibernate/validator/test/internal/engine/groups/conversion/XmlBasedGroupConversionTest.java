@@ -18,6 +18,7 @@ import org.testng.annotations.BeforeMethod;
  * @author Hardy Ferentschik
  */
 public class XmlBasedGroupConversionTest extends AbstractGroupConversionTest {
+	@Override
 	@BeforeMethod
 	public void setupValidator() {
 		Configuration<?> configuration = ValidatorUtil.getConfiguration();
@@ -31,6 +32,7 @@ public class XmlBasedGroupConversionTest extends AbstractGroupConversionTest {
 	}
 
 
+	@Override
 	public void conversionFromSequenceCausesException() {
 		Configuration<?> configuration = ValidatorUtil.getConfiguration();
 		configuration.addMapping(

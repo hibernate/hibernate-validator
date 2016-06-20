@@ -10,6 +10,7 @@ package org.hibernate.validator.test.internal.cdi.methodvalidation.inheritance;
  * @author Hardy Ferentschik
  */
 public abstract class AbstractGreeter implements Greeter {
+	@Override
 	public String greet(String greeting) {
 		return "Hello" + getName() + ", " + greeting;
 	}

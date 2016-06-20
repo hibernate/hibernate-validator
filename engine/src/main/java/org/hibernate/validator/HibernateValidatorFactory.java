@@ -23,5 +23,6 @@ public interface HibernateValidatorFactory extends ValidatorFactory {
 	 *
 	 * @return A context for validator configuration.
 	 */
+	@Override
 	HibernateValidatorContext usingContext();
 }

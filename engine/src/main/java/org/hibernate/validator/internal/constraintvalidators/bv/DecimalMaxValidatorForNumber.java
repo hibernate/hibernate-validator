@@ -29,6 +29,7 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 	private BigDecimal maxValue;
 	private boolean inclusive;
 
+	@Override
 	public void initialize(DecimalMax maxValue) {
 		try {
 			this.maxValue = new BigDecimal( maxValue.value() );
@@ -39,6 +40,7 @@ public class DecimalMaxValidatorForNumber implements ConstraintValidator<Decimal
 		this.inclusive = maxValue.inclusive();
 	}
 
+	@Override
 	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
 		// null values are valid
 		if ( value == null ) {

@@ -26,12 +26,14 @@ public class LengthValidator implements ConstraintValidator<Length, CharSequence
 	private int min;
 	private int max;
 
+	@Override
 	public void initialize(Length parameters) {
 		min = parameters.min();
 		max = parameters.max();
 		validateParameters();
 	}
 
+	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		if ( value == null ) {
 			return true;

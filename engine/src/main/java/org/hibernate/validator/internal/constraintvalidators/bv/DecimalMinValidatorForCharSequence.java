@@ -24,6 +24,7 @@ public class DecimalMinValidatorForCharSequence implements ConstraintValidator<D
 	private BigDecimal minValue;
 	private boolean inclusive;
 
+	@Override
 	public void initialize(DecimalMin minValue) {
 		try {
 			this.minValue = new BigDecimal( minValue.value() );
@@ -34,6 +35,7 @@ public class DecimalMinValidatorForCharSequence implements ConstraintValidator<D
 		this.inclusive = minValue.inclusive();
 	}
 
+	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( value == null ) {

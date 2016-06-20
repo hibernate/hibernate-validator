@@ -12,6 +12,7 @@ package org.hibernate.validator.test.internal.metadata;
  */
 public class ChildWithoutAtValid extends ParentWithAtValid {
 
+	@Override
 	public Order getOrder() {
 		return null;
 	}

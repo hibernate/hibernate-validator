@@ -53,10 +53,12 @@ public class ValidationMessages extends ResourceBundle {
 		setParent( propertyBundle );
 	}
 
+	@Override
 	protected Object handleGetObject(String key) {
 		return messages.get( key );
 	}
 
+	@Override
 	public Enumeration<String> getKeys() {
 		throw new RuntimeException( "Not needed for testing purposes." );
 	}

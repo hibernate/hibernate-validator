@@ -27,6 +27,7 @@ public class DecimalMaxValidatorForCharSequence implements ConstraintValidator<D
 	private BigDecimal maxValue;
 	private boolean inclusive;
 
+	@Override
 	public void initialize(DecimalMax maxValue) {
 		try {
 			this.maxValue = new BigDecimal( maxValue.value() );
@@ -37,6 +38,7 @@ public class DecimalMaxValidatorForCharSequence implements ConstraintValidator<D
 		this.inclusive = maxValue.inclusive();
 	}
 
+	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
 		//null values are valid
 		if ( value == null ) {

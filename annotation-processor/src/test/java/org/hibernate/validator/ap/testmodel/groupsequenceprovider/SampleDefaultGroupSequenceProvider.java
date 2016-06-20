@@ -16,6 +16,7 @@ import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
  */
 public class SampleDefaultGroupSequenceProvider implements DefaultGroupSequenceProvider<Sample> {
 
+	@Override
 	public List<Class<?>> getValidationGroups(Sample object) {
 		return null;
 	}

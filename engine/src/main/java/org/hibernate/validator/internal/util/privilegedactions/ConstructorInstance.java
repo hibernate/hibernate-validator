@@ -37,6 +37,7 @@ public final class ConstructorInstance<T> implements PrivilegedAction<T> {
 		this.initArgs = initArgs;
 	}
 
+	@Override
 	public T run() {
 		try {
 			return constructor.newInstance( initArgs );

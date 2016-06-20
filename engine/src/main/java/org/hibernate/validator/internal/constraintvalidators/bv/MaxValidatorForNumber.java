@@ -24,10 +24,12 @@ public class MaxValidatorForNumber implements ConstraintValidator<Max, Number> {
 
 	private long maxValue;
 
+	@Override
 	public void initialize(Max maxValue) {
 		this.maxValue = maxValue.value();
 	}
 
+	@Override
 	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
 		// null values are valid
 		if ( value == null ) {

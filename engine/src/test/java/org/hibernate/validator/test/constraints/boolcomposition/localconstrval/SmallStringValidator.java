@@ -16,9 +16,11 @@ import javax.validation.ConstraintValidatorContext;
  * @author Dag Hovland
  */
 public class SmallStringValidator implements ConstraintValidator<SmallString, String> {
+	@Override
 	public void initialize(SmallString constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
 		boolean pass;
 		if ( value == null ) {

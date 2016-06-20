@@ -12,9 +12,11 @@ import javax.validation.ConstraintValidatorContext;
 
 public class SizeValidatorForSet implements ConstraintValidator<Size, Set> {
 
+	@Override
 	public void initialize(Size constraintAnnotation) {
 	}
 
+	@Override
 	public boolean isValid(Set object, ConstraintValidatorContext constraintContext) {
 		return true;
 	}

@@ -53,6 +53,7 @@ public class TraversableResolverTest {
 
 
 	public static class ExceptionThrowingTraversableResolver implements TraversableResolver {
+		@Override
 		public boolean isReachable(Object traversableObject,
 								   Path.Node traversableProperty,
 								   Class<?> rootBeanType,
@@ -66,6 +67,7 @@ public class TraversableResolverTest {
 			return true;
 		}
 
+		@Override
 		public boolean isCascadable(Object traversableObject,
 									Path.Node traversableProperty,
 									Class<?> rootBeanType,

@@ -19,6 +19,7 @@ public class FooBarBazDefaultGroupSequenceProvider implements DefaultGroupSequen
 	public FooBarBazDefaultGroupSequenceProvider(FooBarBaz fooBarBaz) {
 	}
 
+	@Override
 	public List<Class<?>> getValidationGroups(FooBarBaz object) {
 		return null;
 	}
