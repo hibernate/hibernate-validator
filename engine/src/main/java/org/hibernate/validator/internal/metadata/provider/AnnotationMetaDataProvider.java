@@ -258,15 +258,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private UnwrapMode unwrapMode(Field field, boolean typeArgumentAnnotated) {
-		boolean notIterable = !ReflectionHelper.isIterable( ReflectionHelper.typeOf( field ) );
+		boolean indexable = ReflectionHelper.isIndexable( ReflectionHelper.typeOf( field ) );
 		UnwrapValidatedValue unwrapValidatedValue = field.getAnnotation( UnwrapValidatedValue.class );
-		return unwrapMode( typeArgumentAnnotated, notIterable, unwrapValidatedValue );
+		return unwrapMode( typeArgumentAnnotated, indexable, unwrapValidatedValue );
 	}
 
 	private UnwrapMode unwrapMode(ExecutableElement executable, boolean typeArgumentAnnotated) {
-		boolean notIterable = !ReflectionHelper.isIterable( ReflectionHelper.typeOf( executable.getMember() ) );
+		boolean indexable = ReflectionHelper.isIndexable( ReflectionHelper.typeOf( executable.getMember() ) );
 		UnwrapValidatedValue unwrapValidatedValue = executable.getAccessibleObject().getAnnotation( UnwrapValidatedValue.class );
-		return unwrapMode( typeArgumentAnnotated, notIterable, unwrapValidatedValue );
+		return unwrapMode( typeArgumentAnnotated, indexable, unwrapValidatedValue );
 	}
 
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
@@ -278,8 +278,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraints;
 	}
 
-	private UnwrapMode unwrapMode(boolean typeArgumentAnnotated, boolean notIterable, UnwrapValidatedValue unwrapValidatedValue) {
-		if ( unwrapValidatedValue == null && typeArgumentAnnotated && notIterable ) {
+	private UnwrapMode unwrapMode(boolean typeArgumentAnnotated, boolean indexable, UnwrapValidatedValue unwrapValidatedValue) {
+		if ( unwrapValidatedValue == null && typeArgumentAnnotated && !indexable ) {
 			/*
 			 * Optional<@NotNull String> exampleValue
 			 */
@@ -295,6 +295,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		 * @NotNull Optional<String> exampleValue
 		 *
 		 * @NotNull String otherExampleValue
+		 *
+		 * @NotNull
+		 * List<@NotBlankTypeUse String> thirdExampleValue
 		 */
 		return UnwrapMode.AUTOMATIC;
 	}
@@ -494,8 +497,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 			typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable.getMember(), i );
 			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
-			boolean notIterable = !ReflectionHelper.isIterable( ReflectionHelper.typeOf( executable, i ) );
-			UnwrapMode unwrapMode = unwrapMode( typeArgumentAnnotated, notIterable, unwrapValidatedValue );
+			boolean indexable = ReflectionHelper.isIndexable( ReflectionHelper.typeOf( executable, i ) );
+			UnwrapMode unwrapMode = unwrapMode( typeArgumentAnnotated, indexable, unwrapValidatedValue );
 
 			metaData.add(
 					new ConstrainedParameter(

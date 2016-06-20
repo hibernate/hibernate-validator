@@ -253,6 +253,28 @@ public final class ReflectionHelper {
 	}
 
 	/**
+	 * Indicates if the type is considered indexable (ie is an {@code Iterable}, an array or a {@code Map}).
+	 *
+	 * @param type the type to inspect.
+	 *
+	 * @return Returns true if the type is indexable.
+	 */
+	public static boolean isIndexable(Type type) {
+		boolean isIndexable = false;
+		if ( ReflectionHelper.isList( type ) ) {
+			isIndexable = true;
+		}
+		else if ( ReflectionHelper.isMap( type ) ) {
+			isIndexable = true;
+		}
+		else if ( TypeHelper.isArray( type ) ) {
+			isIndexable = true;
+		}
+		return isIndexable;
+	}
+
+
+	/**
 	 * Determines the type of elements of an <code>Iterable</code>, array or the value of a <code>Map</code>.
 	 *
 	 * @param type the type to inspect
