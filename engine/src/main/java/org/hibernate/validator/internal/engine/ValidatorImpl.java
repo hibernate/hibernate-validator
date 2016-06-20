@@ -678,7 +678,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 					// Second, validate the content of the value
 					Iterator<?> elementsIter = createIteratorForCascadedValue( type, value, valueContext );
-					boolean isIndexable = isIndexable( type );
+					boolean isIndexable = ReflectionHelper.isIndexable( type );
 
 					validateCascadedConstraint(
 							validationContext,
@@ -730,28 +730,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			iter = Collections.singletonList( value ).iterator();
 		}
 		return iter;
-	}
-
-	/**
-	 * Called when processing cascaded constraints. This methods inspects the type of the cascaded constraints and in case
-	 * of a list or array creates an iterator in order to validate each element.
-	 *
-	 * @param type the type of the cascaded field or property.
-	 *
-	 * @return An iterator over the value of a cascaded property.
-	 */
-	private boolean isIndexable(Type type) {
-		boolean isIndexable = false;
-		if ( ReflectionHelper.isList( type ) ) {
-			isIndexable = true;
-		}
-		else if ( ReflectionHelper.isMap( type ) ) {
-			isIndexable = true;
-		}
-		else if ( TypeHelper.isArray( type ) ) {
-			isIndexable = true;
-		}
-		return isIndexable;
 	}
 
 	private void validateCascadedConstraint(ValidationContext<?> context, Iterator<?> iter, boolean isIndexable, ValueContext<?,

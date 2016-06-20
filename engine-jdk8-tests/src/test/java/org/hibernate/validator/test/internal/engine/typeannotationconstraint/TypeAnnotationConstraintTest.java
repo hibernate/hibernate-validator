@@ -6,6 +6,12 @@
  */
 package org.hibernate.validator.test.internal.engine.typeannotationconstraint;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -13,24 +19,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import org.apache.log4j.Logger;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
 import org.hibernate.validator.testutils.constraints.NotNullTypeUse;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Tests Java 8 type use annotations.
@@ -112,15 +115,35 @@ public class TypeAnnotationConstraintTest {
 
 	@Test
 	public void constraint_specified_on_value_type_of_map_gets_validated() {
-		F f = new F();
+		F1 f = new F1();
 		f.namesMap = newHashMap();
 		f.namesMap.put( "first", "Name 1" );
 		f.namesMap.put( "second", "" );
 		f.namesMap.put( "third", "Name 3" );
-		Set<ConstraintViolation<F>> constraintViolations = validator.validate( f );
+		Set<ConstraintViolation<F1>> constraintViolations = validator.validate( f );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "namesMap[second]" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1062")
+	public void constraints_specified_on_map_and_on_value_type_of_map_get_validated() {
+		F2 f = new F2();
+		f.namesMap = newHashMap();
+		f.namesMap.put( "first", "Name 1" );
+		f.namesMap.put( "second", "" );
+		f.namesMap.put( "third", "Name 3" );
+		Set<ConstraintViolation<F2>> constraintViolations = validator.validate( f );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "namesMap[second]" );
+		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class );
+
+		f = new F2();
+		constraintViolations = validator.validate( f );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "namesMap" );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000182.*")
@@ -260,8 +283,14 @@ public class TypeAnnotationConstraintTest {
 		}
 	}
 
-	static class F {
+	static class F1 {
 		@Valid
+		Map<String, @NotBlankTypeUse String> namesMap;
+	}
+
+	static class F2 {
+		@Valid
+		@NotNull
 		Map<String, @NotBlankTypeUse String> namesMap;
 	}
 
