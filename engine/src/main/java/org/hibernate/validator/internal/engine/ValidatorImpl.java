@@ -1343,11 +1343,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
 			for ( GroupWithInheritance groupOfGroups : sequence ) {
-				int numberOfFailingConstraint = 0;
+				int numberOfFailingConstraintsBeforeGroup = context.getFailingConstraints().size();
 				for ( Group group : groupOfGroups ) {
-					numberOfFailingConstraint += validateReturnValueForGroup(
-							context, bean, value, group
-					);
+					validateReturnValueForGroup( context, bean, value, group );
 					if ( shouldFailFast( context ) ) {
 						return;
 					}
@@ -1362,7 +1360,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					}
 				}
 
-				if ( numberOfFailingConstraint > 0 ) {
+				if ( context.getFailingConstraints().size() > numberOfFailingConstraintsBeforeGroup ) {
 					break;
 				}
 			}
