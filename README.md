@@ -80,6 +80,20 @@ You will also need a JDK 8 and Maven 3 (>= 3.0.3). With these prerequisites in p
 
 There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://hibernate.org/validator/contribute/).
 
+### Build on JDK 9
+
+To build Hibernate Validator with JDK 9, export the following environment variable:
+
+    export MAVEN_OPTS="-addmods java.annotations.common,java.xml.bind"
+
+Then the build can be started like this:
+
+    mvn clean install -DdisableDocumentationBuild=true -DdisableDistributionBuild
+
+The documentation and distribution modules are known to not work on Java 9 for the time being, hence they need to be excluded.
+Also the integration tests on WildFly will fail on Java 9 currently, hence this "integration" module is excluded automatically when building on JDK 9.
+
+
 ## Continuous Integration
 
 The [official Continuous Integration service for the project](https://hibernate-validator.ci.cloudbees.com/) is hosted at CloudBees.
