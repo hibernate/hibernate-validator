@@ -69,10 +69,8 @@
         <module>engine-jdk8-tests</module>
         <module>cdi</module>
         <module>tck-runner</module>
-        <module>integration</module>
         <module>annotation-processor</module>
         <module>performance</module>
-        <module>osgi</module>
     </modules>
 
     <properties>
@@ -782,6 +780,16 @@
     </distributionManagement>
 
     <profiles>
+        <profile>
+            <id>pre-jdk9</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <modules>
+                <module>integration</module>
+                <module>osgi</module>
+            </modules>
+        </profile>
         <profile>
             <id>docs</id>
             <activation>
