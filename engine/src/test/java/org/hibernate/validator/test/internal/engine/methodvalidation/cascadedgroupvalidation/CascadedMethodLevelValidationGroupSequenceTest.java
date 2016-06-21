@@ -6,18 +6,17 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.cascadedgroupvalidation;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.ValidatorUtil;
-
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
+import org.hibernate.validator.testutil.TestForIssue;
+import org.hibernate.validator.testutils.ValidatorUtil;
+import org.testng.annotations.Test;
 
 /**
  * @author Jan-Willem Willebrands
@@ -90,6 +89,77 @@ public class CascadedMethodLevelValidationGroupSequenceTest {
         setUpValidatorForGroups( CompoundGroup.class );
         try {
             entityRepository.store( new CompoundEntity( new Entity( null, null ) ) );
+            fail( "Expected MethodConstraintViolationException wasn't thrown." );
+        }
+        catch ( ConstraintViolationException e ) {
+
+            assertEquals( e.getConstraintViolations().size(), 1 );
+
+            ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+            assertConstraintViolation(
+                    constraintViolation, "may not be null", CompoundEntityRepositoryImpl.class, null
+            );
+            assertEquals(
+                    constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
+            );
+        }
+    }
+    
+    /**
+     * Expect a single constraint violation from the first validation group.
+     */
+	@Test
+	private void cascadedReturnValueConstraintInFirstGroup() {
+		setUpValidatorForGroups( CompoundGroup.class );
+		try {
+			entityRepository.getEntity( new CompoundEntity( new Entity( null, "value" ) ) );
+            fail( "Expected MethodConstraintViolationException wasn't thrown." );
+		}
+        catch (ConstraintViolationException e) {
+            assertEquals( e.getConstraintViolations().size(), 1 );
+            ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+            assertConstraintViolation(
+                    constraintViolation, "may not be null", CompoundEntityRepositoryImpl.class, null
+            );
+            assertEquals(
+                    constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup1.class
+            );
+		}
+	}
+	
+    /**
+     * Expect a single constraint violation from the second validation group.
+     */
+    @Test
+    private void cascadedReturnValueConstraintInSecondGroup() {
+        setUpValidatorForGroups( CompoundGroup.class );
+        try {
+            entityRepository.getEntity( new CompoundEntity( new Entity( "value", null ) ) );
+            fail( "Expected MethodConstraintViolationException wasn't thrown." );
+        }
+        catch ( ConstraintViolationException e ) {
+
+            assertEquals( e.getConstraintViolations().size(), 1 );
+
+            ConstraintViolation<?> constraintViolation = e.getConstraintViolations().iterator().next();
+            assertConstraintViolation(
+                    constraintViolation, "may not be null", CompoundEntityRepositoryImpl.class, null
+            );
+            assertEquals(
+                    constraintViolation.getConstraintDescriptor().getGroups().iterator().next(), ValidationGroup2.class
+            );
+        }
+    }
+    
+    /**
+     * Expect a single constraint violation in the first group. The second group should not be
+     * validated due to the violation in the first group.
+     */
+    @Test
+    private void cascadedReturnValueConstraintInBothGroups() {
+        setUpValidatorForGroups( CompoundGroup.class );
+        try {
+            entityRepository.getEntity( new CompoundEntity( new Entity( null, null ) ) );
             fail( "Expected MethodConstraintViolationException wasn't thrown." );
         }
         catch ( ConstraintViolationException e ) {

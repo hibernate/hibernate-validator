@@ -12,5 +12,8 @@ import javax.validation.Valid;
  * @author Jan-Willem Willebrands
  */
 public interface CompoundEntityRepository {
-    void store(@Valid CompoundEntity entity);
+	void store(@Valid CompoundEntity entity);
+
+	@Valid
+	CompoundEntity getEntity(CompoundEntity entity);
 }
