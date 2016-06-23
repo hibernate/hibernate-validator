@@ -12,10 +12,11 @@ import javax.validation.Valid;
  * @author Jan-Willem Willebrands
  */
 public class CompoundEntity {
-    @Valid
-    Entity entity;
 
-    public CompoundEntity(Entity entity) {
-        this.entity = entity;
-    }
+	@Valid
+	Entity entity;
+
+	public CompoundEntity(Entity entity) {
+		this.entity = entity;
+	}
 }

@@ -12,14 +12,14 @@ import javax.validation.constraints.NotNull;
  * @author Jan-Willem Willebrands
  */
 public class Entity {
-    @NotNull(groups = ValidationGroup1.class)
-    String value1;
+	@NotNull(groups = ValidationGroup1.class)
+	String value1;
 
-    @NotNull(groups = ValidationGroup2.class)
-    String value2;
+	@NotNull(groups = ValidationGroup2.class)
+	String value2;
 
-    public Entity(String value1, String value2) {
-        this.value1 = value1;
-        this.value2 = value2;
-    }
+	public Entity(String value1, String value2) {
+		this.value1 = value1;
+		this.value2 = value2;
+	}
 }
