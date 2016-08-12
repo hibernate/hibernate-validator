@@ -1,6 +1,9 @@
 # Typically *NIX text editors, by default, append '~' to files on saving to make backups
 *~
 
+# Our build scripts - necessary for our release jobs
+hibernate-noorm-release-scripts
+
 # Gradle work directory
 .gradle
 buildSrc/.gradle
