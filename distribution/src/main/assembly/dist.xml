@@ -85,6 +85,7 @@
                 <exclude>**/zanata.sh</exclude>
                 <exclude>**/zanata.xml</exclude>
                 <exclude>src/main/scripts/**</exclude>
+                <exclude>hibernate-noorm-release-scripts/**</exclude>
 
                 <!-- actual files which should be ignored -->
                 <exclude>.git</exclude>
