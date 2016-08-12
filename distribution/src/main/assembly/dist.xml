@@ -55,6 +55,10 @@
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
+            <source>../CONTRIBUTING.md</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
             <source>../changelog.txt</source>
             <outputDirectory>/</outputDirectory>
         </file>
@@ -77,6 +81,7 @@
             <excludes>
                 <!-- we already have these files at the top level of the distribution -->
                 <exclude>README.md</exclude>
+                <exclude>CONTRIBUTING.md</exclude>
                 <exclude>changelog.txt</exclude>
                 <exclude>copyright.txt</exclude>
                 <exclude>license.txt</exclude>
@@ -88,9 +93,14 @@
                 <exclude>hibernate-noorm-release-scripts/**</exclude>
 
                 <!-- actual files which should be ignored -->
+                <exclude>.travis.yml</exclude>
+                <exclude>travis/**</exclude>
                 <exclude>.git</exclude>
                 <exclude>.gitignore</exclude>
                 <exclude>**/target/**</exclude>
+                <exclude>**/.settings/**</exclude>
+                <exclude>**/.project</exclude>
+                <exclude>**/.classpath</exclude>
                 <exclude>**/.idea/**</exclude>
                 <exclude>.sonar-ide.properties</exclude>
                 <exclude>**/*.iml</exclude>
