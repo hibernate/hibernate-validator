@@ -23,6 +23,12 @@
     <module name="TreeWalker">
         <property name="cacheFile" value="${checkstyle.cache.file}"/>
 
+        <module name="RegexpSinglelineJava">
+            <!-- do not allow a package declaration that contains ".target." or "target;"  -->
+            <property name="format" value="^package .*\.target[\.;]"/>
+            <property name="message" value="Do not use &quot;target&quot; as package name element"/>
+        </module>
+
         <!-- Use tabs -->
         <module name="RegexpSinglelineJava">
             <property name="format" value="^ +\t*\S" />
