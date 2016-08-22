@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           targetNamespace="http://jboss.org/xml/ns/javax/validation/configuration"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:config="http://jboss.org/xml/ns/javax/validation/configuration"
+           version="1.1">
+
+    <xs:annotation>
+        <xs:documentation><![CDATA[
+            This is the XML Schema for the Bean Validation configuration file.
+            The configuration file must be named "META-INF/validation.xml".
+
+            Bean Validation configuration files must indicate the Bean Validation
+            XML schema by using the validation namespace:
+
+            http://jboss.org/xml/ns/javax/validation/configuration
+
+            and indicate the version of the schema by using the version attribute
+            as shown below:
+
+            <validation-config
+                xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="
+                    http://jboss.org/xml/ns/javax/validation/configuration
+                    validation-configuration-1.1.xsd"
+                version="1.1">
+                [...]
+            </validation-config>
+        ]]>
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:element name="validation-config" type="config:validation-configType"/>
+    <xs:complexType name="validation-configType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="default-provider" minOccurs="0"/>
+            <xs:element type="xs:string" name="message-interpolator" minOccurs="0"/>
+            <xs:element type="xs:string" name="traversable-resolver" minOccurs="0"/>
+            <xs:element type="xs:string" name="constraint-validator-factory" minOccurs="0"/>
+            <xs:element type="xs:string" name="parameter-name-provider" minOccurs="0"/>
+            <xs:element type="config:executable-validationType" name="executable-validation" minOccurs="0"/>
+            <xs:element type="xs:string" name="constraint-mapping" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="config:propertyType" name="property" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="version" type="config:versionType" fixed="1.1" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="executable-validationType">
+        <xs:sequence>
+            <xs:element type="config:default-validated-executable-typesType" name="default-validated-executable-types" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="enabled" use="optional" type="xs:boolean" default="true"/>
+    </xs:complexType>
+    <xs:complexType name="default-validated-executable-typesType">
+        <xs:sequence>
+            <xs:element name="executable-type" maxOccurs="unbounded" minOccurs="1">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="NONE"/>
+                        <xs:enumeration value="CONSTRUCTORS"/>
+                        <xs:enumeration value="NON_GETTER_METHODS"/>
+                        <xs:enumeration value="GETTER_METHODS"/>
+                        <xs:enumeration value="ALL"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="propertyType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="name" use="required" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:simpleType name="versionType">
+        <xs:restriction base="xs:token">
+            <xs:pattern value="[0-9]+(\.[0-9]+)*" />
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

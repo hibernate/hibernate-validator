@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<xs:schema attributeFormDefault="unqualified"
+           elementFormDefault="qualified"
+           targetNamespace="http://jboss.org/xml/ns/javax/validation/mapping"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"
+           version="1.1">
+
+    <xs:annotation>
+        <xs:documentation><![CDATA[
+            This is the XML Schema for Bean Validation constraint mapping files.
+
+            Bean Validation constraint mapping files must indicate the Bean Validation
+            XML schema by using the constraint mapping namespace:
+
+            http://jboss.org/xml/ns/javax/validation/mapping
+
+            and indicate the version of the schema by using the version attribute
+            as shown below:
+
+            <constraint-mappings
+                xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="
+                    http://jboss.org/xml/ns/javax/validation/mapping
+                    validation-mapping-1.1.xsd"
+                version="1.1">
+                ...
+            </constraint-mappings>
+        ]]>
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:element name="constraint-mappings" type="map:constraint-mappingsType"/>
+
+    <xs:complexType name="payloadType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="groupsType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="groupSequenceType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="groupConversionType">
+        <xs:attribute type="xs:string" name="from" use="required"/>
+        <xs:attribute type="xs:string" name="to" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="constraint-mappingsType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="default-package" minOccurs="0"/>
+            <xs:element type="map:beanType"
+                        name="bean"
+                        maxOccurs="unbounded"
+                        minOccurs="0"/>
+            <xs:element type="map:constraint-definitionType"
+                        name="constraint-definition"
+                        maxOccurs="unbounded"
+                        minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="version" type="map:versionType" fixed="1.1" use="required"/>
+    </xs:complexType>
+    <xs:simpleType name="versionType">
+        <xs:restriction base="xs:token">
+            <xs:pattern value="[0-9]+(\.[0-9]+)*"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="validated-byType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:boolean" name="include-existing-validators" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="constraintType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="message" minOccurs="0"/>
+            <xs:element type="map:groupsType"
+                        name="groups"
+                        minOccurs="0"/>
+            <xs:element type="map:payloadType"
+                        name="payload"
+                        minOccurs="0"/>
+            <xs:element type="map:elementType"
+                        name="element"
+                        maxOccurs="unbounded"
+                        minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="annotation" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="elementType" mixed="true">
+        <xs:sequence>
+            <xs:element type="xs:string" name="value" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="map:annotationType"
+                        name="annotation"
+                        maxOccurs="unbounded"
+                        minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="classType">
+        <xs:sequence>
+            <xs:element type="map:groupSequenceType"
+                        name="group-sequence"
+                        minOccurs="0"/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
+                        maxOccurs="unbounded"
+                        minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="beanType">
+        <xs:sequence>
+            <xs:element type="map:classType"
+                        name="class"
+                        minOccurs="0">
+            </xs:element>
+            <xs:element type="map:fieldType"
+                        name="field"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:getterType"
+                        name="getter"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:constructorType"
+                        name="constructor"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:methodType"
+                        name="method"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="class" use="required"/>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="annotationType">
+        <xs:sequence>
+            <xs:element type="map:elementType"
+                        name="element"
+                        maxOccurs="unbounded"
+                        minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="getterType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
+            <xs:element type="map:groupConversionType"
+                        name="convert-group"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="methodType">
+        <xs:sequence>
+            <xs:element type="map:parameterType"
+                        name="parameter"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:crossParameterType"
+                        name="cross-parameter"
+                        minOccurs="0"
+                        maxOccurs="1"/>
+            <xs:element type="map:returnValueType"
+                        name="return-value"
+                        minOccurs="0"
+                        maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="constructorType">
+        <xs:sequence>
+            <xs:element type="map:parameterType"
+                        name="parameter"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:crossParameterType"
+                        name="cross-parameter"
+                        minOccurs="0"
+                        maxOccurs="1"/>
+            <xs:element type="map:returnValueType"
+                        name="return-value"
+                        minOccurs="0"
+                        maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="parameterType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
+            <xs:element type="map:groupConversionType"
+                        name="convert-group"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="type" use="required"/>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="returnValueType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
+            <xs:element type="map:groupConversionType"
+                        name="convert-group"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="crossParameterType">
+        <xs:sequence>
+            <xs:element type="map:constraintType"
+                        name="constraint"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="constraint-definitionType">
+        <xs:sequence>
+            <xs:element type="map:validated-byType"
+                        name="validated-by"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="annotation" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="fieldType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="valid" minOccurs="0" fixed=""/>
+            <xs:element type="map:groupConversionType"
+                        name="convert-group"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+            <xs:element type="map:constraintType"
+                        name="constraint"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:boolean" name="ignore-annotations" use="optional"/>
+    </xs:complexType>
+</xs:schema>
