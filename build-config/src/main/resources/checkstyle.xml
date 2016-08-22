@@ -131,7 +131,7 @@
         <module name="RightCurly">
             <property name="option" value="alone"/>
             <property name="tokens" value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF,
-                        LITERAL_ELSE, CLASS_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, LITERAL_DO,
+                        LITERAL_ELSE, CLASS_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE,
                         STATIC_INIT, INSTANCE_INIT" />
         </module>
 
