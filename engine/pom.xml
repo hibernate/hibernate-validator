@@ -18,7 +18,7 @@
     <artifactId>hibernate-validator</artifactId>
 
     <name>Hibernate Validator Engine</name>
-    <description>Hibernate's Bean Validation (JSR-303) reference implementation.</description>
+    <description>Hibernate's Bean Validation (JSR-380) reference implementation.</description>
 
     <distributionManagement>
         <site>
@@ -128,6 +128,11 @@
             <artifactId>fest-assert</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap</groupId>
+            <artifactId>shrinkwrap-impl-base</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -176,7 +181,7 @@
                                 <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                                 <manifestEntries>
                                     <Specification-Title>Bean Validation</Specification-Title>
-                                    <Specification-Version>1.1</Specification-Version>
+                                    <Specification-Version>2.0</Specification-Version>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -190,7 +195,7 @@
                     <instructions>
                         <Import-Package>
                             javax.persistence.*;version="[2.0.0,3.0.0)";resolution:=optional,
-                            javax.validation.*;version="[1.0.0,2.0.0)",
+                            javax.validation.*;version="[2.0.0,3.0.0)",
                             javax.xml.*;version="0",
                             javax.el.*;version="[2.0.0,4.0.0)";resolution:=optional,
                             org.xml.sax.*;version="0",

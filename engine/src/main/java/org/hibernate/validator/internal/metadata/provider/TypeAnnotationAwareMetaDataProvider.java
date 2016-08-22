@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
@@ -21,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.validation.ParameterNameProvider;
 import javax.validation.Valid;
 
@@ -29,15 +34,10 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Extends {@code AnnotationMetaDataProvider} by discovering and registering constraints defined via Java 8 type
@@ -46,7 +46,6 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Khalid Alqinyah
  * @author Hardy Ferentschik
  */
-@IgnoreJava6Requirement
 public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvider {
 
 	private static final Log log = LoggerFactory.make();

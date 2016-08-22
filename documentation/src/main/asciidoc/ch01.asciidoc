@@ -3,7 +3,7 @@
 
 This chapter will show you how to get started with Hibernate Validator, the reference implementation (RI) of Bean Validation. For the following quick-start you need:
 
-* A JDK >= 6
+* A JDK 8
 * http://maven.apache.org/[Apache Maven]
 * An Internet connection (Maven has to download all required libraries)
 

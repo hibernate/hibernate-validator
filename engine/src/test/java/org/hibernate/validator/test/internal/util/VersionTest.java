@@ -27,11 +27,11 @@ public class VersionTest {
 
 	@Test
 	public void unknown() {
-		assertEquals( Version.determineJavaRelease( "abc" ), 6 );
+		assertEquals( Version.determineJavaRelease( "abc" ), 8 );
 	}
 
 	@Test
 	public void nullValue() {
-		assertEquals( Version.determineJavaRelease( null ), 6 );
+		assertEquals( Version.determineJavaRelease( null ), 8 );
 	}
 }

@@ -79,7 +79,7 @@ If a `ValidatorFactory` instance is no longer in use, it should be disposed by c
 ==== `ValidationProviderResolver`
 
 By default, available Bean Validation providers are discovered using the
-link:http://docs.oracle.com/javase/6/docs/technotes/guides/jar/jar.html#Service%20Provider[Java
+link:http://docs.oracle.com/javase/8/docs/technotes/guides/jar/jar.html#Service%20Provider[Java
 Service Provider] mechanism.
 
 For that purpose, each provider includes the file _META-

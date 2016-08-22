@@ -64,19 +64,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <!--
-                     The default target level is 1.6 (configured in parent pom).
-                     We only have test sources in this module which use 1.8 (also configured explicitly via 'testSource'
-                     and 'testTarget' in the parent pom). Unfortunately, this causes problems when importing in an IDE
-                     (since they don't handle the different language level settings between production and test classes).
-                     The import would generate a module with a target level of 1.6 which leads to compilation errors
-                     in the IDE. Since we have no production classes in this module we can just set 'source' and 'target'
-                     to 1.8 as well, so that the IDE import works. See HV-915
-                     -->
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.asciidoctor</groupId>

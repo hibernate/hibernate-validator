@@ -55,9 +55,9 @@ public final class Version {
 			}
 		}
 
-		// Cannot determine Java version; Assuming 1.6, not enabling the 1.8-only features
+		// Cannot determine Java version; Assuming 1.8.
 		LOG.unknownJvmVersion( specificationVersion );
-		return 6;
+		return 8;
 	}
 
 	// helper class should not have a public constructor

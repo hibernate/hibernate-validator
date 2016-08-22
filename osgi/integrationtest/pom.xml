@@ -125,13 +125,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
             <!-- Generates a dependencies.properties file; Required for versionAsInProject() -->
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>

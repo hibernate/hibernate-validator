@@ -22,5 +22,5 @@ import java.lang.annotation.Target;
  */
 @Retention(value = RetentionPolicy.CLASS)
 @Target(value = { ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.TYPE })
-public @interface IgnoreJava6Requirement {
+public @interface IgnoreJava8Requirement {
 }

@@ -7,12 +7,12 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
 import java.time.OffsetDateTime;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
@@ -20,7 +20,6 @@ import org.hibernate.validator.spi.time.TimeProvider;
  *
  * @author Khalid Alqinyah
  */
-@IgnoreJava6Requirement
 public class FutureValidatorForOffsetDateTime implements ConstraintValidator<Future, OffsetDateTime> {
 
 	@Override

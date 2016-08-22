@@ -280,7 +280,7 @@ public final class ReflectionHelper {
 	 * @param type the type to inspect
 	 *
 	 * @return Returns the type of elements of an <code>Iterable</code>, array or the value of a <code>Map</code>. <code>
-	 *         null</code> is returned in case the type is not indexable (in the context of JSR 303).
+	 *         null</code> is returned in case the type is not indexable (in the context of JSR 380).
 	 */
 	public static Type getIndexedType(Type type) {
 		Type indexedType = null;

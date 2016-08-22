@@ -20,7 +20,7 @@ The full list of changes for this release can be found in changelog.txt.
 
 ## System Requirements
 
-JDK 1.6 or above.
+JDK 1.8 or above.
 
 ## Using Hibernate Validator
 

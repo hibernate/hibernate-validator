@@ -6,17 +6,16 @@
  */
 package org.hibernate.validator.internal.engine.valuehandling;
 
-import javafx.beans.value.ObservableValue;
-
-import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
+import org.hibernate.validator.internal.util.IgnoreJava8Requirement;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+
+import javafx.beans.value.ObservableValue;
 
 /**
  * Unwraps a JavaFX {@code ObservableValue} and returns the wrapped value and type.
  *
  * @author Khalid Alqinyah
  */
-@IgnoreJava6Requirement
 public class JavaFXPropertyValueUnwrapper extends TypeResolverBasedValueUnwrapper<ObservableValue<?>> {
 
 	public JavaFXPropertyValueUnwrapper(TypeResolutionHelper typeResolutionHelper) {
@@ -24,6 +23,7 @@ public class JavaFXPropertyValueUnwrapper extends TypeResolverBasedValueUnwrappe
 	}
 
 	@Override
+	@IgnoreJava8Requirement // ObservableValue is not supported by animal-sniffer signature file
 	public Object handleValidatedValue(ObservableValue<?> value) {
 		if ( value != null ) {
 			return value.getValue();

@@ -10,18 +10,15 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Past;
 
-import org.joda.time.ReadableInstant;
-
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-import org.hibernate.validator.internal.util.IgnoreJava6Requirement;
 import org.hibernate.validator.spi.time.TimeProvider;
+import org.joda.time.ReadableInstant;
 
 /**
  * Check if Joda Time type who implements {@code org.joda.time.ReadableInstant} is in the past.
  *
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  */
-@IgnoreJava6Requirement
 public class PastValidatorForReadableInstant implements ConstraintValidator<Past, ReadableInstant> {
 
 	@Override

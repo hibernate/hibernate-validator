@@ -26,7 +26,7 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
 
 /**
  * An annotation processor for checking <a
- * href="http://jcp.org/en/jsr/detail?id=303">Bean Validation</a> constraints.
+ * href="http://jcp.org/en/jsr/detail?id=380">Bean Validation</a> constraints.
  * The processor supports the following options:
  * <ul>
  * <li><code>diagnosticKind</code>: the severity with which any occurred

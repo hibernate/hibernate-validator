@@ -260,7 +260,7 @@ public class RedefiningDefaultGroupTest {
 
 	@Test
 	public void testSubclassesInheritGroupSequence() {
-		// our assertion here is based around Item C from Section 3.4.5 of the JSR 303 Validation Spec that class X
+		// our assertion here is based around Item C from Section 3.4.5 of the JSR 380 Validation Spec that class X
 		// (MiniRentalCar) without explicitly defining a Default group would then inherit it's super class "Default"
 		// constraints along with it's own attribute level constraints not explicitly tied to a group other than Default.
 		MiniRentalCar miniRentalCar = new MiniRentalCar( "Morris", "DD-AB-123", 0 );

@@ -51,8 +51,7 @@ public interface ValidationOrder {
 
 		@Override
 		public Iterator<Group> getGroupIterator() {
-			// Not using emptyIterator() to stay on 1.6 language level
-			return Collections.<Group>emptyList().iterator();
+			return Collections.<Group>emptyIterator();
 		}
 
 		@Override

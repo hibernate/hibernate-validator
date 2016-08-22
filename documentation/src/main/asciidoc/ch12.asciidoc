@@ -44,7 +44,7 @@ annotations themselves
 === Options
 
 The behavior of the Hibernate Validator Annotation Processor can be controlled using the
-http://java.sun.com/javase/6/docs/technotes/tools/windows/javac.html#options[processor options]
+http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javac.html#BHCHACIB[processor options]
 listed in table <<table_processor_options>>:
 
 [[table_processor_options]]
@@ -83,7 +83,7 @@ NetBeans).
 ===== javac
 
 When compiling on the command line using
-http://java.sun.com/javase/6/docs/technotes/guides/javac/index.html[javac], specify the JAR
+http://java.sun.com/javase/8/docs/technotes/guides/javac/index.html[javac], specify the JAR
 _hibernate-validator-annotation-processor-{hvVersion}.jar_ using the "processorpath" option as shown in
 the following listing. The processor will be detected automatically by the compiler and invoked
 during compilation.
@@ -159,15 +159,15 @@ on the project's actual classpath):
 <plugin>
     <artifactId>maven-compiler-plugin</artifactId>
     <configuration>
-        <source>1.6</source>
-        <target>1.6</target>
+        <source>1.8</source>
+        <target>1.8</target>
         <compilerArgument>-proc:none</compilerArgument>
     </configuration>
 </plugin>
 <plugin>
     <groupId>org.bsc.maven</groupId>
     <artifactId>maven-processor-plugin</artifactId>
-    <version>2.2.1</version>
+    <version>3.1.0</version>
     <executions>
         <execution>
             <id>process</id>
@@ -197,7 +197,7 @@ on the project's actual classpath):
 Do the following to use the annotation processor within the http://www.eclipse.org/[Eclipse] IDE:
 
 * Right-click your project, choose "Properties"
-* Go to "Java Compiler" and make sure, that "Compiler compliance level" is set to "1.6".
+* Go to "Java Compiler" and make sure, that "Compiler compliance level" is set to "1.8".
 Otherwise the processor won't be activated
 * Go to "Java Compiler - Annotation Processing" and choose "Enable annotation processing"
 * Go to "Java Compiler - Annotation Processing - Factory Path" and add the JAR

@@ -14,8 +14,8 @@ import javax.validation.constraints.Size;
 
 /**
  * An example entity class enriched with constraint annotations from
- * the Bean Validation API (<a href="http://jcp.org/en/jsr/detail?id=303">JSR
- * 303</a>). Have a look at {@link org.hibernate.validator.quickstart.CarTest} to learn, how the Bean Validation
+ * the Bean Validation API (<a href="http://jcp.org/en/jsr/detail?id=380">JSR
+ * 380</a>). Have a look at {@link org.hibernate.validator.quickstart.CarTest} to learn, how the Bean Validation
  * API can be used to validate {@code Car} instances.
  *
  * @author Gunnar Morling
