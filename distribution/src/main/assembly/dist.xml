@@ -87,8 +87,6 @@
                 <exclude>license.txt</exclude>
 
                 <!-- only needed for documentation and helper scripts, no need to include them -->
-                <exclude>**/zanata.sh</exclude>
-                <exclude>**/zanata.xml</exclude>
                 <exclude>src/main/scripts/**</exclude>
                 <exclude>hibernate-noorm-release-scripts/**</exclude>
 
