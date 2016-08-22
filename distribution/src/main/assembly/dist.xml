@@ -33,8 +33,7 @@
                 <include>javax.validation:validation-api</include>
                 <include>org.jboss.logging:jboss-logging</include>
                 <include>com.fasterxml:classmate</include>
-                <include>javax.el:*</include>
-                <include>org.glassfish.web:*</include>
+                <include>org.glassfish:javax.el</include>
             </includes>
         </dependencySet>
         <dependencySet>

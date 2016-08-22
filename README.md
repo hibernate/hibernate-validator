@@ -42,14 +42,9 @@ Logging will delegate any log requests to that provider.
       In an EE environment they are often already provided.
 
         <dependency>
-           <groupId>javax.el</groupId>
-           <artifactId>javax.el-api</artifactId>
-           <version>2.2.4</version>
-        </dependency>
-        <dependency>
-           <groupId>org.glassfish.web</groupId>
+           <groupId>org.glassfish</groupId>
            <artifactId>javax.el</artifactId>
-           <version>2.2.4</version>
+           <version>3.0.1-b08</version>
         </dependency>
 
 * Bean Validation defines integration points with [CDI](http://jcp.org/en/jsr/detail?id=346). If your application runs
