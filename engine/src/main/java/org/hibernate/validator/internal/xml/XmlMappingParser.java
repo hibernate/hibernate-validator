@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ParameterNameProvider;
 import javax.xml.bind.JAXBContext;
@@ -39,10 +44,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * XML parser for validation-mapping files.
@@ -73,6 +74,7 @@ public class XmlMappingParser {
 	static {
 		SCHEMAS_BY_VERSION.put( "1.0", "META-INF/validation-mapping-1.0.xsd" );
 		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
+		SCHEMAS_BY_VERSION.put( "2.0", "META-INF/validation-mapping-2.0.xsd" );
 	}
 
 	public XmlMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider,

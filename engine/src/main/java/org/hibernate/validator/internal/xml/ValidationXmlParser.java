@@ -52,6 +52,7 @@ public class ValidationXmlParser {
 	static {
 		SCHEMAS_BY_VERSION.put( "1.0", "META-INF/validation-configuration-1.0.xsd" );
 		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-configuration-1.1.xsd" );
+		SCHEMAS_BY_VERSION.put( "2.0", "META-INF/validation-configuration-2.0.xsd" );
 	}
 
 	public ValidationXmlParser(ClassLoader externalClassLoader) {

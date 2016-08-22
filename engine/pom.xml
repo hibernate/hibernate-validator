@@ -274,8 +274,8 @@
                             <!-- Makes sure the generated code is compatible with JAXB 2.1 which is what comes with Java 1.6 -->
                             <target>2.1</target>
                             <sources>
-                                <source>src/main/xsd/validation-configuration-1.1.xsd</source>
-                                <source>src/main/xsd/validation-mapping-1.1.xsd</source>
+                                <source>src/main/xsd/validation-configuration-2.0.xsd</source>
+                                <source>src/main/xsd/validation-mapping-2.0.xsd</source>
                             </sources>
                         </configuration>
                     </plugin>
@@ -330,8 +330,8 @@
                                 <argument>2.1</argument>
                                 <argument>-d</argument>
                                 <argument>target/generated-sources/jaxb</argument>
-                                <argument>src/main/xsd/validation-configuration-1.1.xsd</argument>
-                                <argument>src/main/xsd/validation-mapping-1.1.xsd</argument>
+                                <argument>src/main/xsd/validation-configuration-2.0.xsd</argument>
+                                <argument>src/main/xsd/validation-mapping-2.0.xsd</argument>
                                 <argument>-b</argument>
                                 <argument>src/main/xjb/binding-customization.xjb</argument>
                             </arguments>

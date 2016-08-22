@@ -7,7 +7,7 @@
   -->
 <jxb:bindings version="1.0" xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
               xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc">
-    <jxb:bindings schemaLocation="../xsd/validation-mapping-1.1.xsd" node="/xs:schema">
+    <jxb:bindings schemaLocation="../xsd/validation-mapping-2.0.xsd" node="/xs:schema">
         <!-- let jaxb be whitespace tolerant - http://www.highlevelbits.com/2009/08/jaxb-with-maven_16.html -->
         <jxb:globalBindings>
             <xjc:javaType name="java.lang.String" xmlType="xs:string"
@@ -20,7 +20,7 @@
         </jxb:bindings>
     </jxb:bindings>
 
-    <jxb:bindings schemaLocation="../xsd/validation-configuration-1.1.xsd" node="/xs:schema">
+    <jxb:bindings schemaLocation="../xsd/validation-configuration-2.0.xsd" node="/xs:schema">
         <!-- Use existing enum type -->
         <jxb:bindings node="//xs:element[@name='executable-type']">
             <jxb:javaType name="javax.validation.executable.ExecutableType"

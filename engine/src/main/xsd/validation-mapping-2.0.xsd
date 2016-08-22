@@ -7,10 +7,10 @@
   -->
 <xs:schema attributeFormDefault="unqualified"
            elementFormDefault="qualified"
-           targetNamespace="http://jboss.org/xml/ns/javax/validation/mapping"
+           targetNamespace="http://xmlns.jcp.org/xml/ns/validation/mapping"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:map="http://jboss.org/xml/ns/javax/validation/mapping"
-           version="1.1">
+           xmlns:map="http://xmlns.jcp.org/xml/ns/validation/mapping"
+           version="2.0">
 
     <xs:annotation>
         <xs:documentation><![CDATA[
@@ -19,18 +19,18 @@
             Bean Validation constraint mapping files must indicate the Bean Validation
             XML schema by using the constraint mapping namespace:
 
-            http://jboss.org/xml/ns/javax/validation/mapping
+            http://xmlns.jcp.org/xml/ns/validation/mapping
 
             and indicate the version of the schema by using the version attribute
             as shown below:
 
             <constraint-mappings
-                xmlns="http://jboss.org/xml/ns/javax/validation/mapping"
+                xmlns="http://xmlns.jcp.org/xml/ns/validation/mapping"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:schemaLocation="
-                    http://jboss.org/xml/ns/javax/validation/mapping
-                    validation-mapping-1.1.xsd"
-                version="1.1">
+                    http://xmlns.jcp.org/xml/ns/validation/mapping
+                    validation-mapping-2.0.xsd"
+                version="2.0">
                 ...
             </constraint-mappings>
         ]]>
@@ -70,7 +70,7 @@
                         maxOccurs="unbounded"
                         minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute name="version" type="map:versionType" fixed="1.1" use="required"/>
+        <xs:attribute name="version" type="map:versionType" fixed="2.0" use="required"/>
     </xs:complexType>
     <xs:simpleType name="versionType">
         <xs:restriction base="xs:token">

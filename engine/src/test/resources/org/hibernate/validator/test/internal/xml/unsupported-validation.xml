@@ -8,7 +8,7 @@
 <validation-config
     xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-2.0.xsd"
-    version="2.0">
+    xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.2.xsd"
+    version="1.2">
 
 </validation-config>

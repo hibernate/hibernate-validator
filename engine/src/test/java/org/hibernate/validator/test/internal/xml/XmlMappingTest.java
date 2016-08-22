@@ -6,6 +6,11 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.testng.Assert.assertEquals;
+
 import java.io.InputStream;
 import java.lang.annotation.ElementType;
 import java.util.ArrayList;
@@ -32,11 +37,6 @@ import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.testng.Assert.assertEquals;
 
 /**
  * @author Hardy Ferentschik
@@ -173,7 +173,7 @@ public class XmlMappingTest {
 
 	@Test(
 			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for constraint mapping file: 2\\.0\\."
+			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for constraint mapping file: 1\\.2\\."
 	)
 	public void shouldFailToLoadConstraintMappingWithUnsupportedVersion() {
 		final Configuration<?> configuration = ValidatorUtil.getConfiguration();
@@ -280,7 +280,7 @@ public class XmlMappingTest {
 
 	@Test(
 			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for META-INF/validation.xml: 2\\.0\\."
+			expectedExceptionsMessageRegExp = "HV000122: Unsupported schema version for META-INF/validation.xml: 1\\.2\\."
 	)
 	public void shouldFailToLoadValidationXmlWithUnsupportedVersion() {
 		validationXmlTestHelper.runWithCustomValidationXml(
