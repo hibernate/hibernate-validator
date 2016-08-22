@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
@@ -41,18 +40,18 @@ public class ValidationXmlParser {
 	private static final Log log = LoggerFactory.make();
 
 	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
-	private static final ConcurrentMap<String, String> SCHEMAS_BY_VERSION = new ConcurrentHashMap<String, String>(
-			2,
-			0.75f,
-			1
-	);
+	private static final Map<String, String> SCHEMAS_BY_VERSION = Collections.unmodifiableMap( getSchemasByVersion() );
 
 	private final ClassLoader externalClassLoader;
 
-	static {
-		SCHEMAS_BY_VERSION.put( "1.0", "META-INF/validation-configuration-1.0.xsd" );
-		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-configuration-1.1.xsd" );
-		SCHEMAS_BY_VERSION.put( "2.0", "META-INF/validation-configuration-2.0.xsd" );
+	private static Map<String, String> getSchemasByVersion() {
+		Map<String, String> schemasByVersion = new HashMap<String, String>();
+
+		schemasByVersion.put( "1.0", "META-INF/validation-configuration-1.0.xsd" );
+		schemasByVersion.put( "1.1", "META-INF/validation-configuration-1.1.xsd" );
+		schemasByVersion.put( "2.0", "META-INF/validation-configuration-2.0.xsd" );
+
+		return schemasByVersion;
 	}
 
 	public ValidationXmlParser(ClassLoader externalClassLoader) {
