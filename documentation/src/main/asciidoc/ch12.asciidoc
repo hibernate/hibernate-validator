@@ -83,7 +83,7 @@ NetBeans).
 ===== javac
 
 When compiling on the command line using
-http://java.sun.com/javase/8/docs/technotes/guides/javac/index.html[javac], specify the JAR
+http://docs.oracle.com/javase/8/docs/technotes/guides/javac/index.html[javac], specify the JAR
 _hibernate-validator-annotation-processor-{hvVersion}.jar_ using the "processorpath" option as shown in
 the following listing. The processor will be detected automatically by the compiler and invoked
 during compilation.

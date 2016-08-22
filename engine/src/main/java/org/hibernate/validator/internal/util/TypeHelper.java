@@ -145,7 +145,7 @@ public final class TypeHelper {
 	 *
 	 * @return the erased type, never a parameterized type nor a type variable
 	 *
-	 * @see <a href="http://java.sun.com/docs/books/jls/third_edition/html/typesValues.html#4.6">4.6 Type Erasure</a>
+	 * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-4.html#jls-4.6">4.6 Type Erasure</a>
 	 */
 	public static Type getErasedType(Type type) {
 		// the erasure of a parameterized type G<T1, ... ,Tn> is |G|
@@ -515,7 +515,7 @@ public final class TypeHelper {
 	 *
 	 * @return {@code true} if the specified type is a reference type
 	 *
-	 * @see <a href="http://java.sun.com/docs/books/jls/third_edition/html/typesValues.html#4.3">4.3 Reference Types and Values</a>
+	 * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-4.html#jls-4.3">4.3 Reference Types and Values</a>
 	 */
 	private static boolean isReferenceType(Type type) {
 		return type == null
