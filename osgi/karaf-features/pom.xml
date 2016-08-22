@@ -21,11 +21,6 @@
     <name>Hibernate Validator Karaf Features</name>
     <description>Hibernate Validator features for Apache Karaf</description>
 
-    <properties>
-        <pax.exam.version>4.4.0</pax.exam.version>
-        <apache.karaf.version>3.0.3</apache.karaf.version>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
