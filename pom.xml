@@ -99,10 +99,10 @@
 
         <bv.api.version>1.1.0.Final</bv.api.version>
         <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>5.2.4.Final</previous.stable>
+        <previous.stable>5.3.3.Final</previous.stable>
 
         <paranamer.version>2.8</paranamer.version>
-        <javax.el.version>2.2.4</javax.el.version>
+        <javax.el.version>3.0.1-b08</javax.el.version>
         <jboss.logging.version>3.3.0.Final</jboss.logging.version>
         <jboss.logging.processor.version>2.0.1.Final</jboss.logging.processor.version>
 
@@ -200,14 +200,8 @@
                 <artifactId>jboss-logging-annotations</artifactId>
                 <version>${jboss.logging.processor.version}</version>
             </dependency>
-            <!-- Not going to upgrade to org.glassfish:javax.el:3.0.0 for now, since it is only Java 7 compatible -->
             <dependency>
-                <groupId>javax.el</groupId>
-                <artifactId>javax.el-api</artifactId>
-                <version>${javax.el.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.web</groupId>
+                <groupId>org.glassfish</groupId>
                 <artifactId>javax.el</artifactId>
                 <version>${javax.el.version}</version>
             </dependency>

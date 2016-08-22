@@ -16,8 +16,7 @@
 
         <bundle>mvn:org.jboss.logging/jboss-logging/${jboss.logging.version}</bundle>
         <bundle>mvn:com.fasterxml/classmate/${classmate.version}</bundle>
-        <bundle>mvn:javax.el/javax.el-api/${javax.el.version}</bundle>
-        <bundle>mvn:org.glassfish.web/javax.el/${javax.el.version}</bundle>
+        <bundle>mvn:org.glassfish/javax.el/${javax.el.version}</bundle>
         <bundle>mvn:org.jsoup/jsoup/${jsoup.version}</bundle>
         <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
     </feature>
