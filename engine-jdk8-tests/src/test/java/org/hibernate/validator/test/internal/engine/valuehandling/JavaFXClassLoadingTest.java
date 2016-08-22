@@ -14,16 +14,15 @@ import javax.validation.ValidationException;
 import org.fest.assertions.Assertions;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.classloader.ShrinkWrapClassLoader;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 /**
  * @author Davide D'Alto
  */
-@TestForIssue( jiraKey = "HV-1017")
+@TestForIssue(jiraKey = "HV-1017")
 public class JavaFXClassLoadingTest {
 
 	/**
