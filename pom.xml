@@ -23,28 +23,42 @@
             <name>Emmanuel Bernard</name>
             <email>emmanuel@hibernate.org</email>
             <organization>JBoss, by Red Hat</organization>
-            <url>http://in.relation.to/Bloggers/Emmanuel</url>
+            <url>http://in.relation.to/emmanuel-bernard/</url>
         </developer>
         <developer>
             <id>hardy.ferentschik</id>
             <name>Hardy Ferentschik</name>
             <email>hferents@redhat.com</email>
             <organization>JBoss, by Red Hat</organization>
-            <url>http://in.relation.to/Bloggers/Hardy</url>
+            <url>http://in.relation.to/hardy-ferentschik/</url>
         </developer>
         <developer>
             <id>gunnar.morling</id>
             <name>Gunnar Morling</name>
-            <email>gunnar.morling@googlemail.com</email>
+            <email>gunnar@hibernate.org</email>
             <organization>JBoss, by Red Hat</organization>
-            <url>http://musingsofaprogrammingaddict.blogspot.com/</url>
+            <url>http://in.relation.to/gunnar-morling/</url>
         </developer>
         <developer>
             <id>kevinpollet</id>
             <name>Kevin Pollet</name>
             <email>kevin.pollet@serli.com</email>
             <organization>SERLI</organization>
-            <url>http://www.serli.com</url>
+            <url>http://www.serli.com/</url>
+        </developer>
+        <developer>
+            <id>davide.dalto</id>
+            <name>Davide D'Alto</name>
+            <email>davide@hibernate.org</email>
+            <organization>JBoss, by Red Hat</organization>
+            <url>http://in.relation.to/davide-dalto/</url>
+        </developer>
+        <developer>
+            <id>guillaume.smet</id>
+            <name>Guillaume Smet</name>
+            <email>guillaume.smet@hibernate.org</email>
+            <organization>JBoss, by Red Hat</organization>
+            <url>http://in.relation.to/guillaume-smet/</url>
         </developer>
     </developers>
 
