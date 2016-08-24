@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.engine.resolver;
 import java.lang.annotation.ElementType;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 
@@ -20,8 +21,8 @@ import javax.validation.TraversableResolver;
  * @author Emmanuel Bernard
  */
 public class CachingTraversableResolverForSingleValidation implements TraversableResolver {
-	private TraversableResolver delegate;
-	private Map<TraversableHolder, TraversableHolder> traversables = new HashMap<TraversableHolder, TraversableHolder>();
+	private final TraversableResolver delegate;
+	private final Map<TraversableHolder, TraversableHolder> traversables = new HashMap<TraversableHolder, TraversableHolder>();
 
 	public CachingTraversableResolverForSingleValidation(TraversableResolver delegate) {
 		this.delegate = delegate;
@@ -29,9 +30,7 @@ public class CachingTraversableResolverForSingleValidation implements Traversabl
 
 	@Override
 	public boolean isReachable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
-		TraversableHolder currentLH = new TraversableHolder(
-				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
-		);
+		TraversableHolder currentLH = new TraversableHolder( traversableObject, traversableProperty );
 		TraversableHolder cachedLH = traversables.get( currentLH );
 		if ( cachedLH == null ) {
 			currentLH.isReachable = delegate.isReachable(
@@ -58,9 +57,8 @@ public class CachingTraversableResolverForSingleValidation implements Traversabl
 
 	@Override
 	public boolean isCascadable(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
-		TraversableHolder currentLH = new TraversableHolder(
-				traversableObject, traversableProperty, rootBeanType, pathToTraversableObject, elementType
-		);
+		TraversableHolder currentLH = new TraversableHolder( traversableObject, traversableProperty );
+
 		TraversableHolder cachedLH = traversables.get( currentLH );
 		if ( cachedLH == null ) {
 			currentLH.isCascadable = delegate.isCascadable(
@@ -88,21 +86,15 @@ public class CachingTraversableResolverForSingleValidation implements Traversabl
 	private static final class TraversableHolder {
 		private final Object traversableObject;
 		private final Path.Node traversableProperty;
-		private final Class<?> rootBeanType;
-		private final Path pathToTraversableObject;
-		private final ElementType elementType;
 		private final int hashCode;
 
 		private Boolean isReachable;
 		private Boolean isCascadable;
 
 
-		private TraversableHolder(Object traversableObject, Path.Node traversableProperty, Class<?> rootBeanType, Path pathToTraversableObject, ElementType elementType) {
+		private TraversableHolder(Object traversableObject, Path.Node traversableProperty) {
 			this.traversableObject = traversableObject;
 			this.traversableProperty = traversableProperty;
-			this.rootBeanType = rootBeanType;
-			this.pathToTraversableObject = pathToTraversableObject;
-			this.elementType = elementType;
 			this.hashCode = buildHashCode();
 		}
 
@@ -117,15 +109,6 @@ public class CachingTraversableResolverForSingleValidation implements Traversabl
 
 			TraversableHolder that = (TraversableHolder) o;
 
-			if ( elementType != that.elementType ) {
-				return false;
-			}
-			if ( !pathToTraversableObject.equals( that.pathToTraversableObject ) ) {
-				return false;
-			}
-			if ( !rootBeanType.equals( that.rootBeanType ) ) {
-				return false;
-			}
 			if ( traversableObject != null ? !traversableObject.equals( that.traversableObject ) : that.traversableObject != null ) {
 				return false;
 			}
@@ -142,11 +125,10 @@ public class CachingTraversableResolverForSingleValidation implements Traversabl
 		}
 
 		public int buildHashCode() {
-			int result = traversableObject != null ? traversableObject.hashCode() : 0;
+			// HV-1013 Using identity hash code in order to avoid calling hashCode() of objects which may
+			// be handling null properties not correctly
+			int result = traversableObject != null ? System.identityHashCode( traversableObject ) : 0;
 			result = 31 * result + traversableProperty.hashCode();
-			result = 31 * result + rootBeanType.hashCode();
-			result = 31 * result + pathToTraversableObject.hashCode();
-			result = 31 * result + elementType.hashCode();
 			return result;
 		}
 	}
