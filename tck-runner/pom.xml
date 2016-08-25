@@ -18,9 +18,9 @@
     <artifactId>hibernate-validator-tck-runner</artifactId>
 
     <name>Hibernate Validator TCK Runner</name>
-    <description>Aggregates dependencies and runs the JSR-349 TCK</description>
+    <description>Aggregates dependencies and runs the JSR-380 TCK</description>
     <properties>
-        <tck.version>1.1.4.Final</tck.version>
+        <tck.version>2.0.0-SNAPSHOT</tck.version>
         <tck.suite.file>${project.build.directory}/dependency/beanvalidation-tck-tests-suite.xml</tck.suite.file>
         <wildflyTargetDir>${project.build.directory}/wildfly-${wildfly.version}</wildflyTargetDir>
         <validation.provider>org.hibernate.validator.HibernateValidator</validation.provider>

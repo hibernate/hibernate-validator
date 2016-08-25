@@ -38,10 +38,10 @@ public class TckRunner {
 
 	public static void main(String[] args) {
 		XmlSuite suite = new XmlSuite();
-		suite.setName( "JSR-349-TCK" );
+		suite.setName( "JSR-380-TCK" );
 
 		XmlTest test = new XmlTest(suite);
-		test.setName( "JSR-349-TCK" );
+		test.setName( "JSR-380-TCK" );
 
 		List<XmlPackage> packages = Collections.singletonList( new XmlPackage( "org.hibernate.beanvalidation.tck.tests" ) );
 		test.setXmlPackages( packages );

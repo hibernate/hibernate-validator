@@ -1,7 +1,7 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="JSR-349-TCK" verbose="1">
-    <test name="JSR-349-TCK">
+<suite name="JSR-380-TCK" verbose="1">
+    <test name="JSR-380-TCK">
 
         <method-selectors>
             <method-selector>
