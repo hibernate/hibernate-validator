@@ -425,7 +425,7 @@ unwrapped to `HibernateConstraintViolation` in order to retrieve the dynamic pay
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/dynamicpayload/DynamicPayloadTest.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/dynamicpayload/DynamicPayLoadTest.java[tags=include]
 ----
 ====
 
@@ -811,7 +811,7 @@ definitions. You can use the programmatic constraint declaration API - see
 
 [[example-using-constraint-definition-api]]
 .Adding constraint definitions through the programmatic API
-========
+====
 [source, JAVA, indent=0]
 ----
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraintapi/ConstraintApiTest.java[tags=constraintDefinition]
