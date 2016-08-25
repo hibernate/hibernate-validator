@@ -11,7 +11,7 @@ code which is really metadata about the class itself.
 
 image::application-layers.png[]
 
-JSR 349 - Bean Validation 1.1 - defines a metadata model and API for entity and method validation.
+JSR 380 - Bean Validation 2.0 - defines a metadata model and API for entity and method validation.
 The default metadata source are annotations, with the ability to override and extend the meta-data
 through the use of XML. The API is not tied to a specific application tier nor programming model. It
 is specifically not tied to either web or persistence tier, and is available for both server-side
@@ -19,7 +19,7 @@ application programming, as well as rich client Swing application developers.
 
 image::application-layers2.png[]
 
-Hibernate Validator is the reference implementation of this JSR 349. The implementation itself as
+Hibernate Validator is the reference implementation of this JSR 380. The implementation itself as
 well as the Bean Validation API and TCK are all provided and distributed under the
 http://www.apache.org/licenses/LICENSE-2.0[Apache Software License 2.0].
 

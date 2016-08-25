@@ -5,7 +5,7 @@
 
 ## What is it?
 
-This is the reference implementation of [JSR-349 - Bean Validation 1.1](http://beanvalidation.org/).
+This is the reference implementation of [JSR-380 - Bean Validation 2.0](http://beanvalidation.org/).
 Bean Validation defines a metadata model and API for JavaBean as well as method validation.
 The default metadata source are annotations, with the ability to override and extend
 the meta-data through the use of XML validation descriptors.
@@ -98,7 +98,7 @@ We provide a `.travis.yml` file so that you can enable CI for your GitHub fork b
 ## Hibernate Validator URLs
 
 * [Home Page](http://hibernate.org/validator/)
-* [Bean Validation Home](http://beanvalidation.org)
+* [Bean Validation Home](http://beanvalidation.org/)
 * [Downloads](http://hibernate.org/validator/downloads/)
 * [Mailing Lists](http://hibernate.org/community/)
 * [Issue Tracking](https://hibernate.atlassian.net/browse/HV)

@@ -95,7 +95,7 @@ public class BeanMetaDataManager {
 
 	/**
 	 * the three properties in this field affect the invocation of rules associated to section 4.5.5
-	 * of the V1.1 specification.  By default they are all false, if true they allow
+	 * of the specification.  By default they are all false, if true they allow
 	 * for relaxation of the Liskov Substitution Principal.
 	 */
 	private final MethodValidationConfiguration methodValidationConfiguration;
