@@ -71,7 +71,7 @@ the Apache Software License 2.0. Refer to license.txt for more information.
 You can build Hibernate Validator from source by cloning the git repository git://github.com/hibernate/hibernate-validator.git.
 You will also need a JDK 8 and Maven 3 (>= 3.0.3). With these prerequisites in place you can compile the source via
 
-    mvn clean install
+    mvn -s settings-example.xml clean install
 
 There are more build options available as well. For more information refer to [Contributing to Hibernate Validator](http://hibernate.org/validator/contribute/).
 
@@ -83,7 +83,7 @@ To build Hibernate Validator with JDK 9, export the following environment variab
 
 Then the build can be started like this:
 
-    mvn clean install -DdisableDocumentationBuild=true -DdisableDistributionBuild
+    mvn -s settings-example.xml clean install -DdisableDocumentationBuild=true -DdisableDistributionBuild
 
 The documentation and distribution modules are known to not work on Java 9 for the time being, hence they need to be excluded.
 Also the integration tests on WildFly will fail on Java 9 currently, hence this "integration" module is excluded automatically when building on JDK 9.
