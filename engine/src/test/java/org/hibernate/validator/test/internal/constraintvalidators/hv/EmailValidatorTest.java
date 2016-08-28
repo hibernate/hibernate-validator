@@ -154,10 +154,12 @@ public class EmailValidatorTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HV-1005")
+	@TestForIssue(jiraKey = {"HV-1005", "HV-1066"})
 	public void testEmailWith64CharacterLocalPartIsValid() {
 		// Local part should allow up to 64 octets: https://tools.ietf.org/html/rfc5321#section-4.5.3.1.1
-		isValidEmail( stringOfLength( 64 ) + "@foo.com" );
+		for (int num = 1; num < 64; num++) {
+			isValidEmail( stringOfLength( num ) + "@foo.com" );
+		}
 	}
 
 	@Test
@@ -167,10 +169,12 @@ public class EmailValidatorTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HV-1005")
+	@TestForIssue(jiraKey = {"HV-1005", "HV-1066"})
 	public void testEmailWith255CharacterDomainPartIsValid() {
 		// Domain part should allow up to 255
-		isValidEmail( "foo@" + stringOfLength( 251 ) + ".com" );
+		for (int num = 1; num < 251; num++) {
+			isValidEmail( "foo@" + stringOfLength( num ) + ".com" );
+		}
 	}
 
 	@Test

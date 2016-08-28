@@ -36,6 +36,7 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 	private static final String IP_DOMAIN = "\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\]";
 	private static final int MAX_LOCAL_PART_LENGTH = 64;
 	private static final int MAX_DOMAIN_PART_LENGTH = 255;
+	private static final int ASCII_MAX_LABEL_LENGTH = 63;
 
 	/**
 	 * Regular expression for the local part of an email address (everything before '@')
@@ -104,7 +105,8 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 	private String toAscii(String unicodeString) throws IllegalArgumentException {
 		String asciiString = "";
 		int start = 0;
-		int end = unicodeString.length() <= 63 ? unicodeString.length() : 63;
+		int index = getBreakingIndex( unicodeString, ASCII_MAX_LABEL_LENGTH );
+		int end = unicodeString.length() <=  index ? unicodeString.length() : index;
 		while ( true ) {
 			// IDN.toASCII only supports a max "label" length of 63 characters. Need to chunk the input in these sizes
 			asciiString += IDN.toASCII( unicodeString.substring( start, end ) );
@@ -112,9 +114,17 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 				break;
 			}
 			start = end;
-			end = start + 63 > unicodeString.length() ? unicodeString.length() : start + 63;
+			index = getBreakingIndex( unicodeString, start + ASCII_MAX_LABEL_LENGTH );
+			end = index > unicodeString.length() ? unicodeString.length() : index;
 		}
 
 		return asciiString;
+	}
+
+	private int getBreakingIndex(String unicodeString, int index) {
+		if (unicodeString.length() <= index) {
+			return index;
+		}
+		return unicodeString.charAt( index ) == '.' ? Math.max( 0, index - 1 ) : index;
 	}
 }
