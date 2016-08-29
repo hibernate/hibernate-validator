@@ -6,14 +6,18 @@
  */
 package org.hibernate.validator.constraints;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Documented;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import org.hibernate.validator.constraints.ScriptAssert.List;
 
 /**
  * <p>
@@ -65,10 +69,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *
  * @author Gunnar Morling
  */
+@Documented
+@Constraint(validatedBy = { })
 @Target({ TYPE })
 @Retention(RUNTIME)
-@Constraint(validatedBy = { })
-@Documented
+@Repeatable(List.class)
 public @interface ScriptAssert {
 
 	String message() default "{org.hibernate.validator.constraints.ScriptAssert.message}";
