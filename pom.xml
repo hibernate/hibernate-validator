@@ -755,7 +755,7 @@
 
     <ciManagement>
         <system>Jenkins</system>
-        <url>https://hibernate-validator.ci.cloudbees.com/</url>
+        <url>http://ci.hibernate.org/view/Validator/</url>
     </ciManagement>
 
     <issueManagement>
