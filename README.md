@@ -91,7 +91,7 @@ Also the integration tests on WildFly will fail on Java 9 currently, hence this 
 
 ## Continuous Integration
 
-The [official Continuous Integration service for the project](https://hibernate-validator.ci.cloudbees.com/) is hosted at CloudBees.
+The official Continuous Integration service for the project is hosted on [ci.hibernate.org](http://ci.hibernate.org/view/Validator/).
 
 We provide a `.travis.yml` file so that you can enable CI for your GitHub fork by enabling the build in [your Travis CI account](https://travis-ci.org/).
 
@@ -102,4 +102,4 @@ We provide a `.travis.yml` file so that you can enable CI for your GitHub fork b
 * [Downloads](http://hibernate.org/validator/downloads/)
 * [Mailing Lists](http://hibernate.org/community/)
 * [Issue Tracking](https://hibernate.atlassian.net/browse/HV)
-* [Continuous Integration](https://hibernate-validator.ci.cloudbees.com/) [![Build Status](https://hibernate-validator.ci.cloudbees.com/buildStatus/icon?job=HV-5-MASTER)](https://hibernate-validator.ci.cloudbees.com/view/Hibernate%20Validator%205/job/HV-5-MASTER/)
+* [Continuous Integration](http://ci.hibernate.org/view/Validator/) [![Build Status](http://ci.hibernate.org/buildStatus/icon?job=hibernate-validator-master)](http://ci.hibernate.org/view/Validator/job/hibernate-validator-master/)
