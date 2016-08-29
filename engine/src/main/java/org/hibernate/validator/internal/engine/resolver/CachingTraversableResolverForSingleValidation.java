@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.engine.resolver;
 import java.lang.annotation.ElementType;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 
@@ -20,8 +21,8 @@ import javax.validation.TraversableResolver;
  * @author Emmanuel Bernard
  */
 public class CachingTraversableResolverForSingleValidation implements TraversableResolver {
-	private TraversableResolver delegate;
-	private Map<TraversableHolder, TraversableHolder> traversables = new HashMap<TraversableHolder, TraversableHolder>();
+	private final TraversableResolver delegate;
+	private final Map<TraversableHolder, TraversableHolder> traversables = new HashMap<TraversableHolder, TraversableHolder>();
 
 	public CachingTraversableResolverForSingleValidation(TraversableResolver delegate) {
 		this.delegate = delegate;
@@ -142,7 +143,9 @@ public class CachingTraversableResolverForSingleValidation implements Traversabl
 		}
 
 		public int buildHashCode() {
-			int result = traversableObject != null ? traversableObject.hashCode() : 0;
+			// HV-1013 Using identity hash code in order to avoid calling hashCode() of objects which may
+			// be handling null properties not correctly
+			int result = traversableObject != null ? System.identityHashCode( traversableObject ) : 0;
 			result = 31 * result + traversableProperty.hashCode();
 			result = 31 * result + rootBeanType.hashCode();
 			result = 31 * result + pathToTraversableObject.hashCode();
