@@ -102,4 +102,5 @@ We provide a `.travis.yml` file so that you can enable CI for your GitHub fork b
 * [Downloads](http://hibernate.org/validator/downloads/)
 * [Mailing Lists](http://hibernate.org/community/)
 * [Issue Tracking](https://hibernate.atlassian.net/browse/HV)
-* [Continuous Integration](http://ci.hibernate.org/view/Validator/) [![Build Status](http://ci.hibernate.org/buildStatus/icon?job=hibernate-validator-master)](http://ci.hibernate.org/view/Validator/job/hibernate-validator-master/)
+* [Continuous Integration](http://ci.hibernate.org/view/Validator/) | [![Build Status](http://ci.hibernate.org/view/Validator/job/hibernate-validator-master/badge/icon)](http://ci.hibernate.org/view/Validator/job/hibernate-validator-master/)
+
