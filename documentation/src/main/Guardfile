@@ -11,6 +11,13 @@ guard 'shell' do
     File.open("../../target/asciidoc-preview/#{html_file_name}", 'w') { |file| file.write("#{html.render}") }
     # not sure why the file also gets created in the source directory!?
     if File.exist?("asciidoc/#{html_file_name}")
+    
+    
+    
+    
+    
+swetha sridhar 
+
     	File.delete("asciidoc/#{html_file_name}")
     end
   }
