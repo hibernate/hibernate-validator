@@ -16,11 +16,6 @@ public class ELState implements ParserState {
 	private static final Log log = LoggerFactory.make();
 
 	@Override
-	public void start(TokenCollector tokenCollector) {
-		throw new IllegalStateException( "Parsing of message descriptor cannot start in this state" );
-	}
-
-	@Override
 	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
 		tokenCollector.appendToToken( TokenCollector.EL_DESIGNATOR );
 		tokenCollector.terminateToken();
@@ -33,7 +28,6 @@ public class ELState implements ParserState {
 		tokenCollector.appendToToken( character );
 		tokenCollector.terminateToken();
 		tokenCollector.transitionState( new BeginState() );
-		tokenCollector.next();
 	}
 
 	@Override
@@ -44,7 +38,6 @@ public class ELState implements ParserState {
 		tokenCollector.appendToToken( character );
 		tokenCollector.makeELToken();
 		tokenCollector.transitionState( new InterpolationTermState() );
-		tokenCollector.next();
 	}
 
 	@Override
@@ -59,7 +52,6 @@ public class ELState implements ParserState {
 	public void handleEscapeCharacter(char character, TokenCollector tokenCollector)
 			throws MessageDescriptorFormatException {
 		tokenCollector.transitionState( new EscapedState( this ) );
-		tokenCollector.next();
 	}
 
 	@Override
@@ -68,5 +60,3 @@ public class ELState implements ParserState {
 		handleNonMetaCharacter( character, tokenCollector );
 	}
 }
-
-

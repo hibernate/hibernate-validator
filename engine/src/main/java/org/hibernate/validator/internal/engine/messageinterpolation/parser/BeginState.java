@@ -18,11 +18,7 @@ public class BeginState implements ParserState {
 
 	@Override
 	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
-	}
-
-	@Override
-	public void start(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
-		tokenCollector.next();
+		tokenCollector.terminateToken();
 	}
 
 	@Override
@@ -30,7 +26,6 @@ public class BeginState implements ParserState {
 			throws MessageDescriptorFormatException {
 		tokenCollector.appendToToken( character );
 		tokenCollector.transitionState( new MessageState() );
-		tokenCollector.next();
 	}
 
 	@Override
@@ -43,7 +38,6 @@ public class BeginState implements ParserState {
 			tokenCollector.makeParameterToken();
 		}
 		tokenCollector.transitionState( new InterpolationTermState() );
-		tokenCollector.next();
 	}
 
 	@Override
@@ -56,7 +50,6 @@ public class BeginState implements ParserState {
 			throws MessageDescriptorFormatException {
 		tokenCollector.appendToToken( character );
 		tokenCollector.transitionState( new EscapedState( this ) );
-		tokenCollector.next();
 	}
 
 	@Override
@@ -68,9 +61,6 @@ public class BeginState implements ParserState {
 		else {
 			ParserState state = new ELState();
 			tokenCollector.transitionState( state );
-			tokenCollector.next();
 		}
 	}
 }
-
-
