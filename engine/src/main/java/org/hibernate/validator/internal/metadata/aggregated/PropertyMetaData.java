@@ -6,10 +6,16 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.ElementType;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -32,8 +38,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
+import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
+import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * Represents the constraint related meta data for a JavaBeans property.
@@ -86,7 +93,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		);
 
 		if ( cascadingMember != null ) {
-			this.cascadingMember = cascadingMember;
+			this.cascadingMember = getAccessible( cascadingMember );
 			this.elementType = cascadingMember instanceof Field ? ElementType.FIELD : ElementType.METHOD;
 		}
 		else {
@@ -99,8 +106,28 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}
 
-	public Member getCascadingMember() {
-		return cascadingMember;
+	/**
+	 * Returns an accessible version of the given member. Will be the given member itself in case it is accessible,
+	 * otherwise a copy which is set accessible.
+	 */
+	private static Member getAccessible(Member original) {
+		if ( ( (AccessibleObject) original ).isAccessible() ) {
+			return original;
+		}
+
+		Class<?> clazz = original.getDeclaringClass();
+		Member member;
+
+		if ( original instanceof Field ) {
+			member = run( GetDeclaredField.action( clazz, original.getName() ) );
+		}
+		else {
+			member = run( GetDeclaredMethod.action( clazz, original.getName() ) );
+		}
+
+		run( SetAccessibility.action( member ) );
+
+		return member;
 	}
 
 	@Override
@@ -137,8 +164,27 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 	}
 
 	@Override
-	public String toString() {
+	public Object getValue(Object parent) {
+		if ( elementType == ElementType.METHOD ) {
+			return ReflectionHelper.getValue( (Method) cascadingMember, parent );
+		}
+		else {
+			return ReflectionHelper.getValue( (Field) cascadingMember, parent );
+		}
+	}
 
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	@Override
+	public String toString() {
 		return "PropertyMetaData [type=" + getType() + ", propertyName="
 				+ getName() + ", cascadingMember=[" + cascadingMember + "]]";
 	}

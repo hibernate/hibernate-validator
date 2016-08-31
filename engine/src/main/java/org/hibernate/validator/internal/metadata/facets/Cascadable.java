@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.facets;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.util.Set;
+
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 
@@ -89,4 +90,9 @@ public interface Cascadable {
 	 * @return This cascadable type.
 	 */
 	Type getType();
+
+	/**
+	 * Returns the value of this cacadable from the given parent.
+	 */
+	Object getValue(Object parent);
 }
