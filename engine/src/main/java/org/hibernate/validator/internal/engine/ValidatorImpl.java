@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -23,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
@@ -69,10 +74,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.
@@ -178,7 +179,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		validationOrderGenerator = new ValidationOrderGenerator();
 
-		this.accessibleMembers = new ConcurrentReferenceHashMap<Member, Member>(
+		this.accessibleMembers = new ConcurrentReferenceHashMap<>(
 				100,
 				ReferenceType.SOFT,
 				ReferenceType.SOFT
@@ -1654,17 +1655,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private Object getValue(Object object, ValidationContext validationContext, Cascadable cascadable) {
-		Object value;
-		if ( cascadable instanceof PropertyMetaData ) {
-			Member member = getAccessible( ( (PropertyMetaData) cascadable ).getCascadingMember() );
-			value = getValue( member, object );
-		}
-		else if ( cascadable instanceof ParameterMetaData ) {
-			value = ( (Object[]) object )[( (ParameterMetaData) cascadable ).getIndex()];
-		}
-		else {
-			value = object;
-		}
+		Object value = cascadable.getValue( object );
 
 		// Value can be wrapped (e.g. Optional<Address>). Try to unwrap it
 		UnwrapMode unwrapMode = cascadable.unwrapMode();

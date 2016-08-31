@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -25,8 +27,6 @@ import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * An aggregated view of the constraint related meta data for a single method
@@ -106,6 +106,11 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				defaultGroupSequence,
 				getGroupConversionDescriptors()
 		);
+	}
+
+	@Override
+	public Object getValue(Object parent) {
+		return ( (Object[]) parent )[getIndex()];
 	}
 
 	public static class Builder extends MetaDataBuilder {

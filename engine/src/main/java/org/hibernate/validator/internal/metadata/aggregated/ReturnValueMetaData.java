@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
@@ -99,5 +100,10 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				defaultGroupSequence,
 				groupConversionHelper.asDescriptors()
 		);
+	}
+
+	@Override
+	public Object getValue(Object parent) {
+		return parent;
 	}
 }
