@@ -16,11 +16,6 @@ public class InterpolationTermState implements ParserState {
 	private static final Log log = LoggerFactory.make();
 
 	@Override
-	public void start(TokenCollector tokenCollector) {
-		throw new IllegalStateException( "Parsing of message descriptor cannot start in this state" );
-	}
-
-	@Override
 	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
 		throw log.getNonTerminatedParameterException(
 				tokenCollector.getOriginalMessageDescriptor(),
@@ -32,7 +27,6 @@ public class InterpolationTermState implements ParserState {
 	public void handleNonMetaCharacter(char character, TokenCollector tokenCollector)
 			throws MessageDescriptorFormatException {
 		tokenCollector.appendToToken( character );
-		tokenCollector.next();
 	}
 
 	@Override
@@ -46,7 +40,6 @@ public class InterpolationTermState implements ParserState {
 		tokenCollector.terminateToken();
 		BeginState beginState = new BeginState();
 		tokenCollector.transitionState( beginState );
-		tokenCollector.next();
 	}
 
 	@Override
@@ -55,16 +48,11 @@ public class InterpolationTermState implements ParserState {
 		tokenCollector.appendToToken( character );
 		ParserState state = new EscapedState( this );
 		tokenCollector.transitionState( state );
-		tokenCollector.next();
-
 	}
 
 	@Override
 	public void handleELDesignator(char character, TokenCollector tokenCollector)
 			throws MessageDescriptorFormatException {
 		tokenCollector.appendToToken( character );
-		tokenCollector.next();
 	}
 }
-
-

@@ -13,7 +13,6 @@ package org.hibernate.validator.internal.engine.messageinterpolation.parser;
  * @author Hardy Ferentschik
  */
 public interface ParserState {
-	void start(TokenCollector tokenCollector) throws MessageDescriptorFormatException;
 
 	void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException;
 
@@ -27,4 +26,3 @@ public interface ParserState {
 
 	void handleELDesignator(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException;
 }
-

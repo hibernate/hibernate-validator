@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
 import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTermType;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
  * Used to creates a list of tokens from a message descriptor.
@@ -28,7 +28,7 @@ public class TokenCollector {
 	private final String originalMessageDescriptor;
 	private final InterpolationTermType interpolationTermType;
 
-	private List<Token> tokenList;
+	private final List<Token> tokenList;
 	private ParserState currentParserState;
 	private int currentPosition;
 	private Token currentToken;
@@ -69,10 +69,11 @@ public class TokenCollector {
 		currentToken.makeELToken();
 	}
 
-	public void next() throws MessageDescriptorFormatException {
+	private void next() throws MessageDescriptorFormatException {
 		if ( currentPosition == originalMessageDescriptor.length() ) {
 			// give the current context the chance to complete
 			currentParserState.terminate( this );
+			currentPosition++;
 			return;
 		}
 		char currentCharacter = originalMessageDescriptor.charAt( currentPosition );
@@ -98,12 +99,12 @@ public class TokenCollector {
 				currentParserState.handleNonMetaCharacter( currentCharacter, this );
 			}
 		}
-		// make sure the last token is terminated
-		terminateToken();
 	}
 
 	public final void parse() throws MessageDescriptorFormatException {
-		currentParserState.start( this );
+		while ( currentPosition <= originalMessageDescriptor.length() ) {
+			next();
+		}
 	}
 
 	public void transitionState(ParserState newState) {
@@ -122,4 +123,3 @@ public class TokenCollector {
 		return originalMessageDescriptor;
 	}
 }
-
