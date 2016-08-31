@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -36,6 +39,7 @@ import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -44,9 +48,6 @@ import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is the Hibernate Validator default
@@ -263,23 +264,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			serviceLoaderBasedContributor.createConstraintMappings( builder );
 		}
 
-		// XML-defined constraint mapping contributor
-		String constraintMappingContributorClassName = configurationState.getProperties()
-				.get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTOR );
+		// XML-defined constraint mapping contributors
+		List<ConstraintMappingContributor> contributors = getPropertyConfiguredConstraintMappingContributors( configurationState.getProperties(),
+				externalClassLoader );
 
-		if ( constraintMappingContributorClassName != null ) {
-			@SuppressWarnings("unchecked")
-			Class<? extends ConstraintMappingContributor> contributorType = (Class<? extends ConstraintMappingContributor>) run(
-					LoadClass
-							.action( constraintMappingContributorClassName, externalClassLoader )
-			);
-
-			ConstraintMappingContributor contributor = run(
-					NewInstance.action(
-							contributorType,
-							"constraint mapping contributor class"
-					)
-			);
+		for ( ConstraintMappingContributor contributor : contributors ) {
 			DefaultConstraintMappingBuilder builder = new DefaultConstraintMappingBuilder( constraintMappings );
 			contributor.createConstraintMappings( builder );
 		}
@@ -482,6 +471,50 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 
 		return handlers;
+	}
+
+	/**
+	 * Returns a list with {@link ConstraintMappingContributor}s configured via the
+	 * {@link HibernateValidatorConfiguration#CONSTRAINT_MAPPING_CONTRIBUTORS} property.
+	 *
+	 * Also takes into account the deprecated {@link HibernateValidatorConfiguration#CONSTRAINT_MAPPING_CONTRIBUTOR}
+	 * property.
+	 *
+	 * @param properties the properties used to bootstrap the factory
+	 *
+	 * @return a list with property-configured {@link ContraintMappingContributor}s; May be empty but never {@code null}
+	 */
+	private static List<ConstraintMappingContributor> getPropertyConfiguredConstraintMappingContributors(
+			Map<String, String> properties, ClassLoader externalClassLoader) {
+		String deprecatedPropertyValue = properties.get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTOR );
+		String propertyValue = properties.get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTORS );
+
+		if ( StringHelper.isNullOrEmptyString( deprecatedPropertyValue ) && StringHelper.isNullOrEmptyString( propertyValue ) ) {
+			return Collections.emptyList();
+		}
+
+		StringBuilder assembledPropertyValue = new StringBuilder();
+		if ( !StringHelper.isNullOrEmptyString( deprecatedPropertyValue ) ) {
+			assembledPropertyValue.append( deprecatedPropertyValue );
+		}
+		if ( !StringHelper.isNullOrEmptyString( propertyValue ) ) {
+			if ( assembledPropertyValue.length() > 0 ) {
+				assembledPropertyValue.append( "," );
+			}
+			assembledPropertyValue.append( propertyValue );
+		}
+
+		String[] contributorNames = assembledPropertyValue.toString().split( "," );
+		List<ConstraintMappingContributor> contributors = newArrayList( contributorNames.length );
+
+		for ( String contributorName : contributorNames ) {
+			@SuppressWarnings("unchecked")
+			Class<? extends ConstraintMappingContributor> contributorType = (Class<? extends ConstraintMappingContributor>) run(
+					LoadClass.action( contributorName, externalClassLoader ) );
+			contributors.add( run( NewInstance.action( contributorType, "constraint mapping contributor class" ) ) );
+		}
+
+		return contributors;
 	}
 
 	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,

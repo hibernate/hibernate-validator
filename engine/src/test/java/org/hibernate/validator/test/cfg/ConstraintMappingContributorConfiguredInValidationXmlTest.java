@@ -58,7 +58,7 @@ public class ConstraintMappingContributorConfiguredInValidationXmlTest {
 			runWithCustomValidationXml( validationXmlName, runnable );
 	}
 
-	public static class MyConstraintMappingContributor implements ConstraintMappingContributor {
+	public static class MyConstraintMappingContributor1 implements ConstraintMappingContributor {
 
 		@Override
 		public void createConstraintMappings(ConstraintMappingBuilder builder) {
@@ -68,7 +68,13 @@ public class ConstraintMappingContributorConfiguredInValidationXmlTest {
 						.constraint( new NotNullDef() )
 					.property( "numberOfHelpers", FIELD )
 						.constraint( new MinDef().value( 1 ) );
+		}
+	}
 
+	public static class MyConstraintMappingContributor2 implements ConstraintMappingContributor {
+
+		@Override
+		public void createConstraintMappings(ConstraintMappingBuilder builder) {
 			builder.addConstraintMapping()
 				.type( Runner.class )
 					.property( "paidEntryFee", FIELD )
