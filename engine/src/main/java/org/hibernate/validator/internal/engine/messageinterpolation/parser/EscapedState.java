@@ -17,11 +17,6 @@ public class EscapedState implements ParserState {
 	}
 
 	@Override
-	public void start(TokenCollector tokenCollector) {
-		throw new IllegalStateException( "Parsing of message descriptor cannot start in this state" );
-	}
-
-	@Override
 	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
 		tokenCollector.terminateToken();
 	}
@@ -58,9 +53,5 @@ public class EscapedState implements ParserState {
 			throws MessageDescriptorFormatException {
 		tokenCollector.appendToToken( character );
 		tokenCollector.transitionState( previousState );
-		tokenCollector.next();
 	}
 }
-
-
-
