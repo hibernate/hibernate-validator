@@ -292,7 +292,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraint
 If you are not bootstrapping a validator factory manually
 but work with the default factory as configured via _META-INF/validation.xml_
 (see <<chapter-xml-configuration>>),
-you can add one or more constraint mappings by creating a constraint mapping contributor.
+you can add one or more constraint mappings by creating one or several constraint mapping contributors.
 To do so, implement the `ConstraintMappingContributor` contract:
 
 [[example-constraint-mapping-contributor]]
@@ -305,7 +305,8 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraint
 ====
 
 You then need to specify the fully-qualified class name of the contributor implementation in _META-INF/validation.xml_,
-using the property key `hibernate.validator.constraint_mapping_contributor`.
+using the property key `hibernate.validator.constraint_mapping_contributors`. You can specify several
+contributors by separating them with a comma.
 
 [[section-advanced-constraint-composition]]
 === Advanced constraint composition features
