@@ -1660,7 +1660,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		// Value can be wrapped (e.g. Optional<Address>). Try to unwrap it
 		UnwrapMode unwrapMode = cascadable.unwrapMode();
 		if ( UnwrapMode.UNWRAP.equals( unwrapMode ) || UnwrapMode.AUTOMATIC.equals( unwrapMode ) ) {
-			ValidatedValueUnwrapper valueHandler = validationContext.getValidatedValueUnwrapper( cascadable.getType() );
+			ValidatedValueUnwrapper valueHandler = validationContext.getValidatedValueUnwrapper( cascadable.getCascadableType() );
 			if ( valueHandler != null ) {
 				value = valueHandler.handleValidatedValue( value );
 			}

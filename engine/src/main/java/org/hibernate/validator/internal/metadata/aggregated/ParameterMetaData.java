@@ -113,6 +113,11 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		return ( (Object[]) parent )[getIndex()];
 	}
 
+	@Override
+	public Type getCascadableType() {
+		return getType();
+	}
+
 	public static class Builder extends MetaDataBuilder {
 		private final Type parameterType;
 		private final int parameterIndex;
