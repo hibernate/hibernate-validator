@@ -152,6 +152,8 @@ When applying constraints on an `Iterable` type argument, Hibernate Validator wi
 element. <<example-type-arguments-constraints-collections>> shows an example of a
 `List` with a type argument constraint.
 
+In this example, `@ValidPart` is a custom constraint allowed to be used in the `TYPE_USE` context.
+
 [[example-type-arguments-constraints-collections]]
 .Type argument constraint on `List`
 ====
