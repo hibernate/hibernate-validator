@@ -179,7 +179,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		validationOrderGenerator = new ValidationOrderGenerator();
 
-		this.accessibleMembers = new ConcurrentReferenceHashMap<>(
+		this.accessibleMembers = new ConcurrentReferenceHashMap<Member, Member>(
 				100,
 				ReferenceType.SOFT,
 				ReferenceType.SOFT
