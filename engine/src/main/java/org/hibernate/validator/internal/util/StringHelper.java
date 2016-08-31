@@ -85,9 +85,20 @@ public class StringHelper {
 		}
 	}
 
+	/**
+	 * Indicates if the string is null or is empty ie only contains whitespaces.
+	 *
+	 * @param value the string considered
+	 * @return true if the string is null or only contains whitespaces
+	 */
+	public static boolean isNullOrEmptyString(String value) {
+		return value == null || value.trim().isEmpty();
+	}
+
 	private static boolean startsWithSeveralUpperCaseLetters(String string) {
 		return string.length() > 1 &&
 				Character.isUpperCase( string.charAt( 0 ) ) &&
 				Character.isUpperCase( string.charAt( 1 ) );
 	}
+
 }
