@@ -106,4 +106,9 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	public Object getValue(Object parent) {
 		return parent;
 	}
+
+	@Override
+	public Type getCascadableType() {
+		return getType();
+	}
 }

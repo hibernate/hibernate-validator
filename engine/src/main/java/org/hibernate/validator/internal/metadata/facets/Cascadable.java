@@ -89,7 +89,7 @@ public interface Cascadable {
 	 *
 	 * @return This cascadable type.
 	 */
-	Type getType();
+	Type getCascadableType();
 
 	/**
 	 * Returns the value of this cacadable from the given parent.
