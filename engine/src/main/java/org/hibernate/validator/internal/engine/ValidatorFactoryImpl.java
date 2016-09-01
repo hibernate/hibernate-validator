@@ -477,34 +477,19 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * Returns a list with {@link ConstraintMappingContributor}s configured via the
 	 * {@link HibernateValidatorConfiguration#CONSTRAINT_MAPPING_CONTRIBUTORS} property.
 	 *
-	 * Also takes into account the deprecated {@link HibernateValidatorConfiguration#CONSTRAINT_MAPPING_CONTRIBUTOR}
-	 * property.
-	 *
 	 * @param properties the properties used to bootstrap the factory
 	 *
 	 * @return a list with property-configured {@link ContraintMappingContributor}s; May be empty but never {@code null}
 	 */
 	private static List<ConstraintMappingContributor> getPropertyConfiguredConstraintMappingContributors(
 			Map<String, String> properties, ClassLoader externalClassLoader) {
-		String deprecatedPropertyValue = properties.get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTOR );
 		String propertyValue = properties.get( HibernateValidatorConfiguration.CONSTRAINT_MAPPING_CONTRIBUTORS );
 
-		if ( StringHelper.isNullOrEmptyString( deprecatedPropertyValue ) && StringHelper.isNullOrEmptyString( propertyValue ) ) {
+		if ( StringHelper.isNullOrEmptyString( propertyValue ) ) {
 			return Collections.emptyList();
 		}
 
-		StringBuilder assembledPropertyValue = new StringBuilder();
-		if ( !StringHelper.isNullOrEmptyString( deprecatedPropertyValue ) ) {
-			assembledPropertyValue.append( deprecatedPropertyValue );
-		}
-		if ( !StringHelper.isNullOrEmptyString( propertyValue ) ) {
-			if ( assembledPropertyValue.length() > 0 ) {
-				assembledPropertyValue.append( "," );
-			}
-			assembledPropertyValue.append( propertyValue );
-		}
-
-		String[] contributorNames = assembledPropertyValue.toString().split( "," );
+		String[] contributorNames = propertyValue.toString().split( "," );
 		List<ConstraintMappingContributor> contributors = newArrayList( contributorNames.length );
 
 		for ( String contributorName : contributorNames ) {
