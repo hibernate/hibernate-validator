@@ -1085,7 +1085,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( executableMetaData == null ) {
 			// there is no executable metadata - specified object and method do not match
 			throw log.getMethodOrConstructorNotDefinedByValidatedTypeException(
-					beanMetaData.getBeanClass().getName(),
+					beanMetaData.getBeanClass(),
 					validationContext.getExecutable().getMember()
 			);
 		}
@@ -1240,8 +1240,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						valueType
 				) ) {
 					throw log.getParameterTypesDoNotMatchException(
-							valueType.getName(),
-							parameterMetaData.getType().toString(),
+							valueType,
+							parameterMetaData.getType(),
 							i,
 							validationContext.getExecutable().getMember()
 					);
@@ -1500,7 +1500,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		// use precomputed method list as ReflectionHelper#containsMember is slow
 		if ( property == null ) {
-			throw log.getInvalidPropertyPathException( elem.getName(), metaData.getBeanClass().getName() );
+			throw log.getInvalidPropertyPathException( elem.getName(), metaData.getBeanClass() );
 		}
 		else if ( !propertyIter.hasNext() ) {
 			metaConstraintsList.addAll( property.getConstraints() );

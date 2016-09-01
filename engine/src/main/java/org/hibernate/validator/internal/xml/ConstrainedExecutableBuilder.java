@@ -91,14 +91,14 @@ class ConstrainedExecutableBuilder {
 
 			if ( method == null ) {
 				throw log.getBeanDoesNotContainMethodException(
-						beanClass.getName(),
+						beanClass,
 						methodName,
 						parameterTypes
 				);
 			}
 
 			if ( alreadyProcessedMethods.contains( method ) ) {
-				throw log.getMethodIsDefinedTwiceInMappingXmlForBeanException( method.toString(), beanClass.getName() );
+				throw log.getMethodIsDefinedTwiceInMappingXmlForBeanException( method, beanClass );
 			}
 			else {
 				alreadyProcessedMethods.add( method );
@@ -149,14 +149,14 @@ class ConstrainedExecutableBuilder {
 
 			if ( constructor == null ) {
 				throw log.getBeanDoesNotContainConstructorException(
-						beanClass.getName(),
-						StringHelper.join( constructorParameterTypes, ", " )
+						beanClass,
+						constructorParameterTypes
 				);
 			}
 			if ( alreadyProcessedConstructors.contains( constructor ) ) {
 				throw log.getConstructorIsDefinedTwiceInMappingXmlForBeanException(
-						constructor.toString(),
-						beanClass.getName()
+						constructor,
+						beanClass
 				);
 			}
 			else {
@@ -311,7 +311,7 @@ class ConstrainedExecutableBuilder {
 				parameterTypes.add( parameterClass );
 			}
 			catch (ValidationException e) {
-				throw log.getInvalidParameterTypeException( type, beanClass.getName() );
+				throw log.getInvalidParameterTypeException( type, beanClass );
 			}
 		}
 

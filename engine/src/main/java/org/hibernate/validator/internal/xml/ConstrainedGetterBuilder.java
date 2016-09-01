@@ -101,7 +101,7 @@ class ConstrainedGetterBuilder {
 
 	private static Method findGetter(Class<?> beanClass, String getterName, List<String> alreadyProcessedGetterNames) {
 		if ( alreadyProcessedGetterNames.contains( getterName ) ) {
-			throw log.getIsDefinedTwiceInMappingXmlForBeanException( getterName, beanClass.getName() );
+			throw log.getIsDefinedTwiceInMappingXmlForBeanException( getterName, beanClass );
 		}
 		else {
 			alreadyProcessedGetterNames.add( getterName );
@@ -109,7 +109,7 @@ class ConstrainedGetterBuilder {
 
 		final Method method = run( GetMethodFromPropertyName.action( beanClass, getterName ) );
 		if ( method == null ) {
-			throw log.getBeanDoesNotContainThePropertyException( beanClass.getName(), getterName );
+			throw log.getBeanDoesNotContainThePropertyException( beanClass, getterName );
 		}
 
 		return method;

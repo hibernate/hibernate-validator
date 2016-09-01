@@ -499,7 +499,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			Set<Class<?>> definedConstraints) {
 		Class<A> constraintType = constraintDefinitionContribution.getConstraintType();
 		if ( definedConstraints.contains( constraintType ) ) {
-			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( constraintType.getName() );
+			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( constraintType );
 		}
 		definedConstraints.add( constraintType );
 		constraintHelper.putValidatorClasses(

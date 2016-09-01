@@ -159,7 +159,7 @@ class AnnotationProxy implements Annotation, InvocationHandler, Serializable {
 			else {
 				throw log.getNoValueProvidedForAnnotationParameterException(
 						m.getName(),
-						annotationType.getSimpleName()
+						annotationType
 				);
 			}
 		}

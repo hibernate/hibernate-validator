@@ -56,7 +56,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 		Contracts.assertNotNull( type, MESSAGES.beanTypeMustNotBeNull() );
 
 		if ( configuredTypes.contains( type ) ) {
-			throw log.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type.getName() );
+			throw log.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type );
 		}
 
 		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<C>( this, type );
@@ -100,7 +100,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 
 		if ( definedConstraints.contains( annotationClass ) ) {
 			// Fail fast for easy-to-detect definition conflicts; other conflicts are handled in ValidatorFactoryImpl
-			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( annotationClass.getName() );
+			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( annotationClass );
 		}
 
 		ConstraintDefinitionContextImpl<A> constraintContext = new ConstraintDefinitionContextImpl<A>( this, annotationClass );
