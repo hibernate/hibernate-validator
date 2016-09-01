@@ -29,7 +29,7 @@ public final class ConstructorInstance<T> implements PrivilegedAction<T> {
 	private final Object[] initArgs;
 
 	public static <T> ConstructorInstance<T> action(Constructor<T> constructor, Object... initArgs) {
-		return new ConstructorInstance<T>( constructor, initArgs );
+		return new ConstructorInstance<>( constructor, initArgs );
 	}
 
 	private ConstructorInstance(Constructor<T> constructor, Object... initArgs) {
@@ -42,17 +42,8 @@ public final class ConstructorInstance<T> implements PrivilegedAction<T> {
 		try {
 			return constructor.newInstance( initArgs );
 		}
-		catch (InstantiationException e) {
-			throw log.getUnableToInstantiateException( constructor.getName(), e );
-		}
-		catch (IllegalAccessException e) {
-			throw log.getUnableToInstantiateException( constructor.getName(), e );
-		}
-		catch (InvocationTargetException e) {
-			throw log.getUnableToInstantiateException( constructor.getName(), e );
-		}
-		catch (RuntimeException e) {
-			throw log.getUnableToInstantiateException( constructor.getName(), e );
+		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw log.getUnableToInstantiateException( constructor.getDeclaringClass(), e );
 		}
 	}
 }
