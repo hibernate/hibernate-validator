@@ -132,7 +132,7 @@ public class ValidationBootstrapParameters {
 				providerClass = (Class<? extends ValidationProvider<?>>) run(
 						LoadClass.action( providerFqcn, externalClassLoader )
 				);
-				log.usingValidationProvider( providerFqcn );
+				log.usingValidationProvider( providerClass );
 			}
 			catch (Exception e) {
 				throw log.getUnableToInstantiateValidationProviderClassException( providerFqcn, e );
@@ -144,11 +144,11 @@ public class ValidationBootstrapParameters {
 		if ( messageInterpolatorFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) run(
+				Class<? extends MessageInterpolator> messageInterpolatorClass = (Class<? extends MessageInterpolator>) run(
 						LoadClass.action( messageInterpolatorFqcn, externalClassLoader )
 				);
 				messageInterpolator = run( NewInstance.action( messageInterpolatorClass, "message interpolator" ) );
-				log.usingMessageInterpolator( messageInterpolatorFqcn );
+				log.usingMessageInterpolator( messageInterpolatorClass );
 			}
 			catch (ValidationException e) {
 				throw log.getUnableToInstantiateMessageInterpolatorClassException( messageInterpolatorFqcn, e );
@@ -160,11 +160,11 @@ public class ValidationBootstrapParameters {
 		if ( traversableResolverFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<TraversableResolver> clazz = (Class<TraversableResolver>) run(
+				Class<? extends TraversableResolver> clazz = (Class<? extends TraversableResolver>) run(
 						LoadClass.action( traversableResolverFqcn, externalClassLoader )
 				);
 				traversableResolver = run( NewInstance.action( clazz, "traversable resolver" ) );
-				log.usingTraversableResolver( traversableResolverFqcn );
+				log.usingTraversableResolver( clazz );
 			}
 			catch (ValidationException e) {
 				throw log.getUnableToInstantiateTraversableResolverClassException( traversableResolverFqcn, e );
@@ -176,11 +176,11 @@ public class ValidationBootstrapParameters {
 		if ( constraintFactoryFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<ConstraintValidatorFactory> clazz = (Class<ConstraintValidatorFactory>) run(
+				Class<? extends ConstraintValidatorFactory> clazz = (Class<? extends ConstraintValidatorFactory>) run(
 						LoadClass.action( constraintFactoryFqcn, externalClassLoader )
 				);
 				constraintValidatorFactory = run( NewInstance.action( clazz, "constraint factory class" ) );
-				log.usingConstraintFactory( constraintFactoryFqcn );
+				log.usingConstraintFactory( clazz );
 			}
 			catch (ValidationException e) {
 				throw log.getUnableToInstantiateConstraintFactoryClassException( constraintFactoryFqcn, e );
@@ -192,11 +192,11 @@ public class ValidationBootstrapParameters {
 		if ( parameterNameProviderFqcn != null ) {
 			try {
 				@SuppressWarnings("unchecked")
-				Class<ParameterNameProvider> clazz = (Class<ParameterNameProvider>) run(
+				Class<? extends ParameterNameProvider> clazz = (Class<? extends ParameterNameProvider>) run(
 						LoadClass.action( parameterNameProviderFqcn, externalClassLoader )
 				);
 				parameterNameProvider = run( NewInstance.action( clazz, "parameter name provider class" ) );
-				log.usingParameterNameProvider( parameterNameProviderFqcn );
+				log.usingParameterNameProvider( clazz );
 			}
 			catch (ValidationException e) {
 				throw log.getUnableToInstantiateParameterNameProviderClassException( parameterNameProviderFqcn, e );

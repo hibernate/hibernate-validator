@@ -79,7 +79,7 @@ public class ValidationOrderGenerator {
 
 		for ( Class<?> clazz : groups ) {
 			if ( !clazz.isInterface() ) {
-				throw log.getGroupHasToBeAnInterfaceException( clazz.getName() );
+				throw log.getGroupHasToBeAnInterfaceException( clazz );
 			}
 		}
 
