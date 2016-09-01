@@ -187,7 +187,6 @@ public class ConstraintTree<A extends Annotation> {
 		if ( validatedValueUnwrapper == null ) {
 			throw log.getNoUnwrapperFoundForTypeException(
 					valueContext.getDeclaredTypeOfValidatedElement()
-							.toString()
 			);
 		}
 
@@ -212,7 +211,6 @@ public class ConstraintTree<A extends Annotation> {
 		if ( descriptor.getConstraintType() == ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER ) {
 			throw log.getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArrayException(
 					descriptor.getAnnotationType()
-							.getName()
 			);
 		}
 		else {
@@ -226,7 +224,7 @@ public class ConstraintTree<A extends Annotation> {
 					className = clazz.getName();
 				}
 			}
-			throw log.getNoValidatorFoundForTypeException( descriptor.getAnnotationType().getName(), className, path );
+			throw log.getNoValidatorFoundForTypeException( descriptor.getAnnotationType(), className, path );
 		}
 	}
 
@@ -264,16 +262,16 @@ public class ConstraintTree<A extends Annotation> {
 		// validator for wrapper and wrapped value is ambiguous -> exception!
 		if ( validatorForWrappedValue != null && validatorForWrapper != null ) {
 			throw log.getConstraintValidatorExistsForWrapperAndWrappedValueException(
-					valueContext.getPropertyPath().toString(),
-					descriptor.getAnnotationType().getName(),
-					validatedValueUnwrapper.getClass().getName()
+					valueContext.getPropertyPath(),
+					descriptor.getAnnotationType(),
+					validatedValueUnwrapper.getClass()
 			);
 		}
 
 		// neither a validator for wrapper not wrapped value -> exception!
 		if ( validatorForWrappedValue == null && validatorForWrapper == null ) {
 			throw log.getNoValidatorFoundForTypeException(
-					descriptor.getAnnotationType().getName(),
+					descriptor.getAnnotationType(),
 					validatedValueType.toString(),
 					valueContext.getPropertyPath().toString()
 			);

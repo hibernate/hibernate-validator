@@ -111,7 +111,7 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 		if ( ReflectionHelper.isIterable( annotatedType.getType() ) || ReflectionHelper.isMap( annotatedType.getType() ) ) {
 			if ( !isCascaded ) {
 				throw log.getTypeAnnotationConstraintOnIterableRequiresUseOfValidAnnotationException(
-						member.getDeclaringClass().getName(),
+						member.getDeclaringClass(),
 						member.getName()
 				);
 			}
@@ -187,7 +187,7 @@ public class TypeAnnotationAwareMetaDataProvider extends AnnotationMetaDataProvi
 			}
 
 			// If it is not a Map, log a message and ignore
-			log.parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported( annotatedType.getType().getTypeName() );
+			log.parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported( annotatedType.getType() );
 		}
 
 		return Optional.empty();

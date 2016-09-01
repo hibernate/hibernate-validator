@@ -97,7 +97,7 @@ class ConstrainedFieldBuilder {
 
 	private static Field findField(Class<?> beanClass, String fieldName, List<String> alreadyProcessedFieldNames) {
 		if ( alreadyProcessedFieldNames.contains( fieldName ) ) {
-			throw log.getIsDefinedTwiceInMappingXmlForBeanException( fieldName, beanClass.getName() );
+			throw log.getIsDefinedTwiceInMappingXmlForBeanException( fieldName, beanClass );
 		}
 		else {
 			alreadyProcessedFieldNames.add( fieldName );
@@ -105,7 +105,7 @@ class ConstrainedFieldBuilder {
 
 		final Field field = run( GetDeclaredField.action( beanClass, fieldName ) );
 		if ( field == null ) {
-			throw log.getBeanDoesNotContainTheFieldException( beanClass.getName(), fieldName );
+			throw log.getBeanDoesNotContainTheFieldException( beanClass, fieldName );
 		}
 		return field;
 	}

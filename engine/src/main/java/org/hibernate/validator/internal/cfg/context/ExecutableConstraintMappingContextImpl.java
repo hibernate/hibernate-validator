@@ -71,7 +71,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 
 		if ( context != null ) {
 			throw log.getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(
-					typeContext.getBeanClass().getName(),
+					typeContext.getBeanClass(),
 					executable.getAsString(),
 					index
 			);
@@ -85,7 +85,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 	public CrossParameterConstraintMappingContext crossParameter() {
 		if ( crossParameterContext != null ) {
 			throw log.getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(
-					typeContext.getBeanClass().getName(),
+					typeContext.getBeanClass(),
 					executable.getAsString()
 			);
 		}
@@ -97,7 +97,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 	public ReturnValueConstraintMappingContext returnValue() {
 		if ( returnValueContext != null ) {
 			throw log.getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(
-					typeContext.getBeanClass().getName(),
+					typeContext.getBeanClass(),
 					executable.getAsString()
 			);
 		}
