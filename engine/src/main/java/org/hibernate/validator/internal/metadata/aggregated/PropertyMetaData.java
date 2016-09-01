@@ -286,7 +286,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				if ( !UnwrapMode.AUTOMATIC.equals( newUnwrapMode ) && !newUnwrapMode.equals( unwrapMode ) ) {
 					throw log.getInconsistentValueUnwrappingConfigurationBetweenFieldAndItsGetterException(
 							propertyName,
-							getBeanClass().getName()
+							getBeanClass()
 					);
 				}
 			}

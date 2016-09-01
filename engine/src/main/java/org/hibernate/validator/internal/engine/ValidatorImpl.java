@@ -1089,7 +1089,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( executableMetaData == null ) {
 			// there is no executable metadata - specified object and method do not match
 			throw log.getMethodOrConstructorNotDefinedByValidatedTypeException(
-					beanMetaData.getBeanClass().getName(),
+					beanMetaData.getBeanClass(),
 					validationContext.getExecutable().getMember()
 			);
 		}
@@ -1244,8 +1244,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						valueType
 				) ) {
 					throw log.getParameterTypesDoNotMatchException(
-							valueType.getName(),
-							parameterMetaData.getType().toString(),
+							valueType,
+							parameterMetaData.getType(),
 							i,
 							validationContext.getExecutable().getMember()
 					);
@@ -1502,7 +1502,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// if the property is not the leaf property, we set up the context for the next iteration
 			if ( propertyPathIter.hasNext() ) {
 				if ( !propertyMetaData.isCascading() ) {
-					throw log.getInvalidPropertyPathException( validationContext.getRootBeanClass().getName(), propertyPath.asString() );
+					throw log.getInvalidPropertyPathException( validationContext.getRootBeanClass(), propertyPath.asString() );
 				}
 
 				value = getBeanPropertyValue( validationContext, value, propertyMetaData );
@@ -1538,7 +1538,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		if ( propertyMetaData == null ) {
 			// should only happen if the property path is empty, which should never happen
-			throw log.getInvalidPropertyPathException( clazz.getName(), propertyPath.asString() );
+			throw log.getInvalidPropertyPathException( clazz, propertyPath.asString() );
 		}
 
 		metaConstraints.addAll( propertyMetaData.getConstraints() );
@@ -1592,7 +1592,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		if ( propertyMetaData == null ) {
 			// should only happen if the property path is empty, which should never happen
-			throw log.getInvalidPropertyPathException( clazz.getName(), propertyPath.asString() );
+			throw log.getInvalidPropertyPathException( clazz, propertyPath.asString() );
 		}
 
 		metaConstraints.addAll( propertyMetaData.getConstraints() );
@@ -1711,14 +1711,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private PropertyMetaData getBeanPropertyMetaData( Class<?> beanClass, Path.Node propertyNode ) {
 		if ( !ElementKind.PROPERTY.equals( propertyNode.getKind() ) ) {
-			throw log.getInvalidPropertyPathException( beanClass.getName(), propertyNode.getName() );
+			throw log.getInvalidPropertyPathException( beanClass, propertyNode.getName() );
 		}
 
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( beanClass );
 		PropertyMetaData propertyMetaData = beanMetaData.getMetaDataFor( propertyNode.getName() );
 
 		if ( propertyMetaData == null ) {
-			throw log.getInvalidPropertyPathException( beanClass.getName(), propertyNode.getName() );
+			throw log.getInvalidPropertyPathException( beanClass, propertyNode.getName() );
 		}
 		return propertyMetaData;
 	}

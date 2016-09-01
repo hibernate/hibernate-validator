@@ -50,7 +50,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		for ( DefaultConstraintMapping constraintMapping : mappings ) {
 			for ( Class<?> configuredType : constraintMapping.getConfiguredTypes() ) {
 				if ( allConfiguredTypes.contains( configuredType ) ) {
-					throw log.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( configuredType.getName() );
+					throw log.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( configuredType );
 				}
 			}
 

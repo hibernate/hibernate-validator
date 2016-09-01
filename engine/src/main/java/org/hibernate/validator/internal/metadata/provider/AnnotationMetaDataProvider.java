@@ -192,7 +192,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			}
 		}
 
-		throw log.getWrongDefaultGroupSequenceProviderTypeException( beanClass.getName() );
+		throw log.getWrongDefaultGroupSequenceProviderTypeException( beanClass );
 	}
 
 	private Set<MetaConstraint<?>> getClassLevelConstraints(Class<?> clazz) {

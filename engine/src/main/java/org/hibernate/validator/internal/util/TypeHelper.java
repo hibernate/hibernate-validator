@@ -304,7 +304,7 @@ public final class TypeHelper {
 			Type type = extractType( validator );
 
 			if ( validatorsTypes.containsKey( type ) ) {
-				throw log.getMultipleValidatorsForSameTypeException( annotationType.getName(), type.toString() );
+				throw log.getMultipleValidatorsForSameTypeException( annotationType, type );
 			}
 
 			validatorsTypes.put( type, validator );

@@ -276,7 +276,7 @@ public class NodeImpl
 			return nodeType.cast( this );
 		}
 
-		throw log.getUnableToNarrowNodeTypeException( this.getClass().getName(), kind, nodeType.getName() );
+		throw log.getUnableToNarrowNodeTypeException( this.getClass(), kind, nodeType );
 	}
 
 	@Override

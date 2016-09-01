@@ -476,20 +476,20 @@ public class ConstraintHelper {
 		if ( hasGenericValidators && hasCrossParameterValidator ) {
 			if ( method == null ) {
 				throw log.getGenericAndCrossParameterConstraintDoesNotDefineValidationAppliesToParameterException(
-						annotationType.getName()
+						annotationType
 				);
 			}
 			if ( method.getReturnType() != ConstraintTarget.class ) {
-				throw log.getValidationAppliesToParameterMustHaveReturnTypeConstraintTargetException( annotationType.getName() );
+				throw log.getValidationAppliesToParameterMustHaveReturnTypeConstraintTargetException( annotationType );
 			}
 			ConstraintTarget defaultValue = (ConstraintTarget) method.getDefaultValue();
 			if ( defaultValue != ConstraintTarget.IMPLICIT ) {
-				throw log.getValidationAppliesToParameterMustHaveDefaultValueImplicitException( annotationType.getName() );
+				throw log.getValidationAppliesToParameterMustHaveDefaultValueImplicitException( annotationType );
 			}
 		}
 		else if ( method != null ) {
 			throw log.getValidationAppliesToParameterMustNotBeDefinedForNonGenericAndCrossParameterConstraintException(
-					annotationType.getName()
+					annotationType
 			);
 		}
 	}

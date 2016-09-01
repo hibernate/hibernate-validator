@@ -178,7 +178,7 @@ public class ConstraintValidatorManager {
 				validatorClass
 		);
 		if ( constraintValidator == null ) {
-			throw log.getConstraintFactoryMustNotReturnNullException( validatorClass.getName() );
+			throw log.getConstraintFactoryMustNotReturnNullException( validatorClass );
 		}
 		initializeConstraint( descriptor, constraintValidator );
 		return constraintValidator;
@@ -232,13 +232,7 @@ public class ConstraintValidatorManager {
 		}
 
 		if ( discoveredSuitableTypes.size() > 1 ) {
-			StringBuilder builder = new StringBuilder();
-			for ( Type clazz : discoveredSuitableTypes ) {
-				builder.append( clazz );
-				builder.append( ", " );
-			}
-			builder.delete( builder.length() - 2, builder.length() );
-			throw log.getMoreThanOneValidatorFoundForTypeException( validatedValueType, builder.toString() );
+			throw log.getMoreThanOneValidatorFoundForTypeException( validatedValueType, discoveredSuitableTypes );
 		}
 
 		Type suitableType = discoveredSuitableTypes.get( 0 );
@@ -261,7 +255,7 @@ public class ConstraintValidatorManager {
 			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
 		catch (RuntimeException e) {
-			throw log.getUnableToInitializeConstraintValidatorException( constraintValidator.getClass().getName(), e );
+			throw log.getUnableToInitializeConstraintValidatorException( constraintValidator.getClass(), e );
 		}
 	}
 

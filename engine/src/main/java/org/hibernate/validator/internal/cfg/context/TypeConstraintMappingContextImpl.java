@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
@@ -33,7 +36,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
@@ -42,9 +44,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Constraint mapping creational context which allows to configure the class-level constraints for one bean.
@@ -125,7 +124,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		}
 
 		if ( configuredMembers.contains( member ) ) {
-			throw log.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass.getName(), property );
+			throw log.getPropertyHasAlreadyBeConfiguredViaProgrammaticApiException( beanClass, property );
 		}
 
 		PropertyConstraintMappingContextImpl context = new PropertyConstraintMappingContextImpl(
@@ -153,7 +152,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		if ( configuredMembers.contains( method ) ) {
 			throw log.getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(
-					beanClass.getName(),
+					beanClass,
 					ExecutableElement.getExecutableAsString( name, parameterTypes )
 			);
 		}
@@ -171,14 +170,14 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		if ( constructor == null || constructor.getDeclaringClass() != beanClass ) {
 			throw log.getBeanDoesNotContainConstructorException(
-					beanClass.getName(),
-					StringHelper.join( parameterTypes, ", " )
+					beanClass,
+					Arrays.asList( parameterTypes )
 			);
 		}
 
 		if ( configuredMembers.contains( constructor ) ) {
 			throw log.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(
-					beanClass.getName(),
+					beanClass,
 					ExecutableElement.getExecutableAsString( beanClass.getSimpleName(), parameterTypes )
 			);
 		}

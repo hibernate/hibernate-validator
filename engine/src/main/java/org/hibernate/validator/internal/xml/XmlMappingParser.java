@@ -267,7 +267,7 @@ public class XmlMappingParser {
 
 			Class<?> clazz = classLoadingHelper.loadClass( annotationClassName, defaultPackage );
 			if ( !clazz.isAnnotation() ) {
-				throw log.getIsNotAnAnnotationException( annotationClassName );
+				throw log.getIsNotAnAnnotationException( clazz );
 			}
 			Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) clazz;
 
@@ -299,7 +299,7 @@ public class XmlMappingParser {
 
 	private void checkClassHasNotBeenProcessed(Set<Class<?>> processedClasses, Class<?> beanClass) {
 		if ( processedClasses.contains( beanClass ) ) {
-			throw log.getBeanClassHasAlreadyBeConfiguredInXmlException( beanClass.getName() );
+			throw log.getBeanClassHasAlreadyBeConfiguredInXmlException( beanClass );
 		}
 	}
 

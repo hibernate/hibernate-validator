@@ -179,7 +179,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		);
 
 		if ( crossParameterValidatorClasses.size() > 1 ) {
-			throw log.getMultipleCrossParameterValidatorClassesException( annotationType.getName() );
+			throw log.getMultipleCrossParameterValidatorClassesException( annotationType );
 		}
 
 		this.constraintType = determineConstraintType(
@@ -383,7 +383,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		if ( constraintTarget == ConstraintTarget.RETURN_VALUE ) {
 			if ( !isExecutable ) {
 				throw log.getParametersOrReturnValueConstraintTargetGivenAtNonExecutableException(
-						annotationType.getName(),
+						annotationType,
 						ConstraintTarget.RETURN_VALUE
 				);
 			}
@@ -393,7 +393,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		else if ( constraintTarget == ConstraintTarget.PARAMETERS ) {
 			if ( !isExecutable ) {
 				throw log.getParametersOrReturnValueConstraintTargetGivenAtNonExecutableException(
-						annotationType.getName(),
+						annotationType,
 						ConstraintTarget.PARAMETERS
 				);
 			}
@@ -438,7 +438,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		// Now we are out of luck
 		if ( constraintType == null ) {
-			throw log.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType.getName() );
+			throw log.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType );
 		}
 
 		if ( constraintType == ConstraintType.CROSS_PARAMETER ) {
@@ -450,18 +450,18 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private void validateCrossParameterConstraintType(Member member, boolean hasCrossParameterValidator) {
 		if ( !hasCrossParameterValidator ) {
-			throw log.getCrossParameterConstraintHasNoValidatorException( annotationType.getName() );
+			throw log.getCrossParameterConstraintHasNoValidatorException( annotationType );
 		}
 		else if ( member == null ) {
-			throw log.getCrossParameterConstraintOnClassException( annotationType.getName() );
+			throw log.getCrossParameterConstraintOnClassException( annotationType );
 		}
 		else if ( member instanceof Field ) {
-			throw log.getCrossParameterConstraintOnFieldException( annotationType.getName(), member.toString() );
+			throw log.getCrossParameterConstraintOnFieldException( annotationType, member );
 		}
 		else if ( !hasParameters( member ) ) {
 			throw log.getCrossParameterConstraintOnMethodWithoutParametersException(
-					annotationType.getName(),
-					member.toString()
+					annotationType,
+					member
 			);
 		}
 	}
@@ -474,8 +474,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		for ( ConstraintDescriptorImpl<?> composingConstraint : composingConstraints ) {
 			if ( composingConstraint.constraintType != constraintType ) {
 				throw log.getComposedAndComposingConstraintsHaveDifferentTypesException(
-						annotationType.getName(),
-						composingConstraint.annotationType.getName(),
+						annotationType,
+						composingConstraint.annotationType,
 						constraintType,
 						composingConstraint.constraintType
 				);
@@ -610,7 +610,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		Class<?> returnTypeOfOverriddenConstraint = method.getReturnType();
 		if ( !returnTypeOfOverriddenConstraint.equals( m.getReturnType() ) ) {
 			throw log.getWrongAttributeTypeForOverriddenConstraintException(
-					returnTypeOfOverriddenConstraint.getName(),
+					returnTypeOfOverriddenConstraint,
 					m.getReturnType()
 			);
 		}

@@ -470,7 +470,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 		if ( !groupSequenceContainsDefault ) {
-			throw log.getBeanClassMustBePartOfRedefinedDefaultGroupSequenceException( beanClass.getName() );
+			throw log.getBeanClassMustBePartOfRedefinedDefaultGroupSequenceException( beanClass );
 		}
 		if ( log.isTraceEnabled() ) {
 			log.tracef(

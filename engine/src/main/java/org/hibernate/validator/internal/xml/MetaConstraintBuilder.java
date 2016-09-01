@@ -120,7 +120,7 @@ class MetaConstraintBuilder {
 	private static <A extends Annotation> Class<?> getAnnotationParameterType(Class<A> annotationClass, String name) {
 		Method m = run( GetMethod.action( annotationClass, name ) );
 		if ( m == null ) {
-			throw log.getAnnotationDoesNotContainAParameterException( annotationClass.getName(), name );
+			throw log.getAnnotationDoesNotContainAParameterException( annotationClass, name );
 		}
 		return m.getReturnType();
 	}
@@ -294,7 +294,7 @@ class MetaConstraintBuilder {
 		for ( String groupClass : payloadType.getValue() ) {
 			Class<?> payload = classLoadingHelper.loadClass( groupClass, defaultPackage );
 			if ( !Payload.class.isAssignableFrom( payload ) ) {
-				throw log.getWrongPayloadClassException( payload.getName() );
+				throw log.getWrongPayloadClassException( payload );
 			}
 			else {
 				payloadList.add( (Class<? extends Payload>) payload );

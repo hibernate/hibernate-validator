@@ -38,7 +38,7 @@ public class XmlConfigurationExceptionTest {
 			Throwable cause = e.getCause();
 			assertEquals(
 					cause.getMessage(),
-					"HV000085: No value provided for parameter 'regexp' of annotation @Pattern.",
+					"HV000085: No value provided for parameter 'regexp' of annotation @javax.validation.constraints.Pattern.",
 					"Wrong error message"
 			);
 		}
