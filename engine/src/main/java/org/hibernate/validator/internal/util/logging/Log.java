@@ -244,8 +244,6 @@ public interface Log extends BasicLogger {
 	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(String executableName, int nbParameters, int listSize);
 
 	@Message(id = 63, value = "Unable to instantiate %s.")
-	ValidationException getUnableToInstantiateException(String className, @Cause Exception e);
-
 	ValidationException getUnableToInstantiateException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz, @Cause Exception e);
 
 	@Message(id = 64, value = "Unable to instantiate %1$s: %2$s.")
