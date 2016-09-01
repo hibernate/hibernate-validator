@@ -131,7 +131,7 @@
         <!-- OSGi dependencies -->
         <pax.exam.version>4.8.0</pax.exam.version>
         <pax.url.version>2.4.7</pax.url.version>
-        <apache.karaf.version>3.0.6</apache.karaf.version>
+        <apache.karaf.version>4.0.6</apache.karaf.version>
         <osgi-core.version>6.0.0</osgi-core.version>
 
         <puppycrawl.checkstyle.version>7.1</puppycrawl.checkstyle.version>
