@@ -144,6 +144,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <reuseForks>false</reuseForks>
+					<argLine>-Xmx1024m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/jenkins-buid/${env.BUILD_TAG}</argLine>
                 </configuration>
             </plugin>
         </plugins>
