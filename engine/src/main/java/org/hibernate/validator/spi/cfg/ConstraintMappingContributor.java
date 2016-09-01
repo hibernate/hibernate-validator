@@ -12,7 +12,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
  * Implementations contribute {@link ConstraintMapping}s to validator factory.
  * <p>
  * A constraint mapping contributor can be configured in {@code META-INF/validation.xml}, using the property
- * {@link org.hibernate.validator.HibernateValidatorConfiguration#CONSTRAINT_MAPPING_CONTRIBUTOR}, thus allowing to set
+ * {@link org.hibernate.validator.HibernateValidatorConfiguration#CONSTRAINT_MAPPING_CONTRIBUTORS}, thus allowing to set
  * up constraints to be validated by default validators dynamically via the API for programmatic constraint declaration.
  * <p>
  * Implementations must have a no-args constructor.
@@ -40,7 +40,7 @@ import org.hibernate.validator.cfg.ConstraintMapping;
  * }
  * </pre>
  * <p>
- * @see org.hibernate.validator.HibernateValidatorConfiguration#CONSTRAINT_MAPPING_CONTRIBUTOR
+ * @see org.hibernate.validator.HibernateValidatorConfiguration#CONSTRAINT_MAPPING_CONTRIBUTORS
  * @author Gunnar Morling
  */
 public interface ConstraintMappingContributor {
