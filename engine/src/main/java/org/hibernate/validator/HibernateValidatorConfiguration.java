@@ -62,11 +62,22 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * the default validator factory. Accepts a String with the fully-qualified class name of a
 	 * {@link org.hibernate.validator.spi.cfg.ConstraintMappingContributor} implementation.
 	 *
+	 * @deprecated use hibernate.validator.constraint_mapping_contributors instead
 	 * @since 5.2
 	 */
+	@Deprecated
 	String CONSTRAINT_MAPPING_CONTRIBUTOR = "hibernate.validator.constraint_mapping_contributor";
 
-	/*
+	/**
+	 * Property for configuring a constraint mapping contributor, allowing to set up one or more constraint mappings for
+	 * the default validator factory. Accepts a String with the comma separated fully-qualified class names of one or more
+	 * {@link org.hibernate.validator.spi.cfg.ConstraintMappingContributor} implementations.
+	 *
+	 * @since 5.3
+	 */
+	String CONSTRAINT_MAPPING_CONTRIBUTORS = "hibernate.validator.constraint_mapping_contributors";
+
+	/**
 	 * Property corresponding to the {@link #timeProvider(TimeProvider)} method. Accepts a String with the
 	 * fully-qualified class name of a {@link TimeProvider} implementation.
 	 *
