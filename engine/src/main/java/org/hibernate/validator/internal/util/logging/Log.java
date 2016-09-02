@@ -109,9 +109,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 13, value = "The class %1$s does not have a property '%2$s' with access %3$s.")
 	ValidationException getUnableToFindPropertyWithAccessException(Class<?> beanClass, String property, ElementType elementType);
 
-	@Message(id = 14, value = "Type %1$s doesn't have a method %2$s.")
-	IllegalArgumentException getUnableToFindMethodException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String method);
-
 	@Message(id = 16, value = "%s does not represent a valid BigDecimal format.")
 	IllegalArgumentException getInvalidBigDecimalFormatException(String value, @Cause NumberFormatException e);
 

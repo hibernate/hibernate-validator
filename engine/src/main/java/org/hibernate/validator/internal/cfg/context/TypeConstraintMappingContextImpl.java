@@ -144,10 +144,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		Method method = run( GetDeclaredMethod.action( beanClass, name, parameterTypes ) );
 
 		if ( method == null || method.getDeclaringClass() != beanClass ) {
-			throw log.getUnableToFindMethodException(
-					beanClass,
-					ExecutableElement.getExecutableAsString( name, parameterTypes )
-			);
+			throw log.getBeanDoesNotContainMethodException( beanClass, name, Arrays.asList( parameterTypes ) );
 		}
 
 		if ( configuredMembers.contains( method ) ) {

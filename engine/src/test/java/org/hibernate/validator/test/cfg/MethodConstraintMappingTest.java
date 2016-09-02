@@ -6,28 +6,6 @@
  */
 package org.hibernate.validator.test.cfg;
 
-import java.lang.annotation.ElementType;
-import java.util.Set;
-import javax.validation.ConstraintDeclarationException;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.groups.Default;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.HibernateValidator;
-import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.cfg.GenericConstraintDef;
-import org.hibernate.validator.cfg.defs.NotNullDef;
-import org.hibernate.validator.cfg.defs.SizeDef;
-import org.hibernate.validator.testutil.TestForIssue;
-
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
@@ -36,6 +14,29 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;
+
+import java.lang.annotation.ElementType;
+import java.util.Set;
+
+import javax.validation.ConstraintDeclarationException;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.groups.Default;
+
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.GenericConstraintDef;
+import org.hibernate.validator.cfg.defs.NotNullDef;
+import org.hibernate.validator.cfg.defs.SizeDef;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Tests the definition of method constraints with the programmatic API.
@@ -129,8 +130,8 @@ public class MethodConstraintMappingTest {
 	}
 
 	@Test(
-			expectedExceptions = IllegalArgumentException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: Type .*GreetingService doesn't have a method greet().*"
+			expectedExceptions = ValidationException.class,
+			expectedExceptionsMessageRegExp = "HV000135.*"
 	)
 	public void testCascadingDefinitionOnMissingMethod() {
 		ConstraintMapping mapping = config.createConstraintMapping();
@@ -249,7 +250,7 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.parameter( 0 )
-				.constraint( new GenericConstraintDef<Size>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+				.constraint( new GenericConstraintDef<>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
 		config.addMapping( mapping );
 
 		try {
@@ -448,7 +449,7 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.returnValue()
-				.constraint( new GenericConstraintDef<Size>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+				.constraint( new GenericConstraintDef<>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
 		config.addMapping( mapping );
 
 		try {
@@ -614,7 +615,7 @@ public class MethodConstraintMappingTest {
 				.method( "greet", String.class, String.class )
 				.returnValue()
 				.constraint(
-						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+						new GenericConstraintDef<>(
 								GenericAndCrossParameterConstraint.class
 						)
 				);
@@ -642,7 +643,7 @@ public class MethodConstraintMappingTest {
 				.method( "greet", String.class, String.class )
 				.crossParameter()
 				.constraint(
-						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+						new GenericConstraintDef<>(
 								GenericAndCrossParameterConstraint.class
 						)
 				);
