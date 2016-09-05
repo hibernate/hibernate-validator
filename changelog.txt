@@ -1,6 +1,56 @@
 Hibernate Validator Changelog
 =============================
 
+5.3.0.CR1 (05-09-2016)
+-------------------------
+
+** Bug
+    * HV-1057 - engine        - Group sequences don't honor inheritance relationships properly
+    * HV-1055 - engine        - Default group sequence does not honour group hierarchy
+    * HV-1068 - engine        - Wrong import in MessageDescriptorFormatException
+    * HV-1071 - engine        - HV-1049 prevents annotations in the default package working
+    * HV-1049 - engine        - Don't access annotations from "jdk.internal" package
+    * HV-1054 - engine        - Catch correct exception type in AbstractMessageInterpolator
+    * HV-1072 - engine        - Parameter validation does not stop when group in sequence has cascaded constraint violations.
+    * HV-1050 - build         - Build fails under Windows
+    * HV-1063 - tests         - Upgrade dependencies used by OSGi integration tests
+    * HV-1080 - engine        - Validation of Java 8 Optional throws ClassCastException
+    * HV-1066 - validators    - email domains with a 63 character length fails EmailValidator
+    * HV-1048 - engine        - Correctly interpret version string returned by JDK 9
+    * HV-1062 - validators    - Use type annotations for map values with @NotNull annotation on the map
+    * HV-1013 - validators    - Validator invokes hashCode() with null mandatory field 
+    * HV-1046 - documentation - Fix example 11.4 in reference guide
+    * HV-1091 - engine        - java.lang.StackOverflowError generated when using too big validation message
+    * HV-1031 - engine        - Type parameter validations are not executed against all elements in a collection if elements contain the same object instance.
+
+** Improvement
+    * HV-1038 - build         - Update to ClassMate 1.3.0
+    * HV-1058 - engine        - Avoid repeated retrieval of default group sequence in BeanMetadataImpl#getConstrainedPropertiesAsDescriptors()
+    * HV-1060 - engine        - Include messages for @EAN and @ParameterScriptAssert in Brazilian Portuguese error messages
+    * HV-1076 - build         - Improve Checkstyle configuration
+    * HV-1081 - build         - Reuse the release scripts of OGM to automatize the release process
+    * HV-1077 - engine        - Add missing @Override annotation
+    * HV-1074 - engine        - Add Arabic translation
+    * HV-1015 - tests         - Provide test case template
+    * HV-1082 - documentation - Upgrade maven-jdocbook-plugin and pressgang to generate valid HTML5 documentation
+    * HV-1078 - documentation - Update the CONTRIBUTING.md file
+    * HV-1075 - validators    - Update and improve the French translation
+    * HV-1083 - build         - Properly ignore hibernate-noorm-release-scripts directory in the build
+    * HV-1014 - documentation - Clarify what @ValidPart is in example 2.3 of the reference guide
+    * HV-1096 - validators    - ValidationMessages for Russian
+    * HV-1086 - build         - Update Maven dependencies and align with WildFly 10.1.0.Final
+
+** New Feature
+    * HV-1070 - build         - Preparatory work for building with Java 9
+    * HV-501 - engine        - Extend programmatic API to allow alteration of ConstraintValidator list for a given constraint
+    * HV-1065 - engine        - Add hibernate.validator.constraint_mapping_contributor*s* to take a list of contributors and deprecate hibernate.validator.constraint_mapping_contributor
+
+** Task
+    * HV-1053 - build         - Use WildFly 10.0.0.Final for integration tests
+    * HV-1052 - build         - Upgrade to current version of JBoss logging processor
+    * HV-1034 - build         - Allow compilation using JDK9
+    * HV-1064 - tests         - Add Travis support
+
 5.3.0.Alpha1 (15.01.2016)
 -------------------------
 
