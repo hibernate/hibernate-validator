@@ -55,6 +55,10 @@ grant codeBase "file:${localRepository}/org/jboss/logging/jboss-logging/-" {
 
 grant codeBase "file:${localRepository}/javax/validation/validation-api/-" {
     permission java.io.FilePermission "<<ALL FILES>>", "read";
+
+    // in some tests this property is accessed by the TCK when the API JAR is on the callstack; the TCK doesn't
+    // use privileged actions, hence allow this read
+    permission java.util.PropertyPermission "validation.provider", "read";
 };
 
 /* =================== */
