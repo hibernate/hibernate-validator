@@ -30,7 +30,7 @@ import org.hibernate.validator.test.internal.xml.XmlMappingTest;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 

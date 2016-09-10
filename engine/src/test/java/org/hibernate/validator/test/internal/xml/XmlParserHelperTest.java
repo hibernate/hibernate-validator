@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.xml.XmlParserHelper;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit test for {@link XmlParserHelper}.

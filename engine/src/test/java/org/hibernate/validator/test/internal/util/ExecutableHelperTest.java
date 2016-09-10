@@ -18,7 +18,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.test.internal.util.classhierarchy.Novella;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

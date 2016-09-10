@@ -6,12 +6,13 @@
  */
 package org.hibernate.validator.testutil;
 
+import org.assertj.core.api.ListAssert;
+
+import java.util.ArrayList;
 import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
 
-import org.fest.assertions.CollectionAssert;
-
-import static org.fest.assertions.Formatting.format;
+import static org.assertj.core.api.Fail.fail;
 
 /**
  * Provides assertion methods for testing {@link javax.validation.metadata.ElementDescriptor}
@@ -34,10 +35,13 @@ public class DescriptorAssert {
 	 *
 	 * @author Gunnar Morling
 	 */
-	public static class GroupConversionDescriptorSetAssert extends CollectionAssert {
+	public static class GroupConversionDescriptorSetAssert extends ListAssert {
+
+		private final Set<? extends GroupConversionDescriptor> actual;
 
 		protected GroupConversionDescriptorSetAssert(Set<GroupConversionDescriptor> actual) {
-			super( actual );
+			super( new ArrayList(actual));
+			this.actual = actual;
 		}
 
 		public void containsConversion(Class<?> from, Class<?> to) {
@@ -57,7 +61,7 @@ public class DescriptorAssert {
 			}
 
 			if ( !foundMatchingConversion ) {
-				fail( format( "<%s> does not contain a conversion from <%s> to <%s>.", actual, from, to ) );
+				fail( String.format( "<%s> does not contain a conversion from <%s> to <%s>.", actual, from, to ) );
 			}
 		}
 	}

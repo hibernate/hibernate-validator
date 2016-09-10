@@ -25,7 +25,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.Cust
 import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.testutils.ValidatorUtil.getMethodDescriptor;
 import static org.testng.Assert.assertEquals;

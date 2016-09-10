@@ -36,7 +36,7 @@ import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;

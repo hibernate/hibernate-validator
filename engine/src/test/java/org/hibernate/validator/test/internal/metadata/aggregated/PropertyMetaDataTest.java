@@ -27,7 +27,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 
 /**

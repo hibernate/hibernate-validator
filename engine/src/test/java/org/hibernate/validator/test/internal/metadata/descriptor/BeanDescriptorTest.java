@@ -31,7 +31,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
@@ -312,7 +312,7 @@ public class BeanDescriptorTest {
 		assertThat( getSignatures( constrainedConstructors ) ).containsOnly(
 				Arrays.<Class<?>>asList( String.class ),
 				Arrays.<Class<?>>asList( String.class, Customer.class ),
-				Collections.emptyList(),
+				Collections.<Class<?>>emptyList(),
 				Arrays.<Class<?>>asList( DateMidnight.class, DateMidnight.class )
 		);
 	}

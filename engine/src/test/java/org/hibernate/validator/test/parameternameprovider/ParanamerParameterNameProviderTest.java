@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 

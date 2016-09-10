@@ -20,7 +20,6 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
-import org.fest.assertions.Assertions;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -39,6 +38,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
@@ -95,7 +95,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths( constraintViolations, "method.arg0", "method.arg0" );
-		Assertions.assertThat( constraintViolations ).onProperty( "message" ).containsOnly( "container", "type" );
+		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNullTypeUse.class );
 	}
 
@@ -136,7 +136,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelD(), method, values );
 
-		Assertions.assertThat( constraintViolations ).isEmpty();
+		assertThat( constraintViolations ).isEmpty();
 	}
 
 	@Test
@@ -149,7 +149,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths( constraintViolations, "method.arg0", "method.arg0" );
-		Assertions.assertThat( constraintViolations ).onProperty( "message" ).containsOnly( "container", "type" );
+		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class, NotNull.class );
 	}
 
@@ -200,7 +200,7 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 				.forExecutables()
 				.validateParameters( new ModelE(), method, values );
 
-		Assertions.assertThat( constraintViolations ).isEmpty();
+		assertThat( constraintViolations ).isEmpty();
 	}
 
 	@Test

@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.StringHelper;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;

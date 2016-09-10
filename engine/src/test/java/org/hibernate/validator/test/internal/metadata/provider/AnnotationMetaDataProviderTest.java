@@ -45,7 +45,7 @@ import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.testng.Assert.assertEquals;
 

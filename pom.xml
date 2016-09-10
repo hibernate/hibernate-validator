@@ -240,9 +240,9 @@
                 <version>3.4</version>
             </dependency>
             <dependency>
-                <groupId>org.easytesting</groupId>
-                <artifactId>fest-assert</artifactId>
-                <version>1.4</version>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>3.5.2</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>

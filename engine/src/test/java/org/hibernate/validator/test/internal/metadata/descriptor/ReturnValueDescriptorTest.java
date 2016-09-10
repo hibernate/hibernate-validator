@@ -25,7 +25,7 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.Cust
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.CustomerRepositoryExtReturnValueComplex;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintTypes;
 import static org.hibernate.validator.testutil.DescriptorAssert.assertThat;
 import static org.hibernate.validator.testutils.ValidatorUtil.getMethodReturnValueDescriptor;

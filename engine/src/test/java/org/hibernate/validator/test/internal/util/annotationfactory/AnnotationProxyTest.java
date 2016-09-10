@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.test.internal.util.annotationfactory;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -18,6 +16,8 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Gunnar Morling

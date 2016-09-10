@@ -18,7 +18,7 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.model.Custo
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeKinds;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
 

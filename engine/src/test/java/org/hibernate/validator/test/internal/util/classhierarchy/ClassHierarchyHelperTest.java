@@ -13,7 +13,8 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 /**
  * Unit test for {@link ClassHierarchyHelper}.
