@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;

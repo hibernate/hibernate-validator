@@ -6,6 +6,12 @@
  */
 package org.hibernate.validator.test.internal.metadata.provider;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.testng.Assert.assertEquals;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -42,12 +48,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.testng.Assert.assertEquals;
 
 /**
  * Unit test for {@link AnnotationMetaDataProvider}.

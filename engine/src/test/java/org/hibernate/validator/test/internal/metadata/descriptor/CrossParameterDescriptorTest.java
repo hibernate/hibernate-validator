@@ -6,6 +6,14 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintTypes;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConstructorDescriptor;
+import static org.hibernate.validator.testutils.ValidatorUtil.getMethodDescriptor;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.util.Set;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -19,14 +27,6 @@ import org.hibernate.validator.test.internal.metadata.ConsistentDateParameters;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintTypes;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConstructorDescriptor;
-import static org.hibernate.validator.testutils.ValidatorUtil.getMethodDescriptor;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author Gunnar Morling

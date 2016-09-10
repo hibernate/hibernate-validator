@@ -6,6 +6,11 @@
  */
 package org.hibernate.validator.test.internal.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Date;
@@ -17,11 +22,6 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.test.internal.util.classhierarchy.Novella;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for {@link ExecutableHelper}.

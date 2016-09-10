@@ -250,7 +250,7 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.parameter( 0 )
-				.constraint( new GenericConstraintDef<>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+				.constraint( new GenericConstraintDef<Size>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
 		config.addMapping( mapping );
 
 		try {
@@ -449,7 +449,7 @@ public class MethodConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.method( "greet", String.class )
 				.returnValue()
-				.constraint( new GenericConstraintDef<>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+				.constraint( new GenericConstraintDef<Size>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
 		config.addMapping( mapping );
 
 		try {
@@ -615,7 +615,7 @@ public class MethodConstraintMappingTest {
 				.method( "greet", String.class, String.class )
 				.returnValue()
 				.constraint(
-						new GenericConstraintDef<>(
+						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
 								GenericAndCrossParameterConstraint.class
 						)
 				);
@@ -643,7 +643,7 @@ public class MethodConstraintMappingTest {
 				.method( "greet", String.class, String.class )
 				.crossParameter()
 				.constraint(
-						new GenericConstraintDef<>(
+						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
 								GenericAndCrossParameterConstraint.class
 						)
 				);

@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.test.internal.metadata.provider;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.util.Collections;
@@ -29,9 +32,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
 import org.hibernate.validator.testutils.constraints.NotNullTypeUse;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
  * Tests for {@link org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider}.

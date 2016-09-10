@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertEquals;
 
@@ -15,7 +16,6 @@ import javax.validation.Validator;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.fest.assertions.Assertions;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
@@ -38,8 +38,8 @@ public class XmlParsingTest {
 
 		ConstraintDescriptorImpl<?> descriptor = getSingleConstraintDescriptorForClass( validator, Double.class );
 		MyConstraint constraint = (MyConstraint) descriptor.getAnnotation();
-		Assertions.assertThat( constraint.additionalConstraints() ).hasSize( 1 );
-		Assertions.assertThat( constraint.additionalConstraints()[0].constraint() ).isEqualTo( "AA" );
+		assertThat( constraint.additionalConstraints() ).hasSize( 1 );
+		assertThat( constraint.additionalConstraints()[0].constraint() ).isEqualTo( "AA" );
 	}
 
 	@Test
@@ -53,8 +53,8 @@ public class XmlParsingTest {
 
 		ConstraintDescriptorImpl<?> descriptor = getSingleConstraintDescriptorForClass( validator, Double.class );
 		MyConstraint constraint = (MyConstraint) descriptor.getAnnotation();
-		Assertions.assertThat( constraint.additionalConstraints() ).hasSize( 1 );
-		Assertions.assertThat( constraint.additionalConstraints()[0].constraint() ).isEqualTo( "" );
+		assertThat( constraint.additionalConstraints() ).hasSize( 1 );
+		assertThat( constraint.additionalConstraints()[0].constraint() ).isEqualTo( "" );
 	}
 
 	private ConstraintDescriptorImpl<?> getSingleConstraintDescriptorForClass(Validator validator, Class<?> clazz) {
