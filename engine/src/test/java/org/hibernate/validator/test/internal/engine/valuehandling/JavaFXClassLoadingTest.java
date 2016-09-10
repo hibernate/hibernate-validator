@@ -6,12 +6,13 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import javax.validation.ValidationException;
 
-import org.fest.assertions.Assertions;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -34,14 +35,14 @@ public class JavaFXClassLoadingTest {
 	public void shouldBeAbleToFindTheClassInTCCL() throws Exception {
 		JavaArchive archive = ShrinkWrap.create( JavaArchive.class ).addClass( JavaFXClassLoadingTest.class );
 		ShrinkWrapClassLoader classLoaderWithoutExpectedClass = new ShrinkWrapClassLoader( (ClassLoader) null, archive );
-		Assertions.assertThat( isClassPresent( JAVAFX_APPLICATION_CLASS, classLoaderWithoutExpectedClass, true ) ).isTrue();
+		assertThat( isClassPresent( JAVAFX_APPLICATION_CLASS, classLoaderWithoutExpectedClass, true ) ).isTrue();
 	}
 
 	@Test
 	public void shouldNotFindTheClass() throws Exception {
 		JavaArchive archive = ShrinkWrap.create( JavaArchive.class ).addClass( JavaFXClassLoadingTest.class );
 		ShrinkWrapClassLoader classLoaderWithoutExpectedClass = new ShrinkWrapClassLoader( (ClassLoader) null, archive );
-		Assertions.assertThat( isClassPresent( JAVAFX_APPLICATION_CLASS, classLoaderWithoutExpectedClass, false ) ).isFalse();
+		assertThat( isClassPresent( JAVAFX_APPLICATION_CLASS, classLoaderWithoutExpectedClass, false ) ).isFalse();
 	}
 
 	private static boolean isClassPresent(String className, ClassLoader classLoader, boolean fallbackOnTCCL) {

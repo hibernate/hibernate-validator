@@ -6,6 +6,18 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeKinds;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.fail;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -32,18 +44,6 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithConstrainedVoidMethodImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.RepositoryBase;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeKinds;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.fail;
 
 /**
  * Integration test for the method-level validation related features of {@link org.hibernate.validator.internal.engine.ValidatorImpl}.

@@ -6,6 +6,16 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -30,16 +40,6 @@ import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.IllegalCustomerRepositoryExt;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for {@link BeanDescriptor} and its creation.
@@ -312,7 +312,7 @@ public class BeanDescriptorTest {
 		assertThat( getSignatures( constrainedConstructors ) ).containsOnly(
 				Arrays.<Class<?>>asList( String.class ),
 				Arrays.<Class<?>>asList( String.class, Customer.class ),
-				Collections.emptyList(),
+				Collections.<Class<?>>emptyList(),
 				Arrays.<Class<?>>asList( DateMidnight.class, DateMidnight.class )
 		);
 	}

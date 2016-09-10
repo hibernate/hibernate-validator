@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.InputStream;
 import javax.xml.stream.XMLEventReader;
 
@@ -13,8 +15,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.xml.XmlParserHelper;
-
-import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * Unit test for {@link XmlParserHelper}.

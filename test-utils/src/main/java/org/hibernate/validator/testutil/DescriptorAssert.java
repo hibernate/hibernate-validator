@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.testutil;
 
+import static org.assertj.core.api.Fail.fail;
+
+import org.assertj.core.api.IterableAssert;
+
 import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
-
-import org.fest.assertions.CollectionAssert;
-
-import static org.fest.assertions.Formatting.format;
 
 /**
  * Provides assertion methods for testing {@link javax.validation.metadata.ElementDescriptor}
@@ -34,7 +34,7 @@ public class DescriptorAssert {
 	 *
 	 * @author Gunnar Morling
 	 */
-	public static class GroupConversionDescriptorSetAssert extends CollectionAssert {
+	public static class GroupConversionDescriptorSetAssert extends IterableAssert<GroupConversionDescriptor> {
 
 		protected GroupConversionDescriptorSetAssert(Set<GroupConversionDescriptor> actual) {
 			super( actual );
@@ -45,10 +45,7 @@ public class DescriptorAssert {
 
 			boolean foundMatchingConversion = false;
 
-			@SuppressWarnings("unchecked")
-			Iterable<GroupConversionDescriptor> actualConversions = (Iterable<GroupConversionDescriptor>) actual;
-
-			for ( GroupConversionDescriptor groupConversionDescriptor : actualConversions ) {
+			for ( GroupConversionDescriptor groupConversionDescriptor : actual ) {
 				if ( groupConversionDescriptor.getFrom().equals( from ) &&
 						groupConversionDescriptor.getTo().equals( to ) ) {
 					foundMatchingConversion = true;
@@ -57,7 +54,7 @@ public class DescriptorAssert {
 			}
 
 			if ( !foundMatchingConversion ) {
-				fail( format( "<%s> does not contain a conversion from <%s> to <%s>.", actual, from, to ) );
+				fail( String.format( "<%s> does not contain a conversion from <%s> to <%s>.", actual, from, to ) );
 			}
 		}
 	}
