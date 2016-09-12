@@ -6,6 +6,12 @@
  */
 package org.hibernate.validator.testutil;
 
+import static org.assertj.core.api.Fail.fail;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.PathImpl.createNewPath;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
 
@@ -23,12 +29,6 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
-
-import static org.assertj.core.api.Fail.fail;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.PathImpl.createNewPath;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
 /**
  * This class provides useful functions to assert correctness of constraint violations raised

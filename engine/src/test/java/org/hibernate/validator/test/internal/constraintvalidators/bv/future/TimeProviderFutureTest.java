@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.future;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -29,10 +33,6 @@ import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.test.internal.xml.XmlMappingTest;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 /**
  * Test for using the {@code TimeProvider} contract in {@code @Future} validators.

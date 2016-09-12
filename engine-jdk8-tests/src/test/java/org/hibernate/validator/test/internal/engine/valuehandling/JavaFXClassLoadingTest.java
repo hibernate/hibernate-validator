@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -18,8 +20,6 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.classloader.ShrinkWrapClassLoader;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Davide D'Alto

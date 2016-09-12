@@ -6,6 +6,14 @@
  */
 package org.hibernate.validator.test.internal.engine.constraintvalidation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
 import java.util.Set;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
@@ -26,14 +34,6 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik

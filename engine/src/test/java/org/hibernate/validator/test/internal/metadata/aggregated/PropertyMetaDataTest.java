@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.test.internal.metadata.aggregated;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
+
 import java.util.Collections;
 import java.util.Set;
 import javax.validation.ConstraintDeclarationException;
@@ -26,9 +29,6 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.assertEquals;
 
 /**
  * @author Gunnar Morling

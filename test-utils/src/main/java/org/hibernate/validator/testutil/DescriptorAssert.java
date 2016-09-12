@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.testutil;
 
+import static org.assertj.core.api.Fail.fail;
+
 import org.assertj.core.api.ListAssert;
 
 import java.util.ArrayList;
 import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
-
-import static org.assertj.core.api.Fail.fail;
 
 /**
  * Provides assertion methods for testing {@link javax.validation.metadata.ElementDescriptor}

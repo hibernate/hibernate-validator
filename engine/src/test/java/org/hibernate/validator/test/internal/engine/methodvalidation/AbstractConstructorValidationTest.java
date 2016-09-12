@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeKinds;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
+
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
@@ -17,10 +21,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeKinds;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
 
 /**
  * @author Gunnar Morling

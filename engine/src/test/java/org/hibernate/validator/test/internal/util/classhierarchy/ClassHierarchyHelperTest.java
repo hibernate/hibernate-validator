@@ -6,15 +6,14 @@
  */
 package org.hibernate.validator.test.internal.util.classhierarchy;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 /**
  * Unit test for {@link ClassHierarchyHelper}.

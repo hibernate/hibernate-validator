@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.test.parameternameprovider;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,10 +27,6 @@ import org.testng.annotations.Test;
 
 import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
 /**
  * Test for {@link ParanamerParameterNameProvider}.

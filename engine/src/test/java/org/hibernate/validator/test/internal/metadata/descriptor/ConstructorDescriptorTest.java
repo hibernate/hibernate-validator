@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.test.internal.metadata.descriptor;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConstructorDescriptor;
+
 import java.util.List;
 import java.util.Set;
 import javax.validation.metadata.ConstraintDescriptor;
@@ -18,9 +21,6 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt;
 import org.hibernate.validator.test.internal.metadata.CustomerRepositoryExt.ValidB2BRepository;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConstructorDescriptor;
 
 /**
  * @author Gunnar Morling
