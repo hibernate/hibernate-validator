@@ -40,7 +40,7 @@ public class DescriptorAssert {
 		private final Set<? extends GroupConversionDescriptor> actual;
 
 		protected GroupConversionDescriptorSetAssert(Set<GroupConversionDescriptor> actual) {
-			super( new ArrayList(actual));
+			super( new ArrayList( actual ) );
 			this.actual = actual;
 		}
 
