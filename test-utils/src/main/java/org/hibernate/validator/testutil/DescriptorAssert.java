@@ -8,9 +8,8 @@ package org.hibernate.validator.testutil;
 
 import static org.assertj.core.api.Fail.fail;
 
-import org.assertj.core.api.ListAssert;
+import org.assertj.core.api.IterableAssert;
 
-import java.util.ArrayList;
 import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
 
@@ -35,12 +34,12 @@ public class DescriptorAssert {
 	 *
 	 * @author Gunnar Morling
 	 */
-	public static class GroupConversionDescriptorSetAssert extends ListAssert {
+	public static class GroupConversionDescriptorSetAssert extends IterableAssert {
 
 		private final Set<? extends GroupConversionDescriptor> actual;
 
 		protected GroupConversionDescriptorSetAssert(Set<GroupConversionDescriptor> actual) {
-			super( new ArrayList( actual ) );
+			super( actual );
 			this.actual = actual;
 		}
 

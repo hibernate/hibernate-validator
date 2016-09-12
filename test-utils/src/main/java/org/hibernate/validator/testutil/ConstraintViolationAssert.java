@@ -7,13 +7,12 @@
 package org.hibernate.validator.testutil;
 
 import static org.assertj.core.api.Fail.fail;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.PathImpl.createNewPath;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.ListAssert;
+import org.assertj.core.api.IterableAssert;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -140,7 +139,7 @@ public final class ConstraintViolationAssert {
 	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
 			Class<?> rootBeanClass, Object invalidValue, String propertyPath) {
 		assertTrue(
-				pathsAreEqual( violation.getPropertyPath(), createNewPath( propertyPath ) ),
+				pathsAreEqual( violation.getPropertyPath(), PathImpl.createNewPath(propertyPath) ),
 				"Wrong propertyPath"
 		);
 		assertConstraintViolation( violation, errorMessage, rootBeanClass, invalidValue );
@@ -340,12 +339,12 @@ public final class ConstraintViolationAssert {
 		return new PathExpectation();
 	}
 
-	public static class ConstraintViolationSetAssert extends ListAssert {
+	public static class ConstraintViolationSetAssert extends IterableAssert {
 
 		private final Set<? extends ConstraintViolation<?>> actualViolations;
 
 		protected ConstraintViolationSetAssert(Set<? extends ConstraintViolation<?>> actualViolations) {
-			super( new ArrayList(actualViolations) );
+			super( actualViolations );
 			this.actualViolations = actualViolations;
 		}
 
