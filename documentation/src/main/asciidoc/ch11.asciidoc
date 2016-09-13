@@ -1,5 +1,3 @@
-:sourcedir: ../../test/java
-
 [[validator-specifics]]
 == Hibernate Validator Specifics
 

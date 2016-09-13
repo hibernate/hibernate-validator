@@ -12,6 +12,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+//tag::include[]
 @Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
 @Retention(RUNTIME)
 @Constraint(validatedBy = CheckCaseValidator.class)
@@ -34,3 +35,4 @@ public @interface CheckCase {
 		CheckCase[] value();
 	}
 }
+//end::include[]

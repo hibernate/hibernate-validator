@@ -11,12 +11,14 @@ import javax.validation.constraints.Size;
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+//tag::include[]
 @NotNull
 @Size(min = 2, max = 14)
 @CheckCase(CaseMode.UPPER)
-@Target({ METHOD, FIELD, ANNOTATION_TYPE })
+@Target({ METHOD, FIELD, ANNOTATION_TYPE, TYPE_USE })
 @Retention(RUNTIME)
 @Constraint(validatedBy = { })
 @Documented
@@ -29,3 +31,4 @@ public @interface ValidLicensePlate {
 
 	Class<? extends Payload>[] payload() default { };
 }
+//end::include[]

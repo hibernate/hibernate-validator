@@ -26,6 +26,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
@@ -34,16 +35,13 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
-import org.hibernate.validator.testutils.constraints.NotNullTypeUse;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Test combination of {@link Optional} and {@link UnwrapValidatedValue} on methods.
@@ -97,7 +95,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 		assertCorrectPropertyPaths( constraintViolations, "ModelB.arg0", "ModelB.arg0" );
 
 		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNullTypeUse.class );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNull.class );
 	}
 
 	@Test
@@ -111,7 +109,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "ModelB.arg0" );
 		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotNullTypeUse.class );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
 
 	@Test
@@ -151,7 +149,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths( constraintViolations, "ModelC.arg0", "ModelC.arg0" );
 		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class, NotNull.class );
+		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotNull.class );
 	}
 
 	@Test
@@ -229,13 +227,13 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 
 	static class ModelB {
 
-		public ModelB(@UnwrapValidatedValue(false) @NotNull(message = "container") Optional<@NotNullTypeUse(message = "type") String> valueWithNotNull) {
+		public ModelB(@UnwrapValidatedValue(false) @NotNull(message = "container") Optional<@NotNull(message = "type") String> valueWithNotNull) {
 		}
 	}
 
 	static class ModelC {
 
-		public ModelC(@UnwrapValidatedValue(true) @NotNull(message = "container") Optional<@NotBlankTypeUse(message = "type") String> valueWithNotNullUnwrapped) {
+		public ModelC(@UnwrapValidatedValue(true) @NotNull(message = "container") Optional<@NotBlank(message = "type") String> valueWithNotNullUnwrapped) {
 		}
 	}
 
