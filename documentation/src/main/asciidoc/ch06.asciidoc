@@ -44,32 +44,11 @@ before, this may look a bit scary, but actually it's not that hard:
 [[example-defining-custom-constraint]]
 .Defining the `@CheckCase` constraint annotation
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06;
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CheckCase.java[lines=1..1]
 
-@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
-@Retention(RUNTIME)
-@Constraint(validatedBy = CheckCaseValidator.class)
-@Documented
-public @interface CheckCase {
-
-	String message() default "{org.hibernate.validator.referenceguide.chapter06.CheckCase." +
-			"message}";
-
-	Class<?>[] groups() default { };
-
-	Class<? extends Payload>[] payload() default { };
-
-	CaseMode value();
-
-	@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
-	@Retention(RUNTIME)
-	@Documented
-	@interface List {
-		CheckCase[] value();
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CheckCase.java[tags=include]
 ----
 ====
 
@@ -121,11 +100,11 @@ annotation, if it is the only attribute specified, as e.g. in `@CheckCase(CaseMo
 
 In addition, the constraint annotation is decorated with a couple of meta annotations:
 
-* `@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE})`: Defines the supported target element types
-for the constraint. `@CheckCase` may be used on fields (element type `FIELD`), JavaBeans properties as
-well as method return values (`METHOD`) and method/constructor parameters (`PARAMETER`). The element
-type `ANNOTATION_TYPE` allows for the creation of composed constraints
-(see <<section-constraint-composition>>) based on `@CheckCase`.
+* `@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE, TYPE_USE})`: Defines the supported target
+element types for the constraint. `@CheckCase` may be used on fields (element type `FIELD`), JavaBeans properties
+as well as method return values (`METHOD`), method/constructor parameters (`PARAMETER`) and type argument of
+parameterized types (`TYPE_USE`). The element type `ANNOTATION_TYPE` allows for the creation of composed
+constraints (see <<section-constraint-composition>>) based on `@CheckCase`.
 +
 When creating a class-level constraint (see <<validator-usingvalidator-classlevel>>), the element
 type `TYPE` would have to be used. Constraints targeting the return value of a constructor need to
@@ -651,26 +630,11 @@ comprises the constraints `@NotNull`, `@Size` and `@CheckCase`:
 [[example-composed-constraint]]
 .Creating a composing constraint `@ValidLicensePlate`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06.constraintcomposition;
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintcomposition/ValidLicensePlate.java[lines=1..1]
 
-@NotNull
-@Size(min = 2, max = 14)
-@CheckCase(CaseMode.UPPER)
-@Target({ METHOD, FIELD, ANNOTATION_TYPE })
-@Retention(RUNTIME)
-@Constraint(validatedBy = { })
-@Documented
-public @interface ValidLicensePlate {
-
-	String message() default "{org.hibernate.validator.referenceguide.chapter06." +
-			"constraintcomposition.ValidLicensePlate.message}";
-
-	Class<?>[] groups() default { };
-
-	Class<? extends Payload>[] payload() default { };
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintcomposition/ValidLicensePlate.java[tags=include]
 ----
 ====
 

@@ -138,10 +138,10 @@ to be validated twice.
 ==== Type argument constraints
 
 Starting from Java 8, it is possible to specify constraints directly on the type argument of a
-parameterized type. However, this requires that `ElementType.TYPE_USE` is specified via `@Target`
-in the constraint definition. To maintain backwards compatibility, built-in Bean Validation as well as
-Hibernate Validator specific constraints do not yet specify `ElementType.TYPE_USE`. To make use of
-type argument constraints, custom constraints must be used (see <<validator-customconstraints>>).
+parameterized type. This requires that `ElementType.TYPE_USE` is specified via `@Target`
+in the constraint definition. As of Bean Validation 2.0, built-in Bean Validation as well as
+Hibernate Validator specific constraints specify `ElementType.TYPE_USE` and can be used
+directly in this context.
 
 Hibernate Validator validates type arguments constraints specified on collections, map values,
 `java.util.Optional`, and custom parameterized types.
