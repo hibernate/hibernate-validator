@@ -28,10 +28,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.apache.log4j.Logger;
+import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
-import org.hibernate.validator.testutils.constraints.NotNullTypeUse;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -61,9 +60,9 @@ public class TypeAnnotationConstraintTest {
 		assertCorrectPropertyPaths( constraintViolations, "names[1]", "names[2]", "names[2]" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
-				NotBlankTypeUse.class,
-				NotBlankTypeUse.class,
-				NotNullTypeUse.class
+				NotBlank.class,
+				NotBlank.class,
+				NotNull.class
 		);
 	}
 
@@ -85,9 +84,9 @@ public class TypeAnnotationConstraintTest {
 		assertCorrectPropertyPaths( constraintViolations, "strings[0]", "strings[2]", "strings[2]" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
-				NotBlankTypeUse.class,
-				NotBlankTypeUse.class,
-				NotNullTypeUse.class
+				NotBlank.class,
+				NotBlank.class,
+				NotNull.class
 		);
 	}
 
@@ -98,7 +97,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<B>> constraintViolations = validator.validate( b );
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths( constraintViolations, "bars[1]", "bars[0].number" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNullTypeUse.class );
+		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
 	}
 
 	@Test
@@ -110,7 +109,7 @@ public class TypeAnnotationConstraintTest {
 
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "stringOptional" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class );
+		assertCorrectConstraintTypes( constraintViolations, NotBlank.class );
 	}
 
 	@Test
@@ -123,7 +122,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<F1>> constraintViolations = validator.validate( f );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "namesMap[second]" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class );
+		assertCorrectConstraintTypes( constraintViolations, NotBlank.class );
 	}
 
 	@Test
@@ -137,7 +136,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<F2>> constraintViolations = validator.validate( f );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "namesMap[second]" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class );
+		assertCorrectConstraintTypes( constraintViolations, NotBlank.class );
 
 		f = new F2();
 		constraintViolations = validator.validate( f );
@@ -171,9 +170,9 @@ public class TypeAnnotationConstraintTest {
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
-				NotBlankTypeUse.class,
-				NotBlankTypeUse.class,
-				NotNullTypeUse.class
+				NotBlank.class,
+				NotBlank.class,
+				NotNull.class
 		);
 	}
 
@@ -198,10 +197,10 @@ public class TypeAnnotationConstraintTest {
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
-				NotBlankTypeUse.class,
-				NotBlankTypeUse.class,
-				NotNullTypeUse.class,
-				NotBlankTypeUse.class
+				NotBlank.class,
+				NotBlank.class,
+				NotNull.class,
+				NotBlank.class
 		);
 	}
 
@@ -225,10 +224,10 @@ public class TypeAnnotationConstraintTest {
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
-				NotBlankTypeUse.class,
-				NotBlankTypeUse.class,
-				NotNullTypeUse.class,
-				NotBlankTypeUse.class
+				NotBlank.class,
+				NotBlank.class,
+				NotNull.class,
+				NotBlank.class
 		);
 	}
 
@@ -249,27 +248,27 @@ public class TypeAnnotationConstraintTest {
 
 	static class A1 {
 		@Valid
-		List<@NotNullTypeUse @NotBlankTypeUse String> names;
+		List<@NotNull @NotBlank String> names;
 	}
 
 	static class A2 {
-		List<@NotNullTypeUse @NotBlankTypeUse String> names;
+		List<@NotNull @NotBlank String> names;
 	}
 
 	static class B {
 		@Valid
-		List<@NotNullTypeUse Bar> bars;
+		List<@NotNull Bar> bars;
 	}
 
 	static class C {
-		Optional<@NotBlankTypeUse String> stringOptional;
+		Optional<@NotBlank String> stringOptional;
 	}
 
 	static class A3 {
 		List<String> strings;
 
 		@Valid
-		public List<@NotNullTypeUse @NotBlankTypeUse String> getStrings() {
+		public List<@NotNull @NotBlank String> getStrings() {
 			return strings;
 		}
 	}
@@ -278,30 +277,30 @@ public class TypeAnnotationConstraintTest {
 		List<String> strings;
 
 		@Valid
-		public List<@NotNullTypeUse @NotBlankTypeUse String> returnStrings() {
+		public List<@NotNull @NotBlank String> returnStrings() {
 			return strings;
 		}
 	}
 
 	static class F1 {
 		@Valid
-		Map<String, @NotBlankTypeUse String> namesMap;
+		Map<String, @NotBlank String> namesMap;
 	}
 
 	static class F2 {
 		@Valid
 		@NotNull
-		Map<String, @NotBlankTypeUse String> namesMap;
+		Map<String, @NotBlank String> namesMap;
 	}
 
 	static class G {
-		public G(@Valid List<@NotNullTypeUse @NotBlankTypeUse String> names, Optional<@NotBlankTypeUse String> optionalParameter) {
+		public G(@Valid List<@NotNull @NotBlank String> names, Optional<@NotBlank String> optionalParameter) {
 
 		}
 	}
 
 	static class H {
-		public void setValues(@Valid List<@NotNullTypeUse @NotBlankTypeUse String> listParameter, Optional<@NotBlankTypeUse String> optionalParameter) {
+		public void setValues(@Valid List<@NotNull @NotBlank String> listParameter, Optional<@NotBlank String> optionalParameter) {
 
 		}
 	}
@@ -316,7 +315,7 @@ public class TypeAnnotationConstraintTest {
 	}
 
 	static class BazHolder {
-		Baz<@NotNullTypeUse String> baz;
+		Baz<@NotNull String> baz;
 	}
 
 	class Baz<T> {
@@ -324,7 +323,7 @@ public class TypeAnnotationConstraintTest {
 	}
 
 	class FooHolder {
-		Foo<@NotNullTypeUse Integer, @NotBlankTypeUse String> foo;
+		Foo<@NotNull Integer, @NotBlank String> foo;
 	}
 
 	class Foo<T, V> {

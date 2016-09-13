@@ -15,11 +15,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
+import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -30,8 +30,8 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
-import org.hibernate.validator.testutils.constraints.NotNullTypeUse;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Tests for {@link org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider}.
@@ -60,7 +60,7 @@ public class TypeAnnotationAwareMetaDataProviderTest {
 		ConstrainedField field = findConstrainedField( beanConfigurations, A.class, "names" );
 		assertThat( field.getTypeArgumentsConstraints() ).hasSize( 2 );
 		assertThat( getAnnotationsTypes( field.getTypeArgumentsConstraints() ) ).contains(
-				NotNullTypeUse.class, NotBlankTypeUse.class
+				NotNull.class, NotBlank.class
 		);
 	}
 
@@ -73,7 +73,7 @@ public class TypeAnnotationAwareMetaDataProviderTest {
 		ConstrainedExecutable executable = findConstrainedMethod( beanConfigurations, B.class, "getNames" );
 		assertThat( executable.getTypeArgumentsConstraints() ).hasSize( 2 );
 		assertThat( getAnnotationsTypes( executable.getTypeArgumentsConstraints() ) ).contains(
-				NotNullTypeUse.class, NotBlankTypeUse.class
+				NotNull.class, NotBlank.class
 		);
 	}
 
@@ -86,7 +86,7 @@ public class TypeAnnotationAwareMetaDataProviderTest {
 		ConstrainedExecutable executable = findConstrainedMethod( beanConfigurations, C.class, "returnNames" );
 		assertThat( executable.getTypeArgumentsConstraints() ).hasSize( 2 );
 		assertThat( getAnnotationsTypes( executable.getTypeArgumentsConstraints() ) ).contains(
-				NotNullTypeUse.class, NotBlankTypeUse.class
+				NotNull.class, NotBlank.class
 		);
 	}
 
@@ -107,7 +107,7 @@ public class TypeAnnotationAwareMetaDataProviderTest {
 		ConstrainedParameter parameter = executable.getParameterMetaData( 2 );
 		assertThat( parameter.getTypeArgumentsConstraints() ).hasSize( 2 );
 		assertThat( getAnnotationsTypes( parameter.getTypeArgumentsConstraints() ) ).contains(
-				NotNullTypeUse.class, NotBlankTypeUse.class
+				NotNull.class, NotBlank.class
 		);
 	}
 
@@ -128,7 +128,7 @@ public class TypeAnnotationAwareMetaDataProviderTest {
 		ConstrainedParameter parameter = executable.getParameterMetaData( 2 );
 		assertThat( parameter.getTypeArgumentsConstraints() ).hasSize( 2 );
 		assertThat( getAnnotationsTypes( parameter.getTypeArgumentsConstraints() ) ).contains(
-				NotNullTypeUse.class, NotBlankTypeUse.class
+				NotNull.class, NotBlank.class
 		);
 	}
 
@@ -179,31 +179,31 @@ public class TypeAnnotationAwareMetaDataProviderTest {
 
 	static class A {
 		@Valid
-		List<@NotNullTypeUse @NotBlankTypeUse String> names;
+		List<@NotNull @NotBlank String> names;
 	}
 
 	static class B {
 		@Valid
-		public List<@NotNullTypeUse @NotBlankTypeUse String> getNames() {
+		public List<@NotNull @NotBlank String> getNames() {
 			return Collections.emptyList();
 		}
 	}
 
 	static class C {
 		@Valid
-		public List<@NotNullTypeUse @NotBlankTypeUse String> returnNames() {
+		public List<@NotNull @NotBlank String> returnNames() {
 			return Collections.emptyList();
 		}
 	}
 
 	static class D {
-		public void setValues(String s, Integer i, @Valid List<@NotNullTypeUse @NotBlankTypeUse String> numbers) {
+		public void setValues(String s, Integer i, @Valid List<@NotNull @NotBlank String> numbers) {
 
 		}
 	}
 
 	static class E {
-		public E(String s, Integer i, @Valid List<@NotNullTypeUse @NotBlankTypeUse String> numbers) {
+		public E(String s, Integer i, @Valid List<@NotNull @NotBlank String> numbers) {
 
 		}
 	}

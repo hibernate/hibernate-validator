@@ -11,6 +11,7 @@ import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
@@ -35,7 +36,7 @@ import org.hibernate.validator.constraints.CreditCardNumber.List;
  */
 @Documented
 @Constraint(validatedBy = { })
-@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
 @ReportAsSingleViolation
@@ -57,7 +58,7 @@ public @interface CreditCardNumber {
 	/**
 	 * Defines several {@code @CreditCardNumber} annotations on the same element.
 	 */
-	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 	@Retention(RUNTIME)
 	@Documented
 	public @interface List {

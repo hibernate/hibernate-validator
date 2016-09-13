@@ -25,6 +25,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
@@ -33,16 +34,13 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
-import org.hibernate.validator.testutils.constraints.NotNullTypeUse;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Test combination of {@link Optional} and {@link UnwrapValidatedValue} on fields.
@@ -90,7 +88,7 @@ public class OptionalTypeAnnotationConstraintOnFieldTest {
 		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNull", "valueWithNotNull" );
 		// TODO: We don't need to validate the type since the container already failed
 		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNullTypeUse.class );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNull.class );
 	}
 
 	@Test
@@ -102,7 +100,7 @@ public class OptionalTypeAnnotationConstraintOnFieldTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNull" );
 		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotNullTypeUse.class );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
 
 	@Test
@@ -135,7 +133,7 @@ public class OptionalTypeAnnotationConstraintOnFieldTest {
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNullUnwrapped", "valueWithNotNullUnwrapped" );
 		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class, NotNull.class );
+		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotNull.class );
 	}
 
 	@Test
@@ -209,7 +207,7 @@ public class OptionalTypeAnnotationConstraintOnFieldTest {
 
 		@UnwrapValidatedValue(false)
 		@NotNull(message = "container")
-		Optional<@NotNullTypeUse(message = "type") String> valueWithNotNull;
+		Optional<@NotNull(message = "type") String> valueWithNotNull;
 
 	}
 
@@ -217,7 +215,7 @@ public class OptionalTypeAnnotationConstraintOnFieldTest {
 
 		@UnwrapValidatedValue(true)
 		@NotNull(message = "container")
-		Optional<@NotBlankTypeUse(message = "type") String> valueWithNotNullUnwrapped;
+		Optional<@NotBlank(message = "type") String> valueWithNotNullUnwrapped;
 	}
 
 	private static class ModelD {

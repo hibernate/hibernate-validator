@@ -6,11 +6,22 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 import java.util.Set;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -23,27 +34,17 @@ import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Null;
 
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.TypeResolver;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
+import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-import org.hibernate.validator.testutils.constraints.NotBlankTypeUse;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import com.fasterxml.classmate.ResolvedType;
+import com.fasterxml.classmate.TypeResolver;
 
 /**
  * Test the various scenarios for explicit and implicit unwrapping of values.
@@ -86,7 +87,7 @@ public class UnwrapModesTest {
 		Set<ConstraintViolation<Bar>> constraintViolations = validatorWithUnwrapper.validate( new Bar() );
 		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths( constraintViolations, "integerHolder", "stringHolder" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class, NotBlankTypeUse.class );
+		assertCorrectConstraintTypes( constraintViolations, Min.class, NotBlank.class );
 	}
 
 	@Test
@@ -146,7 +147,7 @@ public class UnwrapModesTest {
 		@Min(10)
 		private ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 
-		private ValueHolder<@NotBlankTypeUse String> stringHolder = new ValueHolder<>( "" );
+		private ValueHolder<@NotBlank String> stringHolder = new ValueHolder<>( "" );
 	}
 
 	public class Baz {
