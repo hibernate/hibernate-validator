@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.internal.constraintvalidators.hv.NotEmptyCharSequenceValidator;
 import org.testng.annotations.Test;
 
 import javax.validation.ConstraintViolation;
@@ -19,30 +19,29 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-/**
- * @author Hardy Ferentschik
- */
-public class BlankValidatorTest {
+
+public class EmptyCharSequenceValidatorTest {
+
 	@Test
 	public void testConstraintValidator() {
-		NotBlankValidator constraintValidator = new NotBlankValidator();
-
+		NotEmptyCharSequenceValidator constraintValidator = new NotEmptyCharSequenceValidator();
 		assertTrue( constraintValidator.isValid( "a", null ) );
+		assertTrue( constraintValidator.isValid( " ", null ) );
+		assertTrue( constraintValidator.isValid( "\t", null ) );
+		assertTrue( constraintValidator.isValid( "\n", null ) );
 		assertFalse( constraintValidator.isValid( null, null ) );
 		assertFalse( constraintValidator.isValid( "", null ) );
-		assertFalse( constraintValidator.isValid( " ", null ) );
-		assertFalse( constraintValidator.isValid( "\t", null ) );
-		assertFalse( constraintValidator.isValid( "\n", null ) );
+
 	}
 
 	@Test
-	public void testNotBlank() {
-		validate( new Foo() , false);
+	public void testNotEmpty() {
+		validate( new Foo(), false );
 	}
 
 	@Test
-	public void testNotBlankCanBeNull() {
-		validate( new Bar() , true);
+	public void testNotEmptyCanBeNull() {
+		validate( new Bar(), true );
 	}
 
 	private <T extends WithName> void validate( T bean, boolean canBeNull ) {
@@ -57,15 +56,15 @@ public class BlankValidatorTest {
 
 		bean.setName( " " );
 		constraintViolations = validator.validate( bean );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertNumberOfViolations( constraintViolations, 0 );
 
 		bean.setName( "\t" );
 		constraintViolations = validator.validate( bean );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertNumberOfViolations( constraintViolations, 0 );
 
 		bean.setName( "\n" );
 		constraintViolations = validator.validate( bean );
-		assertNumberOfViolations( constraintViolations, 1 );
+		assertNumberOfViolations( constraintViolations, 0 );
 
 		bean.setName( "john doe" );
 		constraintViolations = validator.validate( bean );
@@ -77,7 +76,7 @@ public class BlankValidatorTest {
 	}
 
 	class Foo implements WithName {
-		@NotBlank
+		@NotEmpty
 		String name;
 
 		@Override
@@ -87,7 +86,7 @@ public class BlankValidatorTest {
 	}
 
 	class Bar implements WithName {
-		@NotBlank(canBeNull = true)
+		@NotEmpty(canBeNull = true)
 		String name;
 
 		@Override

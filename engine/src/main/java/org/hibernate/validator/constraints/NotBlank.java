@@ -21,12 +21,12 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
-import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotBlank.List;
 
 /**
  * Validate that the annotated string is not {@code null} or empty.
+ * To allow {@code null} values to be valid {@code canBeNull} should be set to {@code true}
  * The difference to {@code NotEmpty} is that trailing whitespaces are getting ignored.
  *
  * @author Hardy Ferentschik
@@ -36,7 +36,6 @@ import org.hibernate.validator.constraints.NotBlank.List;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 @ReportAsSingleViolation
-@NotNull
 @Repeatable(List.class)
 public @interface NotBlank {
 	String message() default "{org.hibernate.validator.constraints.NotBlank.message}";
@@ -44,6 +43,8 @@ public @interface NotBlank {
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
+
+	boolean canBeNull() default false;
 
 	/**
 	 * Defines several {@code @NotBlank} annotations on the same element.
