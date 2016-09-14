@@ -44,5 +44,10 @@ public abstract class NotEmptyBaseValidator<T> implements ConstraintValidator<No
 		return isNotEmpty( element );
 	}
 
+	/**
+	 * test if element is of correct length
+	 * @param element an element to test
+	 * @return {@code true} if test is passed, {@code false} otherwise
+	 */
 	protected abstract boolean isNotEmpty( T element );
 }
