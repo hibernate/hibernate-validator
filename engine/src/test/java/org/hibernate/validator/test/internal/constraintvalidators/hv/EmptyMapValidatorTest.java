@@ -12,12 +12,11 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotEmptyMapValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyMapValidator;
 import org.testng.annotations.Test;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +29,7 @@ public class EmptyMapValidatorTest {
 	public void testConstraintValidator() {
 		NotEmptyMapValidator constraintValidator = new NotEmptyMapValidator();
 		assertFalse( constraintValidator.isValid( Collections.emptyMap(), null ) );
-		assertTrue( constraintValidator.isValid( new HashMap(){ {put( "key", "val" );}}, null ) );
+		assertTrue( constraintValidator.isValid( getNonEmptyMap(), null ) );
 		assertFalse( constraintValidator.isValid( null, null ) );
 	}
 
@@ -54,9 +53,18 @@ public class EmptyMapValidatorTest {
 		constraintViolations = validator.validate( bean );
 		assertNumberOfViolations( constraintViolations, 1 );
 
-		bean.setMap( new HashMap(){ {put( "key", "val" );}} );
+		bean.setMap( getNonEmptyMap() );
 		constraintViolations = validator.validate( bean );
 		assertNumberOfViolations( constraintViolations, 0 );
+
+	}
+
+	private Map getNonEmptyMap() {
+		return new HashMap() {
+			{
+				put( "key", "val" );
+			}
+		};
 
 	}
 

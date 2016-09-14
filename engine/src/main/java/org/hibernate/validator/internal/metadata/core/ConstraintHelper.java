@@ -86,10 +86,10 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidato
 import org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotEmptyArrayValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotEmptyCharSequenceValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotEmptyIterableValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotEmptyMapValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyArrayValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyCharSequenceValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyIterableValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyMapValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoZonedDateTime;
@@ -218,10 +218,9 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
 		putConstraint( tmpConstraints, Mod11Check.class, Mod11CheckValidator.class );
 		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
-		putConstraint( tmpConstraints, NotEmpty.class, NotEmptyCharSequenceValidator.class );
-		putConstraint( tmpConstraints, NotEmpty.class, NotEmptyIterableValidator.class );
-		putConstraint( tmpConstraints, NotEmpty.class, NotEmptyMapValidator.class );
-		putConstraint( tmpConstraints, NotEmpty.class, NotEmptyArrayValidator.class );
+		putConstraints(tmpConstraints, NotEmpty.class,
+				Arrays.asList(NotEmptyCharSequenceValidator.class, NotEmptyIterableValidator.class,
+						NotEmptyMapValidator.class, NotEmptyArrayValidator.class));
 		putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
 		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
 		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );

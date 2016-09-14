@@ -12,7 +12,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotEmptyIterableValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyIterableValidator;
 import org.testng.annotations.Test;
 
 import javax.validation.ConstraintViolation;

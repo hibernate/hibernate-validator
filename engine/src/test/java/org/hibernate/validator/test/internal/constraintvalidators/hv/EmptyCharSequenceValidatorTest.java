@@ -7,7 +7,7 @@
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
 import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotEmptyCharSequenceValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyCharSequenceValidator;
 import org.testng.annotations.Test;
 
 import javax.validation.ConstraintViolation;

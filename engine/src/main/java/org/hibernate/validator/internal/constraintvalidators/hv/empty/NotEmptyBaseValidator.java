@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.constraintvalidators.hv;
+package org.hibernate.validator.internal.constraintvalidators.hv.empty;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -34,10 +34,10 @@ public abstract class NotEmptyBaseValidator<T> implements ConstraintValidator<No
 	 */
 	@Override
 	public boolean isValid( T element, ConstraintValidatorContext constraintValidatorContext ) {
-		if (!canBeNull && element == null) {
+		if ( !canBeNull && element == null ) {
 			return false;
 		}
-		if (element == null) {
+		if ( element == null ) {
 			return true;
 		}
 
