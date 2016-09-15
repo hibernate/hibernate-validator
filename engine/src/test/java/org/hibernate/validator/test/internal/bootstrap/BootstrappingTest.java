@@ -18,13 +18,13 @@ import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
@@ -71,7 +71,7 @@ public class BootstrappingTest {
 
 		Set<ConstraintViolation<Customer>> constraintViolations = validator.validate( customer );
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectConstraintTypes( constraintViolations, NotEmpty.class );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertCorrectPropertyPaths( constraintViolations, "lastName" );
 
 		// get a new factory using a custom configuration

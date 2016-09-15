@@ -21,13 +21,12 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotEmpty.List;
 
 /**
  * Asserts that the annotated string, collection, map or array is not {@code null} or empty.
+ * To allow {@code null} values to be valid {@code canBeNull} should be set to {@code true}.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -38,14 +37,14 @@ import org.hibernate.validator.constraints.NotEmpty.List;
 @Retention(RUNTIME)
 @Repeatable(List.class)
 @ReportAsSingleViolation
-@NotNull
-@Size(min = 1)
 public @interface NotEmpty {
 	String message() default "{org.hibernate.validator.constraints.NotEmpty.message}";
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
+
+	boolean canBeNull() default false;
 
 	/**
 	 * Defines several {@code @NotEmpty} annotations on the same element.

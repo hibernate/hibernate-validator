@@ -253,6 +253,21 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SAFE_HTML, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SCRIPT_ASSERT, Object.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.URL, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint(
+				HibernateValidatorTypes.NOT_EMPTY,
+				Object[].class,
+				boolean[].class,
+				byte[].class,
+				char[].class,
+				double[].class,
+				float[].class,
+				int[].class,
+				long[].class,
+				short[].class,
+				Iterable.class,
+				Map.class,
+				String.class
+		);
 	}
 
 	/**

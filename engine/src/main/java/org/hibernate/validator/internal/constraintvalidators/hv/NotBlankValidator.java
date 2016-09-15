@@ -18,8 +18,11 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 public class NotBlankValidator implements ConstraintValidator<NotBlank, CharSequence> {
 
+	private boolean canBeNull = false;
+
 	@Override
 	public void initialize(NotBlank annotation) {
+		this.canBeNull = annotation.canBeNull();
 	}
 
 	/**
@@ -33,6 +36,9 @@ public class NotBlankValidator implements ConstraintValidator<NotBlank, CharSequ
 	 */
 	@Override
 	public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {
+		if ( !canBeNull && charSequence == null ) {
+			return false;
+		}
 		if ( charSequence == null ) {
 			return true;
 		}

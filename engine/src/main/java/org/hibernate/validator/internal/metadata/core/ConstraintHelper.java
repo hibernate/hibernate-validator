@@ -6,6 +6,11 @@
  */
 package org.hibernate.validator.internal.metadata.core;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -45,6 +50,7 @@ import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -80,6 +86,17 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidato
 import org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyArrayValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyBooleanArrayValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyByteArrayValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyCharArrayValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyCharSequenceValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyDoubleArrayValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyFloatArrayValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyIntArrayValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyIterableValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyLongArrayValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyMapValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoZonedDateTime;
@@ -105,6 +122,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidat
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.empty.NotEmptyShortArrayValidator;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -114,10 +132,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.
@@ -212,6 +226,12 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
 		putConstraint( tmpConstraints, Mod11Check.class, Mod11CheckValidator.class );
 		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
+		putConstraints(tmpConstraints, NotEmpty.class,
+				Arrays.asList(NotEmptyCharSequenceValidator.class, NotEmptyIterableValidator.class,
+						NotEmptyMapValidator.class, NotEmptyArrayValidator.class, NotEmptyBooleanArrayValidator.class,
+						NotEmptyByteArrayValidator.class, NotEmptyCharArrayValidator.class, NotEmptyDoubleArrayValidator.class,
+						NotEmptyFloatArrayValidator.class, NotEmptyIntArrayValidator.class, NotEmptyLongArrayValidator.class,
+						NotEmptyShortArrayValidator.class));
 		putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
 		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
 		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );

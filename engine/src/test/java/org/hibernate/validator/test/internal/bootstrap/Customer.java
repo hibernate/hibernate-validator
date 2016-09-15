@@ -20,7 +20,7 @@ public class Customer {
 	@NotEmpty
 	private String firstName;
 	private String middleName;
-	@NotEmpty
+	@NotNull
 	private String lastName;
 
 	@Valid
