@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.constraintcomposition;
+
+//end::include[]
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -13,6 +16,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+//tag::include[]
 @NotNull
 @Size(min = 2, max = 14)
 @CheckCase(CaseMode.UPPER)
@@ -29,3 +33,4 @@ public @interface ValidLicensePlate {
 
 	Class<? extends Payload>[] payload() default { };
 }
+//end::include[]

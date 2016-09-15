@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter05.groupconversion;
+
+//end::include[]
 
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -9,6 +12,7 @@ import javax.validation.constraints.Size;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
+//tag::include[]
 @GroupSequence({ CarChecks.class, Car.class })
 public class Car {
 
@@ -56,3 +60,4 @@ public class Car {
 
 	// getters and setters ...
 }
+//end::include[]

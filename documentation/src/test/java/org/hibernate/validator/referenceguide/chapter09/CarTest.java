@@ -42,6 +42,7 @@ public class CarTest {
 
 	@Test
 	public void testBeanDescriptor() {
+		//tag::testBeanDescriptor[]
 		BeanDescriptor carDescriptor = validator.getConstraintsForClass( Car.class );
 
 		assertTrue( carDescriptor.isBeanConstrained() );
@@ -100,12 +101,14 @@ public class CarTest {
 						String.class
 				)
 		);
+		//end::testBeanDescriptor[]
 	}
 
 	@Test
 	public void testPropertyDescriptor() {
 		BeanDescriptor carDescriptor = validator.getConstraintsForClass( Car.class );
 
+		//tag::testPropertyDescriptor[]
 		PropertyDescriptor licensePlateDescriptor = carDescriptor.getConstraintsForProperty(
 				"licensePlate"
 		);
@@ -125,12 +128,14 @@ public class CarTest {
 		assertFalse( driverDescriptor.hasConstraints() );
 		assertTrue( driverDescriptor.isCascaded() );
 		assertEquals( 1, driverDescriptor.getGroupConversions().size() );
+		//end::testPropertyDescriptor[]
 	}
 
 	@Test
 	public void testMethodAndConstructorDescriptor() {
 		BeanDescriptor carDescriptor = validator.getConstraintsForClass( Car.class );
 
+		//tag::testMethodAndConstructorDescriptor[]
 		//driveAway(int) has a constrained parameter and an unconstrained return value
 		MethodDescriptor driveAwayDescriptor = carDescriptor.getConstraintsForMethod(
 				"driveAway",
@@ -199,12 +204,14 @@ public class CarTest {
 						.getConstraintDescriptors()
 						.size()
 		);
+		//end::testMethodAndConstructorDescriptor[]
 	}
 
 	@Test
 	public void testElementDescriptor() {
 		BeanDescriptor carDescriptor = validator.getConstraintsForClass( Car.class );
 
+		//tag::testElementDescriptor[]
 		PropertyDescriptor manufacturerDescriptor = carDescriptor.getConstraintsForProperty(
 				"manufacturer"
 		);
@@ -220,12 +227,14 @@ public class CarTest {
 
 		assertTrue( loadCrossParameterDescriptor.hasConstraints() );
 		assertEquals( Object[].class, loadCrossParameterDescriptor.getElementClass() );
+		//end::testElementDescriptor[]
 	}
 
 	@Test
 	public void testConstraintFinderApi() {
 		BeanDescriptor carDescriptor = validator.getConstraintsForClass( Car.class );
 
+		//tag::testConstraintFinderApi[]
 		PropertyDescriptor manufacturerDescriptor = carDescriptor.getConstraintsForProperty(
 				"manufacturer"
 		);
@@ -275,11 +284,13 @@ public class CarTest {
 						.getConstraintDescriptors()
 						.size()
 		);
+		//end::testConstraintFinderApi[]
 	}
 
 	@Test
 	public void testGroupConversionDescriptor() {
 		BeanDescriptor carDescriptor = validator.getConstraintsForClass( Car.class );
+		//tag::testGroupConversionDescriptor[]
 		PropertyDescriptor driverDescriptor = carDescriptor.getConstraintsForProperty( "driver" );
 
 		Set<GroupConversionDescriptor> groupConversions = driverDescriptor.getGroupConversions();
@@ -289,12 +300,14 @@ public class CarTest {
 				.next();
 		assertEquals( Default.class, groupConversionDescriptor.getFrom() );
 		assertEquals( Person.Basic.class, groupConversionDescriptor.getTo() );
+		//end::testGroupConversionDescriptor[]
 	}
 
 	@Test
 	public void testConstraintDescriptor() {
 		BeanDescriptor carDescriptor = validator.getConstraintsForClass( Car.class );
 
+		//tag::testConstraintDescriptor[]
 		//descriptor for the @LuggageCountMatchesPassengerCount constraint on the
 		//load(List<Person>, List<PieceOfLuggage>) method
 		ConstraintDescriptor<?> constraintDescriptor = carDescriptor.getConstraintsForMethod(
@@ -336,5 +349,6 @@ public class CarTest {
 				Arrays.<Class<?>>asList( LuggageCountMatchesPassengerCount.Validator.class ),
 				constraintDescriptor.getConstraintValidatorClasses()
 		);
+		//end::testConstraintDescriptor[]
 	}
 }

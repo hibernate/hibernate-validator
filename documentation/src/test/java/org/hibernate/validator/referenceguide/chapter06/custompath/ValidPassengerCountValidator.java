@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.custompath;
+
+//end::include[]
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+//tag::include[]
 public class ValidPassengerCountValidator
 		implements ConstraintValidator<ValidPassengerCount, Car> {
 
@@ -28,3 +32,4 @@ public class ValidPassengerCountValidator
 		return isValid;
 	}
 }
+//end::include[]

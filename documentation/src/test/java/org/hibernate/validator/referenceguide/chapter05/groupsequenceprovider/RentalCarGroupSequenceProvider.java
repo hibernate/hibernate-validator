@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter05.groupsequenceprovider;
+
+//end::include[]
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +9,7 @@ import java.util.List;
 import org.hibernate.validator.referenceguide.chapter05.CarChecks;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
+//tag::include[]
 public class RentalCarGroupSequenceProvider
 		implements DefaultGroupSequenceProvider<RentalCar> {
 
@@ -21,3 +25,4 @@ public class RentalCarGroupSequenceProvider
 		return defaultGroupSequence;
 	}
 }
+//end::include[]

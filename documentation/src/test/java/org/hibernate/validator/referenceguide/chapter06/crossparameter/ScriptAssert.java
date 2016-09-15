@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.crossparameter;
+
+//end::include[]
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -10,6 +13,7 @@ import javax.validation.Payload;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+//tag::include[]
 @Constraint(validatedBy = {
 		ScriptAssertObjectValidator.class,
 		ScriptAssertParametersValidator.class
@@ -30,3 +34,4 @@ public @interface ScriptAssert {
 
 	ConstraintTarget validationAppliesTo() default ConstraintTarget.IMPLICIT;
 }
+//end::include[]

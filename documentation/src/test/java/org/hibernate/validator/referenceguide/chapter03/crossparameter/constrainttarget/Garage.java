@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter03.crossparameter.constrainttarget;
+
+//end::include[]
 
 import java.util.List;
 import javax.validation.ConstraintTarget;
 
+//tag::include[]
 public class Garage {
 
 	@ELAssert(expression = "...", validationAppliesTo = ConstraintTarget.PARAMETERS)
@@ -17,3 +21,4 @@ public class Garage {
 		return null;
 	}
 }
+//end::include[]

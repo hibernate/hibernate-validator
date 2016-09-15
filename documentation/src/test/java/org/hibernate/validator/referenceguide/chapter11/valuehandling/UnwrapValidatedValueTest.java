@@ -9,11 +9,13 @@ import org.junit.Test;
 public class UnwrapValidatedValueTest {
 
 	@Test
-	public void failFast() {
+	public void unwrapValidated() {
+		//tag::unwrapValidated[]
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
 				.addValidatedValueHandler( new PropertyValueUnwrapper() )
 				.buildValidatorFactory()
 				.getValidator();
+		//end::unwrapValidated[]
 	}
 }

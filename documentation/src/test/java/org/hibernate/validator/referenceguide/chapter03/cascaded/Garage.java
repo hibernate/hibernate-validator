@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter03.cascaded;
+
+//end::include[]
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+//tag::include[]
 public class Garage {
 
 	@NotNull
@@ -18,3 +22,4 @@ public class Garage {
 		return false;
 	}
 }
+//end::include[]

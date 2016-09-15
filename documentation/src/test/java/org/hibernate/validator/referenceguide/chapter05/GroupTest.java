@@ -24,6 +24,7 @@ public class GroupTest {
 
 	@Test
 	public void driveAway() {
+		//tag::driveAway[]
 		// create a car and check that everything is ok with it.
 		Car car = new Car( "Morris", "DD-AB-123", 2 );
 		Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
@@ -57,18 +58,20 @@ public class GroupTest {
 		assertEquals( 0, validator.validate( car, DriverChecks.class ).size() );
 
 		// just checking that everything is in order now
-		assertEquals(
-				0, validator.validate(
-				car,
-				Default.class,
-				CarChecks.class,
-				DriverChecks.class
-		).size()
+		assertEquals(0,
+				validator.validate(
+						car,
+						Default.class,
+						CarChecks.class,
+						DriverChecks.class
+				).size()
 		);
+		//end::driveAway[]
 	}
 
 	@Test
 	public void testOrderedChecks() {
+		//tag::testOrderedChecks[]
 		Car car = new Car( "Morris", "DD-AB-123", 2 );
 		car.setPassedVehicleInspection( true );
 
@@ -78,6 +81,7 @@ public class GroupTest {
 		car.setDriver( john );
 
 		assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );
+		//end::testOrderedChecks[]
 	}
 
 	/**
@@ -85,6 +89,7 @@ public class GroupTest {
 	 */
 	@Test
 	public void carIsRented() {
+		//tag::carIsRented[]
 		RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
 		rentalCar.setPassedVehicleInspection( true );
 		rentalCar.setRented( true );
@@ -102,5 +107,6 @@ public class GroupTest {
 		constraintViolations = validator.validate( rentalCar );
 
 		assertEquals( 0, constraintViolations.size() );
+		//end::carIsRented[]
 	}
 }

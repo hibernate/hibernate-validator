@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter10.cdi.injection;
+
+//end::include[]
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -6,6 +9,7 @@ import javax.inject.Inject;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+//tag::include[]
 public class ValidLicensePlateValidator
 		implements ConstraintValidator<ValidLicensePlate, String> {
 
@@ -31,3 +35,4 @@ public class ValidLicensePlateValidator
 		return vehicleRegistry.isValidLicensePlate( licensePlate );
 	}
 }
+//end::include[]

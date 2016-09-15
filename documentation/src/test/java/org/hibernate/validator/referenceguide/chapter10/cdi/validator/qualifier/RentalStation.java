@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter10.cdi.validator.qualifier;
+
+//end::include[]
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -7,6 +10,7 @@ import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.cdi.HibernateValidator;
 
+//tag::include[]
 @ApplicationScoped
 public class RentalStation {
 
@@ -20,3 +24,4 @@ public class RentalStation {
 
 	//...
 }
+//end::include[]

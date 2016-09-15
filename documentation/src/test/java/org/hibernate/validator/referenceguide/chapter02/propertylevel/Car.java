@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter02.propertylevel;
+
+//end::include[]
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 
+//tag::include[]
 public class Car {
 
 	private String manufacturer;
@@ -32,3 +36,4 @@ public class Car {
 		this.isRegistered = isRegistered;
 	}
 }
+//end::include[]

@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter03.validation;
+
+//end::include[]
 
 import java.util.Collections;
 import java.util.List;
@@ -6,6 +9,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+//tag::include[]
 public class Car {
 
 	public Car(@NotNull String manufacturer) {
@@ -27,3 +31,4 @@ public class Car {
 		return Collections.emptyList();
 	}
 }
+//end::include[]

@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter09;
+
+//end::include[]
 
 import java.util.List;
 import javax.validation.ConstraintTarget;
@@ -10,6 +13,7 @@ import javax.validation.constraints.Size;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
+//tag::include[]
 @ValidCar
 public class Car implements Vehicle {
 
@@ -49,8 +53,8 @@ public class Car implements Vehicle {
 			piecesOfLuggagePerPassenger = 2,
 			validationAppliesTo = ConstraintTarget.PARAMETERS,
 			payload = SeverityInfo.class,
-			message = "There must not be more than {piecesOfLuggagePerPassenger} pieces of " +
-					"luggage per passenger."
+			message = "There must not be more than {piecesOfLuggagePerPassenger} pieces " +
+					"of luggage per passenger."
 	)
 	public void load(List<Person> passengers, List<PieceOfLuggage> luggage) {
 		//...
@@ -74,3 +78,4 @@ public class Car implements Vehicle {
 
 	//further getters and setters...
 }
+//end::include[]

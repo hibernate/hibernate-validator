@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter11.dynamicpayload;
+
+//end::include[]
 
 import java.util.Map;
 import javax.validation.ConstraintValidator;

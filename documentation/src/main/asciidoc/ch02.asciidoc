@@ -36,25 +36,9 @@ level configuration example:
 [[example-field-level]]
 .Field-level constraints
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.fieldlevel;
-
-public class Car {
-
-	@NotNull
-	private String manufacturer;
-
-	@AssertTrue
-	private boolean isRegistered;
-
-	public Car(String manufacturer, boolean isRegistered) {
-		this.manufacturer = manufacturer;
-		this.isRegistered = isRegistered;
-	}
-
-	//getters and setters...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/fieldlevel/Car.java[tags=include]
 ----
 ====
 
@@ -82,39 +66,9 @@ constraints are used.
 [[example-property-level]]
 .Property-level constraints
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.propertylevel;
-
-public class Car {
-
-	private String manufacturer;
-
-	private boolean isRegistered;
-
-	public Car(String manufacturer, boolean isRegistered) {
-		this.manufacturer = manufacturer;
-		this.isRegistered = isRegistered;
-	}
-
-	@NotNull
-	public String getManufacturer() {
-		return manufacturer;
-	}
-
-	public void setManufacturer(String manufacturer) {
-		this.manufacturer = manufacturer;
-	}
-
-	@AssertTrue
-	public boolean isRegistered() {
-		return isRegistered;
-	}
-
-	public void setRegistered(boolean isRegistered) {
-		this.isRegistered = isRegistered;
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/propertylevel/Car.java[tags=include]
 ----
 ====
 
@@ -157,38 +111,14 @@ In this example, `@ValidPart` is a custom constraint allowed to be used in the `
 [[example-type-arguments-constraints-collections]]
 .Type argument constraint on `List`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class Car {
-
-	@Valid
-	private List<@ValidPart String> parts = new ArrayList<>();
-
-	public void addPart(String part) {
-		parts.add( part );
-	}
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/list/Car.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Car car = Car();
-car.addPart( "Wheel" );
-car.addPart( null );
-
-Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
-
-assertEquals( 1, constraintViolations.size() );
-assertEquals(
-		"'null' is not a valid car part.",
-		constraintViolations.iterator().next().getMessage()
-);
-assertEquals( "parts[1].<collection element>",
-		constraintViolations.iterator().next().getPropertyPath().toString() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/list/CarTest.java[tags=validateListTypeArgumentConstraint]
 ----
 ====
 
@@ -201,38 +131,14 @@ argument constraint.
 [[example-type-arguments-constraints-map]]
 .Type argument constraint on maps
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class Car {
-
-	public static enum FuelConsumption {
-		CITY,
-		HIGHWAY
-	}
-
-	@Valid
-	private EnumMap<FuelConsumption, @MaxAllowedFuelConsumption Integer> fuelConsumption = new EnumMap<>( FuelConsumption.class );
-
-	public void setFuelConsumption(FuelConsumption consumption, int value) {
-		fuelConsumption.put( consumption, value );
-	}
-
-    //...
-}
-
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/map/Car.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Car car = new Car();
-car.setFuelConsumption( Car.FuelConsumption.HIGHWAY, 20 );
-
-Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
-
-assertEquals( 1, constraintViolations.size() );
-assertEquals( "20 is outside the max fuel consumption.", constraintViolations.iterator().next().getMessage() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/map/CarTest.java[tags=validateMapTypeArgumentConstraint]
 ----
 ====
 
@@ -246,39 +152,14 @@ an example of an `Optional` with a type argument constraint.
 [[example-type-arguments-constraints-optional]]
 .Type argument constraint on Optional
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Optional;
-import javax.validation.Valid;
-
-public class Car {
-
-	private Optional<@MinTowingCapacity(1000) Integer> towingCapacity = Optional.empty();
-
-	public void setTowingCapacity(Integer alias) {
-		towingCapacity = Optional.of( alias );
-	}
-
-    //...
-}
-
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/optional/Car.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Car car = Car();
-car.setTowingCapacity( 100 );
-
-Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
-
-assertEquals( 1, constraintViolations.size() );
-assertEquals( "Not enough towing capacity.", constraintViolations.iterator().next().getMessage() );
-assertEquals( "towingCapacity", constraintViolations.iterator().next().getPropertyPath().toString() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/optional/CarTest.java[tags=validateOptionalTypeArgumentConstraint]
 ----
 ====
 
@@ -297,90 +178,29 @@ parameterized type with a type argument constraint.
 [[example-type-arguments-constraints-custom-parameterized-type]]
 .Type argument constraint on custom parameterized type
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class Car {
-
-	private GearBox<@MinTorque(100) Gear> gearBox;
-
-	public void setGearBox(GearBox<Gear> gearBox) {
-		this.gearBox = gearBox;
-	}
-
-	//...
-}
-
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/Car.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class GearBox<T extends Gear> {
-
-	private final T gear;
-
-	public GearBox(T gear) {
-		this.gear = gear;
-	}
-
-	public Gear getGear() {
-		return this.gear;
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/GearBox.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class Gear {
-	private final Integer torque;
-
-	public Gear(Integer torque) {
-		this.torque = torque;
-	}
-
-	public Integer getTorque() {
-		return torque;
-	}
-
-	public static class AcmeGear extends Gear {
-		public AcmeGear() {
-			super( 100 );
-		}
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/Gear.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
-
-public class GearBoxUnwrapper extends ValidatedValueUnwrapper<GearBox> {
-	@Override
-	public Object handleValidatedValue(GearBox gearBox) {
-		return gearBox == null ? null : gearBox.getGear();
-	}
-
-	@Override
-	public Type getValidatedValueType(Type valueType) {
-		return Gear.class;
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/GearBoxUnwrapper.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Car car = Car();
-car.setGearBox( new GearBox<>( new Gear.AcmeGear() ) );
-
-Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
-assertEquals( 1, constraintViolations.size() );
-assertEquals( "Gear is not providing enough torque.", constraintViolations.iterator().next().getMessage() );
-assertEquals( "gearBox", constraintViolations.iterator().next().getPropertyPath().toString() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/CarTest.java[tags=validateCustomTypeArgumentConstraint]
 ----
 ====
 
@@ -404,19 +224,9 @@ constraint.
 [[example-class-level]]
 .Class-level constraint
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.classlevel;
-
-@ValidPassengerCount
-public class Car {
-
-	private int seatCount;
-
-	private List<Person> passengers;
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/classlevel/Car.java[tags=include]
 ----
 ====
 
@@ -429,38 +239,14 @@ things clearer let's have a look at the following example:
 
 .Constraint inheritance
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.inheritance;
-
-public class Car {
-
-	private String manufacturer;
-
-	@NotNull
-	public String getManufacturer() {
-		return manufacturer;
-	}
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/inheritance/Car.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.inheritance;
-
-public class RentalCar extends Car {
-
-	private String rentalStation;
-
-	@NotNull
-	public String getRentalStation() {
-		return rentalStation;
-	}
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/inheritance/RentalCar.java[tags=include]
 ----
 ====
 
@@ -484,31 +270,14 @@ reference to another object with `@Valid` as demonstrated in <<example-cascaded-
 [[example-cascaded-validation]]
 .Cascaded validation
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.objectgraph;
-
-public class Car {
-
-	@NotNull
-	@Valid
-	private Person driver;
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/Car.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.objectgraph;
-
-public class Person {
-
-	@NotNull
-	private String name;
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/Person.java[tags=include]
 ----
 ====
 
@@ -536,18 +305,9 @@ parent object is validated.
 [[example-cascaded-validation-list]]
 .Cascaded validation of a collection
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter02.objectgraph.list;
-
-public class Car {
-
-	@NotNull
-	@Valid
-	private List<Person> passengers = new ArrayList<Person>();
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/objectgraph/list/Car.java[tags=include]
 ----
 ====
 
@@ -571,10 +331,9 @@ use the static method `Validation#buildDefaultValidatorFactory()`:
 
 .`Validation#buildDefaultValidatorFactory()`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-Validator validator = factory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=setUpValidator]
 ----
 ====
 
@@ -605,14 +364,9 @@ property. The validation call therefore returns one `ConstraintViolation` object
 [[example-validator-validate]]
 .Using `Validator#validate()`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Car car = new Car( null, true );
-
-Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
-
-assertEquals( 1, constraintViolations.size() );
-assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=validate]
 ----
 ====
 
@@ -624,17 +378,9 @@ property name is the JavaBeans property name.
 
 .Using `Validator#validateProperty()`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Car car = new Car( null, true );
-
-Set<ConstraintViolation<Car>> constraintViolations = validator.validateProperty(
-		car,
-		"manufacturer"
-);
-
-assertEquals( 1, constraintViolations.size() );
-assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=validateProperty]
 ----
 ====
 
@@ -646,18 +392,10 @@ validated successfully, if the property had the specified value:
 
 .Using `Validator#validateValue()`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Set<ConstraintViolation<Car>> constraintViolations = validator.validateValue(
-		Car.class,
-		"manufacturer",
-		null
-);
-
-assertEquals( 1, constraintViolations.size() );
-assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );
----
-
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/validation/ValidationTest.java[tags=validateValue]
+----
 ====
 
 [NOTE]

@@ -1,9 +1,13 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter05.groupconversion;
+
+//end::include[]
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+//tag::include[]
 public class Driver {
 
 	@NotNull
@@ -40,3 +44,4 @@ public class Driver {
 
 	// getters and setters ...
 }
+//end::include[]

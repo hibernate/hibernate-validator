@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation.implicit;
+
+//end::include[]
 
 import java.util.Date;
 import java.util.List;
@@ -7,6 +10,7 @@ import javax.validation.constraints.Min;
 import javax.validation.executable.ExecutableType;
 import javax.validation.executable.ValidateOnExecution;
 
+//tag::include[]
 @ApplicationScoped
 @ValidateOnExecution(type = ExecutableType.IMPLICIT)
 public class ExpressRentalStation implements RentalStation {
@@ -23,3 +27,4 @@ public class ExpressRentalStation implements RentalStation {
 		return null;
 	}
 }
+//end::include[]
