@@ -1,7 +1,11 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter03.inheritance.parameter;
+
+//end::include[]
 
 import javax.validation.constraints.Max;
 
+//tag::include[]
 public class Car implements Vehicle {
 
 	@Override
@@ -9,3 +13,4 @@ public class Car implements Vehicle {
 		//...
 	}
 }
+//end::include[]

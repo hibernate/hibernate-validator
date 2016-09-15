@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter05;
+
+//end::include[]
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 
+//tag::include[]
 public class Driver extends Person {
 
 	@Min(
@@ -34,3 +38,4 @@ public class Driver extends Person {
 		this.age = age;
 	}
 }
+//end::include[]

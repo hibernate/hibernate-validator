@@ -1,5 +1,9 @@
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
+//tag::include[]
+package org.hibernate.validator.referenceguide.chapter02.typeargument.custom;
 
+//end::include[]
+
+//tag::include[]
 public class Gear {
 	private final Integer torque;
 
@@ -17,3 +21,4 @@ public class Gear {
 		}
 	}
 }
+//end::include[]

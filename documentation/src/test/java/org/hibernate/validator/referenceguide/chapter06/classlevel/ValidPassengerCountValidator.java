@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.classlevel;
+
+//end::include[]
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+//tag::include[]
 public class ValidPassengerCountValidator
 		implements ConstraintValidator<ValidPassengerCount, Car> {
 
@@ -19,3 +23,4 @@ public class ValidPassengerCountValidator
 		return car.getPassengers().size() <= car.getSeatCount();
 	}
 }
+//end::include[]

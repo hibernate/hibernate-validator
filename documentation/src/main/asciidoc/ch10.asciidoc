@@ -189,21 +189,9 @@ instances and use them in your managed beans. Just annotate instance fields of y
 [[example-dependency-injection]]
 .Retrieving validator factory and validator via `@Inject`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter10.cdi.validator;
-
-@ApplicationScoped
-public class RentalStation {
-
-	@Inject
-	private ValidatorFactory validatorFactory;
-
-	@Inject
-	private Validator validator;
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/cdi/validator/RentalStation.java[tags=include]
 ----
 ====
 
@@ -218,23 +206,9 @@ validator from Hibernate Validator are injected by annotating the injection poin
 [[example-dependency-injection-using-hv]]
 .Using the `@HibernateValidator` qualifier annotation
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter10.cdi.validator.qualifier;
-
-@ApplicationScoped
-public class RentalStation {
-
-	@Inject
-	@HibernateValidator
-	private ValidatorFactory validatorFactory;
-
-	@Inject
-	@HibernateValidator
-	private Validator validator;
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/cdi/validator/qualifier/RentalStation.java[tags=include]
 ----
 ====
 
@@ -259,35 +233,9 @@ logic.
 [[example-constraint-validator-injected-bean]]
 .Constraint validator with injected bean
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter10.cdi.injection;
-
-public class ValidLicensePlateValidator
-		implements ConstraintValidator<ValidLicensePlate, String> {
-
-	@Inject
-	private VehicleRegistry vehicleRegistry;
-
-	@PostConstruct
-	public void postConstruct() {
-		//do initialization logic...
-	}
-
-	@PreDestroy
-	public void preDestroy() {
-		//do destruction logic...
-	}
-
-	@Override
-	public void initialize(ValidLicensePlate constraintAnnotation) {
-	}
-
-	@Override
-	public boolean isValid(String licensePlate, ConstraintValidatorContext constraintContext) {
-		return vehicleRegistry.isValidLicensePlate( licensePlate );
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/cdi/injection/ValidLicensePlateValidator.java[tags=include]
 ----
 ====
 
@@ -315,49 +263,14 @@ You can see an example in <<example-cdi-method-validation>>.
 [[example-cdi-method-validation]]
 .CDI managed beans with method-level constraints
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation;
-
-@ApplicationScoped
-public class RentalStation {
-
-	@Valid
-	public RentalStation() {
-		//...
-	}
-
-	@NotNull
-	@Valid
-	public Car rentCar(
-			@NotNull Customer customer,
-			@NotNull @Future Date startDate,
-			@Min(1) int durationInDays) {
-		//...
-	}
-
-	@NotNull
-	List<Car> getAvailableCars() {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/cdi/methodvalidation/RentalStation.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation;
-
-@RequestScoped
-public class RentCarRequest {
-
-	@Inject
-	private RentalStation rentalStation;
-
-	public void rentCar(String customerId, Date startDate, int duration) {
-		//causes ConstraintViolationException
-		rentalStation.rentCar( null, null, -1 );
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/cdi/methodvalidation/RentCarRequest.java[tags=include]
 ----
 ====
 
@@ -397,34 +310,9 @@ INF/validation.xml__.
 [[example-using-validateonexecution]]
 .Using `@ValidateOnExecution`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation.configuration;
-
-@ApplicationScoped
-@ValidateOnExecution(type = ExecutableType.ALL)
-public class RentalStation {
-
-	@Valid
-	public RentalStation() {
-		//...
-	}
-
-	@NotNull
-	@Valid
-	@ValidateOnExecution(type = ExecutableType.NONE)
-	public Car rentCar(
-			@NotNull Customer customer,
-			@NotNull @Future Date startDate,
-			@Min(1) int durationInDays) {
-		//...
-	}
-
-	@NotNull
-	public List<Car> getAvailableCars() {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/cdi/methodvalidation/configuration/RentalStation.java[tags=include]
 ----
 ====
 
@@ -457,36 +345,14 @@ an the validation interceptor kicks in when the methods on `ExpressRentalStation
 [[example-using-executabletype-implicit]]
 .Using `ExecutableType.IMPLICIT`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation.implicit;
-
-@ValidateOnExecution(type = ExecutableType.ALL)
-public interface RentalStation {
-
-	@NotNull
-	@Valid
-	Car rentCar(
-			@NotNull Customer customer,
-			@NotNull @Future Date startDate,
-			@Min(1) int durationInDays);
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/cdi/methodvalidation/implicit/RentalStation.java[tags=include]
 ----
 
-
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation.implicit;
-
-@ApplicationScoped
-@ValidateOnExecution(type = ExecutableType.IMPLICIT)
-public class ExpressRentalStation implements RentalStation {
-
-	@Override
-	public Car rentCar(Customer customer, Date startDate, @Min(1) int durationInDays) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/cdi/methodvalidation/implicit/ExpressRentalStation.java[tags=include]
 ----
 ====
 
@@ -500,21 +366,9 @@ managed objects such as EJBs etc., as shown in <<example-validator-resource-inje
 [[example-validator-resource-injection]]
 .Retrieving `Validator` and `ValidatorFactory` via `@Resource` injection
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter10.javaee;
-
-@Stateless
-public class RentalStationBean {
-
-	@Resource
-	private ValidatorFactory validatorFactory;
-
-	@Resource
-	private Validator validator;
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter10/javaee/RentalStationBean.java[tags=include]
 ----
 ====
 

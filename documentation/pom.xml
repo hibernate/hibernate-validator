@@ -76,6 +76,7 @@
                             <sourceHighlighter>highlightjs</sourceHighlighter>
                             <attributes>
                                 <sourcedir>${basedir}/src/test/java</sourcedir>
+                                <engine-sourcedir>${basedir}/../engine/src/main/java</engine-sourcedir>
                             </attributes>
                         </configuration>
                     </execution>

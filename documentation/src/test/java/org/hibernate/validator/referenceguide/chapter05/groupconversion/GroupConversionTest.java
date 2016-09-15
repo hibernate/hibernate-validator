@@ -23,6 +23,7 @@ public class GroupConversionTest {
 
 	@Test
 	public void validateDriverChecksTogetherWithCarChecks() {
+		//tag::validateDriverChecksTogetherWithCarChecks[]
 		// create a car and validate. The Driver is still null and does not get validated
 		Car car = new Car( "VW", "USD-123", 4 );
 		car.setPassedVehicleInspection( true );
@@ -42,5 +43,6 @@ public class GroupConversionTest {
 				constraintViolations.iterator().next().getMessage(),
 				"You first have to pass the driving test"
 		);
+		//end::validateDriverChecksTogetherWithCarChecks[]
 	}
 }

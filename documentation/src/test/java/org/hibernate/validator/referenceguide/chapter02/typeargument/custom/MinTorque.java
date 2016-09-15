@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
+package org.hibernate.validator.referenceguide.chapter02.typeargument.custom;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -17,26 +17,33 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Constraint(validatedBy = { ValidPart.ValidPartValidator.class })
+@Constraint(validatedBy = { MinTorque.MinTorqueValidator.class })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
-public @interface ValidPart {
-	String message() default "{org.hibernate.validator.referenceguide.chapter02.typeargument.ValidPart.message}";
+public @interface MinTorque {
+	long value();
+
+	String message() default "{org.hibernate.validator.referenceguide.chapter02.typeargument.MinTorque.message}";
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
 
-	class ValidPartValidator
-			implements ConstraintValidator<ValidPart, String> {
+	class MinTorqueValidator implements ConstraintValidator<MinTorque, Gear> {
+		private long min;
 
 		@Override
-		public void initialize(ValidPart annotation) {
+		public void initialize(MinTorque annotation) {
+			this.min = annotation.value();
 		}
 
 		@Override
-		public boolean isValid(String value, ConstraintValidatorContext context) {
-			return value != null;
+		public boolean isValid(Gear gear, ConstraintValidatorContext context) {
+			if ( gear == null ) {
+				return true;
+			}
+
+			return gear.getTorque() > min;
 		}
 	}
 }

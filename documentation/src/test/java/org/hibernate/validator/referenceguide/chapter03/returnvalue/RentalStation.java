@@ -1,9 +1,13 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter03.returnvalue;
+
+//end::include[]
 
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+//tag::include[]
 public class RentalStation {
 
 	@ValidRentalStation
@@ -18,3 +22,4 @@ public class RentalStation {
 		return null;
 	}
 }
+//end::include[]

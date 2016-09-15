@@ -1,9 +1,13 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter08;
+
+//end::include[]
 
 import java.util.List;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.spi.ValidationProvider;
 
+//tag::include[]
 public class OsgiServiceDiscoverer implements ValidationProviderResolver {
 
 	@Override
@@ -12,3 +16,4 @@ public class OsgiServiceDiscoverer implements ValidationProviderResolver {
 		return null;
 	}
 }
+//end::include[]

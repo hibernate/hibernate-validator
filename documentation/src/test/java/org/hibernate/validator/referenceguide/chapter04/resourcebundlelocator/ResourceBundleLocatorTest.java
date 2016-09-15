@@ -18,6 +18,7 @@ public class ResourceBundleLocatorTest {
 
 	@Test
 	public void messagesRetrievedFromSpecificBundle() {
+		//tag::messagesRetrievedFromSpecificBundle[]
 		Validator validator = Validation.byDefaultProvider()
 				.configure()
 				.messageInterpolator(
@@ -27,6 +28,7 @@ public class ResourceBundleLocatorTest {
 				)
 				.buildValidatorFactory()
 				.getValidator();
+		//end::messagesRetrievedFromSpecificBundle[]
 
 		Set<ConstraintViolation<Car>> violations = validator.validateProperty(
 				new Car(),
@@ -38,6 +40,7 @@ public class ResourceBundleLocatorTest {
 
 	@Test
 	public void usingAggregateResourceBundleLocator() {
+		//tag::usingAggregateResourceBundleLocator[]
 		Validator validator = Validation.byDefaultProvider()
 				.configure()
 				.messageInterpolator(
@@ -52,6 +55,7 @@ public class ResourceBundleLocatorTest {
 				)
 				.buildValidatorFactory()
 				.getValidator();
+		//end::usingAggregateResourceBundleLocator[]
 
 		Set<ConstraintViolation<Car>> violations = validator.validateProperty(
 				new Car(),

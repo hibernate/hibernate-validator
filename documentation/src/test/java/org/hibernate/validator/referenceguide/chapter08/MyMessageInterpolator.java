@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter08;
+
+//end::include[]
 
 import java.util.Locale;
 import javax.validation.MessageInterpolator;
 
+//tag::include[]
 public class MyMessageInterpolator implements MessageInterpolator {
 
 	@Override
@@ -17,3 +21,4 @@ public class MyMessageInterpolator implements MessageInterpolator {
 		return null;
 	}
 }
+//end::include[]

@@ -1,4 +1,4 @@
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
+package org.hibernate.validator.referenceguide.chapter02.typeargument.list;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -17,33 +17,26 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Documented
-@Constraint(validatedBy = { MinTowingCapacity.MinTowingCapacityValidator.class })
+@Constraint(validatedBy = { ValidPart.ValidPartValidator.class })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
-public @interface MinTowingCapacity {
-	long value();
-
-	String message() default "{org.hibernate.validator.referenceguide.chapter02.typeargument.MinTowingCapacity.message}";
+public @interface ValidPart {
+	String message() default "{org.hibernate.validator.referenceguide.chapter02.typeargument.ValidPart.message}";
 
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
 
-	class MinTowingCapacityValidator implements ConstraintValidator<MinTowingCapacity, Integer> {
-		private long min;
+	class ValidPartValidator
+			implements ConstraintValidator<ValidPart, String> {
 
 		@Override
-		public void initialize(MinTowingCapacity annotation) {
-			min = annotation.value();
+		public void initialize(ValidPart annotation) {
 		}
 
 		@Override
-		public boolean isValid(Integer value, ConstraintValidatorContext context) {
-			if ( value == null ) {
-				return true;
-			}
-
-			return value >= min;
+		public boolean isValid(String value, ConstraintValidatorContext context) {
+			return value != null;
 		}
 	}
 }

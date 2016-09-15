@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.crossparameter;
+
+//end::include[]
 
 import java.util.Date;
 import javax.validation.ConstraintValidator;
@@ -6,8 +9,9 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 
+//tag::include[]
 @SupportedValidationTarget(ValidationTarget.PARAMETERS)
-public class ConsistentDateParameterValidator implements
+public class ConsistentDateParametersValidator implements
 		ConstraintValidator<ConsistentDateParameters, Object[]> {
 
 	@Override
@@ -35,3 +39,4 @@ public class ConsistentDateParameterValidator implements
 		return ( (Date) value[0] ).before( (Date) value[1] );
 	}
 }
+//end::include[]

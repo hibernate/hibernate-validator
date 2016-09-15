@@ -48,23 +48,9 @@ parameters as demonstrated in <<example-declaring-parameter-constraints>>.
 [[example-declaring-parameter-constraints]]
 .Declaring method and constructor parameter constraints
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.parameter;
-
-public class RentalStation {
-
-	public RentalStation(@NotNull String name) {
-		//...
-	}
-
-	public void rentCar(
-			@NotNull Customer customer,
-			@NotNull @Future Date startDate,
-			@Min(1) int durationInDays) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/parameter/RentalStation.java[tags=include]
 ----
 ====
 
@@ -105,17 +91,9 @@ ensure that no passenger has more than two pieces of luggage.
 [[example-using-cross-parameter-constraint]]
 .Declaring a cross-parameter constraint
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.crossparameter;
-
-public class Car {
-
-	@LuggageCountMatchesPassengerCount(piecesOfLuggagePerPassenger = 2)
-	public void load(List<Person> passengers, List<PieceOfLuggage> luggage) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/crossparameter/Car.java[tags=include]
 ----
 ====
 
@@ -138,22 +116,9 @@ to apply the constraint to the executable return value.
 [[example-specifying-constraint-target]]
 .Specifying a constraint's target
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.crossparameter.constrainttarget;
-
-public class Garage {
-
-	@ELAssert(expression = "...", validationAppliesTo = ConstraintTarget.PARAMETERS)
-	public Car buildCar(List<Part> parts) {
-		//...
-	}
-
-	@ELAssert(expression = "...", validationAppliesTo = ConstraintTarget.RETURN_VALUE)
-	public Car paintCar(int color) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/crossparameter/constrainttarget/Garage.java[tags=include]
 ----
 ====
 
@@ -177,23 +142,9 @@ executable as shown in <<example-declaring-return-value-constraints>>.
 [[example-declaring-return-value-constraints]]
 .Declaring method and constructor return value constraints
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.returnvalue;
-
-public class RentalStation {
-
-	@ValidRentalStation
-	public RentalStation() {
-		//...
-	}
-
-	@NotNull
-	@Size(min = 1)
-	public List<Customer> getCustomers() {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/returnvalue/RentalStation.java[tags=include]
 ----
 ====
 
@@ -216,46 +167,14 @@ well as the return value of the `Garage` constructor are marked for cascaded val
 [[example-cascaded-executable-validation]]
 .Marking executable parameters and return values for cascaded validation
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.cascaded;
-
-public class Garage {
-
-	@NotNull
-	private String name;
-
-	@Valid
-	public Garage(String name) {
-		this.name = name;
-	}
-
-	public boolean checkCar(@Valid @NotNull Car car) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/cascaded/Garage.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.cascaded;
-
-public class Car {
-
-	@NotNull
-	private String manufacturer;
-
-	@NotNull
-	@Size(min = 2, max = 14)
-	private String licensePlate;
-
-	public Car(String manufacturer, String licencePlate) {
-		this.manufacturer = manufacturer;
-		this.licensePlate = licencePlate;
-	}
-
-	//getters and setters ...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/cascaded/Car.java[tags=include]
 ----
 ====
 
@@ -286,16 +205,9 @@ be validated and a `ConstraintViolation` created when any of the contained `Car`
 [[example-cascaded-executable-validation-listtyped]]
 .List-typed method parameter marked for cascaded validation
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.cascaded.collection;
-
-public class Garage {
-
-	public boolean checkCars(@Valid @NotNull List<Car> cars) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/cascaded/collection/Garage.java[tags=include]
 ----
 ====
 
@@ -324,27 +236,14 @@ methods which override or implement a method declared in a supertype (superclass
 [[example-illegal-parameter-constraints]]
 .Illegal method parameter constraint in subtype
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.inheritance.parameter;
-
-public interface Vehicle {
-
-    void drive(@Max(75) int speedInMph);
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/inheritance/parameter/Vehicle.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.inheritance.parameter;
-
-public class Car implements Vehicle {
-
-	@Override
-	public void drive(@Max(55) int speedInMph) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/inheritance/parameter/Car.java[tags=include]
 ----
 ====
 
@@ -362,38 +261,19 @@ Therefore the constraint on `Vehicle#drive()` is illegal.
 [[example-illegal-parameter-constraints-parallel-types]]
 .Illegal method parameter constraint in parallel types of a hierarchy
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.inheritance.parallel;
-
-public interface Vehicle {
-
-	void drive(@Max(75) int speedInMph);
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/inheritance/parallel/Vehicle.java[tags=include]
 ----
 
-
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.inheritance.parallel;
-
-public interface Car {
-
-	public void drive(int speedInMph);
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/inheritance/parallel/Car.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.inheritance.parallel;
-
-public class RacingCar implements Car, Vehicle {
-
-	@Override
-	public void drive(int speedInMph) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/inheritance/parallel/RacingCar.java[tags=include]
 ----
 ====
 
@@ -413,30 +293,14 @@ as the `@NotNull` constraint on the implemented interface method `Vehicle#getPas
 [[example-return-value-constraints-in-hierarchy]]
 .Return value constraints on supertype and subtype method
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.inheritance.returnvalue;
-
-public interface Vehicle {
-
-	@NotNull
-	List<Person> getPassengers();
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/inheritance/returnvalue/Vehicle.java[tags=include]
 ----
 
-
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.inheritance.returnvalue;
-
-public class Car implements Vehicle {
-
-	@Override
-	@Size(min = 1)
-	public List<Person> getPassengers() {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/inheritance/returnvalue/Car.java[tags=include]
 ----
 ====
 
@@ -482,10 +346,9 @@ You can retrieve an `ExecutableValidator` instance via `Validator#forExecutables
 [[example-obtaining-executable-validator]]
 .Obtaining an `ExecutableValidator` instance
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-executableValidator = factory.getValidator().forExecutables();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/validation/CarTest.java[tags=setUpValidator]
 ----
 ====
 
@@ -513,30 +376,9 @@ shown in <<example-executable-validator-class-car>>.
 [[example-executable-validator-class-car]]
 .Class `Car` with constrained methods and constructors
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.validation;
-
-public class Car {
-
-	public Car(@NotNull String manufacturer) {
-		//...
-	}
-
-	@ValidRacingCar
-	public Car(String manufacturer, String team) {
-		//...
-	}
-
-	public void drive(@Max(75) int speedInMph) {
-		//...
-	}
-
-	@Size(min = 1)
-	public List<Passenger> getPassengers() {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/validation/Car.java[tags=include]
 ----
 ====
 
@@ -549,24 +391,9 @@ violation of the `@Max` constraint on the parameter of the `drive()` method.
 [[example-executable-validator-validate-parameters]]
 .Using `ExecutableValidator#validateParameters()`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Car object = new Car( "Morris" );
-Method method = Car.class.getMethod( "drive", int.class );
-Object[] parameterValues = { 80 };
-Set<ConstraintViolation<Car>> violations = executableValidator.validateParameters(
-		object,
-		method,
-		parameterValues
-);
-
-assertEquals( 1, violations.size() );
-Class<? extends Annotation> constraintType = violations.iterator()
-		.next()
-		.getConstraintDescriptor()
-		.getAnnotation()
-		.annotationType();
-assertEquals( Max.class, constraintType );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/validation/CarTest.java[tags=validateParameters]
 ----
 ====
 
@@ -582,24 +409,9 @@ Using `validateReturnValue()` the return value of a method can can be validated.
 [[example-executable-validator-validate-return-value]]
 .Using `ExecutableValidator#validateReturnValue()`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Car object = new Car( "Morris" );
-Method method = Car.class.getMethod( "getPassengers" );
-Object returnValue = Collections.<Passenger>emptyList();
-Set<ConstraintViolation<Car>> violations = executableValidator.validateReturnValue(
-		object,
-		method,
-		returnValue
-);
-
-assertEquals( 1, violations.size() );
-Class<? extends Annotation> constraintType = violations.iterator()
-		.next()
-		.getConstraintDescriptor()
-		.getAnnotation()
-		.annotationType();
-assertEquals( Size.class, constraintType );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/validation/CarTest.java[tags=validateReturnValue]
 ----
 ====
 
@@ -613,22 +425,9 @@ violation.
 [[example-executable-validator-validate-constructor-parameters]]
 .Using `ExecutableValidator#validateConstructorParameters()`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Constructor<Car> constructor = Car.class.getConstructor( String.class );
-Object[] parameterValues = { null };
-Set<ConstraintViolation<Car>> violations = executableValidator.validateConstructorParameters(
-		constructor,
-		parameterValues
-);
-
-assertEquals( 1, violations.size() );
-Class<? extends Annotation> constraintType = violations.iterator()
-		.next()
-		.getConstraintDescriptor()
-		.getAnnotation()
-		.annotationType();
-assertEquals( NotNull.class, constraintType );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/validation/CarTest.java[tags=validateConstructorParameters]
 ----
 ====
 
@@ -642,23 +441,9 @@ the `@ValidRacingCar` constraint (not shown).
 [[example-executable-validator-validate-constructor-return-value]]
 .Using `ExecutableValidator#validateConstructorReturnValue()`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-//constructor for creating racing cars
-Constructor<Car> constructor = Car.class.getConstructor( String.class, String.class );
-Car createdObject = new Car( "Morris", null );
-Set<ConstraintViolation<Car>> violations = executableValidator.validateConstructorReturnValue(
-		constructor,
-		createdObject
-);
-
-assertEquals( 1, violations.size() );
-Class<? extends Annotation> constraintType = violations.iterator()
-		.next()
-		.getConstraintDescriptor()
-		.getAnnotation()
-		.annotationType();
-assertEquals( ValidRacingCar.class, constraintType );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/validation/CarTest.java[tags=validateConstructorReturnValue]
 ----
 ====
 
@@ -685,30 +470,9 @@ path nodes. How this can be done is shown in <<example-executable-validation-pro
 [[example-executable-validation-property-path]]
 .Retrieving method and parameter information
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Car object = new Car( "Morris" );
-Method method = Car.class.getMethod( "drive", int.class );
-Object[] parameterValues = { 80 };
-Set<ConstraintViolation<Car>> violations = executableValidator.validateParameters(
-		object,
-		method,
-		parameterValues
-);
-
-assertEquals( 1, violations.size() );
-Iterator<Node> propertyPath = violations.iterator()
-		.next()
-		.getPropertyPath()
-		.iterator();
-
-MethodNode methodNode = propertyPath.next().as( MethodNode.class );
-assertEquals( "drive", methodNode.getName() );
-assertEquals( Arrays.<Class<?>>asList( int.class ), methodNode.getParameterTypes() );
-
-ParameterNode parameterNode = propertyPath.next().as( ParameterNode.class );
-assertEquals( "arg0", parameterNode.getName() );
-assertEquals( 0, parameterNode.getParameterIndex() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/validation/CarTest.java[tags=retrieveMethodAndParameterInformation]
 ----
 ====
 
@@ -733,16 +497,8 @@ constraint from <<example-using-cross-parameter-constraint>> could be expressed 
 [[example-parameterscriptassert]]
 .Using `@ParameterScriptAssert`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter03.parametersscriptassert;
-
-public class Car {
-
-	@ParameterScriptAssert(lang = "javascript", script = "arg1.size() <= arg0.size() * 2")
-	public void load(List<Person> passengers, List<PieceOfLuggage> luggage) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter03/parameterscriptassert/Car.java[tags=include]
 ----
 ====

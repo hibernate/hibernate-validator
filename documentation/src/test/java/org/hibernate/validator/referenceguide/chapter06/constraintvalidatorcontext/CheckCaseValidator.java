@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.constraintvalidatorcontext;
+
+//end::include[]
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+//tag::include[]
 public class CheckCaseValidator implements ConstraintValidator<CheckCase, String> {
 
 	private CaseMode caseMode;
@@ -38,3 +42,4 @@ public class CheckCaseValidator implements ConstraintValidator<CheckCase, String
 		return isValid;
 	}
 }
+//end::include[]

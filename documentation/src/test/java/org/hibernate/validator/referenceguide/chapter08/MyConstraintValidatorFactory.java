@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter08;
+
+//end::include[]
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 
+//tag::include[]
 public class MyConstraintValidatorFactory implements ConstraintValidatorFactory {
 
 	@Override
@@ -16,3 +20,4 @@ public class MyConstraintValidatorFactory implements ConstraintValidatorFactory 
 		//...
 	}
 }
+//end::include[]

@@ -29,12 +29,15 @@ public class CarTest {
 
 	@BeforeClass
 	public static void setUpValidator() {
+		//tag::setUpValidator[]
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		executableValidator = factory.getValidator().forExecutables();
+		//end::setUpValidator[]
 	}
 
 	@Test
 	public void validateParameters() throws Exception {
+		//tag::validateParameters[]
 		Car object = new Car( "Morris" );
 		Method method = Car.class.getMethod( "drive", int.class );
 		Object[] parameterValues = { 80 };
@@ -51,10 +54,12 @@ public class CarTest {
 				.getAnnotation()
 				.annotationType();
 		assertEquals( Max.class, constraintType );
+		//end::validateParameters[]
 	}
 
 	@Test
 	public void validateReturnValue() throws Exception {
+		//tag::validateReturnValue[]
 		Car object = new Car( "Morris" );
 		Method method = Car.class.getMethod( "getPassengers" );
 		Object returnValue = Collections.<Passenger>emptyList();
@@ -71,10 +76,12 @@ public class CarTest {
 				.getAnnotation()
 				.annotationType();
 		assertEquals( Size.class, constraintType );
+		//end::validateReturnValue[]
 	}
 
 	@Test
 	public void validateConstructorParameters() throws Exception {
+		//tag::validateConstructorParameters[]
 		Constructor<Car> constructor = Car.class.getConstructor( String.class );
 		Object[] parameterValues = { null };
 		Set<ConstraintViolation<Car>> violations = executableValidator.validateConstructorParameters(
@@ -89,10 +96,12 @@ public class CarTest {
 				.getAnnotation()
 				.annotationType();
 		assertEquals( NotNull.class, constraintType );
+		//end::validateConstructorParameters[]
 	}
 
 	@Test
 	public void validateConstructorReturnValue() throws Exception {
+		//tag::validateConstructorReturnValue[]
 		//constructor for creating racing cars
 		Constructor<Car> constructor = Car.class.getConstructor( String.class, String.class );
 		Car createdObject = new Car( "Morris", null );
@@ -108,10 +117,12 @@ public class CarTest {
 				.getAnnotation()
 				.annotationType();
 		assertEquals( ValidRacingCar.class, constraintType );
+		//end::validateConstructorReturnValue[]
 	}
 
 	@Test
 	public void retrieveMethodAndParameterInformation() throws Exception {
+		//tag::retrieveMethodAndParameterInformation[]
 		Car object = new Car( "Morris" );
 		Method method = Car.class.getMethod( "drive", int.class );
 		Object[] parameterValues = { 80 };
@@ -134,5 +145,6 @@ public class CarTest {
 		ParameterNode parameterNode = propertyPath.next().as( ParameterNode.class );
 		assertEquals( "arg0", parameterNode.getName() );
 		assertEquals( 0, parameterNode.getParameterIndex() );
+		//end::retrieveMethodAndParameterInformation[]
 	}
 }

@@ -1,9 +1,13 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter06;
+
+//end::include[]
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+//tag::include[]
 public class Car {
 
 	@NotNull
@@ -25,3 +29,4 @@ public class Car {
 
 	//getters and setters ...
 }
+//end::include[]

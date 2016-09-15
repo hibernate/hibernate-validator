@@ -1,7 +1,11 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter05;
+
+//end::include[]
 
 import javax.validation.constraints.NotNull;
 
+//tag::include[]
 public class Person {
 
 	@NotNull
@@ -13,3 +17,4 @@ public class Person {
 
 	// getters and setters ...
 }
+//end::include[]

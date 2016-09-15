@@ -122,34 +122,9 @@ Lets dive directly into an example to see how to apply constraints.
 [[example-class-car]]
 .Class Car annotated with constraints
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter01;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-public class Car {
-
-    @NotNull
-    private String manufacturer;
-
-    @NotNull
-    @Size(min = 2, max = 14)
-    private String licensePlate;
-
-    @Min(2)
-    private int seatCount;
-
-    public Car(String manufacturer, String licencePlate, int seatCount) {
-        this.manufacturer = manufacturer;
-        this.licensePlate = licencePlate;
-        this.seatCount = seatCount;
-    }
-
-    //getters and setters ...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter01/Car.java[]
 ----
 ====
 
@@ -176,80 +151,9 @@ unit test for `Car`:
 
 .Class CarTest showing validation examples
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter01;
-
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-
-public class CarTest {
-
-    private static Validator validator;
-
-    @BeforeClass
-    public static void setUpValidator() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
-
-    @Test
-    public void manufacturerIsNull() {
-        Car car = new Car( null, "DD-AB-123", 4 );
-
-        Set<ConstraintViolation<Car>> constraintViolations =
-                validator.validate( car );
-
-        assertEquals( 1, constraintViolations.size() );
-        assertEquals( "may not be null", constraintViolations.iterator().next().getMessage() );
-    }
-
-    @Test
-    public void licensePlateTooShort() {
-        Car car = new Car( "Morris", "D", 4 );
-
-        Set<ConstraintViolation<Car>> constraintViolations =
-                validator.validate( car );
-
-        assertEquals( 1, constraintViolations.size() );
-        assertEquals(
-                "size must be between 2 and 14",
-                constraintViolations.iterator().next().getMessage()
-        );
-    }
-
-    @Test
-    public void seatCountTooLow() {
-        Car car = new Car( "Morris", "DD-AB-123", 1 );
-
-        Set<ConstraintViolation<Car>> constraintViolations =
-                validator.validate( car );
-
-        assertEquals( 1, constraintViolations.size() );
-        assertEquals(
-                "must be greater than or equal to 2",
-                constraintViolations.iterator().next().getMessage()
-        );
-    }
-
-    @Test
-    public void carIsValid() {
-        Car car = new Car( "Morris", "DD-AB-123", 2 );
-
-        Set<ConstraintViolation<Car>> constraintViolations =
-                validator.validate( car );
-
-        assertEquals( 0, constraintViolations.size() );
-    }
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter01/CarTest.java[]
 ----
 ====
 

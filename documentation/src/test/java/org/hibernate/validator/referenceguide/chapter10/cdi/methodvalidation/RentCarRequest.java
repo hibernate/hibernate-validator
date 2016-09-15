@@ -1,9 +1,13 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation;
+
+//end::include[]
 
 import java.util.Date;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
+//tag::include[]
 @RequestScoped
 public class RentCarRequest {
 
@@ -15,3 +19,4 @@ public class RentCarRequest {
 		rentalStation.rentCar( null, null, -1 );
 	}
 }
+//end::include[]

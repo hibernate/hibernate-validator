@@ -22,6 +22,7 @@ public class CarTest {
 
 	@Test
 	public void messageDescriptors() {
+		//tag::messageDescriptors[]
 		Car car = new Car( null, "A", 1, 400.123456, BigDecimal.valueOf( 200000 ) );
 
 		String message = validator.validateProperty( car, "manufacturer" )
@@ -47,5 +48,6 @@ public class CarTest {
 
 		message = validator.validateProperty( car, "price" ).iterator().next().getMessage();
 		assertEquals( "Price must not be higher than $100000", message );
+		//end::messageDescriptors[]
 	}
 }
