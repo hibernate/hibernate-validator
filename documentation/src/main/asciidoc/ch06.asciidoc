@@ -27,14 +27,9 @@ a better approach is using a Java 5 enum for that purpose:
 
 .Enum `CaseMode` to express upper vs. lower case
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06;
-
-public enum CaseMode {
-	UPPER,
-	LOWER;
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CaseMode.java[]
 ----
 ====
 
@@ -46,8 +41,6 @@ before, this may look a bit scary, but actually it's not that hard:
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CheckCase.java[lines=1..1]
-
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CheckCase.java[tags=include]
 ----
 ====
@@ -67,26 +60,14 @@ payload objects to a constraint. This attribute is not used by the API itself. A
 custom payload could be the definition of a severity:
 +
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-public class Severity {
-	public interface Info extends Payload {
-	}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/payload/Severity.java[tags=include]
+----
 
-	public interface Error extends Payload {
-	}
-}
-
-public class ContactDetails {
-	@NotNull(message = "Name is mandatory", payload = Severity.Error.class)
-	private String name;
-
-	@NotNull(message = "Phone number not specified, but not mandatory",
-			payload = Severity.Info.class)
-	private String phoneNumber;
-
-	// ...
-}
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/payload/ContactDetails.java[tags=include]
 ----
 ====
 +
@@ -138,33 +119,9 @@ shown below:
 [[example-constraint-validator]]
 .Implementing a constraint validator for the constraint `@CheckCase`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06;
-
-public class CheckCaseValidator implements ConstraintValidator<CheckCase, String> {
-
-	private CaseMode caseMode;
-
-	@Override
-	public void initialize(CheckCase constraintAnnotation) {
-		this.caseMode = constraintAnnotation.value();
-	}
-
-	@Override
-	public boolean isValid(String object, ConstraintValidatorContext constraintContext) {
-		if ( object == null ) {
-			return true;
-		}
-
-		if ( caseMode == CaseMode.UPPER ) {
-			return object.equals( object.toUpperCase() );
-		}
-		else {
-			return object.equals( object.toLowerCase() );
-		}
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CheckCaseValidator.java[tags=include]
 ----
 ====
 
@@ -196,45 +153,9 @@ demonstrated with an example:
 [[example-constraint-validator-context]]
 .Using `ConstraintValidatorContext` to define custom error messages
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06.constraintvalidatorcontext;
-
-public class CheckCaseValidator implements ConstraintValidator<CheckCase, String> {
-
-	private CaseMode caseMode;
-
-	@Override
-	public void initialize(CheckCase constraintAnnotation) {
-		this.caseMode = constraintAnnotation.value();
-	}
-
-	@Override
-	public boolean isValid(String object, ConstraintValidatorContext constraintContext) {
-		if ( object == null ) {
-			return true;
-		}
-
-		boolean isValid;
-		if ( caseMode == CaseMode.UPPER ) {
-			isValid = object.equals( object.toUpperCase() );
-		}
-		else {
-			isValid = object.equals( object.toLowerCase() );
-		}
-
-		if ( !isValid ) {
-			constraintContext.disableDefaultConstraintViolation();
-			constraintContext.buildConstraintViolationWithTemplate(
-					"{org.hibernate.validator.referenceguide.chapter03." +
-					"constraintvalidatorcontext.CheckCase.message}"
-			)
-			.addConstraintViolation();
-		}
-
-		return isValid;
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintvalidatorcontext/CheckCaseValidator.java[tags=include]
 ----
 ====
 
@@ -279,31 +200,9 @@ specify that the `licensePlate` field should only contain upper-case strings:
 [[example-car-with-checkcase]]
 .Applying the `@CheckCase` constraint
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06;
-
-public class Car {
-
-	@NotNull
-	private String manufacturer;
-
-	@NotNull
-	@Size(min = 2, max = 14)
-	@CheckCase(CaseMode.UPPER)
-	private String licensePlate;
-
-	@Min(2)
-	private int seatCount;
-
-	public Car ( String manufacturer, String licencePlate, int seatCount ) {
-		this.manufacturer = manufacturer;
-		this.licensePlate = licencePlate;
-		this.seatCount = seatCount;
-	}
-
-	//getters and setters ...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/Car.java[tags=include]
 ----
 ====
 
@@ -313,24 +212,9 @@ license plate causes the `@CheckCase` constraint to be violated.
 [[example-using-checkcase]]
 .Validating objects with the `@CheckCase` constraint
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-//invalid license plate
-Car car = new Car( "Morris", "dd-ab-123", 4 );
-Set<ConstraintViolation<Car>> constraintViolations =
-		validator.validate( car );
-assertEquals( 1, constraintViolations.size() );
-assertEquals(
-		"Case mode must be UPPER.",
-		constraintViolations.iterator().next().getMessage()
-);
-
-//valid license plate
-car = new Car( "Morris", "DD-AB-123", 4 );
-
-constraintViolations = validator.validate( car );
-
-assertEquals( 0, constraintViolations.size() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/CarTest.java[tags=testCheckCaseConstraint]
 ----
 ====
 
@@ -345,45 +229,14 @@ entire object. Class-level constraints are defined in the same was as are proper
 [[example-implementing-classlevel-constraint]]
 .Implementing a class-level constraint
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06.classlevel;
-
-@Target({ TYPE, ANNOTATION_TYPE })
-@Retention(RUNTIME)
-@Constraint(validatedBy = { ValidPassengerCountValidator.class })
-@Documented
-public @interface ValidPassengerCount {
-
-	String message() default "{org.hibernate.validator.referenceguide.chapter06.classlevel." +
-			"ValidPassengerCount.message}";
-
-	Class<?>[] groups() default { };
-
-	Class<? extends Payload>[] payload() default { };
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/classlevel/ValidPassengerCount.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06.classlevel;
-
-public class ValidPassengerCountValidator
-		implements ConstraintValidator<ValidPassengerCount, Car> {
-
-	@Override
-	public void initialize(ValidPassengerCount constraintAnnotation) {
-	}
-
-	@Override
-	public boolean isValid(Car car, ConstraintValidatorContext context) {
-		if ( car == null ) {
-			return true;
-		}
-
-		return car.getPassengers().size() <= car.getSeatCount();
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/classlevel/ValidPassengerCountValidator.java[tags=include]
 ----
 ====
 
@@ -410,35 +263,9 @@ could add several property nodes, pointing to a sub-entity of the validated bean
 [[example-custom-error]]
 .Adding a new `ConstraintViolation` with custom property path
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06.custompath;
-
-public class ValidPassengerCountValidator
-		implements ConstraintValidator<ValidPassengerCount, Car> {
-
-	@Override
-	public void initialize(ValidPassengerCount constraintAnnotation) {
-	}
-
-	@Override
-	public boolean isValid(Car car, ConstraintValidatorContext constraintValidatorContext) {
-		if ( car == null ) {
-			return true;
-		}
-
-		boolean isValid = car.getPassengers().size() <= car.getSeatCount();
-
-		if ( !isValid ) {
-			constraintValidatorContext.disableDefaultConstraintViolation();
-			constraintValidatorContext
-					.buildConstraintViolationWithTemplate( "{my.custom.template}" )
-					.addPropertyNode( "passengers" ).addConstraintViolation();
-		}
-
-		return isValid;
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/custompath/ValidPassengerCountValidator.java[tags=include]
 ----
 ====
 
@@ -462,23 +289,9 @@ check that two `Date` parameters of a method are in the correct order:
 
 .Cross-parameter constraint
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06.crossparameter;
-
-@Constraint(validatedBy = ConsistentDateParameterValidator.class)
-@Target({ METHOD, CONSTRUCTOR, ANNOTATION_TYPE })
-@Retention(RUNTIME)
-@Documented
-public @interface ConsistentDateParameters {
-
-	String message() default "{org.hibernate.validator.referenceguide.chapter06." +
-			"crossparameter.ConsistentDateParameters.message}";
-
-	Class<?>[] groups() default { };
-
-	Class<? extends Payload>[] payload() default { };
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/crossparameter/ConsistentDateParameters.java[tags=include]
 ----
 ====
 
@@ -501,39 +314,9 @@ constraint target apparent.
 [[example-cross-parameter-validator]]
 .Generic and cross-parameter constraint
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06.crossparameter;
-
-@SupportedValidationTarget(ValidationTarget.PARAMETERS)
-public class ConsistentDateParameterValidator implements
-		ConstraintValidator<ConsistentDateParameters, Object[]> {
-
-	@Override
-	public void initialize(ConsistentDateParameters constraintAnnotation) {
-	}
-
-	@Override
-	public boolean isValid(Object[] value, ConstraintValidatorContext context) {
-		if ( value.length != 2 ) {
-			throw new IllegalArgumentException( "Illegal method signature" );
-		}
-
-		//leave null-checking to @NotNull on individual parameters
-		if ( value[0] == null || value[1] == null ) {
-			return true;
-		}
-
-		if ( !( value[0] instanceof Date ) || !( value[1] instanceof Date ) ) {
-			throw new IllegalArgumentException(
-					"Illegal method signature, expected two " +
-							"parameters of type Date."
-			);
-		}
-
-		return ( (Date) value[0] ).before( (Date) value[1] );
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/crossparameter/ConsistentDateParametersValidator.java[tags=include]
 ----
 ====
 
@@ -567,30 +350,9 @@ to specify the constraint's target as shown in <<example-dual-cross-parameter-co
 [[example-dual-cross-parameter-constraint]]
 .Generic and cross-parameter constraint
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06.crossparameter;
-
-@Constraint(validatedBy = {
-		ScriptAssertObjectValidator.class,
-		ScriptAssertParametersValidator.class
-})
-@Target({ TYPE, FIELD, PARAMETER, METHOD, CONSTRUCTOR, ANNOTATION_TYPE })
-@Retention(RUNTIME)
-@Documented
-public @interface ScriptAssert {
-
-	String message() default "{org.hibernate.validator.referenceguide.chapter06." +
-			"crossparameter.ScriptAssert.message}";
-
-	Class<?>[] groups() default { };
-
-	Class<? extends Payload>[] payload() default { };
-
-	String script();
-
-	ConstraintTarget validationAppliesTo() default ConstraintTarget.IMPLICIT;
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/crossparameter/ScriptAssert.java[tags=include]
 ----
 ====
 
@@ -605,12 +367,9 @@ If the target can not be determined implicitly, it must be set by the user to ei
 [[example-dual-cross-parameter-constraint-usage]]
 .Specifying the target for a generic and cross-parameter constraint
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-@ScriptAssert(script = "arg1.size() <= arg0", validationAppliesTo = ConstraintTarget.PARAMETERS)
-public Car buildCar(int seatCount, List<Passenger> passengers) {
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/crossparameter/ScriptAssertTest.java[tags=buildCar]
 ----
 ====
 
@@ -632,8 +391,6 @@ comprises the constraints `@NotNull`, `@Size` and `@CheckCase`:
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintcomposition/ValidLicensePlate.java[lines=1..1]
-
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintcomposition/ValidLicensePlate.java[tags=include]
 ----
 ====
@@ -648,17 +405,9 @@ version, where the three constraints were declared directly at the field itself:
 
 .Application of composing constraint `ValidLicensePlate`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter06.constraintcomposition;
-
-public class Car {
-
-	@ValidLicensePlate
-	private String licensePlate;
-
-	//...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintcomposition/Car.java[]
 ----
 ====
 
@@ -669,18 +418,8 @@ single `ConstraintViolation` in case any of the composing constraints is violate
 
 .Using @ReportAsSingleViolation
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-//...
-@ReportAsSingleViolation
-public @interface ValidLicensePlate {
-
-	String message() default "{org.hibernate.validator.referenceguide.chapter06." +
-			"constraintcomposition.ValidLicensePlate.message}";
-
-	Class<?>[] groups() default { };
-
-	Class<? extends Payload>[] payload() default { };
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter06/constraintcomposition/reportassingle/ValidLicensePlate.java[tags=include]
 ----
 ====

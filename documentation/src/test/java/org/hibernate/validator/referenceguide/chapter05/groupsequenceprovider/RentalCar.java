@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter05.groupsequenceprovider;
+
+//end::include[]
 
 import javax.validation.constraints.AssertFalse;
 
@@ -6,6 +9,7 @@ import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.referenceguide.chapter05.Car;
 import org.hibernate.validator.referenceguide.chapter05.RentalChecks;
 
+//tag::include[]
 @GroupSequenceProvider(RentalCarGroupSequenceProvider.class)
 public class RentalCar extends Car {
 
@@ -24,3 +28,4 @@ public class RentalCar extends Car {
 		this.rented = rented;
 	}
 }
+//end::include[]

@@ -17,16 +17,15 @@ public class DynamicPayLoadTest {
 
 	private static Validator validator;
 
-
 	@BeforeClass
 	public static void setUpValidator() {
 		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
 		validator = validatorFactory.getValidator();
 	}
 
-	//tag::include[]
 	@Test
 	public void testDynamicPayloadAddedToConstraintViolation() throws Exception {
+		//tag::include[]
 		Car car = new Car( 2 );
 		car.addPassenger( new Person() );
 		car.addPassenger( new Person() );
@@ -42,7 +41,7 @@ public class DynamicPayLoadTest {
 		);
 		String suggestedCar = hibernateConstraintViolation.getDynamicPayload( String.class );
 		assertEquals( "Toyota Volta", suggestedCar );
+		//end::include[]
 	}
-	//end::include[]
 }
 

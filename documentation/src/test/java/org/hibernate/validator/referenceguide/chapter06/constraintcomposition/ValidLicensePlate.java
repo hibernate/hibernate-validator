@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.constraintcomposition;
+
+//end::include[]
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation;
+
+//end::include[]
 
 import java.util.Date;
 import java.util.List;
@@ -8,6 +11,7 @@ import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+//tag::include[]
 @ApplicationScoped
 public class RentalStation {
 
@@ -32,3 +36,4 @@ public class RentalStation {
 		return null;
 	}
 }
+//end::include[]

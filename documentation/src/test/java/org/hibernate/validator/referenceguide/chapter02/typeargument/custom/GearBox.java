@@ -1,5 +1,9 @@
-package org.hibernate.validator.referenceguide.chapter02.typeargument;
+//tag::include[]
+package org.hibernate.validator.referenceguide.chapter02.typeargument.custom;
 
+//end::include[]
+
+//tag::include[]
 public class GearBox<T extends Gear> {
 
 	private final T gear;
@@ -12,3 +16,4 @@ public class GearBox<T extends Gear> {
 		return this.gear;
 	}
 }
+//end::include[]

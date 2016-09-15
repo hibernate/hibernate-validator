@@ -26,21 +26,9 @@ assumed.
 [[example-person]]
 .Example class `Person`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05;
-
-public class Person {
-
-	@NotNull
-	private String name;
-
-	public Person(String name) {
-		this.name = name;
-	}
-
-	// getters and setters ...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/Person.java[tags=include]
 ----
 ====
 
@@ -58,48 +46,14 @@ that groups can inherit from each other via class inheritance.
 [[example-driver]]
 .Driver
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05;
-
-public class Driver extends Person {
-
-	@Min(
-			value = 18,
-			message = "You have to be 18 to drive a car",
-			groups = DriverChecks.class
-	)
-	public int age;
-
-	@AssertTrue(
-			message = "You first have to pass the driving test",
-			groups = DriverChecks.class
-	)
-	public boolean hasDrivingLicense;
-
-	public Driver(String name) {
-		super( name );
-	}
-
-	public void passedDrivingTest(boolean b) {
-		hasDrivingLicense = b;
-	}
-
-	public int getAge() {
-		return age;
-	}
-
-	public void setAge(int age) {
-		this.age = age;
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/Driver.java[tags=include]
 ----
-[source, JAVA]
-----
-package org.hibernate.validator.referenceguide.chapter05;
 
-public interface DriverChecks {
-}
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/DriverChecks.java[]
 ----
 ====
 
@@ -110,46 +64,14 @@ whether a car passed the road worthy tests.
 [[example-car]]
 .Car
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05;
-
-public class Car {
-	@NotNull
-	private String manufacturer;
-
-	@NotNull
-	@Size(min = 2, max = 14)
-	private String licensePlate;
-
-	@Min(2)
-	private int seatCount;
-
-	@AssertTrue(
-			message = "The car has to pass the vehicle inspection first",
-			groups = CarChecks.class
-	)
-	private boolean passedVehicleInspection;
-
-	@Valid
-	private Driver driver;
-
-	public Car(String manufacturer, String licencePlate, int seatCount) {
-		this.manufacturer = manufacturer;
-		this.licensePlate = licencePlate;
-		this.seatCount = seatCount;
-	}
-
-	// getters and setters ...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/Car.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05;
-
-public interface CarChecks {
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/CarChecks.java[]
 ----
 ====
 
@@ -166,49 +88,9 @@ method results in different validation results.
 [[example-drive-away]]
 .Using validation groups
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-// create a car and check that everything is ok with it.
-Car car = new Car( "Morris", "DD-AB-123", 2 );
-Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
-assertEquals( 0, constraintViolations.size() );
-
-// but has it passed the vehicle inspection?
-constraintViolations = validator.validate( car, CarChecks.class );
-assertEquals( 1, constraintViolations.size() );
-assertEquals(
-		"The car has to pass the vehicle inspection first",
-		constraintViolations.iterator().next().getMessage()
-);
-
-// let's go to the vehicle inspection
-car.setPassedVehicleInspection( true );
-assertEquals( 0, validator.validate( car ).size() );
-
-// now let's add a driver. He is 18, but has not passed the driving test yet
-Driver john = new Driver( "John Doe" );
-john.setAge( 18 );
-car.setDriver( john );
-constraintViolations = validator.validate( car, DriverChecks.class );
-assertEquals( 1, constraintViolations.size() );
-assertEquals(
-		"You first have to pass the driving test",
-		constraintViolations.iterator().next().getMessage()
-);
-
-// ok, John passes the test
-john.passedDrivingTest( true );
-assertEquals( 0, validator.validate( car, DriverChecks.class ).size() );
-
-// just checking that everything is in order now
-assertEquals(
-		0, validator.validate(
-		car,
-		Default.class,
-		CarChecks.class,
-		DriverChecks.class
-).size()
-);
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.java[tags=driveAway]
 ----
 ====
 
@@ -242,13 +124,9 @@ constraints of the following groups in the sequence get validated.
 [[example-defining-group-sequence]]
 .Defining a group sequence
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05;
-
-@GroupSequence({ Default.class, CarChecks.class, DriverChecks.class })
-public interface OrderedChecks {
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/OrderedChecks.java[]
 ----
 ====
 
@@ -265,17 +143,9 @@ You then can use the new sequence as shown in in <<example-group-sequence>>.
 [[example-group-sequence]]
 .Using a group sequence
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Car car = new Car( "Morris", "DD-AB-123", 2 );
-car.setPassedVehicleInspection( true );
-
-Driver john = new Driver( "John Doe" );
-john.setAge( 18 );
-john.passedDrivingTest( true );
-car.setDriver( john );
-
-assertEquals( 0, validator.validate( car, OrderedChecks.class ).size() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.java[tags=testOrderedChecks]
 ----
 ====
 
@@ -293,35 +163,14 @@ the sequence of groups which substitute Default for this class within the annota
 [[example-rental-car]]
 .Class `RentalCar` with redefined default group
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05;
-
-@GroupSequence({ RentalChecks.class, CarChecks.class, RentalCar.class })
-public class RentalCar extends Car {
-	@AssertFalse(message = "The car is currently rented out", groups = RentalChecks.class)
-	private boolean rented;
-
-	public RentalCar(String manufacturer, String licencePlate, int seatCount) {
-		super( manufacturer, licencePlate, seatCount );
-	}
-
-	public boolean isRented() {
-		return rented;
-	}
-
-	public void setRented(boolean rented) {
-		this.rented = rented;
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/RentalCar.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05;
-
-public interface RentalChecks {
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/RentalChecks.java[]
 ----
 ====
 
@@ -331,25 +180,9 @@ With this definition you can evaluate the constraints belonging to `RentalChecks
 [[example-testCarIsRented]]
 .Validating an object with redefined default group
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-RentalCar rentalCar = new RentalCar( "Morris", "DD-AB-123", 2 );
-rentalCar.setPassedVehicleInspection( true );
-rentalCar.setRented( true );
-
-Set<ConstraintViolation<RentalCar>> constraintViolations = validator.validate( rentalCar );
-
-assertEquals( 1, constraintViolations.size() );
-assertEquals(
-		"Wrong message",
-		"The car is currently rented out",
-		constraintViolations.iterator().next().getMessage()
-);
-
-rentalCar.setRented( false );
-constraintViolations = validator.validate( rentalCar );
-
-assertEquals( 0, constraintViolations.size() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.java[tags=carIsRented]
 ----
 ====
 
@@ -382,49 +215,14 @@ scenario you could for instance dynamically add the `CarChecks` as seen in
 [[example-implementing-using-default-group-sequence-provider]]
 .Implementing and using a default group sequence provider
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05.groupsequenceprovider;
-
-public class RentalCarGroupSequenceProvider
-		implements DefaultGroupSequenceProvider<RentalCar> {
-
-	@Override
-	public List<Class<?>> getValidationGroups(RentalCar car) {
-		List<Class<?>> defaultGroupSequence = new ArrayList<Class<?>>();
-		defaultGroupSequence.add( RentalCar.class );
-
-		if ( car != null && !car.isRented() ) {
-			defaultGroupSequence.add( CarChecks.class );
-		}
-
-		return defaultGroupSequence;
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupsequenceprovider/RentalCarGroupSequenceProvider.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05.groupsequenceprovider;
-
-@GroupSequenceProvider(RentalCarGroupSequenceProvider.class)
-public class RentalCar extends Car {
-
-	@AssertFalse(message = "The car is currently rented out", groups = RentalChecks.class)
-	private boolean rented;
-
-	public RentalCar(String manufacturer, String licencePlate, int seatCount) {
-		super( manufacturer, licencePlate, seatCount );
-	}
-
-	public boolean isRented() {
-		return rented;
-	}
-
-	public void setRented(boolean rented) {
-		this.rented = rented;
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupsequenceprovider/RentalCar.java[tags=include]
 ----
 ====
 
@@ -445,75 +243,14 @@ cascaded validation of the driver association.
 [[example-group-conversion-dedault-to-driver-checks]]
 .`@ConvertGroup` usage
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05.groupconversion;
-
-public class Driver {
-
-	@NotNull
-	private String name;
-
-	@Min(
-			value = 18,
-			message = "You have to be 18 to drive a car",
-			groups = DriverChecks.class
-	)
-	public int age;
-
-	@AssertTrue(
-			message = "You first have to pass the driving test",
-			groups = DriverChecks.class
-	)
-	public boolean hasDrivingLicense;
-
-	public Driver(String name) {
-		this.name = name;
-	}
-
-	public void passedDrivingTest(boolean b) {
-		hasDrivingLicense = b;
-	}
-
-	// getters and setters ...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupconversion/Driver.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter05.groupconversion;
-
-@GroupSequence({ CarChecks.class, Car.class })
-public class Car {
-
-	@NotNull
-	private String manufacturer;
-
-	@NotNull
-	@Size(min = 2, max = 14)
-	private String licensePlate;
-
-	@Min(2)
-	private int seatCount;
-
-	@AssertTrue(
-			message = "The car has to pass the vehicle inspection first",
-			groups = CarChecks.class
-	)
-	private boolean passedVehicleInspection;
-
-	@Valid
-	@ConvertGroup(from = Default.class, to = DriverChecks.class)
-	private Driver driver;
-
-	public Car(String manufacturer, String licencePlate, int seatCount) {
-		this.manufacturer = manufacturer;
-		this.licensePlate = licencePlate;
-		this.seatCount = seatCount;
-	}
-
-	// getters and setters ...
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupconversion/Car.java[tags=include]
 ----
 ====
 
@@ -524,27 +261,9 @@ the `validate()` call.
 [[example-group-conversion-test]]
 .Test case for `@ConvertGroup`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-// create a car and validate. The Driver is still null and does not get validated
-Car car = new Car( "VW", "USD-123", 4 );
-car.setPassedVehicleInspection( true );
-Set<ConstraintViolation<Car>> constraintViolations = validator.validate( car );
-assertEquals( 0, constraintViolations.size() );
-
-// create a driver who has not passed the driving test
-Driver john = new Driver( "John Doe" );
-john.setAge( 18 );
-
-// now let's add a driver to the car
-car.setDriver( john );
-constraintViolations = validator.validate( car );
-assertEquals( 1, constraintViolations.size() );
-assertEquals(
-		"The driver constraint should also be validated as part of the default group",
-		constraintViolations.iterator().next().getMessage(),
-		"You first have to pass the driving test"
-);
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupconversion/GroupConversionTest.java[tags=validateDriverChecksTogetherWithCarChecks]
 ----
 ====
 

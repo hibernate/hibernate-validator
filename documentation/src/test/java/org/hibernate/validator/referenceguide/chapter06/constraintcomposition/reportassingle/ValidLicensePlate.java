@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.constraintcomposition.reportassingle;
+
+//end::include[]
 
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 
+//tag::include[]
 //...
 @ReportAsSingleViolation
 public @interface ValidLicensePlate {
@@ -14,3 +18,4 @@ public @interface ValidLicensePlate {
 
 	Class<? extends Payload>[] payload() default { };
 }
+//end::include[]

@@ -162,13 +162,9 @@ Alternatively these settings can be applied during programmatic bootstrapping.
 [[example-relaxing-method-validation]]
 .Configuring method validation behaviour in class hierarchies
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-HibernateValidatorConfiguration configuration = Validation.byProvider(HibernateValidator.class).configure();
-
-configuration.allowMultipleCascadedValidationOnReturnValues(true)
-    .allowOverridingMethodAlterParameterConstraint(true)
-    .allowParallelMethodsDefineParameterConstraints(true);
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/relaxation/RelaxationTest.java[tags=testRelaxation]
 ----
 ====
 
@@ -348,25 +344,9 @@ Either the validated string is all lower-cased or it is between two and three ch
 [[example-boolean-constraint-composition]]
 .OR composition of constraints
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter11.booleancomposition;
-
-@ConstraintComposition(OR)
-@Pattern(regexp = "[a-z]")
-@Size(min = 2, max = 3)
-@ReportAsSingleViolation
-@Target({ METHOD, FIELD })
-@Retention(RUNTIME)
-@Constraint(validatedBy = { })
-public @interface PatternOrSize {
-	String message() default "{org.hibernate.validator.referenceguide.chapter11." +
-			"booleancomposition.PatternOrSize.message}";
-
-	Class<?>[] groups() default { };
-
-	Class<? extends Payload>[] payload() default { };
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/booleancomposition/PatternOrSize.java[tags=include]
 ----
 ====
 
@@ -491,38 +471,9 @@ how to include the current date in order to make the message more explicit.
 [[example-custom-message-parameter]]
 .Custom @Future validator with message parameters
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-public class MyFutureValidator implements ConstraintValidator<Future, Date> {
-
-	@Override
-	public void initialize(Future constraintAnnotation) {
-	}
-
-	@Override
-	public boolean isValid(Date value, ConstraintValidatorContext context) {
-		if ( value == null ) {
-			return true;
-		}
-
-		HibernateConstraintValidatorContext hibernateContext = context.unwrap(
-				HibernateConstraintValidatorContext.class
-		);
-
-		Date now = new Date( hibernateContext.getTimeProvider().getCurrentTime() );
-
-		if ( !value.after( now ) ) {
-			hibernateContext.disableDefaultConstraintViolation();
-			hibernateContext.addExpressionVariable( "now", now )
-					.buildConstraintViolationWithTemplate( "Must be after ${now}" )
-					.addConstraintViolation();
-
-			return false;
-		}
-
-		return true;
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/context/MyFutureValidator.java[tags=include]
 ----
 ====
 +
@@ -543,17 +494,9 @@ bundle. If you have any other usecases, let us know.
 [[example-custom-message-interpolator-context]]
 .`HibernateMessageInterpolatorContext`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-public interface HibernateMessageInterpolatorContext extends MessageInterpolator.Context {
-
-	/**
-	 * Returns the currently validated root bean type.
-	 *
-	 * @return The currently validated root bean type.
-	 */
-	Class<?> getRootBeanType();
-}
+include::{engine-sourcedir}/org/hibernate/validator/messageinterpolation/HibernateMessageInterpolatorContext.java[lines=18..26]
 ----
 ====
 
@@ -596,10 +539,9 @@ string value not the wrapping `Property` instance.
 [[example-using-unwrapvalidatedvalue]]
 .Applying a constraint to wrapped value of a JavaFX property
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-@Size(min = 3)
-private Property<String> name = new SimpleStringProperty( "Bob" );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/valuehandling/Person.java[tags=javafxUnwrapValidatedValue]
 ----
 ====
 
@@ -625,20 +567,9 @@ schematically looks for a JavaFX `PropertyValueUnwrapper`. You just need to exte
 [[example-implementation-of-validatedvalueunwrapper]]
 .Implementing the ValidatedValueUnwrapper interface
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-public class PropertyValueUnwrapper extends ValidatedValueUnwrapper<Property<?>> {
-
-	@Override
-	public Object handleValidatedValue(Property<?> value) {
-		//...
-	}
-
-	@Override
-	public Type getValidatedValueType(Type valueType) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/valuehandling/PropertyValueUnwrapper.java[tags=include]
 ----
 ====
 
@@ -647,13 +578,9 @@ The `ValidatedValueUnwrapper` needs also to be registered with the `ValidatorFac
 [[example-registering-validatedvalueunwrapper]]
 .Registering a ValidatedValueUnwrapper
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-Validator validator = Validation.byProvider( HibernateValidator.class )
-		.configure()
-		.addValidatedValueHandler( new PropertyValueUnwrapper() )
-		.buildValidatorFactory()
-		.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/valuehandling/UnwrapValidatedValueTest.java[tags=unwrapValidated]
 ----
 ====
 
@@ -688,14 +615,9 @@ required. An example of unwrapping an `Optional` instance is shown in
 [[example-using-unwrapvalidatedvalue-and-optional]]
 .Unwrapping `Optional` instances
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-@Size(min = 3)
-private Optional<String> firstName = Optional.of( "John" );
-
-@NotNull
-@UnwrapValidatedValue // UnwrapValidatedValue required since otherwise unclear which value to validate
-private Optional<String> lastName = Optional.of( "Doe" );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/valuehandling/Person.java[tags=optional]
 ----
 ====
 
@@ -717,16 +639,9 @@ shown in <<example-using-unwrapvalidatedvalue-and-javafx>>.
 [[example-using-unwrapvalidatedvalue-and-javafx]]
 .Unwrapping `JavaFX` properties
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-@Min(value = 3)
-IntegerProperty integerProperty1 = new SimpleIntegerProperty( 4 );
-
-@Min(value = 3)
-Property<Number> integerProperty2 = new SimpleIntegerProperty( 4 );
-
-@Min(value = 3)
-ObservableValue<Number> integerProperty3 = new SimpleIntegerProperty( 4 );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/valuehandling/Person.java[tags=javafx]
 ----
 ====
 
@@ -740,17 +655,14 @@ object would be performed.
 [[example-using-unwrapvalidatedvalue-and-optional-with-valid]]
 .Unwrapping `Optional` prior to cascaded validation via `@Valid`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-@Valid
-private Optional<Person> person = Optional.of( new Person() );
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/valuehandling/graph/Container.java[tags=include]
 ----
-[source, JAVA]
+
+[source, JAVA, indent=0]
 ----
-public class Person {
-	@Size(min =3)
-	private String name = "Bob";
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/valuehandling/graph/Person.java[tags=include]
 ----
 ====
 
@@ -854,15 +766,9 @@ you may provide a specific classloader for loading these resources when bootstra
 [[example-using-external-class-loader]]
 .Providing a classloader for loading external resources and classes
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ClassLoader classLoader = ...;
-
-Validator validator = Validation.byProvider( HibernateValidator.class )
-		.configure()
-		.externalClassLoader( classLoader )
-		.buildValidatorFactory()
-		.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/classloading/ClassLoadingTest.java[tags=setupValidator]
 ----
 ====
 
@@ -890,23 +796,14 @@ To address such scenarios, Hibernate Validator provides a custom contract for ob
 [[example-using-time-provider]]
 .Using a custom `TimeProvider`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-public class CustomTimeProvider implements TimeProvider {
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/timeprovider/CustomTimeProvider.java[tags=include]
+----
 
-	@Override
-	public long getCurrentTime() {
-		Calendar now = ...;
-		return now.getTimeInMillis();
-	}
-}
+[source, JAVA, indent=0]
 ----
-[source, JAVA]
-----
-ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
-		.configure()
-		.timeProvider( timeProvider )
-		.buildValidatorFactory();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/timeprovider/CustomTimeProviderTest.java[tags=setupValidator]
 ----
 ====
 

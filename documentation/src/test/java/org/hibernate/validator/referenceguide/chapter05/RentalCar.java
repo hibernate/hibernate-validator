@@ -1,8 +1,12 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter05;
+
+//end::include[]
 
 import javax.validation.GroupSequence;
 import javax.validation.constraints.AssertFalse;
 
+//tag::include[]
 @GroupSequence({ RentalChecks.class, CarChecks.class, RentalCar.class })
 public class RentalCar extends Car {
 	@AssertFalse(message = "The car is currently rented out", groups = RentalChecks.class)
@@ -20,3 +24,4 @@ public class RentalCar extends Car {
 		this.rented = rented;
 	}
 }
+//end::include[]

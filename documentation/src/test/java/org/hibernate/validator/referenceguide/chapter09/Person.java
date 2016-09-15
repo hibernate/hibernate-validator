@@ -1,7 +1,11 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter09;
+
+//end::include[]
 
 import javax.validation.constraints.NotNull;
 
+//tag::include[]
 public class Person {
 
 	public interface Basic {
@@ -12,3 +16,4 @@ public class Person {
 
 	//getters and setters ...
 }
+//end::include[]

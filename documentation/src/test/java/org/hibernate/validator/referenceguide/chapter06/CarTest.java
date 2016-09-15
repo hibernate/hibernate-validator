@@ -23,6 +23,7 @@ public class CarTest {
 
 	@Test
 	public void testCheckCaseConstraint() {
+		//tag::testCheckCaseConstraint[]
 		//invalid license plate
 		Car car = new Car( "Morris", "dd-ab-123", 4 );
 		Set<ConstraintViolation<Car>> constraintViolations =
@@ -39,5 +40,6 @@ public class CarTest {
 		constraintViolations = validator.validate( car );
 
 		assertEquals( 0, constraintViolations.size() );
+		//end::testCheckCaseConstraint[]
 	}
 }

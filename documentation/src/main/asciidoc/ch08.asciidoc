@@ -17,10 +17,9 @@ validator factory:
 [[example-build-default-validator-factory]]
 .Bootstrapping default `ValidatorFactory` and `Validator`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-Validator validator = factory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=buildDefaultValidatorFactory]
 ----
 ====
 
@@ -41,12 +40,9 @@ provider's `ValidationProvider` class as shown in <<example-using-specific-provi
 [[example-using-specific-provider]]
 .Bootstrapping `ValidatorFactory` and Validator using a specific provider
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
-		.configure()
-		.buildValidatorFactory();
-Validator validator = validatorFactory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=byProvider]
 ----
 ====
 
@@ -60,12 +56,9 @@ Similarly you can retrieve the default validator factory for configuration which
 [[example-configuring-default-provider]]
 .Retrieving the default `ValidatorFactory` for configuration
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory validatorFactory = Validation.byDefaultProvider()
-		.configure()
-		.buildValidatorFactory();
-Validator validator = validatorFactory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=byDefaultProvider]
 ----
 ====
 
@@ -98,26 +91,14 @@ To use a custom provider resolver pass it via `providerResolver()` as shown show
 [[example-using-custom-validation-provider-resolver]]
 .Using a custom `ValidationProviderResolver`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter08;
-
-public class OsgiServiceDiscoverer implements ValidationProviderResolver {
-
-	@Override
-	public List<ValidationProvider<?>> getValidationProviders() {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/OsgiServiceDiscoverer.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory validatorFactory = Validation.byDefaultProvider()
-		.providerResolver( new OsgiServiceDiscoverer() )
-		.configure()
-		.buildValidatorFactory();
-Validator validator = validatorFactory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=providerResolver]
 ----
 ====
 
@@ -155,31 +136,14 @@ interface via `Configuration#messageInterpolator()` as shown in
 [[example-using-custom-message-interpolator]]
 .Using a custom `MessageInterpolator`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter08;
-
-public class MyMessageInterpolator implements MessageInterpolator {
-
-	@Override
-	public String interpolate(String messageTemplate, Context context) {
-		//...
-	}
-
-	@Override
-	public String interpolate(String messageTemplate, Context context, Locale locale) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/MyMessageInterpolator.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory validatorFactory = Validation.byDefaultProvider()
-		.configure()
-		.messageInterpolator( new MyMessageInterpolator() )
-		.buildValidatorFactory();
-Validator validator = validatorFactory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=messageInterpolator]
 ----
 ====
 
@@ -197,41 +161,14 @@ custom traversable resolver implementation.
 [[example-using-custom-traversable-resolver]]
 .Using a custom `TraversableResolver`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter08;
-
-public class MyTraversableResolver implements TraversableResolver {
-
-	@Override
-	public boolean isReachable(
-			Object traversableObject,
-			Node traversableProperty,
-			Class<?> rootBeanType,
-			Path pathToTraversableObject,
-			ElementType elementType) {
-		//...
-	}
-
-	@Override
-	public boolean isCascadable(
-			Object traversableObject,
-			Node traversableProperty,
-			Class<?> rootBeanType,
-			Path pathToTraversableObject,
-			ElementType elementType) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/MyTraversableResolver.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory validatorFactory = Validation.byDefaultProvider()
-		.configure()
-		.traversableResolver( new MyTraversableResolver() )
-		.buildValidatorFactory();
-Validator validator = validatorFactory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=traversableResolver]
 ----
 ====
 
@@ -255,31 +192,14 @@ To configure a custom constraint validator factory call `Configuration#constrain
 [[example-using-custom-constraint-validator-factory]]
 .Using a custom `ConstraintValidatorFactory`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter08;
-
-public class MyConstraintValidatorFactory implements ConstraintValidatorFactory {
-
-	@Override
-	public <T extends ConstraintValidator<?, ?>> T getInstance(Class<T> key) {
-		//...
-	}
-
-	@Override
-	public void releaseInstance(ConstraintValidator<?, ?> instance) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/MyConstraintValidatorFactory.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory validatorFactory = Validation.byDefaultProvider()
-		.configure()
-		.constraintValidatorFactory( new MyConstraintValidatorFactory() )
-		.buildValidatorFactory();
-Validator validator = validatorFactory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=constraintValidatorFactory]
 ----
 ====
 
@@ -321,31 +241,14 @@ the `<parameter-name-provider>` element in the _META-INF/validation.xml_ file
 [[example-using-custom-parameter-name-provider]]
 .Using a custom `ParameterNameProvider`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-package org.hibernate.validator.referenceguide.chapter08;
-
-public class MyParameterNameProvider implements ParameterNameProvider {
-
-	@Override
-	public List<String> getParameterNames(Constructor<?> constructor) {
-		//...
-	}
-
-	@Override
-	public List<String> getParameterNames(Method method) {
-		//...
-	}
-}
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/MyParameterNameProvider.java[tags=include]
 ----
 
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory validatorFactory = Validation.byDefaultProvider()
-		.configure()
-		.parameterNameProvider( new MyParameterNameProvider() )
-		.buildValidatorFactory();
-Validator validator = validatorFactory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=parameterNameProvider]
 ----
 ====
 
@@ -371,16 +274,9 @@ stream(s) must adhere to the XML schema for constraint mappings presented in
 [[example-adding-mapping-streams]]
 .Adding constraint mapping streams
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-InputStream constraintMapping1 = ...;
-InputStream constraintMapping2 = ...;
-ValidatorFactory validatorFactory = Validation.byDefaultProvider()
-		.configure()
-		.addMapping( constraintMapping1 )
-		.addMapping( constraintMapping2 )
-		.buildValidatorFactory();
-Validator validator = validatorFactory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=addMapping]
 ----
 ====
 
@@ -399,14 +295,9 @@ more programmatic constraint mappings as demonstrated in
 [[example-hibernate-validator-specific-options]]
 .Setting Hibernate Validator specific options
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
-		.configure()
-		.failFast( true )
-		.addMapping( (ConstraintMapping) null )
-		.buildValidatorFactory();
-Validator validator = validatorFactory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=providerSpecificOptions]
 ----
 ====
 
@@ -416,13 +307,9 @@ Validator supports enabling the fail fast mode that way, too:
 [[example-hibernate-validator-specific-option-via-addproperty]]
 .Enabling a Hibernate Validator specific option via `addProperty()`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
-		.configure()
-		.addProperty( "hibernate.validator.fail_fast", "true" )
-		.buildValidatorFactory();
-Validator validator = validatorFactory.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=providerSpecificOptionViaAddProperty]
 ----
 ====
 
@@ -439,13 +326,8 @@ be achieved by calling `ValidatorFactory#usingContext()`.
 [[example-using-context]]
 .Configuring a `Validator` instance via `usingContext()`
 ====
-[source, JAVA]
+[source, JAVA, indent=0]
 ----
-ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
-
-Validator validator = validatorFactory.usingContext()
-		.messageInterpolator( new MyMessageInterpolator() )
-		.traversableResolver( new MyTraversableResolver() )
-		.getValidator();
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=usingContext]
 ----
 ====

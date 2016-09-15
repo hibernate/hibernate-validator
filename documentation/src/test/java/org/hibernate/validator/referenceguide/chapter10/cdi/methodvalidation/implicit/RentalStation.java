@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter10.cdi.methodvalidation.implicit;
+
+//end::include[]
 
 import java.util.Date;
 import java.util.List;
@@ -9,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableType;
 import javax.validation.executable.ValidateOnExecution;
 
+//tag::include[]
 @ValidateOnExecution(type = ExecutableType.ALL)
 public interface RentalStation {
 
@@ -22,3 +26,4 @@ public interface RentalStation {
 	@NotNull
 	List<Car> getAvailableCars();
 }
+//end::include[]

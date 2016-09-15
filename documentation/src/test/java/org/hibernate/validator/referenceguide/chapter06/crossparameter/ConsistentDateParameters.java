@@ -1,4 +1,7 @@
+//tag::include[]
 package org.hibernate.validator.referenceguide.chapter06.crossparameter;
+
+//end::include[]
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -11,7 +14,8 @@ import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Constraint(validatedBy = ConsistentDateParameterValidator.class)
+//tag::include[]
+@Constraint(validatedBy = ConsistentDateParametersValidator.class)
 @Target({ METHOD, CONSTRUCTOR, ANNOTATION_TYPE })
 @Retention(RUNTIME)
 @Documented
@@ -24,3 +28,4 @@ public @interface ConsistentDateParameters {
 
 	Class<? extends Payload>[] payload() default { };
 }
+//end::include[]
