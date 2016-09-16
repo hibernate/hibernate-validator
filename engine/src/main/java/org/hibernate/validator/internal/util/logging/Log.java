@@ -5,6 +5,10 @@
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.util.logging;
+import static org.jboss.logging.Logger.Level.DEBUG;
+import static org.jboss.logging.Logger.Level.INFO;
+import static org.jboss.logging.Logger.Level.WARN;
+
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -31,10 +35,6 @@ import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
-
-import static org.jboss.logging.Logger.Level.DEBUG;
-import static org.jboss.logging.Logger.Level.INFO;
-import static org.jboss.logging.Logger.Level.WARN;
 
 /**
  * The Hibernate Validator logger interface for JBoss Logging.
@@ -643,4 +643,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 193, value = "%s is configured more than once via the programmatic constraint definition API.")
 	ValidationException getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException(String annotationClassName);
+
+	@Message(id = 194, value = "An empty element is only supported when a String is expected.")
+	ValidationException getEmptyElementOnlySupportedWhenStringIsExpected();
 }
