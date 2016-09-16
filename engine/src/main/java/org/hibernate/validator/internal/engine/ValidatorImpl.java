@@ -558,9 +558,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
 			PropertyMetaData propertyMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() )
-					.getMetaDataFor(
-							ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() )
-					);
+					.getMetaDataFor( metaConstraint.getLocation().getPropertyName() );
 
 			if ( !propertyPathComplete ) {
 				valueContext.appendNode( propertyMetaData );
@@ -592,9 +590,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		boolean validationSuccessful;
 
 		PropertyMetaData propertyMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() )
-				.getMetaDataFor(
-						ReflectionHelper.getPropertyName( metaConstraint.getLocation().getMember() )
-				);
+				.getMetaDataFor( metaConstraint.getLocation().getPropertyName() );
 
 		if ( !propertyPathComplete ) {
 			valueContext.appendNode( propertyMetaData );

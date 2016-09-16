@@ -46,6 +46,11 @@ public class ConstraintLocation {
 	 */
 	private final Type typeForValidatorResolution;
 
+	/**
+	 * The property name of a member.
+	 */
+	private final String propertyName;
+
 	public static ConstraintLocation forClass(Class<?> declaringClass) {
 		// HV-623 - create a ParameterizedType in case the class has type parameters. Needed for constraint validator
 		// resolution (HF)
@@ -99,6 +104,7 @@ public class ConstraintLocation {
 	private ConstraintLocation(Class<?> declaringClass, Member member, Type typeOfAnnotatedElement) {
 		this.declaringClass = declaringClass;
 		this.member = member;
+		this.propertyName = member == null ? null : ReflectionHelper.getPropertyName( member );
 
 		if ( typeOfAnnotatedElement instanceof Class && ( (Class<?>) typeOfAnnotatedElement ).isPrimitive() ) {
 			this.typeForValidatorResolution = ReflectionHelper.boxedType( (Class<?>) typeOfAnnotatedElement );
@@ -124,6 +130,14 @@ public class ConstraintLocation {
 	 */
 	public Member getMember() {
 		return member;
+	}
+
+	/**
+	 * Returns the property name of the member represented by this location.
+	 * @return the property name of member represented by this location. Will be {@code null} when this location represents a type.
+	 */
+	public String getPropertyName() {
+		return propertyName;
 	}
 
 	/**
