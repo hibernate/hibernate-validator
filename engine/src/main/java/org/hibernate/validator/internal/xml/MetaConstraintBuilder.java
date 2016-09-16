@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -13,6 +15,8 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBElement;
@@ -27,8 +31,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-
 /**
  * Build meta constraint from XML
  *
@@ -36,6 +38,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
  */
 class MetaConstraintBuilder {
 	private static final Log log = LoggerFactory.make();
+
+	private static final Pattern IS_ONLY_WHITESPACE = Pattern.compile( "\\s*" );
 
 	private static final String MESSAGE_PARAM = "message";
 	private static final String GROUPS_PARAM = "groups";
@@ -125,7 +129,15 @@ class MetaConstraintBuilder {
 
 		boolean isArray = returnType.isArray();
 		if ( !isArray ) {
-			if ( elementType.getContent().size() != 1 ) {
+			if ( elementType.getContent().size() == 0 ) {
+				if ( returnType.getName().equals( String.class.getName() ) ) {
+					return "";
+				}
+				else {
+					throw log.getEmptyElementOnlySupportedWhenStringIsExpected();
+				}
+			}
+			else if ( elementType.getContent().size() > 1 ) {
 				throw log.getAttemptToSpecifyAnArrayWhereSingleValueIsExpectedException();
 			}
 			return getSingleValue( elementType.getContent().get( 0 ), returnType, defaultPackage );
@@ -142,7 +154,7 @@ class MetaConstraintBuilder {
 	private static void removeEmptyContentElements(ElementType elementType) {
 		List<Serializable> contentToDelete = newArrayList();
 		for ( Serializable content : elementType.getContent() ) {
-			if ( content instanceof String && ( (String) content ).matches( "[\\n ].*" ) ) {
+			if ( content instanceof String && IS_ONLY_WHITESPACE.matcher( (String) content ).matches() ) {
 				contentToDelete.add( content );
 			}
 		}
