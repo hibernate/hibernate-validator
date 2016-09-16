@@ -34,9 +34,12 @@ import org.hibernate.validator.constraints.Email;
  */
 public class EmailValidator implements ConstraintValidator<Email, CharSequence> {
 	private static final String LOCAL_PART_ATOM = "[a-z0-9!#$%&'*+/=?^_`{|}~\u0080-\uFFFF-]";
+	private static final String LOCAL_PART_INSIDE_QUOTES_ATOM = "([a-z0-9!#$%&'*.(),<>\\[\\]:;  @+/=?^_`{|}~\u0080-\uFFFF-]|\\\\\\\\|\\\\\\\")";
 	private static final String DOMAIN_LABEL = "[a-z0-9!#$%&'*+/=?^_`{|}~-]";
 	private static final String DOMAIN = DOMAIN_LABEL + "+(\\." + DOMAIN_LABEL + "+)*";
 	private static final String IP_DOMAIN = "\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\]";
+	//IP v6 regex taken from http://stackoverflow.com/questions/53497/regular-expression-that-matches-valid-ipv6-addresses
+	private static final String IP_V6_DOMAIN = "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))";
 	private static final int MAX_LOCAL_PART_LENGTH = 64;
 	/**
 	 * This is the maximum length of a domain name. But be aware that each label (parts separated by a dot) of the
@@ -48,14 +51,15 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 	 * Regular expression for the local part of an email address (everything before '@')
 	 */
 	private static final Pattern LOCAL_PART_PATTERN = Pattern.compile(
-			LOCAL_PART_ATOM + "+(\\." + LOCAL_PART_ATOM + "+)*", CASE_INSENSITIVE
+			"(" + LOCAL_PART_ATOM + "+|\"" + LOCAL_PART_INSIDE_QUOTES_ATOM + "+\")" +
+					"(\\." + "(" + LOCAL_PART_ATOM + "+|\"" + LOCAL_PART_INSIDE_QUOTES_ATOM + "+\")" + ")*", CASE_INSENSITIVE
 	);
 
 	/**
 	 * Regular expression for the domain part of an email address (everything after '@')
 	 */
 	private static final Pattern DOMAIN_PATTERN = Pattern.compile(
-			DOMAIN + "|" + IP_DOMAIN, CASE_INSENSITIVE
+			DOMAIN + "|" + IP_DOMAIN + "|" + "\\[IPv6:" + IP_V6_DOMAIN + "\\]", CASE_INSENSITIVE
 	);
 
 	@Override
@@ -68,20 +72,24 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 			return true;
 		}
 
-		// split email at '@' and consider local and domain part separately;
-		// note a split limit of 3 is used as it causes all characters following to an (illegal) second @ character to
-		// be put into a separate array element, avoiding the regex application in this case since the resulting array
-		// has more than 2 elements
-		String[] emailParts = value.toString().split( "@", 3 );
-		if ( emailParts.length != 2 ) {
+		// cannot split email string at @ as it can be a part of quoted local part of email.
+		// so we need to split at a position of last @ present in the string:
+		String stringValue = value.toString();
+		int splitPosition = stringValue.lastIndexOf( "@" );
+
+		// need to check if
+		if ( splitPosition < 0 ) {
 			return false;
 		}
 
-		if ( !matchLocalPart( emailParts[0] ) ) {
+		String localPart = stringValue.substring( 0, splitPosition );
+		String domainPart = stringValue.substring( splitPosition + 1 );
+
+		if ( !matchLocalPart( localPart ) ) {
 			return false;
 		}
 
-		return matchDomain( emailParts[1] );
+		return matchDomain( domainPart );
 	}
 
 	private boolean matchLocalPart(String localPart) {
