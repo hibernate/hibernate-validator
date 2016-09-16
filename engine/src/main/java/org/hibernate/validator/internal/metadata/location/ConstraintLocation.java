@@ -37,6 +37,11 @@ public class ConstraintLocation {
 	private final Member member;
 
 	/**
+	 * The property name associated with the member.
+	 */
+	private final String propertyName;
+
+	/**
 	 * The type hosting this location.
 	 */
 	private final Class<?> declaringClass;
@@ -99,6 +104,7 @@ public class ConstraintLocation {
 	private ConstraintLocation(Class<?> declaringClass, Member member, Type typeOfAnnotatedElement) {
 		this.declaringClass = declaringClass;
 		this.member = member;
+		this.propertyName = member == null ? null : ReflectionHelper.getPropertyName( member );
 
 		if ( typeOfAnnotatedElement instanceof Class && ( (Class<?>) typeOfAnnotatedElement ).isPrimitive() ) {
 			this.typeForValidatorResolution = ReflectionHelper.boxedType( (Class<?>) typeOfAnnotatedElement );
@@ -124,6 +130,15 @@ public class ConstraintLocation {
 	 */
 	public Member getMember() {
 		return member;
+	}
+
+	/**
+	 * Returns the property name of the member represented by this location.
+	 *
+	 * @return the property name of the member represented by this location. Will be {@code null} when this location represents a type.
+	 */
+	public String getPropertyName() {
+		return propertyName;
 	}
 
 	/**
