@@ -65,6 +65,25 @@ public class EmailValidatorTest {
 		isValidEmail( "---@example.com" );
 		isValidEmail( "foo-bar@example.net" );
 		isValidEmail( "mailbox.sub1.sub2@this-domain" );
+		isValidEmail( "prettyandsimple@example.com" );
+		isValidEmail( "very.common@example.com" );
+		isValidEmail( "disposable.style.email.with+symbol@example.com" );
+		isValidEmail( "other.email-with-dash@example.com" );
+		isValidEmail( "x@example.com" );
+		isValidEmail( "\"much.more unusual\"@example.com" );
+		isValidEmail( "\"very.unusual.@.unusual.com\"@example.com" );
+		isValidEmail( "\"very.(),:;<>[]\\\".VERY.\\\"very@\\\\ \\\"very\\\".unusual\"@strange.example.com" );
+		isValidEmail( "\"some \".\" strange \".\" part*:; \"@strange.example.com" );
+		isValidEmail( "example-indeed@strange-example.com" );
+		isValidEmail( "admin@mailserver1" );
+		isValidEmail( "#!$%&'*+-/=?^_`{}|~@example.org" );
+		isValidEmail( "\"()<>[]:,;@\\\"!#$%&'-/=?^_`{}| ~.a\"@example.org" );
+		isValidEmail( "\" \"@example.org" );
+		isValidEmail( "example@localhost" );
+		isValidEmail( "example@s.solutions" );
+		isValidEmail( "user@localserver" );
+		isValidEmail( "user@tt" );
+		isValidEmail( "user@[IPv6:2001:DB8::1]" );
 	}
 
 	@Test
@@ -84,6 +103,14 @@ public class EmailValidatorTest {
 		isInvalidEmail( ".me@example.com" );
 		isInvalidEmail( "me@example..com" );
 		isInvalidEmail( "me\\@example.com" );
+		isInvalidEmail( "Abc.example.com" ); // (no @ character)
+		isInvalidEmail( "A@b@c@example.com" ); // (only one @ is allowed outside quotation marks)
+		isInvalidEmail( "a\"b(c)d,e:f;g<h>i[j\\k]l@example.com" ); // (none of the special characters in this local-part are allowed outside quotation marks)
+		isInvalidEmail( "just\"not\"right@example.com" ); // (quoted strings must be dot separated or the only element making up the local-part)
+		isInvalidEmail( "this is\"not\\allowed@example.com" ); // (spaces, quotes, and backslashes may only exist when within quoted strings and preceded by a backslash)
+		isInvalidEmail( "this\\ still\\\"not\\\\allowed@example.com" ); // (even if escaped (preceded by a backslash), spaces, quotes, and backslashes must still be contained by quotes)
+		isInvalidEmail( "john..doe@example.com" ); // (double dot before @) with caveat: Gmail lets this through, Email address#Local-part the dots altogether
+		isInvalidEmail( "john.doe@example..com" );
 	}
 
 	@Test
