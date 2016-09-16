@@ -235,7 +235,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );
 
-			this.propertyName = ReflectionHelper.getPropertyName( constrainedField.getLocation().getMember() );
+			this.propertyName = constrainedField.getLocation().getPropertyName();
 			this.propertyType = ReflectionHelper.typeOf( constrainedField.getLocation().getMember() );
 			add( constrainedField );
 		}
@@ -251,7 +251,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );
 
-			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getLocation().getMember() );
+			this.propertyName = constrainedMethod.getLocation().getPropertyName();
 			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getLocation().getMember() );
 			add( constrainedMethod );
 		}
@@ -268,7 +268,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			}
 
 			return equals(
-					ReflectionHelper.getPropertyName( constrainedElement.getLocation().getMember() ),
+					constrainedElement.getLocation().getPropertyName(),
 					propertyName
 			);
 		}
