@@ -14,7 +14,6 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
 
-import java.util.Arrays;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
