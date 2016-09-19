@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,10 +52,6 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
-
 /**
  * Hibernate specific {@code Configuration} implementation.
  *
@@ -90,7 +90,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
 	private ClassLoader externalClassLoader;
 	private TimeProvider timeProvider;
-	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
+	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -117,9 +117,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		if ( isJavaFxInClasspath() ) {
 			validatedValueHandlers.add( createJavaFXUnwrapperClass( typeResolutionHelper ) );
 		}
-		if ( Version.getJavaRelease() >= 8 ) {
-			validatedValueHandlers.add( new OptionalValueUnwrapper( typeResolutionHelper ) );
-		}
+		validatedValueHandlers.add( new OptionalValueUnwrapper( typeResolutionHelper ) );
+
 		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator(
 				ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES
 		);

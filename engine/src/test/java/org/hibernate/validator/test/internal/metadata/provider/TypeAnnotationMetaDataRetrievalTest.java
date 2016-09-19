@@ -24,7 +24,7 @@ import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider;
+import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -34,17 +34,17 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Tests for {@link org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider}.
+ * Tests for retrieval of type annotation level constraints.
  *
  * @author Khalid Alqinyah
  */
-public class TypeAnnotationAwareMetaDataProviderTest {
+public class TypeAnnotationMetaDataRetrievalTest {
 
-	private TypeAnnotationAwareMetaDataProvider provider;
+	private AnnotationMetaDataProvider provider;
 
 	@BeforeClass
 	public void setup() {
-		provider = new TypeAnnotationAwareMetaDataProvider(
+		provider = new AnnotationMetaDataProvider(
 				new ConstraintHelper(),
 				new DefaultParameterNameProvider(),
 				new AnnotationProcessingOptionsImpl()

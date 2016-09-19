@@ -6,6 +6,11 @@
  */
 package org.hibernate.validator.internal.metadata;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
+import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -24,17 +29,10 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
-import org.hibernate.validator.internal.metadata.provider.TypeAnnotationAwareMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.Version;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.Option.IDENTITY_COMPARISONS;
-import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * This manager is in charge of providing all constraint related meta data
@@ -142,7 +140,7 @@ public class BeanMetaDataManager {
 
 		this.methodValidationConfiguration = methodValidationConfiguration;
 
-		this.beanMetaDataCache = new ConcurrentReferenceHashMap<Class<?>, BeanMetaData<?>>(
+		this.beanMetaDataCache = new ConcurrentReferenceHashMap<>(
 				DEFAULT_INITIAL_CAPACITY,
 				DEFAULT_LOAD_FACTOR,
 				DEFAULT_CONCURRENCY_LEVEL,
@@ -152,21 +150,12 @@ public class BeanMetaDataManager {
 		);
 
 		AnnotationProcessingOptions annotationProcessingOptions = getAnnotationProcessingOptionsFromNonDefaultProviders();
-		AnnotationMetaDataProvider defaultProvider;
-		if ( Version.getJavaRelease() >= 8 ) {
-			defaultProvider = new TypeAnnotationAwareMetaDataProvider(
+		AnnotationMetaDataProvider defaultProvider = new AnnotationMetaDataProvider(
 					constraintHelper,
 					parameterNameProvider,
 					annotationProcessingOptions
 			);
-		}
-		else {
-			defaultProvider = new AnnotationMetaDataProvider(
-					constraintHelper,
-					parameterNameProvider,
-					annotationProcessingOptions
-			);
-		}
+
 		this.metaDataProviders.add( defaultProvider );
 	}
 
