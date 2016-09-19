@@ -131,7 +131,7 @@ class MetaConstraintBuilder {
 		boolean isArray = returnType.isArray();
 		if ( !isArray ) {
 			if ( elementType.getContent().size() == 0 ) {
-				if ( CharSequence.class.isAssignableFrom( returnType ) ) {
+				if ( returnType == String.class ) {
 					return "";
 				}
 				else {
@@ -196,7 +196,7 @@ class MetaConstraintBuilder {
 
 	private Object convertStringToReturnType(Class<?> returnType, String value, String defaultPackage) {
 		Object returnValue;
-		if ( returnType.getName().equals( byte.class.getName() ) ) {
+		if ( returnType == byte.class ) {
 			try {
 				returnValue = Byte.parseByte( value );
 			}
@@ -204,7 +204,7 @@ class MetaConstraintBuilder {
 				throw log.getInvalidNumberFormatException( "byte", e );
 			}
 		}
-		else if ( returnType.getName().equals( short.class.getName() ) ) {
+		else if ( returnType == short.class ) {
 			try {
 				returnValue = Short.parseShort( value );
 			}
@@ -212,7 +212,7 @@ class MetaConstraintBuilder {
 				throw log.getInvalidNumberFormatException( "short", e );
 			}
 		}
-		else if ( returnType.getName().equals( int.class.getName() ) ) {
+		else if ( returnType == int.class ) {
 			try {
 				returnValue = Integer.parseInt( value );
 			}
@@ -220,7 +220,7 @@ class MetaConstraintBuilder {
 				throw log.getInvalidNumberFormatException( "int", e );
 			}
 		}
-		else if ( returnType.getName().equals( long.class.getName() ) ) {
+		else if ( returnType == long.class ) {
 			try {
 				returnValue = Long.parseLong( value );
 			}
@@ -228,7 +228,7 @@ class MetaConstraintBuilder {
 				throw log.getInvalidNumberFormatException( "long", e );
 			}
 		}
-		else if ( returnType.getName().equals( float.class.getName() ) ) {
+		else if ( returnType == float.class ) {
 			try {
 				returnValue = Float.parseFloat( value );
 			}
@@ -236,7 +236,7 @@ class MetaConstraintBuilder {
 				throw log.getInvalidNumberFormatException( "float", e );
 			}
 		}
-		else if ( returnType.getName().equals( double.class.getName() ) ) {
+		else if ( returnType == double.class ) {
 			try {
 				returnValue = Double.parseDouble( value );
 			}
@@ -244,19 +244,19 @@ class MetaConstraintBuilder {
 				throw log.getInvalidNumberFormatException( "double", e );
 			}
 		}
-		else if ( returnType.getName().equals( boolean.class.getName() ) ) {
+		else if ( returnType == boolean.class ) {
 			returnValue = Boolean.parseBoolean( value );
 		}
-		else if ( returnType.getName().equals( char.class.getName() ) ) {
+		else if ( returnType == char.class ) {
 			if ( value.length() != 1 ) {
 				throw log.getInvalidCharValueException( value );
 			}
 			returnValue = value.charAt( 0 );
 		}
-		else if ( returnType.getName().equals( String.class.getName() ) ) {
+		else if ( returnType == String.class ) {
 			returnValue = value;
 		}
-		else if ( returnType.getName().equals( Class.class.getName() ) ) {
+		else if ( returnType == Class.class ) {
 			returnValue = classLoadingHelper.loadClass( value, defaultPackage );
 		}
 		else {
