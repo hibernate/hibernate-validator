@@ -14,6 +14,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -130,11 +131,11 @@ class MetaConstraintBuilder {
 		boolean isArray = returnType.isArray();
 		if ( !isArray ) {
 			if ( elementType.getContent().size() == 0 ) {
-				if ( returnType.getName().equals( String.class.getName() ) ) {
+				if ( CharSequence.class.isAssignableFrom( returnType ) ) {
 					return "";
 				}
 				else {
-					throw log.getEmptyElementOnlySupportedWhenStringIsExpected();
+					throw log.getEmptyElementOnlySupportedWhenCharSequenceIsExpectedExpection();
 				}
 			}
 			else if ( elementType.getContent().size() > 1 ) {
@@ -152,13 +153,12 @@ class MetaConstraintBuilder {
 	}
 
 	private static void removeEmptyContentElements(ElementType elementType) {
-		List<Serializable> contentToDelete = newArrayList();
-		for ( Serializable content : elementType.getContent() ) {
+		for ( Iterator<Serializable> contentIterator = elementType.getContent().iterator(); contentIterator.hasNext(); ){
+			Serializable content = contentIterator.next();
 			if ( content instanceof String && IS_ONLY_WHITESPACE.matcher( (String) content ).matches() ) {
-				contentToDelete.add( content );
+				contentIterator.remove();
 			}
 		}
-		elementType.getContent().removeAll( contentToDelete );
 	}
 
 	private Object getSingleValue(Serializable serializable, Class<?> returnType, String defaultPackage) {
