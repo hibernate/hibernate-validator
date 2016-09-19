@@ -11,20 +11,27 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedParameterizedType;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.GroupSequence;
@@ -53,6 +60,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -88,7 +96,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		this.constraintHelper = constraintHelper;
 		this.parameterNameProvider = parameterNameProvider;
 		this.annotationProcessingOptions = annotationProcessingOptions;
-		configuredBeans = new ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>>(
+		configuredBeans = new ConcurrentReferenceHashMap<>(
 				DEFAULT_INITIAL_CAPACITY,
 				SOFT,
 				SOFT
@@ -151,7 +159,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			constrainedElements.add( classLevelMetaData );
 		}
 
-		return new BeanConfiguration<T>(
+		return new BeanConfiguration<>(
 				ConfigurationSource.ANNOTATION,
 				beanClass,
 				constrainedElements,
@@ -638,16 +646,16 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass,
 			ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, ConstraintLocation.forClass( declaringClass ) );
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forClass( declaringClass ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, ConstraintLocation.forProperty( member ) );
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forProperty( member ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(ExecutableElement member,
 			int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>(
+		return new MetaConstraint<>(
 				descriptor,
 				ConstraintLocation.forParameter( member, parameterIndex )
 		);
@@ -655,18 +663,18 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member,
 			ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, ConstraintLocation.forReturnValue( member ) );
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forReturnValue( member ) );
 	}
 
 	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(ExecutableElement member,
 			ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<A>( descriptor, ConstraintLocation.forCrossParameter( member ) );
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forCrossParameter( member ) );
 	}
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Member member,
 			A annotation,
 			ElementType type) {
-		return new ConstraintDescriptorImpl<A>(
+		return new ConstraintDescriptorImpl<>(
 				constraintHelper,
 				member,
 				annotation,
@@ -692,8 +700,21 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
 	 */
 	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForMember(Member member) {
-		// To be extended by subclasses
-		return Collections.<MetaConstraint<?>>emptySet();
+		AnnotatedType annotatedType = null;
+
+		if ( member instanceof Field ) {
+			annotatedType = ( (Field) member ).getAnnotatedType();
+		}
+
+		if ( member instanceof Method ) {
+			annotatedType = ( (Method) member ).getAnnotatedReturnType();
+		}
+
+		return findTypeArgumentsConstraints(
+				member,
+				annotatedType,
+				( (AccessibleObject) member ).isAnnotationPresent( Valid.class )
+		);
 	}
 
 	/**
@@ -705,7 +726,119 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
 	 */
 	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Member member, int i) {
-		// To be extended by subclasses
-		return Collections.emptySet();
+		Parameter parameter = ( (Executable) member ).getParameters()[i];
+		try {
+			return findTypeArgumentsConstraints(
+					member,
+					parameter.getAnnotatedType(),
+					parameter.isAnnotationPresent( Valid.class )
+			);
+		}
+		catch (ArrayIndexOutOfBoundsException ex) {
+			log.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
+			return Collections.emptySet();
+		}
+	}
+
+	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, AnnotatedType annotatedType, boolean isCascaded) {
+		Optional<AnnotatedType> typeParameter = getTypeParameter( annotatedType );
+		if ( !typeParameter.isPresent() ) {
+			return Collections.emptySet();
+		}
+
+		List<ConstraintDescriptorImpl<?>> constraintDescriptors = findTypeUseConstraints( member, typeParameter.get() );
+		if ( constraintDescriptors.isEmpty() ) {
+			return Collections.emptySet();
+		}
+
+		// HV-925
+		// We need to determine the validated type used for constraint validator resolution.
+		// Iterables and maps need special treatment at this point, since the validated type is the type of the
+		// specified type parameter. In the other cases the validated type is the parameterized type, eg Optional<String>.
+		// In the latter case a value unwrapping has to occur
+		Type validatedType = annotatedType.getType();
+		if ( ReflectionHelper.isIterable( annotatedType.getType() ) || ReflectionHelper.isMap( annotatedType.getType() ) ) {
+			if ( !isCascaded ) {
+				throw log.getTypeAnnotationConstraintOnIterableRequiresUseOfValidAnnotationException(
+						member.getDeclaringClass(),
+						member.getName()
+				);
+			}
+			validatedType = typeParameter.get().getType();
+		}
+
+		return convertToTypeArgumentMetaConstraints(
+				constraintDescriptors,
+				member,
+				validatedType
+		);
+	}
+
+	/**
+	 * Finds type use annotation constraints defined on the type argument.
+	 */
+	private List<ConstraintDescriptorImpl<?>> findTypeUseConstraints(Member member, AnnotatedType typeArgument) {
+		List<ConstraintDescriptorImpl<?>> metaData = newArrayList();
+
+		for ( Annotation annotation : typeArgument.getAnnotations() ) {
+			metaData.addAll( findConstraintAnnotations( member, annotation, ElementType.TYPE_USE ) );
+		}
+
+		return metaData;
+	}
+
+	/**
+	 * Creates meta constraints for type arguments constraints.
+	 */
+	private Set<MetaConstraint<?>> convertToTypeArgumentMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Member member, Type type) {
+		Set<MetaConstraint<?>> constraints = newHashSet( constraintDescriptors.size() );
+		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
+			MetaConstraint<?> metaConstraint = createTypeArgumentMetaConstraint( member, constraintDescription, type );
+			constraints.add( metaConstraint );
+		}
+		return constraints;
+	}
+
+	/**
+	 * Creates a {@code MetaConstraint} for a type argument constraint.
+	 */
+	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor, Type type) {
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( member, type ) );
+	}
+
+	/**
+	 * Returns the type argument of a parameterized type. If the type is a {@code Map}, the method returns the value
+	 * type argument. If the type has more than one type argument and is not a Map, the method returns an empty {@code
+	 * Optional}.
+	 */
+	private Optional<AnnotatedType> getTypeParameter(AnnotatedType annotatedType) {
+		if ( annotatedType == null ) {
+			return Optional.empty();
+		}
+
+		if ( !TypeHelper.isAssignable( AnnotatedParameterizedType.class, annotatedType.getClass() ) ) {
+			return Optional.empty();
+		}
+
+		AnnotatedType[] annotatedArguments = ( (AnnotatedParameterizedType) annotatedType ).getAnnotatedActualTypeArguments();
+
+		// One type argument, return it
+		if ( annotatedArguments.length == 1 ) {
+			return Optional.of( annotatedArguments[0] );
+		}
+
+		// More than one type argument
+		if ( annotatedArguments.length > 1 ) {
+
+			// If it is a Map, return the value type argument
+			if ( ReflectionHelper.isMap( annotatedType.getType() ) ) {
+				return Optional.of( annotatedArguments[1] );
+			}
+
+			// If it is not a Map, log a message and ignore
+			log.parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported( annotatedType.getType() );
+		}
+
+		return Optional.empty();
 	}
 }

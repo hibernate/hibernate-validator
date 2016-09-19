@@ -6,6 +6,11 @@
  */
 package org.hibernate.validator.internal.metadata.core;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -59,8 +64,13 @@ import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValida
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForChronoZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForDate;
@@ -68,19 +78,6 @@ import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureVal
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForOffsetDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadablePartial;
-import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
-import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
-import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator;
-import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
-import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForDate;
@@ -88,9 +85,6 @@ import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidat
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForOffsetDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadablePartial;
-import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArray;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfBoolean;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfByte;
@@ -102,22 +96,27 @@ import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidat
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForMap;
+import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Keeps track of builtin constraints and their validator implementations, as well as already resolved validator definitions.
@@ -159,12 +158,12 @@ public class ConstraintHelper {
 			futureValidators.add( FutureValidatorForReadableInstant.class );
 			futureValidators.add( FutureValidatorForReadablePartial.class );
 		}
-		if ( Version.getJavaRelease() >= 8 ) {
-			// Java 8 date/time API validators
-			futureValidators.add( FutureValidatorForChronoZonedDateTime.class );
-			futureValidators.add( FutureValidatorForInstant.class );
-			futureValidators.add( FutureValidatorForOffsetDateTime.class );
-		}
+
+		// Java 8 date/time API validators
+		futureValidators.add( FutureValidatorForChronoZonedDateTime.class );
+		futureValidators.add( FutureValidatorForInstant.class );
+		futureValidators.add( FutureValidatorForOffsetDateTime.class );
+
 		putConstraints( tmpConstraints, Future.class, futureValidators );
 
 		putConstraints( tmpConstraints, Max.class, MaxValidatorForNumber.class, MaxValidatorForCharSequence.class );
@@ -179,12 +178,11 @@ public class ConstraintHelper {
 			pastValidators.add( PastValidatorForReadableInstant.class );
 			pastValidators.add( PastValidatorForReadablePartial.class );
 		}
-		if ( Version.getJavaRelease() >= 8 ) {
-			// Java 8 date/time API validators
-			pastValidators.add( PastValidatorForChronoZonedDateTime.class );
-			pastValidators.add( PastValidatorForInstant.class );
-			pastValidators.add( PastValidatorForOffsetDateTime.class );
-		}
+		// Java 8 date/time API validators
+		pastValidators.add( PastValidatorForChronoZonedDateTime.class );
+		pastValidators.add( PastValidatorForInstant.class );
+		pastValidators.add( PastValidatorForOffsetDateTime.class );
+
 		putConstraints( tmpConstraints, Past.class, pastValidators );
 
 		putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
