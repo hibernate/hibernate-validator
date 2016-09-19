@@ -162,7 +162,7 @@
 
         <!--  Avoid some import statements -->
         <module name="IllegalImport">
-            <property name="illegalPkgs" value="java.awt, sun, org.slf4j, junit.framework"/>
+            <property name="illegalPkgs" value="java.awt, sun, org.slf4j, junit.framework, org.junit"/>
         </module>
 
     </module>
