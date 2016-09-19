@@ -682,6 +682,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 193, value = "%s is configured more than once via the programmatic constraint definition API.")
 	ValidationException getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass);
 
-	@Message(id = 194, value = "An empty element is only supported when a String is expected.")
-	ValidationException getEmptyElementOnlySupportedWhenStringIsExpected();
+	@Message(id = 194, value = "An empty element is only supported when a CharSequence is expected.")
+	ValidationException getEmptyElementOnlySupportedWhenCharSequenceIsExpectedExpection();
 }

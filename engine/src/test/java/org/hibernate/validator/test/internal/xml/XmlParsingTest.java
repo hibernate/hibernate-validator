@@ -18,7 +18,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.assertj.core.api.Assertions;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 /**
  * Various tests for parsing of XML mapping files.
