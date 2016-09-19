@@ -15,7 +15,7 @@ import javax.validation.Validator;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.assertj.core.api.Assertions;
+import org.fest.assertions.Assertions;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
