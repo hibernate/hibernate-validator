@@ -84,6 +84,7 @@
         <module>tck-runner</module>
         <module>annotation-processor</module>
         <module>performance</module>
+        <module>modules</module>
     </modules>
 
     <properties>
