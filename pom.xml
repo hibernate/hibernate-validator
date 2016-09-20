@@ -86,6 +86,7 @@
         <module>annotation-processor</module>
         <module>integration</module>
         <module>performance</module>
+        <module>modules</module>
     </modules>
 
     <properties>
