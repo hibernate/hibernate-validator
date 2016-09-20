@@ -5,10 +5,10 @@
   ~ License: Apache License, Version 2.0
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
-<features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0"
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0"
     name="hibernate-validator-osgi-features"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.2.0">
+    xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0">
 
     <feature name="hibernate-validator" version="${project.version}">
         <bundle>mvn:org.hibernate/hibernate-validator/${project.version}</bundle>
@@ -21,6 +21,7 @@
         <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
     </feature>
     <feature name="hibernate-validator-paranamer" version="${project.version}">
+        <feature prerequisite="true">wrap</feature>
         <feature>hibernate-validator</feature>
         <bundle>wrap:mvn:com.thoughtworks.paranamer:paranamer:${paranamer.version}</bundle>
     </feature>
