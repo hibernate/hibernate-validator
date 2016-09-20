@@ -138,63 +138,18 @@
                                     <version>${wildfly.version}</version>
                                     <type>tar.gz</type>
                                     <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-hv-snapshot</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>
-                                ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/main
-                            </outputDirectory>
-                            <stripVersion>false</stripVersion>
-                            <artifactItems>
                                 <artifactItem>
                                     <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-validator</artifactId>
+                                    <artifactId>hibernate-validator-modules</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>wildfly-10-dist</classifier>
+                                    <type>zip</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-hv-cdi-snapshot</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>
-                                ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/cdi/main
-                            </outputDirectory>
-                            <stripVersion>false</stripVersion>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.hibernate</groupId>
-                                    <artifactId>hibernate-validator-cdi</artifactId>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>update-modules</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <source>${pom.basedir}/src/script/setupModules.groovy</source>
                         </configuration>
                     </execution>
                 </executions>
