@@ -82,11 +82,11 @@
         <module>engine</module>
         <module>engine-jdk8-tests</module>
         <module>cdi</module>
+        <module>modules</module>
         <module>tck-runner</module>
         <module>annotation-processor</module>
         <module>integration</module>
         <module>performance</module>
-        <module>modules</module>
     </modules>
 
     <properties>

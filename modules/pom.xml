@@ -16,7 +16,8 @@
 
     <properties>
         <module.xml.basedir>${basedir}/src/main/modules</module.xml.basedir>
-        <hibernate.validator.module.slot>${project.version}</hibernate.validator.module.slot>
+        <module.xml.aliases.basedir>${basedir}/src/main/aliases</module.xml.aliases.basedir>
+        <hibernate.validator.module.slot>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.validator.module.slot>
         <hibernate.validator.module.xml>${module.xml.basedir}/org/hibernate/validator/module.xml</hibernate.validator.module.xml>
         <hibernate.validator.cdi.module.xml>${module.xml.basedir}/org/hibernate/validator/cdi/module.xml</hibernate.validator.cdi.module.xml>
     </properties>
@@ -38,6 +39,20 @@
 
     <build>
         <plugins>
+            <plugin>
+                <!-- This defines the properties 'parsedVersion.majorVersion'
+                    and 'parsedVersion.minorVersion' to be in synch with the current project version -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>parse-project-version</id>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
