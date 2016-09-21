@@ -1,0 +1,2 @@
+Manifest-Version: 1.0
+Dependencies: org.hibernate.validator:${project.version}, org.hibernate.validator.cdi:${project.version}

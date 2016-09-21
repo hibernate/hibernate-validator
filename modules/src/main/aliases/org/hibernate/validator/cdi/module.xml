@@ -7,4 +7,4 @@
   -->
 <module-alias xmlns="urn:jboss:module:1.1"
               name="org.hibernate.validator.cdi" slot="${hibernate.validator.module.slot}"
-              target-name="org.hibernate.validator.cdi" target-slot="${project.verson}"/>
+              target-name="org.hibernate.validator.cdi" target-slot="${project.version}"/>
