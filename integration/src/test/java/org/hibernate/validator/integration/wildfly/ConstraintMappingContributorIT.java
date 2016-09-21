@@ -40,6 +40,7 @@ public class ConstraintMappingContributorIT {
 		return ShrinkWrap.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses( Broomstick.class, MyConstraintMappingContributor.class )
 				.addAsResource( "constraint-mapping-contributor-validation.xml", "META-INF/validation.xml" )
+				.addAsManifestResource( "MANIFEST.MF" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 

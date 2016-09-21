@@ -81,6 +81,7 @@
         <module>build-config</module>
         <module>engine</module>
         <module>cdi</module>
+        <module>modules</module>
         <module>tck-runner</module>
         <module>annotation-processor</module>
         <module>performance</module>

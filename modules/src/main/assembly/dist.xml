@@ -1,0 +1,56 @@
+<assembly>
+    <id>wildfly-10-dist</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <baseDirectory>/</baseDirectory>
+
+    <files>
+        <!-- hibernate-validator -->
+        <file>
+            <source>${module.xml.aliases.basedir}/org/hibernate/validator/module.xml</source>
+            <outputDirectory>org/hibernate/validator/${hibernate.validator.module.slot}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${hibernate.validator.module.xml}</source>
+            <outputDirectory>org/hibernate/validator/${project.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <!-- hibernate-validator-cdi -->
+        <file>
+            <source>${module.xml.aliases.basedir}/org/hibernate/validator/cdi/module.xml</source>
+            <outputDirectory>org/hibernate/validator/cdi/${hibernate.validator.module.slot}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+        <file>
+            <source>${hibernate.validator.cdi.module.xml}</source>
+            <outputDirectory>org/hibernate/validator/cdi/${project.version}</outputDirectory>
+            <filtered>true</filtered>
+        </file>
+    </files>
+
+    <dependencySets>
+        <!-- hibernate-validator -->
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/validator/${project.version}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.hibernate:hibernate-validator</include>
+            </includes>
+        </dependencySet>
+        <!-- hibernate-validator-cdi -->
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>org/hibernate/validator/cdi/${project.version}</outputDirectory>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.hibernate:hibernate-validator-cdi</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
+</assembly>
