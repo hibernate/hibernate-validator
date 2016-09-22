@@ -6,26 +6,24 @@
  */
 package org.hibernate.validator.test.internal.cdi.methodvalidation.inheritance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.fail;
+
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.NotNull;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class MultipleInterfaceInheritanceMethodValidationTest {
+public class MultipleInterfaceInheritanceMethodValidationTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -47,14 +45,14 @@ public class MultipleInterfaceInheritanceMethodValidationTest {
 			fail( "Method invocation should have caused a ConstraintViolationException" );
 		}
 		catch (ConstraintViolationException e) {
-			assertEquals(
+			assertThat(
 					e.getConstraintViolations()
 							.iterator()
 							.next()
 							.getConstraintDescriptor()
 							.getAnnotation()
-							.annotationType(), NotNull.class
-			);
+							.annotationType() )
+					.isEqualTo( NotNull.class );
 		}
 	}
 }

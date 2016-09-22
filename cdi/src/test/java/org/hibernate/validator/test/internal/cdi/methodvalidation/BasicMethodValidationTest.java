@@ -6,25 +6,23 @@
  */
 package org.hibernate.validator.test.internal.cdi.methodvalidation;
 
+import static org.testng.Assert.fail;
+
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class BasicMethodValidationTest {
+public class BasicMethodValidationTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createDeployment() {

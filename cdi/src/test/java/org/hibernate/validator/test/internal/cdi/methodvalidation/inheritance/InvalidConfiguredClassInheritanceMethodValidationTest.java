@@ -6,29 +6,26 @@
  */
 package org.hibernate.validator.test.internal.cdi.methodvalidation.inheritance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.fail;
+
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.inject.Inject;
 import javax.validation.ValidationException;
 
+import org.hibernate.validator.internal.cdi.ValidationExtension;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.hibernate.validator.internal.cdi.ValidationExtension;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class InvalidConfiguredClassInheritanceMethodValidationTest {
+public class InvalidConfiguredClassInheritanceMethodValidationTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -52,7 +49,7 @@ public class InvalidConfiguredClassInheritanceMethodValidationTest {
 			);
 		}
 		catch (ValidationException e) {
-			assertTrue( e.getMessage().startsWith( "HV000166" ) );
+			assertThat( e.getMessage() ).startsWith( "HV000166" );
 		}
 	}
 

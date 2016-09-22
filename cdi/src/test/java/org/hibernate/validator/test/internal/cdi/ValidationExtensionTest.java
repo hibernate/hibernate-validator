@@ -6,11 +6,20 @@
  */
 package org.hibernate.validator.test.internal.cdi;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.fail;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.Annotated;
@@ -23,21 +32,12 @@ import javax.validation.ValidatorFactory;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.Before;
-import org.junit.Test;
-
 import org.hibernate.validator.internal.cdi.ValidationExtension;
 import org.hibernate.validator.internal.cdi.ValidationProviderHelper;
 import org.hibernate.validator.internal.cdi.ValidatorBean;
 import org.hibernate.validator.internal.cdi.ValidatorFactoryBean;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.fail;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -51,7 +51,7 @@ public class ValidationExtensionTest {
 	private BeanManager beanManagerMock;
 
 	@SuppressWarnings("unchecked")
-	@Before
+	@BeforeMethod
 	public void setUp() {
 		extension = new ValidationExtension();
 		afterBeanDiscoveryMock = createMock( AfterBeanDiscovery.class );

@@ -6,37 +6,33 @@
  */
 package org.hibernate.validator.test.internal.cdi.injection;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import javax.inject.Inject;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.test.internal.cdi.injection.MyValidationProvider.MyValidator;
 import org.hibernate.validator.test.internal.cdi.injection.MyValidationProvider.MyValidatorFactory;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.testng.Arquillian;
+import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.StringAsset;
+import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.testng.annotations.Test;
 
 /**
  * Tests the injection of validator and validator factory if the default provider is not Hibernate Validator.
  *
  * @author Gunnar Morling
  */
-@RunWith(Arquillian.class)
 @TestForIssue(jiraKey = "HV-858")
-public class InjectionOfCustomProviderTest {
+public class InjectionOfCustomProviderTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -78,43 +74,43 @@ public class InjectionOfCustomProviderTest {
 
 	@Test
 	public void testInjectionOfDefaultFactory() throws Exception {
-		assertNotNull( defaultValidatorFactory );
-		assertTrue( defaultValidatorFactory instanceof MyValidatorFactory );
-		assertTrue( defaultValidatorFactory.unwrap( MyValidatorFactory.class ) instanceof MyValidatorFactory );
+		assertThat( defaultValidatorFactory ).isNotNull();
+		assertThat( defaultValidatorFactory ).isInstanceOf( MyValidatorFactory.class );
+		assertThat( defaultValidatorFactory.unwrap( MyValidatorFactory.class ) ).isInstanceOf( MyValidatorFactory.class );
 
-		assertNotNull( myValidatorFactory );
+		assertThat( myValidatorFactory ).isNotNull();
 	}
 
 	@Test
 	public void testInjectionOfDefaultValidator() throws Exception {
-		assertNotNull( defaultValidator );
-		assertTrue( defaultValidator instanceof MyValidator );
-		assertNotNull( defaultValidator.forExecutables() );
+		assertThat( defaultValidator ).isNotNull();
+		assertThat( defaultValidator ).isInstanceOf( MyValidator.class );
+		assertThat( defaultValidator.forExecutables() ).isNotNull();
 
-		assertNotNull( myValidator );
-		assertNotNull( myValidator.forExecutables() );
+		assertThat( myValidator ).isNotNull();
+		assertThat( myValidator.forExecutables() ).isNotNull();
 
-		assertEquals( 1, defaultValidator.validate( new TestEntity() ).size() );
-		assertEquals( 1, myValidator.validate( new TestEntity() ).size() );
+		assertThat( defaultValidator.validate( new TestEntity() ) ).hasSize( 1 );
+		assertThat( myValidator.validate( new TestEntity() ) ).hasSize( 1 );
 	}
 
 	@Test
 	public void testInjectionOfHibernateFactory() throws Exception {
-		assertNotNull( hibernateValidatorFactory );
-		assertNotNull( hibernateValidatorSpecificFactory );
+		assertThat( hibernateValidatorFactory ).isNotNull();
+		assertThat( hibernateValidatorSpecificFactory ).isNotNull();
 
-		assertEquals( ValidatorImpl.class, hibernateValidatorFactory.getValidator().getClass() );
-		assertEquals( ValidatorImpl.class, hibernateValidatorSpecificFactory.getValidator().getClass() );
+		assertThat( hibernateValidatorFactory.getValidator() ).isExactlyInstanceOf( ValidatorImpl.class );
+		assertThat( hibernateValidatorSpecificFactory.getValidator() ).isExactlyInstanceOf( ValidatorImpl.class );
 	}
 
 	@Test
 	public void testInjectionOfHibernateValidator() throws Exception {
-		assertNotNull( hibernateValidator );
-		assertNotNull( hibernateValidator.forExecutables() );
+		assertThat( hibernateValidator ).isNotNull();
+		assertThat( hibernateValidator.forExecutables() ).isNotNull();
 
-		assertNotNull( hibernateValidator.unwrap( Validator.class ) );
+		assertThat( hibernateValidator.unwrap( Validator.class ) ).isNotNull();
 
-		assertEquals( 1, hibernateValidator.validate( new TestEntity() ).size() );
+		assertThat( hibernateValidator.validate( new TestEntity() ) ).hasSize( 1 );
 	}
 
 	public static class TestEntity {

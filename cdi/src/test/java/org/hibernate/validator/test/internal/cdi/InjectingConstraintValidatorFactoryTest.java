@@ -6,6 +6,12 @@
  */
 package org.hibernate.validator.test.internal.cdi;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.testng.Assert.fail;
+
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
@@ -14,16 +20,9 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Min;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import org.hibernate.validator.internal.cdi.InjectingConstraintValidatorFactory;
-
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.fail;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -35,7 +34,7 @@ public class InjectingConstraintValidatorFactoryTest {
 	private InjectionTarget<MyValidator> injectionTargetMock;
 	private CreationalContext<MyValidator> creationalContextMock;
 
-	@Before
+	@BeforeClass
 	@SuppressWarnings("unchecked")
 	public void setUp() {
 		beanManagerMock = createMock( BeanManager.class );
