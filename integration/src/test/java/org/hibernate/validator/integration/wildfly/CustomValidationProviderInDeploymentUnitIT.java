@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.integration.wildfly;
 
+import static org.junit.Assert.assertTrue;
+
 import javax.inject.Inject;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -22,8 +24,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the usage of a custom validation provider coming as part of the deployment unit.
@@ -46,6 +46,7 @@ public class CustomValidationProviderInDeploymentUnitIT {
 								.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" ) )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( "validation-custom-provider.xml", "META-INF/validation.xml" )
+				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 

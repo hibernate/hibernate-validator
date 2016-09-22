@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.integration.wildfly.jpa;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
@@ -23,8 +26,6 @@ import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * Tests the usage of HV by JPA, applying a custom validation.xml. Also making sure that the VF is CDI-enabled.
  *
@@ -41,11 +42,12 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap
 				.create( WebArchive.class, WAR_FILE_NAME )
-				.addClasses( Magician.class, ValidMagicianName.class, MagicianService.class )
+				.addClasses( Magician.class, ValidMagicianName.class, MagicianService.class, Wand.class, WandConstraintMappingContributor.class )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )
 				.addAsResource( "constraints-magician.xml", "META-INF/validation/constraints-magician.xml" )
+				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
@@ -73,6 +75,7 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 
 		try {
 			magicianService.storeMagician();
+			fail( "Expected exception wasn't raised" );
 		}
 		catch (Exception e) {
 			Throwable rootException = getRootException( e );
@@ -84,6 +87,31 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 		}
 
 		log.debug( "testValidatorFactoryPassedToPersistenceUnitIsCorrectlyConfigured completed" );
+	}
+
+	/**
+	 * Makes sure the HV added via our module ZIP is used instead the one coming with WF by relying on functionality not
+	 * present in the WF-provided HV
+	 */
+	// TODO How to make that work reliably also after a HV upgrade within WF?
+	@Test
+	public void testValidatorFactoryPassedToPersistenceUnitIsContributedFromPortableExtensionOfCurrentModuleZip() throws Exception {
+		log.debug( "Running testValidatorFactoryPassedToPersistenceUnitIsContributedFromPortableExtensionOfCurrentModuleZip..." );
+
+		try {
+			magicianService.storeWand();
+			fail( "Expected exception wasn't raised" );
+		}
+		catch (Exception e) {
+			Throwable rootException = getRootException( e );
+			assertEquals( ConstraintViolationException.class, rootException.getClass() );
+
+			ConstraintViolationException constraintViolationException = (ConstraintViolationException) rootException;
+			assertEquals( 1, constraintViolationException.getConstraintViolations().size() );
+			assertEquals( "size must be between 5 and 2147483647", constraintViolationException.getConstraintViolations().iterator().next().getMessage() );
+		}
+
+		log.debug( "testValidatorFactoryPassedToPersistenceUnitIsContributedFromPortableExtensionOfCurrentModuleZip completed" );
 	}
 
 	private Throwable getRootException(Throwable throwable) {

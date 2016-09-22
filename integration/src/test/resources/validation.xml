@@ -14,4 +14,5 @@
         validation.xml is applied, in turn letting us know that the custom provider can be used successfully
     -->
     <constraint-mapping>META-INF/validation/constraints-magician.xml</constraint-mapping>
+    <property name="hibernate.validator.constraint_mapping_contributors">org.hibernate.validator.integration.wildfly.jpa.WandConstraintMappingContributor</property>
 </validation-config>

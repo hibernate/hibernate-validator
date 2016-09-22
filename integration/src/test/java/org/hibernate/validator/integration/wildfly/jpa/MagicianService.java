@@ -24,4 +24,10 @@ public class MagicianService {
 		magician.setName( "Balduin" );
 		em.persist( magician );
 	}
+
+	public void storeWand() {
+		Wand wand = new Wand();
+		wand.setBrand( "Doh" );
+		em.persist( wand );
+	}
 }

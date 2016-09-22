@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.integration.wildfly;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -21,8 +23,6 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Asserts constraints mappings contributed via {@code validation.xml} are applied.
@@ -40,7 +40,7 @@ public class ConstraintMappingContributorIT {
 		return ShrinkWrap.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses( Broomstick.class, MyConstraintMappingContributor.class )
 				.addAsResource( "constraint-mapping-contributor-validation.xml", "META-INF/validation.xml" )
-				.addAsManifestResource( "MANIFEST.MF" )
+				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
