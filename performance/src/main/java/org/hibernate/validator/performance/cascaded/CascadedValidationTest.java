@@ -6,12 +6,15 @@
  */
 package org.hibernate.validator.performance.cascaded;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validation;
@@ -19,10 +22,8 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -32,7 +33,7 @@ public class CascadedValidationTest {
 	private static final int NUMBER_OF_RUNNABLES = 10000;
 	private static final int SIZE_OF_THREAD_POOL = 50;
 
-	@BeforeClass
+	@BeforeTest
 	public static void setupValidatorInstance() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
@@ -50,7 +51,7 @@ public class CascadedValidationTest {
 		gonzo.addFriend( kermit ).addFriend( piggy );
 
 		Set<ConstraintViolation<Person>> violations = validator.validate( kermit );
-		assertEquals( 0, violations.size() );
+		assertThat( violations ).hasSize( 0 );
 	}
 
 	/**

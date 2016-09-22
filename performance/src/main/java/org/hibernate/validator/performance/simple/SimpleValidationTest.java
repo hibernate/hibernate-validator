@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.performance.simple;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Random;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -16,10 +18,8 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -41,7 +41,7 @@ public class SimpleValidationTest {
 	private static Validator validator;
 	private static Random random;
 
-	@BeforeClass
+	@BeforeTest
 	public static void setUpValidatorFactory() {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
@@ -52,7 +52,7 @@ public class SimpleValidationTest {
 	public void testSimpleBeanValidation() {
 		DriverSetup driverSetup = new DriverSetup();
 		Set<ConstraintViolation<Driver>> violations = validator.validate( driverSetup.getDriver() );
-		assertEquals( driverSetup.getExpectedViolationCount(), violations.size() );
+		assertThat( violations ).hasSize( driverSetup.getExpectedViolationCount() );
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class SimpleValidationTest {
 		DriverSetup driverSetup = new DriverSetup();
 		Validator localValidator = Validation.buildDefaultValidatorFactory().getValidator();
 		Set<ConstraintViolation<Driver>> violations = localValidator.validate( driverSetup.getDriver() );
-		assertEquals( driverSetup.getExpectedViolationCount(), violations.size() );
+		assertThat( violations ).hasSize( driverSetup.getExpectedViolationCount() );
 	}
 
 	public class Driver {
