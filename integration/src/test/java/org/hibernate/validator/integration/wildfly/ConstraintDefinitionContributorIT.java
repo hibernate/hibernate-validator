@@ -6,12 +6,18 @@
  */
 package org.hibernate.validator.integration.wildfly;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import org.hibernate.validator.integration.util.IntegrationTestUtil;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -20,12 +26,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import org.hibernate.validator.integration.util.IntegrationTestUtil;
-import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Hardy Ferentschik
@@ -52,6 +52,7 @@ public class ConstraintDefinitionContributorIT {
 								.as( JavaArchive.class )
 				)
 				.addAsResource( "log4j.properties" )
+				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 

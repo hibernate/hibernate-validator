@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.integration.wildfly;
 
+import static org.junit.Assert.assertEquals;
+
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
@@ -17,8 +19,6 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Asserts that the validation interceptor picks up a {@code Validator} provided by the application and uses it for
@@ -42,6 +42,7 @@ public class MethodValidationWithCustomValidatorIT {
 	public static Archive<?> createTestArchive() {
 		return ShrinkWrap.create( WebArchive.class, WAR_FILE_NAME )
 				.addClasses( MyValidator.class )
+				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 

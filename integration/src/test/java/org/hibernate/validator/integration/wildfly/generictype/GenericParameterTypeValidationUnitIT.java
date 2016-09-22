@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.integration.wildfly.generictype;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -23,16 +27,13 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 @TestForIssue(jiraKey = "HV-978")
 @RunWith(Arquillian.class)
 public class GenericParameterTypeValidationUnitIT {
 	@Deployment
 	public static WebArchive deployment() {
 		return ShrinkWrap.create( WebArchive.class )
+				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addPackage( GenericParameterTypeValidationUnitIT.class.getPackage() );
 	}
