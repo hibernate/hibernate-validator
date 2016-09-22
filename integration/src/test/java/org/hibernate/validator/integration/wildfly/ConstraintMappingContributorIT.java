@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.integration.wildfly;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 
@@ -15,29 +15,25 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.annotations.Test;
 
 /**
  * Asserts constraints mappings contributed via {@code validation.xml} are applied.
  *
  * @author Gunnar Morling
  */
-@RunWith(Arquillian.class)
-public class ConstraintMappingContributorIT {
+public class ConstraintMappingContributorIT extends AbstractArquillianIT {
 
 	private static final String WAR_FILE_NAME = ConstraintMappingContributorIT.class
 			.getSimpleName() + ".war";
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		return ShrinkWrap.create( WebArchive.class, WAR_FILE_NAME )
+		return buildTestArchive( WAR_FILE_NAME )
 				.addClasses( Broomstick.class, MyConstraintMappingContributor.class )
 				.addAsResource( "constraint-mapping-contributor-validation.xml", "META-INF/validation.xml" )
 				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
@@ -51,10 +47,7 @@ public class ConstraintMappingContributorIT {
 	public void shouldApplyContributedConstraintMapping() {
 		Set<ConstraintViolation<Broomstick>> violations = validator.validate( new Broomstick() );
 
-		assertEquals( 1, violations.size() );
-		assertEquals(
-				NotNull.class,
-				violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType()
-		);
+		assertThat( violations ).hasSize( 1 );
+		assertThat( violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo( NotNull.class );
 	}
 }

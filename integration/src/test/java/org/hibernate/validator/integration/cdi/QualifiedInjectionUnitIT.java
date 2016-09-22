@@ -6,30 +6,27 @@
  */
 package org.hibernate.validator.integration.cdi;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.Serializable;
+
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import org.hibernate.validator.cdi.HibernateValidator;
+import org.hibernate.validator.integration.AbstractArquillianIT;
+import org.hibernate.validator.testutil.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.hibernate.validator.cdi.HibernateValidator;
-import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.junit.Assert.assertNotNull;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class QualifiedInjectionUnitIT {
+public class QualifiedInjectionUnitIT extends AbstractArquillianIT {
 	private static final String WAR_FILE_NAME = QualifiedInjectionUnitIT.class.getSimpleName() + ".war";
 
 	@Inject
@@ -45,24 +42,22 @@ public class QualifiedInjectionUnitIT {
 
 	@Deployment
 	public static WebArchive createTestArchive() throws Exception {
-		return ShrinkWrap
-				.create( WebArchive.class, WAR_FILE_NAME )
-				.addAsResource( "log4j.properties" )
+		return buildTestArchive( WAR_FILE_NAME )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
 	@Test
 	public void testQualifiedValidatorFactoryAndValidatorInjectable() {
-		assertNotNull( "The validator factory should have been injected", validatorFactory );
-		assertNotNull( "The validator should have been injected", validator );
+		assertThat( validatorFactory ).as( "The validator factory should have been injected" ).isNotNull();
+		assertThat( validator ).as( "The validator should have been injected" ).isNotNull();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-787")
 	public void testInjectionIntoBeanWithPassivatingScope() throws Exception {
-		assertNotNull( testEntity );
-		assertNotNull( testEntity.getValidatorFactory() );
-		assertNotNull( testEntity.getValidator() );
+		assertThat( testEntity ).isNotNull();
+		assertThat( testEntity.getValidatorFactory() ).isNotNull();
+		assertThat( testEntity.getValidator() ).isNotNull();
 	}
 
 	@SessionScoped

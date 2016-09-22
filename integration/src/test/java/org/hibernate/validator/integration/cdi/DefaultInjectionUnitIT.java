@@ -6,25 +6,22 @@
  */
 package org.hibernate.validator.integration.cdi;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.validation.ValidatorFactory;
 
+import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertNotNull;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class DefaultInjectionUnitIT {
+public class DefaultInjectionUnitIT extends AbstractArquillianIT {
 	private static final String WAR_FILE_NAME = DefaultInjectionUnitIT.class.getSimpleName() + ".war";
 
 	@Inject
@@ -35,15 +32,14 @@ public class DefaultInjectionUnitIT {
 
 	@Deployment
 	public static WebArchive createTestArchive() throws Exception {
-		return ShrinkWrap
-				.create( WebArchive.class, WAR_FILE_NAME )
+		return buildTestArchive( WAR_FILE_NAME )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
 	@Test
 	public void testDefaultValidatorFactoryInjected() {
-		assertNotNull( "The bean manager should have been injected", beanManager );
-		assertNotNull( "The validator factory should have been injected", validatorFactory );
+		assertThat( beanManager ).as( "The bean manager should have been injected" ).isNotNull();
+		assertThat( validatorFactory ).as( "The validator factory should have been injected" ).isNotNull();
 	}
 
 }
