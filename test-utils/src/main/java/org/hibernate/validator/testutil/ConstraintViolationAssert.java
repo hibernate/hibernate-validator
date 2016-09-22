@@ -140,7 +140,7 @@ public final class ConstraintViolationAssert {
 	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
 			Class<?> rootBeanClass, Object invalidValue, String propertyPath) {
 		assertTrue(
-				pathsAreEqual( violation.getPropertyPath(), PathImpl.createNewPath(propertyPath) ),
+				pathsAreEqual( violation.getPropertyPath(), PathImpl.createNewPath( propertyPath ) ),
 				"Wrong propertyPath"
 		);
 		assertConstraintViolation( violation, errorMessage, rootBeanClass, invalidValue );

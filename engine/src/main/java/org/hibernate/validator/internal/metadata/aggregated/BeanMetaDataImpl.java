@@ -551,7 +551,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					executableHelper,
 					validationOrderGenerator,
 					beanClass,
-					methodValidationConfiguration);
+					methodValidationConfiguration );
 		}
 
 		public void add(BeanConfiguration<? super T> configuration) {

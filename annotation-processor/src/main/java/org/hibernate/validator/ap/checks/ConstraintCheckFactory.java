@@ -70,16 +70,18 @@ public class ConstraintCheckFactory {
 		methodChecks = CollectionHelper.newHashMap();
 		methodChecks.put(
 				AnnotationType.CONSTRAINT_ANNOTATION,
-				new SingleValuedChecks( new GetterCheck(methodConstraintsSupported), new StaticCheck(), new MethodAnnotationCheck(constraintHelper), new TypeCheck( constraintHelper ) )
+				new SingleValuedChecks( new GetterCheck( methodConstraintsSupported ), new StaticCheck(), new MethodAnnotationCheck( constraintHelper ),
+						new TypeCheck( constraintHelper ) )
 		);
 		methodChecks.put(
 				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION, new MultiValuedChecks(
-						constraintHelper, new GetterCheck(methodConstraintsSupported), new StaticCheck(), new MethodAnnotationCheck(constraintHelper), new TypeCheck( constraintHelper )
-				)
+						constraintHelper, new GetterCheck( methodConstraintsSupported ), new StaticCheck(), new MethodAnnotationCheck( constraintHelper ),
+						new TypeCheck( constraintHelper ) )
 		);
 		methodChecks.put(
 				AnnotationType.GRAPH_VALIDATION_ANNOTATION,
-				new SingleValuedChecks( new GetterCheck(methodConstraintsSupported), new StaticCheck(), new MethodAnnotationCheck(constraintHelper), new PrimitiveCheck() )
+				new SingleValuedChecks( new GetterCheck( methodConstraintsSupported ), new StaticCheck(), new MethodAnnotationCheck( constraintHelper ),
+						new PrimitiveCheck() )
 		);
 		methodChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );
 
@@ -99,7 +101,7 @@ public class ConstraintCheckFactory {
 						new TargetCheck( annotationApiHelper ),
 						new ConstraintValidatorCheck( constraintHelper, annotationApiHelper ),
 						new AnnotationTypeMemberCheck( annotationApiHelper, typeUtils ),
-						new CrossParameterConstraintCheck(annotationApiHelper, constraintHelper, typeUtils)
+						new CrossParameterConstraintCheck( annotationApiHelper, constraintHelper, typeUtils )
 				)
 		);
 		annotationTypeChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );

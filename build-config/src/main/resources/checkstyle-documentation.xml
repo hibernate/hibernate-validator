@@ -125,11 +125,9 @@
                         STATIC_INIT, INSTANCE_INIT" />
         </module>
 
-        <!-- METHOD_CALL breaks inline casts
-            (i.e. Iterable<?> collection = ((Map<?,?>) value).values();)
-            in 6.15-->
         <module name="ParenPad">
-            <property name="tokens" value="CTOR_CALL, SUPER_CTOR_CALL"/>
+            <property name="tokens" value="CTOR_CALL, METHOD_CALL, SUPER_CTOR_CALL, LITERAL_FOR, LITERAL_IF,
+                        LITERAL_WHILE, LITERAL_SWITCH, LITERAL_NEW"/>
             <property name="option" value="space"/>
         </module>
 

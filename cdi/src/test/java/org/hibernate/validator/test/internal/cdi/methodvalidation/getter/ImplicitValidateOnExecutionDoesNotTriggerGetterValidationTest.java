@@ -36,9 +36,9 @@ public class ImplicitValidateOnExecutionDoesNotTriggerGetterValidationTest exten
 	public void testValidationOfConstrainedGetter() {
 		Delivery delivery = deliveryService.getAnotherDelivery();
 		assertThat( delivery )
-				.as("the constraint is invalid, but no violation exception is expected since " +
+				.as( "the constraint is invalid, but no violation exception is expected since " +
 						"@ValidateOnExecution(type=IMPLICIT) on the type-level should have no effect " +
-						"and thus the default settings apply")
+						"and thus the default settings apply" )
 				.isNull();
 	}
 }

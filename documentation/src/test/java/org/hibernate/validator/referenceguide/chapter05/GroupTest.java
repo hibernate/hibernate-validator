@@ -58,7 +58,7 @@ public class GroupTest {
 		assertEquals( 0, validator.validate( car, DriverChecks.class ).size() );
 
 		// just checking that everything is in order now
-		assertEquals(0,
+		assertEquals( 0,
 				validator.validate(
 						car,
 						Default.class,

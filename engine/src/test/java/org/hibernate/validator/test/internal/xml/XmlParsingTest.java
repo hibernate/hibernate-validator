@@ -32,7 +32,7 @@ public class XmlParsingTest {
 	public void xmlConstraintMappingSupportsTabsWithoutNewLines() {
 		Validator validator = getConfiguration()
 				.addMapping(
-						XmlParsingTest.class.getResourceAsStream("hv-1101-tabs-mapping.xml" ) )
+						XmlParsingTest.class.getResourceAsStream( "hv-1101-tabs-mapping.xml" ) )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -47,7 +47,7 @@ public class XmlParsingTest {
 	public void xmlConstraintMappingSupportsEmptyElementForStrings() {
 		Validator validator = getConfiguration()
 				.addMapping(
-						XmlParsingTest.class.getResourceAsStream("hv-1101-empty-element-mapping.xml" ) )
+						XmlParsingTest.class.getResourceAsStream( "hv-1101-empty-element-mapping.xml" ) )
 				.buildValidatorFactory()
 				.getValidator();
 

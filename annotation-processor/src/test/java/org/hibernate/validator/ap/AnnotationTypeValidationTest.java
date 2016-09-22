@@ -179,7 +179,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		};
 
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles );
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
@@ -197,7 +197,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		};
 
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles );
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
@@ -215,7 +215,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		};
 
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles );
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
@@ -233,7 +233,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		};
 
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles );
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
@@ -252,7 +252,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		};
 
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles );
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
@@ -274,7 +274,7 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 		};
 
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles);
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles );
 
 		assertTrue( compilationResult );
 	}
