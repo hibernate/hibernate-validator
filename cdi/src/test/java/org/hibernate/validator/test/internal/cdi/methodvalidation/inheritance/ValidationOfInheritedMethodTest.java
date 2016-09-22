@@ -6,25 +6,23 @@
  */
 package org.hibernate.validator.test.internal.cdi.methodvalidation.inheritance;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.fail;
+
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class ValidationOfInheritedMethodTest {
+public class ValidationOfInheritedMethodTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -57,7 +55,7 @@ public class ValidationOfInheritedMethodTest {
 	@Test
 	public void testInterfaceMethodWithExecutableTypeNoneDoesNotGetValidated() throws Exception {
 		try {
-			assertNull( encryptor.encrypt( "top secret" ) );
+			assertThat( encryptor.encrypt( "top secret" ) ).isNull();
 		}
 		catch (ConstraintViolationException e) {
 			fail( "Encryptor#encrypt should not be validated, because it is explicitly excluded from executable validation" );
