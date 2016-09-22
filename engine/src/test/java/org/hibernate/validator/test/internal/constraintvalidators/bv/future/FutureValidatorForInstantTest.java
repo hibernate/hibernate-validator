@@ -36,7 +36,7 @@ public class FutureValidatorForInstantTest {
 		Instant past = Instant.now().minusSeconds( 3600 );
 
 		assertTrue( constraint.isValid( null, null ), "null fails validation." );
-		assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future Instant '" + future + "' fails validation.");
-		assertFalse( constraint.isValid( past, getConstraintValidatorContext() ), "Past Instant '" + past + "' validated as future.");
+		assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future Instant '" + future + "' fails validation." );
+		assertFalse( constraint.isValid( past, getConstraintValidatorContext() ), "Past Instant '" + past + "' validated as future." );
 	}
 }

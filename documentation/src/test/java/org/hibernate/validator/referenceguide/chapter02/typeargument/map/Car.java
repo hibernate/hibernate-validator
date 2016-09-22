@@ -16,7 +16,7 @@ public class Car {
 	}
 
 	@Valid
-	private EnumMap<FuelConsumption, @MaxAllowedFuelConsumption Integer> fuelConsumption = new EnumMap<>(FuelConsumption.class);
+	private EnumMap<FuelConsumption, @MaxAllowedFuelConsumption Integer> fuelConsumption = new EnumMap<>( FuelConsumption.class );
 
 	public void setFuelConsumption(FuelConsumption consumption, int value) {
 		fuelConsumption.put( consumption, value );

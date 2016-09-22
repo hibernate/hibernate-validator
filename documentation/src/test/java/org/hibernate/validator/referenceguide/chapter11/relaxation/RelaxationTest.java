@@ -11,11 +11,11 @@ public class RelaxationTest {
 	@Test
 	public void testRelaxation() {
 		//tag::testRelaxation[]
-		HibernateValidatorConfiguration configuration = Validation.byProvider(HibernateValidator.class).configure();
+		HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class ).configure();
 
-		configuration.allowMultipleCascadedValidationOnReturnValues(true)
-				.allowOverridingMethodAlterParameterConstraint(true)
-				.allowParallelMethodsDefineParameterConstraints(true);
+		configuration.allowMultipleCascadedValidationOnReturnValues( true )
+				.allowOverridingMethodAlterParameterConstraint( true )
+				.allowParallelMethodsDefineParameterConstraints( true );
 		//end::testRelaxation[]
 	}
 

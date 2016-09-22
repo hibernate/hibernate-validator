@@ -40,8 +40,8 @@ public class FutureValidatorForOffsetDateTimeTest {
 			ZoneOffset offset = ZoneOffset.ofHours( i );
 			OffsetDateTime future = OffsetDateTime.now( offset ).plusHours( 1 );
 			OffsetDateTime past = OffsetDateTime.now( offset ).minusHours( 1 );
-			assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future OffsetDateTime '" + future + "' fails validation.");
-			assertFalse( constraint.isValid( past, getConstraintValidatorContext() ), "Past OffsetDateTime '" + past + "' validated as future.");
+			assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future OffsetDateTime '" + future + "' fails validation." );
+			assertFalse( constraint.isValid( past, getConstraintValidatorContext() ), "Past OffsetDateTime '" + past + "' validated as future." );
 		}
 	}
 }

@@ -560,7 +560,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		};
 
 		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles);
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, false, true, sourceFiles );
 
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(

@@ -770,7 +770,7 @@ public class ConstraintHelper {
 		for ( AnnotationValue oneValidatorClassReference : validatorClassReferences ) {
 
 			if ( isValidationTargetSupported( oneValidatorClassReference, target ) ) {
-				TypeMirror supportedType = determineSupportedType( oneValidatorClassReference);
+				TypeMirror supportedType = determineSupportedType( oneValidatorClassReference );
 				supportedTypes.add( supportedType );
 			}
 		}
