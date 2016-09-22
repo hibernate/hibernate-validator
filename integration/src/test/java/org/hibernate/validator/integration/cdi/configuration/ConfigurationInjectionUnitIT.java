@@ -6,28 +6,24 @@
  */
 package org.hibernate.validator.integration.cdi.configuration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import javax.inject.Inject;
 import javax.validation.ValidatorFactory;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.hibernate.validator.cdi.HibernateValidator;
+import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.integration.cdi.service.PingService;
 import org.hibernate.validator.integration.cdi.service.PingServiceImpl;
-
-import static org.junit.Assert.assertEquals;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class ConfigurationInjectionUnitIT {
+public class ConfigurationInjectionUnitIT extends AbstractArquillianIT {
 	private static final String WAR_FILE_NAME = ConfigurationInjectionUnitIT.class.getSimpleName() + ".war";
 
 	@Inject
@@ -36,8 +32,7 @@ public class ConfigurationInjectionUnitIT {
 
 	@Deployment
 	public static WebArchive createTestArchive() throws Exception {
-		return ShrinkWrap
-				.create( WebArchive.class, WAR_FILE_NAME )
+		return buildTestArchive( WAR_FILE_NAME )
 				.addClasses(
 						PingService.class,
 						PingServiceImpl.class,
@@ -46,7 +41,6 @@ public class ConfigurationInjectionUnitIT {
 						ParameterNameProviderWithInjection.class,
 						TraversableResolverWithInjection.class
 				)
-				.addAsResource( "log4j.properties" )
 				.addAsResource( "validation-custom-config.xml", "META-INF/validation.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
@@ -76,6 +70,6 @@ public class ConfigurationInjectionUnitIT {
 	}
 
 	private void assertPingService(PingService pingService) {
-		assertEquals( "The ping service should respond", "pong", pingService.ping() );
+		assertThat( pingService.ping() ).as( "The ping service should respond" ).isEqualTo( "pong" );
 	}
 }

@@ -6,24 +6,21 @@
  */
 package org.hibernate.validator.integration.wildfly;
 
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.inject.Inject;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 import org.apache.log4j.Logger;
+import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 import org.hibernate.validator.integration.util.MyValidator;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.annotations.Test;
 
 /**
  * Tests the usage of a custom validation provider coming as part of the deployment unit.
@@ -31,16 +28,14 @@ import org.junit.runner.RunWith;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-@RunWith(Arquillian.class)
-public class CustomValidationProviderInDeploymentUnitIT {
+public class CustomValidationProviderInDeploymentUnitIT extends AbstractArquillianIT {
 
 	private static final String WAR_FILE_NAME = CustomValidationProviderInDeploymentUnitIT.class.getSimpleName() + ".war";
 	private static final Logger log = Logger.getLogger( CustomValidationProviderInDeploymentUnitIT.class );
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		return ShrinkWrap
-				.create( WebArchive.class, WAR_FILE_NAME )
+		return buildTestArchive( WAR_FILE_NAME )
 				.addAsLibrary( IntegrationTestUtil.createCustomBeanValidationProviderJar()
 								.as( JavaArchive.class )
 								.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" ) )
@@ -60,11 +55,10 @@ public class CustomValidationProviderInDeploymentUnitIT {
 		Validator validator = validatorFactory.getValidator();
 
 		// Asserting the validator type as the VF is the wrapper type used within WildFly (LazyValidatorFactory)
-		assertTrue(
-				"The custom validator implementation as retrieved from the default provider configured in META-INF/validation.xml should be used but actually "
-						+ validator + " is used",
-				validator instanceof MyValidator
-		);
+		assertThat( validator )
+				.as( "The custom validator implementation as retrieved from the default provider configured in META-INF/validation.xml should be used but actually "
+						+ validator + " is used" )
+				.isInstanceOf( MyValidator.class );
 
 		log.debug( "testValidatorFactoryFromCustomValidationProvider completed" );
 	}

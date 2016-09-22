@@ -6,31 +6,27 @@
  */
 package org.hibernate.validator.integration.cdi;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import javax.inject.Inject;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ValidatorFactory;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.hibernate.validator.cdi.HibernateValidator;
+import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.integration.cdi.constraint.Pingable;
 import org.hibernate.validator.integration.cdi.constraint.PingableValidator;
 import org.hibernate.validator.integration.cdi.service.PingService;
 import org.hibernate.validator.integration.cdi.service.PingServiceImpl;
-
-import static org.junit.Assert.assertNotNull;
+import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class ConstraintValidatorInjectionUnitIT {
+public class ConstraintValidatorInjectionUnitIT extends AbstractArquillianIT {
 	private static final String WAR_FILE_NAME = ConstraintValidatorInjectionUnitIT.class.getSimpleName() + ".war";
 
 	@Inject
@@ -39,15 +35,13 @@ public class ConstraintValidatorInjectionUnitIT {
 
 	@Deployment
 	public static WebArchive createTestArchive() throws Exception {
-		return ShrinkWrap
-				.create( WebArchive.class, WAR_FILE_NAME )
+		return buildTestArchive( WAR_FILE_NAME )
 				.addClasses(
 						Pingable.class,
 						PingService.class,
 						PingServiceImpl.class,
 						PingableValidator.class
 				)
-				.addAsResource( "log4j.properties" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
@@ -56,7 +50,7 @@ public class ConstraintValidatorInjectionUnitIT {
 		ConstraintValidatorFactory constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		PingableValidator validator = constraintValidatorFactory.getInstance( PingableValidator.class );
 
-		assertNotNull( "Constraint Validator could not be created", validator );
-		assertNotNull( "The ping service did not get injected", validator.getPingService() );
+		assertThat( validator ).as( "Constraint Validator could not be created" ).isNotNull();
+		assertThat( validator.getPingService() ).as( "The ping service did not get injected" ).isNotNull();
 	}
 }

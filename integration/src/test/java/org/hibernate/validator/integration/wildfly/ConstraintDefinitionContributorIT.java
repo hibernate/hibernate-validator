@@ -6,8 +6,7 @@
  */
 package org.hibernate.validator.integration.wildfly;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,22 +15,19 @@ import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.integration.util.IntegrationTestUtil;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class ConstraintDefinitionContributorIT {
+public class ConstraintDefinitionContributorIT extends AbstractArquillianIT {
 	private static final String WAR_FILE_NAME = ConstraintDefinitionContributorIT.class.getSimpleName() + ".war";
 
 	@Inject
@@ -40,8 +36,7 @@ public class ConstraintDefinitionContributorIT {
 
 	@Deployment
 	public static WebArchive createTestArchive() throws Exception {
-		return ShrinkWrap
-				.create( WebArchive.class, WAR_FILE_NAME )
+		return buildTestArchive( WAR_FILE_NAME )
 				.addClass( TestEntity.class )
 				.addAsLibrary(
 						IntegrationTestUtil.createAcmeConstraintDefinitionContributorJar()
@@ -51,7 +46,6 @@ public class ConstraintDefinitionContributorIT {
 						IntegrationTestUtil.createOxBerryConstraintDefinitionContributorJar()
 								.as( JavaArchive.class )
 				)
-				.addAsResource( "log4j.properties" )
 				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
@@ -62,14 +56,14 @@ public class ConstraintDefinitionContributorIT {
 	public void testConstraintContributionsGetDiscovered() throws Exception {
 		TestEntity testEntity = new TestEntity( "foo" );
 		Set<ConstraintViolation<TestEntity>> constraintViolations = validator.validate( testEntity );
-		assertEquals( "There should be two constraint violations", 2, constraintViolations.size() );
+		assertThat( constraintViolations ).as( "There should be two constraint violations" ).hasSize( 2 );
 
 		Set<String> messages = new HashSet<String>();
 		for ( ConstraintViolation<TestEntity> constraintViolation : constraintViolations ) {
 			messages.add( constraintViolation.getMessage() );
 		}
 
-		assertTrue( "Expected message 'acme' not in set - " + messages, messages.contains( "acme" ) );
-		assertTrue( "Expected message 'oxberry' not in set - " + messages, messages.contains( "oxberry" ) );
+		assertThat( messages ).contains( "acme" );
+		assertThat( messages ).contains( "oxberry" );
 	}
 }

@@ -6,9 +6,8 @@
  */
 package org.hibernate.validator.integration.wildfly;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.fail;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -16,31 +15,26 @@ import javax.naming.NamingException;
 import javax.validation.ValidatorFactory;
 
 import org.apache.log4j.Logger;
+import org.hibernate.validator.integration.AbstractArquillianIT;
+import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.annotations.Test;
 
 /**
  * Tests the integration of Hibernate Validator in Wildfly.
  *
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class JndiLookupOfValidatorFactoryIT {
+public class JndiLookupOfValidatorFactoryIT extends AbstractArquillianIT {
 	private static final String WAR_FILE_NAME = JndiLookupOfValidatorFactoryIT.class.getSimpleName() + ".war";
 	private static final Logger log = Logger.getLogger( JndiLookupOfValidatorFactoryIT.class );
 	private static final String DEFAULT_JNDI_NAME_OF_VALIDATOR_FACTORY = "java:comp/ValidatorFactory";
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		return ShrinkWrap
-				.create( WebArchive.class, WAR_FILE_NAME )
-				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
-				.addAsResource( "log4j.properties" );
+		return buildTestArchive( WAR_FILE_NAME )
+				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" );
 	}
 
 	@Test
@@ -49,13 +43,11 @@ public class JndiLookupOfValidatorFactoryIT {
 		try {
 			Context ctx = new InitialContext();
 			Object obj = ctx.lookup( DEFAULT_JNDI_NAME_OF_VALIDATOR_FACTORY );
-			assertTrue( "The default validator factory should be bound", obj != null );
+			assertThat( obj ).as( "The default validator factory should be bound" ).isNotNull();
 			ValidatorFactory factory = (ValidatorFactory) obj;
-			assertEquals(
-					"The Hibernate Validator implementation should be used",
-					"ValidatorImpl",
-					factory.getValidator().getClass().getSimpleName()
-			);
+			assertThat( factory.getValidator() )
+					.as( "The Hibernate Validator implementation should be used" )
+					.isExactlyInstanceOf( ValidatorImpl.class );
 		}
 		catch (NamingException e) {
 			fail( "The default validator factory should be bound" );

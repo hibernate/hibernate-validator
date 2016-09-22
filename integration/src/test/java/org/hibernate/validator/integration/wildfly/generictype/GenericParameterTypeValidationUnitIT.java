@@ -6,9 +6,8 @@
  */
 package org.hibernate.validator.integration.wildfly.generictype;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.fail;
 
 import java.util.Set;
 
@@ -18,21 +17,20 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.annotations.Test;
 
 @TestForIssue(jiraKey = "HV-978")
-@RunWith(Arquillian.class)
-public class GenericParameterTypeValidationUnitIT {
+public class GenericParameterTypeValidationUnitIT extends AbstractArquillianIT {
+	private static final String WAR_FILE_NAME = GenericParameterTypeValidationUnitIT.class.getSimpleName() + ".war";
+
 	@Deployment
 	public static WebArchive deployment() {
-		return ShrinkWrap.create( WebArchive.class )
+		return buildTestArchive( WAR_FILE_NAME )
 				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addPackage( GenericParameterTypeValidationUnitIT.class.getPackage() );
@@ -52,13 +50,11 @@ public class GenericParameterTypeValidationUnitIT {
 		}
 		catch (ConstraintViolationException e) {
 			Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-			assertTrue( "Unexpected number of constraint violations", violations.size() == 1 );
+			assertThat( violations ).as( "Unexpected number of constraint violations" ).hasSize( 1 );
 			ConstraintViolation<?> constraintViolation = violations.iterator().next();
-			assertEquals(
-					"Unexpected constraint type ",
-					NotNull.class,
-					constraintViolation.getConstraintDescriptor().getAnnotation().annotationType()
-			);
+			assertThat( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType() )
+					.as( "Unexpected constraint type" )
+					.isEqualTo( NotNull.class );
 		}
 	}
 
@@ -70,13 +66,11 @@ public class GenericParameterTypeValidationUnitIT {
 		}
 		catch (ConstraintViolationException e) {
 			Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-			assertTrue( "Unexpected number of constraint violations", violations.size() == 1 );
+			assertThat( violations ).as( "Unexpected number of constraint violations" ).hasSize( 1 );
 			ConstraintViolation<?> constraintViolation = violations.iterator().next();
-			assertEquals(
-					"Unexpected constraint type ",
-					Min.class,
-					constraintViolation.getConstraintDescriptor().getAnnotation().annotationType()
-			);
+			assertThat( constraintViolation.getConstraintDescriptor().getAnnotation().annotationType() )
+					.as( "Unexpected constraint type" )
+					.isEqualTo( Min.class );
 		}
 	}
 }
