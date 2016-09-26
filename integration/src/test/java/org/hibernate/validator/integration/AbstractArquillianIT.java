@@ -10,6 +10,7 @@ import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
 
 /**
  * Base class for all the TestNG tests using Arquillian
@@ -19,15 +20,12 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 public abstract class AbstractArquillianIT extends Arquillian {
 
 	public static WebArchive buildTestArchive(String warFileName) {
+		PomEquippedResolveStage pom = Maven.resolver().loadPomFromFile( "pom.xml" );
 		return ShrinkWrap
 				.create( WebArchive.class, warFileName )
 				.addClass( AbstractArquillianIT.class )
-				.addAsLibraries(
-						Maven.resolver().resolve( "org.testng:testng:6.8" ).withTransitivity().asFile()
-				)
-				.addAsLibraries(
-						Maven.resolver().resolve( "org.assertj:assertj-core:3.5.2" ).withTransitivity().asFile()
-				)
+				.addAsLibraries( pom.resolve( "org.testng:testng" ).withTransitivity().asFile() )
+				.addAsLibraries( pom.resolve( "org.assertj:assertj-core" ).withTransitivity().asFile() )
 				.addAsResource( "log4j.properties" );
 	}
 
