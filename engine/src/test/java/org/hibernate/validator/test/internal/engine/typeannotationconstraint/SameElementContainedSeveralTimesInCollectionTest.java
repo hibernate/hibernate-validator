@@ -6,20 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine.typeannotationconstraint;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE_PARAMETER;
-import static java.lang.annotation.ElementType.TYPE_USE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,10 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.Constraint;
 import javax.validation.ConstraintViolation;
-import javax.validation.OverridesAttribute;
-import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.Size;
@@ -80,7 +66,7 @@ public class SameElementContainedSeveralTimesInCollectionTest {
 	private static class ListContainer {
 
 		@Valid
-		public List<@SizeWithTypeUse(min = 1) String> values;
+		public List<@Size(min = 1) String> values;
 
 		public ListContainer(List<String> values) {
 			this.values = values;
@@ -90,31 +76,11 @@ public class SameElementContainedSeveralTimesInCollectionTest {
 	private static class MapContainer {
 
 		@Valid
-		public Map<String, @SizeWithTypeUse(min = 1) List<String>> values;
+		public Map<String, @Size(min = 1) List<String>> values;
 
 		public MapContainer(Map<String, List<String>> values) {
 			this.values = values;
 		}
 	}
 
-	// TODO Remove once the original one supports TYPE_USE
-	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_PARAMETER, TYPE_USE })
-	@Retention(RUNTIME)
-	@Documented
-	@Constraint(validatedBy = {})
-	@Size
-	public @interface SizeWithTypeUse {
-
-		String message() default "{javax.validation.constraints.Size.message}";
-
-		Class<?>[] groups() default {};
-
-		Class<? extends Payload>[] payload() default {};
-
-		@OverridesAttribute(constraint = Size.class, name = "min")
-		int min() default 0;
-
-		@OverridesAttribute(constraint = Size.class, name = "max")
-		int max() default Integer.MAX_VALUE;
-	}
 }

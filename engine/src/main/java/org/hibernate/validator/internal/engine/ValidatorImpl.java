@@ -85,11 +85,6 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  */
 public class ValidatorImpl implements Validator, ExecutableValidator {
 
-	/**
-	 * For compatibility with JDK 7 we cannot use ElementType#TYPE_USE
-	 */
-	private static final String TYPE_USE = "TYPE_USE";
-
 	private static final Log log = LoggerFactory.make();
 
 	/**
@@ -564,7 +559,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				valueContext.appendNode( propertyMetaData );
 			}
 
-			if ( TYPE_USE.equals( metaConstraint.getElementType().name() ) ) {
+			if ( ElementType.TYPE_USE.equals( metaConstraint.getElementType() ) ) {
 				// TYPE_USE constraints always require UNWRAP
 				valueContext.setUnwrapMode( UnwrapMode.UNWRAP );
 			}

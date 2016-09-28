@@ -6,11 +6,19 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
+import static org.hibernate.validator.constraints.CompositionType.AND;
+import static org.hibernate.validator.constraints.CompositionType.OR;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
 
@@ -23,12 +31,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
-import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
-import static org.hibernate.validator.constraints.CompositionType.AND;
-import static org.hibernate.validator.constraints.CompositionType.OR;
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 /**
  * Due to constraint composition a single constraint annotation can lead to a whole constraint tree being validated.
  * This class encapsulates such a tree.
@@ -39,8 +41,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2012 SERLI
  */
 public class ConstraintTree<A extends Annotation> {
-
-	private static final String TYPE_USE = "TYPE_USE";
 
 	private static final Log log = LoggerFactory.make();
 
@@ -166,8 +166,8 @@ public class ConstraintTree<A extends Annotation> {
 			);
 		}
 		// TYPE_USE requires implicitly unwrapping
-		else if ( valueContext.getUnwrapMode().equals( UnwrapMode.UNWRAP )
-				|| TYPE_USE.equals( valueContext.getElementType().name() ) ) {
+		else if ( UnwrapMode.UNWRAP.equals( valueContext.getUnwrapMode() )
+				|| ElementType.TYPE_USE.equals( valueContext.getElementType() ) ) {
 			return getInitializedValidatorInstanceForWrappedInstance(
 					validationContext,
 					valueContext,
