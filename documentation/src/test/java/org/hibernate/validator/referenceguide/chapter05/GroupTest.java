@@ -39,7 +39,7 @@ public class GroupTest {
 
 		// let's go to the vehicle inspection
 		car.setPassedVehicleInspection( true );
-		assertEquals( 0, validator.validate( car ).size() );
+		assertEquals( 0, validator.validate( car, CarChecks.class ).size() );
 
 		// now let's add a driver. He is 18, but has not passed the driving test yet
 		Driver john = new Driver( "John Doe" );
