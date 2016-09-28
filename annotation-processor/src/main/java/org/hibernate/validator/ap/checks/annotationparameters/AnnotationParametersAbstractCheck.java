@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Checks, that parameters used on annotation are valid.
+ * Checks that parameters used on annotation are valid.
  */
 public abstract class AnnotationParametersAbstractCheck extends AbstractConstraintCheck {
 
@@ -37,25 +37,21 @@ public abstract class AnnotationParametersAbstractCheck extends AbstractConstrai
 
 	@Override
 	public Set<ConstraintCheckError> checkField(VariableElement element, AnnotationMirror annotation) {
-
 		return checkAnnotation( element, annotation );
 	}
 
 	@Override
 	public Set<ConstraintCheckError> checkMethod(ExecutableElement element, AnnotationMirror annotation) {
-
 		return checkAnnotation( element, annotation );
 	}
 
 	@Override
 	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
-
 		return checkAnnotation( element, annotation );
 	}
 
 	@Override
 	public Set<ConstraintCheckError> checkNonAnnotationType(TypeElement element, AnnotationMirror annotation) {
-
 		return checkAnnotation( element, annotation );
 	}
 
@@ -78,7 +74,7 @@ public abstract class AnnotationParametersAbstractCheck extends AbstractConstrai
 	}
 
 	/**
-	 * method which actually perform validation of annotation parameters.
+	 * method which actually performs validation of annotation parameters.
 	 *
 	 * @param element    annotated element
 	 * @param annotation annotation to process
