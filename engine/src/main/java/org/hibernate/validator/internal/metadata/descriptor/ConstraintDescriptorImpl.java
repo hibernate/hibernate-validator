@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
@@ -75,7 +76,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			Retention.class.getName(),
 			Target.class.getName(),
 			Constraint.class.getName(),
-			ReportAsSingleViolation.class.getName()
+			ReportAsSingleViolation.class.getName(),
+			Repeatable.class.getName()
 	);
 
 	/**
