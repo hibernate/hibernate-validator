@@ -32,7 +32,8 @@ public class AnnotationParametersPatternCheck extends AnnotationParametersAbstra
 
 		try {
 			Pattern.compile( regexp );
-		} catch (PatternSyntaxException e) {
+		}
+		catch (PatternSyntaxException e) {
 			return CollectionHelper.asSet(
 					new ConstraintCheckError(
 							element, annotation, "INVALID_PATTERN_ANNOTATION_PARAMETERS"

@@ -8,7 +8,6 @@ package org.hibernate.validator.ap.testmodel.annotationparameters;
 
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Digits;
 import java.math.BigDecimal;
 
 public class ValidDecimalMinMaxParameters {
