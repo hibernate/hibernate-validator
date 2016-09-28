@@ -6,19 +6,19 @@
  */
 package org.hibernate.validator.performance.statistical;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.InputStream;
 import java.util.Set;
+
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -29,7 +29,7 @@ public class StatisticalValidationTest {
 	private static Validator validator;
 	private static TestEntity[] entitiesUnderTest = new TestEntity[NUMBER_OF_TEST_ENTITIES];
 
-	@BeforeClass
+	@BeforeTest
 	public static void setUpValidatorFactory() throws Exception {
 		ValidatorFactory factory;
 		final Configuration<?> configuration = Validation.byDefaultProvider().configure();
@@ -37,7 +37,7 @@ public class StatisticalValidationTest {
 		try {
 			configuration.addMapping( mappingStream );
 			factory = configuration.buildValidatorFactory();
-			assertNotNull( factory );
+			assertThat( factory ).isNotNull();
 		}
 		finally {
 			mappingStream.close();
@@ -54,7 +54,7 @@ public class StatisticalValidationTest {
 	public void testValidationWithStatisticalGraphDepthAndConstraintValidator() throws Exception {
 		for ( int i = 0; i < NUMBER_OF_TEST_ENTITIES; i++ ) {
 			Set<ConstraintViolation<TestEntity>> violations = validator.validate( entitiesUnderTest[i] );
-			assertEquals( StatisticalConstraintValidator.threadLocalCounter.get().getFailures(), violations.size() );
+			assertThat( violations ).hasSize( StatisticalConstraintValidator.threadLocalCounter.get().getFailures() );
 			StatisticalConstraintValidator.threadLocalCounter.get().reset();
 		}
 	}

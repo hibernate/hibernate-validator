@@ -6,19 +6,16 @@
  */
 package org.hibernate.validator.integration.wildfly;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.annotations.Test;
 
 /**
  * Asserts that the validation interceptor picks up a {@code Validator} provided by the application and uses it for
@@ -26,8 +23,7 @@ import org.junit.runner.RunWith;
  *
  * @author Gunnar Morling
  */
-@RunWith(Arquillian.class)
-public class MethodValidationWithCustomValidatorIT {
+public class MethodValidationWithCustomValidatorIT extends AbstractArquillianIT {
 
 	private static final String WAR_FILE_NAME = MethodValidationWithCustomValidatorIT.class
 			.getSimpleName() + ".war";
@@ -40,7 +36,7 @@ public class MethodValidationWithCustomValidatorIT {
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		return ShrinkWrap.create( WebArchive.class, WAR_FILE_NAME )
+		return buildTestArchive( WAR_FILE_NAME )
 				.addClasses( MyValidator.class )
 				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
@@ -54,12 +50,10 @@ public class MethodValidationWithCustomValidatorIT {
 
 	@Test
 	public void shouldUseApplicationProvidedValidatorForMethodValidation() {
-		assertEquals( 0, validator.getForExecutablesInvocationCount() );
+		assertThat( validator.getForExecutablesInvocationCount() ).isEqualTo( 0 );
 		myService.doSomething( "foobar" );
-		assertEquals(
-				"MyValidator#forExecutable() should have been invoked once.",
-				1,
-				validator.getForExecutablesInvocationCount()
-		);
+		assertThat( validator.getForExecutablesInvocationCount() )
+				.as( "MyValidator#forExecutable() should have been invoked once." )
+				.isEqualTo( 1 );
 	}
 }

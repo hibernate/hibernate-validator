@@ -6,30 +6,26 @@
  */
 package org.hibernate.validator.test.internal.cdi.injection;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import javax.inject.Inject;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.HibernateValidatorFactory;
+import org.hibernate.validator.cdi.HibernateValidator;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import org.hibernate.validator.HibernateValidatorFactory;
-import org.hibernate.validator.cdi.HibernateValidator;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class InjectionTest {
+public class InjectionTest extends Arquillian {
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -56,24 +52,24 @@ public class InjectionTest {
 
 	@Test
 	public void testInjectionOfQualifiedBeans() throws Exception {
-		assertNotNull( validatorFactory );
-		assertNotNull( validator );
+		assertThat( validatorFactory ).isNotNull();
+		assertThat( validator ).isNotNull();
 
-		assertEquals( 1, validator.validate( new TestEntity() ).size() );
+		assertThat( validator.validate( new TestEntity() ) ).hasSize( 1 );
 	}
 
 	@Test
 	public void testInjectionOfDefaultBeans() throws Exception {
-		assertNotNull( defaultValidatorFactory );
-		assertNotNull( defaultValidator );
+		assertThat( defaultValidatorFactory ).isNotNull();
+		assertThat( defaultValidator ).isNotNull();
 
-		assertEquals( 1, defaultValidator.validate( new TestEntity() ).size() );
+		assertThat( defaultValidator.validate( new TestEntity() ) ).hasSize( 1 );
 	}
 
 	@Test
 	public void testInjectionOfHibernateValidatorFactory() throws Exception {
-		assertNotNull( hibernateValidatorFactory );
-		assertEquals( 1, hibernateValidatorFactory.getValidator().validate( new TestEntity() ).size() );
+		assertThat( hibernateValidatorFactory ).isNotNull();
+		assertThat( hibernateValidatorFactory.getValidator().validate( new TestEntity() ) ).hasSize( 1 );
 	}
 
 	public static class TestEntity {

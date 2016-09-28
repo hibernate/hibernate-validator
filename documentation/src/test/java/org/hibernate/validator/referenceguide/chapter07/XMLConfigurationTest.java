@@ -82,12 +82,12 @@ public class XMLConfigurationTest {
 		MethodDescriptor methodDescriptor = beanDescriptor.getConstraintsForMethod( "buildCar", java.util.List.class );
 		CrossParameterDescriptor crossParameterDescriptor = methodDescriptor.getCrossParameterDescriptor();
 		Set<ConstraintDescriptor<?>> constraintDescriptors = crossParameterDescriptor.getConstraintDescriptors();
-		assertCorrectConstraintTypes( constraintDescriptors, ELAssert.class);
+		assertCorrectConstraintTypes( constraintDescriptors, ELAssert.class );
 
 		methodDescriptor = beanDescriptor.getConstraintsForMethod( "paintCar", int.class );
 		ReturnValueDescriptor returnValueDescriptor = methodDescriptor.getReturnValueDescriptor();
 		constraintDescriptors = returnValueDescriptor.getConstraintDescriptors();
-		assertCorrectConstraintTypes( constraintDescriptors, ELAssert.class);
+		assertCorrectConstraintTypes( constraintDescriptors, ELAssert.class );
 	}
 
 	private void assertCorrectConstraintTypes( Set<ConstraintDescriptor<?>> constraintDescriptors,

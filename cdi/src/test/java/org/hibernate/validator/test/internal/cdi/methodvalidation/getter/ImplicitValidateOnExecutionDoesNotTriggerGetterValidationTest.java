@@ -6,23 +6,21 @@
  */
 package org.hibernate.validator.test.internal.cdi.methodvalidation.getter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import javax.inject.Inject;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.testng.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertNull;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  */
-@RunWith(Arquillian.class)
-public class ImplicitValidateOnExecutionDoesNotTriggerGetterValidationTest {
+public class ImplicitValidateOnExecutionDoesNotTriggerGetterValidationTest extends Arquillian {
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap.create( JavaArchive.class )
@@ -37,11 +35,10 @@ public class ImplicitValidateOnExecutionDoesNotTriggerGetterValidationTest {
 	@Test
 	public void testValidationOfConstrainedGetter() {
 		Delivery delivery = deliveryService.getAnotherDelivery();
-		assertNull(
-				"the constraint is invalid, but no violation exception is expected since " +
+		assertThat( delivery )
+				.as( "the constraint is invalid, but no violation exception is expected since " +
 						"@ValidateOnExecution(type=IMPLICIT) on the type-level should have no effect " +
-						"and thus the default settings apply",
-				delivery
-		);
+						"and thus the default settings apply" )
+				.isNull();
 	}
 }

@@ -6,25 +6,22 @@
  */
 package org.hibernate.validator.integration.wildfly.jpa;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.fail;
 
 import javax.inject.Inject;
 import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
+import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
-import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.persistence20.PersistenceDescriptor;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.testng.annotations.Test;
 
 /**
  * Tests the usage of HV by JPA, applying a custom validation.xml. Also making sure that the VF is CDI-enabled.
@@ -32,18 +29,15 @@ import org.junit.runner.RunWith;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-@RunWith(Arquillian.class)
-public class CustomValidatorFactoryInPersistenceUnitIT {
+public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillianIT {
 
 	private static final String WAR_FILE_NAME = CustomValidatorFactoryInPersistenceUnitIT.class.getSimpleName() + ".war";
 	private static final Logger log = Logger.getLogger( CustomValidatorFactoryInPersistenceUnitIT.class );
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		return ShrinkWrap
-				.create( WebArchive.class, WAR_FILE_NAME )
+		return buildTestArchive( WAR_FILE_NAME )
 				.addClasses( Magician.class, ValidMagicianName.class, MagicianService.class, Wand.class, WandConstraintMappingContributor.class )
-				.addAsResource( "log4j.properties" )
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )
 				.addAsResource( "constraints-magician.xml", "META-INF/validation/constraints-magician.xml" )
@@ -79,11 +73,12 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 		}
 		catch (Exception e) {
 			Throwable rootException = getRootException( e );
-			assertEquals( ConstraintViolationException.class, rootException.getClass() );
+			assertThat( rootException ).isExactlyInstanceOf( ConstraintViolationException.class );
 
 			ConstraintViolationException constraintViolationException = (ConstraintViolationException) rootException;
-			assertEquals( 1, constraintViolationException.getConstraintViolations().size() );
-			assertEquals( "Invalid magician name", constraintViolationException.getConstraintViolations().iterator().next().getMessage() );
+			assertThat( constraintViolationException.getConstraintViolations() ).hasSize( 1 );
+			assertThat( constraintViolationException.getConstraintViolations().iterator().next().getMessage() )
+					.isEqualTo( "Invalid magician name" );
 		}
 
 		log.debug( "testValidatorFactoryPassedToPersistenceUnitIsCorrectlyConfigured completed" );
@@ -104,11 +99,12 @@ public class CustomValidatorFactoryInPersistenceUnitIT {
 		}
 		catch (Exception e) {
 			Throwable rootException = getRootException( e );
-			assertEquals( ConstraintViolationException.class, rootException.getClass() );
+			assertThat( rootException ).isExactlyInstanceOf( ConstraintViolationException.class );
 
 			ConstraintViolationException constraintViolationException = (ConstraintViolationException) rootException;
-			assertEquals( 1, constraintViolationException.getConstraintViolations().size() );
-			assertEquals( "size must be between 5 and 2147483647", constraintViolationException.getConstraintViolations().iterator().next().getMessage() );
+			assertThat( constraintViolationException.getConstraintViolations() ).hasSize( 1 );
+			assertThat( constraintViolationException.getConstraintViolations().iterator().next().getMessage() )
+					.isEqualTo( "size must be between 5 and 2147483647" );
 		}
 
 		log.debug( "testValidatorFactoryPassedToPersistenceUnitIsContributedFromPortableExtensionOfCurrentModuleZip completed" );

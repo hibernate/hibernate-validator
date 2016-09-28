@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 /**
  * Ensure large error messages can be interpolated.

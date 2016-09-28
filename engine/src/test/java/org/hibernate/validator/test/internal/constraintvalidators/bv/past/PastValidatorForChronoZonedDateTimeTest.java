@@ -41,8 +41,8 @@ public class PastValidatorForChronoZonedDateTimeTest {
 			ZoneId zone = ZoneId.ofOffset( "UTC", ZoneOffset.ofHours( i ) );
 			ZonedDateTime future = ZonedDateTime.now( zone ).plusHours( 1 );
 			ZonedDateTime past = ZonedDateTime.now( zone ).minusHours( 1 );
-			assertTrue( constraint.isValid( past, getConstraintValidatorContext() ), "Past ZonedDateTime '" + past + "' fails validation.");
-			assertFalse( constraint.isValid( future, getConstraintValidatorContext() ), "Future ZonedDateTime '" + future + "' validated as past.");
+			assertTrue( constraint.isValid( past, getConstraintValidatorContext() ), "Past ZonedDateTime '" + past + "' fails validation." );
+			assertFalse( constraint.isValid( future, getConstraintValidatorContext() ), "Future ZonedDateTime '" + future + "' validated as past." );
 		}
 	}
 }

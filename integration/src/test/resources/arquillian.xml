@@ -10,9 +10,12 @@
             xsi:schemaLocation="http://jboss.org/schema/arquillian
         http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
 
+    <!-- Uncomment in order to inspect deployments -->
+    <!--
     <engine>
         <property name="deploymentExportPath">${basedir}/target/</property>
     </engine>
+    -->
 
     <container qualifier="wildfly" default="true">
         <protocol type="jmx-wildfly">
