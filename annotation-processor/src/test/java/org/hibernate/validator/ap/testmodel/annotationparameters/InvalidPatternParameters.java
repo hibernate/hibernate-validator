@@ -19,4 +19,7 @@ public class InvalidPatternParameters {
 	@Pattern( regexp = "+" )
 	private String strings3;
 
+	@Pattern.List( {@Pattern( regexp = "+" ), @Pattern( regexp = "[a" )} )
+	private String strings4;
+
 }

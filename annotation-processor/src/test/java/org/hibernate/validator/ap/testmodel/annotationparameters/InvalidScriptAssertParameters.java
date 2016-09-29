@@ -60,4 +60,9 @@ public class InvalidScriptAssertParameters {
 
 	}
 
+	@ScriptAssert.List( {@ScriptAssert( lang = " ", script = " ", alias = " " ), @ScriptAssert( lang = " ", script = " ", alias = "some alias" )} )
+	public static class Case11 {
+
+	}
+
 }

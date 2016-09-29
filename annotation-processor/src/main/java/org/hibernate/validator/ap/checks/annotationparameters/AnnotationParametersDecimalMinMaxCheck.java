@@ -18,6 +18,8 @@ import java.util.Set;
 
 /**
  * Checks, that parameters used on {@code javax.validation.constraints.DecimalMin} and {@code javax.validation.constraints.DecimalMax} annotation are valid.
+ *
+ * @author Marko Bekhta
  */
 public class AnnotationParametersDecimalMinMaxCheck extends AnnotationParametersAbstractCheck {
 

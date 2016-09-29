@@ -68,4 +68,8 @@ public class ValidDecimalMinMaxParameters {
 	@DecimalMin( value = "-0" )
 	private BigDecimal decimal14;
 
+	@DecimalMax.List( {@DecimalMax( value = "-0" ), @DecimalMax( value = "0E+7" )} )
+	@DecimalMin.List( {@DecimalMin( value = "-0" ), @DecimalMin( value = "0E+7" )} )
+	private BigDecimal decimal15;
+
 }

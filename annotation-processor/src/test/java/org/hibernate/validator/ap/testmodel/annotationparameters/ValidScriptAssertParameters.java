@@ -20,4 +20,9 @@ public class ValidScriptAssertParameters {
 
 	}
 
+	@ScriptAssert.List( {@ScriptAssert( lang = "some lang", script = "some script", alias = "some alias" ), @ScriptAssert( lang = "some lang", script = "some script" )} )
+	public static class Case3 {
+
+	}
+
 }

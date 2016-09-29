@@ -20,4 +20,7 @@ public class InvalidSizeParameters {
 	@Size( min = 15, max = 10 )
 	private Collection<String> strings3;
 
+	@Size.List( {@Size( min = -1 ), @Size( max = -15 ), @Size( min = 15, max = 10 )} )
+	private Collection<String> strings4;
+
 }

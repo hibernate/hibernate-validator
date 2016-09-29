@@ -19,4 +19,7 @@ public class ValidPatternParameters {
 	@Pattern( regexp = "\\." )
 	private String strings3;
 
+	@Pattern.List( {@Pattern( regexp = "\\." ), @Pattern( regexp = "[test]" ), @Pattern( regexp = "test" )} )
+	private String strings4;
+
 }

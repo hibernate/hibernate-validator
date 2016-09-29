@@ -17,6 +17,8 @@ import java.util.Set;
 
 /**
  * Checks, that parameters used on {@code org.hibernate.validator.constraints.ScriptAssert} annotation are valid.
+ *
+ * @author Marko Bekhta
  */
 public class AnnotationParametersScriptAssertCheck extends AnnotationParametersAbstractCheck {
 

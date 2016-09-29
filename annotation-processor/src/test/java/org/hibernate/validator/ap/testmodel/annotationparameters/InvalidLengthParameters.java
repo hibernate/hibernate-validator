@@ -20,4 +20,7 @@ public class InvalidLengthParameters {
 	@Length( min = 15, max = 10 )
 	private String string3;
 
+	@Length.List( {@Length( min = 15, max = 10 ), @Length( max = -10 )} )
+	private String string4;
+
 }

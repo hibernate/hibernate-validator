@@ -23,4 +23,7 @@ public class ValidSizeParameters {
 	@Size( min = 10, max = 15 )
 	private Collection<String> strings4;
 
+	@Size.List( {@Size, @Size( min = 10 ), @Size( max = 15 ), @Size( min = 10, max = 15 )} )
+	private Collection<String> strings5;
+
 }

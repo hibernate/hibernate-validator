@@ -19,6 +19,8 @@ import java.util.regex.PatternSyntaxException;
 
 /**
  * Checks, that parameters used on {@code javax.validation.constraints.Pattern} annotation are valid.
+ *
+ * @author Marko Bekhta
  */
 public class AnnotationParametersPatternCheck extends AnnotationParametersAbstractCheck {
 

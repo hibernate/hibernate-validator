@@ -22,6 +22,8 @@ import java.util.Set;
 
 /**
  * Checks that parameters used on annotation are valid.
+ *
+ * @author Marko Bekhta
  */
 public abstract class AnnotationParametersAbstractCheck extends AbstractConstraintCheck {
 
@@ -32,7 +34,6 @@ public abstract class AnnotationParametersAbstractCheck extends AbstractConstrai
 	public AnnotationParametersAbstractCheck(AnnotationApiHelper annotationApiHelper, String... annotationClass) {
 		this.annotationApiHelper = annotationApiHelper;
 		this.annotationClasses = new HashSet<>( Arrays.asList( annotationClass ) );
-
 	}
 
 	@Override
@@ -61,7 +62,7 @@ public abstract class AnnotationParametersAbstractCheck extends AbstractConstrai
 	 * @param annotation annotation you want to process by this class
 	 * @return {@code true} if such annotation can be processed, {@code false} otherwise.
 	 */
-	protected boolean canCheckThisAnnotation(AnnotationMirror annotation) {
+	private boolean canCheckThisAnnotation(AnnotationMirror annotation) {
 		return annotationClasses.contains( annotation.getAnnotationType().asElement().toString() );
 	}
 

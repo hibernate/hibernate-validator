@@ -30,12 +30,13 @@ import java.io.File;
 
 /**
  * Test cases for {@link ConstraintValidationProcessor} testing the checking of annotation parameters validity.
+ *
+ * @author Marko Bekhta
  */
 public class AnnotationParametersValidationTest extends ConstraintValidationProcessorTestBase {
 
 	@Test
 	public void testValidSizeParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( ValidSizeParameters.class );
 
 		boolean compilationResult =
@@ -47,7 +48,6 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 
 	@Test
 	public void testInvalidSizeParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( InvalidSizeParameters.class );
 
 		boolean compilationResult =
@@ -58,13 +58,13 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				diagnostics,
 				new DiagnosticExpectation( Kind.ERROR, 14 ),
 				new DiagnosticExpectation( Kind.ERROR, 17 ),
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 20 ),
+				new DiagnosticExpectation( Kind.ERROR, 23 )
 		);
 	}
 
 	@Test
 	public void testValidLengthParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( ValidLengthParameters.class );
 
 		boolean compilationResult =
@@ -76,7 +76,6 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 
 	@Test
 	public void testInvalidLengthParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( InvalidLengthParameters.class );
 
 		boolean compilationResult =
@@ -87,13 +86,13 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				diagnostics,
 				new DiagnosticExpectation( Kind.ERROR, 14 ),
 				new DiagnosticExpectation( Kind.ERROR, 17 ),
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 20 ),
+				new DiagnosticExpectation( Kind.ERROR, 23 )
 		);
 	}
 
 	@Test
 	public void testValidScriptAssertParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( ValidScriptAssertParameters.class );
 
 		boolean compilationResult =
@@ -105,7 +104,6 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 
 	@Test
 	public void testInvalidScriptAssertParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( InvalidScriptAssertParameters.class );
 
 		boolean compilationResult =
@@ -123,13 +121,13 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.ERROR, 43 ),
 				new DiagnosticExpectation( Kind.ERROR, 48 ),
 				new DiagnosticExpectation( Kind.ERROR, 53 ),
-				new DiagnosticExpectation( Kind.ERROR, 58 )
+				new DiagnosticExpectation( Kind.ERROR, 58 ),
+				new DiagnosticExpectation( Kind.ERROR, 63 )
 		);
 	}
 
 	@Test
 	public void testValidPatternParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( ValidPatternParameters.class );
 
 		boolean compilationResult =
@@ -141,7 +139,6 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 
 	@Test
 	public void testInvalidPatternParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( InvalidPatternParameters.class );
 
 		boolean compilationResult =
@@ -152,13 +149,13 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				diagnostics,
 				new DiagnosticExpectation( Kind.ERROR, 13 ),
 				new DiagnosticExpectation( Kind.ERROR, 16 ),
-				new DiagnosticExpectation( Kind.ERROR, 19 )
+				new DiagnosticExpectation( Kind.ERROR, 19 ),
+				new DiagnosticExpectation( Kind.ERROR, 22 )
 		);
 	}
 
 	@Test
 	public void testValidDigitsParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( ValidDigitsParameters.class );
 
 		boolean compilationResult =
@@ -170,7 +167,6 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 
 	@Test
 	public void testInvalidDigitsParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( InvalidDigitsParameters.class );
 
 		boolean compilationResult =
@@ -181,13 +177,13 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				diagnostics,
 				new DiagnosticExpectation( Kind.ERROR, 14 ),
 				new DiagnosticExpectation( Kind.ERROR, 17 ),
-				new DiagnosticExpectation( Kind.ERROR, 20 )
+				new DiagnosticExpectation( Kind.ERROR, 20 ),
+				new DiagnosticExpectation( Kind.ERROR, 23 )
 		);
 	}
 
 	@Test
 	public void testValidDecimalMinMaxParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( ValidDecimalMinMaxParameters.class );
 
 		boolean compilationResult =
@@ -199,7 +195,6 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 
 	@Test
 	public void testInvalidDecimalMinMaxParameters() {
-
 		File sourceFile = compilerHelper.getSourceFile( InvalidDecimalMinMaxParameters.class );
 
 		boolean compilationResult =
@@ -213,7 +208,9 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.ERROR, 19 ),
 				new DiagnosticExpectation( Kind.ERROR, 20 ),
 				new DiagnosticExpectation( Kind.ERROR, 23 ),
-				new DiagnosticExpectation( Kind.ERROR, 24 )
+				new DiagnosticExpectation( Kind.ERROR, 24 ),
+				new DiagnosticExpectation( Kind.ERROR, 27 ),
+				new DiagnosticExpectation( Kind.ERROR, 28 )
 		);
 	}
 

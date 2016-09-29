@@ -17,6 +17,8 @@ import java.util.Set;
 
 /**
  * Checks, that parameters used on {@code javax.validation.constraints.Digits} annotation are valid.
+ *
+ * @author Marko Bekhta
  */
 public class AnnotationParametersDigitsCheck extends AnnotationParametersAbstractCheck {
 

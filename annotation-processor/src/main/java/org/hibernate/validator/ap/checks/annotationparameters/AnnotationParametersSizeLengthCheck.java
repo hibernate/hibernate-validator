@@ -17,6 +17,8 @@ import java.util.Set;
 
 /**
  * Checks, that parameters used on {@code javax.validation.constraints.Size} and {@code org.hibernate.validator.constraints.Length} annotation are valid.
+ *
+ * @author Marko Bekhta
  */
 public class AnnotationParametersSizeLengthCheck extends AnnotationParametersAbstractCheck {
 
@@ -31,7 +33,7 @@ public class AnnotationParametersSizeLengthCheck extends AnnotationParametersAbs
 		Integer max = annotationApiHelper.getAnnotationValue( annotation, "max" ) != null ?
 				(Integer) annotationApiHelper.getAnnotationValue( annotation, "max" ).getValue() : Integer.MAX_VALUE;
 
-		if ( ( min != null && min < 0 ) || ( max != null && max < 0 ) || ( max != null && min != null && min > max ) ) {
+		if ( ( min < 0 ) || ( max < 0 ) || ( min > max ) ) {
 			return CollectionHelper.asSet(
 					new ConstraintCheckError(
 							element, annotation, "INVALID_SIZE_LENGTH_ANNOTATION_PARAMETERS"

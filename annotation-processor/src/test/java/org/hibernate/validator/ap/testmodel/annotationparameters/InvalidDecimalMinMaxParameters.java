@@ -24,4 +24,8 @@ public class InvalidDecimalMinMaxParameters {
 	@DecimalMin( value = "123E-3-3" )
 	private BigDecimal decimal3;
 
+	@DecimalMax.List( {@DecimalMax( value = "123E-3-3" )} )
+	@DecimalMin.List( {@DecimalMin( value = "123E-3-3" )} )
+	private BigDecimal decimal4;
+
 }

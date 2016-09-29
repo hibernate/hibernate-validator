@@ -22,4 +22,7 @@ public class ValidLengthParameters {
 	@Length( min = 10, max = 15 )
 	private String string4;
 
+	@Length.List( {@Length( min = 10, max = 15 ), @Length( max = 10 ), @Length( min = 10 ), @Length} )
+	private String string5;
+
 }

@@ -20,4 +20,7 @@ public class InvalidDigitsParameters {
 	@Digits( integer = -5, fraction = -3 )
 	private BigDecimal decimal3;
 
+	@Digits.List( {@Digits( integer = -5, fraction = -3 ), @Digits( integer = 5, fraction = -3 )} )
+	private BigDecimal decimal4;
+
 }
