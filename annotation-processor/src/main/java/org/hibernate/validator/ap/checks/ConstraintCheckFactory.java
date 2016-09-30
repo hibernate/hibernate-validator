@@ -11,6 +11,11 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Types;
 
+import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersDecimalMinMaxCheck;
+import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersDigitsCheck;
+import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersPatternCheck;
+import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersScriptAssertCheck;
+import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersSizeLengthCheck;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
@@ -49,17 +54,33 @@ public class ConstraintCheckFactory {
 	private static final SingleValuedChecks NULL_CHECKS = new SingleValuedChecks();
 
 	public ConstraintCheckFactory(Types typeUtils, ConstraintHelper constraintHelper, AnnotationApiHelper annotationApiHelper, boolean methodConstraintsSupported) {
-
 		this.constraintHelper = constraintHelper;
 
 		fieldChecks = CollectionHelper.newHashMap();
 		fieldChecks.put(
 				AnnotationType.CONSTRAINT_ANNOTATION,
-				new SingleValuedChecks( new StaticCheck(), new TypeCheck( constraintHelper ) )
+				new SingleValuedChecks(
+						new StaticCheck(),
+						new TypeCheck( constraintHelper ),
+						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
+						new AnnotationParametersPatternCheck( annotationApiHelper ),
+						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
+						new AnnotationParametersDigitsCheck( annotationApiHelper ),
+						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper )
+				)
 		);
 		fieldChecks.put(
 				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION,
-				new MultiValuedChecks( constraintHelper, new StaticCheck(), new TypeCheck( constraintHelper ) )
+				new MultiValuedChecks(
+						constraintHelper,
+						new StaticCheck(),
+						new TypeCheck( constraintHelper ),
+						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
+						new AnnotationParametersPatternCheck( annotationApiHelper ),
+						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
+						new AnnotationParametersDigitsCheck( annotationApiHelper ),
+						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper )
+				)
 		);
 		fieldChecks.put(
 				AnnotationType.GRAPH_VALIDATION_ANNOTATION,
@@ -70,13 +91,32 @@ public class ConstraintCheckFactory {
 		methodChecks = CollectionHelper.newHashMap();
 		methodChecks.put(
 				AnnotationType.CONSTRAINT_ANNOTATION,
-				new SingleValuedChecks( new GetterCheck( methodConstraintsSupported ), new StaticCheck(), new MethodAnnotationCheck( constraintHelper ),
-						new TypeCheck( constraintHelper ) )
+				new SingleValuedChecks(
+						new GetterCheck( methodConstraintsSupported ),
+						new StaticCheck(),
+						new MethodAnnotationCheck( constraintHelper ),
+						new TypeCheck( constraintHelper ),
+						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
+						new AnnotationParametersPatternCheck( annotationApiHelper ),
+						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
+						new AnnotationParametersDigitsCheck( annotationApiHelper ),
+						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper )
+				)
 		);
 		methodChecks.put(
-				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION, new MultiValuedChecks(
-						constraintHelper, new GetterCheck( methodConstraintsSupported ), new StaticCheck(), new MethodAnnotationCheck( constraintHelper ),
-						new TypeCheck( constraintHelper ) )
+				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION,
+				new MultiValuedChecks(
+						constraintHelper,
+						new GetterCheck( methodConstraintsSupported ),
+						new StaticCheck(),
+						new MethodAnnotationCheck( constraintHelper ),
+						new TypeCheck( constraintHelper ),
+						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
+						new AnnotationParametersPatternCheck( annotationApiHelper ),
+						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
+						new AnnotationParametersDigitsCheck( annotationApiHelper ),
+						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper )
+				)
 		);
 		methodChecks.put(
 				AnnotationType.GRAPH_VALIDATION_ANNOTATION,
@@ -88,11 +128,26 @@ public class ConstraintCheckFactory {
 		annotationTypeChecks = CollectionHelper.newHashMap();
 		annotationTypeChecks.put(
 				AnnotationType.CONSTRAINT_ANNOTATION,
-				new SingleValuedChecks( new AnnotationTypeCheck( constraintHelper ) )
+				new SingleValuedChecks(
+						new AnnotationTypeCheck( constraintHelper ),
+						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
+						new AnnotationParametersPatternCheck( annotationApiHelper ),
+						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
+						new AnnotationParametersDigitsCheck( annotationApiHelper ),
+						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper )
+				)
 		);
 		annotationTypeChecks.put(
 				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION,
-				new MultiValuedChecks( constraintHelper, new AnnotationTypeCheck( constraintHelper ) )
+				new MultiValuedChecks(
+						constraintHelper,
+						new AnnotationTypeCheck( constraintHelper ),
+						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
+						new AnnotationParametersPatternCheck( annotationApiHelper ),
+						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
+						new AnnotationParametersDigitsCheck( annotationApiHelper ),
+						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper )
+				)
 		);
 		annotationTypeChecks.put(
 				AnnotationType.CONSTRAINT_META_ANNOTATION,
@@ -108,11 +163,27 @@ public class ConstraintCheckFactory {
 
 		nonAnnotationTypeChecks = CollectionHelper.newHashMap();
 		nonAnnotationTypeChecks.put(
-				AnnotationType.CONSTRAINT_ANNOTATION, new SingleValuedChecks( new TypeCheck( constraintHelper ) )
+				AnnotationType.CONSTRAINT_ANNOTATION,
+				new SingleValuedChecks(
+						new TypeCheck( constraintHelper ),
+						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
+						new AnnotationParametersPatternCheck( annotationApiHelper ),
+						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
+						new AnnotationParametersDigitsCheck( annotationApiHelper ),
+						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper )
+				)
 		);
 		nonAnnotationTypeChecks.put(
 				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION,
-				new MultiValuedChecks( constraintHelper, new TypeCheck( constraintHelper ) )
+				new MultiValuedChecks(
+						constraintHelper,
+						new TypeCheck( constraintHelper ),
+						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
+						new AnnotationParametersPatternCheck( annotationApiHelper ),
+						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
+						new AnnotationParametersDigitsCheck( annotationApiHelper ),
+						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper )
+				)
 		);
 		nonAnnotationTypeChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );
 		nonAnnotationTypeChecks.put(
@@ -135,7 +206,6 @@ public class ConstraintCheckFactory {
 	 *         the given element.
 	 */
 	public ConstraintChecks getConstraintChecks(Element annotatedElement, AnnotationMirror annotation) {
-
 		AnnotationType annotationType = constraintHelper.getAnnotationType( annotation );
 
 		switch ( annotatedElement.getKind() ) {
