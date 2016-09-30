@@ -52,7 +52,7 @@ import org.xml.sax.SAXException;
  *
  * @author Hardy Ferentschik
  */
-public class XmlMappingParser {
+public class MappingXmlParser {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -79,7 +79,7 @@ public class XmlMappingParser {
 		return schemasByVersion;
 	}
 
-	public XmlMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider,
+	public MappingXmlParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider,
 			ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
