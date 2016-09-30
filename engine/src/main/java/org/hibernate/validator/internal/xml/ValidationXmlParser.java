@@ -22,12 +22,16 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
+import javax.xml.validation.Validator;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
+import org.xml.sax.SAXException;
 
 /**
  * Parser for <i>validation.xml</i> using JAXB.
@@ -64,8 +68,8 @@ public class ValidationXmlParser {
 	 * @return The parameters parsed out of <i>validation.xml</i> wrapped in an instance of {@code ConfigurationImpl.ValidationBootstrapParameters}.
 	 */
 	public final BootstrapConfiguration parseValidationXml() {
-		InputStream inputStream = getValidationXmlInputStream();
-		if ( inputStream == null ) {
+		InputStream in = getValidationXmlInputStream();
+		if ( in == null ) {
 			return BootstrapConfigurationImpl.getDefaultBootstrapConfiguration();
 		}
 
@@ -74,16 +78,36 @@ public class ValidationXmlParser {
 			// this avoids accessing javax.xml.stream.* (which does not exist on Android) when not actually
 			// working with the XML configuration
 			XmlParserHelper xmlParserHelper = new XmlParserHelper();
-			XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( VALIDATION_XML_FILE, inputStream );
 
+			// the InputStream supports mark and reset
+			in.mark( Integer.MAX_VALUE );
+
+			XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( VALIDATION_XML_FILE, new CloseIgnoringInputStream( in ) );
 			String schemaVersion = xmlParserHelper.getSchemaVersion( VALIDATION_XML_FILE, xmlEventReader );
+			xmlEventReader.close();
+
+			in.reset();
+
+			// The validation is done first as we manipulate the XML document before pushing it to the unmarshaller
+			// and it might not be valid anymore as we might have switched the namespace to the latest namespace
+			// supported.
 			Schema schema = getSchema( xmlParserHelper, schemaVersion );
-			ValidationConfigType validationConfig = unmarshal( xmlEventReader, schema );
+			Validator validator = schema.newValidator();
+			validator.validate( new StreamSource( new CloseIgnoringInputStream( in ) ) );
+
+			in.reset();
+
+			xmlEventReader = xmlParserHelper.createXmlEventReader( VALIDATION_XML_FILE, new CloseIgnoringInputStream( in ) );
+			ValidationConfigType validationConfig = unmarshal( xmlEventReader );
+			xmlEventReader.close();
 
 			return createBootstrapConfiguration( validationConfig );
 		}
+		catch (XMLStreamException | IOException | SAXException e) {
+			throw log.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
+		}
 		finally {
-			closeStream( inputStream );
+			closeStream( in );
 		}
 	}
 
@@ -110,7 +134,7 @@ public class ValidationXmlParser {
 		return xmlParserHelper.getSchema( schemaResource );
 	}
 
-	private ValidationConfigType unmarshal(XMLEventReader xmlEventReader, Schema schema) {
+	private ValidationConfigType unmarshal(XMLEventReader xmlEventReader) {
 		log.parsingXMLFile( VALIDATION_XML_FILE );
 
 		try {
@@ -118,7 +142,6 @@ public class ValidationXmlParser {
 			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
 			JAXBContext jc = run( NewJaxbContext.action( ValidationConfigType.class ) );
 			Unmarshaller unmarshaller = jc.createUnmarshaller();
-			unmarshaller.setSchema( schema );
 
 			// Unmashaller#unmarshal() requires several permissions internally and doesn't use any privileged blocks
 			// itself; Wrapping it here avoids that all calling code bases need to have these permissions as well
