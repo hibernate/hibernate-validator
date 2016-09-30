@@ -6,15 +6,21 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -30,8 +36,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.GetResource;
 import org.hibernate.validator.internal.util.privilegedactions.NewSchema;
-
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Provides common functionality used within the different XML descriptor
@@ -50,13 +54,27 @@ public class XmlParserHelper {
 	private static final int NUMBER_OF_SCHEMAS = 4;
 	private static final String DEFAULT_VERSION = "1.0";
 
+	private static final Map<String, String> NAMESPACE_NORMALIZATION_MAPPING;
+
 	// xmlInputFactory used to be static in order to cache the factory, but that introduced a leakage of
-	// class loader in Wildfly. See HV-842
+	// class loader in WildFly. See HV-842
 	private final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+
+	// xmlEventFactory should not be static either.
+	private final XMLEventFactory xmlEventFactory = XMLEventFactory.newInstance();
 
 	private static final ConcurrentMap<String, Schema> schemaCache = new ConcurrentHashMap<String, Schema>(
 			NUMBER_OF_SCHEMAS
 	);
+
+	static {
+		Map<String, String> namespaceNormalizationMapping = new HashMap<>();
+		namespaceNormalizationMapping.put( LocalNamespace.VALIDATION_1_CONFIGURATION.getNamespaceURI(),
+				LocalNamespace.VALIDATION_2_CONFIGURATION.getNamespaceURI() );
+		namespaceNormalizationMapping.put( LocalNamespace.VALIDATION_1_MAPPING.getNamespaceURI(),
+				LocalNamespace.VALIDATION_2_MAPPING.getNamespaceURI() );
+		NAMESPACE_NORMALIZATION_MAPPING = Collections.unmodifiableMap( namespaceNormalizationMapping );
+	}
 
 	/**
 	 * Retrieves the schema version applying for the given XML input stream as
@@ -86,7 +104,11 @@ public class XmlParserHelper {
 
 	public synchronized XMLEventReader createXmlEventReader(String resourceName, InputStream xmlStream) {
 		try {
-			return xmlInputFactory.createXMLEventReader( xmlStream );
+			return new NamespaceNormalizingXMLEventReaderDelegate(
+					xmlInputFactory.createXMLEventReader( xmlStream ),
+					xmlEventFactory,
+					NAMESPACE_NORMALIZATION_MAPPING
+			);
 		}
 		catch (Exception e) {
 			throw log.getUnableToCreateXMLEventReader( resourceName, e );
