@@ -23,6 +23,10 @@ import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 final class ResourceLoaderHelper {
 	private static final Log log = LoggerFactory.make();
 
+	private ResourceLoaderHelper() {
+		// Not allowed
+	}
+
 	/**
 	 * Returns an input stream for the given path, which supports the mark/reset
 	 * contract.
