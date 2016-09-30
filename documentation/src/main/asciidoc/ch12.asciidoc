@@ -39,6 +39,7 @@ getter methods (optionally, see below)
 * only such annotation types are annotated with constraint annotations which are constraint
 annotations themselves
 * definition of dynamic default group sequence with @GroupSequenceProvider is valid
+* annotation parameter values are meaningful and valid
 
 [[validator-annotationprocessor-options]]
 === Options
