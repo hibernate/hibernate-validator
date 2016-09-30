@@ -45,6 +45,10 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
+import org.hibernate.validator.internal.xml.binding.BeanType;
+import org.hibernate.validator.internal.xml.binding.ConstraintDefinitionType;
+import org.hibernate.validator.internal.xml.binding.ConstraintMappingsType;
+import org.hibernate.validator.internal.xml.binding.ValidatedByType;
 import org.xml.sax.SAXException;
 
 /**
