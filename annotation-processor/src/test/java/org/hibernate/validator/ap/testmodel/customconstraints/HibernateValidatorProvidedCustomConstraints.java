@@ -25,7 +25,7 @@ import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 
-@ScriptAssert(script = "", lang = "javascript")
+@ScriptAssert(script = "some script", lang = "javascript")
 @SuppressWarnings("deprecation")
 public class HibernateValidatorProvidedCustomConstraints {
 
