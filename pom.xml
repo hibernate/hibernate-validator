@@ -439,7 +439,7 @@
                         <!-- These classes are either imported from other sources and re-formatted
                         or generated or present significant reasons to not follow the rules. -->
                         <excludes>
-                            **/org/hibernate/validator/internal/xml/*.java,
+                            **/org/hibernate/validator/internal/xml/binding/*.java,
                             **/Log_$logger.java,
                             **/Messages_$bundle.java,
                             **/ConcurrentReferenceHashMap.java,

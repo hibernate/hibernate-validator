@@ -6,10 +6,12 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 import java.util.List;
 import java.util.Map;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import org.hibernate.validator.internal.xml.binding.GroupConversionType;
 
 /**
  * Builder for group conversions.
