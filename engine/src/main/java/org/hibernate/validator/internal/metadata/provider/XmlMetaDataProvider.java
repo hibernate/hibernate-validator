@@ -18,7 +18,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
-import org.hibernate.validator.internal.xml.XmlMappingParser;
+import org.hibernate.validator.internal.xml.MappingXmlParser;
 
 /**
  * A {@link MetaDataProvider} providing constraint related meta data based on
@@ -46,19 +46,19 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 		this( constraintHelper, createMappingParser( constraintHelper, parameterNameProvider, mappingStreams, externalClassLoader ) );
 	}
 
-	private XmlMetaDataProvider(ConstraintHelper constraintHelper, XmlMappingParser mappingParser) {
+	private XmlMetaDataProvider(ConstraintHelper constraintHelper, MappingXmlParser mappingParser) {
 		super( constraintHelper, createBeanConfigurations( mappingParser ) );
 		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}
 
-	private static XmlMappingParser createMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider, Set<InputStream> mappingStreams,
+	private static MappingXmlParser createMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider, Set<InputStream> mappingStreams,
 			ClassLoader externalClassLoader) {
-		XmlMappingParser mappingParser = new XmlMappingParser( constraintHelper, parameterNameProvider, externalClassLoader );
+		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, parameterNameProvider, externalClassLoader );
 		mappingParser.parse( mappingStreams );
 		return mappingParser;
 	}
 
-	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(XmlMappingParser mappingParser) {
+	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(MappingXmlParser mappingParser) {
 		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<String, BeanConfiguration<?>>();
 		for ( Class<?> clazz : mappingParser.getXmlConfiguredClasses() ) {
 			Set<ConstrainedElement> constrainedElements = mappingParser.getConstrainedElementsForClass( clazz );

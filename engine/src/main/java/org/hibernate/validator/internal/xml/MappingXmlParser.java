@@ -49,7 +49,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  */
-public class XmlMappingParser {
+public class MappingXmlParser {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -75,7 +75,7 @@ public class XmlMappingParser {
 		SCHEMAS_BY_VERSION.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
 	}
 
-	public XmlMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider,
+	public MappingXmlParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider,
 			ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
