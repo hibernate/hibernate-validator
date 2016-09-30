@@ -158,7 +158,7 @@ class MetaConstraintBuilder {
 	}
 
 	private static void removeEmptyContentElements(ElementType elementType) {
-		for ( Iterator<Serializable> contentIterator = elementType.getContent().iterator(); contentIterator.hasNext(); ){
+		for ( Iterator<Serializable> contentIterator = elementType.getContent().iterator(); contentIterator.hasNext(); ) {
 			Serializable content = contentIterator.next();
 			if ( content instanceof String && IS_ONLY_WHITESPACE.matcher( (String) content ).matches() ) {
 				contentIterator.remove();
