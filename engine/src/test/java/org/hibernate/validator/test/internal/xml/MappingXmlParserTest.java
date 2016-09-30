@@ -21,7 +21,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValida
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.xml.XmlMappingParser;
+import org.hibernate.validator.internal.xml.MappingXmlParser;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
@@ -32,15 +32,15 @@ import static org.testng.Assert.fail;
 /**
  * @author Hardy Ferentschik
  */
-public class XmlMappingParserTest {
+public class MappingXmlParserTest {
 
-	private XmlMappingParser xmlMappingParser;
+	private MappingXmlParser xmlMappingParser;
 	private ConstraintHelper constraintHelper;
 
 	@BeforeMethod
 	public void setupParserHelper() {
 		constraintHelper = new ConstraintHelper();
-		xmlMappingParser = new XmlMappingParser( constraintHelper, new DefaultParameterNameProvider(), null );
+		xmlMappingParser = new MappingXmlParser( constraintHelper, new DefaultParameterNameProvider(), null );
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class XmlMappingParserTest {
 		assertTrue( validators.contains( DecimalMinValidatorForNumber.class ), "Missing default validator" );
 
 		Set<InputStream> mappingStreams = newHashSet();
-		mappingStreams.add( XmlMappingParserTest.class.getResourceAsStream( "decimal-min-mapping-1.xml" ) );
+		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-1.xml" ) );
 
 		xmlMappingParser.parse( mappingStreams );
 
@@ -71,8 +71,8 @@ public class XmlMappingParserTest {
 	@TestForIssue(jiraKey = "HV-782")
 	public void testOverridingOfConstraintValidatorsFromMultipleMappingFilesThrowsException() {
 		Set<InputStream> mappingStreams = newHashSet();
-		mappingStreams.add( XmlMappingParserTest.class.getResourceAsStream( "decimal-min-mapping-1.xml" ) );
-		mappingStreams.add( XmlMappingParserTest.class.getResourceAsStream( "decimal-min-mapping-2.xml" ) );
+		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-1.xml" ) );
+		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-2.xml" ) );
 
 		try {
 			xmlMappingParser.parse( mappingStreams );

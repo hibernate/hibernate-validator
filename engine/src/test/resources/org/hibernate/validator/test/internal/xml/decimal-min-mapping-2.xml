@@ -6,7 +6,7 @@
 
     <constraint-definition annotation="javax.validation.constraints.DecimalMin">
         <validated-by include-existing-validators="true">
-            <value>org.hibernate.validator.test.internal.xml.XmlMappingParserTest$DecimalMinValidatorForBar</value>
+            <value>org.hibernate.validator.test.internal.xml.MappingXmlParserTest$DecimalMinValidatorForBar</value>
         </validated-by>
     </constraint-definition>
 </constraint-mappings>
