@@ -6,11 +6,15 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.ElementType;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
@@ -21,9 +25,8 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import org.hibernate.validator.internal.xml.binding.ConstraintType;
+import org.hibernate.validator.internal.xml.binding.ParameterType;
 
 /**
  * Builder for constraint parameters.

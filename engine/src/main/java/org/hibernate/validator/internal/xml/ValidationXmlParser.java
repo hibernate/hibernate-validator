@@ -31,6 +31,10 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
+import org.hibernate.validator.internal.xml.binding.DefaultValidatedExecutableTypesType;
+import org.hibernate.validator.internal.xml.binding.ExecutableValidationType;
+import org.hibernate.validator.internal.xml.binding.PropertyType;
+import org.hibernate.validator.internal.xml.binding.ValidationConfigType;
 import org.xml.sax.SAXException;
 
 /**
