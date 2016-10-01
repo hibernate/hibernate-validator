@@ -22,25 +22,34 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.constraints.NotNull;
 
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
 
 /**
  * @author Hardy Ferentschik
  */
-public class CascadedValidationTest {
-	private static Validator validator;
+public class CascadedValidation {
 	private static final int NUMBER_OF_RUNNABLES = 10000;
 	private static final int SIZE_OF_THREAD_POOL = 50;
 
-	@BeforeTest
-	public static void setupValidatorInstance() {
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-		validator = factory.getValidator();
+	@State( Scope.Benchmark )
+	public static class CascadedValidationState {
+		public volatile Validator validator;
+
+		public CascadedValidationState() {
+			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+			validator = factory.getValidator();
+		}
 	}
 
-	@Test
-	public void testCascadedValidation() {
+	@Benchmark
+	@BenchmarkMode( Mode.All )
+	@OutputTimeUnit( TimeUnit.MILLISECONDS )
+	public void testCascadedValidation(CascadedValidationState state) {
 		// TODO graphs needs to be generated and deeper
 		Person kermit = new Person( "kermit" );
 		Person piggy = new Person( "miss piggy" );
@@ -50,19 +59,18 @@ public class CascadedValidationTest {
 		piggy.addFriend( kermit ).addFriend( gonzo );
 		gonzo.addFriend( kermit ).addFriend( piggy );
 
-		Set<ConstraintViolation<Person>> violations = validator.validate( kermit );
+		Set<ConstraintViolation<Person>> violations = state.validator.validate( kermit );
 		assertThat( violations ).hasSize( 0 );
 	}
 
-	/**
-	 * To be executed manually. Not part of the JMeter tests for now.
-	 */
-	@Test
-	public void testCascadedValidationMultiThreaded() throws Exception {
+	@Benchmark
+	@BenchmarkMode( Mode.All )
+	@OutputTimeUnit( TimeUnit.MILLISECONDS )
+	public void testCascadedValidationMultiThreaded(CascadedValidationState state) throws Exception {
 		CountDownLatch startLatch = new CountDownLatch( 1 );
 		ExecutorService executor = Executors.newFixedThreadPool( SIZE_OF_THREAD_POOL );
 		for ( int i = 0; i <= NUMBER_OF_RUNNABLES; i++ ) {
-			Runnable run = new TestRunner( startLatch );
+			Runnable run = new TestRunner( startLatch, state );
 			executor.execute( run );
 		}
 		executor.shutdown();
@@ -75,7 +83,7 @@ public class CascadedValidationTest {
 		String name;
 
 		@Valid
-		Set<Person> friends = new HashSet<Person>();
+		Set<Person> friends = new HashSet<>();
 
 		public Person(String name) {
 			this.name = name;
@@ -90,9 +98,11 @@ public class CascadedValidationTest {
 	public class TestRunner implements Runnable {
 		private static final int NUMBER_OF_VALIDATION_ITERATIONS = 1000;
 		private final CountDownLatch latch;
+		private final CascadedValidationState state;
 
-		public TestRunner(CountDownLatch latch) {
+		public TestRunner(CountDownLatch latch, CascadedValidationState state) {
 			this.latch = latch;
+			this.state = state;
 		}
 
 		@Override
@@ -105,7 +115,7 @@ public class CascadedValidationTest {
 				return;
 			}
 			for ( int i = 0; i < NUMBER_OF_VALIDATION_ITERATIONS; i++ ) {
-				testCascadedValidation();
+				testCascadedValidation( state );
 			}
 		}
 	}
