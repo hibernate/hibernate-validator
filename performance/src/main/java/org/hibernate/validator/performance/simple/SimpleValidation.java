@@ -8,8 +8,13 @@ package org.hibernate.validator.performance.simple;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Random;
-import java.util.Set;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -17,14 +22,14 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Hardy Ferentschik
  */
-public class SimpleValidationTest {
+public class SimpleValidation {
 	private static final String[] names = {
 			null,
 			"Jacob",
@@ -38,24 +43,31 @@ public class SimpleValidationTest {
 			"William"
 	};
 
-	private static Validator validator;
-	private static Random random;
+	private static final Random random = new Random();
 
-	@BeforeTest
-	public static void setUpValidatorFactory() {
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-		validator = factory.getValidator();
-		random = new Random();
+	@State(Scope.Benchmark)
+	public static class ValidationState {
+		public volatile Validator validator;
+
+		{
+			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+			validator = factory.getValidator();
+		}
+
 	}
 
-	@Test
-	public void testSimpleBeanValidation() {
+	@Benchmark
+	@BenchmarkMode(Mode.All)
+	@OutputTimeUnit(TimeUnit.MILLISECONDS)
+	public void testSimpleBeanValidation( ValidationState state ) {
 		DriverSetup driverSetup = new DriverSetup();
-		Set<ConstraintViolation<Driver>> violations = validator.validate( driverSetup.getDriver() );
+		Set<ConstraintViolation<Driver>> violations = state.validator.validate( driverSetup.getDriver() );
 		assertThat( violations ).hasSize( driverSetup.getExpectedViolationCount() );
 	}
 
-	@Test
+	@Benchmark
+	@BenchmarkMode(Mode.All)
+	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public void testSimpleBeanValidationRecreatingValidatorFactory() {
 		DriverSetup driverSetup = new DriverSetup();
 		Validator localValidator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -73,7 +85,7 @@ public class SimpleValidationTest {
 		@AssertTrue
 		private boolean hasDrivingLicense;
 
-		public Driver(String name, int age, boolean hasDrivingLicense) {
+		public Driver( String name, int age, boolean hasDrivingLicense ) {
 			this.name = name;
 			this.age = age;
 			this.hasDrivingLicense = hasDrivingLicense;
