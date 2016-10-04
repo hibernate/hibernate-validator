@@ -78,6 +78,10 @@ import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureVal
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForOffsetDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadablePartial;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMaxValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMinValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.MaxValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.MinValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForDate;
@@ -133,6 +137,7 @@ public class ConstraintHelper {
 
 	private static final Log log = LoggerFactory.make();
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
+	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
 
 	// immutable
 	private final Map<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints;
@@ -147,8 +152,17 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, CNPJ.class, CNPJValidator.class );
 		putConstraint( tmpConstraints, CPF.class, CPFValidator.class );
 
-		putConstraints( tmpConstraints, DecimalMax.class, DecimalMaxValidatorForNumber.class, DecimalMaxValidatorForCharSequence.class );
-		putConstraints( tmpConstraints, DecimalMin.class, DecimalMinValidatorForNumber.class, DecimalMinValidatorForCharSequence.class );
+		if ( isJavaMoneyInClasspath() ) {
+			putConstraints( tmpConstraints, DecimalMax.class, Arrays.asList( DecimalMaxValidatorForNumber.class,
+					DecimalMaxValidatorForCharSequence.class, DecimalMaxValidatorForMonetaryAmount.class ) );
+			putConstraints( tmpConstraints, DecimalMin.class, Arrays.asList( DecimalMinValidatorForNumber.class,
+					DecimalMinValidatorForCharSequence.class, DecimalMinValidatorForMonetaryAmount.class ) );
+		}
+		else {
+			putConstraints( tmpConstraints, DecimalMax.class, DecimalMaxValidatorForNumber.class, DecimalMaxValidatorForCharSequence.class );
+			putConstraints( tmpConstraints, DecimalMin.class, DecimalMinValidatorForNumber.class, DecimalMinValidatorForCharSequence.class );
+		}
+
 		putConstraints( tmpConstraints, Digits.class, DigitsValidatorForCharSequence.class, DigitsValidatorForNumber.class );
 
 		List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = newArrayList( 11 );
@@ -166,8 +180,17 @@ public class ConstraintHelper {
 
 		putConstraints( tmpConstraints, Future.class, futureValidators );
 
-		putConstraints( tmpConstraints, Max.class, MaxValidatorForNumber.class, MaxValidatorForCharSequence.class );
-		putConstraints( tmpConstraints, Min.class, MinValidatorForNumber.class, MinValidatorForCharSequence.class );
+		if ( isJavaMoneyInClasspath() ) {
+			putConstraints( tmpConstraints, Max.class, Arrays.asList( MaxValidatorForNumber.class,
+					MaxValidatorForCharSequence.class, MaxValidatorForMonetaryAmount.class ) );
+			putConstraints( tmpConstraints, Min.class, Arrays.asList( MinValidatorForNumber.class,
+					MinValidatorForCharSequence.class, MinValidatorForMonetaryAmount.class ) );
+		}
+		else {
+			putConstraints( tmpConstraints, Max.class, MaxValidatorForNumber.class, MaxValidatorForCharSequence.class );
+			putConstraints( tmpConstraints, Min.class, MinValidatorForNumber.class, MinValidatorForCharSequence.class );
+		}
+
 		putConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
 		putConstraint( tmpConstraints, Null.class, NullValidator.class );
 
@@ -498,6 +521,10 @@ public class ConstraintHelper {
 
 	private static boolean isJodaTimeInClasspath() {
 		return isClassPresent( JODA_TIME_CLASS_NAME );
+	}
+
+	private static boolean isJavaMoneyInClasspath() {
+		return isClassPresent( JAVA_MONEY_CLASS_NAME );
 	}
 
 	/**

@@ -89,6 +89,11 @@
             <artifactId>paranamer</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>javax.money</groupId>
+            <artifactId>money-api</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!--
         Test dependencies
@@ -126,6 +131,11 @@
         <dependency>
             <groupId>org.jboss.shrinkwrap</groupId>
             <artifactId>shrinkwrap-impl-base</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.javamoney</groupId>
+            <artifactId>moneta</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
