@@ -4,9 +4,10 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.constraintvalidators.bv;
+package org.hibernate.validator.internal.constraintvalidators.bv.money;
 
 import java.math.BigDecimal;
+import javax.money.MonetaryAmount;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.DecimalMin;
@@ -15,12 +16,13 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * Check that the character sequence (e.g. string) being validated represents a number, and has a value
- * greater than or equal to the minimum value specified.
+ * Check that the number being validated is less than or equal to the maximum
+ * value specified.
  *
- * @author Hardy Ferentschik
+ * @author Lukas Niemeier
+ * @author Willi Schönborn
  */
-public class DecimalMinValidatorForCharSequence implements ConstraintValidator<DecimalMin, CharSequence> {
+public class DecimalMinValidatorForMonetaryAmount implements ConstraintValidator<DecimalMin, MonetaryAmount> {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -39,17 +41,14 @@ public class DecimalMinValidatorForCharSequence implements ConstraintValidator<D
 	}
 
 	@Override
-	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
-		//null values are valid
+	public boolean isValid(MonetaryAmount value, ConstraintValidatorContext context) {
+		// null values are valid
 		if ( value == null ) {
 			return true;
 		}
-		try {
-			int comparisonResult = new BigDecimal( value.toString() ).compareTo( minValue );
-			return inclusive ? comparisonResult >= 0 : comparisonResult > 0;
-		}
-		catch (NumberFormatException nfe) {
-			return false;
-		}
+
+		int comparisonResult = value.getNumber().numberValueExact( BigDecimal.class ).compareTo( minValue );
+		return inclusive ? comparisonResult >= 0 : comparisonResult > 0;
 	}
+
 }
