@@ -482,7 +482,7 @@ impact portability of your application between Bean Validation providers.
               `int`, `long` and the
               respective wrappers of the primitive types; Additionally
               supported by HV: any sub-type of
-              `Number`|Checks whether the annotated value is less than the
+              `Number` and `javax.money.MonetaryAmount`|Checks whether the annotated value is less than the
               specified maximum, when inclusive=false.
               Otherwise whether the value is less than or equal to the
               specified maximum. The parameter value is
@@ -495,7 +495,7 @@ impact portability of your application between Bean Validation providers.
               `int`, `long` and the
               respective wrappers of the primitive types; Additionally
               supported by HV: any sub-type of
-              `Number`|Checks whether the annotated value is larger than the
+              `Number` and `javax.money.MonetaryAmount`|Checks whether the annotated value is larger than the
               specified minimum, when inclusive=false.
               Otherwise whether the value is larger than or equal to the
               specified minimum. The parameter value is
@@ -528,7 +528,7 @@ impact portability of your application between Bean Validation providers.
               primitive types; Additionally supported by HV: any sub-type of
               `CharSequence` (the numeric value
               represented by the character sequence is evaluated), any
-              sub-type of `Number`|Checks whether the annotated value is less than or equal
+              sub-type of `Number` and `javax.money.MonetaryAmount`|Checks whether the annotated value is less than or equal
               to the specified maximum|Adds a check constraint on the column
 |`@Min(value=)`|`BigDecimal`,
               `BigInteger`, `byte`,
@@ -537,7 +537,7 @@ impact portability of your application between Bean Validation providers.
               primitive types; Additionally supported by HV: any sub-type of
               `CharSequence` (the numeric value
               represented by the char sequence is evaluated), any sub-type of
-              `Number`|Checks whether the annotated value is higher than or
+              `Number` and `javax.money.MonetaryAmount`|Checks whether the annotated value is higher than or
               equal to the specified minimum|Adds a check constraint on the column
 |`@NotNull`|Any type|Checks that the annotated value is not
               `null`.|Column(s) are not nullable

@@ -16,7 +16,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * Check that the number being validated is less than or equal to the maximum
+ * Check that the number being validated is greater than or equal to the minimum
  * value specified.
  *
  * @author Hardy Ferentschik

@@ -17,15 +17,13 @@ import javax.validation.constraints.DecimalMin;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.xml.MappingXmlParser;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -50,9 +48,8 @@ public class MappingXmlParserTest {
 				DecimalMin.class
 		);
 
-		assertEquals( validators.size(), 2, "Wrong number of default validators" );
-		assertTrue( validators.contains( DecimalMinValidatorForCharSequence.class ), "Missing default validator" );
-		assertTrue( validators.contains( DecimalMinValidatorForNumber.class ), "Missing default validator" );
+		assertFalse( validators.isEmpty(), "Wrong number of default validators" );
+		assertFalse( validators.contains( DecimalMinValidatorForFoo.class ) , "The custom validator must be absent" );
 
 		Set<InputStream> mappingStreams = newHashSet();
 		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-1.xml" ) );
@@ -60,11 +57,10 @@ public class MappingXmlParserTest {
 		xmlMappingParser.parse( mappingStreams );
 
 		validators = constraintHelper.getAllValidatorClasses( DecimalMin.class );
-		assertEquals( validators.size(), 3, "Wrong number of default validators" );
-		assertTrue( validators.contains( DecimalMinValidatorForCharSequence.class ), "Missing default validator" );
-		assertTrue( validators.contains( DecimalMinValidatorForNumber.class ), "Missing default validator" );
+		assertFalse( validators.isEmpty(), "Wrong number of default validators" );
 		assertTrue( validators.contains( DecimalMinValidatorForFoo.class ), "Missing xml configured validator" );
-		assertTrue( validators.indexOf( DecimalMinValidatorForFoo.class ) == 2, "The custom validator must be last" );
+		assertTrue( validators.indexOf( DecimalMinValidatorForFoo.class ) == validators.size() - 1,
+				"The custom validator must be last" );
 	}
 
 	@Test
