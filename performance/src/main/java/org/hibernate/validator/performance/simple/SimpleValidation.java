@@ -43,15 +43,15 @@ public class SimpleValidation {
 			"William"
 	};
 
-	private static final Random random = new Random();
-
 	@State(Scope.Benchmark)
 	public static class ValidationState {
 		public volatile Validator validator;
+		public volatile Random random;
 
 		{
 			ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 			validator = factory.getValidator();
+			random = new Random();
 		}
 
 	}
@@ -60,7 +60,7 @@ public class SimpleValidation {
 	@BenchmarkMode(Mode.All)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public void testSimpleBeanValidation( ValidationState state ) {
-		DriverSetup driverSetup = new DriverSetup();
+		DriverSetup driverSetup = new DriverSetup( state );
 		Set<ConstraintViolation<Driver>> violations = state.validator.validate( driverSetup.getDriver() );
 		assertThat( violations ).hasSize( driverSetup.getExpectedViolationCount() );
 	}
@@ -68,8 +68,8 @@ public class SimpleValidation {
 	@Benchmark
 	@BenchmarkMode(Mode.All)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
-	public void testSimpleBeanValidationRecreatingValidatorFactory() {
-		DriverSetup driverSetup = new DriverSetup();
+	public void testSimpleBeanValidationRecreatingValidatorFactory( ValidationState state ) {
+		DriverSetup driverSetup = new DriverSetup( state );
 		Validator localValidator = Validation.buildDefaultValidatorFactory().getValidator();
 		Set<ConstraintViolation<Driver>> violations = localValidator.validate( driverSetup.getDriver() );
 		assertThat( violations ).hasSize( driverSetup.getExpectedViolationCount() );
@@ -107,20 +107,20 @@ public class SimpleValidation {
 		private int expectedViolationCount;
 		private Driver driver;
 
-		public DriverSetup() {
+		public DriverSetup(ValidationState state) {
 			expectedViolationCount = 0;
 
-			String name = names[random.nextInt( 10 )];
+			String name = names[state.random.nextInt( 10 )];
 			if ( name == null ) {
 				expectedViolationCount++;
 			}
 
-			int randomAge = random.nextInt( 100 );
+			int randomAge = state.random.nextInt( 100 );
 			if ( randomAge < 18 ) {
 				expectedViolationCount++;
 			}
 
-			int rand = random.nextInt( 2 );
+			int rand = state.random.nextInt( 2 );
 			boolean hasLicense = rand == 1;
 			if ( !hasLicense ) {
 				expectedViolationCount++;
