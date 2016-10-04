@@ -43,20 +43,23 @@ It will generate a set of reports from the each test execution. Currently it'll 
 
 #### Profiling
 
-The pom contains an example on how you can run the tests while attaching a profiler. You will need to
-adjust the property _profilingOptions_ used in the _chronos-jmeter-maven-plugin_ configuration.
+List of available profilers:
 
-For [JProfiler](http://www.ej-technologies.com/products/jprofiler/overview.html) on MacOS, the options look like similar to this:
+| Parameter Name | Description |
+| :---: | :--- |
+| CL | Classloader profiling via standard MBeans |
+| COMP | JIT compiler profiling via standard MBeans |
+| GC | GC profiling via standard MBeans |
+| HS_CL | HotSpot ™ classloader profiling via implementation-specific MBeans |
+| HS_COMP | HotSpot ™ JIT compiler profiling via implementation-specific MBeans |
+| HS_GC | HotSpot ™ memory manager (GC) profiling via implementation-specific MBeans |
+| HS_RT | HotSpot ™ runtime profiling via implementation-specific MBeans |
+| HS_THR | HotSpot ™ threading subsystem via implementation-specific MBeans |
+| STACK | Simple and naive Java stack profiler |
 
-    -agentpath:/Applications/Development/jprofiler7/bin/macos/libjprofilerti.jnilib=port=8849,nowait
+If you want to run one of those profilers - pass it as parameter when running a jar file. For example:
 
-There exists _jprofiler_ profile with the above options which you can enable via:
-
-     mvn clean package chronos-jmeter:jmeter -P hv-5.1,jprofiler
-
-Instead of editing the pom you can pass the profiling options via the command line:
-
-    mvn clean package chronos-jmeter:jmeter -DprofilingOptions=<youroptions> -P hv-5.1
+    > java -jar target/hibernate-validator-performance.jar STACK
 
 #### Creating reports for all major Validator versions
 
