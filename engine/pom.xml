@@ -267,7 +267,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <packageName>org.hibernate.validator.internal.xml</packageName>
+                            <packageName>org.hibernate.validator.internal.xml.binding</packageName>
                             <extension>true</extension>
                             <!-- Generate correct getters for Boolean properties -->
                             <enableIntrospection>true</enableIntrospection>

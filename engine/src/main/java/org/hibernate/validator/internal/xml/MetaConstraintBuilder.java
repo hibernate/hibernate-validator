@@ -31,6 +31,11 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
+import org.hibernate.validator.internal.xml.binding.AnnotationType;
+import org.hibernate.validator.internal.xml.binding.ConstraintType;
+import org.hibernate.validator.internal.xml.binding.ElementType;
+import org.hibernate.validator.internal.xml.binding.GroupsType;
+import org.hibernate.validator.internal.xml.binding.PayloadType;
 
 /**
  * Build meta constraint from XML
@@ -153,7 +158,7 @@ class MetaConstraintBuilder {
 	}
 
 	private static void removeEmptyContentElements(ElementType elementType) {
-		for ( Iterator<Serializable> contentIterator = elementType.getContent().iterator(); contentIterator.hasNext(); ){
+		for ( Iterator<Serializable> contentIterator = elementType.getContent().iterator(); contentIterator.hasNext(); ) {
 			Serializable content = contentIterator.next();
 			if ( content instanceof String && IS_ONLY_WHITESPACE.matcher( (String) content ).matches() ) {
 				contentIterator.remove();

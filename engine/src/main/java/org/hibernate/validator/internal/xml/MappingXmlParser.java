@@ -10,7 +10,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -29,7 +28,10 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
+import javax.xml.validation.Validator;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -43,13 +45,18 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
+import org.hibernate.validator.internal.xml.binding.BeanType;
+import org.hibernate.validator.internal.xml.binding.ConstraintDefinitionType;
+import org.hibernate.validator.internal.xml.binding.ConstraintMappingsType;
+import org.hibernate.validator.internal.xml.binding.ValidatedByType;
+import org.xml.sax.SAXException;
 
 /**
  * XML parser for validation-mapping files.
  *
  * @author Hardy Ferentschik
  */
-public class XmlMappingParser {
+public class MappingXmlParser {
 
 	private static final Log log = LoggerFactory.make();
 
@@ -76,7 +83,7 @@ public class XmlMappingParser {
 		return schemasByVersion;
 	}
 
-	public XmlMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider,
+	public MappingXmlParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider,
 			ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
@@ -131,22 +138,30 @@ public class XmlMappingParser {
 
 			Set<String> alreadyProcessedConstraintDefinitions = newHashSet();
 			for ( InputStream in : mappingStreams ) {
-
-				// check whether mark is supported, if so we can reset the stream in order to allow reuse of Configuration
-				boolean markSupported = in.markSupported();
-				if ( markSupported ) {
-					in.mark( Integer.MAX_VALUE );
-				}
+				// the InputStreams passed in parameters support mark and reset
+				in.mark( Integer.MAX_VALUE );
 
 				XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
 				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", xmlEventReader );
+				xmlEventReader.close();
+
+				in.reset();
+
+				// The validation is done first as we manipulate the XML document before pushing it to the unmarshaller
+				// and it might not be valid anymore as we might have switched the namespace to the latest namespace
+				// supported.
 				String schemaResourceName = getSchemaResourceName( schemaVersion );
 				Schema schema = xmlParserHelper.getSchema( schemaResourceName );
+				Validator validator = schema.newValidator();
+				validator.validate( new StreamSource( new CloseIgnoringInputStream( in ) ) );
 
+				in.reset();
+
+				xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
 				Unmarshaller unmarshaller = jc.createUnmarshaller();
-				unmarshaller.setSchema( schema );
-
 				ConstraintMappingsType mapping = getValidationConfig( xmlEventReader, unmarshaller );
+				xmlEventReader.close();
+
 				String defaultPackage = mapping.getDefaultPackage();
 
 				parseConstraintDefinitions(
@@ -166,17 +181,10 @@ public class XmlMappingParser {
 					);
 				}
 
-				if ( markSupported ) {
-					try {
-						in.reset();
-					}
-					catch (IOException e) {
-						log.debug( "Unable to reset input stream." );
-					}
-				}
+				in.reset();
 			}
 		}
-		catch (JAXBException e) {
+		catch (JAXBException | SAXException | IOException | XMLStreamException e) {
 			throw log.getErrorParsingMappingFileException( e );
 		}
 	}
@@ -388,17 +396,4 @@ public class XmlMappingParser {
 		}
 	}
 
-	// HV-1025 - On some JVMs (eg the IBM JVM) the JAXB implementation closes the underlying input stream.
-	// To prevent this we wrap the input stream to be able to ignore the close event. It is the responsibility
-	// of the client API to close the stream (as per Bean Validation spec, see javax.validation.Configuration).
-	private static class CloseIgnoringInputStream extends FilterInputStream {
-		public CloseIgnoringInputStream(InputStream in) {
-			super( in );
-		}
-
-		@Override
-		public void close() {
-			// do nothing
-		}
-	}
 }
