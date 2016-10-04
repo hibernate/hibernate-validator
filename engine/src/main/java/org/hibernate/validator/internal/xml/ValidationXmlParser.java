@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,19 +47,8 @@ public class ValidationXmlParser {
 	private static final Log log = LoggerFactory.make();
 
 	private static final String VALIDATION_XML_FILE = "META-INF/validation.xml";
-	private static final Map<String, String> SCHEMAS_BY_VERSION = Collections.unmodifiableMap( getSchemasByVersion() );
 
 	private final ClassLoader externalClassLoader;
-
-	private static Map<String, String> getSchemasByVersion() {
-		Map<String, String> schemasByVersion = new HashMap<String, String>();
-
-		schemasByVersion.put( "1.0", "META-INF/validation-configuration-1.0.xsd" );
-		schemasByVersion.put( "1.1", "META-INF/validation-configuration-1.1.xsd" );
-		schemasByVersion.put( "2.0", "META-INF/validation-configuration-2.0.xsd" );
-
-		return schemasByVersion;
-	}
 
 	public ValidationXmlParser(ClassLoader externalClassLoader) {
 		this.externalClassLoader = externalClassLoader;
@@ -129,13 +117,13 @@ public class ValidationXmlParser {
 	}
 
 	private Schema getSchema(XmlParserHelper xmlParserHelper, String schemaVersion) {
-		String schemaResource = SCHEMAS_BY_VERSION.get( schemaVersion );
+		ValidationSchema schema = ValidationSchema.getConfigurationSchema( schemaVersion );
 
-		if ( schemaResource == null ) {
+		if ( schema == null ) {
 			throw log.getUnsupportedSchemaVersionException( VALIDATION_XML_FILE, schemaVersion );
 		}
 
-		return xmlParserHelper.getSchema( schemaResource );
+		return xmlParserHelper.getSchema( schema.getSchemaPath() );
 	}
 
 	private ValidationConfigType unmarshal(XMLEventReader xmlEventReader) {
