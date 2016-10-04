@@ -54,7 +54,7 @@ public class NamespaceNormalizingXMLEventReaderDelegate extends EventReaderDeleg
 		return normalizeXMLEvent( super.nextEvent() );
 	}
 
-	public XMLEvent normalizeXMLEvent(XMLEvent xmlEvent) {
+	private XMLEvent normalizeXMLEvent(XMLEvent xmlEvent) {
 		if ( xmlEvent.isStartElement() ) {
 			return normalizeNamespace( xmlEvent.asStartElement() );
 		}
@@ -67,22 +67,22 @@ public class NamespaceNormalizingXMLEventReaderDelegate extends EventReaderDeleg
 	}
 
 	@SuppressWarnings("unchecked")
-	public StartElement normalizeNamespace(StartElement element) {
+	private StartElement normalizeNamespace(StartElement element) {
 		eventFactory.setLocation( element.getLocation() );
 		return eventFactory.createStartElement( normalizeQName( element.getName() ), element.getAttributes(), normalizeNamespaces( element.getNamespaces() ) );
 	}
 
 	@SuppressWarnings("unchecked")
-	public EndElement normalizeNamespace(EndElement element) {
+	private EndElement normalizeNamespace(EndElement element) {
 		eventFactory.setLocation( element.getLocation() );
 		return eventFactory.createEndElement( normalizeQName( element.getName() ), normalizeNamespaces( element.getNamespaces() ) );
 	}
 
-	public QName normalizeQName(QName qName) {
+	private QName normalizeQName(QName qName) {
 		return new QName( normalizeNamespaceURI( qName.getNamespaceURI() ), qName.getLocalPart() );
 	}
 
-	public Iterator<Namespace> normalizeNamespaces(Iterator<Namespace> namespaces) {
+	private Iterator<Namespace> normalizeNamespaces(Iterator<Namespace> namespaces) {
 		List<Namespace> newNamespaces = new ArrayList<>();
 		while ( namespaces.hasNext() ) {
 			newNamespaces.add( normalizeNamespace( namespaces.next() ) );
@@ -90,11 +90,11 @@ public class NamespaceNormalizingXMLEventReaderDelegate extends EventReaderDeleg
 		return newNamespaces.iterator();
 	}
 
-	public Namespace normalizeNamespace(Namespace namespace) {
+	private Namespace normalizeNamespace(Namespace namespace) {
 		return eventFactory.createNamespace( namespace.getPrefix(), normalizeNamespaceURI( namespace.getNamespaceURI() ) );
 	}
 
-	public String normalizeNamespaceURI(String namespaceURI) {
+	private String normalizeNamespaceURI(String namespaceURI) {
 		return namespaceMapping.getOrDefault( namespaceURI, namespaceURI );
 	}
 
