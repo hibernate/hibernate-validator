@@ -16,7 +16,6 @@ import java.lang.annotation.Annotation;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,18 +69,6 @@ public class MappingXmlParser {
 	private final ParameterNameProvider parameterNameProvider;
 
 	private final ClassLoadingHelper classLoadingHelper;
-
-	private static final Map<String, String> SCHEMAS_BY_VERSION = Collections.unmodifiableMap( getSchemasByVersion() );
-
-	private static Map<String, String> getSchemasByVersion() {
-		Map<String, String> schemasByVersion = new HashMap<String, String>();
-
-		schemasByVersion.put( "1.0", "META-INF/validation-mapping-1.0.xsd" );
-		schemasByVersion.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
-		schemasByVersion.put( "2.0", "META-INF/validation-mapping-2.0.xsd" );
-
-		return schemasByVersion;
-	}
 
 	public MappingXmlParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider,
 			ClassLoader externalClassLoader) {
@@ -369,13 +356,13 @@ public class MappingXmlParser {
 	}
 
 	private String getSchemaResourceName(String schemaVersion) {
-		String schemaResource = SCHEMAS_BY_VERSION.get( schemaVersion );
+		ValidationSchema schema = ValidationSchema.getMappingSchema( schemaVersion );
 
-		if ( schemaResource == null ) {
+		if ( schema == null ) {
 			throw log.getUnsupportedSchemaVersionException( "constraint mapping file", schemaVersion );
 		}
 
-		return schemaResource;
+		return schema.getSchemaPath();
 	}
 
 	/**

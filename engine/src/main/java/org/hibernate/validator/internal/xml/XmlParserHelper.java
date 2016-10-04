@@ -69,10 +69,10 @@ public class XmlParserHelper {
 
 	static {
 		Map<String, String> namespaceNormalizationMapping = new HashMap<>();
-		namespaceNormalizationMapping.put( LocalNamespace.VALIDATION_1_CONFIGURATION.getNamespaceURI(),
-				LocalNamespace.VALIDATION_2_CONFIGURATION.getNamespaceURI() );
-		namespaceNormalizationMapping.put( LocalNamespace.VALIDATION_1_MAPPING.getNamespaceURI(),
-				LocalNamespace.VALIDATION_2_MAPPING.getNamespaceURI() );
+		namespaceNormalizationMapping.put( ValidationSchema.VALIDATION_1_0_CONFIGURATION.getNamespaceURI(),
+				ValidationSchema.VALIDATION_2_0_CONFIGURATION.getNamespaceURI() );
+		namespaceNormalizationMapping.put( ValidationSchema.VALIDATION_1_0_MAPPING.getNamespaceURI(),
+				ValidationSchema.VALIDATION_2_0_MAPPING.getNamespaceURI() );
 		NAMESPACE_NORMALIZATION_MAPPING = Collections.unmodifiableMap( namespaceNormalizationMapping );
 	}
 
