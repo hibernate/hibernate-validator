@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -20,13 +21,16 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Threads;
+import org.openjdk.jmh.annotations.Warmup;
 
 /**
  * @author Hardy Ferentschik
@@ -62,12 +66,11 @@ public class StatisticalValidation {
 						e2.printStackTrace();
 					}
 				}
-
 			}
 
 			validator = factory.getValidator();
 
-			entitiesUnderTest = CollectionHelper.newArrayList( NUMBER_OF_TEST_ENTITIES );
+			entitiesUnderTest = new ArrayList<TestEntity>();
 			for ( int i = 0; i < NUMBER_OF_TEST_ENTITIES; i++ ) {
 				entitiesUnderTest.add( new TestEntity( i % 10 ) );
 			}
@@ -78,7 +81,11 @@ public class StatisticalValidation {
 	@Benchmark
 	@BenchmarkMode(Mode.All)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
-	public void testValidationWithStatisticalGraphDepthAndConstraintValidator( StatisticalValidationState state ) throws Exception {
+	@Fork(value = 1)
+	@Threads(100)
+	@Warmup(iterations = 10)
+	@Measurement(iterations = 10)
+	public void testValidationWithStatisticalGraphDepthAndConstraintValidator(StatisticalValidationState state) throws Exception {
 		for ( TestEntity testEntity : state.entitiesUnderTest ) {
 			Set<ConstraintViolation<TestEntity>> violations = state.validator.validate( testEntity );
 			assertThat( violations ).hasSize( StatisticalConstraintValidator.threadLocalCounter.get().getFailures() );
