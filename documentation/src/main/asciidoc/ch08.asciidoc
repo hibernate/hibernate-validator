@@ -222,16 +222,12 @@ In case a method or constructor parameter constraint is violated, the `Parameter
 interface is used to retrieve the parameter name and make it available to the user via the
 property path of the constraint violation.
 
-The default implementation returns parameter names in the form of `arg0`, `arg1` etc, while custom
-implementations can retrieve the parameter names using methods such as parameter annotations,
-debug symbols, or Java 8 reflection.
+The default implementation returns parameter names as obtained through the Java reflection API.
+If you compile your sources using the `-parameters` compiler flag, the actual parameter names as
+in the source code will be returned. Otherwise synthetic names in the form of `arg0`, `arg1` etc.
+will be used.
 
-An implementation for retrieving the parameter names using reflection in Java 8 is provided with
-`ReflectionParameterNameProvider`. For this parameter name provider to work, the
-source must be compiled using the `–parameters` compiler argument. Otherwise, the provider will
-return synthetic names in the form of `arg0`, `arg1`, etc.
-
-To use `ReflectionParameterNameProvider` or another custom provider either pass an instance of
+To use a custom parameter name provider either pass an instance of
 the provider during bootstrapping as shown in <<example-using-custom-parameter-name-provider>>,
 or specify the fully qualified class name of the provider as value for
 the `<parameter-name-provider>` element in the _META-INF/validation.xml_ file

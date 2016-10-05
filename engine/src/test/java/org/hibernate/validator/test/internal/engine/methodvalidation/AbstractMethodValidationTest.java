@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -31,9 +32,6 @@ import javax.validation.Path;
 import javax.validation.Path.ParameterNode;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-
-import org.joda.time.DateMidnight;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Address;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
@@ -44,6 +42,8 @@ import org.hibernate.validator.test.internal.engine.methodvalidation.service.Cus
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryWithConstrainedVoidMethodImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.RepositoryBase;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.joda.time.DateMidnight;
+import org.testng.annotations.Test;
 
 /**
  * Integration test for the method-level validation related features of {@link org.hibernate.validator.internal.engine.ValidatorImpl}.
@@ -97,7 +97,7 @@ public abstract class AbstractMethodValidationTest {
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"findCustomerByName.arg0"
+					"findCustomerByName.name"
 			);
 			assertEquals( constraintViolation.getLeafBean(), customerRepository );
 			assertEquals( constraintViolation.getInvalidValue(), null );
@@ -123,7 +123,7 @@ public abstract class AbstractMethodValidationTest {
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"findCustomerByAgeAndName.arg1"
+					"findCustomerByAgeAndName.name"
 			);
 			assertEquals( constraintViolation.getExecutableParameters(), new Object[] { 30, null } );
 			assertEquals( constraintViolation.getExecutableReturnValue(), null );
@@ -162,7 +162,7 @@ public abstract class AbstractMethodValidationTest {
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
 			assertEquals(
-					constraintViolation.getPropertyPath().toString(), "persistCustomer.arg0.name"
+					constraintViolation.getPropertyPath().toString(), "persistCustomer.customer.name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -192,7 +192,7 @@ public abstract class AbstractMethodValidationTest {
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"persistCustomer.arg0.address.city"
+					"persistCustomer.customer.address.city"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -223,7 +223,7 @@ public abstract class AbstractMethodValidationTest {
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"cascadingMapParameter.arg0[Bob].name"
+					"cascadingMapParameter.customer[Bob].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -253,7 +253,7 @@ public abstract class AbstractMethodValidationTest {
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"cascadingIterableParameter.arg0[1].name"
+					"cascadingIterableParameter.customer[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -282,7 +282,7 @@ public abstract class AbstractMethodValidationTest {
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
 			assertEquals(
 					constraintViolation.getPropertyPath().toString(),
-					"cascadingArrayParameter.arg0[1].name"
+					"cascadingArrayParameter.customer[1].name"
 			);
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
 			assertEquals( constraintViolation.getRootBean(), customerRepository );
@@ -347,7 +347,7 @@ public abstract class AbstractMethodValidationTest {
 			assertParameterIndex( constraintViolation, 0 );
 			assertMethodValidationType( constraintViolation, ElementKind.PARAMETER );
 			assertEquals( constraintViolation.getRootBeanClass(), CustomerRepositoryImpl.class );
-			assertEquals( constraintViolation.getPropertyPath().toString(), "bar.arg0.name" );
+			assertEquals( constraintViolation.getPropertyPath().toString(), "bar.customer.name" );
 		}
 	}
 

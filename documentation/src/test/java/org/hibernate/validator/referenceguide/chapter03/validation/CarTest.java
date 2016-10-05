@@ -1,5 +1,7 @@
 package org.hibernate.validator.referenceguide.chapter03.validation;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -7,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Path.MethodNode;
 import javax.validation.Path.Node;
@@ -20,8 +23,6 @@ import javax.validation.executable.ExecutableValidator;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class CarTest {
 
@@ -143,7 +144,7 @@ public class CarTest {
 		assertEquals( Arrays.<Class<?>>asList( int.class ), methodNode.getParameterTypes() );
 
 		ParameterNode parameterNode = propertyPath.next().as( ParameterNode.class );
-		assertEquals( "arg0", parameterNode.getName() );
+		assertEquals( "speedInMph", parameterNode.getName() );
 		assertEquals( 0, parameterNode.getParameterIndex() );
 		//end::retrieveMethodAndParameterInformation[]
 	}

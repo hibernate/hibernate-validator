@@ -6,6 +6,12 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import static org.testng.Assert.fail;
+
 import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -16,15 +22,9 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.constraints.ParameterScriptAssert;
-import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidatingProxy;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.fail;
 
 /**
  * Test for {@link org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator}.
@@ -46,7 +46,7 @@ public class ParameterScriptAssertValidatorTest {
 			fail( "Expected exception wasn't raised" );
 		}
 		catch (ConstraintViolationException e) {
-			assertCorrectConstraintViolationMessages( e, "script expression \"arg0 < arg1\" didn't evaluate to true" );
+			assertCorrectConstraintViolationMessages( e, "script expression \"start < end\" didn't evaluate to true" );
 		}
 	}
 
@@ -54,7 +54,7 @@ public class ParameterScriptAssertValidatorTest {
 	public void shouldApplyParameterNameProvider() {
 		CalendarService calendar = getValidatingProxy(
 				new CalendarServiceImpl(),
-				getConfiguration().parameterNameProvider( new DummyParameterNameProvider() )
+				getConfiguration().parameterNameProvider( new PrefixableParameterNameProvider( "param" ) )
 						.buildValidatorFactory()
 						.getValidator()
 		);
@@ -87,13 +87,13 @@ public class ParameterScriptAssertValidatorTest {
 		);
 		assertCorrectConstraintViolationMessages(
 				violations,
-				"script expression \"arg0.size() > 3\" didn't evaluate to true"
+				"script expression \"name.size() > 3\" didn't evaluate to true"
 		);
 	}
 
 	public interface CalendarService {
 
-		@ParameterScriptAssert(script = "arg0 < arg1", lang = "groovy")
+		@ParameterScriptAssert(script = "start < end", lang = "groovy")
 		void createEvent(Date start, Date end);
 
 
@@ -106,7 +106,7 @@ public class ParameterScriptAssertValidatorTest {
 		public CalendarServiceImpl() {
 		}
 
-		@ParameterScriptAssert(script = "arg0.size() > 3", lang = "groovy")
+		@ParameterScriptAssert(script = "name.size() > 3", lang = "groovy")
 		public CalendarServiceImpl(String name) {
 		}
 
@@ -116,13 +116,6 @@ public class ParameterScriptAssertValidatorTest {
 
 		@Override
 		public void createEvent(Date start, Date end, String title) {
-		}
-	}
-
-	private static class DummyParameterNameProvider extends DefaultParameterNameProvider {
-		@Override
-		protected String getPrefix() {
-			return "param";
 		}
 	}
 }

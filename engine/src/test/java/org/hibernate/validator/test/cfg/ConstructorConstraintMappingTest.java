@@ -6,6 +6,12 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,6 +20,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
 import java.util.Date;
 import java.util.Set;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -25,21 +32,14 @@ import javax.validation.constraints.Size;
 import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.GenericConstraintDef;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
-
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Tests the definition of constructor constraints with the programmatic API.
@@ -97,7 +97,7 @@ public class ConstructorConstraintMappingTest {
 				parameterValues
 		);
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
-		assertCorrectPropertyPaths( violations, "GreetingService.arg0.name" );
+		assertCorrectPropertyPaths( violations, "GreetingService.user.name" );
 	}
 
 	@Test
@@ -124,7 +124,7 @@ public class ConstructorConstraintMappingTest {
 				parameterValues
 		);
 		assertCorrectConstraintViolationMessages( violations, "name must not be null" );
-		assertCorrectPropertyPaths( violations, "GreetingService.arg0.name" );
+		assertCorrectPropertyPaths( violations, "GreetingService.user.name" );
 	}
 
 	@Test(
@@ -167,7 +167,7 @@ public class ConstructorConstraintMappingTest {
 				parameterValues
 		);
 		assertCorrectConstraintViolationMessages( violations, "may not be null" );
-		assertCorrectPropertyPaths( violations, "GreetingService.arg0" );
+		assertCorrectPropertyPaths( violations, "GreetingService.user" );
 	}
 
 	@Test
@@ -176,7 +176,7 @@ public class ConstructorConstraintMappingTest {
 		mapping.type( GreetingService.class )
 				.constructor( String.class )
 				.parameter( 0 )
-				.constraint( new GenericConstraintDef<Size>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
+				.constraint( new GenericConstraintDef<>( Size.class ).param( "min", 1 ).param( "max", 10 ) );
 		config.addMapping( mapping );
 
 		Constructor<GreetingService> constructor = GreetingService.class.getConstructor( String.class );
@@ -190,7 +190,7 @@ public class ConstructorConstraintMappingTest {
 		);
 
 		assertCorrectConstraintViolationMessages( violations, "size must be between 1 and 10" );
-		assertCorrectPropertyPaths( violations, "GreetingService.arg0" );
+		assertCorrectPropertyPaths( violations, "GreetingService.message" );
 	}
 
 	@Test
@@ -218,7 +218,7 @@ public class ConstructorConstraintMappingTest {
 				"size must be between 1 and 10",
 				"size must be between 2 and 10"
 		);
-		assertCorrectPropertyPaths( violations, "GreetingService.arg0", "GreetingService.arg0" );
+		assertCorrectPropertyPaths( violations, "GreetingService.message", "GreetingService.message" );
 	}
 
 	@Test
@@ -247,7 +247,7 @@ public class ConstructorConstraintMappingTest {
 				"size must be between 1 and 10",
 				"size must be between 1 and 10"
 		);
-		assertCorrectPropertyPaths( violations, "GreetingService.arg0", "GreetingService.arg1" );
+		assertCorrectPropertyPaths( violations, "GreetingService.message", "GreetingService.anotherMessage" );
 	}
 
 	@Test
@@ -274,7 +274,7 @@ public class ConstructorConstraintMappingTest {
 				"size must be between 1 and 10",
 				"size must be between 2 and 10"
 		);
-		assertCorrectPropertyPaths( violations, "GreetingService.arg0", "GreetingService.arg0" );
+		assertCorrectPropertyPaths( violations, "GreetingService.message", "GreetingService.message" );
 	}
 
 	@Test
@@ -284,7 +284,7 @@ public class ConstructorConstraintMappingTest {
 				.constructor( String.class )
 				.returnValue()
 				.constraint(
-						new GenericConstraintDef<ValidGreetingService>( ValidGreetingService.class ).message(
+						new GenericConstraintDef<>( ValidGreetingService.class ).message(
 								"invalid"
 						)
 				);
@@ -310,12 +310,12 @@ public class ConstructorConstraintMappingTest {
 				.constructor( String.class )
 				.returnValue()
 				.constraint(
-						new GenericConstraintDef<ValidGreetingService>( ValidGreetingService.class ).message(
+						new GenericConstraintDef<>( ValidGreetingService.class ).message(
 								"invalid 1"
 						)
 				)
 				.constraint(
-						new GenericConstraintDef<ValidGreetingService>( ValidGreetingService.class ).message(
+						new GenericConstraintDef<>( ValidGreetingService.class ).message(
 								"invalid 2"
 						)
 				);
@@ -341,7 +341,7 @@ public class ConstructorConstraintMappingTest {
 				.constructor( CharSequence.class )
 				.returnValue()
 				.constraint(
-						new GenericConstraintDef<ValidGreetingService>( ValidGreetingService.class ).message(
+						new GenericConstraintDef<>( ValidGreetingService.class ).message(
 								"invalid 2"
 						)
 				);
@@ -367,7 +367,7 @@ public class ConstructorConstraintMappingTest {
 				.constructor( String.class, String.class )
 				.returnValue()
 				.constraint(
-						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+						new GenericConstraintDef<>(
 								GenericAndCrossParameterConstraint.class
 						)
 				);
@@ -393,7 +393,7 @@ public class ConstructorConstraintMappingTest {
 				.constructor( String.class, String.class )
 				.crossParameter()
 				.constraint(
-						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+						new GenericConstraintDef<>(
 								GenericAndCrossParameterConstraint.class
 						)
 				);

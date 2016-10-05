@@ -190,10 +190,10 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 4 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"setValues.arg0[0]",
-				"setValues.arg0[2]",
-				"setValues.arg0[2]",
-				"setValues.arg1"
+				"setValues.listParameter[0]",
+				"setValues.listParameter[2]",
+				"setValues.listParameter[2]",
+				"setValues.optionalParameter"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -217,10 +217,10 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 4 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"G.arg0[0]",
-				"G.arg0[2]",
-				"G.arg0[2]",
-				"G.arg1"
+				"G.names[0]",
+				"G.names[2]",
+				"G.names[2]",
+				"G.optionalParameter"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,

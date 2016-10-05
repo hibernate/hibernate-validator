@@ -17,16 +17,17 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
 
-import com.thoughtworks.paranamer.AnnotationParanamer;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.Test;
+
+import com.thoughtworks.paranamer.AnnotationParanamer;
 
 /**
  * Test for {@link ParanamerParameterNameProvider}.
@@ -73,7 +74,7 @@ public class ParanamerParameterNameProviderTest {
 
 		Method method = ComputerGame.class.getMethod( "startGame", String.class, int.class );
 		List<String> parameterNames = parameterNameProvider.getParameterNames( method );
-		assertThat( parameterNames ).containsExactly( "arg0", "arg1" );
+		assertThat( parameterNames ).containsExactly( "level", "numberOfPlayers" );
 	}
 
 	@Test

@@ -6,12 +6,21 @@
  */
 package org.hibernate.validator.test.constraints;
 
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+
 import java.lang.annotation.Retention;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -25,20 +34,11 @@ import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 import javax.validation.executable.ExecutableValidator;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Tests for the {@link javax.validation.ConstraintValidatorContext} API.
@@ -144,14 +144,14 @@ public class ConstraintValidatorContextTest {
 		Set<ConstraintViolation<User>> constraintViolations = executableValidator.validateParameters(
 				new User(),
 				User.class.getMethod( "setAddresses", Map.class ),
-				new java.lang.Object[] { new HashMap() }
+				new java.lang.Object[] { new HashMap<>() }
 		);
 
 		assertThat( constraintViolations ).containsOnlyPaths(
-				pathWith().method( "setAddresses" ).parameter( "arg0", 0 ),
-				pathWith().method( "setAddresses" ).parameter( "arg0", 0 ).bean(),
+				pathWith().method( "setAddresses" ).parameter( "addresses", 0 ),
+				pathWith().method( "setAddresses" ).parameter( "addresses", 0 ).bean(),
 				pathWith().method( "setAddresses" )
-						.parameter( "arg0", 0 )
+						.parameter( "addresses", 0 )
 						.property( "myNode1", true, null, 23 )
 						.bean()
 		);
@@ -161,7 +161,7 @@ public class ConstraintValidatorContextTest {
 	@TestForIssue(jiraKey = "HV-709")
 	public void testAddParameterNodeUsingCustomParameterNameProvider() throws Exception {
 		ExecutableValidator executableValidator = ValidatorUtil.getConfiguration()
-				.parameterNameProvider( new MyParameterNameProvider() )
+				.parameterNameProvider( new PrefixableParameterNameProvider( "param" ) )
 				.buildValidatorFactory()
 				.getValidator()
 				.forExecutables();
@@ -169,7 +169,7 @@ public class ConstraintValidatorContextTest {
 		Set<ConstraintViolation<User>> constraintViolations = executableValidator.validateParameters(
 				new User(),
 				User.class.getMethod( "setAddresses", Map.class ),
-				new java.lang.Object[] { new HashMap() }
+				new java.lang.Object[] { new HashMap<>() }
 		);
 
 
@@ -486,14 +486,5 @@ public class ConstraintValidatorContextTest {
 				return false;
 			}
 		}
-	}
-
-	private static class MyParameterNameProvider extends DefaultParameterNameProvider {
-
-		@Override
-		protected String getPrefix() {
-			return "param";
-		}
-
 	}
 }

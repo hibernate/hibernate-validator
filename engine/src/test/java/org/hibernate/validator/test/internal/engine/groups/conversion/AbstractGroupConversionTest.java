@@ -6,9 +6,14 @@
  */
 package org.hibernate.validator.test.internal.engine.groups.conversion;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
@@ -22,10 +27,6 @@ import javax.validation.groups.Default;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.testng.annotations.Test;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.asSet;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 /**
  * Integrative test for group conversion.
@@ -60,7 +61,7 @@ public abstract class AbstractGroupConversionTest {
 				new List<?>[] { Arrays.asList( new Address() ) }
 		);
 
-		assertCorrectPropertyPaths( violations, "setAddresses.arg0[0].street1", "setAddresses.arg0[0].zipCode" );
+		assertCorrectPropertyPaths( violations, "setAddresses.addresses[0].street1", "setAddresses.addresses[0].zipCode" );
 	}
 
 	@Test

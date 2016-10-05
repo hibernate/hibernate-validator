@@ -125,7 +125,7 @@ public class MethodConstraintMappingTest {
 		}
 		catch (ConstraintViolationException e) {
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.arg0.name" );
+			assertCorrectPropertyPaths( e, "greet.user.name" );
 		}
 	}
 
@@ -177,7 +177,7 @@ public class MethodConstraintMappingTest {
 		}
 		catch (ConstraintViolationException e) {
 			assertCorrectConstraintViolationMessages( e, "size must be between 5 and 10" );
-			assertCorrectPropertyPaths( e, "greet.arg0" );
+			assertCorrectPropertyPaths( e, "greet.string" );
 		}
 	}
 
@@ -201,7 +201,7 @@ public class MethodConstraintMappingTest {
 		}
 		catch (ConstraintViolationException e) {
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.arg0.name" );
+			assertCorrectPropertyPaths( e, "greet.user.name" );
 		}
 	}
 
@@ -240,7 +240,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.arg0" );
+			assertCorrectPropertyPaths( e, "greet.user" );
 		}
 	}
 
@@ -267,7 +267,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10"
 			);
-			assertCorrectPropertyPaths( e, "greet.arg0" );
+			assertCorrectPropertyPaths( e, "greet.string" );
 		}
 	}
 
@@ -295,7 +295,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
 			);
-			assertCorrectPropertyPaths( e, "greet.arg0", "greet.arg0" );
+			assertCorrectPropertyPaths( e, "greet.string", "greet.string" );
 		}
 	}
 
@@ -324,7 +324,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 1 and 10"
 			);
-			assertCorrectPropertyPaths( e, "greet.arg0", "greet.arg1" );
+			assertCorrectPropertyPaths( e, "greet.string1", "greet.string2" );
 		}
 	}
 
@@ -351,7 +351,7 @@ public class MethodConstraintMappingTest {
 			assertCorrectConstraintViolationMessages(
 					e, "size must be between 1 and 10", "size must be between 2 and 10"
 			);
-			assertCorrectPropertyPaths( e, "sayHello.arg0", "sayHello.arg0" );
+			assertCorrectPropertyPaths( e, "sayHello.name", "sayHello.name" );
 		}
 	}
 
@@ -375,7 +375,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.arg0" );
+			assertCorrectPropertyPaths( e, "greet.user" );
 		}
 
 		try {
@@ -386,7 +386,7 @@ public class MethodConstraintMappingTest {
 		catch (ConstraintViolationException e) {
 
 			assertCorrectConstraintViolationMessages( e, "may not be null" );
-			assertCorrectPropertyPaths( e, "greet.arg0.name" );
+			assertCorrectPropertyPaths( e, "greet.user.name" );
 		}
 	}
 

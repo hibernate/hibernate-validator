@@ -6,11 +6,17 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validator;
@@ -18,16 +24,10 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.executable.ExecutableValidator;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Tests for {@link org.hibernate.validator.internal.engine.valuehandling.OptionalValueUnwrapper}.
@@ -92,7 +92,7 @@ public class OptionalValueUnwrapperTest {
 				values
 		);
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "setOptionalLong.arg0" );
+		assertCorrectPropertyPaths( constraintViolations, "setOptionalLong.optionalLongPara" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class );
 	}
 
@@ -121,7 +121,7 @@ public class OptionalValueUnwrapperTest {
 				values
 		);
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "setBar.arg0.number" );
+		assertCorrectPropertyPaths( constraintViolations, "setBar.optionalBarPara.number" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class );
 	}
 

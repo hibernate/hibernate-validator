@@ -11,16 +11,16 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNodeNames;
 
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.executable.ExecutableValidator;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
+import org.testng.annotations.Test;
 
 /**
  * @author Gunnar Morling
@@ -53,7 +53,7 @@ public abstract class AbstractConstructorValidationTest {
 				ElementKind.CONSTRUCTOR,
 				ElementKind.PARAMETER
 		);
-		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", "arg0" );
+		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", "id" );
 	}
 
 	@Test
@@ -72,7 +72,7 @@ public abstract class AbstractConstructorValidationTest {
 
 		Path path = constraintViolation.getPropertyPath();
 		assertNodeKinds( path, ElementKind.CONSTRUCTOR, ElementKind.PARAMETER, ElementKind.PROPERTY );
-		assertNodeNames( path, "CustomerRepositoryImpl", "arg0", "name" );
+		assertNodeNames( path, "CustomerRepositoryImpl", "customer", "name" );
 	}
 
 	@Test

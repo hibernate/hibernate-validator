@@ -6,17 +6,17 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
-import java.util.Collections;
-import java.util.List;
-import javax.validation.ParameterNameProvider;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
-
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.testng.Assert.assertEquals;
+
+import java.util.Collections;
+import java.util.List;
+
+import javax.validation.ParameterNameProvider;
+
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Unit test for {@link DefaultParameterNameProvider}.
@@ -44,7 +44,7 @@ public class DefaultParameterNameProviderTest {
 	public void getParametersForConstructorWithOneParameter() throws Exception {
 		assertEquals(
 				parameterNameProvider.getParameterNames( Foo.class.getConstructor( String.class ) ),
-				buildExpectedArgumentNameList( "arg0" )
+				buildExpectedArgumentNameList( "bar" )
 		);
 	}
 
@@ -52,7 +52,7 @@ public class DefaultParameterNameProviderTest {
 	public void getParametersForConstructorWithSeveralParameters() throws Exception {
 		assertEquals(
 				parameterNameProvider.getParameterNames( Foo.class.getConstructor( String.class, String.class ) ),
-				buildExpectedArgumentNameList( "arg0", "arg1" )
+				buildExpectedArgumentNameList( "bar", "baz" )
 		);
 	}
 
@@ -68,7 +68,7 @@ public class DefaultParameterNameProviderTest {
 	public void getParametersForMethodWithOneParameter() throws Exception {
 		assertEquals(
 				parameterNameProvider.getParameterNames( Foo.class.getMethod( "foo", String.class ) ),
-				buildExpectedArgumentNameList( "arg0" )
+				buildExpectedArgumentNameList( "bar" )
 		);
 	}
 
@@ -76,7 +76,7 @@ public class DefaultParameterNameProviderTest {
 	public void getParametersForMethodWithSeveralParameters() throws Exception {
 		assertEquals(
 				parameterNameProvider.getParameterNames( Foo.class.getMethod( "foo", String.class, String.class ) ),
-				buildExpectedArgumentNameList( "arg0", "arg1" )
+				buildExpectedArgumentNameList( "bar", "baz" )
 		);
 	}
 

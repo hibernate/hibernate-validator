@@ -6,30 +6,30 @@
  */
 package org.hibernate.validator.test.parameternameprovider;
 
+import static org.testng.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import javax.validation.ParameterNameProvider;
 
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import org.hibernate.validator.parameternameprovider.ReflectionParameterNameProvider;
-
-import static org.testng.Assert.assertEquals;
-
 /**
- * Tests for {@link org.hibernate.validator.parameternameprovider.ReflectionParameterNameProvider}.
+ * Tests for {@link org.hibernate.validator.internal.engine.DefaultParameterNameProvider}.
  *
  * @author Khalid Alqinyah
  */
-public class ReflectionParameterNameProviderTest {
+public class DefaultParameterNameProviderTest {
 
 	private ParameterNameProvider parameterNameProvider;
 
 	@BeforeClass
 	public void setup() {
-		parameterNameProvider = new ReflectionParameterNameProvider();
+		parameterNameProvider = new DefaultParameterNameProvider();
 	}
 
 	@Test

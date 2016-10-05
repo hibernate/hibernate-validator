@@ -7,16 +7,18 @@
 package org.hibernate.validator.internal.engine;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 import javax.validation.ParameterNameProvider;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-
 /**
- * A default {@link ParameterNameProvider} implementation which returns
- * parameter names in the form {@code arg0}, {@code arg1} etc. as defined by the
- * BV specification.
+ * A default {@link ParameterNameProvider} implementation which returns parameter names obtained from the Java
+ * reflection API as mandated by the BV specification.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
@@ -25,31 +27,22 @@ public class DefaultParameterNameProvider implements ParameterNameProvider {
 
 	@Override
 	public List<String> getParameterNames(Constructor<?> constructor) {
-		return getParameterNames( constructor.getParameterTypes().length );
+		return doGetParameterNames( constructor );
 	}
 
 	@Override
 	public List<String> getParameterNames(Method method) {
-		return getParameterNames( method.getParameterTypes().length );
+		return doGetParameterNames( method );
 	}
 
-	private List<String> getParameterNames(int parameterCount) {
-		List<String> parameterNames = newArrayList();
+	private List<String> doGetParameterNames(Executable executable) {
+		Parameter[] parameters = executable.getParameters();
+		List<String> parameterNames = new ArrayList<>( parameters.length );
 
-		for ( int i = 0; i < parameterCount; i++ ) {
-			parameterNames.add( getPrefix() + i );
+		for ( Parameter parameter : parameters ) {
+			parameterNames.add( parameter.getName() );
 		}
 
-		return parameterNames;
-	}
-
-	/**
-	 * Returns the prefix to be used for parameter names. Defaults to {@code arg} as per
-	 * the spec. Can be overridden to create customized name providers.
-	 *
-	 * @return The prefix to be used for parameter names.
-	 */
-	protected String getPrefix() {
-		return "arg";
+		return Collections.unmodifiableList( parameterNames );
 	}
 }

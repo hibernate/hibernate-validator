@@ -67,7 +67,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.validateConstructorParameters( constructor, values );
 
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelA.arg0" );
+		assertCorrectPropertyPaths( constraintViolations, "ModelA.valueWithoutTypeAnnotation" );
 		assertCorrectConstraintViolationMessages( constraintViolations, "container" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
@@ -92,7 +92,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.validateConstructorParameters( constructor, values );
 
 		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelB.arg0", "ModelB.arg0" );
+		assertCorrectPropertyPaths( constraintViolations, "ModelB.valueWithNotNull", "ModelB.valueWithNotNull" );
 
 		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNull.class );
@@ -107,7 +107,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.validateConstructorParameters( constructor, values );
 
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelB.arg0" );
+		assertCorrectPropertyPaths( constraintViolations, "ModelB.valueWithNotNull" );
 		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
@@ -122,7 +122,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 
 
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelD.arg0" );
+		assertCorrectPropertyPaths( constraintViolations, "ModelD.valueWithNullOrNotBlank" );
 		assertCorrectConstraintViolationMessages( constraintViolations, "container" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
@@ -147,7 +147,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.validateConstructorParameters( constructor, values );
 
 		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelC.arg0", "ModelC.arg0" );
+		assertCorrectPropertyPaths( constraintViolations, "ModelC.valueWithNotNullUnwrapped", "ModelC.valueWithNotNullUnwrapped" );
 		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotNull.class );
 	}
@@ -161,7 +161,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.validateConstructorParameters( constructor, values );
 
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelD.arg0" );
+		assertCorrectPropertyPaths( constraintViolations, "ModelD.valueWithNullOrNotBlank" );
 		assertCorrectConstraintViolationMessages( constraintViolations, "type" );
 		assertCorrectConstraintTypes( constraintViolations, NullOrNotBlank.class );
 	}
@@ -186,7 +186,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.validateConstructorParameters( constructor, values );
 
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelE.arg0" );
+		assertCorrectPropertyPaths( constraintViolations, "ModelE.valueReference" );
 		assertCorrectConstraintViolationMessages( constraintViolations, "reference" );
 		assertCorrectConstraintTypes( constraintViolations, NullOrNotBlank.class );
 	}

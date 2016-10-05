@@ -6,9 +6,17 @@
  */
 package org.hibernate.validator.test.internal.bootstrap;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Set;
+
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -20,8 +28,6 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.executable.ExecutableValidator;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -29,14 +35,9 @@ import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator
 import org.hibernate.validator.internal.engine.ConfigurationImpl;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
+import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * Tests the Bean Validation bootstrapping.
@@ -111,7 +112,7 @@ public class BootstrappingTest {
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		Validator validator = factory
 				.usingContext()
-				.parameterNameProvider( new DummyParameterNameProvider() )
+				.parameterNameProvider( new PrefixableParameterNameProvider( "foo" ) )
 				.getValidator();
 		ExecutableValidator executableValidator = validator.forExecutables();
 		Method addOrderMethod = Customer.class.getMethod( "addOrder", Order.class );

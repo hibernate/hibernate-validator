@@ -1,9 +1,16 @@
 package org.hibernate.validator.referenceguide.chapter09;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.lang.annotation.ElementType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ConstraintTarget;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -20,16 +27,9 @@ import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 import javax.validation.metadata.Scope;
 
+import org.hibernate.validator.referenceguide.chapter09.Car.SeverityInfo;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import org.hibernate.validator.referenceguide.chapter09.Car.SeverityInfo;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class CarTest {
 
@@ -154,7 +154,7 @@ public class CarTest {
 
 		//The "speed" parameter is located at index 0, has one constraint and is not cascaded
 		//nor does it define group conversions
-		assertEquals( "arg0", speedDescriptor.getName() );
+		assertEquals( "speed", speedDescriptor.getName() );
 		assertEquals( 0, speedDescriptor.getIndex() );
 		assertEquals( 1, speedDescriptor.getConstraintDescriptors().size() );
 		assertFalse( speedDescriptor.isCascaded() );

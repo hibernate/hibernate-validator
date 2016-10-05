@@ -16,14 +16,12 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.ParameterNameProvider;
 import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableType;
 import javax.validation.executable.ValidateOnExecution;
 import javax.validation.groups.Default;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
@@ -40,6 +38,8 @@ import org.hibernate.validator.test.internal.metadata.Customer;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository;
 import org.hibernate.validator.test.internal.metadata.CustomerRepository.ValidationGroup;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Tests creation of {@link org.hibernate.validator.internal.metadata.raw.ConstrainedParameter} in
@@ -73,7 +73,7 @@ public class ParameterMetaDataTest {
 		assertFalse( parameterMetaData.isCascading() );
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 1 );
-		assertEquals( parameterMetaData.getName(), "arg1" );
+		assertEquals( parameterMetaData.getName(), "lastName" );
 		assertThat( parameterMetaData ).hasSize( 1 );
 		assertEquals(
 				parameterMetaData.iterator().next().getDescriptor().getAnnotation().annotationType(), NotNull.class
@@ -90,7 +90,7 @@ public class ParameterMetaDataTest {
 		assertTrue( parameterMetaData.isCascading() );
 		assertTrue( parameterMetaData.isConstrained() );
 		assertEquals( parameterMetaData.getIndex(), 0 );
-		assertEquals( parameterMetaData.getName(), "arg0" );
+		assertEquals( parameterMetaData.getName(), "customer" );
 		assertThat( parameterMetaData ).isEmpty();
 	}
 
