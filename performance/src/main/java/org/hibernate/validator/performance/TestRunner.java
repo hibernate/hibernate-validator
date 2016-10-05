@@ -25,7 +25,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,37 +56,24 @@ public final class TestRunner {
 	}
 
 	public static void main(String[] args) throws RunnerException {
-		runTest( SimpleValidation.class.getSimpleName(), 10, 10, 100, 100, 1, args );
-		runTest( CascadedValidation.class.getSimpleName(), 10, 10, 100, 100, 1, args );
-		runTest( StatisticalValidation.class.getSimpleName(), 10, 5, 200, 10, 1, args );
+		runTest( args, SimpleValidation.class.getSimpleName(), CascadedValidation.class.getSimpleName(), StatisticalValidation.class.getSimpleName() );
 	}
 
 	/**
-	 * @param className             simple class name of a class that contains benchmarks to run
-	 * @param warmupIterations      number of warmup iterations
-	 * @param warmupTime            warmup time in seconds
-	 * @param measurementIterations number measurement iterations
-	 * @param threads               number of threads
-	 * @param forks                 numer of forks
+	 * @param classNames             simple class name of a class that contains benchmarks to run
 	 * @param profilers             array of profiler keys
 	 * @throws RunnerException if there's a problem running benchmarks
 	 */
-	public static void runTest(String className, int warmupIterations, int warmupTime,
-							   int measurementIterations, int threads, int forks,
-							   String[] profilers) throws RunnerException {
+	public static void runTest(String[] profilers, String... classNames) throws RunnerException {
 		ChainedOptionsBuilder builder =
 				new OptionsBuilder()
-						.include( className )
-						.warmupIterations( warmupIterations )
-						.warmupTime( TimeValue.seconds( warmupTime ) )
-						.measurementIterations( measurementIterations )
-						.threads( threads )
-						.forks( forks )
 						.resultFormat( ResultFormatType.JSON )
-						.result( String.format( "%sJmhResult.json", className ) );
+						.result( String.format( "JmhResult.json" ) );
 		Arrays.stream( profilers )
 				.filter( profileKey -> PROFILERS.containsKey( profileKey ) )
 				.forEach( profileKey -> builder.addProfiler( PROFILERS.get( profileKey ) ) );
+		Arrays.stream( classNames )
+				.forEach( className -> builder.include( className ) );
 
 		Options opt = builder.build();
 		new Runner( opt ).run();

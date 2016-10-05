@@ -10,10 +10,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Threads;
+import org.openjdk.jmh.annotations.Warmup;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -59,7 +63,11 @@ public class SimpleValidation {
 	@Benchmark
 	@BenchmarkMode(Mode.All)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
-	public void testSimpleBeanValidation( ValidationState state ) {
+	@Fork(value = 1)
+	@Threads(50)
+	@Warmup(iterations = 10)
+	@Measurement(iterations = 50)
+	public void testSimpleBeanValidation(ValidationState state) {
 		DriverSetup driverSetup = new DriverSetup( state );
 		Set<ConstraintViolation<Driver>> violations = state.validator.validate( driverSetup.getDriver() );
 		assertThat( violations ).hasSize( driverSetup.getExpectedViolationCount() );
@@ -68,7 +76,11 @@ public class SimpleValidation {
 	@Benchmark
 	@BenchmarkMode(Mode.All)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
-	public void testSimpleBeanValidationRecreatingValidatorFactory( ValidationState state ) {
+	@Fork(value = 1)
+	@Threads(50)
+	@Warmup(iterations = 10)
+	@Measurement(iterations = 50)
+	public void testSimpleBeanValidationRecreatingValidatorFactory(ValidationState state) {
 		DriverSetup driverSetup = new DriverSetup( state );
 		Validator localValidator = Validation.buildDefaultValidatorFactory().getValidator();
 		Set<ConstraintViolation<Driver>> violations = localValidator.validate( driverSetup.getDriver() );
@@ -85,7 +97,7 @@ public class SimpleValidation {
 		@AssertTrue
 		private boolean hasDrivingLicense;
 
-		public Driver( String name, int age, boolean hasDrivingLicense ) {
+		public Driver(String name, int age, boolean hasDrivingLicense) {
 			this.name = name;
 			this.age = age;
 			this.hasDrivingLicense = hasDrivingLicense;

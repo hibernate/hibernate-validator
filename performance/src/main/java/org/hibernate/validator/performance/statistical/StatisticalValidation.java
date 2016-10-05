@@ -10,10 +10,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Threads;
+import org.openjdk.jmh.annotations.Warmup;
 
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
@@ -43,11 +47,12 @@ public class StatisticalValidation {
 		public StatisticalValidationState() {
 			ValidatorFactory factory = null;
 			final Configuration<?> configuration = Validation.byDefaultProvider().configure();
-			try (InputStream mappingStream = StatisticalValidation.class.getResourceAsStream( "mapping.xml" )) {
+			try ( InputStream mappingStream = StatisticalValidation.class.getResourceAsStream( "mapping.xml" ) ) {
 				configuration.addMapping( mappingStream );
 				factory = configuration.buildValidatorFactory();
 				assertThat( factory ).isNotNull();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				e.printStackTrace();
 			}
 
@@ -63,7 +68,11 @@ public class StatisticalValidation {
 	@Benchmark
 	@BenchmarkMode(Mode.All)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
-	public void testValidationWithStatisticalGraphDepthAndConstraintValidator( StatisticalValidationState state ) throws Exception {
+	@Fork(value = 1)
+	@Threads(100)
+	@Warmup(iterations = 10)
+	@Measurement(iterations = 10)
+	public void testValidationWithStatisticalGraphDepthAndConstraintValidator(StatisticalValidationState state) throws Exception {
 		state.entitiesUnderTest.forEach(
 				testEntity -> {
 					Set<ConstraintViolation<TestEntity>> violations = state.validator.validate( testEntity );
