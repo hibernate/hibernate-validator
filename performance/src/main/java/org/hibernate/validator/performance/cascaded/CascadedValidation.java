@@ -24,10 +24,14 @@ import javax.validation.constraints.NotNull;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Threads;
+import org.openjdk.jmh.annotations.Warmup;
 
 /**
  * @author Hardy Ferentschik
@@ -36,7 +40,7 @@ public class CascadedValidation {
 	private static final int NUMBER_OF_RUNNABLES = 10000;
 	private static final int SIZE_OF_THREAD_POOL = 50;
 
-	@State( Scope.Benchmark )
+	@State(Scope.Benchmark)
 	public static class CascadedValidationState {
 		public volatile Validator validator;
 
@@ -47,8 +51,12 @@ public class CascadedValidation {
 	}
 
 	@Benchmark
-	@BenchmarkMode( Mode.All )
-	@OutputTimeUnit( TimeUnit.MILLISECONDS )
+	@BenchmarkMode(Mode.All)
+	@OutputTimeUnit(TimeUnit.MILLISECONDS)
+	@Fork(value = 1)
+	@Threads(50)
+	@Warmup(iterations = 10)
+	@Measurement(iterations = 50)
 	public void testCascadedValidation(CascadedValidationState state) {
 		// TODO graphs needs to be generated and deeper
 		Person kermit = new Person( "kermit" );
@@ -63,9 +71,13 @@ public class CascadedValidation {
 		assertThat( violations ).hasSize( 0 );
 	}
 
-	@Benchmark
-	@BenchmarkMode( Mode.All )
-	@OutputTimeUnit( TimeUnit.MILLISECONDS )
+//	@Benchmark
+//	@BenchmarkMode(Mode.All)
+//	@OutputTimeUnit(TimeUnit.MILLISECONDS)
+//	@Fork(value = 1)
+//	@Threads(2)
+//	@Warmup(iterations = 10)
+//	@Measurement(iterations = 50)
 	public void testCascadedValidationMultiThreaded(CascadedValidationState state) throws Exception {
 		CountDownLatch startLatch = new CountDownLatch( 1 );
 		ExecutorService executor = Executors.newFixedThreadPool( SIZE_OF_THREAD_POOL );
