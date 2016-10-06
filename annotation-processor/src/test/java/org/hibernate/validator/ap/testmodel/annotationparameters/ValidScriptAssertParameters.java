@@ -13,18 +13,20 @@ import org.hibernate.validator.constraints.ScriptAssert;
  */
 public class ValidScriptAssertParameters {
 
-	@ScriptAssert( lang = "some lang", script = "some script" )
+	@ScriptAssert(lang = "some lang", script = "some script")
 	public static class Case1 {
 
 	}
 
-	@ScriptAssert( lang = "some lang", script = "some script", alias = "some alias" )
+	@ScriptAssert(lang = "some lang", script = "some script", alias = "some alias")
 	public static class Case2 {
 
 	}
 
-	@ScriptAssert.List({ @ScriptAssert(lang = "some lang", script = "some script", alias = "some alias"),
-			@ScriptAssert(lang = "some lang", script = "some script") })
+	@ScriptAssert.List({
+			@ScriptAssert(lang = "some lang", script = "some script", alias = "some alias"),
+			@ScriptAssert(lang = "some lang", script = "some script")
+	})
 	public static class Case3 {
 
 	}
