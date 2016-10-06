@@ -6,6 +6,18 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -31,18 +43,6 @@ import org.hibernate.validator.test.constraints.Object;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for {@link org.hibernate.validator.cfg.ConstraintMapping} et al.
@@ -80,7 +80,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	@Test
 	public void testIgnoreClassConstraints() {
 		ConstraintMapping mapping = config.createConstraintMapping();
-		mapping.type( Fu.class ).ignoreAnnotations();
+		mapping.type( Fu.class ).ignoreAnnotations( true );
 		config.addMapping( mapping );
 
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -92,7 +92,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Foo.class )
 				.property( "property", FIELD )
-				.ignoreAnnotations();
+				.ignoreAnnotations( true );
 		config.addMapping( mapping );
 
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -104,7 +104,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Foo.class )
 				.property( "property", METHOD )
-				.ignoreAnnotations();
+				.ignoreAnnotations( true );
 		config.addMapping( mapping );
 
 		Validator validator = config.buildValidatorFactory().getValidator();
@@ -120,7 +120,7 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 		ConstraintMapping mapping = config.createConstraintMapping();
 		mapping.type( Bar.class )
 				.property( "property", FIELD )
-				.ignoreAnnotations()
+				.ignoreAnnotations( true )
 				.constraint( new NullDef() );
 		config.addMapping( mapping );
 		validator = config.buildValidatorFactory().getValidator();

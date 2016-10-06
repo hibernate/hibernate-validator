@@ -81,11 +81,6 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	@Override
-	public TypeConstraintMappingContext<C> ignoreAnnotations() {
-		return ignoreAnnotations( true );
-	}
-
-	@Override
 	public TypeConstraintMappingContext<C> ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreClassLevelConstraintAnnotations( beanClass, ignoreAnnotations );
 		return this;

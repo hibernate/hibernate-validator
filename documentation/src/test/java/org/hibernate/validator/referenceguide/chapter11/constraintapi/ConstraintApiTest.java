@@ -1,5 +1,8 @@
 package org.hibernate.validator.referenceguide.chapter11.constraintapi;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+
 import java.util.List;
 
 import javax.validation.Validation;
@@ -17,9 +20,6 @@ import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraintvalidators.RegexpURLValidator;
 import org.junit.Test;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-
 public class ConstraintApiTest {
 
 	@Test
@@ -36,7 +36,7 @@ public class ConstraintApiTest {
 				.property( "manufacturer", FIELD )
 					.constraint( new NotNullDef() )
 				.property( "licensePlate", FIELD )
-					.ignoreAnnotations()
+					.ignoreAnnotations( true )
 					.constraint( new NotNullDef() )
 					.constraint( new SizeDef().min( 2 ).max( 14 ) )
 			.type( RentalCar.class )
@@ -61,7 +61,7 @@ public class ConstraintApiTest {
 		constraintMapping
 			.type( Car.class )
 				.property( "licensePlate", FIELD )
-					.constraint( new GenericConstraintDef<CheckCase>( CheckCase.class )
+					.constraint( new GenericConstraintDef<>( CheckCase.class )
 						.param( "value", CaseMode.UPPER )
 					);
 		//end::genericConstraintDef[]
@@ -109,7 +109,7 @@ public class ConstraintApiTest {
 						.constraint( new MaxDef().value( 75 ) )
 				.method( "load", List.class, List.class )
 					.crossParameter()
-						.constraint( new GenericConstraintDef<LuggageCountMatchesPassengerCount>(
+						.constraint( new GenericConstraintDef<>(
 								LuggageCountMatchesPassengerCount.class ).param(
 									"piecesOfLuggagePerPassenger", 2
 								)
