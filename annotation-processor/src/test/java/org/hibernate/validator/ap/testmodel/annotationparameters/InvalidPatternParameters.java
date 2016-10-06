@@ -13,16 +13,36 @@ import javax.validation.constraints.Pattern;
  */
 public class InvalidPatternParameters {
 
-	@Pattern( regexp = "\\" )
+	@Pattern(regexp = "\\")
 	private String strings1;
 
-	@Pattern( regexp = "[a" )
+	@Pattern(regexp = "[a")
 	private String strings2;
 
-	@Pattern( regexp = "+" )
+	@Pattern(regexp = "+")
 	private String strings3;
 
 	@Pattern.List({ @Pattern(regexp = "+"), @Pattern(regexp = "[a") })
 	private String strings4;
 
+	public InvalidPatternParameters(
+			@Pattern(regexp = "\\") String strings1,
+			@Pattern(regexp = "[test") String strings2,
+			@Pattern(regexp = "+") String strings3
+	) {
+
+	}
+
+	public void doSomething(
+			@Pattern(regexp = "\\") String strings1,
+			@Pattern(regexp = "[test") String strings2,
+			@Pattern(regexp = "+") String strings3
+	) {
+
+	}
+
+	@Pattern(regexp = "\\")
+	public String doSomething() {
+		return "";
+	}
 }
