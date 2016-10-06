@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
@@ -704,7 +705,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private Iterator<?> createIteratorForCascadedValue(Type type, Object value, ValueContext<?, ?> valueContext) {
 		Iterator<?> iter;
 		if ( ReflectionHelper.isIterable( type ) ) {
-			iter = ( (Iterable<?>) value ).iterator();
+			List<Iterator<?>> iters = newArrayList();
+			iters.add( ( (Iterable<?>) value ).iterator() );
+			
+			List<Object> list = newArrayList();
+			list.add( value );
+			iters.add( list.iterator() );
+			
+			iter = new IteratorContactor( iters );
 			valueContext.markCurrentPropertyAsIterable();
 		}
 		else if ( ReflectionHelper.isMap( type ) ) {
@@ -1719,5 +1727,39 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+	
+	/**
+	 * This class allows to iterate throw merged iterators.
+	 * 
+	 * @author Adam Stawicki
+	 */
+	private static class IteratorContactor implements Iterator<Object> {
+		private List<Iterator<?>> iterators;
+		private int currentPos;
+		
+		public IteratorContactor(List<Iterator<?>> iterators) {
+			this.iterators = iterators;
+			this.currentPos = 0;
+		}
+
+		@Override
+		public boolean hasNext() {
+			if ( iterators.get( currentPos ).hasNext() ) {
+				return true;
+			}
+			if ( iterators.size() -2 < currentPos ) {
+				return false;
+			}
+			return iterators.get( ++currentPos ).hasNext();
+		}
+
+		@Override
+		public Object next() {
+			if ( !hasNext() ) {
+				throw new NoSuchElementException();
+		    }
+			return iterators.get( currentPos ).next();
+		}
 	}
 }
