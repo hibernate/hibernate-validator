@@ -35,6 +35,7 @@ Khalid Alqinyah
 Lee KyoungIl
 Leonardo Loch Zanivan
 Lucas Pouzac
+Lukas Niemeier
 Mark Hobson
 Marko Bekhta
 Mert Çalişkan
@@ -46,4 +47,5 @@ Shelly McGowan
 Steve Ebersole
 Strong Liu
 Victor Rezende dos Santos
+Willi Schönborn
 Yoann Rodière
