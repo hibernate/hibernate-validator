@@ -39,7 +39,8 @@ public class CarTest {
 				"'null' is not a valid car part.",
 				constraintViolations.iterator().next().getMessage()
 		);
-		assertEquals( "parts[1]", constraintViolations.iterator().next().getPropertyPath().toString() );
+		assertEquals( "parts[1].<collection element>",
+				constraintViolations.iterator().next().getPropertyPath().toString() );
 		//end::validateListTypeArgumentConstraint[]
 	}
 

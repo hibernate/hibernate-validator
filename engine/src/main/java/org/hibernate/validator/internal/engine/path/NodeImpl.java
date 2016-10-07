@@ -41,6 +41,7 @@ public class NodeImpl
 	private static final String INDEX_CLOSE = "]";
 	private static final String RETURN_VALUE_NODE_NAME = "<return value>";
 	private static final String CROSS_PARAMETER_NODE_NAME = "<cross-parameter>";
+	private static final String COLLECTION_ELEMENT_NODE_NAME = "<collection element>";
 
 	private final String name;
 	private final NodeImpl parent;
@@ -74,6 +75,20 @@ public class NodeImpl
 	public static NodeImpl createPropertyNode(String name, NodeImpl parent) {
 		return new NodeImpl(
 				name,
+				parent,
+				false,
+				null,
+				null,
+				ElementKind.PROPERTY,
+				EMPTY_CLASS_ARRAY,
+				null,
+				null
+		);
+	}
+
+	public static NodeImpl createCollectionElementNode(NodeImpl parent) {
+		return new NodeImpl(
+				COLLECTION_ELEMENT_NODE_NAME,
 				parent,
 				false,
 				null,
