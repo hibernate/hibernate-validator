@@ -744,26 +744,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					valueContext.getCurrentGroup(),
 					valueContext.getPropertyPath()
 			) ) {
-				validateTypeArgumentConstraints( context, valueContext, value, typeArgumentsConstraint );
+				// Type arguments
+				validateTypeArgumentConstraints( context, buildNewLocalExecutionContext( valueContext, value ), value, typeArgumentsConstraint );
 
 				// Cascade validation
-				ValueContext<?, Object> newValueContext;
-				if ( value != null ) {
-					newValueContext = ValueContext.getLocalExecutionContext(
-							value,
-							beanMetaDataManager.getBeanMetaData( value.getClass() ),
-							valueContext.getPropertyPath()
-					);
-				}
-				else {
-					newValueContext = ValueContext.getLocalExecutionContext(
-							valueContext.getCurrentBeanType(),
-							beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() ),
-							valueContext.getPropertyPath()
-					);
-				}
-
-				validateInContext( newValueContext, context, validationOrder );
+				validateInContext( buildNewLocalExecutionContext( valueContext, value ), context, validationOrder );
 				if ( shouldFailFast( context ) ) {
 					return;
 				}
@@ -772,11 +757,31 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
+	private ValueContext<?, Object> buildNewLocalExecutionContext(ValueContext<?, Object> valueContext, Object value) {
+		ValueContext<?, Object> newValueContext;
+		if ( value != null ) {
+			newValueContext = ValueContext.getLocalExecutionContext(
+					value,
+					beanMetaDataManager.getBeanMetaData( value.getClass() ),
+					valueContext.getPropertyPath()
+			);
+		}
+		else {
+			newValueContext = ValueContext.getLocalExecutionContext(
+					valueContext.getCurrentBeanType(),
+					beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() ),
+					valueContext.getPropertyPath()
+			);
+		}
+		return newValueContext;
+	}
+
 	private void validateTypeArgumentConstraints(ValidationContext<?> context,
 			ValueContext<?, Object> valueContext,
 			Object value,
 			Set<MetaConstraint<?>> typeArgumentsConstraints) {
 		valueContext.setCurrentValidatedValue( value );
+		valueContext.appendCollectionElementNode();
 		for ( MetaConstraint<?> metaConstraint : typeArgumentsConstraints ) {
 			metaConstraint.validateConstraint( context, valueContext );
 			if ( shouldFailFast( context ) ) {
