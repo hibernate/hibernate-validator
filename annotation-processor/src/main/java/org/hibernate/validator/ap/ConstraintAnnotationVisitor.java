@@ -116,7 +116,7 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	 * </p>
 	 * <ul>
 	 * <li>
-	 * Overridden method parameters cannot have wider range of constraints.
+	 * Constraint annotation parameter values are meaningful and valid.
 	 * </li>
 	 * </ul>
 	 */
