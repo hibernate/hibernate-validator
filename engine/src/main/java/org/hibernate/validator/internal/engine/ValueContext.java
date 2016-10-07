@@ -139,6 +139,11 @@ public class ValueContext<T, V> {
 		}
 	}
 
+	public final void appendCollectionElementNode() {
+		propertyPath = PathImpl.createCopy( propertyPath );
+		propertyPath.addCollectionElementNode();
+	}
+
 	public final void appendBeanNode() {
 		propertyPath = PathImpl.createCopy( propertyPath );
 		propertyPath.addBeanNode();

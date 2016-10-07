@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine.typeannotationconstraint;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
@@ -15,12 +16,15 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
+import javax.validation.ElementKind;
+import javax.validation.Path;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
@@ -58,7 +62,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<A1>> constraintViolations = validator.validate( a );
 
 		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "names[1]", "names[2]", "names[2]" );
+		assertCorrectPropertyPaths( constraintViolations, "names[1].<collection element>", "names[2].<collection element>", "names[2].<collection element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlankTypeUse.class,
@@ -82,7 +86,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<A3>> constraintViolations = validator.validate( a );
 
 		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "strings[0]", "strings[2]", "strings[2]" );
+		assertCorrectPropertyPaths( constraintViolations, "strings[0].<collection element>", "strings[2].<collection element>", "strings[2].<collection element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlankTypeUse.class,
@@ -97,7 +101,7 @@ public class TypeAnnotationConstraintTest {
 		b.bars = Arrays.asList( new Bar( 2 ), null );
 		Set<ConstraintViolation<B>> constraintViolations = validator.validate( b );
 		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "bars[1]", "bars[0].number" );
+		assertCorrectPropertyPaths( constraintViolations, "bars[1].<collection element>", "bars[0].number" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNullTypeUse.class );
 	}
 
@@ -122,7 +126,7 @@ public class TypeAnnotationConstraintTest {
 		f.namesMap.put( "third", "Name 3" );
 		Set<ConstraintViolation<F1>> constraintViolations = validator.validate( f );
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "namesMap[second]" );
+		assertCorrectPropertyPaths( constraintViolations, "namesMap[second].<collection element>" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class );
 	}
 
@@ -136,7 +140,7 @@ public class TypeAnnotationConstraintTest {
 		f.namesMap.put( "third", "Name 3" );
 		Set<ConstraintViolation<F2>> constraintViolations = validator.validate( f );
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "namesMap[second]" );
+		assertCorrectPropertyPaths( constraintViolations, "namesMap[second].<collection element>" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlankTypeUse.class );
 
 		f = new F2();
@@ -165,9 +169,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"returnStrings.<return value>[1]",
-				"returnStrings.<return value>[2]",
-				"returnStrings.<return value>[2]"
+				"returnStrings.<return value>[1].<collection element>",
+				"returnStrings.<return value>[2].<collection element>",
+				"returnStrings.<return value>[2].<collection element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -191,9 +195,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 4 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"setValues.arg0[0]",
-				"setValues.arg0[2]",
-				"setValues.arg0[2]",
+				"setValues.arg0[0].<collection element>",
+				"setValues.arg0[2].<collection element>",
+				"setValues.arg0[2].<collection element>",
 				"setValues.arg1"
 		);
 		assertCorrectConstraintTypes(
@@ -218,9 +222,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 4 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"G.arg0[0]",
-				"G.arg0[2]",
-				"G.arg0[2]",
+				"G.arg0[0].<collection element>",
+				"G.arg0[2].<collection element>",
+				"G.arg0[2].<collection element>",
 				"G.arg1"
 		);
 		assertCorrectConstraintTypes(
@@ -245,6 +249,29 @@ public class TypeAnnotationConstraintTest {
 
 		assertingLogger.assertMessageLogged();
 		log4jRootLogger.removeAppender( assertingLogger );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1121")
+	public void property_path_contains_index_information() {
+		A1 a = new A1();
+		a.names = Arrays.asList( "" );
+
+		Set<ConstraintViolation<A1>> constraintViolations = validator.validate( a );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+
+		Iterator<Path.Node> propertyPathIterator = constraintViolations.iterator().next().getPropertyPath().iterator();
+
+		Path.Node firstNode = propertyPathIterator.next();
+		assertThat( firstNode.getIndex() ).isNull();
+		assertThat( firstNode.getName() ).isEqualTo( "names" );
+		assertThat( firstNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
+
+		Path.Node secondNode = propertyPathIterator.next();
+		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
+		assertThat( secondNode.getName() ).isEqualTo( "<collection element>" );
+		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
 	}
 
 	static class A1 {
