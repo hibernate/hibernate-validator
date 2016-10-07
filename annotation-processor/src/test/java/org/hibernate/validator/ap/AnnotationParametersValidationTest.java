@@ -23,6 +23,7 @@ import org.hibernate.validator.ap.testmodel.annotationparameters.ValidPatternPar
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidScriptAssertParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidSizeParameters;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
+
 import org.testng.annotations.Test;
 
 import javax.tools.Diagnostic.Kind;
@@ -59,7 +60,14 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.ERROR, 17 ),
 				new DiagnosticExpectation( Kind.ERROR, 20 ),
 				new DiagnosticExpectation( Kind.ERROR, 23 ),
-				new DiagnosticExpectation( Kind.ERROR, 26 )
+				new DiagnosticExpectation( Kind.ERROR, 26 ),
+				new DiagnosticExpectation( Kind.ERROR, 30 ),
+				new DiagnosticExpectation( Kind.ERROR, 31 ),
+				new DiagnosticExpectation( Kind.ERROR, 32 ),
+				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 39 ),
+				new DiagnosticExpectation( Kind.ERROR, 40 ),
+				new DiagnosticExpectation( Kind.ERROR, 45 )
 		);
 	}
 
@@ -87,7 +95,14 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.ERROR, 16 ),
 				new DiagnosticExpectation( Kind.ERROR, 19 ),
 				new DiagnosticExpectation( Kind.ERROR, 22 ),
-				new DiagnosticExpectation( Kind.ERROR, 25 )
+				new DiagnosticExpectation( Kind.ERROR, 25 ),
+				new DiagnosticExpectation( Kind.ERROR, 29 ),
+				new DiagnosticExpectation( Kind.ERROR, 30 ),
+				new DiagnosticExpectation( Kind.ERROR, 31 ),
+				new DiagnosticExpectation( Kind.ERROR, 37 ),
+				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 39 ),
+				new DiagnosticExpectation( Kind.ERROR, 44 )
 		);
 	}
 
@@ -150,7 +165,14 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.ERROR, 16 ),
 				new DiagnosticExpectation( Kind.ERROR, 19 ),
 				new DiagnosticExpectation( Kind.ERROR, 22 ),
-				new DiagnosticExpectation( Kind.ERROR, 25 )
+				new DiagnosticExpectation( Kind.ERROR, 25 ),
+				new DiagnosticExpectation( Kind.ERROR, 29 ),
+				new DiagnosticExpectation( Kind.ERROR, 30 ),
+				new DiagnosticExpectation( Kind.ERROR, 31 ),
+				new DiagnosticExpectation( Kind.ERROR, 37 ),
+				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 39 ),
+				new DiagnosticExpectation( Kind.ERROR, 44 )
 		);
 	}
 
@@ -178,7 +200,14 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.ERROR, 17 ),
 				new DiagnosticExpectation( Kind.ERROR, 20 ),
 				new DiagnosticExpectation( Kind.ERROR, 23 ),
-				new DiagnosticExpectation( Kind.ERROR, 26 )
+				new DiagnosticExpectation( Kind.ERROR, 26 ),
+				new DiagnosticExpectation( Kind.ERROR, 30 ),
+				new DiagnosticExpectation( Kind.ERROR, 31 ),
+				new DiagnosticExpectation( Kind.ERROR, 32 ),
+				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 39 ),
+				new DiagnosticExpectation( Kind.ERROR, 40 ),
+				new DiagnosticExpectation( Kind.ERROR, 45 )
 		);
 	}
 
@@ -210,7 +239,14 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.ERROR, 26 ),
 				new DiagnosticExpectation( Kind.ERROR, 27 ),
 				new DiagnosticExpectation( Kind.ERROR, 30 ),
-				new DiagnosticExpectation( Kind.ERROR, 31 )
+				new DiagnosticExpectation( Kind.ERROR, 31 ),
+				new DiagnosticExpectation( Kind.ERROR, 35 ),
+				new DiagnosticExpectation( Kind.ERROR, 36 ),
+				new DiagnosticExpectation( Kind.ERROR, 37 ),
+				new DiagnosticExpectation( Kind.ERROR, 43 ),
+				new DiagnosticExpectation( Kind.ERROR, 44 ),
+				new DiagnosticExpectation( Kind.ERROR, 45 ),
+				new DiagnosticExpectation( Kind.ERROR, 50 )
 		);
 	}
 

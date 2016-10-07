@@ -112,6 +112,23 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	/**
 	 * <p>
 	 * Checks whether the given annotations are correctly specified at the given
+	 * method parameter. The following checks are performed:
+	 * </p>
+	 * <ul>
+	 * <li>
+	 * Constraint annotation parameter values are meaningful and valid.
+	 * </li>
+	 * </ul>
+	 */
+	@Override
+	public Void visitVariableAsParameter(VariableElement annotatedField, List<AnnotationMirror> mirrors) {
+		checkConstraints( annotatedField, mirrors );
+		return null;
+	}
+
+	/**
+	 * <p>
+	 * Checks whether the given annotations are correctly specified at the given
 	 * annotation type declaration. The following checks are performed:
 	 * </p>
 	 * <ul>

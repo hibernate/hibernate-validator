@@ -35,6 +35,11 @@ public class ConstraintCheckFactory {
 	private final Map<AnnotationType, ConstraintChecks> fieldChecks;
 
 	/**
+	 * Holds the checks to be executed for method parameter elements.
+	 */
+	private final Map<AnnotationType, ConstraintChecks> parameterChecks;
+
+	/**
 	 * Holds the checks to be executed for method elements.
 	 */
 	private final Map<AnnotationType, ConstraintChecks> methodChecks;
@@ -55,6 +60,34 @@ public class ConstraintCheckFactory {
 
 	public ConstraintCheckFactory(Types typeUtils, ConstraintHelper constraintHelper, AnnotationApiHelper annotationApiHelper, boolean methodConstraintsSupported) {
 		this.constraintHelper = constraintHelper;
+
+		parameterChecks = CollectionHelper.newHashMap();
+
+		parameterChecks.put(
+				AnnotationType.CONSTRAINT_ANNOTATION,
+				new SingleValuedChecks(
+						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
+						new AnnotationParametersPatternCheck( annotationApiHelper ),
+						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
+						new AnnotationParametersDigitsCheck( annotationApiHelper ),
+						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper )
+				)
+		);
+		parameterChecks.put(
+				AnnotationType.MULTI_VALUED_CONSTRAINT_ANNOTATION,
+				new MultiValuedChecks(
+						constraintHelper,
+						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
+						new AnnotationParametersPatternCheck( annotationApiHelper ),
+						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
+						new AnnotationParametersDigitsCheck( annotationApiHelper ),
+						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper )
+				)
+		);
+		parameterChecks.put(
+				AnnotationType.GRAPH_VALIDATION_ANNOTATION, NULL_CHECKS
+		);
+		parameterChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );
 
 		fieldChecks = CollectionHelper.newHashMap();
 		fieldChecks.put(
@@ -209,6 +242,8 @@ public class ConstraintCheckFactory {
 		AnnotationType annotationType = constraintHelper.getAnnotationType( annotation );
 
 		switch ( annotatedElement.getKind() ) {
+			case PARAMETER:
+				return parameterChecks.get( annotationType );
 			case FIELD:
 				return fieldChecks.get( annotationType );
 			case METHOD:

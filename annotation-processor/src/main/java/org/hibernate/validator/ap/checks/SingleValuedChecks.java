@@ -55,7 +55,10 @@ public class SingleValuedChecks implements ConstraintChecks {
 		//the given element
 		for ( ConstraintCheck oneCheck : checks ) {
 
-			if ( element.getKind() == ElementKind.FIELD ) {
+			if ( element.getKind() == ElementKind.PARAMETER ) {
+				theValue.addAll( oneCheck.checkField( (VariableElement) element, annotation ) );
+			}
+			else if ( element.getKind() == ElementKind.FIELD ) {
 				theValue.addAll( oneCheck.checkField( (VariableElement) element, annotation ) );
 			}
 			else if ( element.getKind() == ElementKind.METHOD ) {
