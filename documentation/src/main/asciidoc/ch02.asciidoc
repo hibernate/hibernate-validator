@@ -482,7 +482,7 @@ impact portability of your application between Bean Validation providers.
               `int`, `long` and the
               respective wrappers of the primitive types; Additionally
               supported by HV: any sub-type of
-              `Number` and `javax.money.MonetaryAmount`|Checks whether the annotated value is less than the
+              `Number` and `javax.money.MonetaryAmount` (if the https://jcp.org/en/jsr/detail?id=354[JSR 354 API] and an implementation is on the class path)|Checks whether the annotated value is less than the
               specified maximum, when inclusive=false.
               Otherwise whether the value is less than or equal to the
               specified maximum. The parameter value is
