@@ -4,9 +4,8 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.constraintvalidators.bv;
+package org.hibernate.validator.internal.constraintvalidators.bv.pattern;
 
-import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -16,13 +15,17 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
+ * Base class for any {@link Pattern} validators which prepares and compiles a regular expression.
+ * In specific validators {@link ConstraintValidator#isValid(Object, ConstraintValidatorContext)} method
+ * should be overridden.
+ *
  * @author Hardy Ferentschik
  */
-public class PatternValidator implements ConstraintValidator<Pattern, CharSequence> {
+public abstract class BasePatternValidator<T> implements ConstraintValidator<Pattern, T> {
 
 	private static final Log log = LoggerFactory.make();
 
-	private java.util.regex.Pattern pattern;
+	protected java.util.regex.Pattern pattern;
 
 	@Override
 	public void initialize(Pattern parameters) {
@@ -40,12 +43,4 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 		}
 	}
 
-	@Override
-	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
-		if ( value == null ) {
-			return true;
-		}
-		Matcher m = pattern.matcher( value );
-		return m.matches();
-	}
 }

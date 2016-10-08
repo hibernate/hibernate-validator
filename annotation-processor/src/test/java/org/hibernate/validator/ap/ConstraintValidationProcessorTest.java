@@ -453,8 +453,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 22 ),
-				new DiagnosticExpectation( Kind.ERROR, 22 )
+				new DiagnosticExpectation( Kind.ERROR, 28 )
 		);
 	}
 

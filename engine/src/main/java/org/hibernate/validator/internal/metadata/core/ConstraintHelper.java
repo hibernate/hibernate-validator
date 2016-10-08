@@ -70,7 +70,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForC
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
-import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.pattern.PatternValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForChronoZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForDate;
@@ -89,6 +89,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidat
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForOffsetDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForReadablePartial;
+import org.hibernate.validator.internal.constraintvalidators.bv.pattern.PatternValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArray;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfBoolean;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfByte;
@@ -208,7 +209,12 @@ public class ConstraintHelper {
 
 		putConstraints( tmpConstraints, Past.class, pastValidators );
 
-		putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
+		putConstraints( tmpConstraints, Pattern.class,
+						Arrays.asList(
+								PatternValidatorForCharSequence.class,
+								PatternValidatorForNumber.class
+						)
+		);
 
 		List<Class<? extends ConstraintValidator<Size, ?>>> sizeValidators = newArrayList( 11 );
 		sizeValidators.add( SizeValidatorForCharSequence.class );

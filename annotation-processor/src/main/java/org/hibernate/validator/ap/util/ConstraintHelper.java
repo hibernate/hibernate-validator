@@ -225,7 +225,7 @@ public class ConstraintHelper {
 				Java8DateTime.OFFSET_DATE_TIME,
 				Java8DateTime.INSTANT
 		);
-		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PATTERN, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PATTERN, String.class, Number.class );
 		registerAllowedTypesForBuiltInConstraint(
 				BeanValidationTypes.SIZE,
 				Object[].class,
