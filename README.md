@@ -79,7 +79,7 @@ There are more build options available as well. For more information refer to [C
 
 To build Hibernate Validator with JDK 9, export the following environment variable:
 
-    export MAVEN_OPTS="-addmods java.annotations.common,java.xml.bind"
+    export MAVEN_OPTS="--add-modules java.annotations.common,java.xml.bind"
 
 Then the build can be started like this:
 
