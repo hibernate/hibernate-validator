@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.pattern;
 
+import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -42,5 +43,23 @@ public abstract class BasePatternValidator<T> implements ConstraintValidator<Pat
 			throw log.getInvalidRegularExpressionException( e );
 		}
 	}
+
+	@Override
+	public boolean isValid(T value, ConstraintValidatorContext constraintValidatorContext) {
+		if ( value == null ) {
+			return true;
+		}
+		Matcher m = pattern.matcher( getCharSequenceRepresentation( value ) );
+		return m.matches();
+	}
+
+	/**
+	 * Converts given value of type {@code T} to a CharSequence to which regexp will be applied.
+	 *
+	 * @param value which is validated.
+	 *
+	 * @return {@link CharSequence} representation of given value.
+	 */
+	protected abstract CharSequence getCharSequenceRepresentation(T value);
 
 }

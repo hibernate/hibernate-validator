@@ -6,9 +6,6 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.pattern;
 
-import java.util.regex.Matcher;
-import javax.validation.ConstraintValidatorContext;
-
 /**
  * Validates that given char sequence matches given regexp.
  *
@@ -17,11 +14,7 @@ import javax.validation.ConstraintValidatorContext;
 public class PatternValidatorForCharSequence extends BasePatternValidator<CharSequence> {
 
 	@Override
-	public boolean isValid(CharSequence value, ConstraintValidatorContext constraintValidatorContext) {
-		if ( value == null ) {
-			return true;
-		}
-		Matcher m = pattern.matcher( value );
-		return m.matches();
+	protected CharSequence getCharSequenceRepresentation(CharSequence value) {
+		return value;
 	}
 }
