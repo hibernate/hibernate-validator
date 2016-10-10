@@ -17,8 +17,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Base class for any {@link Pattern} validators which prepares and compiles a regular expression.
- * In specific validators {@link ConstraintValidator#isValid(Object, ConstraintValidatorContext)} method
- * should be overridden.
+ * In specific validators {@link BasePatternValidator#getCharSequenceRepresentation(Object)} method
+ * should be overridden, which provides a string representation of a given value of type {@code T}.
  *
  * @author Hardy Ferentschik
  */
