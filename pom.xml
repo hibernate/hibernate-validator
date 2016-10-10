@@ -878,7 +878,7 @@
                 <jdk>9</jdk>
             </activation>
             <properties>
-                <surefire.argLine.extension>-addmods java.xml.bind</surefire.argLine.extension>
+                <surefire.argLine.extension>--add-modules java.xml.bind</surefire.argLine.extension>
             </properties>
         </profile>
     </profiles>
