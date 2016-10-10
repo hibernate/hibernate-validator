@@ -337,7 +337,7 @@
                             <arguments>
                                 <argument>-enableIntrospection</argument>
                                 <argument>-p</argument>
-                                <argument>org.hibernate.validator.internal.xml</argument>
+                                <argument>org.hibernate.validator.internal.xml.binding</argument>
                                 <argument>-extension</argument>
                                 <argument>-target</argument>
                                 <argument>2.1</argument>
