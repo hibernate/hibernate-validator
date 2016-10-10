@@ -665,33 +665,37 @@
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>1.12</version>
                 </plugin>
-            <plugin>
-                <groupId>com.github.siom79.japicmp</groupId>
-                <artifactId>japicmp-maven-plugin</artifactId>
-                <version>0.9.1</version>
-                <configuration>
-                    <oldVersion>
-                        <dependency>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>${project.artifactId}</artifactId>
-                            <version>${previous.stable}</version>
-                            <type>${project.packaging}</type>
-                        </dependency>
-                    </oldVersion>
-                    <skip>true</skip>
-                    <newVersion>
-                        <file>
-                            <path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
-                        </file>
-                    </newVersion>
-                    <parameter>
-                        <onlyModified>true</onlyModified>
-                        <excludes>
-                            <exclude>org.hibernate.validator.internal.*</exclude>
-                        </excludes>
-                    </parameter>
-                </configuration>
-            </plugin>
+                <plugin>
+                    <!--
+                        Creates a report by running "mvn japicmp:cmp"
+                        Note: you need to install the jars before running the japicmp command.
+                    -->
+                    <groupId>com.github.siom79.japicmp</groupId>
+                    <artifactId>japicmp-maven-plugin</artifactId>
+                    <version>0.9.1</version>
+                    <configuration>
+                        <oldVersion>
+                            <dependency>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>${project.artifactId}</artifactId>
+                                <version>${previous.stable}</version>
+                                <type>${project.packaging}</type>
+                            </dependency>
+                        </oldVersion>
+                        <skip>true</skip>
+                        <newVersion>
+                            <file>
+                                <path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
+                            </file>
+                        </newVersion>
+                        <parameter>
+                            <onlyModified>true</onlyModified>
+                            <excludes>
+                                <exclude>org.hibernate.validator.internal.*</exclude>
+                            </excludes>
+                        </parameter>
+                    </configuration>
+                </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
