@@ -97,6 +97,8 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <bv.api.version>2.0.0-SNAPSHOT</bv.api.version>
+        <!-- Version to be used as baseline for API/SPI change reports -->
+        <previous.stable>5.2.4.Final</previous.stable>
 
         <paranamer.version>2.8</paranamer.version>
         <javax.el.version>3.0.1-b08</javax.el.version>
@@ -663,20 +665,33 @@
                     <artifactId>build-helper-maven-plugin</artifactId>
                     <version>1.12</version>
                 </plugin>
-                <plugin>
-                    <!-- Creates a report by running "mvn clirr:clirr" -->
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>clirr-maven-plugin</artifactId>
-                    <version>2.7</version>
-                    <configuration>
-                        <comparisonVersion>5.2.4.Final</comparisonVersion>
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>0.9.1</version>
+                <configuration>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>${project.groupId}</groupId>
+                            <artifactId>${project.artifactId}</artifactId>
+                            <version>${previous.stable}</version>
+                            <type>${project.packaging}</type>
+                        </dependency>
+                    </oldVersion>
+                    <skip>true</skip>
+                    <newVersion>
+                        <file>
+                            <path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
+                        </file>
+                    </newVersion>
+                    <parameter>
+                        <onlyModified>true</onlyModified>
                         <excludes>
-                            <exclude>org/hibernate/validator/internal/**</exclude>
+                            <exclude>org.hibernate.validator.internal.*</exclude>
                         </excludes>
-                        <logResults>true</logResults>
-                        <minSeverity>info</minSeverity>
-                    </configuration>
-                </plugin>
+                    </parameter>
+                </configuration>
+            </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
