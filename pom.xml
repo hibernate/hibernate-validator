@@ -529,6 +529,22 @@
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.6</version>
+                    <dependencies>
+                        <!--
+                        We need to use a more recent version of the plexus-archiver to support JDK 9
+                        due to https://github.com/codehaus-plexus/plexus-archiver/pull/12
+                        -->
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-archiver</artifactId>
+                            <version>3.4</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.codehaus.plexus</groupId>
+                            <artifactId>plexus-io</artifactId>
+                            <version>2.7.1</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
