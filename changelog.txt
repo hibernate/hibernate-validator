@@ -1,6 +1,23 @@
 Hibernate Validator Changelog
 =============================
 
+5.3.0.Final (11-10-2016)
+-------------------------
+
+** Bug
+    * HV-1117 - build         - Downgrade to surefire and failsafe 2.18.1
+    * HV-1109 - documentation - Fix "Using validation groups" example
+    * HV-1101 - engine        - Issues when using XML validation configuration
+
+** Improvement
+    * HV-1123 - build         - Set up japicmp tooling to create API/SPI change reports
+    * HV-1121 - engine        - Validation error path generation for TYPE_USE annotation
+    * HV-1112 - translations  - ValidationMessages for Slovak
+    * HV-1098 - tck-runner    - Adapt test.policy file of TCK runner for reading "validation.provider" property
+
+** Task
+    * HV-1093 - build         - Change CI links in README.md and pom.xml
+
 5.3.0.CR1 (05-09-2016)
 -------------------------
 
