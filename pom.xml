@@ -129,7 +129,7 @@
         <wildfly.version>10.1.0.Final</wildfly.version>
         <cdi-api.version>1.2</cdi-api.version>
         <weld.version>2.3.5.Final</weld.version>
-        <wildfly-arquillian.version>1.0.2.Final</wildfly-arquillian.version>
+        <wildfly-arquillian.version>2.0.0.Final</wildfly-arquillian.version>
         <jboss-ejb-api_3.2_spec.version>1.0.0.Final</jboss-ejb-api_3.2_spec.version>
 
         <arquillian.version>1.1.11.Final</arquillian.version>
