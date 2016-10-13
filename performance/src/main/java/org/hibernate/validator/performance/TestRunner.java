@@ -9,6 +9,7 @@ package org.hibernate.validator.performance;
 import org.hibernate.validator.performance.cascaded.CascadedValidation;
 import org.hibernate.validator.performance.simple.SimpleValidation;
 import org.hibernate.validator.performance.statistical.StatisticalValidation;
+
 import org.openjdk.jmh.profile.ClassloaderProfiler;
 import org.openjdk.jmh.profile.CompilerProfiler;
 import org.openjdk.jmh.profile.GCProfiler;
@@ -31,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Class containing main method to run all performance tests
+ * Class containing main method to run all performance tests.
  *
  * @author Marko Bekhta
  */
@@ -56,19 +57,25 @@ public final class TestRunner {
 	}
 
 	public static void main(String[] args) throws RunnerException {
-		runTest( args, SimpleValidation.class.getSimpleName(), CascadedValidation.class.getSimpleName(), StatisticalValidation.class.getSimpleName() );
+		runTest(
+				args,
+				SimpleValidation.class.getSimpleName(),
+				CascadedValidation.class.getSimpleName(),
+				StatisticalValidation.class.getSimpleName()
+		);
 	}
 
 	/**
-	 * @param classNames             simple class name of a class that contains benchmarks to run
-	 * @param profilers             array of profiler keys
+	 * @param classNames simple class name of a class that contains benchmarks to run
+	 * @param profilers array of profiler keys
+	 *
 	 * @throws RunnerException if there's a problem running benchmarks
 	 */
 	public static void runTest(String[] profilers, String... classNames) throws RunnerException {
 		ChainedOptionsBuilder builder =
 				new OptionsBuilder()
 						.resultFormat( ResultFormatType.JSON )
-						.result( String.format( "JmhResult.json" ) );
+						.result( "JmhResults.json" );
 		Arrays.stream( profilers )
 				.filter( profileKey -> PROFILERS.containsKey( profileKey ) )
 				.forEach( profileKey -> builder.addProfiler( PROFILERS.get( profileKey ) ) );

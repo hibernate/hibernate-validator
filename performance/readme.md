@@ -34,12 +34,9 @@ The following command line will run all performance tests listed in the main met
     > mvn clean package -P hv-current
     > java -jar target/hibernate-validator-performance.jar
 
-It will generate a set of reports from each test execution. Currently, the following files are generated:
+It will generate a set of reports from each test execution. Currently, all test results information is inside the following generated file:
 
-    > SimpleValidationJmhResult.json
-    > CascadedValidationJmhResult.json
-    > StatisticalValidationJmhResult.json
-
+    > JmhResults.json
 
 #### Profiling
 
@@ -66,10 +63,7 @@ If you want to run one of those profilers - pass it as parameter when running a 
     > mkdir reports
     > for i in "hv-4.3" "hv-4.2" "hv-4.1" "hv-5.0" "hv-5.1" "hv-5.2" "hv-5.3" "hv-current"
     > do
-    > mvn -P $i clean package ; java -jar target/hibernate-validator-performance.jar ;
-    > cp target/SimpleValidationJmhResult.json reports/$iSimpleValidationJmhResult.json;
-    > cp target/CascadedValidationJmhResult.json reports/$iCascadedValidationJmhResult.json;
-    > cp target/StatisticalValidationJmhResult.json reports/$iStatisticalValidationJmhResult.json;
+    > mvn -P $i clean package ; java -jar target/hibernate-validator-performance.jar ; cp target/JmhResults.json reports/$iJmhResults.json;
     > done
 
 ## Existing tests
