@@ -64,7 +64,9 @@ public class MessagerAdapter {
 	 * null.
 	 */
 	public void reportErrors(Collection<ConstraintCheckIssue> errors) {
-		errors.forEach( this::reportError );
+		for ( ConstraintCheckIssue error : errors ) {
+			reportError( error );
+		}
 	}
 
 	/**
@@ -94,7 +96,9 @@ public class MessagerAdapter {
 	 * null.
 	 */
 	public void reportWarnings(Collection<ConstraintCheckIssue> warnings) {
-		warnings.forEach( this::reportWarning );
+		for ( ConstraintCheckIssue warning : warnings ) {
+			reportWarning( warning );
+		}
 	}
 
 	/**
