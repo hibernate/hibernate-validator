@@ -7,7 +7,7 @@
 package org.hibernate.validator.ap.checks.annotationparameters;
 
 import org.hibernate.validator.ap.checks.AbstractConstraintCheck;
-import org.hibernate.validator.ap.checks.ConstraintCheckError;
+import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -37,22 +37,22 @@ public abstract class AnnotationParametersAbstractCheck extends AbstractConstrai
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkField(VariableElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkField(VariableElement element, AnnotationMirror annotation) {
 		return checkAnnotation( element, annotation );
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkMethod(ExecutableElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element, AnnotationMirror annotation) {
 		return checkAnnotation( element, annotation );
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 		return checkAnnotation( element, annotation );
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkNonAnnotationType(TypeElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkNonAnnotationType(TypeElement element, AnnotationMirror annotation) {
 		return checkAnnotation( element, annotation );
 	}
 
@@ -67,7 +67,7 @@ public abstract class AnnotationParametersAbstractCheck extends AbstractConstrai
 	}
 
 
-	private Set<ConstraintCheckError> checkAnnotation(Element element, AnnotationMirror annotation) {
+	private Set<ConstraintCheckIssue> checkAnnotation(Element element, AnnotationMirror annotation) {
 		if ( canCheckThisAnnotation( annotation ) ) {
 			return doCheck( element, annotation );
 		}
@@ -79,9 +79,9 @@ public abstract class AnnotationParametersAbstractCheck extends AbstractConstrai
 	 *
 	 * @param element annotated element
 	 * @param annotation annotation to process
-	 * @return a set of {@link ConstraintCheckError} errors if there are any validation issues with the annotation
+	 * @return a set of {@link ConstraintCheckIssue} errors if there are any validation issues with the annotation
 	 * parameters
 	 */
-	protected abstract Set<ConstraintCheckError> doCheck(Element element, AnnotationMirror annotation);
+	protected abstract Set<ConstraintCheckIssue> doCheck(Element element, AnnotationMirror annotation);
 
 }

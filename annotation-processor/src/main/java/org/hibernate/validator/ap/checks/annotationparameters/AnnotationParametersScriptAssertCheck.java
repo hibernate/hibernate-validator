@@ -6,14 +6,14 @@
  */
 package org.hibernate.validator.ap.checks.annotationparameters;
 
-import org.hibernate.validator.ap.checks.ConstraintCheckError;
-import org.hibernate.validator.ap.util.AnnotationApiHelper;
-import org.hibernate.validator.ap.util.CollectionHelper;
-
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
 import java.util.Collections;
 import java.util.Set;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+
+import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
+import org.hibernate.validator.ap.util.AnnotationApiHelper;
+import org.hibernate.validator.ap.util.CollectionHelper;
 
 /**
  * Checks that the parameters used on {@code org.hibernate.validator.constraints.ScriptAssert} annotations are valid.
@@ -27,7 +27,7 @@ public class AnnotationParametersScriptAssertCheck extends AnnotationParametersA
 	}
 
 	@Override
-	protected Set<ConstraintCheckError> doCheck(Element element, AnnotationMirror annotation) {
+	protected Set<ConstraintCheckIssue> doCheck(Element element, AnnotationMirror annotation) {
 		String lang = (String) annotationApiHelper.getAnnotationValue( annotation, "lang" ).getValue();
 		String script = (String) annotationApiHelper.getAnnotationValue( annotation, "script" ).getValue();
 		String alias = annotationApiHelper.getAnnotationValue( annotation, "alias" ) != null ?
@@ -35,7 +35,7 @@ public class AnnotationParametersScriptAssertCheck extends AnnotationParametersA
 
 		if ( ( lang.trim().length() == 0 ) || ( script.trim().length() == 0 ) || ( alias.trim().length() == 0 ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, "INVALID_SCRIPT_ASSERT_ANNOTATION_PARAMETERS"
 					)
 			);

@@ -33,26 +33,26 @@ import javax.lang.model.element.VariableElement;
 public class AbstractConstraintCheck implements ConstraintCheck {
 
 	@Override
-	public Set<ConstraintCheckError> checkField(VariableElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkField(VariableElement element, AnnotationMirror annotation) {
 
 		return Collections.emptySet();
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkMethod(ExecutableElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element, AnnotationMirror annotation) {
 
 		return Collections.emptySet();
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element,
+	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element,
 														 AnnotationMirror annotation) {
 
 		return Collections.emptySet();
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkNonAnnotationType(
+	public Set<ConstraintCheckIssue> checkNonAnnotationType(
 			TypeElement element, AnnotationMirror annotation) {
 
 		return Collections.emptySet();

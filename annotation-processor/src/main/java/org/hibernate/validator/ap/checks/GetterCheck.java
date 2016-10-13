@@ -28,12 +28,12 @@ public class GetterCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkMethod(ExecutableElement element,
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element,
 												 AnnotationMirror annotation) {
 
 		if ( !methodConstraintsSupported && !isGetterMethod( element ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, "ONLY_GETTERS_MAY_BE_ANNOTATED"
 					)
 			);

@@ -32,8 +32,8 @@ public class MethodAnnotationCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkMethod(ExecutableElement element,
-			AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element,
+												 AnnotationMirror annotation) {
 
 		// Annotations on methods/constructors can refer to return type or parameters (not both)
 		AnnotationProcessorValidationTarget target;
@@ -51,7 +51,7 @@ public class MethodAnnotationCheck extends AbstractConstraintCheck {
 
 				if ( target == null ) {
 					return CollectionHelper.asSet(
-							new ConstraintCheckError(
+							ConstraintCheckIssue.error(
 									element, annotation, "CROSS_PARAMETER_TARGET_NOT_INFERABLE",
 									annotation.getAnnotationType().asElement().getSimpleName() ) );
 				}
@@ -68,13 +68,13 @@ public class MethodAnnotationCheck extends AbstractConstraintCheck {
 
 		if ( target == AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT && !hasReturnValue( element ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, "ONLY_NON_VOID_METHODS_MAY_BE_ANNOTATED" ) );
 		}
 
 		if ( target == AnnotationProcessorValidationTarget.PARAMETERS && !hasParameters( element ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, "CROSS_PARAMETER_VALIDATION_ON_PARAMETERLESS_METHOD",
 							annotation.getAnnotationType().asElement().getSimpleName() ) );
 		}

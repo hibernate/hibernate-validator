@@ -7,12 +7,12 @@
 package org.hibernate.validator.ap.util;
 
 import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.ResourceBundle;
-import java.util.Set;
 import javax.annotation.processing.Messager;
 import javax.tools.Diagnostic.Kind;
 
-import org.hibernate.validator.ap.checks.ConstraintCheckError;
+import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 
 /**
  * Wrapper around {@link Messager}, which adds the ability to format error messages using {@link MessageFormat}.
@@ -63,10 +63,8 @@ public class MessagerAdapter {
 	 * @param errors A set with errors to report. May be empty but must not be
 	 * null.
 	 */
-	public void reportErrors(Set<ConstraintCheckError> errors) {
-		for ( ConstraintCheckError oneError : errors ) {
-			reportError( oneError );
-		}
+	public void reportErrors(Collection<ConstraintCheckIssue> errors) {
+		errors.forEach( this::reportError );
 	}
 
 	/**
@@ -75,7 +73,7 @@ public class MessagerAdapter {
 	 *
 	 * @param error The error to report.
 	 */
-	private void reportError(ConstraintCheckError error) {
+	private void reportError(ConstraintCheckIssue error) {
 
 		String message = errorMessages.getString( error.getMessageKey() );
 
@@ -85,6 +83,36 @@ public class MessagerAdapter {
 
 		messager.printMessage(
 				diagnosticKind, message, error.getElement(), error.getAnnotationMirror()
+		);
+	}
+
+	/**
+	 * Reports the given warnings against the underlying {@link Messager} using
+	 * the specified {@link Kind}.
+	 *
+	 * @param warnings A set with errors to report. May be empty but must not be
+	 * null.
+	 */
+	public void reportWarnings(Collection<ConstraintCheckIssue> warnings) {
+		warnings.forEach( this::reportWarning );
+	}
+
+	/**
+	 * Reports the given warning. Message parameters will be put into the template
+	 * retrieved from the resource bundle if applicable.
+	 *
+	 * @param warning The warning to report.
+	 */
+	private void reportWarning(ConstraintCheckIssue warning) {
+
+		String message = errorMessages.getString( warning.getMessageKey() );
+
+		if ( warning.getMessageParameters() != null ) {
+			message = MessageFormat.format( message, warning.getMessageParameters() );
+		}
+
+		messager.printMessage(
+				Kind.WARNING, message, warning.getElement(), warning.getAnnotationMirror()
 		);
 	}
 

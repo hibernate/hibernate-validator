@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.ap.checks.annotationparameters;
 
-import org.hibernate.validator.ap.checks.ConstraintCheckError;
+import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 
@@ -29,7 +29,7 @@ public class AnnotationParametersDecimalMinMaxCheck extends AnnotationParameters
 	}
 
 	@Override
-	protected Set<ConstraintCheckError> doCheck(Element element, AnnotationMirror annotation) {
+	protected Set<ConstraintCheckIssue> doCheck(Element element, AnnotationMirror annotation) {
 		String value = (String) annotationApiHelper.getAnnotationValue( annotation, "value" ).getValue();
 
 		try {
@@ -38,7 +38,7 @@ public class AnnotationParametersDecimalMinMaxCheck extends AnnotationParameters
 		}
 		catch (NumberFormatException nfe) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, "INVALID_DECIMAL_MIN_MAX_ANNOTATION_PARAMETERS"
 					)
 			);
