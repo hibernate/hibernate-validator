@@ -27,6 +27,7 @@
         -->
         <profilingOptions>-showversion</profilingOptions>
         <history.directory>${project.basedir}/history</history.directory>
+        <jmh.version>1.14.1</jmh.version>
     </properties>
 
     <dependencies>
@@ -35,12 +36,19 @@
             <artifactId>validation-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>${jmh.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -58,44 +66,41 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>chronos-jmeter-maven-plugin</artifactId>
-                <configuration>
-                    <input>${basedir}/src/jmx</input>
-                    <jMeterRemoteLocation>http://www.apache.org/dist/jmeter/binaries/apache-jmeter-2.8.zip
-                    </jMeterRemoteLocation>
-                    <jmeterhome>${project.basedir}/jmeter</jmeterhome>
-                    <jmeterOutput>${project.basedir}/target/chronos/performancetest</jmeterOutput>
-                    <historydir>${history.directory}</historydir>
-                    <heap>1024m</heap>
-                    <loggc>false</loggc>
-                    <jmeterVariables>
-                        <property>
-                            <name>validator</name>
-                            <value>${validator.version}</value>
-                        </property>
-                    </jmeterVariables>
-                    <options>
-                        <option>${profilingOptions}</option>
-                    </options>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>hibernate-validator-performance</finalName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>org.hibernate.validator.performance.TestRunner</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <!--
+                                        Shading signed JARs will fail without this.
+                                        http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+                                    -->
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>chronos-report-maven-plugin</artifactId>
-                <!-- Can't retrieve reporting plug-in version from pluginManagement
-                     (see http://jira.codehaus.org/browse/MSITE-443) -->
-                <version>${org.codehaus.mojo.chronos.version}</version>
-                <configuration>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
 
     <profiles>
         <profile>
@@ -107,11 +112,11 @@
             </properties>
         </profile>
         <profile>
-            <id>hv-5.1</id>
+            <id>hv-current</id>
             <activation>
                 <property>
                     <name>validator</name>
-                    <value>hv-5.1</value>
+                    <value>hv-current</value>
                 </property>
             </activation>
             <dependencies>
@@ -129,8 +134,89 @@
                 </dependency>
             </dependencies>
             <properties>
-                <validator.version>HV 5.1.0-SNAPSHOT</validator.version>
+                <validator.version>${project.version}</validator.version>
             </properties>
+        </profile>
+        <profile>
+            <id>hv-5.3</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-5.3</value>
+                </property>
+            </activation>
+            <properties>
+                <validator.version>5.3.0.Final</validator.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${validator.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>hv-5.2</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-5.2</value>
+                </property>
+            </activation>
+            <properties>
+                <validator.version>5.2.4.Final</validator.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${validator.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>hv-5.1</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-5.1</value>
+                </property>
+            </activation>
+            <properties>
+                <validator.version>5.1.3.Final</validator.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${validator.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </dependency>
+            </dependencies>
         </profile>
         <profile>
             <id>hv-5.0</id>
@@ -140,11 +226,14 @@
                     <value>hv-5.0</value>
                 </property>
             </activation>
+            <properties>
+                <validator.version>5.0.1.Final</validator.version>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
-                    <version>5.0.1.Final</version>
+                    <version>${validator.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.glassfish</groupId>
@@ -155,9 +244,6 @@
                     <artifactId>log4j</artifactId>
                 </dependency>
             </dependencies>
-            <properties>
-                <validator.version>HV 5.0.1.Final</validator.version>
-            </properties>
         </profile>
         <profile>
             <id>hv-4.3</id>
@@ -167,20 +253,20 @@
                     <value>hv-4.3</value>
                 </property>
             </activation>
+            <properties>
+                <validator.version>4.3.0.Final</validator.version>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
-                    <version>4.3.0.Final</version>
+                    <version>${validator.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
                 </dependency>
             </dependencies>
-            <properties>
-                <validator.version>HV 4.3.0.Final</validator.version>
-            </properties>
         </profile>
         <profile>
             <id>hv-4.2</id>
@@ -190,11 +276,14 @@
                     <value>hv-4.2</value>
                 </property>
             </activation>
+            <properties>
+                <validator.version>4.2.0.Final</validator.version>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
-                    <version>4.2.0.Final</version>
+                    <version>${validator.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
@@ -202,9 +291,6 @@
                     <version>1.6.1</version>
                 </dependency>
             </dependencies>
-            <properties>
-                <validator.version>HV 4.2.0.Final</validator.version>
-            </properties>
         </profile>
         <profile>
             <id>hv-4.1</id>
@@ -214,11 +300,14 @@
                     <value>hv-4.1</value>
                 </property>
             </activation>
+            <properties>
+                <validator.version>4.1.0.Final</validator.version>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
-                    <version>4.1.0.Final</version>
+                    <version>${validator.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
@@ -226,9 +315,6 @@
                     <version>1.5.6</version>
                 </dependency>
             </dependencies>
-            <properties>
-                <validator.version>HV 4.1.0.Final</validator.version>
-            </properties>
         </profile>
         <profile>
             <id>bval-0.5</id>
@@ -238,21 +324,21 @@
                     <value>bval-0.5</value>
                 </property>
             </activation>
+            <properties>
+                <validator.version>0.5</validator.version>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.apache.bval</groupId>
-                    <artifactId>bval-core</artifactId>
+                    <artifactId>${validator.version}</artifactId>
                     <version>0.5</version>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.bval</groupId>
                     <artifactId>bval-jsr303</artifactId>
-                    <version>0.5</version>
+                    <version>${validator.version}</version>
                 </dependency>
             </dependencies>
-            <properties>
-                <validator.version>BVAL 0.5</validator.version>
-            </properties>
         </profile>
     </profiles>
 </project>
