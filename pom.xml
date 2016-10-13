@@ -70,6 +70,7 @@
         <module>cdi</module>
         <module>tck-runner</module>
         <module>annotation-processor</module>
+        <module>integration</module>
         <module>performance</module>
     </modules>
 
@@ -840,7 +841,6 @@
                 <jdk>1.8</jdk>
             </activation>
             <modules>
-                <module>integration</module>
                 <module>osgi</module>
             </modules>
         </profile>
