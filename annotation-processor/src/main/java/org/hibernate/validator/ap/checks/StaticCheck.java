@@ -25,22 +25,22 @@ import org.hibernate.validator.ap.util.CollectionHelper;
 public class StaticCheck extends AbstractConstraintCheck {
 
 	@Override
-	public Set<ConstraintCheckError> checkField(VariableElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkField(VariableElement element, AnnotationMirror annotation) {
 
 		return checkInternal( element, annotation, "STATIC_FIELDS_MAY_NOT_BE_ANNOTATED" );
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkMethod(ExecutableElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element, AnnotationMirror annotation) {
 
 		return checkInternal( element, annotation, "STATIC_METHODS_MAY_NOT_BE_ANNOTATED" );
 	}
 
-	private Set<ConstraintCheckError> checkInternal(Element element,
+	private Set<ConstraintCheckIssue> checkInternal(Element element,
 													AnnotationMirror annotation, String messageKey) {
 		if ( isStaticElement( element ) ) {
 
-			return CollectionHelper.asSet( new ConstraintCheckError( element, annotation, messageKey ) );
+			return CollectionHelper.asSet( ConstraintCheckIssue.error( element, annotation, messageKey ) );
 		}
 
 		return Collections.emptySet();

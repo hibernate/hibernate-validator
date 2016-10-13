@@ -46,9 +46,9 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
-		Set<ConstraintCheckError> theValue = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> theValue = CollectionHelper.newHashSet();
 
 		theValue.addAll( checkMessageAttribute( element ) );
 		theValue.addAll( checkGroupsAttribute( element ) );
@@ -69,13 +69,13 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	 *
 	 * @return A possibly non-empty set of constraint check errors, never null.
 	 */
-	private Set<ConstraintCheckError> checkMessageAttribute(TypeElement element) {
+	private Set<ConstraintCheckIssue> checkMessageAttribute(TypeElement element) {
 
 		ExecutableElement messageMethod = getMethod( element, "message" );
 
 		if ( messageMethod == null ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( element, null, "CONSTRAINT_TYPE_MUST_DECLARE_MESSAGE_MEMBER" )
+					ConstraintCheckIssue.error( element, null, "CONSTRAINT_TYPE_MUST_DECLARE_MESSAGE_MEMBER" )
 			);
 		}
 
@@ -83,7 +83,7 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 				annotationApiHelper.getMirrorForType( String.class ), messageMethod.getReturnType()
 		) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( messageMethod, null, "RETURN_TYPE_MUST_BE_STRING" )
+					ConstraintCheckIssue.error( messageMethod, null, "RETURN_TYPE_MUST_BE_STRING" )
 			);
 		}
 
@@ -103,13 +103,13 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	 *
 	 * @return A possibly non-empty set of constraint check errors, never null.
 	 */
-	private Set<ConstraintCheckError> checkGroupsAttribute(TypeElement element) {
+	private Set<ConstraintCheckIssue> checkGroupsAttribute(TypeElement element) {
 
 		ExecutableElement groupsMethod = getMethod( element, "groups" );
 
 		if ( groupsMethod == null ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( element, null, "CONSTRAINT_TYPE_MUST_DECLARE_GROUPS_MEMBER" )
+					ConstraintCheckIssue.error( element, null, "CONSTRAINT_TYPE_MUST_DECLARE_GROUPS_MEMBER" )
 			);
 		}
 
@@ -117,7 +117,7 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 
 		if ( type == null ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( groupsMethod, null, "RETURN_TYPE_MUST_BE_CLASS_ARRAY" )
+					ConstraintCheckIssue.error( groupsMethod, null, "RETURN_TYPE_MUST_BE_CLASS_ARRAY" )
 			);
 		}
 
@@ -127,13 +127,13 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 
 		if ( !( typeHasNameClass && typeHasExactlyOneTypeArgument && typeArgumentIsUnboundWildcard ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( groupsMethod, null, "RETURN_TYPE_MUST_BE_CLASS_ARRAY" )
+					ConstraintCheckIssue.error( groupsMethod, null, "RETURN_TYPE_MUST_BE_CLASS_ARRAY" )
 			);
 		}
 
 		if ( !isEmptyArray( groupsMethod.getDefaultValue() ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( groupsMethod, null, "DEFAULT_VALUE_MUST_BE_EMPTY_ARRAY" )
+					ConstraintCheckIssue.error( groupsMethod, null, "DEFAULT_VALUE_MUST_BE_EMPTY_ARRAY" )
 			);
 		}
 
@@ -153,13 +153,13 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	 *
 	 * @return A possibly non-empty set of constraint check errors, never null.
 	 */
-	private Set<ConstraintCheckError> checkPayloadAttribute(TypeElement element) {
+	private Set<ConstraintCheckIssue> checkPayloadAttribute(TypeElement element) {
 
 		ExecutableElement payloadMethod = getMethod( element, "payload" );
 
 		if ( payloadMethod == null ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( element, null, "CONSTRAINT_TYPE_MUST_DECLARE_PAYLOAD_MEMBER" )
+					ConstraintCheckIssue.error( element, null, "CONSTRAINT_TYPE_MUST_DECLARE_PAYLOAD_MEMBER" )
 			);
 		}
 
@@ -167,7 +167,7 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 
 		if ( type == null ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( payloadMethod, null, "PAYLOAD_RETURN_TYPE_MUST_BE_CLASS_ARRAY" )
+					ConstraintCheckIssue.error( payloadMethod, null, "PAYLOAD_RETURN_TYPE_MUST_BE_CLASS_ARRAY" )
 			);
 		}
 
@@ -181,13 +181,13 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 
 		if ( !( typeHasNameClass && typeHasExactlyOneTypeArgument && typeArgumentIsWildcardWithPayloadExtendsBound ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( payloadMethod, null, "PAYLOAD_RETURN_TYPE_MUST_BE_CLASS_ARRAY" )
+					ConstraintCheckIssue.error( payloadMethod, null, "PAYLOAD_RETURN_TYPE_MUST_BE_CLASS_ARRAY" )
 			);
 		}
 
 		if ( !isEmptyArray( payloadMethod.getDefaultValue() ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( payloadMethod, null, "PAYLOAD_DEFAULT_VALUE_MUST_BE_EMPTY_ARRAY" )
+					ConstraintCheckIssue.error( payloadMethod, null, "PAYLOAD_DEFAULT_VALUE_MUST_BE_EMPTY_ARRAY" )
 			);
 		}
 
@@ -220,7 +220,7 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	 * @param method The method of interest.
 	 *
 	 * @return The component type of the array-typed return value of the given method or null,
-	 *         if the given method has no array-typed return value.
+	 * if the given method has no array-typed return value.
 	 */
 	private DeclaredType getComponentTypeOfArrayReturnType(ExecutableElement method) {
 

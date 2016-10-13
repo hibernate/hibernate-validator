@@ -42,7 +42,7 @@ public class TargetCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
 		Target target = element.getAnnotation( Target.class );
 
@@ -53,7 +53,7 @@ public class TargetCheck extends AbstractConstraintCheck {
 
 		if ( !containsAtLeastOneSupportedElementType( target ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element,
 							annotationApiHelper.getMirror( element.getAnnotationMirrors(), Target.class ),
 							"CONSTRAINT_TYPE_WITH_WRONG_TARGET"

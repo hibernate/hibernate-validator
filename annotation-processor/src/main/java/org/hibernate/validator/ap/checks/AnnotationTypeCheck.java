@@ -30,13 +30,13 @@ public class AnnotationTypeCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element,
+	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element,
 														 AnnotationMirror annotation) {
 
 		if ( !constraintHelper.isConstraintAnnotation( element ) ) {
 
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, "ONLY_CONSTRAINT_ANNOTATIONS_MAY_BE_ANNOTATED"
 					)
 			);

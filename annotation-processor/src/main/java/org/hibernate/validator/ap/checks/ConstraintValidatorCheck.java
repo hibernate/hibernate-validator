@@ -35,7 +35,7 @@ public class ConstraintValidatorCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
 		AnnotationMirror constraintMirror = annotationApiHelper.getMirror(
 				element.getAnnotationMirrors(), BeanValidationTypes.CONSTRAINT
@@ -47,7 +47,7 @@ public class ConstraintValidatorCheck extends AbstractConstraintCheck {
 		if ( !( atLeastOneValidatorGiven || constraintHelper.isComposedConstraint( element ) ) ) {
 
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element,
 							constraintMirror,
 							"CONSTRAINT_TYPE_WITHOUT_VALIDATOR"

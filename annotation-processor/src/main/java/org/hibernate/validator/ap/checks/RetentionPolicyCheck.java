@@ -30,19 +30,19 @@ public class RetentionPolicyCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
 		Retention retention = element.getAnnotation( Retention.class );
 
 		if ( retention == null ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError( element, null, "CONSTRAINT_TYPE_WITH_MISSING_OR_WRONG_RETENTION" )
+					ConstraintCheckIssue.error( element, null, "CONSTRAINT_TYPE_WITH_MISSING_OR_WRONG_RETENTION" )
 			);
 		}
 
 		if ( !retention.value().equals( RetentionPolicy.RUNTIME ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element,
 							annotationApiHelper.getMirror( element.getAnnotationMirrors(), Retention.class ),
 							"CONSTRAINT_TYPE_WITH_MISSING_OR_WRONG_RETENTION"

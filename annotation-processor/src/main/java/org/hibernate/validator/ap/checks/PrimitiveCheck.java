@@ -25,14 +25,14 @@ import org.hibernate.validator.ap.util.CollectionHelper;
 public class PrimitiveCheck extends AbstractConstraintCheck {
 
 	@Override
-	public Set<ConstraintCheckError> checkField(VariableElement element,
+	public Set<ConstraintCheckIssue> checkField(VariableElement element,
 												AnnotationMirror annotation) {
 
 		return checkInternal( element, annotation, element.asType(), "ATVALID_NOT_ALLOWED_AT_PRIMITIVE_FIELD" );
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkMethod(ExecutableElement element,
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element,
 												 AnnotationMirror annotation) {
 
 		return checkInternal(
@@ -40,13 +40,12 @@ public class PrimitiveCheck extends AbstractConstraintCheck {
 		);
 	}
 
-	private Set<ConstraintCheckError> checkInternal(Element element,
+	private Set<ConstraintCheckIssue> checkInternal(Element element,
 													AnnotationMirror annotation, TypeMirror type, String messageKey) {
-
 		if ( type.getKind().isPrimitive() ) {
 
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, messageKey
 					)
 			);
