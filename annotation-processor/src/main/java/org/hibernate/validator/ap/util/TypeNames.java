@@ -67,6 +67,7 @@ public class TypeNames {
 		public static final String SAFE_HTML = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".SafeHtml";
 		public static final String SCRIPT_ASSERT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ScriptAssert";
 		public static final String URL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".URL";
+		public static final String NUMBER_PATTERN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NumberPattern";
 	}
 
 	public static class JodaTypes {

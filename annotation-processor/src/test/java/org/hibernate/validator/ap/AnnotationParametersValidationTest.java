@@ -13,12 +13,14 @@ import static org.testng.AssertJUnit.assertTrue;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidDecimalMinMaxParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidDigitsParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidLengthParameters;
+import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidNumberPatternParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidPatternParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidScriptAssertParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidSizeParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidDecimalMinMaxParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidDigitsParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidLengthParameters;
+import org.hibernate.validator.ap.testmodel.annotationparameters.ValidNumberPatternParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidPatternParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidScriptAssertParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidSizeParameters;
@@ -247,6 +249,36 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.ERROR, 44 ),
 				new DiagnosticExpectation( Kind.ERROR, 45 ),
 				new DiagnosticExpectation( Kind.ERROR, 50 )
+		);
+	}
+
+	@Test
+	public void testValidNumberPatternParameters() {
+		File sourceFile = compilerHelper.getSourceFile( ValidNumberPatternParameters.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertTrue( compilationResult );
+		assertThatDiagnosticsMatch( diagnostics );
+	}
+
+	@Test
+	public void testInvalidNumberPatternParameters() {
+		File sourceFile = compilerHelper.getSourceFile( InvalidNumberPatternParameters.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 16 ),
+				new DiagnosticExpectation( Kind.ERROR, 19 ),
+				new DiagnosticExpectation( Kind.ERROR, 22 ),
+				new DiagnosticExpectation( Kind.ERROR, 26 ),
+				new DiagnosticExpectation( Kind.ERROR, 27 ),
+				new DiagnosticExpectation( Kind.ERROR, 28 )
 		);
 	}
 

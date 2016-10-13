@@ -683,5 +683,8 @@ public interface Log extends BasicLogger {
 	ValidationException getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> annotationClass);
 
 	@Message(id = 194, value = "An empty element is only supported when a CharSequence is expected.")
-	ValidationException getEmptyElementOnlySupportedWhenCharSequenceIsExpectedExpection();
+	ValidationException getEmptyElementOnlySupportedWhenCharSequenceIsExpectedException();
+
+	@Message(id = 195, value = "An invalid number format pattern was provided.")
+	IllegalArgumentException getInvalidNumberFormatException();
 }
