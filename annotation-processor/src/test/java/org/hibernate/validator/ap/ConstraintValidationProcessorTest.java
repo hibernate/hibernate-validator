@@ -69,8 +69,10 @@ import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.Size;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForCollection;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSerializable;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSet;
+import org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests;
 import org.hibernate.validator.ap.testutil.CompilerTestHelper.Library;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.Test;
 
@@ -93,6 +95,30 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics, new DiagnosticExpectation( Kind.ERROR, 43 ), new DiagnosticExpectation( Kind.ERROR, 49 )
+		);
+	}
+
+
+	@Test
+	@TestForIssue( jiraKey = "HV-840" )
+	public void overridingMethodParameterConstrainsTest() {
+		File sourceFile = compilerHelper.getSourceFile( MethodOverridingTests.class );
+
+		boolean compilationResult = compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 29 ),
+				new DiagnosticExpectation( Kind.ERROR, 47 ),
+				new DiagnosticExpectation( Kind.ERROR, 63 ),
+				new DiagnosticExpectation( Kind.ERROR, 82 ),
+				new DiagnosticExpectation( Kind.ERROR, 117 ),
+				new DiagnosticExpectation( Kind.ERROR, 138 ),
+				new DiagnosticExpectation( Kind.ERROR, 146 ),
+				new DiagnosticExpectation( Kind.ERROR, 163 ),
+				new DiagnosticExpectation( Kind.ERROR, 185 ),
+				new DiagnosticExpectation( Kind.ERROR, 213 )
 		);
 	}
 
