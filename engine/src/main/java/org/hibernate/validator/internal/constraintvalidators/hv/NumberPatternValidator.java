@@ -72,20 +72,20 @@ public class NumberPatternValidator implements ConstraintValidator<NumberPattern
 	 * Converts given {@link Number} value to string representation to which regexp will be applied.
 	 * Uses number format if one was provided.
 	 *
-	 * @param value which is validated.
+	 * @param number value which is validated
 	 *
-	 * @return {@link String} representation of given value.
+	 * @return {@link String} representation of given value
 	 */
-	private String getCharSequenceRepresentation(Number value) {
+	private String getCharSequenceRepresentation(Number number) {
 		if ( StringHelper.isNullOrEmptyString( numberFormatString ) ) {
 			//no number format was provided.
-			if ( value instanceof BigDecimal ) {
-				return ( (BigDecimal) value ).toPlainString();
+			if ( number instanceof BigDecimal ) {
+				return ( (BigDecimal) number ).toPlainString();
 			}
-			return value.toString();
+			return number.toString();
 		}
 		else {
-			return new DecimalFormat( numberFormatString ).format( value );
+			return new DecimalFormat( numberFormatString ).format( number );
 		}
 
 	}
