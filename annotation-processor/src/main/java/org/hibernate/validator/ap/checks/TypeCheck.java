@@ -36,15 +36,15 @@ public class TypeCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkField(VariableElement element,
-			AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkField(VariableElement element,
+												AnnotationMirror annotation) {
 
 		return checkInternal( element, annotation, element.asType(), "NOT_SUPPORTED_TYPE" );
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkMethod(ExecutableElement element,
-			AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element,
+												 AnnotationMirror annotation) {
 
 		AnnotationProcessorValidationTarget target = AnnotationProcessorValidationTarget.ANNOTATED_ELEMENT;
 		if ( constraintHelper.isConstraintAnnotation( annotation.getAnnotationType().asElement() ) ) {
@@ -60,20 +60,20 @@ public class TypeCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkNonAnnotationType(
+	public Set<ConstraintCheckIssue> checkNonAnnotationType(
 			TypeElement element, AnnotationMirror annotation) {
 
 		return checkInternal( element, annotation, element.asType(), "NOT_SUPPORTED_TYPE" );
 	}
 
-	private Set<ConstraintCheckError> checkInternal(Element element,
+	private Set<ConstraintCheckIssue> checkInternal(Element element,
 			AnnotationMirror annotation, TypeMirror type, String messageKey) {
 
 		if ( constraintHelper.checkConstraint(
 				annotation.getAnnotationType(), type ) != ConstraintCheckResult.ALLOWED ) {
 
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, messageKey,
 							annotation.getAnnotationType().asElement().getSimpleName() ) );
 		}

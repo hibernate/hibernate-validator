@@ -55,7 +55,7 @@ public class CrossParameterConstraintCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
+	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
 		// this check applies to constraint annotations
 		if ( !constraintHelper.isConstraintAnnotation( element ) ) {
@@ -79,7 +79,7 @@ public class CrossParameterConstraintCheck extends AbstractConstraintCheck {
 		ConstraintCheckResult res = constraintHelper.checkCrossParameterTypes( elementType );
 		if ( res == ConstraintCheckResult.MULTIPLE_VALIDATORS_FOUND ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element,
 							annotation,
 							"CROSS_PARAMETER_CONSTRAINT_MULTIPLE_VALIDATORS",
@@ -87,7 +87,7 @@ public class CrossParameterConstraintCheck extends AbstractConstraintCheck {
 		}
 		else if ( res == ConstraintCheckResult.DISALLOWED ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element,
 							annotation,
 							"CROSS_PARAMETER_CONSTRAINT_VALIDATOR_HAS_INVALID_TYPE",
@@ -100,7 +100,7 @@ public class CrossParameterConstraintCheck extends AbstractConstraintCheck {
 		if ( validationAppliesTo == null && targets.size() > 1 ) {
 			// validationAppliesTo is required to let the user specify the constraint target
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element,
 							annotation,
 							"CROSS_PARAMETER_VALIDATION_APPLIES_TO_REQUIRED",
@@ -111,7 +111,7 @@ public class CrossParameterConstraintCheck extends AbstractConstraintCheck {
 
 			if ( !checkValidationAppliesToReturnType( validationAppliesTo ) ) {
 				return CollectionHelper.asSet(
-						new ConstraintCheckError(
+						ConstraintCheckIssue.error(
 								element,
 								annotation,
 								"CROSS_PARAMETER_VALIDATION_APPLIES_TO_MUST_HAVE_CONSTRAINT_TARGET_RETURN_TYPE",
@@ -119,7 +119,7 @@ public class CrossParameterConstraintCheck extends AbstractConstraintCheck {
 			}
 			else if ( !checkValidationAppliesToDefaultValue( validationAppliesTo ) ) {
 				return CollectionHelper.asSet(
-						new ConstraintCheckError(
+						ConstraintCheckIssue.error(
 								element,
 								annotation,
 								"CROSS_PARAMETER_VALIDATION_APPLIES_TO_MUST_HAVE_IMPLICIT_DEFAULT_VALUE",

@@ -39,10 +39,8 @@ public class MultiValuedChecks implements ConstraintChecks {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> execute(Element element,
-											 AnnotationMirror annotation) {
-
-		Set<ConstraintCheckError> theValue = CollectionHelper.newHashSet();
+	public Set<ConstraintCheckIssue> execute(Element element, AnnotationMirror annotation) {
+		Set<ConstraintCheckIssue> theValue = CollectionHelper.newHashSet();
 
 		//execute the checks on each element of the multi-valued constraint
 		for ( AnnotationMirror onePartOfMultiValuedConstraint :

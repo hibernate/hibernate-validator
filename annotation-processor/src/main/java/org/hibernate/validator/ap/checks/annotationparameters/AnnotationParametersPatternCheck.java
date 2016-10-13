@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.ap.checks.annotationparameters;
 
-import org.hibernate.validator.ap.checks.ConstraintCheckError;
+import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 
@@ -29,7 +29,7 @@ public class AnnotationParametersPatternCheck extends AnnotationParametersAbstra
 	}
 
 	@Override
-	protected Set<ConstraintCheckError> doCheck(Element element, AnnotationMirror annotation) {
+	protected Set<ConstraintCheckIssue> doCheck(Element element, AnnotationMirror annotation) {
 		String regexp = (String) annotationApiHelper.getAnnotationValue( annotation, "regexp" ).getValue();
 
 		try {
@@ -37,7 +37,7 @@ public class AnnotationParametersPatternCheck extends AnnotationParametersAbstra
 		}
 		catch (PatternSyntaxException e) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, "INVALID_PATTERN_ANNOTATION_PARAMETERS"
 					)
 			);

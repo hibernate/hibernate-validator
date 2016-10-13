@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.ap.checks.annotationparameters;
 
-import org.hibernate.validator.ap.checks.ConstraintCheckError;
+import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 
@@ -28,7 +28,7 @@ public class AnnotationParametersSizeLengthCheck extends AnnotationParametersAbs
 	}
 
 	@Override
-	protected Set<ConstraintCheckError> doCheck(Element element, AnnotationMirror annotation) {
+	protected Set<ConstraintCheckIssue> doCheck(Element element, AnnotationMirror annotation) {
 		Integer min = annotationApiHelper.getAnnotationValue( annotation, "min" ) != null ?
 				(Integer) annotationApiHelper.getAnnotationValue( annotation, "min" ).getValue() : 0;
 		Integer max = annotationApiHelper.getAnnotationValue( annotation, "max" ) != null ?
@@ -36,7 +36,7 @@ public class AnnotationParametersSizeLengthCheck extends AnnotationParametersAbs
 
 		if ( ( min < 0 ) || ( max < 0 ) || ( min > max ) ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, "INVALID_SIZE_LENGTH_ANNOTATION_PARAMETERS"
 					)
 			);

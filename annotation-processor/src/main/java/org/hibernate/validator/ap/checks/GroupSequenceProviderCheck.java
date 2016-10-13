@@ -9,7 +9,6 @@ package org.hibernate.validator.ap.checks;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -59,8 +58,8 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 	}
 
 	@Override
-	public Set<ConstraintCheckError> checkNonAnnotationType(TypeElement element, AnnotationMirror annotation) {
-		Set<ConstraintCheckError> errors = CollectionHelper.newHashSet();
+	public Set<ConstraintCheckIssue> checkNonAnnotationType(TypeElement element, AnnotationMirror annotation) {
+		Set<ConstraintCheckIssue> errors = CollectionHelper.newHashSet();
 
 		errors.addAll( checkHostingElement( element, annotation ) );
 		errors.addAll( checkAnnotationValue( element, annotation ) );
@@ -68,10 +67,10 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 		return errors;
 	}
 
-	private Set<ConstraintCheckError> checkHostingElement(TypeElement element, AnnotationMirror annotation) {
+	private Set<ConstraintCheckIssue> checkHostingElement(TypeElement element, AnnotationMirror annotation) {
 		if ( !element.getKind().isClass() ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element, annotation, "GROUP_SEQUENCE_PROVIDER_ANNOTATION_MUST_BE_DEFINED_ON_A_CLASS"
 					)
 			);
@@ -83,7 +82,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 				BeanValidationTypes.GROUP_SEQUENCE
 		) != null ) {
 			return CollectionHelper.asSet(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element,
 							annotation,
 							"GROUP_SEQUENCE_PROVIDER_ANNOTATION_NOT_ALLOWED_ON_CLASS_WITH_GROUP_SEQUENCE_ANNOTATION"
@@ -94,15 +93,15 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 		return Collections.emptySet();
 	}
 
-	private Set<ConstraintCheckError> checkAnnotationValue(TypeElement element, AnnotationMirror annotation) {
-		Set<ConstraintCheckError> errors = CollectionHelper.newHashSet();
+	private Set<ConstraintCheckIssue> checkAnnotationValue(TypeElement element, AnnotationMirror annotation) {
+		Set<ConstraintCheckIssue> errors = CollectionHelper.newHashSet();
 		AnnotationValue value = annotationApiHelper.getAnnotationValue( annotation, "value" );
 		TypeMirror valueType = (TypeMirror) value.getValue();
 		TypeElement valueElement = (TypeElement) typeUtils.asElement( valueType );
 
 		if ( valueElement.getKind().isInterface() || valueElement.getModifiers().contains( Modifier.ABSTRACT ) ) {
 			errors.add(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element,
 							annotation,
 							"GROUP_SEQUENCE_PROVIDER_ANNOTATION_VALUE_MUST_BE_AN_IMPLEMENTATION_CLASS"
@@ -115,7 +114,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 			//interface. In that case, we need to check that it has a public default constructor.
 			if ( !hasPublicDefaultConstructor( valueElement ) ) {
 				errors.add(
-						new ConstraintCheckError(
+						ConstraintCheckIssue.error(
 								element,
 								annotation,
 								"GROUP_SEQUENCE_PROVIDER_ANNOTATION_VALUE_CLASS_MUST_HAVE_DEFAULT_CONSTRUCTOR",
@@ -128,7 +127,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 		TypeMirror genericProviderType = retrieveGenericProviderType( valueType );
 		if ( !typeUtils.isSubtype( element.asType(), genericProviderType ) ) {
 			errors.add(
-					new ConstraintCheckError(
+					ConstraintCheckIssue.error(
 							element,
 							annotation,
 							"GROUP_SEQUENCE_PROVIDER_ANNOTATION_VALUE_DEFINED_PROVIDER_CLASS_WITH_WRONG_TYPE",
