@@ -56,6 +56,7 @@ import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
+import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.REGON;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertFalseValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
@@ -115,6 +116,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertVali
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CNPJValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.pl.NIPValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.REGONValidator;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -235,6 +237,7 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, Mod10Check.class, Mod10CheckValidator.class );
 		putConstraint( tmpConstraints, Mod11Check.class, Mod11CheckValidator.class );
 		putConstraint( tmpConstraints, REGON.class, REGONValidator.class );
+		putConstraint( tmpConstraints, NIP.class, NIPValidator.class );
 		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
 		putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
 		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
