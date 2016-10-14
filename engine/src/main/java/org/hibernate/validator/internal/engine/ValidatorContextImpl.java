@@ -15,6 +15,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
@@ -24,6 +25,7 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Gunnar Morling
  * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
+ * @author Guillaume Smet
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
 
@@ -58,6 +60,10 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 			this.messageInterpolator = validatorFactory.getMessageInterpolator();
 		}
 		else {
+			if ( messageInterpolator instanceof ResourceBundleMessageInterpolator ) {
+				( (ResourceBundleMessageInterpolator) messageInterpolator ).initializeELExpressionFactory();
+			}
+
 			this.messageInterpolator = messageInterpolator;
 		}
 		return this;

@@ -60,6 +60,7 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
+ * @author Guillaume Smet
  */
 public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
 
@@ -300,7 +301,12 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public final ValidatorFactory buildValidatorFactory() {
 		parseValidationXml();
 		ValidatorFactory factory = null;
+
 		try {
+			if ( validationBootstrapParameters.getMessageInterpolator() instanceof ResourceBundleMessageInterpolator ) {
+				( (ResourceBundleMessageInterpolator) validationBootstrapParameters.getMessageInterpolator() ).initializeELExpressionFactory();
+			}
+
 			if ( isSpecificProvider() ) {
 				factory = validationBootstrapParameters.getProvider().buildValidatorFactory( this );
 			}

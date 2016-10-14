@@ -30,17 +30,6 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 	private ExpressionFactory expressionFactory;
 
-	// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
-	// factory type eagerly
-	static {
-		try {
-			ExpressionFactory.class.getName();
-		}
-		catch (NoClassDefFoundError e) {
-			throw LOG.getMissingELDependenciesException();
-		}
-	}
-
 	public ResourceBundleMessageInterpolator() {
 		super();
 	}
@@ -73,5 +62,17 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	public String interpolate(Context context, Locale locale, String term) {
 		InterpolationTerm expression = new InterpolationTerm( term, locale, expressionFactory );
 		return expression.interpolate( context );
+	}
+
+	public synchronized void initializeELExpressionFactory() {
+		if ( expressionFactory == null ) {
+			try {
+				expressionFactory = ExpressionFactory.newInstance();
+			}
+			catch (NoClassDefFoundError e) {
+				// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
+				throw LOG.getMissingELDependenciesException();
+			}
+		}
 	}
 }
