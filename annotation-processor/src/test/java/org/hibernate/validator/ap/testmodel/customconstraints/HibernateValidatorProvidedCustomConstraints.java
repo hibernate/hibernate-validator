@@ -25,6 +25,7 @@ import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
+import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
 
 @ScriptAssert(script = "some script", lang = "javascript")
@@ -51,6 +52,7 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@TituloEleitoral
 	@REGON
 	@NIP
+	@PESEL
 	public String string;
 
 	/**
@@ -73,5 +75,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@TituloEleitoral
 	@REGON
 	@NIP
+	@PESEL
 	public Date date;
 }
