@@ -49,6 +49,11 @@ public class Mod11CheckValidator extends ModCheckBase
 	 */
 	private int threshold;
 
+	/**
+	 * An array of custom weights to be used in the sum
+	 */
+	private int[] customWeights;
+
 	@Override
 	public void initialize(Mod11Check constraintAnnotation) {
 		initialize(
@@ -59,19 +64,23 @@ public class Mod11CheckValidator extends ModCheckBase
 				constraintAnnotation.threshold(),
 				constraintAnnotation.treatCheck10As(),
 				constraintAnnotation.treatCheck11As(),
-				constraintAnnotation.processingDirection()
+				constraintAnnotation.processingDirection(),
+				constraintAnnotation.weights()
 		);
 	}
 
-	public void initialize(int startIndex,
+	public void initialize(
+			int startIndex,
 			int endIndex,
 			int checkDigitIndex,
 			boolean ignoreNonDigitCharacters,
 			int threshold,
 			char treatCheck10As,
 			char treatCheck11As,
-			ProcessingDirection direction
+			ProcessingDirection direction,
+			int... customWeights
 	) {
+
 		super.initialize(
 				startIndex,
 				endIndex,
@@ -83,6 +92,8 @@ public class Mod11CheckValidator extends ModCheckBase
 
 		this.treatCheck10As = treatCheck10As;
 		this.treatCheck11As = treatCheck11As;
+
+		this.customWeights = customWeights;
 
 		if ( !Character.isLetterOrDigit( this.treatCheck10As ) ) {
 			throw log.getTreatCheckAsIsNotADigitNorALetterException( this.treatCheck10As );
@@ -107,7 +118,7 @@ public class Mod11CheckValidator extends ModCheckBase
 			Collections.reverse( digits );
 		}
 
-		int modResult = ModUtil.calculateMod11Check( digits, this.threshold );
+		int modResult = ModUtil.calculateModXCheckWithWeights( digits, 11, this.threshold, customWeights );
 		switch ( modResult ) {
 			case 10:
 				return checkDigit == this.treatCheck10As;
