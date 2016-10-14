@@ -32,7 +32,7 @@ public abstract class PolishNumberValidator<T extends Annotation> extends ModChe
 		switch ( modResult ) {
 			case 10:
 			case 11:
-				return checkDigit == 0;
+				return checkDigit == '0';
 			default:
 				return Character.isDigit( checkDigit ) && modResult == extractDigit( checkDigit );
 		}
