@@ -28,8 +28,10 @@ import org.hibernate.validator.ap.util.CollectionHelper;
  */
 public class AnnotationMessageCheck extends AnnotationParametersAbstractCheck {
 
-	// for dots and no {} around
-	private static final Pattern MESSAGE_PATTERN = Pattern.compile( "(\\w)+(\\.(\\w)+)*" );
+	private static final String WORDS_SEPARATED_WITH_DOTS = "(\\w)+(\\.(\\w)+)*" ;
+
+	// for dots and no {} around, or one of the {} is missing
+	private static final Pattern MESSAGE_PATTERN = Pattern.compile( WORDS_SEPARATED_WITH_DOTS + "|\\{" + WORDS_SEPARATED_WITH_DOTS + "|" + WORDS_SEPARATED_WITH_DOTS + "\\}" );
 
 	private final Elements elementUtils;
 
