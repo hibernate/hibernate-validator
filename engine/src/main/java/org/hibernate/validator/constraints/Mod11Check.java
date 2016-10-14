@@ -116,6 +116,15 @@ public @interface Mod11Check {
 	ProcessingDirection processingDirection() default ProcessingDirection.RIGHT_TO_LEFT;
 
 	/**
+	 * @return an array of custom weights to be used in sum calculation of Mod11 algorithm.
+	 * If the size of provided weights array is less than needed ({@code array.length < endIndex - startIndex})
+	 * the weights will be used repeatedly. For example if constant weight is needed the weights array
+	 * can be initialized as {@code weights = { someConstant }}.
+	 * If weights array is left blank (which is a default value) a classical Mod11 weights are used.
+	 */
+	int[] weights() default { };
+
+	/**
 	 * Defines several {@code @Mod11Check} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
