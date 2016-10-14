@@ -62,7 +62,7 @@ public abstract class AnnotationParametersAbstractCheck extends AbstractConstrai
 	 * @param annotation annotation you want to process by this class
 	 * @return {@code true} if such annotation can be processed, {@code false} otherwise.
 	 */
-	private boolean canCheckThisAnnotation(AnnotationMirror annotation) {
+	protected boolean canCheckThisAnnotation(AnnotationMirror annotation) {
 		return annotationClasses.contains( annotation.getAnnotationType().asElement().toString() );
 	}
 

@@ -18,6 +18,7 @@ import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidScriptAs
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidSizeParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidDecimalMinMaxParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidDigitsParameters;
+import org.hibernate.validator.ap.testmodel.annotationparameters.ValidGroupsParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidLengthParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidPatternParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidScriptAssertParameters;
@@ -250,4 +251,21 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 		);
 	}
 
+	@Test
+	public void testValidGroupsParameter() {
+		File sourceFile = compilerHelper.getSourceFile( ValidGroupsParameters.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 26 ),
+				new DiagnosticExpectation( Kind.ERROR, 29 ),
+				new DiagnosticExpectation( Kind.ERROR, 32 ),
+				new DiagnosticExpectation( Kind.ERROR, 37 ),
+				new DiagnosticExpectation( Kind.ERROR, 42 )
+		);
+	}
 }
