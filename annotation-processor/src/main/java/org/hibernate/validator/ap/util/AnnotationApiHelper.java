@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
@@ -31,9 +32,9 @@ import javax.lang.model.util.Types;
  */
 public class AnnotationApiHelper {
 
-	private Elements elementUtils;
+	private final Elements elementUtils;
 
-	private Types typeUtils;
+	private final Types typeUtils;
 
 	private final Map<Class<?>, TypeMirror> primitiveMirrors;
 
@@ -221,7 +222,7 @@ public class AnnotationApiHelper {
 
 	/**
 	 * Returns the annotation value of the given annotation mirror with the
-	 * given name or it's default value if it was not specified.
+	 * given name or its default value if it was not specified.
 	 *
 	 * @param annotationMirror An annotation mirror.
 	 * @param name The name of the annotation value of interest.
@@ -231,7 +232,6 @@ public class AnnotationApiHelper {
 	 *         within the given annotation mirror.
 	 */
 	public AnnotationValue getAnnotationValueOrDefault(AnnotationMirror annotationMirror, String name) {
-
 		if ( annotationMirror == null || name == null ) {
 			return null;
 		}
@@ -239,9 +239,7 @@ public class AnnotationApiHelper {
 		Map<? extends ExecutableElement, ? extends AnnotationValue> elementValues = elementUtils.getElementValuesWithDefaults( annotationMirror );
 
 		for ( Entry<? extends ExecutableElement, ? extends AnnotationValue> oneElementValue : elementValues.entrySet() ) {
-
 			if ( oneElementValue.getKey().getSimpleName().contentEquals( name ) ) {
-
 				return oneElementValue.getValue();
 			}
 		}

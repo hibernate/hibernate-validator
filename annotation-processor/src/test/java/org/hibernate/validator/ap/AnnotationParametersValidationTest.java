@@ -10,6 +10,10 @@ import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatD
 import static org.testng.Assert.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
+import java.io.File;
+
+import javax.tools.Diagnostic.Kind;
+
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidDecimalMinMaxParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidDigitsParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidLengthParameters;
@@ -25,11 +29,8 @@ import org.hibernate.validator.ap.testmodel.annotationparameters.ValidPatternPar
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidScriptAssertParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidSizeParameters;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
-
+import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
-
-import javax.tools.Diagnostic.Kind;
-import java.io.File;
 
 /**
  * Test cases for {@link ConstraintValidationProcessor} testing the checking of annotation parameters validity.
@@ -272,6 +273,7 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-822")
 	public void testValidMessageParameter() {
 		File sourceFile = compilerHelper.getSourceFile( ValidMessageParameters.class );
 

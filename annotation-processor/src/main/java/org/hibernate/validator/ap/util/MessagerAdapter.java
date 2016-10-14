@@ -9,6 +9,7 @@ package org.hibernate.validator.ap.util;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.ResourceBundle;
+
 import javax.annotation.processing.Messager;
 import javax.tools.Diagnostic.Kind;
 
@@ -31,7 +32,7 @@ public class MessagerAdapter {
 	/**
 	 * The kind of diagnostic to be used when reporting any problems.
 	 */
-	private Kind diagnosticKind;
+	private final Kind diagnosticKind;
 
 	/**
 	 * Creates a new MessagerAdapter.
@@ -76,7 +77,6 @@ public class MessagerAdapter {
 	 * @param error The error to report.
 	 */
 	private void reportError(ConstraintCheckIssue error) {
-
 		String message = errorMessages.getString( error.getMessageKey() );
 
 		if ( error.getMessageParameters() != null ) {
@@ -108,7 +108,6 @@ public class MessagerAdapter {
 	 * @param warning The warning to report.
 	 */
 	private void reportWarning(ConstraintCheckIssue warning) {
-
 		String message = errorMessages.getString( warning.getMessageKey() );
 
 		if ( warning.getMessageParameters() != null ) {
