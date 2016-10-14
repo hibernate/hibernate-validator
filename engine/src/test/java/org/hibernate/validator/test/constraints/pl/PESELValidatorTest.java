@@ -18,6 +18,7 @@ import org.testng.annotations.Test;
 
 /**
  * Tests for PESEL constraints.
+ * A generator which can be used to create fake numbers - <a href="http://www.bogus.ovh.org/generatory/all.html>generator</a>
  *
  * @author Marko Bekhta
  */
@@ -35,7 +36,12 @@ public class PESELValidatorTest {
 		assertNumberOfViolations( validator.validate( new Person( "44051401359" ) ), 0 );
 		assertNumberOfViolations( validator.validate( new Person( "70100619901" ) ), 0 );
 		assertNumberOfViolations( validator.validate( new Person( "80082107231" ) ), 0 );
-		assertNumberOfViolations( validator.validate( new Person( "80062210348" ) ), 0 );
+		assertNumberOfViolations( validator.validate( new Person( "00301202868" ) ), 0 );
+		assertNumberOfViolations( validator.validate( new Person( "00271100559" ) ), 0 );
+		assertNumberOfViolations( validator.validate( new Person( "12241301417" ) ), 0 );
+		assertNumberOfViolations( validator.validate( new Person( "12252918020" ) ), 0 );
+		assertNumberOfViolations( validator.validate( new Person( "12262911406" ) ), 0 );
+
 	}
 
 	@Test
@@ -44,6 +50,11 @@ public class PESELValidatorTest {
 		assertNumberOfViolations( validator.validate( new Person( "92041903791" ) ), 1 );
 		assertNumberOfViolations( validator.validate( new Person( "80082107232" ) ), 1 );
 		assertNumberOfViolations( validator.validate( new Person( "80062210349" ) ), 1 );
+		assertNumberOfViolations( validator.validate( new Person( "00301202866" ) ), 1 );
+		assertNumberOfViolations( validator.validate( new Person( "00271100557" ) ), 1 );
+		assertNumberOfViolations( validator.validate( new Person( "12241301418" ) ), 1 );
+		assertNumberOfViolations( validator.validate( new Person( "12252918029" ) ), 1 );
+		assertNumberOfViolations( validator.validate( new Person( "12262911402" ) ), 1 );
 	}
 
 
