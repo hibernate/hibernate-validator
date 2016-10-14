@@ -14,6 +14,7 @@ import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
+import javax.validation.constraints.Size;
 
 /**
  * @author Marko Bekhta
@@ -50,26 +51,26 @@ public class ValidMessageParameters {
 
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
-	@Constraint(validatedBy = {SomeValidator.class})
+	@Constraint(validatedBy = { SomeValidator.class })
 	public @interface CancellationCodeInvalid {
 
 		String message() default "org.jboss.jdf.example.ticketmonster.model.CancellationCodeInvalid.message";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
-	@Constraint(validatedBy = {SomeOtherValidator.class})
+	@Constraint(validatedBy = { SomeOtherValidator.class })
 	public @interface CancellationCodeValid {
 
 		String message() default "{org.jboss.jdf.example.ticketmonster.model.CancellationCodeInvalid.message}";
 
-		Class<?>[] groups() default {};
+		Class<?>[] groups() default { };
 
-		Class<? extends Payload>[] payload() default {};
+		Class<? extends Payload>[] payload() default { };
 	}
 
 
@@ -86,6 +87,30 @@ public class ValidMessageParameters {
 
 		@CancellationCodeValid(message = "some.bad.overridden.message.example")
 		private String string3;
+
+	}
+
+	public static class Case2 {
+
+		@Size(message = "just some custom message which is completely fine")
+		private String string1;
+
+		@Size(message = "now.this.one.is.probably.not.what.user.wanted.to.get")
+		private String string2;
+
+		@Size(message = "{now.this.one.is.probably.not.what.user.wanted.to.get.as.well")
+		private String string3;
+
+		@Size(message = "{this.one.is.just.fine.even.though.probably.there.is.no.such.key}")
+		private String string4;
+
+		@Size.List({
+				@Size(message = "now.this.one.is.probably.not.what.user.wanted.to.get"),
+				@Size(message = "{now.this.one.is.probably.not.what.user.wanted.to.get.as.well"),
+				@Size(message = "now.this.one.is.probably.not.what.user.wanted.to.get.as.well}"),
+				@Size(message = "{this.one.is.just.fine.even.though.probably.there.is.no.such.key}")
+		})
+		private String string5;
 
 	}
 
