@@ -40,7 +40,7 @@ is just a simple tagging interface.
 [TIP]
 ====
 Using interfaces makes the usage of groups type-safe and allows for easy refactoring. It also means
-that groups can inherit from each other via class inheritance.
+that groups can inherit from each other via class inheritance. See <<section-group-inheritance>>.
 ====
 
 [[example-driver]]
@@ -105,6 +105,47 @@ due to the fact that the driver has not yet passed the driving test. Only after 
 
 The last `validate()` call finally shows that all constraints are passing by validating against all
 defined groups.
+
+[[section-group-inheritance]]
+=== Group inheritance
+
+In <<example-drive-away>>, we need to call `validate()` for each validation group, or specify all of them one by one.
+In some situations, you may want to define a group of constraints which includes another group.
+You can do that using group inheritance.
+
+In <<example-supercar>>, we define a `SuperCar` and a group `RaceCarChecks` that extends the `Default` group.
+A `SuperCar` must have safety belts to be allowed to run in races.
+
+[[example-supercar]]
+.SuperCar
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupinheritance/SuperCar.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/groupinheritance/RaceCarChecks.java[]
+----
+====
+
+Now we will check if a `SuperCar` with one seat and no security belt is a valid car and a valid race-car.
+
+[[example-group-inheritance]]
+.Using group inheritance
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter05/GroupTest.java[tags=testGroupInheritance]
+----
+====
+
+On the first call to `validate()`, we do not specify a group. There is one validation error because a car must have at least one seat.
+It's a constraint from the `Default` group.
+
+On the second call, we specify only the group `RaceCarChecks`. There are two validation errors: one about the seat from the `Default` group,
+another one about safety belt from the `RaceCarChecks` group.
 
 [[section-defining-group-sequences]]
 === Defining group sequences

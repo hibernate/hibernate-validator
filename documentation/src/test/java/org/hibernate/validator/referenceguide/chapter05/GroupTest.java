@@ -1,5 +1,6 @@
 package org.hibernate.validator.referenceguide.chapter05;
 
+import java.util.Iterator;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -9,6 +10,9 @@ import javax.validation.groups.Default;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import org.hibernate.validator.referenceguide.chapter05.groupinheritance.RaceCarChecks;
+import org.hibernate.validator.referenceguide.chapter05.groupinheritance.SuperCar;
 
 import static org.junit.Assert.assertEquals;
 
@@ -67,6 +71,20 @@ public class GroupTest {
 				).size()
 		);
 		//end::driveAway[]
+	}
+
+	@Test
+	public void testGroupInheritance() {
+		//tag::testGroupInheritance[]
+		// create a supercar and check that it's valid as a generic Car
+		SuperCar superCar = new SuperCar( "Morris", "DD-AB-123", 1  );
+		assertEquals( "must be greater than or equal to 2", validator.validate( superCar ).iterator().next().getMessage() );
+
+		// check that this supercar is valid as generic car and also as race car
+		Iterator<ConstraintViolation<SuperCar>> iterator = validator.validate( superCar, RaceCarChecks.class ).iterator();
+		assertEquals( "Race car must have a safety belt", iterator.next().getMessage() );
+		assertEquals( "must be greater than or equal to 2", iterator.next().getMessage() );
+		//end::testGroupInheritance[]
 	}
 
 	@Test
