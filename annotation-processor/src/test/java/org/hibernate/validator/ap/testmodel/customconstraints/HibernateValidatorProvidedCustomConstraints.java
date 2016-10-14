@@ -24,6 +24,7 @@ import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
 import org.hibernate.validator.constraints.br.TituloEleitoral;
+import org.hibernate.validator.constraints.pl.REGON;
 
 @ScriptAssert(script = "some script", lang = "javascript")
 @SuppressWarnings("deprecation")
@@ -47,6 +48,7 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@CNPJ
 	@CPF
 	@TituloEleitoral
+	@REGON
 	public String string;
 
 	/**
@@ -67,5 +69,6 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@CNPJ
 	@CPF
 	@TituloEleitoral
+	@REGON
 	public Date date;
 }
