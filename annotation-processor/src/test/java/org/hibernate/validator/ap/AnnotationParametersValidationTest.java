@@ -283,7 +283,8 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 		assertTrue( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.WARNING, 78 )
+				new DiagnosticExpectation( Kind.WARNING, 56 ),
+				new DiagnosticExpectation( Kind.WARNING, 87 )
 
 		);
 	}

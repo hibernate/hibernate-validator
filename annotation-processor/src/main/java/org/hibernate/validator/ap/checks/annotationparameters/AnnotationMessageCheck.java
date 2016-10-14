@@ -10,7 +10,12 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
 
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
@@ -26,8 +31,11 @@ public class AnnotationMessageCheck extends AnnotationParametersAbstractCheck {
 	// for dots and no {} around
 	private static final Pattern MESSAGE_PATTERN = Pattern.compile( "(\\w)+(\\.(\\w)+)*" );
 
-	public AnnotationMessageCheck(AnnotationApiHelper annotationApiHelper) {
+	private final Elements elementUtils;
+
+	public AnnotationMessageCheck(AnnotationApiHelper annotationApiHelper, Elements elementUtils) {
 		super( annotationApiHelper );
+		this.elementUtils = elementUtils;
 	}
 
 	@Override
@@ -37,15 +45,33 @@ public class AnnotationMessageCheck extends AnnotationParametersAbstractCheck {
 
 	@Override
 	protected Set<ConstraintCheckIssue> doCheck(Element element, AnnotationMirror annotation) {
-		String message = (String) annotationApiHelper.getAnnotationValueOrDefault( annotation, "message" ).getValue();
 
-		if ( MESSAGE_PATTERN.matcher( message ).matches() ) {
+		//check if default message on annotation is correct or not:
+		if ( ElementKind.ANNOTATION_TYPE.equals( element.getKind() ) ) {
+			for ( Element innerElement : elementUtils.getAllMembers( (TypeElement) element ) ) {
+				if ( ElementKind.METHOD.equals( innerElement.getKind() ) && "message".equals( innerElement.getSimpleName().toString() ) ) {
+					if ( MESSAGE_PATTERN.matcher( ( (ExecutableElement) innerElement ).getDefaultValue().getValue().toString() ).matches() ) {
+						return CollectionHelper.asSet(
+								ConstraintCheckIssue.warning(
+										innerElement, annotation, "INVALID_MESSAGE_VALUE_ANNOTATION_PARAMETERS"
+								)
+						);
+					}
+				}
+			}
+		}
+
+		// check if the redefined by user message is correct or not:
+		AnnotationValue value = annotationApiHelper.getAnnotationValue( annotation, "message" );
+
+		if ( value != null && MESSAGE_PATTERN.matcher( (String) value.getValue() ).matches() ) {
 			return CollectionHelper.asSet(
 					ConstraintCheckIssue.warning(
 							element, annotation, "INVALID_MESSAGE_VALUE_ANNOTATION_PARAMETERS"
 					)
 			);
 		}
+
 		return Collections.emptySet();
 	}
 }

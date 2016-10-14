@@ -84,6 +84,9 @@ public class ValidMessageParameters {
 		@CancellationCodeValid
 		private String string2;
 
+		@CancellationCodeValid(message = "some.bad.overridden.message.example")
+		private String string3;
+
 	}
 
 }
