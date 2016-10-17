@@ -16,6 +16,12 @@ public class MultipleConstraintsOfSameType {
 	@List(value = { @Pattern(regexp = ""), @Pattern(regexp = "") })
 	public String string;
 
+	@List(value = { @Pattern(regexp = ""), @Pattern(regexp = "") })
+	public Integer integer;
+
+	@List(value = { @Pattern(regexp = ""), @Pattern(regexp = "") })
+	public double aDouble;
+
 	/**
 	 * Not allowed.
 	 */
