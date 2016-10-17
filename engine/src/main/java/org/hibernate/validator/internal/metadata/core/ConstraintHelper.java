@@ -50,6 +50,7 @@ import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.ModCheck;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NumberPattern;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -108,6 +109,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValida
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator;
+import org.hibernate.validator.internal.constraintvalidators.hv.NumberPatternValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
@@ -237,6 +239,7 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
 		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
 		putConstraint( tmpConstraints, URL.class, URLValidator.class );
+		putConstraint( tmpConstraints, NumberPattern.class, NumberPatternValidator.class );
 
 		this.builtinConstraints = Collections.unmodifiableMap( tmpConstraints );
 	}

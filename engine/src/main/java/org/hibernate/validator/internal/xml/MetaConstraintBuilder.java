@@ -140,7 +140,7 @@ class MetaConstraintBuilder {
 					return "";
 				}
 				else {
-					throw log.getEmptyElementOnlySupportedWhenCharSequenceIsExpectedExpection();
+					throw log.getEmptyElementOnlySupportedWhenCharSequenceIsExpectedException();
 				}
 			}
 			else if ( elementType.getContent().size() > 1 ) {
