@@ -6,10 +6,13 @@
  */
 package org.hibernate.validator.performance;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hibernate.validator.performance.cascaded.CascadedValidation;
 import org.hibernate.validator.performance.simple.SimpleValidation;
 import org.hibernate.validator.performance.statistical.StatisticalValidation;
-
 import org.openjdk.jmh.profile.ClassloaderProfiler;
 import org.openjdk.jmh.profile.CompilerProfiler;
 import org.openjdk.jmh.profile.GCProfiler;
@@ -26,10 +29,6 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Class containing main method to run all performance tests.
@@ -75,7 +74,7 @@ public final class TestRunner {
 		ChainedOptionsBuilder builder =
 				new OptionsBuilder()
 						.resultFormat( ResultFormatType.JSON )
-						.result( "JmhResults.json" );
+						.result( "target/JmhResults.json" );
 		Arrays.stream( profilers )
 				.filter( profileKey -> PROFILERS.containsKey( profileKey ) )
 				.forEach( profileKey -> builder.addProfiler( PROFILERS.get( profileKey ) ) );

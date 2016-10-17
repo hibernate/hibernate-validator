@@ -1,13 +1,15 @@
 # Performance test for Hibernate Validator
 
-The tests are written as JMH benchmarks. They can be developed and executed as usual in your IDE. However, they are not
-executed during regular build as unit tests when a _mvn test_ is running. Instead, to execute the performance tests,
-one should build a jar file with one of the profiles mentioned below and run it.
+The tests are written as [JMH](http://openjdk.java.net/projects/code-tools/jmh/) benchmarks. They can be developed and
+executed as usual in your IDE. However, they are not executed during regular build as unit tests when a _mvn test_ is
+running. Instead, to execute the performance tests, one should build a jar file with one of the profiles mentioned
+below and run it.
 
 ## Profiles
 
 To allow performance testing of different Hibernate Validator versions there are multiple profiles configured.
-Choosing a profile executes the tests against the specified Hibernate Validator resp. BVal version. The defined profiles are:
+Choosing a profile executes the tests against the specified Hibernate Validator or BVal version, respectively. The
+defined profiles are:
 
 * hv-current (Hibernate Validator 6.0.0-SNAPSHOT)
 * hv-5.3 (Hibernate Validator 5.3.0.CR1)
@@ -23,7 +25,7 @@ Choosing a profile executes the tests against the specified Hibernate Validator 
 
 Some tips before you start:
 
-* **These tests are not there to measure absolute execution times! Instead there value lies in the ability to compare against different
+* **These tests are not there to measure absolute execution times! Instead their value lies in the ability to compare against different
 versions of Hibernate Validator using the same tests. This allows to detect and address performance regressions.**
 * You need to specify a profile!
 
@@ -84,6 +86,4 @@ Simple bean with cascaded validation which gets executed over and over.
 A number of _TestEntity_s is created where each entity contains a property for each built-in constraint type and also a reference
 to another _TestEntity_. All constraints are evaluated by a single ConstraintValidator implementation which fails a specified
 percentage of the validations.
-
-
 
