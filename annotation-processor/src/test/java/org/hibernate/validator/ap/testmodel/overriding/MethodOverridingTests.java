@@ -6,11 +6,20 @@
  */
 package org.hibernate.validator.ap.testmodel.overriding;
 
-import org.hibernate.validator.constraints.NotBlank;
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE_USE;
 
+import java.lang.annotation.Target;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.NotBlank;
 
 public class MethodOverridingTests {
 
@@ -44,7 +53,7 @@ public class MethodOverridingTests {
 	public static class MethodOverridingTestCase2Sub extends MethodOverridingTestCase2 {
 
 		@Override
-		public void doSomething(@NotNull @NotBlank @Size( max = 10 ) String param) {
+		public void doSomething(@NotNull @NotBlank @Size(max = 10) String param) {
 			super.doSomething( param );
 		}
 	}
@@ -60,7 +69,7 @@ public class MethodOverridingTests {
 	public static class MethodOverridingTestCase3Sub implements MethodOverridingTestCase3 {
 
 		@Override
-		public void doSomething(@NotNull @NotBlank @Size( max = 10 ) String param) {
+		public void doSomething(@NotNull @NotBlank @Size(max = 10) String param) {
 
 		}
 	}
@@ -95,7 +104,7 @@ public class MethodOverridingTests {
 
 		@Override
 		@NotBlank
-		@Size( max = 10 )
+		@Size(max = 10)
 		public String doSomething(String param) {
 			return "";
 		}
@@ -107,13 +116,14 @@ public class MethodOverridingTests {
 
 	public interface MethodOverridingTestCase6 {
 		@NotBlank
-		@Size( max = 10 )
+		@Size(max = 10)
 		String doSomething(String param);
 	}
 
 	public static class MethodOverridingTestCase6Sub implements MethodOverridingTestCase6 {
 
-		@NotBlank @Override
+		@NotBlank
+		@Override
 		public String doSomething(String param) {
 			return "";
 		}
@@ -125,7 +135,7 @@ public class MethodOverridingTests {
 	 */
 
 	public interface MethodOverridingTestCase7Interface {
-		String doSomething(@NotBlank @Size( max = 10 ) String param);
+		String doSomething(@NotBlank @Size(max = 10) String param);
 	}
 
 	public interface MethodOverridingTestCase7OtherInterface {
@@ -161,9 +171,9 @@ public class MethodOverridingTests {
 
 			@Override
 			public void placeOrder(
-					@NotNull @Size( min = 3, max = 20 ) String customerCode,
+					@NotNull @Size(min = 3, max = 20) String customerCode,
 					@NotNull String item,
-					@Min( 1 ) int quantity) {
+					@Min(1) int quantity) {
 
 			}
 		}
@@ -183,9 +193,9 @@ public class MethodOverridingTests {
 
 			@Override
 			public void placeOrder(
-					@NotNull @Size( min = 3, max = 20 ) String customerCode,
+					@NotNull @Size(min = 3, max = 20) String customerCode,
 					@NotNull String item,
-					@Min( 1 ) int quantity) {
+					@Min(1) int quantity) {
 			}
 		}
 	}
@@ -202,9 +212,9 @@ public class MethodOverridingTests {
 		public interface OrderPlacementService {
 
 			void placeOrder(
-					@NotNull @Size( min = 3, max = 20 ) String customerCode,
+					@NotNull @Size(min = 3, max = 20) String customerCode,
 					@NotNull String item,
-					@Min( 1 ) int quantity);
+					@Min(1) int quantity);
 		}
 
 		public static class SimpleOrderService implements OrderService, OrderPlacementService {
@@ -213,6 +223,50 @@ public class MethodOverridingTests {
 			public void placeOrder(String customerCode, String item, int quantity) {
 			}
 		}
+	}
+
+	/**
+	 * Case 11: some other annotation is present but it should not affect correctness - correct:
+	 */
+	public static class Case11 {
+
+		@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
+		public @interface SomeAnnotation {
+
+		}
+
+		public class OrderService {
+
+			void placeOrder(
+					@NotNull @Size(min = 3, max = 20) String customerCode,
+					@NotNull String item,
+					@Min(1) int quantity) {
+			}
+
+			@Min(0)
+			@SomeAnnotation // this should not affect the check
+			int getOrderId() {
+				return 1;
+			}
+		}
+
+		public class SimpleOrderService extends OrderService {
+
+			@Override
+			public void placeOrder(
+					@SomeAnnotation String customerCode,
+					String item,
+					int quantity) {
+			}
+
+			@Min(0)
+			@Max(10)
+			@Override
+			int getOrderId() {
+				return 10;
+			}
+		}
+
 	}
 }
 
