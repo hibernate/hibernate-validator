@@ -63,7 +63,7 @@ public class ParametersMethodOverrideCheck extends MethodOverrideCheck {
 		if ( overriddenParam == null ) {
 			return true;
 		}
-		return overriddenParam.getAnnotationMirrors().containsAll( current.getAnnotationMirrors() );
+		return annotationMirrorContainsAll( overriddenParam.getAnnotationMirrors(), listOnlyConstraintAnnotations( current.getAnnotationMirrors() ) );
 	}
 
 	@Override

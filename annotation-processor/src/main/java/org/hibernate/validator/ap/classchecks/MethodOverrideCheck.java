@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -30,6 +31,8 @@ import org.hibernate.validator.ap.util.CollectionHelper;
 public abstract class MethodOverrideCheck extends AbstractClassCheck {
 
 	private static final String JAVA_LANG_OBJECT = "java.lang.Object";
+
+	private static final String JAVAX_VALIDATION_CONSTRAINT = "javax.validation.Constraint";
 
 	private final Elements elementUtils;
 
@@ -132,7 +135,7 @@ public abstract class MethodOverrideCheck extends AbstractClassCheck {
 			}
 
 			//need to check all implemented interfaces as well:
-			checkInterfacesForOverriddenMethod( currentTypeElement, parentTypeElement.getInterfaces(), current );
+			elements.addAll( checkInterfacesForOverriddenMethod( currentTypeElement, parentTypeElement.getInterfaces(), current ) );
 
 			parentTypeElement = (TypeElement) typeUtils.asElement( parentTypeElement.getSuperclass() );
 		}
@@ -204,6 +207,68 @@ public abstract class MethodOverrideCheck extends AbstractClassCheck {
 	 */
 	private TypeElement getEnclosingTypeElement(ExecutableElement currentMethod) {
 		return (TypeElement) typeUtils.asElement( currentMethod.getEnclosingElement().asType() );
+	}
+
+	/**
+	 * Returns a list containing those annotation mirrors from the input list,
+	 * which are constraint annotations and filter out others. The input collection
+	 * remains untouched.
+	 *
+	 * @param collectionToFilter a list to be filtered
+	 *
+	 * @return a filtered list with constraint annotations only
+	 */
+	protected List<? extends AnnotationMirror> listOnlyConstraintAnnotations(List<? extends AnnotationMirror> collectionToFilter) {
+		if ( collectionToFilter.isEmpty() ) {
+			return Collections.emptyList();
+		}
+		List<AnnotationMirror> result = CollectionHelper.newArrayList();
+
+		for ( AnnotationMirror annotationMirror : collectionToFilter ) {
+			if ( isConstraintAnnotation( annotationMirror ) ) {
+				result.add( annotationMirror );
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Checks if annotation is a constraint annotation or not.
+	 *
+	 * @param annotationMirror an annotation to check
+	 *
+	 * @return {@code true} if annotation is a constraint annotation, {@code false} otherwise
+	 */
+	private boolean isConstraintAnnotation(AnnotationMirror annotationMirror) {
+		for ( AnnotationMirror mirror : annotationMirror.getAnnotationType().asElement().getAnnotationMirrors() ) {
+			if ( JAVAX_VALIDATION_CONSTRAINT.equals( mirror.getAnnotationType().toString() ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if one list of annotation mirrors contains same kind of annotation as the other.
+	 *
+	 * @param listToCheck list that should contain annotations from the other one
+	 * @param listShouldContain list of annotation that should be present in the first one
+	 *
+	 * @return {@code true} if all annotations from the second list are present in the first one,
+	 * {@code false} otherwise
+	 */
+	protected boolean annotationMirrorContainsAll(List<? extends AnnotationMirror> listToCheck, List<? extends AnnotationMirror> listShouldContain) {
+		Set<String> namesOfAnnotations = CollectionHelper.newHashSet();
+		for ( AnnotationMirror annotationMirror : listToCheck ) {
+			namesOfAnnotations.add( annotationMirror.getAnnotationType().toString() );
+		}
+		for ( AnnotationMirror annotationMirror : listShouldContain ) {
+			if ( !namesOfAnnotations.contains( annotationMirror.getAnnotationType().toString() ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
