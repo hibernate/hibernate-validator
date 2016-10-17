@@ -33,7 +33,7 @@ public class ReturnValueMethodOverrideCheck extends MethodOverrideCheck {
 	 */
 	@Override
 	protected boolean checkOverriddenMethod(ExecutableElement currentMethod, ExecutableElement otherMethod) {
-		return currentMethod.getAnnotationMirrors().containsAll( otherMethod.getAnnotationMirrors() );
+		return annotationMirrorContainsAll( currentMethod.getAnnotationMirrors(), listOnlyConstraintAnnotations( otherMethod.getAnnotationMirrors() ) );
 	}
 
 	@Override
