@@ -12,7 +12,6 @@ import java.util.Map;
 import org.hibernate.validator.performance.cascaded.CascadedValidation;
 import org.hibernate.validator.performance.simple.SimpleValidation;
 import org.hibernate.validator.performance.statistical.StatisticalValidation;
-
 import org.openjdk.jmh.profile.ClassloaderProfiler;
 import org.openjdk.jmh.profile.CompilerProfiler;
 import org.openjdk.jmh.profile.GCProfiler;
@@ -74,7 +73,7 @@ public final class TestRunner {
 		ChainedOptionsBuilder builder =
 				new OptionsBuilder()
 						.resultFormat( ResultFormatType.JSON )
-						.result( "JmhResults.json" );
+						.result( "target/JmhResults.json" );
 		for ( String profilerKey : profilers ) {
 			if ( PROFILERS.containsKey( profilerKey ) ) {
 				builder.addProfiler( PROFILERS.get( profilerKey ) );
