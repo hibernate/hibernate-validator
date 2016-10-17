@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,20 +16,19 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.validation.Validation;
+import javax.validation.bootstrap.GenericBootstrap;
 
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
-
 /**
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
-@TestForIssue(jiraKey = "HV-793")
 public class ValidatorFactoryNoELBootstrapTest {
 
 	@Test
+	@TestForIssue(jiraKey = "HV-793")
 	public void testMissingELDependencyThrowsExceptionDuringFactoryBootstrap() throws Exception {
 		ClassLoader classLoader = new ELIgnoringClassLoader();
 		Class<?> clazz = classLoader.loadClass( Validation.class.getName() );
@@ -41,9 +43,24 @@ public class ValidatorFactoryNoELBootstrapTest {
 		catch (InvocationTargetException e) {
 			assertTrue(
 					getRootCause( e ).getMessage().startsWith( "HV000183" ),
-					"Bootstrapping in Validation should threw an unexpected exception: " + e.getMessage()
+					"Bootstrapping in Validation should throw an unexpected exception: " + e.getMessage()
 			);
 		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1131")
+	public void testMissingELDependencyDontThrowExceptionDuringConfigurationInitialization() throws Exception {
+		ClassLoader classLoader = new ELIgnoringClassLoader();
+
+		Class<?> validationClass = classLoader.loadClass( Validation.class.getName() );
+		Method byDefaultProviderMethod = validationClass.getMethod( "byDefaultProvider" );
+
+		Class<?> genericBootstrapClass = classLoader.loadClass( GenericBootstrap.class.getName() );
+		Method configureMethod = genericBootstrapClass.getMethod( "configure" );
+
+		Object genericBootstrap = byDefaultProviderMethod.invoke( null );
+		configureMethod.invoke( genericBootstrap );
 	}
 
 	/**
@@ -70,17 +87,22 @@ public class ValidatorFactoryNoELBootstrapTest {
 			if ( className.startsWith( EL_PACKAGE_PREFIX ) ) {
 				throw new ClassNotFoundException();
 			}
+
 			// for all other classes we have to jump through some hoops
-			else {
-				// load the class via the parent class loader
-				Class<?> clazz = super.loadClass( className );
-				// if we have a class from the java name space we need to return it, since the security manager
-				// won't allow to redefine it
-				for ( String prefix : PASS_THROUGH_PACKAGE_PREFIXES ) {
-					if ( className.startsWith( prefix ) ) {
-						return clazz;
-					}
+
+			// load the class via the parent class loader
+			// if we have a class from the java name space we need to return it, since the security manager
+			// won't allow to redefine it
+			for ( String prefix : PASS_THROUGH_PACKAGE_PREFIXES ) {
+				if ( className.startsWith( prefix ) ) {
+					return super.loadClass( className );
 				}
+			}
+
+			// if the class is already loaded, we return it
+			Class<?> clazz = findLoadedClass( className );
+			if ( clazz != null ) {
+				return clazz;
 			}
 
 			// for all other classes we load the class data from disk and define the class new
@@ -92,13 +114,36 @@ public class ValidatorFactoryNoELBootstrapTest {
 			catch (IOException e) {
 				throw new RuntimeException();
 			}
-			return defineClass( className, classData, 0, classData.length, null );
+			clazz = defineClass( className, classData, 0, classData.length, null );
+
+			// it is our responsability to define the package of the class
+			String packageName = getPackageName( className );
+			if ( packageName != null && getPackage( packageName ) == null ) {
+				definePackage( packageName, null, null, null, null, null, null, null );
+			}
+
+			return clazz;
 		}
 	}
 
-	private byte[] loadClassData(String className) throws IOException {
+	private static String getPackageName(String className) {
+		int i = className.lastIndexOf( '.' );
+		if ( i > 0 ) {
+			return className.substring( 0, i );
+		}
+		else {
+			return null;
+		}
+	}
+
+	private byte[] loadClassData(String className) throws IOException, ClassNotFoundException {
 		String path = "/" + className.replace( ".", "/" ) + ".class";
 		InputStream in = ValidatorFactoryNoELBootstrapTest.class.getResourceAsStream( path );
+
+		if ( in == null ) {
+			throw new ClassNotFoundException();
+		}
+
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
 		int bytesRead;
