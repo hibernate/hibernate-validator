@@ -141,6 +141,10 @@
                                 <configuration>
                                     <backend>docbook</backend>
                                     <outputDirectory>target/asciidoc-docbook/en-US</outputDirectory>
+                                    <attributes>
+                                        <sourcedir>${basedir}/src/test/java</sourcedir>
+                                        <engine-sourcedir>${basedir}/../engine/src/main/java</engine-sourcedir>
+                                    </attributes>
                                 </configuration>
                             </execution>
                         </executions>
