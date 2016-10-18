@@ -15,6 +15,7 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Set;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.Validator;
@@ -24,9 +25,6 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
@@ -34,6 +32,8 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -214,17 +214,17 @@ public class ConstraintValidatorManagerTest {
 				validator, User.class, "lastName"
 		);
 
-		ConstraintValidator<?, Object> notNullValidatorForFirstName1 = constraintValidatorManager.getInitializedValidator(
+		ConstraintValidator<?, ?> notNullValidatorForFirstName1 = constraintValidatorManager.getInitializedValidator(
 				valueContext.getDeclaredTypeOfValidatedElement(),
 				notNullOnFirstNameDescriptor,
 				constraintValidatorFactory
 		);
-		ConstraintValidator<?, Object> notNullValidatorForFirstName2 = constraintValidatorManager.getInitializedValidator(
+		ConstraintValidator<?, ?> notNullValidatorForFirstName2 = constraintValidatorManager.getInitializedValidator(
 				valueContext.getDeclaredTypeOfValidatedElement(),
 				notNullOnFirstNameDescriptor,
 				constraintValidatorFactory
 		);
-		ConstraintValidator<?, Object> notNullValidatorForLastName = constraintValidatorManager.getInitializedValidator(
+		ConstraintValidator<?, ?> notNullValidatorForLastName = constraintValidatorManager.getInitializedValidator(
 				valueContext.getDeclaredTypeOfValidatedElement(),
 				notNullOnLastNameDescriptor,
 				constraintValidatorFactory
@@ -259,13 +259,13 @@ public class ConstraintValidatorManagerTest {
 				validator, User.class, "address2"
 		);
 
-		ConstraintValidator<?, Object> sizeValidatorForMiddleName = constraintValidatorManager.getInitializedValidator(
+		ConstraintValidator<?, ?> sizeValidatorForMiddleName = constraintValidatorManager.getInitializedValidator(
 				valueContext.getDeclaredTypeOfValidatedElement(), sizeOnMiddleNameDescriptor, constraintValidatorFactory
 		);
-		ConstraintValidator<?, Object> sizeValidatorForAddress1 = constraintValidatorManager.getInitializedValidator(
+		ConstraintValidator<?, ?> sizeValidatorForAddress1 = constraintValidatorManager.getInitializedValidator(
 				valueContext.getDeclaredTypeOfValidatedElement(), sizeOnAddress1Descriptor, constraintValidatorFactory
 		);
-		ConstraintValidator<?, Object> sizeValidatorForAddress2 = constraintValidatorManager.getInitializedValidator(
+		ConstraintValidator<?, ?> sizeValidatorForAddress2 = constraintValidatorManager.getInitializedValidator(
 				valueContext.getDeclaredTypeOfValidatedElement(), sizeOnAddress2Descriptor, constraintValidatorFactory
 		);
 

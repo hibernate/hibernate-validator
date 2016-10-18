@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.xml;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
@@ -15,6 +14,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +33,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -74,7 +75,7 @@ public class MappingXmlParser {
 	private static final Map<String, String> SCHEMAS_BY_VERSION = Collections.unmodifiableMap( getSchemasByVersion() );
 
 	private static Map<String, String> getSchemasByVersion() {
-		Map<String, String> schemasByVersion = new HashMap<String, String>();
+		Map<String, String> schemasByVersion = new HashMap<>();
 
 		schemasByVersion.put( "1.0", "META-INF/validation-mapping-1.0.xsd" );
 		schemasByVersion.put( "1.1", "META-INF/validation-mapping-1.1.xsd" );
@@ -286,7 +287,7 @@ public class MappingXmlParser {
 
 	private <A extends Annotation> void addValidatorDefinitions(Class<A> annotationClass, String defaultPackage,
 			ValidatedByType validatedByType) {
-		List<Class<? extends ConstraintValidator<A, ?>>> constraintValidatorClasses = newArrayList();
+		List<ConstraintValidatorDescriptor<A>> constraintValidatorClasses = new ArrayList<>();
 
 		for ( String validatorClassName : validatedByType.getValue() ) {
 			@SuppressWarnings("unchecked")
@@ -297,7 +298,7 @@ public class MappingXmlParser {
 				throw log.getIsNotAConstraintValidatorClassException( validatorClass );
 			}
 
-			constraintValidatorClasses.add( validatorClass );
+			constraintValidatorClasses.add( ConstraintValidatorDescriptor.forClass( validatorClass ) );
 		}
 		constraintHelper.putValidatorClasses(
 				annotationClass,

@@ -17,6 +17,9 @@
  */
 package org.hibernate.validator.internal.util;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -32,13 +35,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.validation.ConstraintValidator;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Provides utility methods for working with types.
@@ -295,13 +297,13 @@ public final class TypeHelper {
 	 * @return Return a Map&lt;Class, Class&lt;? extends ConstraintValidator&gt;&gt; where the map
 	 *         key is the type the validator accepts and value the validator class itself.
 	 */
-	public static <A extends Annotation> Map<Type, Class<? extends ConstraintValidator<A, ?>>> getValidatorsTypes(
+	public static <A extends Annotation> Map<Type, ConstraintValidatorDescriptor<A>> getValidatorsTypes(
 			Class<A> annotationType,
-			List<Class<? extends ConstraintValidator<A, ?>>> validators) {
-		Map<Type, Class<? extends ConstraintValidator<A, ?>>> validatorsTypes =
-				newHashMap();
-		for ( Class<? extends ConstraintValidator<A, ?>> validator : validators ) {
-			Type type = extractType( validator );
+			List<ConstraintValidatorDescriptor<A>> validators) {
+		Map<Type, ConstraintValidatorDescriptor<A>> validatorsTypes = newHashMap();
+
+		for ( ConstraintValidatorDescriptor<A> validator : validators ) {
+			Type type = validator.getValidatedType();
 
 			if ( validatorsTypes.containsKey( type ) ) {
 				throw log.getMultipleValidatorsForSameTypeException( annotationType, type );
@@ -309,11 +311,11 @@ public final class TypeHelper {
 
 			validatorsTypes.put( type, validator );
 		}
-		return validatorsTypes;
 
+		return validatorsTypes;
 	}
 
-	private static Type extractType(Class<? extends ConstraintValidator<?, ?>> validator) {
+	public static Type extractType(Class<? extends ConstraintValidator<?, ?>> validator) {
 		Map<Type, Type> resolvedTypes = newHashMap();
 		Type constraintValidatorType = resolveTypes( resolvedTypes, validator );
 
@@ -546,7 +548,7 @@ public final class TypeHelper {
 	private static Map<Type, Type> getActualTypeArgumentsByParameter(Type... types) {
 		// TODO: return Map<TypeVariable<Class<?>>, Type> somehow
 
-		Map<Type, Type> actualTypeArgumentsByParameter = new LinkedHashMap<Type, Type>();
+		Map<Type, Type> actualTypeArgumentsByParameter = new LinkedHashMap<>();
 
 		for ( Type type : types ) {
 			actualTypeArgumentsByParameter.putAll( getActualTypeArgumentsByParameterInternal( type ) );
@@ -568,7 +570,7 @@ public final class TypeHelper {
 			throw new MalformedParameterizedTypeException();
 		}
 
-		Map<Type, Type> actualTypeArgumentsByParameter = new LinkedHashMap<Type, Type>();
+		Map<Type, Type> actualTypeArgumentsByParameter = new LinkedHashMap<>();
 
 		for ( int i = 0; i < typeParameters.length; i++ ) {
 			// we only add the mapping if it is not a cyclic dependency (see HV-1032)

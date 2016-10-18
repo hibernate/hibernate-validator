@@ -9,7 +9,8 @@ package org.hibernate.validator.internal.engine.constraintdefinition;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-import javax.validation.ConstraintValidator;
+
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 
 /**
  * Type-safe wrapper class for a constraint annotation and its potential list of constraint validators.
@@ -18,11 +19,11 @@ import javax.validation.ConstraintValidator;
  */
 public class ConstraintDefinitionContribution<A extends Annotation> {
 	private final Class<A> constraintType;
-	private final List<Class<? extends ConstraintValidator<A, ?>>> constraintValidators = new ArrayList<Class<? extends ConstraintValidator<A, ?>>>();
+	private final List<ConstraintValidatorDescriptor<A>> constraintValidators = new ArrayList<>();
 	private final boolean includeExisting;
 
 	public ConstraintDefinitionContribution(Class<A> constraintType,
-			List<Class<? extends ConstraintValidator<A, ?>>> constraintValidators,
+			List<ConstraintValidatorDescriptor<A>> constraintValidators,
 			boolean includeExisting) {
 		this.constraintType = constraintType;
 		this.constraintValidators.addAll( constraintValidators );
@@ -43,7 +44,7 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 	 *
 	 * @return a list of constraint validator types for the constraint type of this instance.
 	 */
-	public List<Class<? extends ConstraintValidator<A, ?>>> getConstraintValidators() {
+	public List<ConstraintValidatorDescriptor<A>> getConstraintValidators() {
 		return constraintValidators;
 	}
 
@@ -94,5 +95,3 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 				'}';
 	}
 }
-
-

@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
@@ -42,6 +43,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
@@ -94,7 +96,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 */
 	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses;
 
-	private final List<Class<? extends ConstraintValidator<T, ?>>> matchingConstraintValidatorClasses;
+	private final List<ConstraintValidatorDescriptor<T>> matchingConstraintValidatorClasses;
 
 	/**
 	 * The groups for which to apply this constraint.
@@ -168,12 +170,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.groups = buildGroupSet( implicitGroup );
 		this.payloads = buildPayloadSet( annotation );
 
-		this.constraintValidatorClasses = constraintHelper.getAllValidatorClasses( annotationType );
-		List<Class<? extends ConstraintValidator<T, ?>>> crossParameterValidatorClasses = constraintHelper.findValidatorClasses(
+		this.constraintValidatorClasses = constraintHelper.getAllValidatorClasses( annotationType )
+				.stream()
+				.map( ConstraintValidatorDescriptor::getValidatorClass )
+				.collect( Collectors.toList() );
+
+		List<ConstraintValidatorDescriptor<T>> crossParameterValidatorClasses = constraintHelper.findValidatorClasses(
 				annotationType,
 				ValidationTarget.PARAMETERS
 		);
-		List<Class<? extends ConstraintValidator<T, ?>>> genericValidatorClasses = constraintHelper.findValidatorClasses(
+		List<ConstraintValidatorDescriptor<T>> genericValidatorClasses = constraintHelper.findValidatorClasses(
 				annotationType,
 				ValidationTarget.ANNOTATED_ELEMENT
 		);
@@ -258,7 +264,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 *
 	 * @return The validators applying to type of this constraint.
 	 */
-	public List<Class<? extends ConstraintValidator<T, ?>>> getMatchingConstraintValidatorClasses() {
+	public List<ConstraintValidatorDescriptor<T>> getMatchingConstraintValidatorClasses() {
 		return matchingConstraintValidatorClasses;
 	}
 

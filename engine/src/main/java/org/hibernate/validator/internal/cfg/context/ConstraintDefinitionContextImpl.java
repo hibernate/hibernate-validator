@@ -6,15 +6,15 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 import java.lang.annotation.Annotation;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.validation.ConstraintValidator;
 
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.util.CollectionHelper;
 
 /**
@@ -32,7 +32,7 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 
 	private boolean includeExistingValidators = true;
 
-	private final Set<Class<? extends ConstraintValidator<A, ?>>> validatorTypes = newHashSet();
+	private final Set<ConstraintValidatorDescriptor<A>> validatorTypes = new HashSet<>();
 
 	ConstraintDefinitionContextImpl(DefaultConstraintMapping mapping, Class<A> annotationType) {
 		super( mapping );
@@ -47,13 +47,13 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 
 	@Override
 	public ConstraintDefinitionContext<A> validatedBy(Class<? extends ConstraintValidator<A, ?>> validator) {
-		validatorTypes.add( validator );
+		validatorTypes.add( ConstraintValidatorDescriptor.forClass( validator ) );
 		return this;
 	}
 
 	@SuppressWarnings("unchecked")
 	ConstraintDefinitionContribution<A> build() {
-		return new ConstraintDefinitionContribution<A>(
+		return new ConstraintDefinitionContribution<>(
 				annotationType,
 				CollectionHelper.newArrayList( validatorTypes ),
 				includeExistingValidators );
