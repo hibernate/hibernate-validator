@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.engine;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -36,7 +37,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private boolean failFast;
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 	private TimeProvider timeProvider;
-	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
+	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
 
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
@@ -46,7 +47,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		this.parameterNameProvider = validatorFactory.getParameterNameProvider();
 		this.failFast = validatorFactory.isFailFast();
-		this.validatedValueHandlers = new ArrayList<ValidatedValueUnwrapper<?>>(
+		this.validatedValueHandlers = new ArrayList<>(
 				validatorFactory.getValidatedValueHandlers()
 		);
 		this.timeProvider = validatorFactory.getTimeProvider();
