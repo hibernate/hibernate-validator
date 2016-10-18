@@ -15,6 +15,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.constraintvalidation.ValidationTarget;
 
+import org.hibernate.validator.cfg.context.ConstraintDefinitionContext.ValidationCallable;
+
 /**
  * Represents a specific validator type.
  *
@@ -29,5 +31,9 @@ public interface ConstraintValidatorDescriptor<A extends Annotation> extends Ser
 
 	static <A extends Annotation> ConstraintValidatorDescriptor<A> forClass(Class<? extends ConstraintValidator<A, ?>> validatorClass) {
 		return new ClassBasedValidatorDescriptor<>( validatorClass );
+	}
+
+	static <A extends Annotation, T> ConstraintValidatorDescriptor<A> forLambda(Class<A> annotationType, Type validatedType, ValidationCallable<T> lambda) {
+		return new LambdaBasedValidatorDescriptor<>( validatedType, lambda );
 	}
 }

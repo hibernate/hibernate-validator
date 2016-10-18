@@ -51,11 +51,32 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 		return this;
 	}
 
+	@Override
+	public <T> ConstraintDefinitionContext.ConstraintValidatorDefinitionContext<A, T> validateType(Class<T> type) {
+		return new ConstraintValidatorDefinitionContextImpl<>( type );
+	}
+
 	@SuppressWarnings("unchecked")
 	ConstraintDefinitionContribution<A> build() {
 		return new ConstraintDefinitionContribution<>(
 				annotationType,
 				CollectionHelper.newArrayList( validatorTypes ),
 				includeExistingValidators );
+	}
+
+	private class ConstraintValidatorDefinitionContextImpl<T> implements ConstraintDefinitionContext.ConstraintValidatorDefinitionContext<A, T> {
+
+		private final Class<T> type;
+
+		public ConstraintValidatorDefinitionContextImpl(Class<T> type) {
+			this.type = type;
+		}
+
+		@Override
+		public ConstraintDefinitionContext<A> with(ConstraintDefinitionContext.ValidationCallable<T> vc) {
+			validatorTypes.add( ConstraintValidatorDescriptor.forLambda( annotationType, type, vc ) );
+
+			return ConstraintDefinitionContextImpl.this;
+		}
 	}
 }

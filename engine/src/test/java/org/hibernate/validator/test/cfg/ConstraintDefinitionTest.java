@@ -11,9 +11,11 @@ import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -269,6 +271,32 @@ public class ConstraintDefinitionTest {
 		validator.validate( new ConstrainedIntegerFieldBean() );
 	}
 
+	@Test
+	public void testConstraintBasedOnMethodReference() {
+		mapping.constraintDefinition( Directory.class )
+				.validateType( File.class ).with( File::exists );
+
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Set<? extends ConstraintViolation<?>> violations = validator.validate( new MyBean() );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintTypes( violations, Directory.class );
+	}
+
+	@Test
+	public void testConstraintBasedOnLambdaExpression() {
+		mapping.constraintDefinition( Directory.class )
+				.validateType( File.class ).with( b -> b.exists() );
+
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		Set<? extends ConstraintViolation<?>> violations = validator.validate( new MyBean() );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintTypes( violations, Directory.class );
+	}
+
 	@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
 	@Retention(RUNTIME)
 	@Documented
@@ -295,7 +323,7 @@ public class ConstraintDefinitionTest {
 	@SuppressWarnings("unchecked")
 	private static void assertCorrectValidatorTypes(Set<? extends ConstraintViolation<?>> violations,
 			Class<? /* extends StubValidator */>... validatorClasses) {
-		List<String> expectedMessages = new ArrayList<String>();
+		List<String> expectedMessages = new ArrayList<>();
 		for ( Class<?> validatorClass : validatorClasses ) {
 			String identifyingMessage = StubValidator.getIdentifyingMessage(
 					(Class<? extends StubValidator<?>>) validatorClass
@@ -401,6 +429,24 @@ public class ConstraintDefinitionTest {
 
 		@ConstraintAnnotation
 		private Short field;
+	}
+
+	private class MyBean {
+
+		@Directory
+		File someDir = new File( "not existing" );
+	}
+
+	@Target({ FIELD, METHOD, PARAMETER, ANNOTATION_TYPE })
+	@Retention(RUNTIME)
+	@Documented
+	@Constraint(validatedBy = {})
+	public @interface Directory {
+		String message() default "";
+
+		Class<?>[] groups() default { };
+
+		Class<? extends Payload>[] payload() default { };
 	}
 
 }

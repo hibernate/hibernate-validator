@@ -39,4 +39,27 @@ public interface ConstraintDefinitionContext<A extends Annotation> extends Const
 	 * @return This context for method chaining.
 	 */
 	ConstraintDefinitionContext<A> validatedBy(Class<? extends ConstraintValidator<A, ?>> validator);
+
+	/**
+	 * Allows to configure a validation implementation using a Lambda expression or method reference. Useful for simple
+	 * validations without the need for accessing constraint properties or customization of error messages etc.
+	 *
+	 * @param type The type of the value to validate
+	 * @return This context for method chaining
+	 */
+	<T> ConstraintValidatorDefinitionContext<A, T> validateType(Class<T> type);
+
+	interface ConstraintValidatorDefinitionContext<A extends Annotation, T> {
+
+		/**
+		 * Applies the given Lambda expression or referenced method to values to be validated. It is guaranteed that
+		 * never {@code null} is passed to these expressions or methods.
+		 */
+		ConstraintDefinitionContext<A> with(ValidationCallable<T> vc);
+	}
+
+	@FunctionalInterface
+	interface ValidationCallable<T> {
+		boolean isValid(T object);
+	}
 }
