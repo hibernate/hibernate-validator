@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -349,21 +350,26 @@ public class ConstraintHelper {
 	 * annotation type.
 	 *
 	 * @param annotationType The constraint annotation type
-	 * @param definitionClasses The validators to register
+	 * @param validatorTypes The validator types to register
 	 * @param keepExistingClasses Whether already-registered validators should be kept or not
 	 * @param <A> the type of the annotation
 	 */
 	public <A extends Annotation> void putValidatorClasses(Class<A> annotationType,
-														   List<ConstraintValidatorDescriptor<A>> definitionClasses,
+														   List<ConstraintValidatorDescriptor<A>> validatorTypes,
 														   boolean keepExistingClasses) {
+
+		List<ConstraintValidatorDescriptor<A>> validatorTypesToAdd = new ArrayList<>();
+
 		if ( keepExistingClasses ) {
-			List<ConstraintValidatorDescriptor<A>> existingClasses = getAllValidatorClasses( annotationType );
-			if ( existingClasses != null ) {
-				definitionClasses.addAll( 0, existingClasses );
+			List<ConstraintValidatorDescriptor<A>> existingValidatorTypes = getAllValidatorClasses( annotationType );
+			if ( existingValidatorTypes != null ) {
+				validatorTypesToAdd.addAll( 0, existingValidatorTypes );
 			}
 		}
 
-		validatorClasses.put( annotationType, definitionClasses );
+		validatorTypesToAdd.addAll( validatorTypes );
+
+		validatorClasses.put( annotationType, validatorTypesToAdd );
 	}
 
 	/**

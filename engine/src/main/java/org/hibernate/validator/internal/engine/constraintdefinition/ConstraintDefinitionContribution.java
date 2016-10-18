@@ -7,7 +7,7 @@
 package org.hibernate.validator.internal.engine.constraintdefinition;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
@@ -19,14 +19,14 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
  */
 public class ConstraintDefinitionContribution<A extends Annotation> {
 	private final Class<A> constraintType;
-	private final List<ConstraintValidatorDescriptor<A>> constraintValidators = new ArrayList<>();
+	private final List<ConstraintValidatorDescriptor<A>> validatorTypes;
 	private final boolean includeExisting;
 
 	public ConstraintDefinitionContribution(Class<A> constraintType,
-			List<ConstraintValidatorDescriptor<A>> constraintValidators,
+			List<ConstraintValidatorDescriptor<A>> validatorTypes,
 			boolean includeExisting) {
 		this.constraintType = constraintType;
-		this.constraintValidators.addAll( constraintValidators );
+		this.validatorTypes = Collections.unmodifiableList( validatorTypes );
 		this.includeExisting = includeExisting;
 	}
 
@@ -44,8 +44,8 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 	 *
 	 * @return a list of constraint validator types for the constraint type of this instance.
 	 */
-	public List<ConstraintValidatorDescriptor<A>> getConstraintValidators() {
-		return constraintValidators;
+	public List<ConstraintValidatorDescriptor<A>> getValidatorTypes() {
+		return validatorTypes;
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 		if ( !constraintType.equals( that.constraintType ) ) {
 			return false;
 		}
-		if ( !constraintValidators.equals( that.constraintValidators ) ) {
+		if ( !validatorTypes.equals( that.validatorTypes ) ) {
 			return false;
 		}
 
@@ -82,7 +82,7 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 	@Override
 	public int hashCode() {
 		int result = constraintType.hashCode();
-		result = 31 * result + constraintValidators.hashCode();
+		result = 31 * result + validatorTypes.hashCode();
 		return result;
 	}
 
@@ -90,7 +90,7 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 	public String toString() {
 		return "ConstraintDefinitionContribution{" +
 				"constraintType=" + constraintType +
-				", constraintValidators=" + constraintValidators +
+				", validatorTypes=" + validatorTypes +
 				", includeExisting=" + includeExisting +
 				'}';
 	}

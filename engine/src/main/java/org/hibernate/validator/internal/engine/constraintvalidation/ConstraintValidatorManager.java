@@ -214,7 +214,7 @@ public class ConstraintValidatorManager {
 	 * @return The class of a matching validator.
 	 */
 	private <A extends Annotation> ConstraintValidatorDescriptor<A> findMatchingValidatorClass(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
-		Map<Type, ConstraintValidatorDescriptor<A>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
+		Map<Type, ConstraintValidatorDescriptor<A>> availableValidatorTypes = TypeHelper.getValidatorTypes(
 				descriptor.getAnnotationType(),
 				descriptor.getMatchingConstraintValidatorClasses()
 		);

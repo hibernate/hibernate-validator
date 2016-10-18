@@ -522,7 +522,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		definedConstraints.add( constraintType );
 		constraintHelper.putValidatorClasses(
 				constraintType,
-				constraintDefinitionContribution.getConstraintValidators(),
+				constraintDefinitionContribution.getValidatorTypes(),
 				constraintDefinitionContribution.includeExisting()
 		);
 	}

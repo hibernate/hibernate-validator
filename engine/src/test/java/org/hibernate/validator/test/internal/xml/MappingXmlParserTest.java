@@ -46,21 +46,21 @@ public class MappingXmlParserTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-782")
 	public void testAdditionalConstraintValidatorsGetAddedAndAreLastInList() {
-		List<ConstraintValidatorDescriptor<DecimalMin>> validators = constraintHelper.getAllValidatorClasses(
+		List<ConstraintValidatorDescriptor<DecimalMin>> validatorTypes = constraintHelper.getAllValidatorClasses(
 				DecimalMin.class
 		);
 
-		assertFalse( validators.isEmpty(), "Wrong number of default validators" );
-		assertEquals( getIndex( validators, DecimalMinValidatorForFoo.class ), -1, "The custom validator must be absent" );
+		assertFalse( validatorTypes.isEmpty(), "Wrong number of default validators" );
+		assertEquals( getIndex( validatorTypes, DecimalMinValidatorForFoo.class ), -1, "The custom validator must be absent" );
 
 		Set<InputStream> mappingStreams = newHashSet();
 		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-1.xml" ) );
 
 		xmlMappingParser.parse( mappingStreams );
 
-		validators = constraintHelper.getAllValidatorClasses( DecimalMin.class );
-		assertFalse( validators.isEmpty(), "Wrong number of default validators" );
-		assertEquals( getIndex( validators, DecimalMinValidatorForFoo.class ), validators.size() - 1,
+		validatorTypes = constraintHelper.getAllValidatorClasses( DecimalMin.class );
+		assertFalse( validatorTypes.isEmpty(), "Wrong number of default validators" );
+		assertEquals( getIndex( validatorTypes, DecimalMinValidatorForFoo.class ), validatorTypes.size() - 1,
 				"The custom validator must be last" );
 	}
 
