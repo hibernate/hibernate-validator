@@ -186,8 +186,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 38, value = "Invalid property path.")
 	IllegalArgumentException getInvalidPropertyPathException();
 
-	@Message(id = 39, value = "Invalid property path. Either there is no property %1$s in entity %2$s or it is not possible to cascade to the property.")
-	IllegalArgumentException getInvalidPropertyPathException(String propertyName, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
+	@Message(id = 39, value = "Invalid property path. Either there is no property %2$s in entity %1$s or it is not possible to cascade to the property.")
+	IllegalArgumentException getInvalidPropertyPathException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String propertyName);
 
 	@Message(id = 40, value = "Property path must provide index or map key.")
 	IllegalArgumentException getPropertyPathMustProvideIndexOrMapKeyException();
