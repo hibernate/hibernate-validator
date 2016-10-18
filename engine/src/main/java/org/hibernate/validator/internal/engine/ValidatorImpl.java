@@ -1494,37 +1494,49 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		BeanMetaData<?> metaData = beanMetaDataManager.getBeanMetaData( clazz );
 		PropertyMetaData property = metaData.getMetaDataFor( elem.getName() );
 
-		// use precomputed method list as ReflectionHelper#containsMember is slow
 		if ( property == null ) {
 			throw log.getInvalidPropertyPathException( elem.getName(), metaData.getBeanClass() );
 		}
-		else if ( !propertyIter.hasNext() ) {
+
+		// if we are in the case of an iterable and we want to validate an element of this iterable, we have to get the
+		// element value
+		if ( property.isCascading() && elem.isIterable() && propertyIter.hasNext() ) {
+			elem = (NodeImpl) propertyIter.next();
+			newValue = newValue == null ? null : getValue( newValue, validationContext, property );
+
+			if ( newValue != null && elem.getIndex() != null ) {
+				newValue = ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
+			}
+			else if ( newValue != null && elem.getKey() != null ) {
+				newValue = ReflectionHelper.getMappedValue( newValue, elem.getKey() );
+			}
+			else if ( newValue != null ) {
+				throw log.getPropertyPathMustProvideIndexOrMapKeyException();
+			}
+			clazz = (Class<?>) ReflectionHelper.getIndexedType( property.getType() );
+
+			metaData = beanMetaDataManager.getBeanMetaData( clazz );
+			property = metaData.getMetaDataFor( elem.getName() );
+
+			if ( property == null ) {
+				throw log.getInvalidPropertyPathException( elem.getName(), metaData.getBeanClass() );
+			}
+		}
+
+		if ( !propertyIter.hasNext() ) {
 			metaConstraintsList.addAll( property.getConstraints() );
 			typeArgumentConstraints.addAll( property.getTypeArgumentsConstraints() );
 		}
 		else {
 			if ( property.isCascading() ) {
-				Type type = property.getType();
 				newValue = newValue == null ? null : getValue( newValue, validationContext, property );
-				if ( elem.isIterable() ) {
-					if ( newValue != null && elem.getIndex() != null ) {
-						newValue = ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
-					}
-					else if ( newValue != null && elem.getKey() != null ) {
-						newValue = ReflectionHelper.getMappedValue( newValue, elem.getKey() );
-					}
-					else if ( newValue != null ) {
-						throw log.getPropertyPathMustProvideIndexOrMapKeyException();
-					}
-					type = ReflectionHelper.getIndexedType( type );
-				}
 
-				ValidationContext newValidationContext;
+				ValidationContext<?> newValidationContext;
 				if ( newValue != null ) {
 					newValidationContext = getValidationContext().forValidateProperty( newValue );
 				}
 				else {
-					newValidationContext = getValidationContext().forValidateValue( (Class<?>) type );
+					newValidationContext = getValidationContext().forValidateValue( (Class<?>) property.getType() );
 				}
 				return collectMetaConstraintsForPath(
 						newValidationContext,
@@ -1539,7 +1551,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		if ( newValue == null ) {
 			return ValueContext.getLocalExecutionContext( clazz, null, propertyPath );
 		}
-		return ValueContext.getLocalExecutionContext( value, null, propertyPath );
+		return ValueContext.getLocalExecutionContext( newValue, null, propertyPath );
 	}
 
 	/**
