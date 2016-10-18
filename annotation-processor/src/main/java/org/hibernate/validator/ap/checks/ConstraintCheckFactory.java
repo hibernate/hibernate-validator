@@ -13,13 +13,14 @@ import javax.lang.model.element.Element;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import org.hibernate.validator.ap.checks.annotationparameters.AnnotationMessageCheck;
+import org.hibernate.validator.ap.checks.annotationparameters.AnnotationDefaultMessageCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersDecimalMinMaxCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersDigitsCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersGroupsCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersPatternCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersScriptAssertCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersSizeLengthCheck;
+import org.hibernate.validator.ap.checks.annotationparameters.AnnotationUserMessageCheck;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
@@ -107,7 +108,7 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersDigitsCheck( annotationApiHelper ),
 						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper ),
 						new AnnotationParametersGroupsCheck( annotationApiHelper ),
-						new AnnotationMessageCheck( annotationApiHelper, elementUtils )
+						new AnnotationUserMessageCheck( annotationApiHelper )
 				)
 		);
 		fieldChecks.put(
@@ -122,7 +123,7 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersDigitsCheck( annotationApiHelper ),
 						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper ),
 						new AnnotationParametersGroupsCheck( annotationApiHelper ),
-						new AnnotationMessageCheck( annotationApiHelper, elementUtils )
+						new AnnotationUserMessageCheck( annotationApiHelper )
 				)
 		);
 		fieldChecks.put(
@@ -145,7 +146,7 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersDigitsCheck( annotationApiHelper ),
 						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper ),
 						new AnnotationParametersGroupsCheck( annotationApiHelper ),
-						new AnnotationMessageCheck( annotationApiHelper, elementUtils )
+						new AnnotationUserMessageCheck( annotationApiHelper )
 				)
 		);
 		methodChecks.put(
@@ -162,7 +163,7 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersDigitsCheck( annotationApiHelper ),
 						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper ),
 						new AnnotationParametersGroupsCheck( annotationApiHelper ),
-						new AnnotationMessageCheck( annotationApiHelper, elementUtils )
+						new AnnotationUserMessageCheck( annotationApiHelper )
 				)
 		);
 		methodChecks.put(
@@ -206,7 +207,8 @@ public class ConstraintCheckFactory {
 						new ConstraintValidatorCheck( constraintHelper, annotationApiHelper ),
 						new AnnotationTypeMemberCheck( annotationApiHelper, typeUtils ),
 						new CrossParameterConstraintCheck( annotationApiHelper, constraintHelper, typeUtils ),
-						new AnnotationMessageCheck( annotationApiHelper, elementUtils )
+						new AnnotationUserMessageCheck( annotationApiHelper ),
+						new AnnotationDefaultMessageCheck( annotationApiHelper, elementUtils )
 				)
 		);
 		annotationTypeChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );
