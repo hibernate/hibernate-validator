@@ -299,6 +299,22 @@ public final class ReflectionHelper {
 	}
 
 	/**
+	 * Converts the given <code>Type</code> to a <code>Class</code>.
+	 *
+	 * @param type the type to convert
+	 * @return the class corresponding to the type
+	 */
+	public static Class<?> getClassFromType(Type type) {
+		if ( type instanceof Class ) {
+			return (Class<?>) type;
+		}
+		if ( type instanceof ParameterizedType ) {
+			return getClassFromType( ( (ParameterizedType) type ).getRawType() );
+		}
+		throw log.getUnableToConvertTypeToClassException( type );
+	}
+
+	/**
 	 * @param type the type to check.
 	 *
 	 * @return Returns <code>true</code> if <code>type</code> is a iterable type, <code>false</code> otherwise.
