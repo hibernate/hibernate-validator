@@ -93,7 +93,9 @@ public class ValidatorFactoryNoELBootstrapTest {
 				"java.",
 				"javax.xml.",
 				"sun.",
-				"org.apache."
+				"org.apache.",
+				"org.xml",
+				"jdk.internal"
 		};
 
 		public ELIgnoringClassLoader() {
