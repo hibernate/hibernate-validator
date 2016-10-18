@@ -72,7 +72,13 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private static final Log log = LoggerFactory.make();
 
 	private final ResourceBundleLocator defaultResourceBundleLocator;
-	private final MessageInterpolator defaultMessageInterpolator;
+
+	/**
+	 * Built lazily so RBMI and its dependency on EL is only initialized if actually needed
+	 */
+	private MessageInterpolator defaultMessageInterpolator;
+	private MessageInterpolator messageInterpolator;
+
 	private final TraversableResolver defaultTraversableResolver;
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
@@ -126,7 +132,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultTraversableResolver = new DefaultTraversableResolver();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
-		this.defaultMessageInterpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
 		this.serviceLoaderBasedConstraintMappingContributor = new ServiceLoaderBasedConstraintMappingContributor(
 				typeResolutionHelper
 		);
@@ -347,7 +352,18 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final MessageInterpolator getMessageInterpolator() {
-		return validationBootstrapParameters.getMessageInterpolator();
+		if ( messageInterpolator == null ) {
+			// apply explicitly given MI, otherwise use default one
+			MessageInterpolator interpolator = validationBootstrapParameters.getMessageInterpolator();
+			if ( interpolator != null ) {
+				messageInterpolator = interpolator;
+			}
+			else {
+				messageInterpolator = getDefaultMessageInterpolatorConfiguredWithClassLoader();
+			}
+		}
+
+		return messageInterpolator;
 	}
 
 	@Override
@@ -401,6 +417,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final MessageInterpolator getDefaultMessageInterpolator() {
+		if ( defaultMessageInterpolator == null ) {
+			defaultMessageInterpolator = new ResourceBundleMessageInterpolator( defaultResourceBundleLocator );
+		}
+
 		return defaultMessageInterpolator;
 	}
 
@@ -428,7 +448,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return programmaticMappings;
 	}
 
-
 	private boolean isSpecificProvider() {
 		return validationBootstrapParameters.getProvider() != null;
 	}
@@ -440,12 +459,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		if ( ignoreXmlConfiguration ) {
 			log.ignoringXmlConfiguration();
 
-			// make sure we use the defaults in case they haven't been provided yet
-			if ( validationBootstrapParameters.getMessageInterpolator() == null ) {
-				validationBootstrapParameters.setMessageInterpolator(
-						getDefaultMessageInterpolatorConfiguredWithClassLoader()
-				);
-			}
 			if ( validationBootstrapParameters.getTraversableResolver() == null ) {
 				validationBootstrapParameters.setTraversableResolver( defaultTraversableResolver );
 			}
@@ -470,11 +483,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		if ( validationBootstrapParameters.getMessageInterpolator() == null ) {
 			if ( xmlParameters.getMessageInterpolator() != null ) {
 				validationBootstrapParameters.setMessageInterpolator( xmlParameters.getMessageInterpolator() );
-			}
-			else {
-				validationBootstrapParameters.setMessageInterpolator(
-						getDefaultMessageInterpolatorConfiguredWithClassLoader()
-				);
 			}
 		}
 
@@ -547,7 +555,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 								true
 						)
 				) :
-				defaultMessageInterpolator;
+				getDefaultMessageInterpolator();
 	}
 
 	/**

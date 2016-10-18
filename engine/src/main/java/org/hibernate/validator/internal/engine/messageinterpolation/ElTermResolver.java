@@ -53,11 +53,7 @@ public class ElTermResolver implements TermResolver {
      */
 	public ElTermResolver(Locale locale, ExpressionFactory expressionFactory) {
 		this.locale = locale;
-		/*
-		 * This call to newInstance might throw. Bad news; error is not until call to validate for case where
-		 * EL is nonfunctional. Good news; cases that don't need EL don't get any exception.
-		 */
-		this.expressionFactory = expressionFactory != null ? expressionFactory : ExpressionFactory.newInstance();
+		this.expressionFactory = expressionFactory;
 	}
 
 	@Override

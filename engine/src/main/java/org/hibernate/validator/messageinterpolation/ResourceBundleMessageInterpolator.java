@@ -28,7 +28,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 	private static final Log LOG = LoggerFactory.make();
 
-	private ExpressionFactory expressionFactory;
+	private final ExpressionFactory expressionFactory;
 
 	// HV-793 - To fail eagerly in case we have no EL dependencies on the classpath we try to load the expression
 	// factory type eagerly
@@ -43,25 +43,30 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 	public ResourceBundleMessageInterpolator() {
 		super();
+		this.expressionFactory = buildExpressionFactory();
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
 		super( userResourceBundleLocator );
+		this.expressionFactory = buildExpressionFactory();
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator) {
 		super( userResourceBundleLocator, contributorResourceBundleLocator );
+		this.expressionFactory = buildExpressionFactory();
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator,
 			boolean cachingEnabled) {
 		super( userResourceBundleLocator, contributorResourceBundleLocator, cachingEnabled );
+		this.expressionFactory = buildExpressionFactory();
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled) {
 		super( userResourceBundleLocator, null, cachingEnabled );
+		this.expressionFactory = buildExpressionFactory();
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled, ExpressionFactory expressionFactory) {
@@ -73,5 +78,15 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	public String interpolate(Context context, Locale locale, String term) {
 		InterpolationTerm expression = new InterpolationTerm( term, locale, expressionFactory );
 		return expression.interpolate( context );
+	}
+
+	private static ExpressionFactory buildExpressionFactory() {
+		try {
+			return ExpressionFactory.newInstance();
+		}
+		catch (NoClassDefFoundError e) {
+			// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
+			throw LOG.getMissingELDependenciesException();
+		}
 	}
 }
