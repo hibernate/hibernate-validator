@@ -1,20 +1,20 @@
 package org.hibernate.validator.referenceguide.chapter05;
 
-import java.util.Iterator;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import org.hibernate.validator.referenceguide.chapter05.groupinheritance.RaceCarChecks;
 import org.hibernate.validator.referenceguide.chapter05.groupinheritance.SuperCar;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 public class GroupTest {
 
@@ -81,9 +81,12 @@ public class GroupTest {
 		assertEquals( "must be greater than or equal to 2", validator.validate( superCar ).iterator().next().getMessage() );
 
 		// check that this supercar is valid as generic car and also as race car
-		Iterator<ConstraintViolation<SuperCar>> iterator = validator.validate( superCar, RaceCarChecks.class ).iterator();
-		assertEquals( "Race car must have a safety belt", iterator.next().getMessage() );
-		assertEquals( "must be greater than or equal to 2", iterator.next().getMessage() );
+		Set<ConstraintViolation<SuperCar>> constraintViolations = validator.validate( superCar, RaceCarChecks.class );
+
+		assertThat( constraintViolations ).extracting( "message" ).containsExactly(
+				"Race car must have a safety belt",
+				"must be greater than or equal to 2"
+		);
 		//end::testGroupInheritance[]
 	}
 
