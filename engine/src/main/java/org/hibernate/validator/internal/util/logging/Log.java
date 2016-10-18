@@ -186,7 +186,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 38, value = "Invalid property path.")
 	IllegalArgumentException getInvalidPropertyPathException();
 
-	@Message(id = 39, value = "Invalid property path. There is no property %1$s in entity %2$s.")
+	@Message(id = 39, value = "Invalid property path. Either there is no property %1$s in entity %2$s or it is not possible to cascade to the property.")
 	IllegalArgumentException getInvalidPropertyPathException(String propertyName, @FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 40, value = "Property path must provide index or map key.")
@@ -684,4 +684,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 194, value = "An empty element is only supported when a CharSequence is expected.")
 	ValidationException getEmptyElementOnlySupportedWhenCharSequenceIsExpectedExpection();
+
+	@Message(id = 195, value = "Unable to reach the property to validate for the bean %s and the property path %s. A property is null along the way.")
+	ValidationException getUnableToReachPropertyToValidateException(Object bean, Path path);
+
+	@Message(id = 196, value = "Unable to convert the Type %s to a Class.")
+	ValidationException getUnableToConvertTypeToClassException(Type type);
 }
