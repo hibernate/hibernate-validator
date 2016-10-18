@@ -6,10 +6,21 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
@@ -21,25 +32,17 @@ import javax.validation.constraints.Pattern;
 import javax.validation.executable.ExecutableValidator;
 import javax.validation.metadata.BeanDescriptor;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.testutil.CountValidationCalls;
 import org.hibernate.validator.testutil.CountValidationCallsValidator;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Guillaume Smet
  */
 public class ValidatorTest {
 	@Test
@@ -211,6 +214,53 @@ public class ValidatorTest {
 		Set<ConstraintViolation<X>> constraintViolations = validator.validateValue( X.class, "list[0].foo", null );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "list[0].foo" );
+
+		Set<ConstraintViolation<K>> constraintViolationsK = validator.validateValue( K.class, "foo.bar", null );
+		assertNumberOfViolations( constraintViolationsK, 1 );
+		assertCorrectPropertyPaths( constraintViolationsK, "foo.bar" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1002")
+	public void testValidatePropertyWithNestedPath() {
+		Validator validator = getValidator();
+		X someX = new X();
+		someX.addZ( new Z() );
+		Set<ConstraintViolation<X>> constraintViolationsX = validator.validateProperty( someX, "list[0].foo" );
+		assertNumberOfViolations( constraintViolationsX, 1 );
+		assertCorrectPropertyPaths( constraintViolationsX, "list[0].foo" );
+
+		I someI = new I();
+		someI.putJ( "bar", new J() );
+		Set<ConstraintViolation<I>> constraintViolationsI = validator.validateProperty( someI, "map[bar].foo" );
+		assertNumberOfViolations( constraintViolationsI, 1 );
+		assertCorrectPropertyPaths( constraintViolationsI, "map[bar].foo" );
+
+		K someK = new K();
+		someK.foo = new L<String>();
+		Set<ConstraintViolation<K>> constraintViolationsK = validator.validateProperty( someK, "foo.bar" );
+		assertNumberOfViolations( constraintViolationsK, 1 );
+		assertCorrectPropertyPaths( constraintViolationsK, "foo.bar" );
+
+		constraintViolationsK = validator.validateProperty( someK, "foo.genericProperty" );
+		assertNumberOfViolations( constraintViolationsK, 1 );
+		assertCorrectPropertyPaths( constraintViolationsK, "foo.genericProperty" );
+	}
+
+	@Test(expectedExceptions = { ValidationException.class }, expectedExceptionsMessageRegExp = "^HV000195:.*")
+	@TestForIssue(jiraKey = "HV-1002")
+	public void testValidatePropertyWithNestedPathAndNullPropertyInTheWay() {
+		Validator validator = getValidator();
+		X someX = new X();
+		validator.validateProperty( someX, "list[0].foo" );
+	}
+
+	@Test(expectedExceptions = { IllegalArgumentException.class }, expectedExceptionsMessageRegExp = "^HV000039:.*")
+	@TestForIssue(jiraKey = "HV-1002")
+	public void testValidatePropertyWithNestedPathAndMissingValid() {
+		Validator validator = getValidator();
+		M someM = new M();
+		validator.validateProperty( someM, "foo.baz" );
 	}
 
 	class A {
@@ -323,6 +373,45 @@ public class ValidatorTest {
 		public String getFoo() {
 			return m_foo;
 		}
+	}
+
+	class I {
+		@Valid
+		Map<String, J> map = new HashMap<String, J>();
+
+		public void putJ(String key, J j) {
+			map.put( key, j );
+		}
+	}
+
+	class J {
+		@NotNull
+		String foo;
+	}
+
+	class K {
+		@Valid
+		L<String> foo;
+	}
+
+	class L<T> {
+		@NotNull
+		String bar;
+
+		@NotNull
+		T genericProperty;
+	}
+
+	class M {
+		N foo;
+
+		@NotNull
+		String bar;
+	}
+
+	class N {
+		@NotNull
+		String baz;
 	}
 
 	class X {

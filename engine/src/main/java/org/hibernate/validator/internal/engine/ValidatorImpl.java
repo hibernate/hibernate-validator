@@ -82,6 +82,7 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Guillaume Smet
  */
 public class ValidatorImpl implements Validator, ExecutableValidator {
 
@@ -793,17 +794,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private <T> Set<ConstraintViolation<T>> validatePropertyInContext(ValidationContext<T> context, PathImpl propertyPath, ValidationOrder validationOrder) {
 		List<MetaConstraint<?>> metaConstraints = newArrayList();
 		List<MetaConstraint<?>> typeUseConstraints = newArrayList();
-		Iterator<Path.Node> propertyIter = propertyPath.iterator();
-		ValueContext<?, Object> valueContext = collectMetaConstraintsForPath(
+		ValueContext<?, Object> valueContext = collectMetaConstraintsForPathWithValue(
 				context,
-				propertyIter,
 				propertyPath,
 				metaConstraints,
 				typeUseConstraints
 		);
 
 		if ( valueContext.getCurrentBean() == null ) {
-			throw log.getInvalidPropertyPathException();
+			throw log.getUnableToReachPropertyToValidateException( context.getRootBean(), propertyPath );
 		}
 
 		if ( metaConstraints.size() == 0 && typeUseConstraints.size() == 0 ) {
@@ -859,8 +858,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private <T> Set<ConstraintViolation<T>> validateValueInContext(ValidationContext<T> context, Object value, PathImpl propertyPath, ValidationOrder validationOrder) {
 		List<MetaConstraint<?>> metaConstraints = newArrayList();
 		List<MetaConstraint<?>> typeArgumentConstraints = newArrayList();
-		ValueContext<?, Object> valueContext = collectMetaConstraintsForPath(
-				context, propertyPath.iterator(), propertyPath, metaConstraints, typeArgumentConstraints
+		ValueContext<?, Object> valueContext = collectMetaConstraintsForPathWithoutValue(
+				context, propertyPath, metaConstraints, typeArgumentConstraints
 		);
 		valueContext.setCurrentValidatedValue( value );
 
@@ -1467,79 +1466,144 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	/**
-	 * Collects all {@code MetaConstraint}s which match the given path relative to the specified root class.
-	 * <p>
-	 * This method is called recursively.
-	 * </p>
+	 * Collects all {@code MetaConstraint}s which match the given property path relative to the specified root class for a given value.
 	 *
 	 * @param validationContext The validation context.
-	 * @param propertyIter An instance of {@code PropertyIterator} in order to iterate the items of the original property path.
 	 * @param propertyPath The property path for which constraints have to be collected.
-	 * @param metaConstraintsList An instance of {@code Map} where {@code MetaConstraint}s which match the given path are saved for each class in the hosting class hierarchy.
+	 * @param metaConstraints A list where {@code MetaConstraint}s which match the given path are saved.
+	 * @param typeArgumentConstraints A list where type arguments {@code MetaConstraint}s which match the given path are saved.
 	 *
 	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to the given property path.
 	 */
-	private <V> ValueContext<?, V> collectMetaConstraintsForPath(ValidationContext validationContext,
-			Iterator<Path.Node> propertyIter,
+	private <V> ValueContext<?, V> collectMetaConstraintsForPathWithValue(ValidationContext<?> validationContext,
 			PathImpl propertyPath,
-			List<MetaConstraint<?>> metaConstraintsList,
+			List<MetaConstraint<?>> metaConstraints,
 			List<MetaConstraint<?>> typeArgumentConstraints) {
 		Class<?> clazz = validationContext.getRootBeanClass();
 		Object value = validationContext.getRootBean();
+		PropertyMetaData propertyMetaData = null;
 
-		// cast is ok, since we are dealing with engine internal classes
-		NodeImpl elem = (NodeImpl) propertyIter.next();
-		Object newValue = value;
+		Iterator<Path.Node> propertyPathIter = propertyPath.iterator();
 
-		BeanMetaData<?> metaData = beanMetaDataManager.getBeanMetaData( clazz );
-		PropertyMetaData property = metaData.getMetaDataFor( elem.getName() );
+		while ( propertyPathIter.hasNext() ) {
+			// cast is ok, since we are dealing with engine internal classes
+			NodeImpl propertyPathNode = (NodeImpl) propertyPathIter.next();
+			propertyMetaData = getPropertyMetaData( clazz, propertyPathNode );
 
-		// use precomputed method list as ReflectionHelper#containsMember is slow
-		if ( property == null ) {
-			throw log.getInvalidPropertyPathException( elem.getName(), metaData.getBeanClass() );
-		}
-		else if ( !propertyIter.hasNext() ) {
-			metaConstraintsList.addAll( property.getConstraints() );
-			typeArgumentConstraints.addAll( property.getTypeArgumentsConstraints() );
-		}
-		else {
-			if ( property.isCascading() ) {
-				Type type = property.getType();
-				newValue = newValue == null ? null : getValue( newValue, validationContext, property );
-				if ( elem.isIterable() ) {
-					if ( newValue != null && elem.getIndex() != null ) {
-						newValue = ReflectionHelper.getIndexedValue( newValue, elem.getIndex() );
+			// if the property is not the leaf property, we set up the context for the next iteration
+			if ( propertyPathIter.hasNext() ) {
+				if ( !propertyMetaData.isCascading() ) {
+					throw log.getInvalidPropertyPathException( propertyPath.asString(), validationContext.getRootBeanClass() );
+				}
+
+				value = getValue( value, validationContext, propertyMetaData );
+				if ( value == null ) {
+					throw log.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
+				}
+				clazz = value.getClass();
+
+				// if we are in the case of an iterable and we want to validate an element of this iterable, we have to get the
+				// element value
+				if ( propertyPathNode.isIterable() ) {
+					propertyPathNode = (NodeImpl) propertyPathIter.next();
+
+					if ( propertyPathNode.getIndex() != null ) {
+						value = ReflectionHelper.getIndexedValue( value, propertyPathNode.getIndex() );
 					}
-					else if ( newValue != null && elem.getKey() != null ) {
-						newValue = ReflectionHelper.getMappedValue( newValue, elem.getKey() );
+					else if ( propertyPathNode.getKey() != null ) {
+						value = ReflectionHelper.getMappedValue( value, propertyPathNode.getKey() );
 					}
-					else if ( newValue != null ) {
+					else {
 						throw log.getPropertyPathMustProvideIndexOrMapKeyException();
 					}
-					type = ReflectionHelper.getIndexedType( type );
-				}
 
-				ValidationContext newValidationContext;
-				if ( newValue != null ) {
-					newValidationContext = getValidationContext().forValidateProperty( newValue );
+					if ( value == null ) {
+						throw log.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
+					}
+
+					clazz = value.getClass();
+					propertyMetaData = getPropertyMetaData( clazz, propertyPathNode );
 				}
-				else {
-					newValidationContext = getValidationContext().forValidateValue( (Class<?>) type );
-				}
-				return collectMetaConstraintsForPath(
-						newValidationContext,
-						propertyIter,
-						propertyPath,
-						metaConstraintsList,
-						typeArgumentConstraints
-				);
 			}
 		}
 
-		if ( newValue == null ) {
-			return ValueContext.getLocalExecutionContext( clazz, null, propertyPath );
+		if ( propertyMetaData == null ) {
+			// should only happen if the property path is empty, which should never happen
+			throw log.getInvalidPropertyPathException( propertyPath.asString(), clazz );
 		}
+
+		metaConstraints.addAll( propertyMetaData.getConstraints() );
+		typeArgumentConstraints.addAll( propertyMetaData.getTypeArgumentsConstraints() );
+
 		return ValueContext.getLocalExecutionContext( value, null, propertyPath );
+	}
+
+	/**
+	 * Collects all {@code MetaConstraint}s which match the given property path relative to the specified root class without a value.
+	 * <p>
+	 * We are only able to use the static types as we don't have the value.
+	 * </p>
+	 *
+	 * @param validationContext The validation context.
+	 * @param propertyPath The property path for which constraints have to be collected.
+	 * @param metaConstraints A list where {@code MetaConstraint}s which match the given path are saved.
+	 * @param typeArgumentConstraints A list where type arguments {@code MetaConstraint}s which match the given path are saved.
+	 *
+	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to the given property path.
+	 */
+	private <V> ValueContext<?, V> collectMetaConstraintsForPathWithoutValue(ValidationContext<?> validationContext,
+			PathImpl propertyPath,
+			List<MetaConstraint<?>> metaConstraints,
+			List<MetaConstraint<?>> typeArgumentConstraints) {
+		Class<?> clazz = validationContext.getRootBeanClass();
+		PropertyMetaData propertyMetaData = null;
+
+		Iterator<Path.Node> propertyPathIter = propertyPath.iterator();
+
+		while ( propertyPathIter.hasNext() ) {
+			// cast is ok, since we are dealing with engine internal classes
+			NodeImpl propertyPathNode = (NodeImpl) propertyPathIter.next();
+			propertyMetaData = getPropertyMetaData( clazz, propertyPathNode );
+
+			// if the property is not the leaf property, we set up the context for the next iteration
+			if ( propertyPathIter.hasNext() ) {
+				// if we are in the case of an iterable and we want to validate an element of this iterable, we have to get the
+				// type from the parameterized type
+				if ( propertyPathNode.isIterable() ) {
+					propertyPathNode = (NodeImpl) propertyPathIter.next();
+
+					clazz = ReflectionHelper.getClassFromType( ReflectionHelper.getIndexedType( propertyMetaData.getType() ) );
+					propertyMetaData = getPropertyMetaData( clazz, propertyPathNode );
+				}
+				else {
+					clazz = ReflectionHelper.getClassFromType( propertyMetaData.getType() );
+				}
+			}
+		}
+
+		if ( propertyMetaData == null ) {
+			// should only happen if the property path is empty, which should never happen
+			throw log.getInvalidPropertyPathException( propertyPath.asString(), clazz );
+		}
+
+		metaConstraints.addAll( propertyMetaData.getConstraints() );
+		typeArgumentConstraints.addAll( propertyMetaData.getTypeArgumentsConstraints() );
+
+		return ValueContext.getLocalExecutionContext( clazz, null, propertyPath );
+	}
+
+	private PropertyMetaData getPropertyMetaData( Class<?> beanClass, Path.Node propertyNode ) {
+		if ( !ElementKind.PROPERTY.equals( propertyNode.getKind() ) ) {
+			throw log.getInvalidPropertyPathException( propertyNode.getName(), beanClass );
+		}
+
+		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( beanClass );
+		PropertyMetaData propertyMetaData = beanMetaData.getMetaDataFor( propertyNode.getName() );
+
+		if ( propertyMetaData == null ) {
+			throw log.getInvalidPropertyPathException( propertyNode.getName(), beanClass );
+		}
+		return propertyMetaData;
 	}
 
 	/**
