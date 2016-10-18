@@ -611,9 +611,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, MetaConstraint<?> metaConstraint) {
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 			if ( valueContext.getCurrentBean() != null ) {
-				Object valueToValidate = getValue(
-						metaConstraint.getLocation().getMember(),
-						valueContext.getCurrentBean()
+				Object valueToValidate = getBeanMemberValue(
+						valueContext.getCurrentBean(),
+						metaConstraint.getLocation().getMember()
 				);
 				valueContext.setCurrentValidatedValue( valueToValidate );
 			}
@@ -647,7 +647,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					elementType
 			) ) {
 
-				Object value = getValue( valueContext.getCurrentBean(), validationContext, cascadable );
+				Object value = getBeanPropertyValue( validationContext, valueContext.getCurrentBean(), cascadable );
 
 				if ( value != null ) {
 
@@ -1497,15 +1497,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		while ( propertyPathIter.hasNext() ) {
 			// cast is ok, since we are dealing with engine internal classes
 			NodeImpl propertyPathNode = (NodeImpl) propertyPathIter.next();
-			propertyMetaData = getPropertyMetaData( clazz, propertyPathNode );
+			propertyMetaData = getBeanPropertyMetaData( clazz, propertyPathNode );
 
 			// if the property is not the leaf property, we set up the context for the next iteration
 			if ( propertyPathIter.hasNext() ) {
 				if ( !propertyMetaData.isCascading() ) {
-					throw log.getInvalidPropertyPathException( propertyPath.asString(), validationContext.getRootBeanClass().getName() );
+					throw log.getInvalidPropertyPathException( validationContext.getRootBeanClass().getName(), propertyPath.asString() );
 				}
 
-				value = getValue( value, validationContext, propertyMetaData );
+				value = getBeanPropertyValue( validationContext, value, propertyMetaData );
 				if ( value == null ) {
 					throw log.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
 				}
@@ -1531,14 +1531,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					}
 
 					clazz = value.getClass();
-					propertyMetaData = getPropertyMetaData( clazz, propertyPathNode );
+					propertyMetaData = getBeanPropertyMetaData( clazz, propertyPathNode );
 				}
 			}
 		}
 
 		if ( propertyMetaData == null ) {
 			// should only happen if the property path is empty, which should never happen
-			throw log.getInvalidPropertyPathException( propertyPath.asString(), clazz.getName() );
+			throw log.getInvalidPropertyPathException( clazz.getName(), propertyPath.asString() );
 		}
 
 		metaConstraints.addAll( propertyMetaData.getConstraints() );
@@ -1572,7 +1572,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		while ( propertyPathIter.hasNext() ) {
 			// cast is ok, since we are dealing with engine internal classes
 			NodeImpl propertyPathNode = (NodeImpl) propertyPathIter.next();
-			propertyMetaData = getPropertyMetaData( clazz, propertyPathNode );
+			propertyMetaData = getBeanPropertyMetaData( clazz, propertyPathNode );
 
 			// if the property is not the leaf property, we set up the context for the next iteration
 			if ( propertyPathIter.hasNext() ) {
@@ -1582,7 +1582,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					propertyPathNode = (NodeImpl) propertyPathIter.next();
 
 					clazz = ReflectionHelper.getClassFromType( ReflectionHelper.getIndexedType( propertyMetaData.getType() ) );
-					propertyMetaData = getPropertyMetaData( clazz, propertyPathNode );
+					propertyMetaData = getBeanPropertyMetaData( clazz, propertyPathNode );
 				}
 				else {
 					clazz = ReflectionHelper.getClassFromType( propertyMetaData.getType() );
@@ -1592,27 +1592,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		if ( propertyMetaData == null ) {
 			// should only happen if the property path is empty, which should never happen
-			throw log.getInvalidPropertyPathException( propertyPath.asString(), clazz.getName() );
+			throw log.getInvalidPropertyPathException( clazz.getName(), propertyPath.asString() );
 		}
 
 		metaConstraints.addAll( propertyMetaData.getConstraints() );
 		typeArgumentConstraints.addAll( propertyMetaData.getTypeArgumentsConstraints() );
 
 		return ValueContext.getLocalExecutionContext( clazz, null, propertyPath );
-	}
-
-	private PropertyMetaData getPropertyMetaData( Class<?> beanClass, Path.Node propertyNode ) {
-		if ( !ElementKind.PROPERTY.equals( propertyNode.getKind() ) ) {
-			throw log.getInvalidPropertyPathException( propertyNode.getName(), beanClass.getName() );
-		}
-
-		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( beanClass );
-		PropertyMetaData propertyMetaData = beanMetaData.getMetaDataFor( propertyNode.getName() );
-
-		if ( propertyMetaData == null ) {
-			throw log.getInvalidPropertyPathException( propertyNode.getName(), beanClass.getName() );
-		}
-		return propertyMetaData;
 	}
 
 	/**
@@ -1723,7 +1709,22 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return context.isFailFastModeEnabled() && !context.getFailingConstraints().isEmpty();
 	}
 
-	private Object getValue(Object object, ValidationContext validationContext, Cascadable cascadable) {
+	private PropertyMetaData getBeanPropertyMetaData( Class<?> beanClass, Path.Node propertyNode ) {
+		if ( !ElementKind.PROPERTY.equals( propertyNode.getKind() ) ) {
+			throw log.getInvalidPropertyPathException( beanClass.getName(), propertyNode.getName() );
+		}
+
+		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( beanClass );
+		PropertyMetaData propertyMetaData = beanMetaData.getMetaDataFor( propertyNode.getName() );
+
+		if ( propertyMetaData == null ) {
+			throw log.getInvalidPropertyPathException( beanClass.getName(), propertyNode.getName() );
+		}
+		return propertyMetaData;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private Object getBeanPropertyValue(ValidationContext<?> validationContext, Object object, Cascadable cascadable) {
 		Object value = cascadable.getValue( object );
 
 		// Value can be wrapped (e.g. Optional<Address>). Try to unwrap it
@@ -1738,7 +1739,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return value;
 	}
 
-	private Object getValue(Member member, Object object) {
+	private Object getBeanMemberValue(Object object, Member member) {
 		if ( member == null ) {
 			return object;
 		}
