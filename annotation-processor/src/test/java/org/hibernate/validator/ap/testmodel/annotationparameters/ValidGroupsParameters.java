@@ -13,7 +13,6 @@ import javax.validation.constraints.Size;
  */
 public class ValidGroupsParameters {
 
-
 	@Size(groups = { })
 	private String string;
 
@@ -51,6 +50,8 @@ public class ValidGroupsParameters {
 	)
 	private String string6;
 
+	@Size(groups = { int.class })
+	private String string7;
 
 	public interface Group1 {
 	}
