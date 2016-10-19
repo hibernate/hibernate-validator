@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -37,8 +38,8 @@ import javax.validation.ConstraintValidator;
 
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.testng.Assert.assertEquals;
@@ -864,6 +865,15 @@ public class TypeHelperTest {
 
 		assertEquals( validatorsTypes.get( Integer.class ), PositiveConstraintValidator.class );
 		assertNull( validatorsTypes.get( String.class ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1032")
+	public void testTypeHelperDoesntGoIntoInfiniteLoop() {
+		Type parentEntityType = ChildEntity.class.getGenericSuperclass();
+		ParameterizedType childEntityType = TypeHelper.parameterizedType( ChildEntity.class, ChildEntity.class.getTypeParameters() );
+
+		assertTrue( TypeHelper.isAssignable( parentEntityType, childEntityType ) );
 	}
 
 	private static void assertAsymmetricallyAssignable(Type supertype, Type type) {
