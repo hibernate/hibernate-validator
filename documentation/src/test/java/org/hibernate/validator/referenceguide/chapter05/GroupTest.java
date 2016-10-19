@@ -83,7 +83,7 @@ public class GroupTest {
 		// check that this supercar is valid as generic car and also as race car
 		Set<ConstraintViolation<SuperCar>> constraintViolations = validator.validate( superCar, RaceCarChecks.class );
 
-		assertThat( constraintViolations ).extracting( "message" ).containsExactly(
+		assertThat( constraintViolations ).extracting( "message" ).containsOnly(
 				"Race car must have a safety belt",
 				"must be greater than or equal to 2"
 		);
