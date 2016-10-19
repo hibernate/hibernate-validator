@@ -183,7 +183,8 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
 						new AnnotationParametersDigitsCheck( annotationApiHelper ),
 						new AnnotationParametersDecimalMinMaxCheck( annotationApiHelper ),
-						new AnnotationParametersGroupsCheck( annotationApiHelper )
+						new AnnotationParametersGroupsCheck( annotationApiHelper ),
+						new AnnotationUserMessageCheck( annotationApiHelper )
 				)
 		);
 		annotationTypeChecks.put(
@@ -207,7 +208,6 @@ public class ConstraintCheckFactory {
 						new ConstraintValidatorCheck( constraintHelper, annotationApiHelper ),
 						new AnnotationTypeMemberCheck( annotationApiHelper, typeUtils ),
 						new CrossParameterConstraintCheck( annotationApiHelper, constraintHelper, typeUtils ),
-						new AnnotationUserMessageCheck( annotationApiHelper ),
 						new AnnotationDefaultMessageCheck( annotationApiHelper, elementUtils )
 				)
 		);
