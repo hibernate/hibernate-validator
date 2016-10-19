@@ -114,4 +114,34 @@ public class ValidMessageParameters {
 
 	}
 
+	public static class Case3 {
+
+		@Target(ElementType.FIELD)
+		@Retention(RetentionPolicy.RUNTIME)
+		@Constraint(validatedBy = { SomeCustomValidator.class })
+		@Size(message = "{user.wants.to.provide.a.custom.key.for.the.message.but.forgets.a.closing.bracket")
+		public @interface SomeCustomConstraintAnnotation {
+
+			String message() default "{some.valid.message.key}";
+
+			Class<?>[] groups() default { };
+
+			Class<? extends Payload>[] payload() default { };
+		}
+
+		private static class SomeCustomValidator implements ConstraintValidator<SomeCustomConstraintAnnotation, String> {
+
+			@Override
+			public void initialize(SomeCustomConstraintAnnotation constraintAnnotation) {
+
+			}
+
+			@Override
+			public boolean isValid(String value, ConstraintValidatorContext context) {
+				return false;
+			}
+
+		}
+	}
+
 }
