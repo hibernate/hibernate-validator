@@ -571,7 +571,10 @@ public final class TypeHelper {
 		Map<Type, Type> actualTypeArgumentsByParameter = new LinkedHashMap<Type, Type>();
 
 		for ( int i = 0; i < typeParameters.length; i++ ) {
-			actualTypeArgumentsByParameter.put( typeParameters[i], typeArguments[i] );
+			// we only add the mapping if it is not a cyclic dependency (see HV-1032)
+			if ( !typeParameters[i].equals( typeArguments[i] ) ) {
+				actualTypeArgumentsByParameter.put( typeParameters[i], typeArguments[i] );
+			}
 		}
 
 		return actualTypeArgumentsByParameter;
