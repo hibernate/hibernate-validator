@@ -11,7 +11,7 @@ import java.util.List;
 import org.hibernate.validator.constraints.pl.REGON;
 
 /**
- * A class for REGON validator. Validates both 9 and 14 digits REGON numbers.
+ * Validator for {@link REGON}. Validates both 9 and 14 digits REGON numbers.
  *
  * @author Marko Bekhta
  */

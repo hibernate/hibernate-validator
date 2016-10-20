@@ -11,7 +11,7 @@ import java.util.List;
 import org.hibernate.validator.constraints.pl.NIP;
 
 /**
- * A class for NIP validator.
+ * Validator for {@link NIP}.
  *
  * @author Marko Bekhta
  */

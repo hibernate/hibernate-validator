@@ -110,7 +110,7 @@ public final class ModUtil {
 	 * @param moduloParam modulo parameter to be used
 	 * @param weights weights for the sum.
 	 *
-	 * @return
+	 * @return the result of mod checksum calculation
 	 */
 	public static int calculateModXCheckWithWeights(final List<Integer> digits, int moduloParam, final int threshold, int... weights) {
 		int sum = 0;
