@@ -24,17 +24,9 @@ import org.hibernate.validator.ap.util.Configuration;
 import org.hibernate.validator.ap.util.MessagerAdapter;
 
 /**
- * An {@link javax.lang.model.element.ElementVisitor} that visits methods of classes and interfaces
- * and applies different checks to them.
- * Each {@link ConstraintCheckIssue} occurred will be reported using the {@link javax.annotation.processing.Messager} API.
- * <p>
- * Visitor is used to go through class/interface hierarchies and find issues related to constraints of overridden methods.
- * Currently implemented checks are looking for:
- * <p>
- * <ul>
- * <li>method parameter constraints in inheritance hierarchies are applied correctly</li>
- * <li>method return value constraints in inheritance hierarchies are applied correctly</li>
- * </ul>
+ * An {@link javax.lang.model.element.ElementVisitor} that visits methods of classes and interfaces and applies
+ * different checks to them. Each {@link ConstraintCheckIssue} occurred will be reported using the
+ * {@link javax.annotation.processing.Messager} API.
  *
  * @author Marko Bekhta
  */
@@ -87,12 +79,7 @@ public class ClassVisitor extends ElementKindVisitor6<Void, Void> {
 	}
 
 	/**
-	 * <p>Checks whether the given method is correctly implemented.</p>
-	 * <p>List of performed checks:</p>
-	 * <ul>
-	 * <li>Checks whether the constrain annotation are correctly applied to method parameters</li>
-	 * <li>Checks whether the constrain annotation are correctly applied to method return value</li>
-	 * </ul>
+	 * Checks whether the constraints of the given method are valid.
 	 *
 	 * @param element a method under investigation
 	 * @param aVoid
@@ -105,7 +92,7 @@ public class ClassVisitor extends ElementKindVisitor6<Void, Void> {
 	}
 
 	/**
-	 * Visits all inner elements of provided {@link TypeElement}
+	 * Visits all inner elements of provided {@link TypeElement}.
 	 *
 	 * @param typeElement inner elements of which you want to visit
 	 */

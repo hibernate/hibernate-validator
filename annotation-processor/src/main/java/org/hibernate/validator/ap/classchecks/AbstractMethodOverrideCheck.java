@@ -24,11 +24,11 @@ import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.CollectionHelper;
 
 /**
- * Abstract base class for {@link ClassCheck} implementations of overridden method checks.
+ * Abstract base class for {@link ClassCheck} implementations that check overridden methods.
  *
  * @author Marko Bekhta
  */
-public abstract class MethodOverrideCheck extends AbstractClassCheck {
+public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 
 	private static final String JAVA_LANG_OBJECT = "java.lang.Object";
 
@@ -38,7 +38,7 @@ public abstract class MethodOverrideCheck extends AbstractClassCheck {
 
 	private final Types typeUtils;
 
-	public MethodOverrideCheck(Elements elementUtils, Types typeUtils) {
+	public AbstractMethodOverrideCheck(Elements elementUtils, Types typeUtils) {
 		this.elementUtils = elementUtils;
 		this.typeUtils = typeUtils;
 	}
@@ -48,18 +48,19 @@ public abstract class MethodOverrideCheck extends AbstractClassCheck {
 		if ( !needToPerformAnyChecks( currentMethod ) ) {
 			return Collections.emptySet();
 		}
+
 		TypeElement currentTypeElement = getEnclosingTypeElement( currentMethod );
 
-		// find if there's a method that was overridden by a current one.
-		List<ExecutableElement> overridden = findAllOverriddenElements( currentTypeElement, currentMethod );
-		if ( overridden.isEmpty() ) {
+		// find if there's a method that was overridden by the current one.
+		List<ExecutableElement> overriddenMethods = findAllOverriddenElements( currentTypeElement, currentMethod );
+		if ( overriddenMethods.isEmpty() ) {
 			return Collections.emptySet();
 		}
 
 		// if there's more than one overridden method we need to make sure that all of them match
 		Set<ConstraintCheckIssue> errors = CollectionHelper.newHashSet();
-		for ( ExecutableElement firstExecutable : overridden ) {
-			for ( ExecutableElement secondExecutable : overridden ) {
+		for ( ExecutableElement firstExecutable : overriddenMethods ) {
+			for ( ExecutableElement secondExecutable : overriddenMethods ) {
 				if ( firstExecutable.equals( secondExecutable ) ) {
 					continue;
 				}
@@ -74,9 +75,9 @@ public abstract class MethodOverrideCheck extends AbstractClassCheck {
 		}
 
 		// if we reached this part of code it means we need to check if the current method 'correctly' overrides super methods.
-		for ( ExecutableElement overriddenExecutableElement : overridden ) {
-			if ( !checkOverriddenMethod( currentMethod, overriddenExecutableElement ) ) {
-				return CollectionHelper.asSet( ConstraintCheckIssue.error( currentMethod, null, getErrorMessageKey(), getEnclosingTypeElement( overriddenExecutableElement ).getQualifiedName().toString() ) );
+		for ( ExecutableElement overriddenMethod : overriddenMethods ) {
+			if ( !checkOverriddenMethod( currentMethod, overriddenMethod ) ) {
+				return CollectionHelper.asSet( ConstraintCheckIssue.error( currentMethod, null, getErrorMessageKey(), getEnclosingTypeElement( overriddenMethod ).getQualifiedName().toString() ) );
 
 			}
 		}
@@ -88,16 +89,24 @@ public abstract class MethodOverrideCheck extends AbstractClassCheck {
 	 * There can be situations in which no checks should be performed. So in such cases we will not look for any overridden
 	 * methods and do any work at all.
 	 *
-	 * @param currentMethod a method under investigation.
+	 * @param currentMethod the method under investigation
 	 *
-	 * @return {@code true} if we should proceed with checks and {@code false} otherwise.
+	 * @return {@code true} if we should proceed with checks and {@code false} otherwise
 	 */
 	protected abstract boolean needToPerformAnyChecks(ExecutableElement currentMethod);
 
-	protected abstract boolean checkOverriddenMethod(ExecutableElement currentMethod, ExecutableElement otherMethod);
+	/**
+	 * Determine if one method 'correctly' overrides another one in terms of annotated parameters
+	 *
+	 * @param currentMethod method from a current subclass
+	 * @param overriddenMethod method from a super class
+	 *
+	 * @return {@code true} if method is overridden 'correctly', {@code false} otherwise
+	 */
+	protected abstract boolean checkOverriddenMethod(ExecutableElement currentMethod, ExecutableElement overriddenMethod);
 
 	/**
-	 * Method which returns a Error message key to be used if there's an error in method overriding
+	 * Method which returns a Error message key to be used if there's an error in method overriding.
 	 *
 	 * @return error message key
 	 */
@@ -105,37 +114,37 @@ public abstract class MethodOverrideCheck extends AbstractClassCheck {
 
 
 	/**
-	 * Find a list of overridden methods from all super classes and all implemented interfaces
+	 * Find a list of overridden methods from all super classes and all implemented interfaces.
 	 *
-	 * @param currentTypeElement a class in which method is located
-	 * @param current method that we want to find overridden ones for
+	 * @param currentTypeElement the class in which the method is located
+	 * @param currentMethod the method for which we want to find the overridden methods
 	 *
-	 * @return a list of overridden methods if there are such and empty list otherwise.
+	 * @return a list of overridden methods if there are any and an empty list otherwise
 	 */
 	private List<ExecutableElement> findAllOverriddenElements(
 			TypeElement currentTypeElement,
-			ExecutableElement current) {
+			ExecutableElement currentMethod) {
 		List<ExecutableElement> elements = CollectionHelper.newArrayList();
 
 		// get a super class
 		TypeElement parentTypeElement = (TypeElement) typeUtils.asElement( currentTypeElement.getSuperclass() );
 
-		//look for implemented interfaces:
-		elements.addAll( checkInterfacesForOverriddenMethod(
+		// look for implemented interfaces:
+		elements.addAll( findOverriddenMethodInInterfaces(
 				currentTypeElement,
 				currentTypeElement.getInterfaces(),
-				current
+				currentMethod
 		) );
 
-		// if super class is java.lang.Object - then there's no need to do any other work - no such method was found.
+		// if super class is java.lang.Object, then there's no need to do any other work: no such method was found.
 		while ( !JAVA_LANG_OBJECT.equals( parentTypeElement.toString() ) ) {
-			ExecutableElement element = getOverriddenElement( currentTypeElement, parentTypeElement, current );
+			ExecutableElement element = getOverriddenElement( currentTypeElement, parentTypeElement, currentMethod );
 			if ( element != null ) {
 				elements.add( element );
 			}
 
-			//need to check all implemented interfaces as well:
-			elements.addAll( checkInterfacesForOverriddenMethod( currentTypeElement, parentTypeElement.getInterfaces(), current ) );
+			// need to check all the implemented interfaces as well
+			elements.addAll( findOverriddenMethodInInterfaces( currentTypeElement, parentTypeElement.getInterfaces(), currentMethod ) );
 
 			parentTypeElement = (TypeElement) typeUtils.asElement( parentTypeElement.getSuperclass() );
 		}
@@ -144,22 +153,22 @@ public abstract class MethodOverrideCheck extends AbstractClassCheck {
 	}
 
 	/**
-	 * Find a list of overridden methods from implemented interfaces
+	 * Find a list of overridden methods from implemented interfaces.
 	 *
-	 * @param currentTypeElement a class in which method is located
+	 * @param currentTypeElement the class in which the method is located
 	 * @param interfaces a list of implemented interfaces
-	 * @param current method that we want to find overridden ones for
+	 * @param currentMethod the method for which we want to find the overridden methods
 	 *
-	 * @return a list of overridden methods if there are such, empty list otherwise.
+	 * @return a list of overridden methods if there are any, an empty list otherwise
 	 */
-	private List<ExecutableElement> checkInterfacesForOverriddenMethod(
+	private List<ExecutableElement> findOverriddenMethodInInterfaces(
 			TypeElement currentTypeElement,
 			List<? extends TypeMirror> interfaces,
-			ExecutableElement current) {
+			ExecutableElement currentMethod) {
 		List<ExecutableElement> elements = CollectionHelper.newArrayList();
 
 		for ( TypeMirror anInterface : interfaces ) {
-			ExecutableElement element = getOverriddenElement( currentTypeElement, (TypeElement) typeUtils.asElement( anInterface ), current );
+			ExecutableElement element = getOverriddenElement( currentTypeElement, (TypeElement) typeUtils.asElement( anInterface ), currentMethod );
 			if ( element != null ) {
 				elements.add( element );
 			}
@@ -169,18 +178,18 @@ public abstract class MethodOverrideCheck extends AbstractClassCheck {
 	}
 
 	/**
-	 * Find a method that is overridden by the one passed to this function
+	 * Find a method that is overridden by the one passed to this function.
 	 *
 	 * @param currentTypeElement a class in which method is located
 	 * @param otherTypeElement a class/interface on which to look for overridden method
-	 * @param current method that we want to find overridden ones for
+	 * @param currentMethod the method for which we want to find the overridden methods
 	 *
-	 * @return an overridden method if there's one, and {@code null} otherwise.
+	 * @return an overridden method if there's one, and {@code null} otherwise
 	 */
 	private ExecutableElement getOverriddenElement(
 			TypeElement currentTypeElement,
 			TypeElement otherTypeElement,
-			ExecutableElement current) {
+			ExecutableElement currentMethod) {
 
 		if ( JAVA_LANG_OBJECT.equals( otherTypeElement.toString() ) ) {
 			return null;
@@ -190,7 +199,7 @@ public abstract class MethodOverrideCheck extends AbstractClassCheck {
 			if ( !element.getKind().equals( ElementKind.METHOD ) ) {
 				continue;
 			}
-			if ( elementUtils.overrides( current, (ExecutableElement) element, currentTypeElement ) ) {
+			if ( elementUtils.overrides( currentMethod, (ExecutableElement) element, currentTypeElement ) ) {
 				return (ExecutableElement) element;
 			}
 		}
