@@ -64,8 +64,7 @@ public class Mod11CheckValidator extends ModCheckBase
 				constraintAnnotation.threshold(),
 				constraintAnnotation.treatCheck10As(),
 				constraintAnnotation.treatCheck11As(),
-				constraintAnnotation.processingDirection(),
-				constraintAnnotation.weights()
+				constraintAnnotation.processingDirection()
 		);
 	}
 

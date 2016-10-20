@@ -16,7 +16,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckBase;
 import org.hibernate.validator.internal.util.ModUtil;
 
 /**
- * A class for PESEL validator.
+ * Validator for {@link PESEL}.
  *
  * @author Marko Bekhta
  */

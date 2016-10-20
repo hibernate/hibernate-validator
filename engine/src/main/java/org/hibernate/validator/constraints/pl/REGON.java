@@ -24,7 +24,7 @@ import javax.validation.ReportAsSingleViolation;
 
 
 /**
- * Validates a REGON number - (9/14 digit number from Rejestr Gospodarki Narodowej ).
+ * Validates a REGON number - (9/14 digit Polish Taxpayer Identification Number).
  *
  * @author Marko Bekhta
  * @see <a href="https://pl.wikipedia.org/wiki/REGO">REGON</a> }
