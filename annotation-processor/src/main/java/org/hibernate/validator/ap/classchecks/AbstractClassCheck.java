@@ -32,6 +32,7 @@ public abstract class AbstractClassCheck implements ClassCheck {
 		return Collections.emptySet();
 	}
 
+	@Override
 	public final Collection<ConstraintCheckIssue> execute(Element element) {
 		switch ( element.getKind() ) {
 			case METHOD:

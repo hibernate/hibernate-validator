@@ -101,7 +101,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 
 	@Test
 	@TestForIssue( jiraKey = "HV-840" )
-	public void overridingMethodParameterConstrainsTest() {
+	public void overridingMethodParameterConstraintsTest() {
 		File sourceFile = compilerHelper.getSourceFile( MethodOverridingTests.class );
 
 		boolean compilationResult = compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );

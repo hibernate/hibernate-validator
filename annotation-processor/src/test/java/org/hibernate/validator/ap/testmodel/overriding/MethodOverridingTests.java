@@ -113,7 +113,6 @@ public class MethodOverridingTests {
 	/**
 	 * Case 6 : Implementing interface with removing constraints on return value - incorrect
 	 */
-
 	public interface MethodOverridingTestCase6 {
 		@NotBlank
 		@Size(max = 10)
@@ -133,7 +132,6 @@ public class MethodOverridingTests {
 	/**
 	 * Case 7 : Deeper hierarchy: Implementing interfaces with different constraints on parameter - incorrect
 	 */
-
 	public interface MethodOverridingTestCase7Interface {
 		String doSomething(@NotBlank @Size(max = 10) String param);
 	}
