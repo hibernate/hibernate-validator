@@ -40,8 +40,8 @@ getter methods (optionally, see below)
 annotations themselves
 * definition of dynamic default group sequence with @GroupSequenceProvider is valid
 * annotation parameter values are meaningful and valid
-* method parameter constraints in inheritance hierarchies are applied correctly
-* method return value constraints in inheritance hierarchies are applied correctly
+* method parameter constraints in inheritance hierarchies respect the inheritance rules
+* method return value constraints in inheritance hierarchies respect the inheritance rules
 
 [[validator-annotationprocessor-options]]
 === Options
