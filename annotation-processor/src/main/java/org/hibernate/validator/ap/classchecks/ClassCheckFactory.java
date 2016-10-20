@@ -16,7 +16,7 @@ import javax.lang.model.util.Types;
 import org.hibernate.validator.ap.util.CollectionHelper;
 
 /**
- * A factory class that provides a collection of {@link ClassCheck}s based on a type of the element we need to check.
+ * A factory class that provides a collection of {@link ClassCheck}s based on the type of the element we need to check.
  *
  * @author Marko Bekhta
  */
