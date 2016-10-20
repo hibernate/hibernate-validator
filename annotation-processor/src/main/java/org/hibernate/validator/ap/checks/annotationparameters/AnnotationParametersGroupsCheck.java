@@ -15,7 +15,7 @@ import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
-import org.hibernate.validator.ap.checks.ConstraintCheckError;
+import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 
@@ -36,14 +36,14 @@ public class AnnotationParametersGroupsCheck extends AnnotationParametersAbstrac
 	}
 
 	@Override
-	protected Set<ConstraintCheckError> doCheck(Element element, AnnotationMirror annotation) {
+	protected Set<ConstraintCheckIssue> doCheck(Element element, AnnotationMirror annotation) {
 		List<? extends AnnotationValue> annotationValue = annotationApiHelper.getAnnotationArrayValue( annotation, "groups" );
-		Set<ConstraintCheckError> issues = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> issues = CollectionHelper.newHashSet();
 
 		for ( AnnotationValue value : annotationValue ) {
 			TypeMirror typeValue = (TypeMirror) value.getValue();
 			if ( !TypeKind.DECLARED.equals( typeValue.getKind() ) || !( (DeclaredType) typeValue ).asElement().getKind().isInterface() ) {
-				issues.add( new ConstraintCheckError(
+				issues.add( ConstraintCheckIssue.error(
 						element, annotation, "INVALID_GROUPS_VALUE_ANNOTATION_PARAMETERS"
 				) );
 			}

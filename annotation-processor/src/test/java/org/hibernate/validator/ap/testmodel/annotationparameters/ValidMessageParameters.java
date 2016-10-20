@@ -144,4 +144,11 @@ public class ValidMessageParameters {
 		}
 	}
 
+	public static class Case4 {
+
+		@Size(message = "Something is wrong. Really wrong.")
+		private String strin1;
+
+	}
+
 }
