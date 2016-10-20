@@ -23,7 +23,6 @@ import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
  * supported by the check.
  * </p>
  *
- *
  * @author Marko Bekhta
  */
 public interface ClassCheck {
@@ -31,11 +30,11 @@ public interface ClassCheck {
 	/**
 	 * Checks whether the given method is written correctly.
 	 *
-	 * @param element A method under investigation
+	 * @param element the method under investigation
 	 *
-	 * @return A collection with errors, that describe, why the given method
+	 * @return a collection with errors that describe why the given method
 	 *         is not correctly implemented. In case no errors occur (the
-	 *         method is written correctly), an empty set must be returned.
+	 *         method is written correctly), an empty set must be returned
 	 */
 	Collection<ConstraintCheckIssue> checkMethod(ExecutableElement element);
 
@@ -43,10 +42,10 @@ public interface ClassCheck {
 	/**
 	 * Run all checks on the element.
 	 *
-	 * @param element an element under investigation
-	 * @return A collection with errors, that describe, why the given element
+	 * @param element the element under investigation
+	 * @return a collection with errors that describe why the given element
 	 *         does not pass the checks. In case no errors occur (all checks completed successfully),
-	 *         an empty set must be returned.
+	 *         an empty set must be returned
 	 */
 	Collection<ConstraintCheckIssue> execute(Element element);
 }

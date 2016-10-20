@@ -13,24 +13,16 @@ import javax.lang.model.util.Types;
 
 /**
  * Checks if the return value of overridden and overriding methods have correct set of annotations.
- * Overridden method cannot have more wider range of constraints on return value the overriding one.
+ * Return value constraints of must not be weakened in subtypes.
  *
  * @author Marko Bekhta
  */
-public class ReturnValueMethodOverrideCheck extends MethodOverrideCheck {
+public class ReturnValueMethodOverrideCheck extends AbstractMethodOverrideCheck {
 
 	public ReturnValueMethodOverrideCheck(Elements elementUtils, Types typeUtils) {
 		super( elementUtils, typeUtils );
 	}
 
-	/**
-	 * Determine if one method 'correctly' overrides another one in terms of returned value
-	 *
-	 * @param currentMethod method from a current subclass
-	 * @param otherMethod method from a super class
-	 *
-	 * @return {@code true} if method is overridden 'correctly', {@code false} otherwise
-	 */
 	@Override
 	protected boolean checkOverriddenMethod(ExecutableElement currentMethod, ExecutableElement otherMethod) {
 		return annotationMirrorContainsAll( currentMethod.getAnnotationMirrors(), listOnlyConstraintAnnotations( otherMethod.getAnnotationMirrors() ) );
@@ -38,7 +30,7 @@ public class ReturnValueMethodOverrideCheck extends MethodOverrideCheck {
 
 	@Override
 	protected boolean needToPerformAnyChecks(ExecutableElement currentMethod) {
-		// if current method returns void - than we will not do any work on it here.
+		// if the method returns void, there's no need to check it
 		return !currentMethod.getReturnType().getKind().equals( TypeKind.VOID );
 	}
 
