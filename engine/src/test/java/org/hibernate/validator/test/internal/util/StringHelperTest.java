@@ -7,7 +7,9 @@
 package org.hibernate.validator.test.internal.util;
 
 import java.util.Arrays;
+import java.util.Locale;
 
+import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.util.StringHelper;
@@ -85,6 +87,15 @@ public class StringHelperTest {
 	@Test
 	public void decapitalizeShouldReturnDecapizalizedWord() {
 		assertEquals( StringHelper.decapitalize( "Giraffe" ), "giraffe" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1140")
+	public void decapitalizeShouldReturnDecapizalizedWordOnTurkishLocale() {
+		Locale defaultLocale = Locale.getDefault();
+		Locale.setDefault( new Locale( "tr" , "TR" ) );
+		assertEquals( StringHelper.decapitalize( "IsIsolationLevelGuaranteed" ), "isIsolationLevelGuaranteed" );
+		Locale.setDefault( defaultLocale );
 	}
 
 	@Test
