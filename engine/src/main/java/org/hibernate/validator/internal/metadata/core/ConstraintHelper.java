@@ -8,18 +8,21 @@ package org.hibernate.validator.internal.metadata.core;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
@@ -38,7 +41,6 @@ import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.constraints.ConstraintComposition;
@@ -120,6 +122,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.br.CPFValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.NIPValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.PESELValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.REGONValidator;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -146,12 +149,12 @@ public class ConstraintHelper {
 	private static final String JAVA_MONEY_CLASS_NAME = "javax.money.MonetaryAmount";
 
 	// immutable
-	private final Map<Class<? extends Annotation>, List<? extends Class<?>>> builtinConstraints;
+	private final Map<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> builtinConstraints;
 
-	private final ValidatorClassMap validatorClasses = new ValidatorClassMap();
+	private final ValidatorDescriptorMap validatorDescriptors = new ValidatorDescriptorMap();
 
 	public ConstraintHelper() {
-		Map<Class<? extends Annotation>, List<? extends Class<?>>> tmpConstraints = newHashMap();
+		Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> tmpConstraints = new HashMap<>();
 
 		putConstraint( tmpConstraints, AssertFalse.class, AssertFalseValidator.class );
 		putConstraint( tmpConstraints, AssertTrue.class, AssertTrueValidator.class );
@@ -247,19 +250,28 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
 		putConstraint( tmpConstraints, URL.class, URLValidator.class );
 
+
 		this.builtinConstraints = Collections.unmodifiableMap( tmpConstraints );
 	}
 
-	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<? extends Class<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType) {
-		validators.put( constraintType, Collections.singletonList( validatorType ) );
+	private static <A extends Annotation> void putConstraint(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType) {
+		validators.put( constraintType, Collections.singletonList( ConstraintValidatorDescriptor.forClass( validatorType ) ) );
 	}
 
-	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<? extends Class<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType1, Class<? extends ConstraintValidator<A, ?>> validatorType2) {
-		validators.put( constraintType, Collections.unmodifiableList( Arrays.<Class<?>>asList( validatorType1, validatorType2 ) ) );
+	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType1, Class<? extends ConstraintValidator<A, ?>> validatorType2) {
+		List<ConstraintValidatorDescriptor<?>> descriptors = Stream.of( validatorType1, validatorType2 )
+				.map( c -> ConstraintValidatorDescriptor.forClass( c ) )
+				.collect( Collectors.toList() );
+
+		validators.put( constraintType, Collections.unmodifiableList( descriptors ) );
 	}
 
-	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<? extends Class<?>>> validators, Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorTypes) {
-		validators.put( constraintType, Collections.unmodifiableList( validatorTypes ) );
+	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators, Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorDescriptors) {
+		List<ConstraintValidatorDescriptor<?>> descriptors = validatorDescriptors.stream()
+				.map( c -> ConstraintValidatorDescriptor.forClass( c ) )
+				.collect( Collectors.toList() );
+
+		validators.put( constraintType, Collections.unmodifiableList( descriptors ) );
 	}
 
 	private boolean isBuiltinConstraint(Class<? extends Annotation> annotationType) {
@@ -285,21 +297,21 @@ public class ConstraintHelper {
 	 *
 	 * @return The validator classes for the given type.
 	 */
-	public <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getAllValidatorClasses(Class<A> annotationType) {
+	public <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getAllValidatorDescriptors(Class<A> annotationType) {
 		Contracts.assertNotNull( annotationType, MESSAGES.classCannotBeNull() );
 
-		List<Class<? extends ConstraintValidator<A, ?>>> classes = validatorClasses.get( annotationType );
+		List<ConstraintValidatorDescriptor<A>> classes = validatorDescriptors.get( annotationType );
 
 		if ( classes == null ) {
-			classes = getDefaultValidatorClasses( annotationType );
+			classes = getDefaultValidatorDescriptors( annotationType );
 
-			List<Class<? extends ConstraintValidator<A, ?>>> cachedValidatorClasses = validatorClasses.putIfAbsent(
+			List<ConstraintValidatorDescriptor<A>> cachedValidatorDescriptors = validatorDescriptors.putIfAbsent(
 					annotationType,
 					classes
 			);
 
-			if ( cachedValidatorClasses != null ) {
-				classes = cachedValidatorClasses;
+			if ( cachedValidatorDescriptors != null ) {
+				classes = cachedValidatorDescriptors;
 			}
 		}
 
@@ -307,61 +319,57 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Returns those validator classes for the given constraint annotation
+	 * Returns those validator descriptors for the given constraint annotation
 	 * matching the given target.
 	 *
 	 * @param annotationType The annotation of interest.
 	 * @param validationTarget The target, either annotated element or parameters.
 	 * @param <A> the type of the annotation
 	 *
-	 * @return A list with matching validator classes.
+	 * @return A list with matching validator descriptors.
 	 */
-	public <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> findValidatorClasses(Class<A> annotationType, ValidationTarget validationTarget) {
-		List<Class<? extends ConstraintValidator<A, ?>>> validatorClasses = getAllValidatorClasses( annotationType );
-		List<Class<? extends ConstraintValidator<A, ?>>> matchingValidatorClasses = newArrayList();
+	public <A extends Annotation> List<ConstraintValidatorDescriptor<A>> findValidatorDescriptors(Class<A> annotationType, ValidationTarget validationTarget) {
+		List<ConstraintValidatorDescriptor<A>> validatorDescriptors = getAllValidatorDescriptors( annotationType );
+		List<ConstraintValidatorDescriptor<A>> matchingValidatorDescriptors = newArrayList();
 
-		for ( Class<? extends ConstraintValidator<A, ?>> validatorClass : validatorClasses ) {
-			if ( supportsValidationTarget( validatorClass, validationTarget ) ) {
-				matchingValidatorClasses.add( validatorClass );
+		for ( ConstraintValidatorDescriptor<A> descriptor : validatorDescriptors ) {
+			if ( supportsValidationTarget( descriptor, validationTarget ) ) {
+				matchingValidatorDescriptors.add( descriptor );
 			}
 		}
 
-		return matchingValidatorClasses;
+		return matchingValidatorDescriptors;
 	}
 
-	private boolean supportsValidationTarget(Class<? extends ConstraintValidator<?, ?>> validatorClass, ValidationTarget target) {
-		SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
-				SupportedValidationTarget.class
-		);
-
-		//by default constraints target the annotated element
-		if ( supportedTargetAnnotation == null ) {
-			return target == ValidationTarget.ANNOTATED_ELEMENT;
-		}
-
-		return Arrays.asList( supportedTargetAnnotation.value() ).contains( target );
+	private boolean supportsValidationTarget(ConstraintValidatorDescriptor<?> validatorDescriptor, ValidationTarget target) {
+		return validatorDescriptor.getValidationTargets().contains( target );
 	}
 
 	/**
-	 * Registers the given validator classes with the given constraint
+	 * Registers the given validator descriptors with the given constraint
 	 * annotation type.
 	 *
 	 * @param annotationType The constraint annotation type
-	 * @param definitionClasses The validators to register
+	 * @param validatorDescriptors The validator descriptors to register
 	 * @param keepExistingClasses Whether already-registered validators should be kept or not
 	 * @param <A> the type of the annotation
 	 */
-	public <A extends Annotation> void putValidatorClasses(Class<A> annotationType,
-														   List<Class<? extends ConstraintValidator<A, ?>>> definitionClasses,
+	public <A extends Annotation> void putValidatorDescriptors(Class<A> annotationType,
+														   List<ConstraintValidatorDescriptor<A>> validatorDescriptors,
 														   boolean keepExistingClasses) {
+
+		List<ConstraintValidatorDescriptor<A>> validatorDescriptorsToAdd = new ArrayList<>();
+
 		if ( keepExistingClasses ) {
-			List<Class<? extends ConstraintValidator<A, ?>>> existingClasses = getAllValidatorClasses( annotationType );
-			if ( existingClasses != null ) {
-				definitionClasses.addAll( 0, existingClasses );
+			List<ConstraintValidatorDescriptor<A>> existingvalidatorDescriptors = getAllValidatorDescriptors( annotationType );
+			if ( existingvalidatorDescriptors != null ) {
+				validatorDescriptorsToAdd.addAll( 0, existingvalidatorDescriptors );
 			}
 		}
 
-		validatorClasses.put( annotationType, definitionClasses );
+		validatorDescriptorsToAdd.addAll( validatorDescriptors );
+
+		this.validatorDescriptors.put( annotationType, validatorDescriptorsToAdd );
 	}
 
 	/**
@@ -493,11 +501,11 @@ public class ConstraintHelper {
 	}
 
 	private void assertValidationAppliesToParameterSetUpCorrectly(Class<? extends Annotation> annotationType) {
-		boolean hasGenericValidators = !findValidatorClasses(
+		boolean hasGenericValidators = !findValidatorDescriptors(
 				annotationType,
 				ValidationTarget.ANNOTATED_ELEMENT
 		).isEmpty();
-		boolean hasCrossParameterValidator = !findValidatorClasses(
+		boolean hasCrossParameterValidator = !findValidatorDescriptors(
 				annotationType,
 				ValidationTarget.PARAMETERS
 		).isEmpty();
@@ -546,9 +554,9 @@ public class ConstraintHelper {
 	 *         built-in constraints.
 	 */
 	@SuppressWarnings("unchecked")
-	private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> getDefaultValidatorClasses(Class<A> annotationType) {
+	private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getDefaultValidatorDescriptors(Class<A> annotationType) {
 		//safe cause all CV for a given annotation A are CV<A, ?>
-		final List<Class<? extends ConstraintValidator<A, ?>>> builtInValidators = (List<Class<? extends ConstraintValidator<A, ?>>>) builtinConstraints
+		final List<ConstraintValidatorDescriptor<A>> builtInValidators = (List<ConstraintValidatorDescriptor<A>>) builtinConstraints
 				.get( annotationType );
 
 		if ( builtInValidators != null ) {
@@ -559,7 +567,9 @@ public class ConstraintHelper {
 				.getAnnotation( Constraint.class )
 				.validatedBy();
 
-		return Arrays.asList( validatedBy );
+		return Stream.of( validatedBy )
+			.map( c -> ConstraintValidatorDescriptor.forClass( c ) )
+			.collect( Collectors.toList() );
 	}
 
 	private static boolean isClassPresent(String className) {
@@ -590,20 +600,20 @@ public class ConstraintHelper {
 	 * @author Gunnar Morling
 	 */
 	@SuppressWarnings("unchecked")
-	private static class ValidatorClassMap {
+	private static class ValidatorDescriptorMap {
 
-		private final ConcurrentMap<Class<? extends Annotation>, List<? extends Class<?>>> constraintValidatorClasses = newConcurrentHashMap();
+		private final ConcurrentMap<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> constraintValidatorDescriptors = newConcurrentHashMap();
 
-		private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> get(Class<A> annotationType) {
-			return (List<Class<? extends ConstraintValidator<A, ?>>>) constraintValidatorClasses.get( annotationType );
+		private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> get(Class<A> annotationType) {
+			return (List<ConstraintValidatorDescriptor<A>>) constraintValidatorDescriptors.get( annotationType );
 		}
 
-		private <A extends Annotation> void put(Class<A> annotationType, List<Class<? extends ConstraintValidator<A, ?>>> validatorClasses) {
-			constraintValidatorClasses.put( annotationType, validatorClasses );
+		private <A extends Annotation> void put(Class<A> annotationType, List<ConstraintValidatorDescriptor<A>> validatorDescriptors) {
+			constraintValidatorDescriptors.put( annotationType, validatorDescriptors );
 		}
 
-		private <A extends Annotation> List<Class<? extends ConstraintValidator<A, ?>>> putIfAbsent(Class<A> annotationType, List<Class<? extends ConstraintValidator<A, ?>>> classes) {
-			return (List<Class<? extends ConstraintValidator<A, ?>>>) constraintValidatorClasses.putIfAbsent(
+		private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> putIfAbsent(Class<A> annotationType, List<ConstraintValidatorDescriptor<A>> classes) {
+			return (List<ConstraintValidatorDescriptor<A>>) constraintValidatorDescriptors.putIfAbsent(
 					annotationType,
 					classes
 			);

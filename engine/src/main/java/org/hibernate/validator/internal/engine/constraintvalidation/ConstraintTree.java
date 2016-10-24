@@ -70,7 +70,7 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
-		return new ConstraintTree<U>( composingDescriptor, this );
+		return new ConstraintTree<>( composingDescriptor, this );
 	}
 
 	public final List<ConstraintTree<?>> getChildren() {
@@ -92,8 +92,8 @@ public class ConstraintTree<A extends Annotation> {
 		return true;
 	}
 
-	private <T, V> void validateConstraints(ValidationContext<T> validationContext,
-			ValueContext<?, V> valueContext,
+	private <T> void validateConstraints(ValidationContext<T> validationContext,
+			ValueContext<?, ?> valueContext,
 			Set<ConstraintViolation<T>> constraintViolations) {
 		CompositionResult compositionResult = validateComposingConstraints(
 				validationContext, valueContext, constraintViolations
@@ -113,7 +113,7 @@ public class ConstraintTree<A extends Annotation> {
 			}
 
 			// find the right constraint validator
-			ConstraintValidator<A, V> validator = getInitializedConstraintValidator( validationContext, valueContext );
+			ConstraintValidator<A, ?> validator = getInitializedConstraintValidator( validationContext, valueContext );
 
 			// create a constraint validator context
 			ConstraintValidatorContextImpl constraintValidatorContext = new ConstraintValidatorContextImpl(
@@ -151,7 +151,7 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	private <T, V> ConstraintValidator<A, V> getInitializedConstraintValidator(ValidationContext<T> validationContext,
+	private <T, V> ConstraintValidator<A, ?> getInitializedConstraintValidator(ValidationContext<T> validationContext,
 			ValueContext<?, V> valueContext) {
 		Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
 		@SuppressWarnings("unchecked")
@@ -182,7 +182,7 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	private <T, V> ConstraintValidator<A, V> getInitializedValidatorInstanceForWrappedInstance(ValidationContext<T> validationContext, ValueContext<?, V> valueContext, Type validatedValueType, ValidatedValueUnwrapper<V> validatedValueUnwrapper) {
+	private <T, V> ConstraintValidator<A, ?> getInitializedValidatorInstanceForWrappedInstance(ValidationContext<T> validationContext, ValueContext<?, V> valueContext, Type validatedValueType, ValidatedValueUnwrapper<V> validatedValueUnwrapper) {
 		// make sure that unwrapper is set
 		if ( validatedValueUnwrapper == null ) {
 			throw log.getNoUnwrapperFoundForTypeException(
@@ -193,7 +193,7 @@ public class ConstraintTree<A extends Annotation> {
 		valueContext.setValidatedValueHandler( validatedValueUnwrapper );
 		validatedValueType = validatedValueUnwrapper.getValidatedValueType( validatedValueType );
 
-		ConstraintValidator<A, V> validator = validationContext.getConstraintValidatorManager()
+		ConstraintValidator<A, ?> validator = validationContext.getConstraintValidatorManager()
 				.getInitializedValidator(
 						validatedValueType,
 						descriptor,
@@ -228,7 +228,7 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	private <T, V> ConstraintValidator<A, V> getConstraintValidatorInstanceForAutomaticUnwrapping(
+	private <T, V> ConstraintValidator<A, ?> getConstraintValidatorInstanceForAutomaticUnwrapping(
 			ValidationContext<T> validationContext,
 			ValueContext<?, V> valueContext
 	) {
@@ -244,7 +244,7 @@ public class ConstraintTree<A extends Annotation> {
 
 		// there is an unwrapper - need to find out for which type (wrapper or wrapped value there
 		// are constraint validators available
-		ConstraintValidator<A, V> validatorForWrappedValue = validationContext.getConstraintValidatorManager()
+		ConstraintValidator<A, ?> validatorForWrappedValue = validationContext.getConstraintValidatorManager()
 				.getInitializedValidator(
 						validatedValueUnwrapper.getValidatedValueType( validatedValueType ),
 						descriptor,
@@ -252,7 +252,7 @@ public class ConstraintTree<A extends Annotation> {
 				);
 
 
-		ConstraintValidator<A, V> validatorForWrapper = validationContext.getConstraintValidatorManager()
+		ConstraintValidator<A, ?> validatorForWrapper = validationContext.getConstraintValidatorManager()
 				.getInitializedValidator(
 						valueContext.getDeclaredTypeOfValidatedElement(),
 						descriptor,
@@ -291,13 +291,13 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	private <T, V> ConstraintValidator<A, V> getConstraintValidatorNoUnwrapping(ValidationContext<T> validationContext,
-			ValueContext<?, V> valueContext) {
+	private <T> ConstraintValidator<A, ?> getConstraintValidatorNoUnwrapping(ValidationContext<T> validationContext,
+			ValueContext<?, ?> valueContext) {
 		// make sure no unwrapper is set
 		valueContext.setValidatedValueHandler( null );
 
 		Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
-		ConstraintValidator<A, V> validator = validationContext.getConstraintValidatorManager()
+		ConstraintValidator<A, ?> validator = validationContext.getConstraintValidatorManager()
 				.getInitializedValidator(
 						validatedValueType,
 						descriptor,

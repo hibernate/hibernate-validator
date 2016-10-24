@@ -6,12 +6,15 @@
  */
 package org.hibernate.validator.internal.engine.constraintvalidation;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorFactory;
@@ -23,8 +26,6 @@ import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
  * Manager in charge of providing and caching initialized {@code ConstraintValidator} instances.
@@ -75,20 +76,19 @@ public class ConstraintValidatorManager {
 	 */
 	public ConstraintValidatorManager(ConstraintValidatorFactory constraintValidatorFactory) {
 		this.defaultConstraintValidatorFactory = constraintValidatorFactory;
-		this.constraintValidatorCache = new ConcurrentHashMap<CacheKey, ConstraintValidator<?, ?>>();
+		this.constraintValidatorCache = new ConcurrentHashMap<>();
 	}
 
 	/**
 	 * @param validatedValueType the type of the value to be validated. Cannot be {@code null}.
 	 * @param descriptor the constraint descriptor for which to get an initalized constraint validator. Cannot be {@code null}
 	 * @param constraintFactory constraint factory used to instantiate the constraint validator. Cannot be {@code null}.
-	 * @param <V> the type of the value to be validated
 	 * @param <A> the annotation type
 	 *
 	 * @return an initialized constraint validator for the given type and annotation of the value to be validated.
 	 * {@code null} is returned if no matching constraint validator could be found.
 	 */
-	public <V, A extends Annotation> ConstraintValidator<A, V> getInitializedValidator(Type validatedValueType,
+	public <A extends Annotation> ConstraintValidator<A, ?> getInitializedValidator(Type validatedValueType,
 			ConstraintDescriptorImpl<A> descriptor,
 			ConstraintValidatorFactory constraintFactory) {
 		Contracts.assertNotNull( validatedValueType );
@@ -103,7 +103,7 @@ public class ConstraintValidatorManager {
 
 		if ( constraintValidatorCache.containsKey( key ) ) {
 			@SuppressWarnings("unchecked")
-			ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get(
+			ConstraintValidator<A, ?> constraintValidator = (ConstraintValidator<A, ?>) constraintValidatorCache.get(
 					key
 			);
 			if ( DUMMY_CONSTRAINT_VALIDATOR.equals( constraintValidator ) ) {
@@ -115,13 +115,13 @@ public class ConstraintValidatorManager {
 			}
 		}
 
-		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass(
+		ConstraintValidatorDescriptor<A> validatorDescriptor = findMatchingValidatorDescriptor(
 				descriptor,
 				validatedValueType
 		);
-		ConstraintValidator<A, V> constraintValidator = createAndInitializeValidator(
+		ConstraintValidator<A, ?> constraintValidator = createAndInitializeValidator(
 				constraintFactory,
-				validatorClass,
+				validatorDescriptor,
 				descriptor
 		);
 		if ( constraintValidator == null ) {
@@ -164,28 +164,23 @@ public class ConstraintValidatorManager {
 		constraintValidatorCache.putIfAbsent( key, constraintValidator );
 	}
 
-	private <V, A extends Annotation> ConstraintValidator<A, V> createAndInitializeValidator(
+	private <A extends Annotation> ConstraintValidator<A, ?> createAndInitializeValidator(
 			ConstraintValidatorFactory constraintFactory,
-			Class<? extends ConstraintValidator<?, ?>> validatorClass,
+			ConstraintValidatorDescriptor<A> validatorDescriptor,
 			ConstraintDescriptor<A> descriptor) {
 
-		if ( validatorClass == null ) {
+		if ( validatorDescriptor == null ) {
 			return null;
 		}
 
-		@SuppressWarnings("unchecked")
-		ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintFactory.getInstance(
-				validatorClass
-		);
-		if ( constraintValidator == null ) {
-			throw log.getConstraintFactoryMustNotReturnNullException( validatorClass );
-		}
+		ConstraintValidator<A, ?> constraintValidator = validatorDescriptor.newInstance( constraintFactory );
+
 		initializeConstraint( descriptor, constraintValidator );
 		return constraintValidator;
 	}
 
 	private void clearEntriesForFactory(ConstraintValidatorFactory constraintFactory) {
-		List<CacheKey> entriesToRemove = new ArrayList<CacheKey>();
+		List<CacheKey> entriesToRemove = new ArrayList<>();
 		for ( Map.Entry<CacheKey, ConstraintValidator<?, ?>> entry : constraintValidatorCache.entrySet() ) {
 			if ( entry.getKey().getConstraintFactory() == constraintFactory ) {
 				entriesToRemove.add( entry.getKey() );
@@ -218,13 +213,13 @@ public class ConstraintValidatorManager {
 	 *
 	 * @return The class of a matching validator.
 	 */
-	private <A extends Annotation> Class<? extends ConstraintValidator<A, ?>> findMatchingValidatorClass(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
-		Map<Type, Class<? extends ConstraintValidator<A, ?>>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
+	private <A extends Annotation> ConstraintValidatorDescriptor<A> findMatchingValidatorDescriptor(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
+		Map<Type, ConstraintValidatorDescriptor<A>> availableValidatorDescriptors = TypeHelper.getValidatorTypes(
 				descriptor.getAnnotationType(),
 				descriptor.getMatchingConstraintValidatorClasses()
 		);
 
-		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType, availableValidatorTypes );
+		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType, availableValidatorDescriptors.keySet() );
 		resolveAssignableTypes( discoveredSuitableTypes );
 
 		if ( discoveredSuitableTypes.size() == 0 ) {
@@ -236,12 +231,12 @@ public class ConstraintValidatorManager {
 		}
 
 		Type suitableType = discoveredSuitableTypes.get( 0 );
-		return availableValidatorTypes.get( suitableType );
+		return availableValidatorDescriptors.get( suitableType );
 	}
 
-	private <A extends Annotation> List<Type> findSuitableValidatorTypes(Type type, Map<Type, Class<? extends ConstraintValidator<A, ?>>> availableValidatorTypes) {
+	private <A extends Annotation> List<Type> findSuitableValidatorTypes(Type type, Iterable<Type> availableValidatorTypes) {
 		List<Type> determinedSuitableTypes = newArrayList();
-		for ( Type validatorType : availableValidatorTypes.keySet() ) {
+		for ( Type validatorType : availableValidatorTypes ) {
 			if ( TypeHelper.isAssignable( validatorType, type )
 					&& !determinedSuitableTypes.contains( validatorType ) ) {
 				determinedSuitableTypes.add( validatorType );
@@ -270,7 +265,7 @@ public class ConstraintValidatorManager {
 			return;
 		}
 
-		List<Type> typesToRemove = new ArrayList<Type>();
+		List<Type> typesToRemove = new ArrayList<>();
 		do {
 			typesToRemove.clear();
 			Type type = assignableTypes.get( 0 );

@@ -7,9 +7,10 @@
 package org.hibernate.validator.internal.engine.constraintdefinition;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import javax.validation.ConstraintValidator;
+
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 
 /**
  * Type-safe wrapper class for a constraint annotation and its potential list of constraint validators.
@@ -18,33 +19,29 @@ import javax.validation.ConstraintValidator;
  */
 public class ConstraintDefinitionContribution<A extends Annotation> {
 	private final Class<A> constraintType;
-	private final List<Class<? extends ConstraintValidator<A, ?>>> constraintValidators = new ArrayList<Class<? extends ConstraintValidator<A, ?>>>();
+	private final List<ConstraintValidatorDescriptor<A>> validatorDescriptors;
 	private final boolean includeExisting;
 
 	public ConstraintDefinitionContribution(Class<A> constraintType,
-			List<Class<? extends ConstraintValidator<A, ?>>> constraintValidators,
+			List<ConstraintValidatorDescriptor<A>> validatorDescriptors,
 			boolean includeExisting) {
 		this.constraintType = constraintType;
-		this.constraintValidators.addAll( constraintValidators );
+		this.validatorDescriptors = Collections.unmodifiableList( validatorDescriptors );
 		this.includeExisting = includeExisting;
 	}
 
 	/**
 	 * Returns the constraint annotation type for which this instance provides constraint validator instances.
-	 *
-	 * @return the constraint annotation type for which this instance provides constraint validator instances.
 	 */
 	public Class<A> getConstraintType() {
 		return constraintType;
 	}
 
 	/**
-	 * Returns a list of constraint validator types for the constraint type of this instance.
-	 *
-	 * @return a list of constraint validator types for the constraint type of this instance.
+	 * Returns a list of constraint validator descriptors for the constraint type of this instance.
 	 */
-	public List<Class<? extends ConstraintValidator<A, ?>>> getConstraintValidators() {
-		return constraintValidators;
+	public List<ConstraintValidatorDescriptor<A>> getValidatorDescriptors() {
+		return validatorDescriptors;
 	}
 
 	/**
@@ -71,7 +68,7 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 		if ( !constraintType.equals( that.constraintType ) ) {
 			return false;
 		}
-		if ( !constraintValidators.equals( that.constraintValidators ) ) {
+		if ( !validatorDescriptors.equals( that.validatorDescriptors ) ) {
 			return false;
 		}
 
@@ -81,7 +78,7 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 	@Override
 	public int hashCode() {
 		int result = constraintType.hashCode();
-		result = 31 * result + constraintValidators.hashCode();
+		result = 31 * result + validatorDescriptors.hashCode();
 		return result;
 	}
 
@@ -89,10 +86,8 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 	public String toString() {
 		return "ConstraintDefinitionContribution{" +
 				"constraintType=" + constraintType +
-				", constraintValidators=" + constraintValidators +
+				", validatorDescriptors=" + validatorDescriptors +
 				", includeExisting=" + includeExisting +
 				'}';
 	}
 }
-
-

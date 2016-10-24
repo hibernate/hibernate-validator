@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
@@ -17,7 +20,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -25,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
@@ -40,9 +43,9 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
-import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -50,9 +53,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Describes a single constraint (including it's composing constraints).
@@ -94,9 +94,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * The set of classes implementing the validation for this constraint. See also
 	 * {@code ConstraintValidator} resolution algorithm.
 	 */
-	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses;
+	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDescriptors;
 
-	private final List<Class<? extends ConstraintValidator<T, ?>>> matchingConstraintValidatorClasses;
+	private final List<ConstraintValidatorDescriptor<T>> matchingConstraintValidatorClasses;
 
 	/**
 	 * The groups for which to apply this constraint.
@@ -170,17 +170,21 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.groups = buildGroupSet( implicitGroup );
 		this.payloads = buildPayloadSet( annotation );
 
-		this.constraintValidatorClasses = constraintHelper.getAllValidatorClasses( annotationType );
-		List<Class<? extends ConstraintValidator<T, ?>>> crossParameterValidatorClasses = constraintHelper.findValidatorClasses(
+		this.constraintValidatorDescriptors = constraintHelper.getAllValidatorDescriptors( annotationType )
+				.stream()
+				.map( ConstraintValidatorDescriptor::getValidatorClass )
+				.collect( Collectors.toList() );
+
+		List<ConstraintValidatorDescriptor<T>> crossParameterValidatorDescriptors = constraintHelper.findValidatorDescriptors(
 				annotationType,
 				ValidationTarget.PARAMETERS
 		);
-		List<Class<? extends ConstraintValidator<T, ?>>> genericValidatorClasses = constraintHelper.findValidatorClasses(
+		List<ConstraintValidatorDescriptor<T>> genericValidatorDescriptors = constraintHelper.findValidatorDescriptors(
 				annotationType,
 				ValidationTarget.ANNOTATED_ELEMENT
 		);
 
-		if ( crossParameterValidatorClasses.size() > 1 ) {
+		if ( crossParameterValidatorDescriptors.size() > 1 ) {
 			throw log.getMultipleCrossParameterValidatorClassesException( annotationType );
 		}
 
@@ -188,8 +192,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				annotation.annotationType(),
 				member,
 				type,
-				!genericValidatorClasses.isEmpty(),
-				!crossParameterValidatorClasses.isEmpty(),
+				!genericValidatorDescriptors.isEmpty(),
+				!crossParameterValidatorDescriptors.isEmpty(),
 				externalConstraintType
 		);
 		this.composingConstraints = parseComposingConstraints( member, constraintHelper, constraintType );
@@ -197,10 +201,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		validateComposingConstraintTypes();
 
 		if ( constraintType == ConstraintType.GENERIC ) {
-			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( genericValidatorClasses );
+			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( genericValidatorDescriptors );
 		}
 		else {
-			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( crossParameterValidatorClasses );
+			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( crossParameterValidatorDescriptors );
 		}
 
 		this.hashCode = annotation.hashCode();
@@ -251,26 +255,17 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
-		return constraintValidatorClasses;
+		return constraintValidatorDescriptors;
 	}
 
 	/**
 	 * Return all constraint validators classes (either generic or cross-parameter) which are registered for the
-	 * constraint of this despriptor.
+	 * constraint of this descriptor.
 	 *
 	 * @return The validators applying to type of this constraint.
 	 */
-	public List<Class<? extends ConstraintValidator<T, ?>>> getMatchingConstraintValidatorClasses() {
+	public List<ConstraintValidatorDescriptor<T>> getMatchingConstraintValidatorClasses() {
 		return matchingConstraintValidatorClasses;
-	}
-
-	public Map<Type, Class<? extends ConstraintValidator<T, ?>>> getAvailableValidatorTypes() {
-
-		Map<Type, Class<? extends ConstraintValidator<T, ?>>> availableValidatorTypes = TypeHelper.getValidatorsTypes(
-				getAnnotationType(),
-				getMatchingConstraintValidatorClasses()
-		);
-		return availableValidatorTypes;
 	}
 
 	@Override
@@ -692,7 +687,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		final Class<U> annotationType = (Class<U>) constraintAnnotation.annotationType();
 
 		// use a annotation proxy
-		AnnotationDescriptor<U> annotationDescriptor = new AnnotationDescriptor<U>(
+		AnnotationDescriptor<U> annotationDescriptor = new AnnotationDescriptor<>(
 				annotationType, buildAnnotationParameterMap( constraintAnnotation )
 		);
 
@@ -728,7 +723,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 
 		U annotationProxy = AnnotationFactory.create( annotationDescriptor );
-		return new ConstraintDescriptorImpl<U>(
+		return new ConstraintDescriptorImpl<>(
 				constraintHelper, member, annotationProxy, elementType, null, definedOn, constraintType
 		);
 	}

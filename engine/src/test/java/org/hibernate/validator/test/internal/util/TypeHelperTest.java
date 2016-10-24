@@ -17,6 +17,11 @@
  */
 package org.hibernate.validator.test.internal.util;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
 import java.io.Serializable;
 import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.InvocationHandler;
@@ -34,18 +39,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.validation.ConstraintValidator;
 
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Tests {@code TypeUtils}.
@@ -858,12 +857,12 @@ public class TypeHelperTest {
 
 	@Test
 	public void testTypeDiscovery() {
-		List<Class<? extends ConstraintValidator<Positive, ?>>> validators = newArrayList();
-		validators.add( PositiveConstraintValidator.class );
-		Map<Type, Class<? extends ConstraintValidator<Positive, ?>>> validatorsTypes = TypeHelper
-				.getValidatorsTypes( Positive.class, validators );
+		List<ConstraintValidatorDescriptor<Positive>> validatorDescriptors = new ArrayList<>();
+		validatorDescriptors.add( ConstraintValidatorDescriptor.forClass( PositiveConstraintValidator.class ) );
+		Map<Type, ConstraintValidatorDescriptor<Positive>> validatorsTypes = TypeHelper
+				.getValidatorTypes( Positive.class, validatorDescriptors );
 
-		assertEquals( validatorsTypes.get( Integer.class ), PositiveConstraintValidator.class );
+		assertEquals( validatorsTypes.get( Integer.class ).getValidatorClass(), PositiveConstraintValidator.class );
 		assertNull( validatorsTypes.get( String.class ) );
 	}
 
