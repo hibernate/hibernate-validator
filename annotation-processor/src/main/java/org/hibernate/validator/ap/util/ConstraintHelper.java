@@ -249,6 +249,9 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.LUHN_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_10_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_11_CHECK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.REGON_CHECK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NIP_CHECK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.PESEL_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NOT_BLANK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SAFE_HTML, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SCRIPT_ASSERT, Object.class );

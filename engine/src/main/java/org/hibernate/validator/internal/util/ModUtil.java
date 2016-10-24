@@ -101,4 +101,33 @@ public final class ModUtil {
 	public static int calculateMod11Check(final List<Integer> digits) {
 		return calculateMod11Check( digits, Integer.MAX_VALUE );
 	}
+
+	/**
+	 * Calculate Modulo {@code moduloParam} checksum with given weights. If no weights are provided then weights similar to Modulo 11 checksum will be used.
+	 * In case when there will be not enough weights provided the ones provided will be used in a looped manner.
+	 *
+	 * @param digits the digits for which to calculate the checksum
+	 * @param moduloParam modulo parameter to be used
+	 * @param weights weights for the sum.
+	 *
+	 * @return the result of mod checksum calculation
+	 */
+	public static int calculateModXCheckWithWeights(final List<Integer> digits, int moduloParam, final int threshold, int... weights) {
+		int sum = 0;
+		int multiplier = 1;
+
+		for ( int index = digits.size() - 1; index >= 0; index-- ) {
+			if ( weights.length != 0 ) {
+				multiplier = weights[weights.length - index % weights.length - 1];
+			}
+			else {
+				multiplier++;
+				if ( multiplier > threshold ) {
+					multiplier = 2;
+				}
+			}
+			sum += digits.get( index ) * multiplier;
+		}
+		return moduloParam - ( sum % moduloParam );
+	}
 }

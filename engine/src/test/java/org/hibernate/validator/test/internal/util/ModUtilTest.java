@@ -77,21 +77,27 @@ public class ModUtilTest {
 	public void testFailMod11SelfValidation() throws Exception {
 		List<Integer> digits = Arrays.asList( 0 );
 		assertFalse( ModUtil.calculateMod11Check( digits ) == 1 );
+		assertFalse( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) == 1 );
 
 		digits = Arrays.asList( 0, 0, 0, 0, 0, 0 );
 		assertEquals( ModUtil.calculateMod11Check( digits ), 11 );
+		assertEquals( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ), 11 );
 
 		digits = Arrays.asList( 0, 0, 0, 0, 0, 0 );
 		assertFalse( ModUtil.calculateMod11Check( digits ) == 1 );
+		assertFalse( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) == 1 );
 
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6 );
 		assertFalse( ModUtil.calculateMod11Check( digits ) == 5 );
+		assertFalse( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) == 5 );
 
 		digits = Arrays.asList( 3, 7, 8, 7, 9, 6, 9, 5, 0, 0 );
 		assertFalse( ModUtil.calculateMod11Check( digits ) == 2 );
+		assertFalse( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) == 2 );
 
 		digits = Arrays.asList( 3, 3, 1, 8, 1, 4, 2, 9, 6, 5 );
 		assertFalse( ModUtil.calculateMod11Check( digits ) == 2 );
+		assertFalse( ModUtil.calculateModXCheckWithWeights( digits, 11, Integer.MAX_VALUE ) == 2 );
 	}
 
 }
