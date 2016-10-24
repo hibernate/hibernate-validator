@@ -10,6 +10,8 @@ import java.lang.annotation.Annotation;
 
 import javax.validation.ConstraintValidator;
 
+import org.hibernate.validator.Incubating;
+
 
 /**
  * Constraint mapping creational context representing a constraint (i.e. annotation type). Allows to define which
@@ -43,12 +45,19 @@ public interface ConstraintDefinitionContext<A extends Annotation> extends Const
 	/**
 	 * Allows to configure a validation implementation using a Lambda expression or method reference. Useful for simple
 	 * validations without the need for accessing constraint properties or customization of error messages etc.
+	 * <p>
 	 *
 	 * @param type The type of the value to validate
 	 * @return This context for method chaining
 	 */
+	@Incubating
 	<T> ConstraintValidatorDefinitionContext<A, T> validateType(Class<T> type);
 
+	/**
+	 * Allows to specify a validation implementation for the given constraint and data type using a Lambda expression or
+	 * method reference.
+	 */
+	@Incubating
 	interface ConstraintValidatorDefinitionContext<A extends Annotation, T> {
 
 		/**
@@ -62,6 +71,7 @@ public interface ConstraintDefinitionContext<A extends Annotation> extends Const
 	 * Callable implementing a validation routine. Usually given as method reference or Lambda expression.
 	 */
 	@FunctionalInterface
+	@Incubating
 	interface ValidationCallable<T> {
 		boolean isValid(T object);
 	}
