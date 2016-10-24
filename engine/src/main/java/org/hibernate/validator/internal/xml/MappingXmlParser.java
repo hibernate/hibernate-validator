@@ -287,7 +287,7 @@ public class MappingXmlParser {
 
 	private <A extends Annotation> void addValidatorDefinitions(Class<A> annotationClass, String defaultPackage,
 			ValidatedByType validatedByType) {
-		List<ConstraintValidatorDescriptor<A>> constraintValidatorClasses = new ArrayList<>();
+		List<ConstraintValidatorDescriptor<A>> constraintValidatorDescriptors = new ArrayList<>( validatedByType.getValue().size() );
 
 		for ( String validatorClassName : validatedByType.getValue() ) {
 			@SuppressWarnings("unchecked")
@@ -298,11 +298,11 @@ public class MappingXmlParser {
 				throw log.getIsNotAConstraintValidatorClassException( validatorClass );
 			}
 
-			constraintValidatorClasses.add( ConstraintValidatorDescriptor.forClass( validatorClass ) );
+			constraintValidatorDescriptors.add( ConstraintValidatorDescriptor.forClass( validatorClass ) );
 		}
-		constraintHelper.putValidatorClasses(
+		constraintHelper.putValidatorDescriptors(
 				annotationClass,
-				constraintValidatorClasses,
+				constraintValidatorDescriptors,
 				Boolean.TRUE.equals( validatedByType.getIncludeExistingValidators() )
 		);
 	}

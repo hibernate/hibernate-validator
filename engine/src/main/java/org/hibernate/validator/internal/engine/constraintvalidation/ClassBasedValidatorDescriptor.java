@@ -31,11 +31,28 @@ class ClassBasedValidatorDescriptor<A extends Annotation> implements ConstraintV
 	private static final Log LOG = LoggerFactory.make();
 
 	private final Class<? extends ConstraintValidator<A, ?>> validatorClass;
+	private final Type validatedType;
+	private final EnumSet<ValidationTarget> validationTargets;
 
 	public ClassBasedValidatorDescriptor(Class<? extends ConstraintValidator<A, ?>> validatorClass) {
 		this.validatorClass = validatorClass;
+		this.validatedType = TypeHelper.extractType( validatorClass );
+		this.validationTargets = determineValidationTargets( validatorClass );
 	}
 
+	private static EnumSet<ValidationTarget> determineValidationTargets(Class<? extends ConstraintValidator<?, ?>> validatorClass) {
+		SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
+				SupportedValidationTarget.class
+		);
+
+		//by default constraints target the annotated element
+		if ( supportedTargetAnnotation == null ) {
+			return EnumSet.of( ValidationTarget.ANNOTATED_ELEMENT );
+		}
+		else {
+			return EnumSet.copyOf( Arrays.asList( supportedTargetAnnotation.value() ) );
+		}
+	}
 	@Override
 	public Class<? extends ConstraintValidator<A, ?>> getValidatorClass() {
 		return validatorClass;
@@ -54,21 +71,11 @@ class ClassBasedValidatorDescriptor<A extends Annotation> implements ConstraintV
 
 	@Override
 	public Type getValidatedType() {
-		return TypeHelper.extractType( validatorClass );
+		return validatedType;
 	}
 
 	@Override
 	public EnumSet<ValidationTarget> getValidationTargets() {
-		SupportedValidationTarget supportedTargetAnnotation = validatorClass.getAnnotation(
-				SupportedValidationTarget.class
-		);
-
-		//by default constraints target the annotated element
-		if ( supportedTargetAnnotation == null ) {
-			return EnumSet.of( ValidationTarget.ANNOTATED_ELEMENT );
-		}
-		else {
-			return EnumSet.copyOf( Arrays.asList( supportedTargetAnnotation.value() ) );
-		}
+		return validationTargets;
 	}
 }
