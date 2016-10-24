@@ -18,15 +18,31 @@ import javax.validation.constraintvalidation.ValidationTarget;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext.ValidationCallable;
 
 /**
- * Represents a specific validator type.
+ * Represents a specific validator (either based on an implementation of {@link ConstraintValidator} or given as a
+ * Lambda expression/method reference.
  *
  * @author Gunnar Morling
  */
 public interface ConstraintValidatorDescriptor<A extends Annotation> extends Serializable {
 
+	/**
+	 * The implementation type of the represented validator.
+	 */
 	Class<? extends ConstraintValidator<A, ?>> getValidatorClass();
+
+	/**
+	 * The targets supported for validation by the represented validator.
+	 */
 	EnumSet<ValidationTarget> getValidationTargets();
+
+	/**
+	 * The data type validated by the represented validator (not the constraint annotation type).
+	 */
 	Type getValidatedType();
+
+	/**
+	 * Creates a new instance of the represented implementation type.
+	 */
 	ConstraintValidator<A, ?> newInstance(ConstraintValidatorFactory constraintFactory);
 
 	static <A extends Annotation> ConstraintValidatorDescriptor<A> forClass(Class<? extends ConstraintValidator<A, ?>> validatorClass) {

@@ -53,11 +53,14 @@ public interface ConstraintDefinitionContext<A extends Annotation> extends Const
 
 		/**
 		 * Applies the given Lambda expression or referenced method to values to be validated. It is guaranteed that
-		 * never {@code null} is passed to these expressions or methods.
+		 * {@code null} is never passed to these expressions or methods.
 		 */
 		ConstraintDefinitionContext<A> with(ValidationCallable<T> vc);
 	}
 
+	/**
+	 * Callable implementing a validation routine. Usually given as method reference or Lambda expression.
+	 */
 	@FunctionalInterface
 	interface ValidationCallable<T> {
 		boolean isValid(T object);

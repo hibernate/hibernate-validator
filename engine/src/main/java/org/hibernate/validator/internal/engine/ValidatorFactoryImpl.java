@@ -520,9 +520,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( constraintType );
 		}
 		definedConstraints.add( constraintType );
-		constraintHelper.putValidatorClasses(
+		constraintHelper.putValidatorDescriptors(
 				constraintType,
-				constraintDefinitionContribution.getValidatorTypes(),
+				constraintDefinitionContribution.getValidatorDescriptors(),
 				constraintDefinitionContribution.includeExisting()
 		);
 	}

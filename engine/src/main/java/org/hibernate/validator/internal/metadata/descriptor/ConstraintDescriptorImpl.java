@@ -94,7 +94,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * The set of classes implementing the validation for this constraint. See also
 	 * {@code ConstraintValidator} resolution algorithm.
 	 */
-	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses;
+	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDescriptors;
 
 	private final List<ConstraintValidatorDescriptor<T>> matchingConstraintValidatorClasses;
 
@@ -170,21 +170,21 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.groups = buildGroupSet( implicitGroup );
 		this.payloads = buildPayloadSet( annotation );
 
-		this.constraintValidatorClasses = constraintHelper.getAllValidatorClasses( annotationType )
+		this.constraintValidatorDescriptors = constraintHelper.getAllValidatorDescriptors( annotationType )
 				.stream()
 				.map( ConstraintValidatorDescriptor::getValidatorClass )
 				.collect( Collectors.toList() );
 
-		List<ConstraintValidatorDescriptor<T>> crossParameterValidatorClasses = constraintHelper.findValidatorClasses(
+		List<ConstraintValidatorDescriptor<T>> crossParameterValidatorDescriptors = constraintHelper.findValidatorDescriptors(
 				annotationType,
 				ValidationTarget.PARAMETERS
 		);
-		List<ConstraintValidatorDescriptor<T>> genericValidatorClasses = constraintHelper.findValidatorClasses(
+		List<ConstraintValidatorDescriptor<T>> genericValidatorDescriptors = constraintHelper.findValidatorDescriptors(
 				annotationType,
 				ValidationTarget.ANNOTATED_ELEMENT
 		);
 
-		if ( crossParameterValidatorClasses.size() > 1 ) {
+		if ( crossParameterValidatorDescriptors.size() > 1 ) {
 			throw log.getMultipleCrossParameterValidatorClassesException( annotationType );
 		}
 
@@ -192,8 +192,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				annotation.annotationType(),
 				member,
 				type,
-				!genericValidatorClasses.isEmpty(),
-				!crossParameterValidatorClasses.isEmpty(),
+				!genericValidatorDescriptors.isEmpty(),
+				!crossParameterValidatorDescriptors.isEmpty(),
 				externalConstraintType
 		);
 		this.composingConstraints = parseComposingConstraints( member, constraintHelper, constraintType );
@@ -201,10 +201,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		validateComposingConstraintTypes();
 
 		if ( constraintType == ConstraintType.GENERIC ) {
-			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( genericValidatorClasses );
+			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( genericValidatorDescriptors );
 		}
 		else {
-			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( crossParameterValidatorClasses );
+			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( crossParameterValidatorDescriptors );
 		}
 
 		this.hashCode = annotation.hashCode();
@@ -255,7 +255,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
-		return constraintValidatorClasses;
+		return constraintValidatorDescriptors;
 	}
 
 	/**

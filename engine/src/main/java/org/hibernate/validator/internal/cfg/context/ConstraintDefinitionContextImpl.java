@@ -32,7 +32,7 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 
 	private boolean includeExistingValidators = true;
 
-	private final Set<ConstraintValidatorDescriptor<A>> validatorTypes = new HashSet<>();
+	private final Set<ConstraintValidatorDescriptor<A>> validatorDescriptors = new HashSet<>();
 
 	ConstraintDefinitionContextImpl(DefaultConstraintMapping mapping, Class<A> annotationType) {
 		super( mapping );
@@ -47,7 +47,7 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 
 	@Override
 	public ConstraintDefinitionContext<A> validatedBy(Class<? extends ConstraintValidator<A, ?>> validator) {
-		validatorTypes.add( ConstraintValidatorDescriptor.forClass( validator ) );
+		validatorDescriptors.add( ConstraintValidatorDescriptor.forClass( validator ) );
 		return this;
 	}
 
@@ -60,7 +60,7 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 	ConstraintDefinitionContribution<A> build() {
 		return new ConstraintDefinitionContribution<>(
 				annotationType,
-				CollectionHelper.newArrayList( validatorTypes ),
+				CollectionHelper.newArrayList( validatorDescriptors ),
 				includeExistingValidators );
 	}
 
@@ -74,7 +74,7 @@ class ConstraintDefinitionContextImpl<A extends Annotation>
 
 		@Override
 		public ConstraintDefinitionContext<A> with(ConstraintDefinitionContext.ValidationCallable<T> vc) {
-			validatorTypes.add( ConstraintValidatorDescriptor.forLambda( annotationType, type, vc ) );
+			validatorDescriptors.add( ConstraintValidatorDescriptor.forLambda( annotationType, type, vc ) );
 
 			return ConstraintDefinitionContextImpl.this;
 		}

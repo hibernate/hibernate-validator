@@ -857,10 +857,10 @@ public class TypeHelperTest {
 
 	@Test
 	public void testTypeDiscovery() {
-		List<ConstraintValidatorDescriptor<Positive>> validatorTypes = new ArrayList<>();
-		validatorTypes.add( ConstraintValidatorDescriptor.forClass( PositiveConstraintValidator.class ) );
+		List<ConstraintValidatorDescriptor<Positive>> validatorDescriptors = new ArrayList<>();
+		validatorDescriptors.add( ConstraintValidatorDescriptor.forClass( PositiveConstraintValidator.class ) );
 		Map<Type, ConstraintValidatorDescriptor<Positive>> validatorsTypes = TypeHelper
-				.getValidatorTypes( Positive.class, validatorTypes );
+				.getValidatorTypes( Positive.class, validatorDescriptors );
 
 		assertEquals( validatorsTypes.get( Integer.class ).getValidatorClass(), PositiveConstraintValidator.class );
 		assertNull( validatorsTypes.get( String.class ) );

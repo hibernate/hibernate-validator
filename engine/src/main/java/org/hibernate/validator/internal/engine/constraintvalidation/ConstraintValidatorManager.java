@@ -115,13 +115,13 @@ public class ConstraintValidatorManager {
 			}
 		}
 
-		ConstraintValidatorDescriptor<A> validatorTypeDescriptor = findMatchingValidatorClass(
+		ConstraintValidatorDescriptor<A> validatorDescriptor = findMatchingValidatorDescriptor(
 				descriptor,
 				validatedValueType
 		);
 		ConstraintValidator<A, ?> constraintValidator = createAndInitializeValidator(
 				constraintFactory,
-				validatorTypeDescriptor,
+				validatorDescriptor,
 				descriptor
 		);
 		if ( constraintValidator == null ) {
@@ -213,13 +213,13 @@ public class ConstraintValidatorManager {
 	 *
 	 * @return The class of a matching validator.
 	 */
-	private <A extends Annotation> ConstraintValidatorDescriptor<A> findMatchingValidatorClass(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
-		Map<Type, ConstraintValidatorDescriptor<A>> availableValidatorTypes = TypeHelper.getValidatorTypes(
+	private <A extends Annotation> ConstraintValidatorDescriptor<A> findMatchingValidatorDescriptor(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
+		Map<Type, ConstraintValidatorDescriptor<A>> availableValidatorDescriptors = TypeHelper.getValidatorTypes(
 				descriptor.getAnnotationType(),
 				descriptor.getMatchingConstraintValidatorClasses()
 		);
 
-		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType, availableValidatorTypes.keySet() );
+		List<Type> discoveredSuitableTypes = findSuitableValidatorTypes( validatedValueType, availableValidatorDescriptors.keySet() );
 		resolveAssignableTypes( discoveredSuitableTypes );
 
 		if ( discoveredSuitableTypes.size() == 0 ) {
@@ -231,7 +231,7 @@ public class ConstraintValidatorManager {
 		}
 
 		Type suitableType = discoveredSuitableTypes.get( 0 );
-		return availableValidatorTypes.get( suitableType );
+		return availableValidatorDescriptors.get( suitableType );
 	}
 
 	private <A extends Annotation> List<Type> findSuitableValidatorTypes(Type type, Iterable<Type> availableValidatorTypes) {
