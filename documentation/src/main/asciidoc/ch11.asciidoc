@@ -6,6 +6,13 @@ in addition to the functionality defined by the Bean Validation specification. T
 fail fast mode, the API for programmatic constraint configuration and the boolean composition of
 constraints.
 
+New APIs or SPIs are tagged with the `org.hibernate.validator.Incubating` annotation as long as they
+are under development. This means that such elements (e.g. packages, types, methods, constants etc.)
+may be incompatibly altered - or removed - in subsequent releases. Usage of incubating API/SPI members
+is encouraged (so the development team can get feedback on these new features) but you should be
+prepared for updating code which is using them as needed when upgrading to a new version of Hibernate
+Validator.
+
 [NOTE]
 ====
 Using the features described in the following sections may result in application code which is not
