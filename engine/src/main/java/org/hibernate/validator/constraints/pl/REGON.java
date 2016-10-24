@@ -18,18 +18,17 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 
-
 /**
- * Validates a REGON number - (9/14 digit Polish Taxpayer Identification Number).
+ * Validates that a {@code CharSequence} is a REGON number (9/14-digit Polish Taxpayer Identification Number).
  *
  * @author Marko Bekhta
  * @see <a href="https://pl.wikipedia.org/wiki/REGO">REGON</a> }
  */
-
 @Documented
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })

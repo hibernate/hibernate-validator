@@ -36,6 +36,7 @@ public class REGONValidator extends PolishNumberValidator<REGON> {
 	 *
 	 * @return an array of weights to be used to calculate a checksum
 	 */
+	@Override
 	protected int[] getWeights(List<Integer> digits) {
 		if ( digits.size() == 8 ) {
 			return WEIGHTS_REGON_9;
@@ -47,6 +48,4 @@ public class REGONValidator extends PolishNumberValidator<REGON> {
 			return new int[] { };
 		}
 	}
-
-	;
 }
