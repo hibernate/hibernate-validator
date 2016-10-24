@@ -156,6 +156,24 @@ public class ConstraintApiTest {
 	}
 
 	@Test
+	public void constraintDefinitionUsingLambda() {
+		HibernateValidatorConfiguration configuration = Validation
+				.byProvider( HibernateValidator.class )
+				.configure();
+
+		//tag::constraintDefinitionUsingLambda[]
+		ConstraintMapping constraintMapping = configuration.createConstraintMapping();
+
+		constraintMapping
+				.constraintDefinition( ValidPassengerCount.class )
+					.validateType( Bus.class )
+						.with( b -> b.getSeatCount() >= b.getPassengers().size() );
+		//end::constraintDefinitionUsingLambda[]
+
+		configuration.addMapping( constraintMapping );
+	}
+
+	@Test
 	public void urlValidationOverride() {
 		HibernateValidatorConfiguration configuration = Validation
 			.byProvider( HibernateValidator.class )
