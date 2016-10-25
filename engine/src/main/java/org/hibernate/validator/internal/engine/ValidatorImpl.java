@@ -13,6 +13,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -60,10 +61,10 @@ import org.hibernate.validator.internal.metadata.aggregated.ReturnValueMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -247,7 +248,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 		Contracts.assertNotNull( parameterValues, MESSAGES.validatedParameterArrayMustNotBeNull() );
 
-		return validateParameters( object, ExecutableElement.forMethod( method ), parameterValues, groups );
+		return validateParameters( object, (Executable) method, parameterValues, groups );
 	}
 
 	@Override
@@ -255,7 +256,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
 		Contracts.assertNotNull( parameterValues, MESSAGES.validatedParameterArrayMustNotBeNull() );
 
-		return validateParameters( null, ExecutableElement.forConstructor( constructor ), parameterValues, groups );
+		return validateParameters( null, constructor, parameterValues, groups );
 	}
 
 	@Override
@@ -263,7 +264,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Contracts.assertNotNull( constructor, MESSAGES.validatedConstructorMustNotBeNull() );
 		Contracts.assertNotNull( createdObject, MESSAGES.validatedConstructorCreatedInstanceMustNotBeNull() );
 
-		return validateReturnValue( null, ExecutableElement.forConstructor( constructor ), createdObject, groups );
+		return validateReturnValue( null, constructor, createdObject, groups );
 	}
 
 	@Override
@@ -271,10 +272,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		Contracts.assertNotNull( object, MESSAGES.validatedObjectMustNotBeNull() );
 		Contracts.assertNotNull( method, MESSAGES.validatedMethodMustNotBeNull() );
 
-		return validateReturnValue( object, ExecutableElement.forMethod( method ), returnValue, groups );
+		return validateReturnValue( object, (Executable) method, returnValue, groups );
 	}
 
-	private <T> Set<ConstraintViolation<T>> validateParameters(T object, ExecutableElement executable, Object[] parameterValues, Class<?>... groups) {
+	private <T> Set<ConstraintViolation<T>> validateParameters(T object, Executable executable, Object[] parameterValues, Class<?>... groups) {
 		//this might be the case for parameterless methods
 		if ( parameterValues == null ) {
 			return Collections.emptySet();
@@ -298,7 +299,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return context.getFailingConstraints();
 	}
 
-	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, ExecutableElement executable, Object returnValue, Class<?>... groups) {
+	private <T> Set<ConstraintViolation<T>> validateReturnValue(T object, Executable executable, Object returnValue, Class<?>... groups) {
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		ValidationContext<T> context = getValidationContext().forValidateReturnValue(
@@ -1077,7 +1078,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// there is no executable metadata - specified object and method do not match
 			throw log.getMethodOrConstructorNotDefinedByValidatedTypeException(
 					beanMetaData.getBeanClass(),
-					validationContext.getExecutable().getMember()
+					validationContext.getExecutable()
 			);
 		}
 
@@ -1149,7 +1150,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		if ( parameterValues.length != executableMetaData.getParameterTypes().length ) {
 			throw log.getInvalidParameterCountForExecutableException(
-					ExecutableElement.getExecutableAsString(
+					ExecutableHelper.getExecutableAsString(
 							executableMetaData.getType().toString() + "#" + executableMetaData.getName(),
 							executableMetaData.getParameterTypes()
 					), parameterValues.length, executableMetaData.getParameterTypes().length
@@ -1229,7 +1230,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							valueType,
 							parameterMetaData.getType(),
 							i,
-							validationContext.getExecutable().getMember()
+							validationContext.getExecutable()
 					);
 				}
 			}

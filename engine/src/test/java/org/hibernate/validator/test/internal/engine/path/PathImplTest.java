@@ -6,18 +6,24 @@
  */
 package org.hibernate.validator.test.internal.engine.path;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertNotNull;
+
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
-
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -25,16 +31,10 @@ import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.assertNotNull;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -176,13 +176,8 @@ public class PathImplTest {
 
 	@Test
 	public void testCreationOfExecutablePath() throws Exception {
-		ExecutableElement executable = ExecutableElement.forMethod(
-				Container.class.getMethod(
-						"addItem",
-						Key.class,
-						Item.class
-				)
-		);
+		Method executable = Container.class.getMethod( "addItem", Key.class, Item.class );
+
 		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
@@ -205,7 +200,7 @@ public class PathImplTest {
 
 	class Container {
 		@Valid
-		Map<Key, Item> store = new HashMap<Key, Item>();
+		Map<Key, Item> store = new HashMap<>();
 
 		public void addItem(Key id, Item item) {
 			store.put( id, item );

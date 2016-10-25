@@ -25,7 +25,7 @@ class MethodConstraintMappingContextImpl extends ExecutableConstraintMappingCont
 	public MethodConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		typeContext.mapping
 				.getAnnotationProcessingOptions()
-				.ignoreConstraintAnnotationsOnMember( executable.getMember(), ignoreAnnotations );
+				.ignoreConstraintAnnotationsOnMember( executable, ignoreAnnotations );
 
 		return this;
 	}

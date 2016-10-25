@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ParameterNameProvider;
-
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
@@ -33,8 +31,9 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -145,7 +144,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		if ( configuredMembers.contains( method ) ) {
 			throw log.getMethodHasAlreadyBeConfiguredViaProgrammaticApiException(
 					beanClass,
-					ExecutableElement.getExecutableAsString( name, parameterTypes )
+					ExecutableHelper.getExecutableAsString( name, parameterTypes )
 			);
 		}
 
@@ -170,7 +169,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		if ( configuredMembers.contains( constructor ) ) {
 			throw log.getConstructorHasAlreadyBeConfiguredViaProgrammaticApiException(
 					beanClass,
-					ExecutableElement.getExecutableAsString( beanClass.getSimpleName(), parameterTypes )
+					ExecutableHelper.getExecutableAsString( beanClass.getSimpleName(), parameterTypes )
 			);
 		}
 
@@ -184,7 +183,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		return context;
 	}
 
-	BeanConfiguration<C> build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+	BeanConfiguration<C> build(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
 		return new BeanConfiguration<>(
 				ConfigurationSource.API,
 				beanClass,
@@ -194,7 +193,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 		);
 	}
 
-	private Set<ConstrainedElement> buildConstraintElements(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+	private Set<ConstrainedElement> buildConstraintElements(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
 		Set<ConstrainedElement> elements = newHashSet();
 
 		//class-level configuration

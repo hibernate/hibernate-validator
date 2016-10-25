@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated.rule;
 
+import java.lang.reflect.Method;
+
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 
 /**
@@ -17,10 +19,11 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 public class VoidMethodsMustNotBeReturnValueConstrained extends MethodConfigurationRule {
 
 	@Override
-	public void apply(ConstrainedExecutable method, ConstrainedExecutable otherMethod) {
-		if ( method.getExecutable().getReturnType() == void.class &&
-				( !method.getConstraints().isEmpty() || method.isCascading() ) ) {
-			throw log.getVoidMethodsMustNotBeConstrainedException( method.getLocation().getMember() );
+	public void apply(ConstrainedExecutable executable, ConstrainedExecutable otherExecutable) {
+		if ( ( executable.getExecutable() instanceof Method ) &&
+				( (Method) executable.getExecutable() ).getReturnType() == void.class &&
+				( !executable.getConstraints().isEmpty() || executable.isCascading() ) ) {
+			throw log.getVoidMethodsMustNotBeConstrainedException( executable.getLocation().getMember() );
 		}
 	}
 }

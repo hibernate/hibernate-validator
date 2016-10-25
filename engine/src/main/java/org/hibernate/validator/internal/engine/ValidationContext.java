@@ -9,8 +9,8 @@ package org.hibernate.validator.internal.engine;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -35,7 +35,6 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.IdentitySet;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -79,7 +78,7 @@ public class ValidationContext<T> {
 	/**
 	 * The method of the current validation call in case of executable validation.
 	 */
-	private final ExecutableElement executable;
+	private final Executable executable;
 
 	/**
 	 * The validated parameters in case of executable parameter validation.
@@ -160,7 +159,7 @@ public class ValidationContext<T> {
 			boolean failFast,
 			T rootBean,
 			Class<T> rootBeanClass,
-			ExecutableElement executable,
+			Executable executable,
 			Object[] executableParameters,
 			Object executableReturnValue) {
 		this.constraintValidatorManager = constraintValidatorManager;
@@ -180,7 +179,7 @@ public class ValidationContext<T> {
 		this.executableReturnValue = executableReturnValue;
 
 		this.processedBeansPerGroup = newHashMap();
-		this.processedPathsPerBean = new IdentityHashMap<Object, Set<PathImpl>>();
+		this.processedPathsPerBean = new IdentityHashMap<>();
 		this.processedMetaConstraints = newHashMap();
 		this.failingConstraintViolations = newHashSet();
 	}
@@ -215,7 +214,7 @@ public class ValidationContext<T> {
 		return rootBeanClass;
 	}
 
-	public ExecutableElement getExecutable() {
+	public Executable getExecutable() {
 		return executable;
 	}
 
@@ -242,11 +241,11 @@ public class ValidationContext<T> {
 		if ( parameterNameProvider == null ) {
 			return null;
 		}
-		else if ( executable.getElementType() == ElementType.METHOD ) {
-			return parameterNameProvider.getParameterNames( (Method) executable.getMember() );
+		else if ( executable instanceof Method ) {
+			return parameterNameProvider.getParameterNames( (Method) executable );
 		}
 		else {
-			return parameterNameProvider.getParameterNames( (Constructor<?>) executable.getMember() );
+			return parameterNameProvider.getParameterNames( (Constructor<?>) executable );
 		}
 	}
 
@@ -480,7 +479,7 @@ public class ValidationContext<T> {
 			processedPathsPerBean.get( value ).add( path );
 		}
 		else {
-			Set<PathImpl> set = new HashSet<PathImpl>();
+			Set<PathImpl> set = new HashSet<>();
 			set.add( path );
 			processedPathsPerBean.put( value, set );
 		}
@@ -534,7 +533,7 @@ public class ValidationContext<T> {
 		public <T> ValidationContext<T> forValidate(T rootBean) {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
-			return new ValidationContext<T>(
+			return new ValidationContext<>(
 					constraintValidatorManager,
 					messageInterpolator,
 					constraintValidatorFactory,
@@ -555,7 +554,7 @@ public class ValidationContext<T> {
 		public <T> ValidationContext<T> forValidateProperty(T rootBean) {
 			@SuppressWarnings("unchecked")
 			Class<T> rootBeanClass = (Class<T>) rootBean.getClass();
-			return new ValidationContext<T>(
+			return new ValidationContext<>(
 					constraintValidatorManager,
 					messageInterpolator,
 					constraintValidatorFactory,
@@ -574,7 +573,7 @@ public class ValidationContext<T> {
 		}
 
 		public <T> ValidationContext<T> forValidateValue(Class<T> rootBeanClass) {
-			return new ValidationContext<T>(
+			return new ValidationContext<>(
 					constraintValidatorManager,
 					messageInterpolator,
 					constraintValidatorFactory,
@@ -595,12 +594,11 @@ public class ValidationContext<T> {
 		public <T> ValidationContext<T> forValidateParameters(
 				ParameterNameProvider parameterNameProvider,
 				T rootBean,
-				ExecutableElement executable,
+				Executable executable,
 				Object[] executableParameters) {
 			@SuppressWarnings("unchecked")
-			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getMember()
-					.getDeclaringClass();
-			return new ValidationContext<T>(
+			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getDeclaringClass();
+			return new ValidationContext<>(
 					constraintValidatorManager,
 					messageInterpolator,
 					constraintValidatorFactory,
@@ -620,12 +618,11 @@ public class ValidationContext<T> {
 
 		public <T> ValidationContext<T> forValidateReturnValue(
 				T rootBean,
-				ExecutableElement executable,
+				Executable executable,
 				Object executableReturnValue) {
 			@SuppressWarnings("unchecked")
-			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getMember()
-					.getDeclaringClass();
-			return new ValidationContext<T>(
+			Class<T> rootBeanClass = rootBean != null ? (Class<T>) rootBean.getClass() : (Class<T>) executable.getDeclaringClass();
+			return new ValidationContext<>(
 					constraintValidatorManager,
 					messageInterpolator,
 					constraintValidatorFactory,

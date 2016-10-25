@@ -13,7 +13,6 @@ import java.lang.annotation.Annotation;
 import java.util.Set;
 
 import javax.validation.Constraint;
-import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
@@ -23,6 +22,7 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -59,7 +59,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 			throw log.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( type );
 		}
 
-		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<C>( this, type );
+		TypeConstraintMappingContextImpl<C> typeContext = new TypeConstraintMappingContextImpl<>( this, type );
 		typeContexts.add( typeContext );
 		configuredTypes.add( type );
 
@@ -82,7 +82,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 	 *
 	 * @return a set of {@link BeanConfiguration}s with an element for each type configured through this mapping
 	 */
-	public Set<BeanConfiguration<?>> getBeanConfigurations(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+	public Set<BeanConfiguration<?>> getBeanConfigurations(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
 		Set<BeanConfiguration<?>> configurations = newHashSet();
 
 		for ( TypeConstraintMappingContextImpl<?> typeContext : typeContexts ) {
@@ -103,7 +103,7 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 			throw log.getConstraintHasAlreadyBeenConfiguredViaProgrammaticApiException( annotationClass );
 		}
 
-		ConstraintDefinitionContextImpl<A> constraintContext = new ConstraintDefinitionContextImpl<A>( this, annotationClass );
+		ConstraintDefinitionContextImpl<A> constraintContext = new ConstraintDefinitionContextImpl<>( this, annotationClass );
 		constraintContexts.add( constraintContext );
 		definedConstraints.add( annotationClass );
 

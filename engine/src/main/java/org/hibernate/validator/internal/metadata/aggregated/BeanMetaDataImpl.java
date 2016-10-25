@@ -6,7 +6,12 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.partition;
+
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -41,7 +46,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
@@ -49,10 +53,6 @@ import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 
 /**
  * This class encapsulates all meta data needed for validation. Implementations of {@code Validator} interface can
@@ -273,8 +273,8 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	@Override
-	public ExecutableMetaData getMetaDataFor(ExecutableElement executable) {
-		return executableMetaDataMap.get( executable.getSignature() );
+	public ExecutableMetaData getMetaDataFor(Executable executable) {
+		return executableMetaDataMap.get( ExecutableHelper.getSignature( executable ) );
 	}
 
 	@Override
@@ -389,7 +389,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			throw log.getInvalidDefaultGroupSequenceDefinitionException();
 		}
 
-		DefaultGroupSequenceContext<T> context = new DefaultGroupSequenceContext<T>();
+		DefaultGroupSequenceContext<T> context = new DefaultGroupSequenceContext<>();
 
 		if ( defaultGroupSequenceProvider != null ) {
 			context.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
@@ -452,7 +452,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private static List<Class<?>> getValidDefaultGroupSequence(Class<?> beanClass, List<Class<?>> groupSequence) {
-		List<Class<?>> validDefaultGroupSequence = new ArrayList<Class<?>>();
+		List<Class<?>> validDefaultGroupSequence = new ArrayList<>();
 
 		boolean groupSequenceContainsDefault = false;
 		if ( groupSequence != null ) {
@@ -546,7 +546,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				ValidationOrderGenerator validationOrderGenerator,
 				Class<T> beanClass,
 				MethodValidationConfiguration methodValidationConfiguration) {
-			return new BeanMetaDataBuilder<T>(
+			return new BeanMetaDataBuilder<>(
 					constraintHelper,
 					executableHelper,
 					validationOrderGenerator,
@@ -605,7 +605,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				aggregatedElements.addAll( builder.build() );
 			}
 
-			return new BeanMetaDataImpl<T>(
+			return new BeanMetaDataImpl<>(
 					beanClass,
 					defaultGroupSequence,
 					defaultGroupSequenceProvider,
@@ -648,7 +648,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				case CONSTRUCTOR:
 				case METHOD:
 					ConstrainedExecutable constrainedExecutable = (ConstrainedExecutable) constrainedElement;
-					Member member = constrainedExecutable.getExecutable().getMember();
+					Member member = constrainedExecutable.getExecutable();
 
 					// HV-890 Not adding meta-data for private super-type methods to the method meta-data of this bean;
 					// It is not needed and it may conflict with sub-type methods of the same signature

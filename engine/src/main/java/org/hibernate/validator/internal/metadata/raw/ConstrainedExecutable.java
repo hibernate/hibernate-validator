@@ -6,23 +6,25 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import java.lang.reflect.Executable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Represents a method or constructor of a Java type and all its associated
@@ -35,7 +37,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 	private static final Log log = LoggerFactory.make();
 
-	private final ExecutableElement executable;
+	private final Executable executable;
 
 	/**
 	 * Constrained-related meta data for this executable's parameters.
@@ -120,13 +122,11 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				unwrapMode
 		);
 
-		this.executable = ( location.getMember() instanceof Method ) ?
-				ExecutableElement.forMethod( (Method) location.getMember() ) :
-				ExecutableElement.forConstructor( (Constructor<?>) location.getMember() );
+		this.executable = (Executable) location.getMember();
 
 		if ( parameterMetaData.size() != executable.getParameterTypes().length ) {
 			throw log.getInvalidLengthOfParameterMetaDataListException(
-					executable.getAsString(),
+					executable,
 					executable.getParameterTypes().length,
 					parameterMetaData.size()
 			);
@@ -154,7 +154,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	public ConstrainedParameter getParameterMetaData(int parameterIndex) {
 		if ( parameterIndex < 0 || parameterIndex > parameterMetaData.size() - 1 ) {
 			throw log.getInvalidExecutableParameterIndexException(
-					executable.getAsString(),
+					executable,
 					parameterIndex
 			);
 		}
@@ -211,10 +211,10 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 *         otherwise.
 	 */
 	public boolean isGetterMethod() {
-		return executable.isGetterMethod();
+		return ReflectionHelper.isGetterMethod( executable );
 	}
 
-	public ExecutableElement getExecutable() {
+	public Executable getExecutable() {
 		return executable;
 	}
 

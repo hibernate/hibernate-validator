@@ -6,6 +6,14 @@
  */
 package org.hibernate.validator.test.cfg;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+
 import java.lang.annotation.ElementType;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -24,8 +32,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.groups.Default;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -46,16 +52,11 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertConstraintViolation;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Unit test for {@link ConstraintMapping} et al.
@@ -101,9 +102,9 @@ public class ConstraintMappingTest {
 	public void testConstraintMappingWithGenericConstraints() {
 		mapping.type( Marathon.class )
 				.property( "name", METHOD )
-				.constraint( new GenericConstraintDef<NotNull>( NotNull.class ) )
+				.constraint( new GenericConstraintDef<>( NotNull.class ) )
 				.property( "numberOfHelpers", FIELD )
-				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 1L ) );
+				.constraint( new GenericConstraintDef<>( Min.class ).param( "value", 1L ) );
 
 		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
 		assertNotNull( beanConfiguration );
@@ -116,7 +117,7 @@ public class ConstraintMappingTest {
 		mapping.type( Marathon.class )
 				.property( "numberOfHelpers", FIELD )
 				.constraint( new MinDef().value( 1 ) )
-				.constraint( new GenericConstraintDef<Min>( Min.class ).param( "value", 2L ) );
+				.constraint( new GenericConstraintDef<>( Min.class ).param( "value", 2L ) );
 
 		BeanConfiguration<Marathon> beanConfiguration = getBeanConfiguration( Marathon.class );
 		assertNotNull( beanConfiguration );
@@ -167,7 +168,7 @@ public class ConstraintMappingTest {
 	public void testThatSpecificParameterCanBeSetAfterAddingGenericConstraintDef() {
 		mapping.type( Marathon.class )
 				.constraint(
-						new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class ).param( "minRunner", 1 )
+						new GenericConstraintDef<>( MarathonConstraint.class ).param( "minRunner", 1 )
 				)
 				.property( "name", METHOD )
 				.constraint( new SizeDef().message( "name too short" ).min( 3 ) );
@@ -402,7 +403,7 @@ public class ConstraintMappingTest {
 	)
 	public void testCustomConstraintTypeMissingParameter() {
 		mapping.type( Marathon.class )
-				.constraint( new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class ) );
+				.constraint( new GenericConstraintDef<>( MarathonConstraint.class ) );
 		config.addMapping( mapping );
 		config.buildValidatorFactory().getValidator();
 	}
@@ -411,7 +412,7 @@ public class ConstraintMappingTest {
 	public void testCustomConstraintType() {
 		mapping.type( Marathon.class )
 				.constraint(
-						new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class )
+						new GenericConstraintDef<>( MarathonConstraint.class )
 								.param( "minRunner", 100 )
 								.message( "Needs more runners" )
 				);
@@ -438,7 +439,7 @@ public class ConstraintMappingTest {
 	)
 	public void testNullBean() {
 		mapping.type( null )
-				.constraint( new GenericConstraintDef<MarathonConstraint>( MarathonConstraint.class ) );
+				.constraint( new GenericConstraintDef<>( MarathonConstraint.class ) );
 		config.addMapping( mapping ).buildValidatorFactory();
 	}
 
@@ -511,7 +512,7 @@ public class ConstraintMappingTest {
 	private <T> BeanConfiguration<T> getBeanConfiguration(Class<T> type) {
 		Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations(
 				new ConstraintHelper(),
-				new DefaultParameterNameProvider()
+				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() )
 		);
 
 		for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {

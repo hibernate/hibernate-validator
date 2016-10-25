@@ -24,6 +24,7 @@ import javax.validation.constraints.DecimalMin;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.xml.MappingXmlParser;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeMethod;
@@ -40,7 +41,7 @@ public class MappingXmlParserTest {
 	@BeforeMethod
 	public void setupParserHelper() {
 		constraintHelper = new ConstraintHelper();
-		xmlMappingParser = new MappingXmlParser( constraintHelper, new DefaultParameterNameProvider(), null );
+		xmlMappingParser = new MappingXmlParser( constraintHelper, new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ), null );
 	}
 
 	@Test
