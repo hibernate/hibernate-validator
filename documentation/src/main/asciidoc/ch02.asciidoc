@@ -784,7 +784,7 @@ Hibernate Validator!
                 a Brazilian individual taxpayer registry number (Cadastro de
                 Pessoa Fídsica)|Brazil|None
 |`@TituloEleitoral`|`CharSequence`|Checks that the annotated character sequence represents
-                a Brazilian voter ID card number (http://ghiorzi.org/cgcancpf.htm[Título Eleitoral])|Brazil|None
+                a Brazilian voter ID card number (http://www.exceldoseujeito.com.br/2008/12/19/validar-cpf-cnpj-e-titulo-de-eleitor-parte-ii/[Título Eleitoral])|Brazil|None
 |`@NIP`|`CharSequence`|Checks that the annotated character sequence represents a Polish VAT identification
  				number (https://pl.wikipedia.org/wiki/NIP[NIP])|Poland|None
 |`@PESEL`|`CharSequence`|Checks that the annotated character sequence represents a Polish national identification
