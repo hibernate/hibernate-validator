@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.validation.ElementKind;
@@ -222,7 +221,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		this.beanDescriptor = new BeanDescriptorImpl(
 				beanClass,
-				getClassLevelConstraintsAsDescriptors(),
+				getClassLevelConstraintsAsDescriptors( allMetaConstraints ),
 				propertyDescriptors,
 				methodsDescriptors,
 				constructorsDescriptors,
@@ -312,16 +311,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		return classHierarchyWithoutInterfaces;
 	}
 
-	private Set<ConstraintDescriptorImpl<?>> getClassLevelConstraintsAsDescriptors() {
-		Set<MetaConstraint<?>> classLevelConstraints = getClassLevelConstraints( allMetaConstraints );
-
-		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
-
-		for ( MetaConstraint<?> metaConstraint : classLevelConstraints ) {
-			theValue.add( metaConstraint.getDescriptor() );
-		}
-
-		return theValue;
+	private static Set<ConstraintDescriptorImpl<?>> getClassLevelConstraintsAsDescriptors(Set<MetaConstraint<?>> constraints) {
+		return constraints.stream()
+				.filter( c -> c.getElementType() == ElementType.TYPE )
+				.map( MetaConstraint::getDescriptor )
+				.collect( Collectors.toSet() );
 	}
 
 	private static Map<String, PropertyDescriptor> getConstrainedPropertiesAsDescriptors(Map<String, PropertyMetaData> propertyMetaDataMap,
@@ -406,16 +400,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		return context;
-	}
-
-	private Set<MetaConstraint<?>> getClassLevelConstraints(Set<MetaConstraint<?>> constraints) {
-		Set<MetaConstraint<?>> classLevelConstraints = constraints.stream()
-			.collect(
-					Collectors.groupingBy( MetaConstraint::getElementType,
-							Collectors.mapping( Function.identity(), Collectors.toSet() ) ) )
-			.get( ElementType.TYPE );
-
-		return classLevelConstraints != null ? classLevelConstraints : Collections.<MetaConstraint<?>>emptySet();
 	}
 
 	private Set<MetaConstraint<?>> getDirectConstraints() {
