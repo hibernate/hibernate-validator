@@ -50,6 +50,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
 
+	private final boolean isGetterMethod;
+
 	/**
 	 * Creates a new executable meta data object for a parameter-less executable.
 	 *
@@ -138,6 +140,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		this.crossParameterConstraints = crossParameterConstraints;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
+		this.isGetterMethod = ReflectionHelper.isGetterMethod( executable );
 	}
 
 	/**
@@ -211,7 +214,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 *         otherwise.
 	 */
 	public boolean isGetterMethod() {
-		return ReflectionHelper.isGetterMethod( executable );
+		return isGetterMethod;
 	}
 
 	public Executable getExecutable() {

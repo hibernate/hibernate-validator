@@ -13,6 +13,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -103,19 +105,9 @@ public final class ExecutableHelper {
 	}
 
 	public static String getSignature(String name, Class<?>[] parameterTypes) {
-		int parameterCount = parameterTypes.length;
-
-		StringBuilder signature = new StringBuilder( name );
-		signature.append( "(" );
-		for ( int i = 0; i < parameterCount; i++ ) {
-			signature.append( parameterTypes[i].getName() );
-			if ( i < parameterCount - 1 ) {
-				signature.append( "," );
-			}
-		}
-		signature.append( ")" );
-
-		return signature.toString();
+		return Stream.of( parameterTypes )
+			.map( t -> t.getName() )
+			.collect( Collectors.joining( ",", name + "(", ")" ) );
 	}
 
 	/**
@@ -128,24 +120,9 @@ public final class ExecutableHelper {
 	 * @return A string representation of the given executable.
 	 */
 	public static String getExecutableAsString(String name, Class<?>... parameterTypes) {
-		StringBuilder sb = new StringBuilder( name );
-		sb.append( "(" );
-
-		boolean isFirst = true;
-
-		for ( Class<?> parameterType : parameterTypes ) {
-			if ( !isFirst ) {
-				sb.append( ", " );
-			}
-			else {
-				isFirst = false;
-			}
-
-			sb.append( parameterType.getSimpleName() );
-		}
-
-		sb.append( ")" );
-		return sb.toString();
+		return Stream.of( parameterTypes )
+			.map( t -> t.getSimpleName() )
+			.collect( Collectors.joining( ", ", name + "(", ")" ) );
 	}
 
 	public static ElementType getElementType(Executable executable) {
