@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintValidator;
-import javax.validation.ParameterNameProvider;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -42,6 +41,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
@@ -68,7 +68,7 @@ public class MappingXmlParser {
 	private final Map<Class<?>, Set<ConstrainedElement>> constrainedElements;
 
 	private final XmlParserHelper xmlParserHelper;
-	private final ParameterNameProvider parameterNameProvider;
+	private final ExecutableParameterNameProvider parameterNameProvider;
 
 	private final ClassLoadingHelper classLoadingHelper;
 
@@ -84,7 +84,7 @@ public class MappingXmlParser {
 		return schemasByVersion;
 	}
 
-	public MappingXmlParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider,
+	public MappingXmlParser(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider,
 			ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();

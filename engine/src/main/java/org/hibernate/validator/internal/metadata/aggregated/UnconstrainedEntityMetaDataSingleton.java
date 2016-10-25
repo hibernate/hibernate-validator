@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.reflect.Executable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +17,6 @@ import javax.validation.metadata.BeanDescriptor;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 /**
  * A dummy implementation of {@code BeanMetaData} used as a placeholder for unconstrained types.
@@ -80,7 +80,7 @@ public final class UnconstrainedEntityMetaDataSingleton<T> implements BeanMetaDa
 	}
 
 	@Override
-	public ExecutableMetaData getMetaDataFor(ExecutableElement method) throws ConstraintDeclarationException {
+	public ExecutableMetaData getMetaDataFor(Executable executable) throws ConstraintDeclarationException {
 		throw new UnsupportedOperationException();
 	}
 

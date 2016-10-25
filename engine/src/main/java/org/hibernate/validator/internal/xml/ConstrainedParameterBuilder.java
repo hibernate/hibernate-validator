@@ -10,12 +10,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Executable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -23,7 +22,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.ParameterType;
@@ -36,12 +35,12 @@ import org.hibernate.validator.internal.xml.binding.ParameterType;
 class ConstrainedParameterBuilder {
 
 	private final GroupConversionBuilder groupConversionBuilder;
-	private final ParameterNameProvider parameterNameProvider;
+	private final ExecutableParameterNameProvider parameterNameProvider;
 	private final MetaConstraintBuilder metaConstraintBuilder;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 
 	ConstrainedParameterBuilder(MetaConstraintBuilder metaConstraintBuilder,
-			ParameterNameProvider parameterNameProvider, GroupConversionBuilder groupConversionBuilder,
+			ExecutableParameterNameProvider parameterNameProvider, GroupConversionBuilder groupConversionBuilder,
 			AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		this.metaConstraintBuilder = metaConstraintBuilder;
 		this.parameterNameProvider = parameterNameProvider;
@@ -50,13 +49,13 @@ class ConstrainedParameterBuilder {
 	}
 
 	List<ConstrainedParameter> buildConstrainedParameters(List<ParameterType> parameterList,
-																		ExecutableElement executableElement,
+																		Executable executable,
 																		String defaultPackage) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
 		int i = 0;
-		List<String> parameterNames = executableElement.getParameterNames( parameterNameProvider );
+		List<String> parameterNames = parameterNameProvider.getParameterNames( executable );
 		for ( ParameterType parameterType : parameterList ) {
-			ConstraintLocation constraintLocation = ConstraintLocation.forParameter( executableElement, i );
+			ConstraintLocation constraintLocation = ConstraintLocation.forParameter( executable, i );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : parameterType.getConstraint() ) {
 				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
@@ -76,7 +75,7 @@ class ConstrainedParameterBuilder {
 			// ignore annotations
 			if ( parameterType.getIgnoreAnnotations() != null ) {
 				annotationProcessingOptions.ignoreConstraintAnnotationsOnParameter(
-						executableElement.getMember(),
+						executable,
 						i,
 						parameterType.getIgnoreAnnotations()
 				);
@@ -86,7 +85,7 @@ class ConstrainedParameterBuilder {
 			ConstrainedParameter constrainedParameter = new ConstrainedParameter(
 					ConfigurationSource.XML,
 					constraintLocation,
-					ReflectionHelper.typeOf( executableElement, i ),
+					ReflectionHelper.typeOf( executable, i ),
 					i,
 					parameterNames.get( i ),
 					metaConstraints,

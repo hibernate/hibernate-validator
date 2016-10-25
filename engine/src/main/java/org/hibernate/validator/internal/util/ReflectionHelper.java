@@ -6,7 +6,10 @@
  */
 package org.hibernate.validator.internal.util;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
@@ -21,11 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 /**
  * Some reflection utility methods. Where necessary calls will be performed as {@code PrivilegedAction} which is necessary
@@ -131,7 +131,7 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Checks whether the given method is a valid JavaBeans getter method, which
+	 * Checks whether the given executable is a valid JavaBeans getter method, which
 	 * is the case if
 	 * <ul>
 	 * <li>its name starts with "get" and it has a return type but no parameter or</li>
@@ -141,12 +141,18 @@ public final class ReflectionHelper {
 	 * {@code boolean} (HV-specific, not mandated by JavaBeans spec).</li>
 	 * </ul>
 	 *
-	 * @param method The method of interest.
+	 * @param executable The executable of interest.
 	 *
-	 * @return {@code true}, if the given method is a JavaBeans getter method,
+	 * @return {@code true}, if the given executable is a JavaBeans getter method,
 	 *         {@code false} otherwise.
 	 */
-	public static boolean isGetterMethod(Method method) {
+	public static boolean isGetterMethod(Executable executable) {
+		if ( !( executable instanceof Method ) ) {
+			return false;
+		}
+
+		Method method = (Method) executable;
+
 		if ( method.getParameterTypes().length != 0 ) {
 			return false;
 		}
@@ -205,7 +211,7 @@ public final class ReflectionHelper {
 	 *
 	 * @return The erased type.
 	 */
-	public static Type typeOf(ExecutableElement executable, int parameterIndex) {
+	public static Type typeOf(Executable executable, int parameterIndex) {
 		Type[] genericParameterTypes = executable.getGenericParameterTypes();
 
 		// getGenericParameterTypes() doesn't return synthetic parameters; in this case fall back to getParameterTypes()

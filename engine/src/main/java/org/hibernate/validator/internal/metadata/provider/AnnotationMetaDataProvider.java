@@ -55,10 +55,11 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
+import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
@@ -88,13 +89,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	protected final ConstraintHelper constraintHelper;
 	protected final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
 	protected final AnnotationProcessingOptions annotationProcessingOptions;
-	protected final ParameterNameProvider parameterNameProvider;
+	protected final ExecutableParameterNameProvider parameterNameProvider;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			ParameterNameProvider parameterNameProvider,
 			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
-		this.parameterNameProvider = parameterNameProvider;
+		this.parameterNameProvider = new ExecutableParameterNameProvider( parameterNameProvider );
 		this.annotationProcessingOptions = annotationProcessingOptions;
 		configuredBeans = new ConcurrentReferenceHashMap<>(
 				DEFAULT_INITIAL_CAPACITY,
@@ -271,9 +272,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return unwrapMode( typeArgumentAnnotated, indexable, unwrapValidatedValue );
 	}
 
-	private UnwrapMode unwrapMode(ExecutableElement executable, boolean typeArgumentAnnotated) {
-		boolean indexable = ReflectionHelper.isIndexable( ReflectionHelper.typeOf( executable.getMember() ) );
-		UnwrapValidatedValue unwrapValidatedValue = executable.getAccessibleObject().getAnnotation( UnwrapValidatedValue.class );
+	private UnwrapMode unwrapMode(Executable executable, boolean typeArgumentAnnotated) {
+		boolean indexable = ReflectionHelper.isIndexable( ReflectionHelper.typeOf( executable ) );
+		UnwrapValidatedValue unwrapValidatedValue = executable.getAnnotation( UnwrapValidatedValue.class );
 		return unwrapMode( typeArgumentAnnotated, indexable, unwrapValidatedValue );
 	}
 
@@ -311,29 +312,24 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
-		List<ExecutableElement> declaredConstructors = ExecutableElement.forConstructors(
-				run( GetDeclaredConstructors.action( clazz ) )
-		);
+		Executable[] declaredConstructors = run( GetDeclaredConstructors.action( clazz ) );
 
 		return getMetaData( declaredConstructors );
 	}
 
 	private Set<ConstrainedExecutable> getMethodMetaData(Class<?> clazz) {
-		List<ExecutableElement> declaredMethods = ExecutableElement.forMethods(
-				run( GetDeclaredMethods.action( clazz ) )
-		);
+		Executable[] declaredMethods = run( GetDeclaredMethods.action( clazz ) );
 
 		return getMetaData( declaredMethods );
 	}
 
-	private Set<ConstrainedExecutable> getMetaData(List<ExecutableElement> executableElements) {
+	private Set<ConstrainedExecutable> getMetaData(Executable[] executableElements) {
 		Set<ConstrainedExecutable> executableMetaData = newHashSet();
 
-		for ( ExecutableElement executable : executableElements ) {
+		for ( Executable executable : executableElements ) {
 			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
 			// anyway and possibly hide the actual method with the same signature in the built meta model
-			Member member = executable.getMember();
-			if ( Modifier.isStatic( member.getModifiers() ) || member.isSynthetic() ) {
+			if ( Modifier.isStatic( executable.getModifiers() ) || executable.isSynthetic() ) {
 				continue;
 			}
 
@@ -351,20 +347,18 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * @return A meta data object describing the constraints specified for the
 	 * given element.
 	 */
-	private ConstrainedExecutable findExecutableMetaData(ExecutableElement executable) {
+	private ConstrainedExecutable findExecutableMetaData(Executable executable) {
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
-
-		AccessibleObject member = executable.getAccessibleObject();
 
 		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = partition(
 				findConstraints(
-						executable.getMember(),
-						executable.getElementType()
+						executable,
+						ExecutableHelper.getElementType( executable )
 				), byType()
 		);
 
 		Set<MetaConstraint<?>> crossParameterConstraints;
-		if ( annotationProcessingOptions.areCrossParameterConstraintsIgnoredFor( executable.getMember() ) ) {
+		if ( annotationProcessingOptions.areCrossParameterConstraintsIgnoredFor( executable ) ) {
 			crossParameterConstraints = Collections.emptySet();
 		}
 		else {
@@ -380,14 +374,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		boolean isCascading;
 
 		UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
-		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable.getMember() ) ) {
+		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable ) ) {
 			returnValueConstraints = Collections.emptySet();
 			typeArgumentsConstraints = Collections.<MetaConstraint<?>>emptySet();
 			groupConversions = Collections.emptyMap();
 			isCascading = false;
 		}
 		else {
-			typeArgumentsConstraints = findTypeAnnotationConstraintsForMember( executable.getMember() );
+			typeArgumentsConstraints = findTypeAnnotationConstraintsForMember( executable );
 			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
 			unwrapMode = unwrapMode( executable, typeArgumentAnnotated );
 			returnValueConstraints = convertToMetaConstraints(
@@ -395,10 +389,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 					executable
 			);
 			groupConversions = getGroupConversions(
-					member.getAnnotation( ConvertGroup.class ),
-					member.getAnnotation( ConvertGroup.List.class )
+					executable.getAnnotation( ConvertGroup.class ),
+					executable.getAnnotation( ConvertGroup.List.class )
 			);
-			isCascading = executable.getAccessibleObject().isAnnotationPresent( Valid.class );
+			isCascading = executable.isAnnotationPresent( Valid.class );
 		}
 
 		return new ConstrainedExecutable(
@@ -414,7 +408,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
-	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, ExecutableElement executable) {
+	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintsDescriptors, Executable executable) {
 		if ( constraintsDescriptors == null ) {
 			return Collections.emptySet();
 		}
@@ -440,12 +434,22 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return A list with parameter meta data for the given executable.
 	 */
-	private List<ConstrainedParameter> getParameterMetaData(ExecutableElement executable) {
+	private List<ConstrainedParameter> getParameterMetaData(Executable executable) {
 		List<ConstrainedParameter> metaData = newArrayList();
 
-		List<String> parameterNames = executable.getParameterNames( parameterNameProvider );
+		List<String> parameterNames = parameterNameProvider.getParameterNames( executable );
+
 		int i = 0;
-		for ( Annotation[] parameterAnnotations : executable.getParameterAnnotations() ) {
+		for ( Parameter parameter : executable.getParameters() ) {
+			Annotation[] parameterAnnotations;
+			try {
+				parameterAnnotations = parameter.getAnnotations();
+			}
+			catch (ArrayIndexOutOfBoundsException ex) {
+				log.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
+				parameterAnnotations = new Annotation[0];
+			}
+
 			boolean parameterIsCascading = false;
 			String parameterName = parameterNames.get( i );
 			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
@@ -453,7 +457,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			ConvertGroup groupConversion = null;
 			ConvertGroup.List groupConversionList = null;
 
-			if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( executable.getMember(), i ) ) {
+			if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( executable, i ) ) {
 				metaData.add(
 						new ConstrainedParameter(
 								ConfigurationSource.ANNOTATION,
@@ -494,7 +498,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 				//4. collect constraints if this annotation is a constraint annotation
 				List<ConstraintDescriptorImpl<?>> constraints = findConstraintAnnotations(
-						executable.getMember(), parameterAnnotation, ElementType.PARAMETER
+						executable, parameterAnnotation, ElementType.PARAMETER
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					parameterConstraints.add(
@@ -503,7 +507,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				}
 			}
 
-			typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable.getMember(), i );
+			typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable, i );
 			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
 			boolean indexable = ReflectionHelper.isIndexable( ReflectionHelper.typeOf( executable, i ) );
 			UnwrapMode unwrapMode = unwrapMode( typeArgumentAnnotated, indexable, unwrapValidatedValue );
@@ -653,7 +657,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return new MetaConstraint<>( descriptor, ConstraintLocation.forProperty( member ) );
 	}
 
-	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(ExecutableElement member,
+	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(Executable member,
 			int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<>(
 				descriptor,
@@ -661,12 +665,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 	}
 
-	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(ExecutableElement member,
+	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(Executable member,
 			ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<>( descriptor, ConstraintLocation.forReturnValue( member ) );
 	}
 
-	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(ExecutableElement member,
+	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(Executable member,
 			ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<>( descriptor, ConstraintLocation.forCrossParameter( member ) );
 	}

@@ -25,7 +25,7 @@ class ConstructorConstraintMappingContextImpl extends ExecutableConstraintMappin
 	public ConstructorConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		typeContext.mapping
 				.getAnnotationProcessingOptions()
-				.ignoreConstraintAnnotationsOnMember( executable.getMember(), ignoreAnnotations );
+				.ignoreConstraintAnnotationsOnMember( executable, ignoreAnnotations );
 
 		return this;
 	}

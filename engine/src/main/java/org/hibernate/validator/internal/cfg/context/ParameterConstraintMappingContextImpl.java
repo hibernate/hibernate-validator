@@ -8,8 +8,6 @@ package org.hibernate.validator.internal.cfg.context;
 
 import java.util.Collections;
 
-import javax.validation.ParameterNameProvider;
-
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
@@ -22,6 +20,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -65,7 +64,7 @@ final class ParameterConstraintMappingContextImpl
 	@Override
 	public ParameterConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsOnParameter(
-				executableContext.getExecutable().getMember(),
+				executableContext.getExecutable(),
 				parameterIndex,
 				ignoreAnnotations
 		);
@@ -97,14 +96,14 @@ final class ParameterConstraintMappingContextImpl
 		return executableContext.getTypeContext().method( name, parameterTypes );
 	}
 
-	public ConstrainedParameter build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+	public ConstrainedParameter build(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedParameter(
 				ConfigurationSource.API,
 				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex ),
 				ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex ),
 				parameterIndex,
-				executableContext.getExecutable().getParameterNames( parameterNameProvider ).get( parameterIndex ),
+				parameterNameProvider.getParameterNames( executableContext.getExecutable() ).get( parameterIndex ),
 				getConstraints( constraintHelper ),
 				Collections.<MetaConstraint<?>>emptySet(),
 				groupConversions,

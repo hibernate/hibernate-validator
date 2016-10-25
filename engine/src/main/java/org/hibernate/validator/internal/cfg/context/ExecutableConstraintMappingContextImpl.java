@@ -6,12 +6,11 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
+import java.lang.reflect.Executable;
 import java.util.Collections;
 import java.util.List;
-
-import javax.validation.ParameterNameProvider;
 
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
@@ -24,12 +23,10 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 /**
  * A constraint mapping creational context which allows to select the parameter or
@@ -43,20 +40,12 @@ abstract class ExecutableConstraintMappingContextImpl {
 	private static final Log log = LoggerFactory.make();
 
 	protected final TypeConstraintMappingContextImpl<?> typeContext;
-	protected final ExecutableElement executable;
+	protected final Executable executable;
 	private final ParameterConstraintMappingContextImpl[] parameterContexts;
 	private ReturnValueConstraintMappingContextImpl returnValueContext;
 	private CrossParameterConstraintMappingContextImpl crossParameterContext;
 
-	<T> ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<T> typeContext, Constructor<T> constructor) {
-		this( typeContext, ExecutableElement.forConstructor( constructor ) );
-	}
-
-	ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Method method) {
-		this( typeContext, ExecutableElement.forMethod( method ) );
-	}
-
-	private ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, ExecutableElement executable) {
+	protected ExecutableConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Executable executable) {
 		this.typeContext = typeContext;
 		this.executable = executable;
 		this.parameterContexts = new ParameterConstraintMappingContextImpl[executable.getParameterTypes().length];
@@ -64,7 +53,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 
 	public ParameterConstraintMappingContext parameter(int index) {
 		if ( index < 0 || index >= executable.getParameterTypes().length ) {
-			throw log.getInvalidExecutableParameterIndexException( executable.getAsString(), index );
+			throw log.getInvalidExecutableParameterIndexException( executable, index );
 		}
 
 		ParameterConstraintMappingContextImpl context = parameterContexts[index];
@@ -72,7 +61,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		if ( context != null ) {
 			throw log.getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
-					executable.getAsString(),
+					executable,
 					index
 			);
 		}
@@ -86,7 +75,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		if ( crossParameterContext != null ) {
 			throw log.getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
-					executable.getAsString()
+					executable
 			);
 		}
 
@@ -98,7 +87,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		if ( returnValueContext != null ) {
 			throw log.getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(
 					typeContext.getBeanClass(),
-					executable.getAsString()
+					executable
 			);
 		}
 
@@ -106,7 +95,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		return returnValueContext;
 	}
 
-	public ExecutableElement getExecutable() {
+	public Executable getExecutable() {
 		return executable;
 	}
 
@@ -114,7 +103,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		return typeContext;
 	}
 
-	public ConstrainedElement build(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+	public ConstrainedElement build(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedExecutable(
 				ConfigurationSource.API,
@@ -129,7 +118,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		);
 	}
 
-	private List<ConstrainedParameter> getParameters(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider) {
+	private List<ConstrainedParameter> getParameters(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
 
 		for ( int i = 0; i < parameterContexts.length; i++ ) {
@@ -144,7 +133,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 								ConstraintLocation.forParameter( executable, i ),
 								ReflectionHelper.typeOf( executable, i ),
 								i,
-								executable.getParameterNames( parameterNameProvider ).get( i )
+								parameterNameProvider.getParameterNames( executable ).get( i )
 						)
 				);
 			}

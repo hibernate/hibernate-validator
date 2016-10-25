@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
+import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 
@@ -77,26 +77,26 @@ public class ConstraintLocation {
 		);
 	}
 
-	public static ConstraintLocation forReturnValue(ExecutableElement executable) {
+	public static ConstraintLocation forReturnValue(Executable executable) {
 		return new ConstraintLocation(
-				executable.getMember().getDeclaringClass(),
-				executable.getMember(),
-				ReflectionHelper.typeOf( executable.getMember() )
+				executable.getDeclaringClass(),
+				executable,
+				ReflectionHelper.typeOf( executable )
 		);
 	}
 
-	public static ConstraintLocation forCrossParameter(ExecutableElement executable) {
+	public static ConstraintLocation forCrossParameter(Executable executable) {
 		return new ConstraintLocation(
-				executable.getMember().getDeclaringClass(),
-				executable.getMember(),
+				executable.getDeclaringClass(),
+				executable,
 				Object[].class
 		);
 	}
 
-	public static ConstraintLocation forParameter(ExecutableElement executable, int index) {
+	public static ConstraintLocation forParameter(Executable executable, int index) {
 		return new ConstraintLocation(
-				executable.getMember().getDeclaringClass(),
-				executable.getMember(),
+				executable.getDeclaringClass(),
+				executable,
 				ReflectionHelper.typeOf( executable, index )
 		);
 	}

@@ -46,7 +46,7 @@ final class ReturnValueConstraintMappingContextImpl
 	@Override
 	public ReturnValueConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsForReturnValue(
-				executableContext.getExecutable().getMember(), ignoreAnnotations
+				executableContext.getExecutable(), ignoreAnnotations
 		);
 		return this;
 	}

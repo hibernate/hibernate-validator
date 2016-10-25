@@ -12,6 +12,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -42,6 +43,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
+import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
@@ -231,14 +233,14 @@ public interface Log extends BasicLogger {
 	GroupDefinitionException getWrongDefaultGroupSequenceProviderTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass);
 
 	@Message(id = 56, value = "Method or constructor %1$s doesn't have a parameter with index %2$d.")
-	IllegalArgumentException getInvalidExecutableParameterIndexException(String executable, int index);
+	IllegalArgumentException getInvalidExecutableParameterIndexException(@FormatWith(ExecutableFormatter.class) Executable executable, int index);
 
 	@Message(id = 59, value = "Unable to retrieve annotation parameter value.")
 	ValidationException getUnableToRetrieveAnnotationParameterValueException(@Cause Exception e);
 
 	@Message(id = 62,
 			value = "Method or constructor %1$s has %2$s parameters, but the passed list of parameter meta data has a size of %3$s.")
-	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(String executableName, int nbParameters, int listSize);
+	IllegalArgumentException getInvalidLengthOfParameterMetaDataListException(@FormatWith(ExecutableFormatter.class) Executable executable, int nbParameters, int listSize);
 
 	@Message(id = 63, value = "Unable to instantiate %s.")
 	ValidationException getUnableToInstantiateException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz, @Cause Exception e);
@@ -607,11 +609,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 174,
 			value = "Parameter %3$s of method or constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String executable, int parameterIndex);
+	ValidationException getParameterHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, @FormatWith(ExecutableFormatter.class) Executable executable, int parameterIndex);
 
 	@Message(id = 175,
 			value = "The return value of method or constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String executable);
+	ValidationException getReturnValueHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, @FormatWith(ExecutableFormatter.class) Executable executable);
 
 	@Message(id = 176,
 			value = "Constructor %2$s of type %1$s is configured more than once via the programmatic constraint declaration API.")
@@ -619,7 +621,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 177,
 			value = "Cross-parameter constraints for the method or constructor %2$s of type %1$s are declared more than once via the programmatic constraint declaration API.")
-	ValidationException getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String executable);
+	ValidationException getCrossParameterElementHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, @FormatWith(ExecutableFormatter.class) Executable executable);
 
 	@Message(id = 178, value = "Multiplier cannot be negative: %d.")
 	IllegalArgumentException getMultiplierCannotBeNegativeException(int multiplier);

@@ -39,7 +39,7 @@ final class CrossParameterConstraintMappingContextImpl
 	@Override
 	public CrossParameterConstraintMappingContext ignoreAnnotations(boolean ignoreAnnotations) {
 		mapping.getAnnotationProcessingOptions().ignoreConstraintAnnotationsForCrossParameterConstraint(
-				executableContext.getExecutable().getMember(), ignoreAnnotations
+				executableContext.getExecutable(), ignoreAnnotations
 		);
 		return this;
 	}

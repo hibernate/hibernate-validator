@@ -31,7 +31,6 @@ import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.test.internal.metadata.Customer;
@@ -66,7 +65,7 @@ public class ParameterMetaDataTest {
 	@Test
 	public void constrainedParameterMetaData() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "createCustomer", CharSequence.class, String.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 1 );
 
@@ -83,7 +82,7 @@ public class ParameterMetaDataTest {
 	@Test
 	public void cascadingParameterMetaData() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "saveCustomer", Customer.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
@@ -97,7 +96,7 @@ public class ParameterMetaDataTest {
 	@Test
 	public void unconstrainedParameterMetaData() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "updateCustomer", Customer.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
@@ -107,18 +106,10 @@ public class ParameterMetaDataTest {
 		assertEquals( parameterMetaData.unwrapMode(), UnwrapMode.AUTOMATIC );
 	}
 
-	@Test(expectedExceptions = IllegalArgumentException.class)
-	public void illegalParameterIndexCausesException() throws Exception {
-		Method method = CustomerRepository.class.getMethod( "foo" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
-
-		methodMetaData.getParameterMetaData( 0 );
-	}
-
 	@Test
 	public void locallyDefinedGroupConversion() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "methodWithParameterGroupConversion", Set.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		assertThat(
 				methodMetaData.getParameterMetaData( 0 )
@@ -129,7 +120,7 @@ public class ParameterMetaDataTest {
 	@Test
 	public void parameterRequiringUnwrapping() throws Exception {
 		Method method = CustomerRepository.class.getMethod( "methodWithParameterRequiringUnwrapping", long.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 
@@ -153,7 +144,7 @@ public class ParameterMetaDataTest {
 		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );
 
 		Method method = Service.class.getMethod( "sayHello", String.class );
-		ExecutableMetaData methodMetaData = localBeanMetaData.getMetaDataFor( ExecutableElement.forMethod( method ) );
+		ExecutableMetaData methodMetaData = localBeanMetaData.getMetaDataFor( method );
 
 		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
 

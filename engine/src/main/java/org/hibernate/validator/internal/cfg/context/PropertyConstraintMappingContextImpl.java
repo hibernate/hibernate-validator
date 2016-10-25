@@ -24,7 +24,6 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -63,7 +62,7 @@ final class PropertyConstraintMappingContextImpl
 		else {
 			super.addConstraint(
 					ConfiguredConstraint.forExecutable(
-							definition, ExecutableElement.forMethod( (Method) member )
+							definition, (Method) member
 					)
 			);
 		}

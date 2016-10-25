@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.lang.reflect.Executable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +17,6 @@ import javax.validation.metadata.BeanDescriptor;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 
 /**
  * Interface defining the meta data about the constraints defined in a given bean.
@@ -96,10 +96,10 @@ public interface BeanMetaData<T> extends Validatable {
 	Set<MetaConstraint<?>> getDirectMetaConstraints();
 
 	/**
-	 * Returns the constraint-related meta data for the given method of the
+	 * Returns the constraint-related meta data for the given executable of the
 	 * class represented by this bean meta data.
 	 *
-	 * @param method The method of interest.
+	 * @param executable The executable of interest.
 	 *
 	 * @return An aggregated view on the constraint related meta data from the
 	 *         given method all the methods from super-types which it overrides
@@ -108,7 +108,7 @@ public interface BeanMetaData<T> extends Validatable {
 	 * @throws ConstraintDeclarationException In case any of the rules for the declaration of method
 	 * constraints described in the Bean Validation specification is violated.
 	 */
-	ExecutableMetaData getMetaDataFor(ExecutableElement method) throws ConstraintDeclarationException;
+	ExecutableMetaData getMetaDataFor(Executable executable) throws ConstraintDeclarationException;
 
 	/**
 	 * @return Returns a list of classes representing the class hierarchy for the entity. The list start with the

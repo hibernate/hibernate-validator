@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -18,10 +20,9 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * A {@link MetaDataProvider} based on the programmatic constraint API.
@@ -37,7 +38,8 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper,
 										ParameterNameProvider parameterNameProvider,
 										Set<DefaultConstraintMapping> constraintMappings) {
-		super( constraintHelper, createBeanConfigurations( constraintMappings, constraintHelper, parameterNameProvider ) );
+		super( constraintHelper,
+				createBeanConfigurations( constraintMappings, constraintHelper, new ExecutableParameterNameProvider( parameterNameProvider ) ) );
 		Contracts.assertNotNull( constraintMappings );
 
 		assertUniquenessOfConfiguredTypes( constraintMappings );
@@ -59,8 +61,8 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	}
 
 	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(Set<DefaultConstraintMapping> mappings, ConstraintHelper constraintHelper,
-			ParameterNameProvider parameterNameProvider) {
-		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<String, BeanConfiguration<?>>();
+			ExecutableParameterNameProvider parameterNameProvider) {
+		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<>();
 		for ( DefaultConstraintMapping mapping : mappings ) {
 			Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations( constraintHelper, parameterNameProvider );
 

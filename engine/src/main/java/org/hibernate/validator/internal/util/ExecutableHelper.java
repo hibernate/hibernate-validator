@@ -6,13 +6,14 @@
  */
 package org.hibernate.validator.internal.util;
 
+import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.hibernate.validator.internal.metadata.raw.ExecutableElement;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetResolvedMemberMethods;
@@ -38,24 +39,6 @@ public final class ExecutableHelper {
 
 	public ExecutableHelper(TypeResolutionHelper typeResolutionHelper) {
 		this.typeResolver = typeResolutionHelper.getTypeResolver();
-	}
-
-	/**
-	 * Checks, whether the represented method overrides the given method.
-	 *
-	 * @param executableElement the method to test against
-	 * @param other The method to test.
-	 *
-	 * @return {@code true} If this methods overrides the passed method,
-	 * {@code false} otherwise.
-	 */
-	public boolean overrides(ExecutableElement executableElement, ExecutableElement other) {
-		//constructors never override another constructor
-		if ( executableElement.getMember() instanceof Constructor || other.getMember() instanceof Constructor ) {
-			return false;
-		}
-
-		return overrides( (Method) executableElement.getMember(), (Method) other.getMember() );
 	}
 
 	/**
@@ -111,6 +94,14 @@ public final class ExecutableHelper {
 		return instanceMethodParametersResolveToSameTypes( subTypeMethod, superTypeMethod );
 	}
 
+	public static String getSimpleName(Executable executable) {
+		return executable instanceof Constructor ? executable.getDeclaringClass().getSimpleName() : executable.getName();
+	}
+
+	public static String getSignature(Executable executable) {
+		return getSignature( getSimpleName( executable ), executable.getParameterTypes() );
+	}
+
 	public static String getSignature(String name, Class<?>[] parameterTypes) {
 		int parameterCount = parameterTypes.length;
 
@@ -125,6 +116,40 @@ public final class ExecutableHelper {
 		signature.append( ")" );
 
 		return signature.toString();
+	}
+
+	/**
+	 * Returns a string representation of an executable with the given name and parameter types in the form
+	 * {@code <name>(<parameterType 0> ...  <parameterType n>)}, e.g. for logging purposes.
+	 *
+	 * @param name the name of the executable
+	 * @param parameterTypes the types of the executable's parameters
+	 *
+	 * @return A string representation of the given executable.
+	 */
+	public static String getExecutableAsString(String name, Class<?>... parameterTypes) {
+		StringBuilder sb = new StringBuilder( name );
+		sb.append( "(" );
+
+		boolean isFirst = true;
+
+		for ( Class<?> parameterType : parameterTypes ) {
+			if ( !isFirst ) {
+				sb.append( ", " );
+			}
+			else {
+				isFirst = false;
+			}
+
+			sb.append( parameterType.getSimpleName() );
+		}
+
+		sb.append( ")" );
+		return sb.toString();
+	}
+
+	public static ElementType getElementType(Executable executable) {
+		return executable instanceof Constructor ? ElementType.CONSTRUCTOR : ElementType.METHOD;
 	}
 
 	/**
