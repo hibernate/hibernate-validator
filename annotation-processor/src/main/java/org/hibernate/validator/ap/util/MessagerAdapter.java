@@ -77,15 +77,7 @@ public class MessagerAdapter {
 	 * @param error The error to report.
 	 */
 	private void reportError(ConstraintCheckIssue error) {
-		String message = errorMessages.getString( error.getMessageKey() );
-
-		if ( error.getMessageParameters() != null ) {
-			message = MessageFormat.format( message, error.getMessageParameters() );
-		}
-
-		messager.printMessage(
-				diagnosticKind, message, error.getElement(), error.getAnnotationMirror()
-		);
+		report( error, diagnosticKind );
 	}
 
 	/**
@@ -108,14 +100,25 @@ public class MessagerAdapter {
 	 * @param warning The warning to report.
 	 */
 	private void reportWarning(ConstraintCheckIssue warning) {
-		String message = errorMessages.getString( warning.getMessageKey() );
+		report( warning, Kind.WARNING );
+	}
 
-		if ( warning.getMessageParameters() != null ) {
-			message = MessageFormat.format( message, warning.getMessageParameters() );
+	/**
+	 * Reports the given issue. Message parameters will be put into the template
+	 * retrieved from the resource bundle if applicable.
+	 *
+	 * @param issue The issue to report.
+	 * @param kind Kind of diagnostics to be used for reporting a given issue.
+	 */
+	private void report(ConstraintCheckIssue issue, Kind kind) {
+		String message = errorMessages.getString( issue.getMessageKey() );
+
+		if ( issue.getMessageParameters() != null ) {
+			message = MessageFormat.format( message, issue.getMessageParameters() );
 		}
 
 		messager.printMessage(
-				Kind.WARNING, message, warning.getElement(), warning.getAnnotationMirror()
+				kind, message, issue.getElement(), issue.getAnnotationMirror()
 		);
 	}
 
