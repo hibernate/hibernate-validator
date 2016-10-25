@@ -224,11 +224,11 @@ public class CompilerTestHelper {
 	 * @param expectations The expectations to compare against.
 	 */
 	public static void assertThatDiagnosticsMatch(DiagnosticCollector<JavaFileObject> diagnostics, DiagnosticExpectation... expectations) {
-		assertEquals( asExpectations( diagnostics.getDiagnostics() ), CollectionHelper.asSet( expectations ) );
+		assertEquals( asExpectations( diagnostics.getDiagnostics() ), CollectionHelper.asTreeSet( expectations ) );
 	}
 
 	private static Set<DiagnosticExpectation> asExpectations(Collection<Diagnostic<? extends JavaFileObject>> diagnosticsList) {
-		Set<DiagnosticExpectation> theValue = CollectionHelper.newHashSet();
+		Set<DiagnosticExpectation> theValue = CollectionHelper.newTreeSet();
 
 		for ( Diagnostic<? extends JavaFileObject> diagnostic : diagnosticsList ) {
 			theValue.add( new DiagnosticExpectation( diagnostic.getKind(), diagnostic.getLineNumber() ) );

@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Provides some methods for simplified collection instantiation.
@@ -31,6 +32,10 @@ public class CollectionHelper {
 		return new HashSet<T>();
 	}
 
+	public static <T> TreeSet<T> newTreeSet() {
+		return new TreeSet<T>();
+	}
+
 	public static <T> ArrayList<T> newArrayList() {
 		return new ArrayList<T>();
 	}
@@ -38,6 +43,11 @@ public class CollectionHelper {
 	public static <T> Set<T> asSet(T... ts) {
 
 		return new HashSet<T>( Arrays.asList( ts ) );
+	}
+
+	public static <T> Set<T> asTreeSet(T... ts) {
+
+		return new TreeSet<T>( Arrays.asList( ts ) );
 	}
 
 }
