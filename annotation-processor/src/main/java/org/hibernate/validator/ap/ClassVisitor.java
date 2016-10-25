@@ -12,7 +12,6 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.ElementKindVisitor6;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
@@ -30,11 +29,7 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
  *
  * @author Marko Bekhta
  */
-public class ClassVisitor extends ElementKindVisitor6<Void, Void> {
-
-	private final MessagerAdapter messager;
-
-	private final boolean verbose;
+public class ClassVisitor extends AbstractElementVisitor<Void, Void> {
 
 	private final ClassCheckFactory factory;
 
@@ -44,8 +39,7 @@ public class ClassVisitor extends ElementKindVisitor6<Void, Void> {
 			ProcessingEnvironment processingEnvironment,
 			MessagerAdapter messager,
 			Configuration configuration) {
-		this.messager = messager;
-		this.verbose = configuration.isVerbose();
+		super( messager, configuration );
 		this.elementUtils = processingEnvironment.getElementUtils();
 
 		this.factory = ClassCheckFactory.getInstance(
@@ -109,27 +103,17 @@ public class ClassVisitor extends ElementKindVisitor6<Void, Void> {
 			for ( ClassCheck classCheck : classChecks ) {
 				allIssues.addAll( classCheck.execute( element ) );
 			}
-			Set<ConstraintCheckIssue> warnings = CollectionHelper.newHashSet();
-			Set<ConstraintCheckIssue> errors = CollectionHelper.newHashSet();
-
-			for ( ConstraintCheckIssue issue : allIssues ) {
-				if ( issue.isError() ) {
-					errors.add( issue );
-				}
-				else if ( issue.isWarning() ) {
-					warnings.add( issue );
-				}
-			}
-
-			messager.reportErrors( errors );
-			messager.reportWarnings( warnings );
+			reportIssues( allIssues );
 		}
 		//HV-293: if single constraints can't be properly checked, report this and
 		//proceed with next constraints
 		catch (Exception e) {
-
 			if ( verbose ) {
-				messager.getDelegate().printMessage( Diagnostic.Kind.NOTE, e.getMessage() != null ? e.getMessage() : e.toString(), element );
+				messager.getDelegate().printMessage(
+						Diagnostic.Kind.NOTE,
+						e.getMessage() != null ? e.getMessage() : e.toString(),
+						element
+				);
 			}
 		}
 	}
