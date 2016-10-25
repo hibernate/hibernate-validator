@@ -7,21 +7,18 @@
 package org.hibernate.validator.ap;
 
 import java.util.List;
-import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.util.ElementKindVisitor6;
 import javax.tools.Diagnostic.Kind;
 
 import org.hibernate.validator.ap.checks.ConstraintCheckFactory;
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.checks.ConstraintChecks;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
-import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.Configuration;
 import org.hibernate.validator.ap.util.ConstraintHelper;
 import org.hibernate.validator.ap.util.MessagerAdapter;
@@ -34,20 +31,13 @@ import org.hibernate.validator.ap.util.MessagerAdapter;
  *
  * @author Gunnar Morling
  */
-final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<AnnotationMirror>> {
-
-	private final MessagerAdapter messager;
+final class ConstraintAnnotationVisitor extends AbstractElementVisitor<Void, List<AnnotationMirror>> {
 
 	private final ConstraintCheckFactory constraintCheckFactory;
 
-	private final boolean verbose;
-
 	public ConstraintAnnotationVisitor(
 			ProcessingEnvironment processingEnvironment, MessagerAdapter messager, Configuration configuration) {
-
-		this.messager = messager;
-		this.verbose = configuration.isVerbose();
-
+		super( messager, configuration );
 		AnnotationApiHelper annotationApiHelper = new AnnotationApiHelper(
 				processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils()
 		);
@@ -212,33 +202,15 @@ final class ConstraintAnnotationVisitor extends ElementKindVisitor6<Void, List<A
 	 */
 	private void checkConstraints(Element annotatedElement, List<AnnotationMirror> mirrors) {
 		for ( AnnotationMirror oneAnnotationMirror : mirrors ) {
-
 			try {
-
 				ConstraintChecks constraintChecks = constraintCheckFactory.getConstraintChecks(
 						annotatedElement, oneAnnotationMirror
 				);
-				Set<ConstraintCheckIssue> allIssues = constraintChecks.execute( annotatedElement, oneAnnotationMirror );
-
-				Set<ConstraintCheckIssue> warnings = CollectionHelper.newHashSet();
-				Set<ConstraintCheckIssue> errors = CollectionHelper.newHashSet();
-
-				for ( ConstraintCheckIssue issue : allIssues ) {
-					if ( issue.isError() ) {
-						errors.add( issue );
-					}
-					else if ( issue.isWarning() ) {
-						warnings.add( issue );
-					}
-				}
-
-				messager.reportErrors( errors );
-				messager.reportWarnings( warnings );
+				reportIssues( constraintChecks.execute( annotatedElement, oneAnnotationMirror ) );
 			}
 			//HV-293: if single constraints can't be properly checked, report this and
 			//proceed with next constraints
 			catch (Exception e) {
-
 				if ( verbose ) {
 					messager.getDelegate()
 							.printMessage( Kind.NOTE, e.getMessage() != null ? e.getMessage() : e.toString(), annotatedElement, oneAnnotationMirror );
