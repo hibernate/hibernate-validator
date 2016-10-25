@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Executable;
@@ -21,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.validation.ElementKind;
 import javax.validation.groups.Default;
@@ -46,7 +47,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
@@ -409,10 +409,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	}
 
 	private Set<MetaConstraint<?>> getClassLevelConstraints(Set<MetaConstraint<?>> constraints) {
-		Set<MetaConstraint<?>> classLevelConstraints = partition(
-				constraints,
-				byElementType()
-		).get( ElementType.TYPE );
+		Set<MetaConstraint<?>> classLevelConstraints = constraints.stream()
+			.collect(
+					Collectors.groupingBy( MetaConstraint::getElementType,
+							Collectors.mapping( Function.identity(), Collectors.toSet() ) ) )
+			.get( ElementType.TYPE );
 
 		return classLevelConstraints != null ? classLevelConstraints : Collections.<MetaConstraint<?>>emptySet();
 	}
@@ -485,15 +486,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private boolean hasDefaultGroupSequenceProvider() {
 		return defaultGroupSequenceProvider != null;
-	}
-
-	private Partitioner<ElementType, MetaConstraint<?>> byElementType() {
-		return new Partitioner<ElementType, MetaConstraint<?>>() {
-			@Override
-			public ElementType getPartition(MetaConstraint<?> constraint) {
-				return constraint.getElementType();
-			}
-		};
 	}
 
 	@Override

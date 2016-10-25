@@ -9,10 +9,8 @@ package org.hibernate.validator.internal.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,78 +88,6 @@ public final class CollectionHelper {
 	}
 
 	public static <T> Set<T> asSet(T... ts) {
-		return new HashSet<T>( Arrays.asList( ts ) );
-	}
-
-	/**
-	 * Creates a map containing the given list's values partitioned by the given
-	 * partitioner.
-	 *
-	 * @param <K> The key type of the resulting map.
-	 * @param <V> The element type of the list to be partitioned.
-	 * @param list The list to be partitioned.
-	 * @param partitioner The partitioner to be used for determining the partitions.
-	 *
-	 * @return A map containing the given list's values partitioned by the given
-	 *         partitioner.
-	 */
-	public static <K, V> Map<K, List<V>> partition(List<V> list, Partitioner<K, V> partitioner) {
-		if ( list == null ) {
-			return Collections.emptyMap();
-		}
-
-		Map<K, List<V>> theValue = newHashMap();
-
-		for ( V v : list ) {
-			K key = partitioner.getPartition( v );
-
-			List<V> partition = theValue.get( key );
-			if ( partition == null ) {
-				partition = newArrayList();
-				theValue.put( key, partition );
-			}
-
-			partition.add( v );
-		}
-
-		return theValue;
-	}
-
-	/**
-	 * Creates a map containing the given set's values partitioned by the given
-	 * partitioner.
-	 *
-	 * @param <K> The key type of the resulting map.
-	 * @param <V> The element type of the set to be partitioned.
-	 * @param set The set to be partitioned.
-	 * @param partitioner The partitioner to be used for determining the partitions.
-	 *
-	 * @return A map containing the given set's values partitioned by the given
-	 *         partitioner.
-	 */
-	public static <K, V> Map<K, Set<V>> partition(Set<V> set, Partitioner<K, V> partitioner) {
-		if ( set == null ) {
-			return Collections.emptyMap();
-		}
-
-		Map<K, Set<V>> theValue = newHashMap();
-
-		for ( V v : set ) {
-			K key = partitioner.getPartition( v );
-
-			Set<V> partition = theValue.get( key );
-			if ( partition == null ) {
-				partition = newHashSet();
-				theValue.put( key, partition );
-			}
-
-			partition.add( v );
-		}
-
-		return theValue;
-	}
-
-	public interface Partitioner<K, V> {
-		K getPartition(V v);
+		return new HashSet<>( Arrays.asList( ts ) );
 	}
 }

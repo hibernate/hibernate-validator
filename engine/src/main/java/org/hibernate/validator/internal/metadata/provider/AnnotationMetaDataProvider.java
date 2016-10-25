@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.metadata.provider;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.CollectionHelper.partition;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -33,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.GroupSequence;
 import javax.validation.ParameterNameProvider;
@@ -56,7 +56,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.CollectionHelper.Partitioner;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -350,12 +349,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private ConstrainedExecutable findExecutableMetaData(Executable executable) {
 		List<ConstrainedParameter> parameterConstraints = getParameterMetaData( executable );
 
-		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = partition(
-				findConstraints(
-						executable,
-						ExecutableHelper.getElementType( executable )
-				), byType()
-		);
+		Map<ConstraintType, List<ConstraintDescriptorImpl<?>>> executableConstraints = findConstraints( executable, ExecutableHelper.getElementType( executable ) )
+			.stream()
+			.collect( Collectors.groupingBy( ConstraintDescriptorImpl::getConstraintType ) );
 
 		Set<MetaConstraint<?>> crossParameterConstraints;
 		if ( annotationProcessingOptions.areCrossParameterConstraintsIgnoredFor( executable ) ) {
@@ -636,16 +632,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		return groupConversions;
-	}
-
-	private Partitioner<ConstraintType, ConstraintDescriptorImpl<?>> byType() {
-		return new Partitioner<ConstraintType, ConstraintDescriptorImpl<?>>() {
-
-			@Override
-			public ConstraintType getPartition(ConstraintDescriptorImpl<?> v) {
-				return v.getConstraintType();
-			}
-		};
 	}
 
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass,
