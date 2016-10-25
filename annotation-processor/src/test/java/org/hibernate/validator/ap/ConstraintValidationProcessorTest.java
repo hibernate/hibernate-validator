@@ -113,18 +113,18 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 56 ),
 				new DiagnosticExpectation( Kind.ERROR, 72 ),
 				new DiagnosticExpectation( Kind.ERROR, 91 ),
-				new DiagnosticExpectation( Kind.ERROR, 127 ),
-				new DiagnosticExpectation( Kind.ERROR, 156 ),
-				new DiagnosticExpectation( Kind.ERROR, 173 ),
-				new DiagnosticExpectation( Kind.ERROR, 195 ),
-				new DiagnosticExpectation( Kind.ERROR, 223 )
+				new DiagnosticExpectation( Kind.ERROR, 126 ),
+				new DiagnosticExpectation( Kind.ERROR, 153 ),
+				new DiagnosticExpectation( Kind.ERROR, 170 ),
+				new DiagnosticExpectation( Kind.ERROR, 192 ),
+				new DiagnosticExpectation( Kind.ERROR, 220 ),
+				new DiagnosticExpectation( Kind.ERROR, 374 ),
+				new DiagnosticExpectation( Kind.ERROR, 388 )
 		);
 	}
 
-	/**
-	 * HV-567
-	 */
 	@Test
+	@TestForIssue( jiraKey = "HV-567" )
 	public void hibernateValidatorProvidedCustomConstraints() {
 		File sourceFile = compilerHelper.getSourceFile( HibernateValidatorProvidedCustomConstraints.class );
 

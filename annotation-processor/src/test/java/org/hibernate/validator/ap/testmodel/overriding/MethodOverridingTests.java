@@ -128,7 +128,6 @@ public class MethodOverridingTests {
 		}
 	}
 
-
 	/**
 	 * Case 7 : Deeper hierarchy: Implementing interfaces with different constraints on parameter - incorrect
 	 */
@@ -262,6 +261,132 @@ public class MethodOverridingTests {
 			@Override
 			int getOrderId() {
 				return 10;
+			}
+		}
+
+	}
+
+	/**
+	 * Case 12: Correct parallel implementation in deep hierarchy - correct
+	 */
+	public static class Case12 {
+
+		public interface SimpleOrderService {
+			void placeOrder(
+					@NotNull @Size(min = 3, max = 20) String customerCode,
+					@NotNull String item,
+					@Min(1) int quantity);
+		}
+
+		public class SimpleOrderServiceImpl implements SimpleOrderService {
+			@Override
+			public void placeOrder(String customerCode, String item, int quantity) {
+
+			}
+		}
+
+		public interface SomeOtherOrderService {
+			void placeOrder(
+					@NotNull @Size(min = 3, max = 20) String customerCode,
+					@NotNull String item,
+					@Min(1) int quantity);
+		}
+
+		public class SomeOtherOrderServiceStrangeImpl extends SimpleOrderServiceImpl implements SomeOtherOrderService {
+			@Override
+			public void placeOrder(String customerCode, String item, int quantity) {
+
+			}
+		}
+
+	}
+
+	/**
+	 * Case 13: Correct parallel implementation in deep hierarchy with a class at the top of the hierarchy
+	 * where a method is originally declared - correct
+	 */
+	public static class Case13 {
+
+		public class BaseOrderServiceImpl {
+			public void placeOrder(
+					@NotNull @Size(min = 3, max = 20) String customerCode,
+					@NotNull String item,
+					@Min(1) int quantity) {
+
+			}
+		}
+
+		public interface SimpleOrderService {
+			void placeOrder(
+					@NotNull @Size(min = 3, max = 20) String customerCode,
+					@NotNull String item,
+					@Min(1) int quantity);
+		}
+
+		public class SimpleOrderServiceImpl extends BaseOrderServiceImpl implements SimpleOrderService {
+			@Override
+			public void placeOrder(String customerCode, String item, int quantity) {
+
+			}
+		}
+
+		public interface SomeOtherOrderService {
+			void placeOrder(
+					@NotNull @Size(min = 3, max = 20) String customerCode,
+					@NotNull String item,
+					@Min(1) int quantity);
+		}
+
+		public class SomeOtherOrderServiceStrangeImpl extends SimpleOrderServiceImpl implements SomeOtherOrderService {
+			@Override
+			public void placeOrder(String customerCode, String item, int quantity) {
+
+			}
+		}
+
+	}
+
+
+	/**
+	 * Case 14: Incorrect parallel implementation in deep hierarchy with a class at the top of the hierarchy
+	 * where a method is originally declared. BaseOrderServiceImpl is missing one of the annotations on parameter - incorrect
+	 */
+	public static class Case14 {
+
+		public class BaseOrderServiceImpl {
+			public void placeOrder(
+					@NotNull String customerCode,
+					@NotNull String item,
+					@Min(1) int quantity) {
+
+			}
+		}
+
+		public interface SimpleOrderService {
+			void placeOrder(
+					@NotNull @Size(min = 3, max = 20) String customerCode,
+					@NotNull String item,
+					@Min(1) int quantity);
+		}
+
+		public class SimpleOrderServiceImpl extends BaseOrderServiceImpl implements SimpleOrderService {
+			@Override
+			public void placeOrder(@NotNull String customerCode, String item, int quantity) {
+
+			}
+		}
+
+		public interface SomeOtherOrderService {
+			void placeOrder(
+					@NotNull @Size(min = 3, max = 20) String customerCode,
+					@NotNull String item,
+					@Min(1) int quantity);
+		}
+
+		public class SomeOtherOrderServiceStrangeImpl extends SimpleOrderServiceImpl implements SomeOtherOrderService {
+			@Override
+			public void placeOrder(String customerCode, String item, int quantity) {
+
 			}
 		}
 
