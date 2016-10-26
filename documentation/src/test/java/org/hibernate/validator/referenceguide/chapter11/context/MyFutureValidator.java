@@ -1,9 +1,7 @@
 //tag::include[]
 package org.hibernate.validator.referenceguide.chapter11.context;
 
-//end::include[]
-
-import java.util.Date;
+import java.time.Instant;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -12,14 +10,14 @@ import javax.validation.constraints.Future;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
 //tag::include[]
-public class MyFutureValidator implements ConstraintValidator<Future, Date> {
+public class MyFutureValidator implements ConstraintValidator<Future, Instant> {
 
 	@Override
 	public void initialize(Future constraintAnnotation) {
 	}
 
 	@Override
-	public boolean isValid(Date value, ConstraintValidatorContext context) {
+	public boolean isValid(Instant value, ConstraintValidatorContext context) {
 		if ( value == null ) {
 			return true;
 		}
@@ -28,9 +26,9 @@ public class MyFutureValidator implements ConstraintValidator<Future, Date> {
 				HibernateConstraintValidatorContext.class
 		);
 
-		Date now = new Date( hibernateContext.getTimeProvider().getCurrentTime() );
+		Instant now = Instant.now( context.getClockProvider().getClock() );
 
-		if ( !value.after( now ) ) {
+		if ( !value.isAfter( now ) ) {
 			hibernateContext.disableDefaultConstraintViolation();
 			hibernateContext.addExpressionVariable( "now", now )
 					.buildConstraintViolationWithTemplate( "Must be after ${now}" )

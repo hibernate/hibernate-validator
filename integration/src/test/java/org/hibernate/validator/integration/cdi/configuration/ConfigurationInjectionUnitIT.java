@@ -39,7 +39,8 @@ public class ConfigurationInjectionUnitIT extends AbstractArquillianIT {
 						ConstraintValidatorFactoryWithInjection.class,
 						MessageInterpolatorWithInjection.class,
 						ParameterNameProviderWithInjection.class,
-						TraversableResolverWithInjection.class
+						TraversableResolverWithInjection.class,
+						ClockProviderWithInjection.class
 				)
 				.addAsResource( "validation-custom-config.xml", "META-INF/validation.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
@@ -67,6 +68,13 @@ public class ConfigurationInjectionUnitIT extends AbstractArquillianIT {
 				.getTraversableResolver();
 
 		assertPingService( traversableResolver.getPingService() );
+	}
+
+	@Test
+	public void testClockProviderGotInjected() {
+		ClockProviderWithInjection clockProvider = (ClockProviderWithInjection) validatorFactory.getClockProvider();
+
+		assertPingService( clockProvider.getPingService() );
 	}
 
 	private void assertPingService(PingService pingService) {

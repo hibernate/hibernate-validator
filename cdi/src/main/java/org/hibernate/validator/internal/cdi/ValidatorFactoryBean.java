@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.cdi;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.security.AccessController;
@@ -20,6 +22,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
 import javax.validation.BootstrapConfiguration;
+import javax.validation.ClockProvider;
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -32,8 +35,6 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 /**
  * A {@link Bean} representing a {@link ValidatorFactory}. There is one instance of this type representing the default
  * validator factory and optionally another instance representing the HV validator factory in case the default provider
@@ -41,6 +42,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ValidatorFactoryBean implements Bean<ValidatorFactory>, PassivationCapable {
 
@@ -51,7 +53,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	public ValidatorFactoryBean(BeanManager beanManager, ValidationProviderHelper validationProviderHelper) {
 		this.beanManager = beanManager;
-		this.destructibleResources = newHashSet( 4 );
+		this.destructibleResources = newHashSet( 5 );
 		this.validationProviderHelper = validationProviderHelper;
 		this.types = Collections.unmodifiableSet(
 				CollectionHelper.<Type>newHashSet(
@@ -113,6 +115,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		config.messageInterpolator( createMessageInterpolator( config ) );
 		config.traversableResolver( createTraversableResolver( config ) );
 		config.parameterNameProvider( createParameterNameProvider( config ) );
+		config.clockProvider( createClockProvider( config ) );
 
 		return config.buildValidatorFactory();
 	}
@@ -134,7 +137,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<MessageInterpolator> messageInterpolatorClass = (Class<MessageInterpolator>) run(
+		Class<? extends MessageInterpolator> messageInterpolatorClass = (Class<? extends MessageInterpolator>) run(
 				LoadClass.action(
 						messageInterpolatorFqcn,
 						null
@@ -153,7 +156,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<TraversableResolver> traversableResolverClass = (Class<TraversableResolver>) run(
+		Class<? extends TraversableResolver> traversableResolverClass = (Class<? extends TraversableResolver>) run(
 				LoadClass.action(
 						traversableResolverFqcn,
 						null
@@ -172,7 +175,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<ParameterNameProvider> parameterNameProviderClass = (Class<ParameterNameProvider>) run(
+		Class<? extends ParameterNameProvider> parameterNameProviderClass = (Class<? extends ParameterNameProvider>) run(
 				LoadClass.action(
 						parameterNameProviderFqcn,
 						null
@@ -180,6 +183,25 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		);
 
 		return createInstance( parameterNameProviderClass );
+	}
+
+	private ClockProvider createClockProvider(Configuration<?> config) {
+		BootstrapConfiguration bootstrapConfiguration = config.getBootstrapConfiguration();
+		String clockProviderFqcn = bootstrapConfiguration.getClockProviderClassName();
+
+		if ( clockProviderFqcn == null ) {
+			return config.getDefaultClockProvider();
+		}
+
+		@SuppressWarnings("unchecked")
+		Class<? extends ClockProvider> clockProviderClass = (Class<? extends ClockProvider>) run(
+				LoadClass.action(
+						clockProviderFqcn,
+						null
+				)
+		);
+
+		return createInstance( clockProviderClass );
 	}
 
 	private ConstraintValidatorFactory createConstraintValidatorFactory(Configuration<?> config) {
@@ -192,7 +214,7 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 		}
 
 		@SuppressWarnings("unchecked")
-		Class<ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<ConstraintValidatorFactory>) run(
+		Class<? extends ConstraintValidatorFactory> constraintValidatorFactoryClass = (Class<? extends ConstraintValidatorFactory>) run(
 				LoadClass.action(
 						constraintValidatorFactoryFqcn,
 						null

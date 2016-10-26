@@ -13,8 +13,6 @@ import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidatorContext;
 
-import org.hibernate.validator.spi.time.TimeProvider;
-
 /**
  * Represents a Hibernate Validator specific context that is used to create
  * {@link javax.validation.Validator} instances. Adds additional configuration options to those
@@ -51,20 +49,6 @@ public interface HibernateValidatorContext extends ValidatorContext {
 	 * @return {@code this} following the chaining method pattern
 	 */
 	HibernateValidatorContext failFast(boolean failFast);
-
-	/**
-	 * Registers the given time provider with the bootstrapped validator. This provider will be used to obtain the
-	 * current time when validating {@code @Future} and {@code @Past} constraints. If not set or if {@code null} is
-	 * passed as a parameter, the time provider of the {@link javax.validation.ValidatorFactory} is used.
-	 *
-	 * @param timeProvider the time provider to register.
-	 *
-	 * @return {@code this} following the chaining method pattern
-	 *
-	 * @hv.experimental This API is considered experimental and may change in future revisions
-	 * @since 5.2
-	 */
-	HibernateValidatorContext timeProvider(TimeProvider timeProvider);
 
 	/**
 	 * Define whether overriding methods that override constraints should throw a {@code ConstraintDefinitionException}.

@@ -71,8 +71,6 @@ part of the public this is not necessarily true for its sub-packages.
             see <<section-extensions-path-api>>.
 |`org.hibernate.validator.spi.constraintdefinition`|An SPI for registering additional constraint validators programmatically,
             see <<section-constraint-definition-contribution>>.
-|`org.hibernate.validator.spi.time`|An SPI for customizing the retrieval of the current time when validating `@Future` and `@Past`,
-            see <<section-time-provider>>.
 |`org.hibernate.validator.valuehandling`, `org.hibernate.validator.spi.valuehandling`|Classes related to the processing
             of values prior to thei validation, see <<section-value-handling>>.
 |===============
@@ -458,22 +456,6 @@ custom extensions for both of these interfaces.
 
 * set arbitrary parameters for interpolation via the Expression Language message interpolation
 facility using `HibernateConstraintValidatorContext#addExpressionVariable(String, Object)`.
-For an example refer to <<example-custom-message-parameter>>.
-+
-[NOTE]
-====
-Note that the parameters specified via `addExpressionVariable(String, Object)` are global and apply
-for all constraint violations created by this `isValid()` invocation. This includes the default
-constraint violation, but also all violations created by the `ConstraintViolationBuilder`. You can,
-however, update the parameters between invocations of
-`ConstraintViolationBuilder#addConstraintViolation()`.
-====
-* obtain the `TimeProvider` for getting the current time when validating `@Future` and `@Past` constraints
-(see also <<section-time-provider>>).
-+
-This is useful if you want to customize the message of the `@Future` constraint.
-By default the message is just "must be in the future". <<example-custom-message-parameter>> shows
-how to include the current date in order to make the message more explicit.
 +
 [[example-custom-message-parameter]]
 .Custom @Future validator with message parameters
@@ -484,9 +466,13 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/context/My
 ----
 ====
 +
-[WARNING]
+[NOTE]
 ====
-This functionality is currently experimental and might change in future versions.
+Note that the parameters specified via `addExpressionVariable(String, Object)` are global and apply
+for all constraint violations created by this `isValid()` invocation. This includes the default
+constraint violation, but also all violations created by the `ConstraintViolationBuilder`. You can,
+however, update the parameters between invocations of
+`ConstraintViolationBuilder#addConstraintViolation()`.
 ====
 * set an arbitrary dynamic payload - see <<section-dynamic-payload>>
 
@@ -803,32 +789,3 @@ Call `ValidatorFactory#close()` if a given validator factory instance is not nee
 Failure to do so may result in a classloader leak in cases where applications/bundles are re-deployed and a non-closed
 validator factory still is referenced by application code.
 ====
-
-[[section-time-provider]]
-=== Time providers for @Future and @Past
-
-By default the current system time is used when validating the `@Future` and `@Past` constraints.
-In some cases it can be necessary though to work with another "logical" date rather than the system time,
-e.g. for testing purposes or in the context of batch applications which may require to run with
-yesterday's date when re-running a failed job execution.
-
-To address such scenarios, Hibernate Validator provides a custom contract for obtaining the current time, `TimeProvider`.
-<<example-using-time-provider>> shows an implementation of this contract and its registration when bootstrapping a validator factory.
-
-[[example-using-time-provider]]
-.Using a custom `TimeProvider`
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/timeprovider/CustomTimeProvider.java[tags=include]
-----
-
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/timeprovider/CustomTimeProviderTest.java[tags=setupValidator]
-----
-====
-
-Alternatively, you can specify the fully-qualified classname of a `TimeProvider` implementation using the property
-`hibernate.validator.time_provider` when configuring the default validator factory via _META-INF/validation.xml_
-(see <<chapter-xml-configuration>>).

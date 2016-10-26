@@ -8,6 +8,7 @@ package org.hibernate.validator.integration.util;
 
 import java.io.InputStream;
 import javax.validation.BootstrapConfiguration;
+import javax.validation.ClockProvider;
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -88,6 +89,16 @@ public class MyValidatorConfiguration implements Configuration<MyValidatorConfig
 
 	@Override
 	public ParameterNameProvider getDefaultParameterNameProvider() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MyValidatorConfiguration clockProvider(ClockProvider clockProvider) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public ClockProvider getDefaultClockProvider() {
 		throw new UnsupportedOperationException();
 	}
 

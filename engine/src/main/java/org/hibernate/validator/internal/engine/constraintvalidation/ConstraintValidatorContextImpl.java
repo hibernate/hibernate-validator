@@ -12,6 +12,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderCustomizableContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.LeafNodeBuilderDefinedContext;
@@ -27,11 +29,11 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ConstraintValidatorContextImpl implements HibernateConstraintValidatorContext {
 
@@ -39,17 +41,17 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	private final Map<String, Object> expressionVariables = newHashMap();
 	private final List<String> methodParameterNames;
-	private final TimeProvider timeProvider;
+	private final ClockProvider clockProvider;
 	private final List<ConstraintViolationCreationContext> constraintViolationCreationContexts = newArrayList( 3 );
 	private final PathImpl basePath;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private boolean defaultDisabled;
 	private Object dynamicPayload;
 
-	public ConstraintValidatorContextImpl(List<String> methodParameterNames, TimeProvider timeProvider, PathImpl propertyPath,
+	public ConstraintValidatorContextImpl(List<String> methodParameterNames, ClockProvider clockProvider, PathImpl propertyPath,
 			ConstraintDescriptor<?> constraintDescriptor) {
 		this.methodParameterNames = methodParameterNames;
-		this.timeProvider = timeProvider;
+		this.clockProvider = clockProvider;
 		this.basePath = propertyPath;
 		this.constraintDescriptor = constraintDescriptor;
 	}
@@ -90,8 +92,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	}
 
 	@Override
-	public TimeProvider getTimeProvider() {
-		return timeProvider;
+	public ClockProvider getClockProvider() {
+		return clockProvider;
 	}
 
 	@Override

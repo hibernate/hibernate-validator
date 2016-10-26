@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.util.Set;
 import javax.enterprise.inject.Alternative;
 import javax.validation.BootstrapConfiguration;
+import javax.validation.ClockProvider;
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
@@ -77,6 +78,11 @@ public class MyValidationProvider implements ValidationProvider<MyValidationProv
 		}
 
 		@Override
+		public MyConfiguration clockProvider(ClockProvider clockProvider) {
+			return null;
+		}
+
+		@Override
 		public MyConfiguration addMapping(InputStream stream) {
 			return null;
 		}
@@ -103,6 +109,11 @@ public class MyValidationProvider implements ValidationProvider<MyValidationProv
 
 		@Override
 		public ParameterNameProvider getDefaultParameterNameProvider() {
+			return null;
+		}
+
+		@Override
+		public ClockProvider getDefaultClockProvider() {
 			return null;
 		}
 
@@ -159,6 +170,11 @@ public class MyValidationProvider implements ValidationProvider<MyValidationProv
 		@Override
 		public ParameterNameProvider getParameterNameProvider() {
 			return delegate.getParameterNameProvider();
+		}
+
+		@Override
+		public ClockProvider getClockProvider() {
+			return delegate.getClockProvider();
 		}
 
 		@Override

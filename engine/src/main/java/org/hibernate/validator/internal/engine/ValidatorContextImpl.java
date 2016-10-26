@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -15,7 +16,6 @@ import javax.validation.Validator;
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * @author Emmanuel Bernard
@@ -32,9 +32,9 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private TraversableResolver traversableResolver;
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private ExecutableParameterNameProvider parameterNameProvider;
+	private ClockProvider clockProvider;
 	private boolean failFast;
 	private final ValueExtractors valueExtractors;
-	private TimeProvider timeProvider;
 	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
 
 
@@ -44,10 +44,10 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.traversableResolver = validatorFactory.getTraversableResolver();
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		this.parameterNameProvider = validatorFactory.getExecutableParameterNameProvider();
+		this.clockProvider = validatorFactory.getClockProvider();
 		this.failFast = validatorFactory.isFailFast();
 		// TODO make overwritable per this context
 		this.valueExtractors = validatorFactory.getValueExtractors();
-		this.timeProvider = validatorFactory.getTimeProvider();
 	}
 
 	@Override
@@ -95,19 +95,19 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
-	public HibernateValidatorContext failFast(boolean failFast) {
-		this.failFast = failFast;
+	public HibernateValidatorContext clockProvider(ClockProvider clockProvider) {
+		if ( clockProvider == null ) {
+			this.clockProvider = validatorFactory.getClockProvider();
+		}
+		else {
+			this.clockProvider = clockProvider;
+		}
 		return this;
 	}
 
 	@Override
-	public HibernateValidatorContext timeProvider(TimeProvider timeProvider) {
-		if ( timeProvider == null ) {
-			this.timeProvider = validatorFactory.getTimeProvider();
-		}
-		else {
-			this.timeProvider = timeProvider;
-		}
+	public HibernateValidatorContext failFast(boolean failFast) {
+		this.failFast = failFast;
 		return this;
 	}
 
@@ -136,9 +136,9 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				messageInterpolator,
 				traversableResolver,
 				parameterNameProvider,
+				clockProvider,
 				failFast,
 				valueExtractors,
-				timeProvider,
 				methodValidationConfiguration
 		);
 	}

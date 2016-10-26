@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
+import javax.validation.ClockProvider;
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintTarget;
@@ -681,4 +682,14 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 199, value = "Cannot extract value for type %1$s with more than one type parameters.")
 	ValidationException getUnableToExtractValueForTypeWithMultipleTypeParametersException(Type type);
+
+	@LogMessage(level = INFO)
+	@Message(id = 200, value = "Using %s as clock provider.")
+	void usingClockProvider(@FormatWith(ClassObjectFormatter.class) Class<? extends ClockProvider> clockProviderClass);
+
+	@Message(id = 201, value = "Unable to instantiate clock provider class %s.")
+	ValidationException getUnableToInstantiateClockProviderClassException(String clockProviderClassName, @Cause ValidationException e);
+
+	@Message(id = 202, value = "Unable to get the current time from the clock provider")
+	ValidationException getUnableToGetCurrentTimeFromClockProvider(@Cause Exception e);
 }

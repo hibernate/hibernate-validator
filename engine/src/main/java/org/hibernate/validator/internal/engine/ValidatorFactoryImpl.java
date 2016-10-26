@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -34,7 +35,6 @@ import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
-import org.hibernate.validator.internal.engine.time.DefaultTimeProvider;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
@@ -50,7 +50,6 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
-import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is the Hibernate Validator default
@@ -82,9 +81,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
 	/**
-	 * Provider for the current time when validating {@code @Future} or code @Past}
+	 * Provider for the current time when validating {@code @Future} or {@code @Past}
 	 */
-	private final TimeProvider timeProvider;
+	private final ClockProvider clockProvider;
 
 	/**
 	 * The default constraint validator factory for this factory.
@@ -144,7 +143,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
-		this.timeProvider = getTimeProvider( configurationState, externalClassLoader );
+		this.clockProvider = configurationState.getClockProvider();
 		this.beanMetaDataManagerMap = Collections.synchronizedMap( new IdentityHashMap<ExecutableParameterNameProvider, BeanMetaDataManager>() );
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
@@ -268,33 +267,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return constraintMappings;
 	}
 
-	private static TimeProvider getTimeProvider(ConfigurationState configurationState, ClassLoader externalClassLoader) {
-		TimeProvider timeProvider = null;
-
-		// programmatic config
-		if ( configurationState instanceof ConfigurationImpl ) {
-			ConfigurationImpl hvConfig = (ConfigurationImpl) configurationState;
-			timeProvider = hvConfig.getTimeProvider();
-		}
-
-		// XML config
-		if ( timeProvider == null ) {
-			String timeProviderClassName = configurationState.getProperties()
-					.get( HibernateValidatorConfiguration.TIME_PROVIDER );
-
-			if ( timeProviderClassName != null ) {
-				@SuppressWarnings("unchecked")
-				Class<? extends TimeProvider> handlerType = (Class<? extends TimeProvider>) run(
-						LoadClass
-								.action( timeProviderClassName, externalClassLoader )
-				);
-				timeProvider = run( NewInstance.action( handlerType, "time provider class" ) );
-			}
-		}
-
-		return timeProvider != null ? timeProvider : DefaultTimeProvider.getInstance();
-	}
-
 	@Override
 	public Validator getValidator() {
 		return createValidator(
@@ -302,9 +274,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				messageInterpolator,
 				traversableResolver,
 				parameterNameProvider,
+				clockProvider,
 				failFast,
 				valueExtractors,
-				timeProvider,
 				methodValidationConfiguration
 		);
 	}
@@ -333,16 +305,17 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return parameterNameProvider;
 	}
 
+	@Override
+	public ClockProvider getClockProvider() {
+		return clockProvider;
+	}
+
 	public boolean isFailFast() {
 		return failFast;
 	}
 
 	ValueExtractors getValueExtractors() {
 		return valueExtractors;
-	}
-
-	TimeProvider getTimeProvider() {
-		return timeProvider;
 	}
 
 	@Override
@@ -374,9 +347,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
+			ClockProvider clockProvider,
 			boolean failFast,
 			ValueExtractors valueExtractors,
-			TimeProvider timeProvider,
 			MethodValidationConfiguration methodValidationConfiguration) {
 
 		BeanMetaDataManager beanMetaDataManager;
@@ -400,7 +373,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				beanMetaDataManager,
 				parameterNameProvider,
-				timeProvider,
+				clockProvider,
 				typeResolutionHelper,
 				valueExtractors,
 				constraintValidatorManager,

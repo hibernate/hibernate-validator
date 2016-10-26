@@ -1,6 +1,9 @@
 package org.hibernate.validator.referenceguide.chapter08;
 
 import java.io.InputStream;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -63,6 +66,16 @@ public class BootstrappingTest {
 				.buildValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
 		//end::traversableResolver[]
+	}
+
+	public void clockProvider() {
+		//tag::clockProvider[]
+		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
+				.configure()
+				.clockProvider( new FixedClockProvider( ZonedDateTime.of( 2016, 6, 15, 0, 0, 0, 0, ZoneId.of( "Europe/Paris" ) ) ) )
+				.buildValidatorFactory();
+		Validator validator = validatorFactory.getValidator();
+		//end::clockProvider[]
 	}
 
 	public void constraintValidatorFactory() {

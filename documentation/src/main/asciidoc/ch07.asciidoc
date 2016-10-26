@@ -51,6 +51,7 @@ API. It is even possible to ignore the XML configuration completely via
         com.acme.ConstraintValidatorFactory
     </constraint-validator-factory>
     <parameter-name-provider>com.acme.ParameterNameProvider</parameter-name-provider>
+    <clock-provider>com.acme.ClockProvider</clock-provider>
 
     <executable-validation enabled="true">
         <default-validated-executable-types>
@@ -75,9 +76,10 @@ found an exception is thrown.
 
 The node `default-provider` allows to choose the Bean Validation provider. This is useful if there is
 more than one provider on the classpath. `message-interpolator`, `traversable-resolver`,
-`constraint-validator-factory` and `parameter-name-provider` allow to customize the used
-implementations for the interfaces `MessageInterpolator`, `TraversableResolver`,
-`ConstraintValidatorFactory` and `ParameterNameProvider` defined in the `javax.validation` package.
+`constraint-validator-factory`, `parameter-name-provider` and `clock-provider` allow to customize
+the used implementations for the interfaces `MessageInterpolator`, `TraversableResolver`,
+`ConstraintValidatorFactory`, `ParameterNameProvider` and `ClockProvider` defined in the
+`javax.validation` package.
 See the sub-sections of <<section-configuring-validator-factory>> for more information about these
 interfaces.
 

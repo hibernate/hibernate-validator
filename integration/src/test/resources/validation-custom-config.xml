@@ -6,17 +6,22 @@
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
 <validation-config
-        xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+        xmlns="http://xmlns.jcp.org/xml/ns/validation/configuration"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.1.xsd"
-        version="1.1">
+        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/validation/configuration validation-configuration-2.0.xsd"
+        version="2.0">
 
-    <message-interpolator>org.hibernate.validator.integration.cdi.configuration.MessageInterpolatorWithInjection
+    <message-interpolator>
+        org.hibernate.validator.integration.cdi.configuration.MessageInterpolatorWithInjection
     </message-interpolator>
-    <traversable-resolver>org.hibernate.validator.integration.cdi.configuration.TraversableResolverWithInjection
+    <traversable-resolver>
+        org.hibernate.validator.integration.cdi.configuration.TraversableResolverWithInjection
     </traversable-resolver>
     <constraint-validator-factory>
         org.hibernate.validator.integration.cdi.configuration.ConstraintValidatorFactoryWithInjection
     </constraint-validator-factory>
+    <clock-provider>
+        org.hibernate.validator.integration.cdi.configuration.ClockProviderWithInjection
+    </clock-provider>
 
 </validation-config>

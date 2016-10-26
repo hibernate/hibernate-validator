@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.integration.util;
 
+import javax.validation.ClockProvider;
 import javax.validation.Configuration;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
@@ -72,6 +73,11 @@ public class MyValidationProvider implements ValidationProvider<MyValidatorConfi
 
 		@Override
 		public ParameterNameProvider getParameterNameProvider() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public ClockProvider getClockProvider() {
 			throw new UnsupportedOperationException();
 		}
 

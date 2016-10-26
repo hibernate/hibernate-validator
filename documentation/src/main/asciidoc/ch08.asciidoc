@@ -257,6 +257,45 @@ for obtaining parameter names at runtime. Refer to <<section-paranamer-parameter
 to learn more about this specific implementation.
 ====
 
+[[section-clock-provider]]
+==== `ClockProvider`
+
+For time related validation (`@Past` and `@Future` constraints for instance), it might be useful to define what is
+considered `now`.
+
+This is especially important when you want to test your constraints in a reliable manner.
+
+The reference time is defined by the `ClockProvider` contract. The responsibility of the `ClockProvider` is to
+provide a `java.time.Clock` defining `now` for time related validators.
+
+[[example-using-custom-clock-provider]]
+.Using a custom `ClockProvider`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/FixedClockProvider.java[tags=include]
+----
+
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter08/BootstrappingTest.java[tags=clockProvider]
+----
+====
+
+Alternatively, you can specify the fully-qualified classname of a `ClockProvider` implementation using the
+`<clock-provider>` element when configuring the default validator factory via _META-INF/validation.xml_
+(see <<chapter-xml-configuration>>).
+
+[NOTE]
+====
+When validating `@Future` and `@Past` constraints, you might want to obtain the current time.
+
+You can obtain the `ClockProvider` in your validators via the `ConstraintValidatorContext`.
+
+For instance, this might be useful if you want to replace the default message of the `@Future` constraint with a more
+explicit one.
+====
+
 ==== Adding mapping streams
 
 As discussed earlier you can configure the constraints applying for your Java beans using XML based

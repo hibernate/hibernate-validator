@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.validation.BootstrapConfiguration;
+import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -49,7 +50,6 @@ import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
 import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
-import org.hibernate.validator.spi.time.TimeProvider;
 
 /**
  * Hibernate specific {@code Configuration} implementation.
@@ -79,6 +79,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final TraversableResolver defaultTraversableResolver;
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 	private final ParameterNameProvider defaultParameterNameProvider;
+	private final ClockProvider defaultClockProvider;
 	private final ConstraintMappingContributor serviceLoaderBasedConstraintMappingContributor;
 
 	private ValidationProviderResolver providerResolver;
@@ -92,7 +93,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean failFast;
 	private final List<ValueExtractor<?>> cascadedValueExtractors = new ArrayList<>();
 	private ClassLoader externalClassLoader;
-	private TimeProvider timeProvider;
 	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
 
 	public ConfigurationImpl(BootstrapState state) {
@@ -124,6 +124,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.defaultTraversableResolver = new DefaultTraversableResolver();
 		this.defaultConstraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		this.defaultParameterNameProvider = new DefaultParameterNameProvider();
+		this.defaultClockProvider = DefaultClockProvider.INSTANCE;
 		this.serviceLoaderBasedConstraintMappingContributor = new ServiceLoaderBasedConstraintMappingContributor(
 				typeResolutionHelper
 		);
@@ -182,6 +183,17 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 		}
 		this.validationBootstrapParameters.setParameterNameProvider( parameterNameProvider );
+		return this;
+	}
+
+	@Override
+	public HibernateValidatorConfiguration clockProvider(ClockProvider clockProvider) {
+		if ( log.isDebugEnabled() ) {
+			if ( clockProvider != null ) {
+				log.debug( "Setting custom ClockProvider of type " + clockProvider.getClass().getName() );
+			}
+		}
+		this.validationBootstrapParameters.setClockProvider( clockProvider );
 		return this;
 	}
 
@@ -270,14 +282,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public HibernateValidatorConfiguration externalClassLoader(ClassLoader externalClassLoader) {
 		Contracts.assertNotNull( externalClassLoader, MESSAGES.parameterMustNotBeNull( "externalClassLoader" ) );
 		this.externalClassLoader = externalClassLoader;
-
-		return this;
-	}
-
-	@Override
-	public HibernateValidatorConfiguration timeProvider(TimeProvider timeProvider) {
-		Contracts.assertNotNull( timeProvider, MESSAGES.parameterMustNotBeNull( "timeProvider" ) );
-		this.timeProvider = timeProvider;
 
 		return this;
 	}
@@ -378,12 +382,13 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return validationBootstrapParameters.getParameterNameProvider();
 	}
 
-	public List<ValueExtractor<?>> getCascadedValueExtractors() {
-		return cascadedValueExtractors;
+	@Override
+	public ClockProvider getClockProvider() {
+		return validationBootstrapParameters.getClockProvider();
 	}
 
-	public TimeProvider getTimeProvider() {
-		return timeProvider;
+	public List<ValueExtractor<?>> getCascadedValueExtractors() {
+		return cascadedValueExtractors;
 	}
 
 	@Override
@@ -424,6 +429,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return defaultParameterNameProvider;
 	}
 
+	@Override
+	public ClockProvider getDefaultClockProvider() {
+		return defaultClockProvider;
+	}
+
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
 		return programmaticMappings;
 	}
@@ -447,6 +457,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 			if ( validationBootstrapParameters.getParameterNameProvider() == null ) {
 				validationBootstrapParameters.setParameterNameProvider( defaultParameterNameProvider );
+			}
+			if ( validationBootstrapParameters.getClockProvider() == null ) {
+				validationBootstrapParameters.setClockProvider( defaultClockProvider );
 			}
 		}
 		else {
@@ -492,6 +505,15 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 			else {
 				validationBootstrapParameters.setParameterNameProvider( defaultParameterNameProvider );
+			}
+		}
+
+		if ( validationBootstrapParameters.getClockProvider() == null ) {
+			if ( xmlParameters.getClockProvider() != null ) {
+				validationBootstrapParameters.setClockProvider( xmlParameters.getClockProvider() );
+			}
+			else {
+				validationBootstrapParameters.setClockProvider( defaultClockProvider );
 			}
 		}
 

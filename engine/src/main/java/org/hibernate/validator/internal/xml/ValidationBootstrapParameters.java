@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -14,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.validation.BootstrapConfiguration;
+import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -26,9 +30,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 /**
  * @author Hardy Ferentschik
  */
@@ -39,6 +40,7 @@ public class ValidationBootstrapParameters {
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
 	private ParameterNameProvider parameterNameProvider;
+	private ClockProvider clockProvider;
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = newHashMap();
@@ -53,6 +55,7 @@ public class ValidationBootstrapParameters {
 		setTraversableResolver( bootstrapConfiguration.getTraversableResolverClassName(), externalClassLoader );
 		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
 		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName(), externalClassLoader );
+		setClockProvider( bootstrapConfiguration.getClockProviderClassName(), externalClassLoader );
 		setMappingStreams( bootstrapConfiguration.getConstraintMappingResourcePaths(), externalClassLoader );
 		setConfigProperties( bootstrapConfiguration.getProperties() );
 	}
@@ -123,6 +126,14 @@ public class ValidationBootstrapParameters {
 
 	public void setParameterNameProvider(ParameterNameProvider parameterNameProvider) {
 		this.parameterNameProvider = parameterNameProvider;
+	}
+
+	public ClockProvider getClockProvider() {
+		return clockProvider;
+	}
+
+	public void setClockProvider(ClockProvider clockProvider) {
+		this.clockProvider = clockProvider;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -200,6 +211,22 @@ public class ValidationBootstrapParameters {
 			}
 			catch (ValidationException e) {
 				throw log.getUnableToInstantiateParameterNameProviderClassException( parameterNameProviderFqcn, e );
+			}
+		}
+	}
+
+	private void setClockProvider(String clockProviderFqcn, ClassLoader externalClassLoader) {
+		if ( clockProviderFqcn != null ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends ClockProvider> clazz = (Class<? extends ClockProvider>) run(
+						LoadClass.action( clockProviderFqcn, externalClassLoader )
+				);
+				clockProvider = run( NewInstance.action( clazz, "clock provider class" ) );
+				log.usingClockProvider( clazz );
+			}
+			catch (ValidationException e) {
+				throw log.getUnableToInstantiateClockProviderClassException( clockProviderFqcn, e );
 			}
 		}
 	}

@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.testutils;
 
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.util.Locale;
@@ -24,12 +26,10 @@ import javax.validation.spi.ValidationProvider;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.internal.engine.DefaultClockProvider;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-import org.hibernate.validator.internal.engine.time.DefaultTimeProvider;
 import org.hibernate.validator.testutil.DummyTraversableResolver;
 import org.hibernate.validator.testutil.ValidationInvocationHandler;
-
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 
 /**
  * A helper providing useful functions for setting up validators.
@@ -235,6 +235,6 @@ public final class ValidatorUtil {
 	}
 
 	public static HibernateConstraintValidatorContext getConstraintValidatorContext() {
-		return new ConstraintValidatorContextImpl( null, DefaultTimeProvider.getInstance(), null, null );
+		return new ConstraintValidatorContextImpl( null, DefaultClockProvider.INSTANCE, null, null );
 	}
 }

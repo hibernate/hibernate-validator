@@ -191,6 +191,7 @@ public class ValidationXmlParser {
 				config.getMessageInterpolator(),
 				config.getTraversableResolver(),
 				config.getParameterNameProvider(),
+				config.getClockProvider(),
 				defaultValidatedExecutableTypes,
 				executableValidationEnabled,
 				new HashSet<String>( config.getConstraintMapping() ),

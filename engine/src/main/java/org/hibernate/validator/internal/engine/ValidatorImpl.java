@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
@@ -73,7 +74,6 @@ import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.cascading.ValueExtractor;
-import org.hibernate.validator.spi.time.TimeProvider;
 
 import com.fasterxml.classmate.ResolvedType;
 
@@ -132,7 +132,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
-	private final TimeProvider timeProvider;
+	/**
+	 * Used to get the current time when validating {@code @Past} and {@code @Future}.
+	 */
+	private final ClockProvider clockProvider;
 
 	/**
 	 * Indicates if validation has to be stopped on first constraint violation.
@@ -151,7 +154,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			TraversableResolver traversableResolver,
 			BeanMetaDataManager beanMetaDataManager,
 			ExecutableParameterNameProvider parameterNameProvider,
-			TimeProvider timeProvider,
+			ClockProvider clockProvider,
 			TypeResolutionHelper typeResolutionHelper,
 			ValueExtractors valueExtractors,
 			ConstraintValidatorManager constraintValidatorManager,
@@ -161,7 +164,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.parameterNameProvider = parameterNameProvider;
-		this.timeProvider = timeProvider;
+		this.clockProvider = clockProvider;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractors = valueExtractors;
 		this.constraintValidatorManager = constraintValidatorManager;
@@ -336,7 +339,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				messageInterpolator,
 				constraintValidatorFactory,
 				getCachingTraversableResolver(),
-				timeProvider,
+				clockProvider,
 				typeResolutionHelper,
 				failFast
 		);

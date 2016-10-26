@@ -52,6 +52,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	private final String messageInterpolatorClassName;
 	private final String traversableResolverClassName;
 	private final String parameterNameProviderClassName;
+	private final String clockProviderClassName;
 	private final Set<String> constraintMappingResourcePaths;
 	private final Map<String, String> properties;
 	private final Set<ExecutableType> validatedExecutableTypes;
@@ -63,6 +64,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.messageInterpolatorClassName = null;
 		this.traversableResolverClassName = null;
 		this.parameterNameProviderClassName = null;
+		this.clockProviderClassName = null;
 		this.validatedExecutableTypes = DEFAULT_VALIDATED_EXECUTABLE_TYPES;
 		this.isExecutableValidationEnabled = true;
 		this.constraintMappingResourcePaths = newHashSet();
@@ -74,6 +76,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 									  String messageInterpolatorClassName,
 									  String traversableResolverClassName,
 									  String parameterNameProviderClassName,
+									  String clockProviderClassName,
 									  EnumSet<ExecutableType> validatedExecutableTypes,
 									  boolean isExecutableValidationEnabled,
 									  Set<String> constraintMappingResourcePaths,
@@ -83,6 +86,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.messageInterpolatorClassName = messageInterpolatorClassName;
 		this.traversableResolverClassName = traversableResolverClassName;
 		this.parameterNameProviderClassName = parameterNameProviderClassName;
+		this.clockProviderClassName = clockProviderClassName;
 		this.validatedExecutableTypes = prepareValidatedExecutableTypes( validatedExecutableTypes );
 		this.isExecutableValidationEnabled = isExecutableValidationEnabled;
 		this.constraintMappingResourcePaths = constraintMappingResourcePaths;
@@ -134,6 +138,11 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	}
 
 	@Override
+	public String getClockProviderClassName() {
+		return clockProviderClassName;
+	}
+
+	@Override
 	public Set<String> getConstraintMappingResourcePaths() {
 		return newHashSet( constraintMappingResourcePaths );
 	}
@@ -164,6 +173,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		sb.append( ", messageInterpolatorClassName='" ).append( messageInterpolatorClassName ).append( '\'' );
 		sb.append( ", traversableResolverClassName='" ).append( traversableResolverClassName ).append( '\'' );
 		sb.append( ", parameterNameProviderClassName='" ).append( parameterNameProviderClassName ).append( '\'' );
+		sb.append( ", clockProviderClassName='" ).append( clockProviderClassName ).append( '\'' );
 		sb.append( ", validatedExecutableTypes='" ).append( validatedExecutableTypes ).append( '\'' );
 		sb.append( ", constraintMappingResourcePaths=" ).append( constraintMappingResourcePaths ).append( '\'' );
 		sb.append( ", properties=" ).append( properties );
