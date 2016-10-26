@@ -18,6 +18,7 @@ import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
@@ -110,5 +111,10 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	@Override
 	public Type getCascadableType() {
 		return getType();
+	}
+
+	@Override
+	public void appendTo(PathImpl path) {
+		path.addReturnValueNode();
 	}
 }

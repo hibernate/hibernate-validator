@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -180,6 +181,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 	@Override
 	public Type getCascadableType() {
 		return cascadableType;
+	}
+
+	@Override
+	public void appendTo(PathImpl path) {
+		path.addPropertyNode( getName() );
 	}
 
 	/**

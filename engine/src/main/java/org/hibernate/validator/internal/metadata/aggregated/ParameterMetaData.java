@@ -19,6 +19,7 @@ import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -116,6 +117,11 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	@Override
 	public Type getCascadableType() {
 		return getType();
+	}
+
+	@Override
+	public void appendTo(PathImpl path) {
+		path.addParameterNode( getName(), getIndex() );
 	}
 
 	public static class Builder extends MetaDataBuilder {

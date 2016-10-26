@@ -9,12 +9,10 @@ package org.hibernate.validator.internal.engine;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 
-import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
-import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
@@ -77,11 +75,11 @@ public class ValueContext<T, V> {
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) value.getClass();
-		return new ValueContext<T, V>( value, rootBeanClass, validatable, propertyPath );
+		return new ValueContext<>( value, rootBeanClass, validatable, propertyPath );
 	}
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(Class<T> type, Validatable validatable, PathImpl propertyPath) {
-		return new ValueContext<T, V>( null, type, validatable, propertyPath );
+		return new ValueContext<>( null, type, validatable, propertyPath );
 	}
 
 	private ValueContext(T currentBean, Class<T> currentBeanType, Validatable validatable, PathImpl propertyPath) {
@@ -126,17 +124,9 @@ public class ValueContext<T, V> {
 	}
 
 	public final void appendNode(Cascadable node) {
-		propertyPath = PathImpl.createCopy( propertyPath );
-
-		if ( node.getKind() == ElementKind.PROPERTY ) {
-			propertyPath.addPropertyNode( node.getName() );
-		}
-		else if ( node.getKind() == ElementKind.PARAMETER ) {
-			propertyPath.addParameterNode( node.getName(), ( (ParameterMetaData) node ).getIndex() );
-		}
-		else if ( node.getKind() == ElementKind.RETURN_VALUE ) {
-			propertyPath.addReturnValueNode();
-		}
+		PathImpl newPath = PathImpl.createCopy( propertyPath );
+		node.appendTo( newPath );
+		propertyPath = newPath;
 	}
 
 	public final void appendCollectionElementNode() {

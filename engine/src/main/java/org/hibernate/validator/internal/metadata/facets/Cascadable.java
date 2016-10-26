@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
@@ -95,4 +96,9 @@ public interface Cascadable {
 	 * Returns the value of this cacadable from the given parent.
 	 */
 	Object getValue(Object parent);
+
+	/**
+	 * Appends this cascadable element to the given path.
+	 */
+	void appendTo(PathImpl path);
 }
