@@ -7,7 +7,6 @@
 package org.hibernate.validator.ap.checks;
 
 import java.util.Map;
-
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Elements;
@@ -21,6 +20,7 @@ import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParamete
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersScriptAssertCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersSizeLengthCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationUserMessageCheck;
+import org.hibernate.validator.ap.checks.annotationparameters.GroupSequenceCheck;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
@@ -240,6 +240,12 @@ public class ConstraintCheckFactory {
 				)
 		);
 		nonAnnotationTypeChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );
+		nonAnnotationTypeChecks.put(
+				AnnotationType.GROUP_SEQUENCE_ANNOTATION,
+				new SingleValuedChecks(
+						new GroupSequenceCheck( annotationApiHelper, typeUtils, constraintHelper )
+				)
+		);
 		nonAnnotationTypeChecks.put(
 				AnnotationType.GROUP_SEQUENCE_PROVIDER_ANNOTATION,
 				new SingleValuedChecks( new GroupSequenceProviderCheck( annotationApiHelper, typeUtils ) )
