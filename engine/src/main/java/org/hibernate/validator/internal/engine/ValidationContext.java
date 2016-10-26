@@ -9,9 +9,7 @@ package org.hibernate.validator.internal.engine;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,6 +33,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.IdentitySet;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -129,7 +128,7 @@ public class ValidationContext<T> {
 	/**
 	 * Parameter name provider which should be used in this context.
 	 */
-	private final ParameterNameProvider parameterNameProvider;
+	private final ExecutableParameterNameProvider parameterNameProvider;
 
 	/**
 	 * List of value un-wrappers.
@@ -152,7 +151,7 @@ public class ValidationContext<T> {
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
-			ParameterNameProvider parameterNameProvider,
+			ExecutableParameterNameProvider parameterNameProvider,
 			TimeProvider timeProvider,
 			List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
 			TypeResolutionHelper typeResolutionHelper,
@@ -241,12 +240,8 @@ public class ValidationContext<T> {
 		if ( parameterNameProvider == null ) {
 			return null;
 		}
-		else if ( executable instanceof Method ) {
-			return parameterNameProvider.getParameterNames( (Method) executable );
-		}
-		else {
-			return parameterNameProvider.getParameterNames( (Constructor<?>) executable );
-		}
+
+		return parameterNameProvider.getParameterNames( executable );
 	}
 
 	public TimeProvider getTimeProvider() {
@@ -592,7 +587,7 @@ public class ValidationContext<T> {
 		}
 
 		public <T> ValidationContext<T> forValidateParameters(
-				ParameterNameProvider parameterNameProvider,
+				ExecutableParameterNameProvider parameterNameProvider,
 				T rootBean,
 				Executable executable,
 				Object[] executableParameters) {

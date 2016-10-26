@@ -65,6 +65,7 @@ import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -129,7 +130,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	/**
 	 * Used for retrieving parameter names to be used in constraint violations or node names.
 	 */
-	private final ParameterNameProvider parameterNameProvider;
+	private final ExecutableParameterNameProvider parameterNameProvider;
 
 	private final TimeProvider timeProvider;
 
@@ -167,7 +168,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
-		this.parameterNameProvider = parameterNameProvider;
+		this.parameterNameProvider = new ExecutableParameterNameProvider( parameterNameProvider );
 		this.timeProvider = timeProvider;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.validatedValueHandlers = validatedValueHandlers;
