@@ -1,6 +1,26 @@
 Hibernate Validator Changelog
 =============================
 
+5.3.1.Final (27-10-2016)
+-------------------------
+
+** Bug
+    * HV-1140 - engine        - StringHelper#decapitalize not working properly on turkish locale
+    * HV-1134 - documentation - Asciidoc Docbook processing is missing the sourcedir attribute
+    * HV-1132 - documentation - Force language in documentation tests
+    * HV-1131 - engine        - EL once again a hard requirement
+    * HV-1032 - engine        - Infinite Loop when validating custom type constraint under certain inheritance scheme
+    * HV-1002 - engine        - validateProperty() behaviour for prop paths with a Set/ List inconsistent with validateValue() 
+
+** Improvement
+    * HV-1130 - build         - Ensure 5.3 runs on JDK 9
+    * HV-1129 - tests         - Upgrade WildFly Arquillian version
+    * HV-1128 - tests         - Enable integration tests on JDK 9
+    * HV-1126 - build         - Upgrade the plexus-archiver dependency used by the assembly plugin to support JDK9
+
+** Task
+    * HV-1125 - build         - Latest Java 9 preview builds need --add-modules instead of -addmods as build option
+
 5.3.0.Final (11-10-2016)
 -------------------------
 
