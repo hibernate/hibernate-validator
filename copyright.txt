@@ -26,6 +26,7 @@ Hardy Ferentschik
 Henno Vermeulen
 Jan-Willem Willebrands
 Jason T. Greene
+Julien Furgerot
 Julien May
 Juraci Krohling
 Justin Nauman
@@ -38,6 +39,7 @@ Lucas Pouzac
 Lukas Niemeier
 Mark Hobson
 Marko Bekhta
+Mert Çalişkan
 Paolo Perrotta
 Pete Muir
 Sanne Grinovero
