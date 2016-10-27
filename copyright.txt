@@ -26,6 +26,7 @@ Henno Vermeulen
 Jan-Willem Willebrands
 Jason T. Greene
 Julien May
+Julien Furgerot
 Juraci Krohling
 Justin Nauman
 Kathryn Killebrew
@@ -35,6 +36,7 @@ Lee KyoungIl
 Leonardo Loch Zanivan
 Lucas Pouzac
 Mark Hobson
+Mert Çalişkan
 Paolo Perrotta
 Pete Muir
 Sanne Grinovero
