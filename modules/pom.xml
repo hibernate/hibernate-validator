@@ -16,10 +16,13 @@
 
     <properties>
         <module.xml.basedir>${basedir}/src/main/modules</module.xml.basedir>
-        <module.xml.aliases.basedir>${basedir}/src/main/aliases</module.xml.aliases.basedir>
-        <hibernate.validator.module.slot>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</hibernate.validator.module.slot>
+        <hibernate.validator.module.slot>main</hibernate.validator.module.slot>
+        <hibernate.validator.cdi.module.slot>main</hibernate.validator.cdi.module.slot>
+        <javax.validation.api.module.slot>main</javax.validation.api.module.slot>
         <hibernate.validator.module.xml>${module.xml.basedir}/org/hibernate/validator/module.xml</hibernate.validator.module.xml>
         <hibernate.validator.cdi.module.xml>${module.xml.basedir}/org/hibernate/validator/cdi/module.xml</hibernate.validator.cdi.module.xml>
+        <validation.api.module.xml>${module.xml.basedir}/javax/validation/api/module.xml</validation.api.module.xml>
+        <layer.name>bean-validation-20</layer.name>
     </properties>
 
     <dependencyManagement/>
@@ -40,11 +43,11 @@
     <build>
         <plugins>
             <plugin>
-                <!-- This defines the properties 'parsedVersion.majorVersion'
-                    and 'parsedVersion.minorVersion' to be in synch with the current project version -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
+                    <!-- This defines the properties 'parsedVersion.majorVersion'
+                    and 'parsedVersion.minorVersion' to be in synch with the current project version -->
                     <execution>
                         <id>parse-project-version</id>
                         <goals>

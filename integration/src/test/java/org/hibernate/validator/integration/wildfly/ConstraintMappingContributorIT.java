@@ -36,7 +36,6 @@ public class ConstraintMappingContributorIT extends AbstractArquillianIT {
 		return buildTestArchive( WAR_FILE_NAME )
 				.addClasses( Broomstick.class, MyConstraintMappingContributor.class )
 				.addAsResource( "constraint-mapping-contributor-validation.xml", "META-INF/validation.xml" )
-				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
