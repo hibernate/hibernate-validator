@@ -33,8 +33,7 @@ public class JndiLookupOfValidatorFactoryIT extends AbstractArquillianIT {
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
-		return buildTestArchive( WAR_FILE_NAME )
-				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" );
+		return buildTestArchive( WAR_FILE_NAME );
 	}
 
 	@Test

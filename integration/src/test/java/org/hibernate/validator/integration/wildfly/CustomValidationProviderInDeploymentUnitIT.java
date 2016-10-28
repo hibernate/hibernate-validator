@@ -41,7 +41,6 @@ public class CustomValidationProviderInDeploymentUnitIT extends AbstractArquilli
 								.addAsManifestResource( EmptyAsset.INSTANCE, "beans.xml" ) )
 				.addAsResource( "log4j.properties" )
 				.addAsResource( "validation-custom-provider.xml", "META-INF/validation.xml" )
-				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 

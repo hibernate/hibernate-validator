@@ -7,7 +7,7 @@
   ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
   -->
 
-<module xmlns="urn:jboss:module:1.3" name="org.hibernate.validator.cdi" slot="${project.version}">
+<module xmlns="urn:jboss:module:1.3" name="org.hibernate.validator.cdi" slot="${hibernate.validator.cdi.module.slot}">
     <resources>
         <resource-root path="hibernate-validator-cdi-${project.version}.jar" />
     </resources>
@@ -16,6 +16,6 @@
         <module name="javax.annotation.api"/>
         <module name="javax.enterprise.api"/>
         <module name="javax.validation.api"/>
-        <module name="org.hibernate.validator" slot="${project.version}"/>
+        <module name="org.hibernate.validator"/>
     </dependencies>
 </module>

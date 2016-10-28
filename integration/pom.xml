@@ -152,7 +152,7 @@
                                     <classifier>wildfly-10-dist</classifier>
                                     <type>zip</type>
                                     <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/</outputDirectory>
+                                    <outputDirectory>${project.build.directory}/wildfly-${wildfly.version}/modules/</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
