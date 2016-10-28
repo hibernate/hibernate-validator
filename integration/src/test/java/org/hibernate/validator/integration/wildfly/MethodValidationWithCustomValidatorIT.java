@@ -38,7 +38,6 @@ public class MethodValidationWithCustomValidatorIT extends AbstractArquillianIT 
 	public static Archive<?> createTestArchive() {
 		return buildTestArchive( WAR_FILE_NAME )
 				.addClasses( MyValidator.class )
-				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 

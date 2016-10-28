@@ -7,26 +7,27 @@
     <baseDirectory>/</baseDirectory>
 
     <files>
-        <!-- hibernate-validator -->
         <file>
-            <source>${module.xml.aliases.basedir}/org/hibernate/validator/module.xml</source>
-            <outputDirectory>org/hibernate/validator/${hibernate.validator.module.slot}</outputDirectory>
+            <source>${module.xml.basedir}/layers.conf</source>
+            <outputDirectory></outputDirectory>
             <filtered>true</filtered>
         </file>
+        <!-- hibernate-validator -->
         <file>
             <source>${hibernate.validator.module.xml}</source>
-            <outputDirectory>org/hibernate/validator/${project.version}</outputDirectory>
+            <outputDirectory>system/layers/${layer.name}/org/hibernate/validator/${hibernate.validator.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
         <!-- hibernate-validator-cdi -->
         <file>
-            <source>${module.xml.aliases.basedir}/org/hibernate/validator/cdi/module.xml</source>
-            <outputDirectory>org/hibernate/validator/cdi/${hibernate.validator.module.slot}</outputDirectory>
+            <source>${hibernate.validator.cdi.module.xml}</source>
+            <outputDirectory>system/layers/${layer.name}/org/hibernate/validator/cdi/${hibernate.validator.cdi.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
+        <!-- validation-api -->
         <file>
-            <source>${hibernate.validator.cdi.module.xml}</source>
-            <outputDirectory>org/hibernate/validator/cdi/${project.version}</outputDirectory>
+            <source>${validation.api.module.xml}</source>
+            <outputDirectory>system/layers/${layer.name}/javax/validation/api/${javax.validation.api.module.slot}</outputDirectory>
             <filtered>true</filtered>
         </file>
     </files>
@@ -35,7 +36,7 @@
         <!-- hibernate-validator -->
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/validator/${project.version}</outputDirectory>
+            <outputDirectory>system/layers/${layer.name}/org/hibernate/validator/main</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
@@ -45,11 +46,22 @@
         <!-- hibernate-validator-cdi -->
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>org/hibernate/validator/cdi/${project.version}</outputDirectory>
+            <outputDirectory>system/layers/${layer.name}/org/hibernate/validator/cdi/main</outputDirectory>
             <useTransitiveFiltering>false</useTransitiveFiltering>
             <unpack>false</unpack>
             <includes>
                 <include>org.hibernate:hibernate-validator-cdi</include>
+            </includes>
+        </dependencySet>
+        <!-- validation-api -->
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>system/layers/${layer.name}/javax/validation/api/main</outputDirectory>
+            <outputFileNameMapping>validation-api-${bv.api.version}.jar</outputFileNameMapping>
+            <useTransitiveFiltering>false</useTransitiveFiltering>
+            <unpack>false</unpack>
+            <includes>
+                <include>javax.validation:validation-api</include>
             </includes>
         </dependencySet>
     </dependencySets>

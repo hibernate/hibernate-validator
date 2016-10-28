@@ -13,8 +13,8 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
 
 /**
- * Base class for all the TestNG tests using Arquillian
- * .
+ * Base class for all the TestNG tests using Arquillian.
+ *
  * @author Guillaume Smet
  */
 public abstract class AbstractArquillianIT extends Arquillian {
@@ -28,5 +28,4 @@ public abstract class AbstractArquillianIT extends Arquillian {
 				.addAsLibraries( pom.resolve( "org.assertj:assertj-core" ).withTransitivity().asFile() )
 				.addAsResource( "log4j.properties" );
 	}
-
 }

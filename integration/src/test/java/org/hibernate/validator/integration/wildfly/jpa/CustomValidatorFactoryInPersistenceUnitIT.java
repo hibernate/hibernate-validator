@@ -41,7 +41,6 @@ public class CustomValidatorFactoryInPersistenceUnitIT extends AbstractArquillia
 				.addAsResource( persistenceXml(), "META-INF/persistence.xml" )
 				.addAsResource( "validation.xml", "META-INF/validation.xml" )
 				.addAsResource( "constraints-magician.xml", "META-INF/validation/constraints-magician.xml" )
-				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 

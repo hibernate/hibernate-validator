@@ -46,7 +46,6 @@ public class ConstraintDefinitionContributorIT extends AbstractArquillianIT {
 						IntegrationTestUtil.createOxBerryConstraintDefinitionContributorJar()
 								.as( JavaArchive.class )
 				)
-				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" );
 	}
 
