@@ -108,6 +108,11 @@ public class ConstraintHelper {
 		CONSTRAINT_META_ANNOTATION,
 
 		/**
+		 * Given annotation is the @GroupSequence annotation.
+		 */
+		GROUP_SEQUENCE_ANNOTATION,
+
+		/**
 		 * Given annotation is the @GroupSequenceProvider annotation.
 		 */
 		GROUP_SEQUENCE_PROVIDER_ANNOTATION,
@@ -301,6 +306,9 @@ public class ConstraintHelper {
 		}
 		else if ( isConstraintMetaAnnotation( annotationMirror ) ) {
 			annotationType = AnnotationType.CONSTRAINT_META_ANNOTATION;
+		}
+		else if ( isGroupSequenceAnnotation( annotationMirror ) ) {
+			annotationType = AnnotationType.GROUP_SEQUENCE_ANNOTATION;
 		}
 		else if ( isGroupSequenceProviderAnnotation( annotationMirror ) ) {
 			annotationType = AnnotationType.GROUP_SEQUENCE_PROVIDER_ANNOTATION;
@@ -609,6 +617,20 @@ public class ConstraintHelper {
 			AnnotationMirror annotationMirror) {
 
 		return getName( annotationMirror.getAnnotationType() ).contentEquals( BeanValidationTypes.VALID );
+	}
+
+	/**
+	 * Checks, whether the given mirror represents the {@code @GroupSequence} annotation.
+	 *
+	 * @param annotationMirror The annotation mirror of interest.
+	 *
+	 * @return True, if the given mirror represents the {@code @GroupSequence} annotation, false
+	 *         otherwise.
+	 */
+	private boolean isGroupSequenceAnnotation(
+			AnnotationMirror annotationMirror) {
+
+		return getName( annotationMirror.getAnnotationType() ).contentEquals( BeanValidationTypes.GROUP_SEQUENCE );
 	}
 
 	/**

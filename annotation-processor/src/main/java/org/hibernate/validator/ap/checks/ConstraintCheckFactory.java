@@ -239,8 +239,9 @@ public class ConstraintCheckFactory {
 						new AnnotationParametersGroupsCheck( annotationApiHelper )
 				)
 		);
+		nonAnnotationTypeChecks.put( AnnotationType.NO_CONSTRAINT_ANNOTATION, NULL_CHECKS );
 		nonAnnotationTypeChecks.put(
-				AnnotationType.NO_CONSTRAINT_ANNOTATION,
+				AnnotationType.GROUP_SEQUENCE_ANNOTATION,
 				new SingleValuedChecks( new GroupSequenceCheck( annotationApiHelper, typeUtils ) )
 		);
 		nonAnnotationTypeChecks.put(
