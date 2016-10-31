@@ -329,7 +329,9 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.ERROR, 91 ),
 				new DiagnosticExpectation( Kind.ERROR, 98 ),
 				new DiagnosticExpectation( Kind.ERROR, 102 ),
-				new DiagnosticExpectation( Kind.ERROR, 145 )
+				new DiagnosticExpectation( Kind.ERROR, 145 ),
+				new DiagnosticExpectation( Kind.ERROR, 168 ),
+				new DiagnosticExpectation( Kind.ERROR, 172 )
 		);
 	}
 

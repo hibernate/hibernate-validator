@@ -15,12 +15,12 @@ import javax.lang.model.util.Types;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationDefaultMessageCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersDecimalMinMaxCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersDigitsCheck;
-import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersGroupSequenceCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersGroupsCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersPatternCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersScriptAssertCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationParametersSizeLengthCheck;
 import org.hibernate.validator.ap.checks.annotationparameters.AnnotationUserMessageCheck;
+import org.hibernate.validator.ap.checks.annotationparameters.GroupSequenceCheck;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
@@ -241,7 +241,7 @@ public class ConstraintCheckFactory {
 		);
 		nonAnnotationTypeChecks.put(
 				AnnotationType.NO_CONSTRAINT_ANNOTATION,
-				new SingleValuedChecks( new AnnotationParametersGroupSequenceCheck( annotationApiHelper, elementUtils, typeUtils ) )
+				new SingleValuedChecks( new GroupSequenceCheck( annotationApiHelper, typeUtils ) )
 		);
 		nonAnnotationTypeChecks.put(
 				AnnotationType.GROUP_SEQUENCE_PROVIDER_ANNOTATION,

@@ -160,4 +160,17 @@ public class InvalidGroupSequenceParameters {
 			}
 		}
 	}
+
+	/**
+	 * Case 5: Group sequence cyclic definition - incorrect
+	 */
+	public static class Case5 {
+		@GroupSequence(Group2.class)
+		public interface Group1 {
+		}
+
+		@GroupSequence(Group1.class)
+		public interface Group2 {
+		}
+	}
 }
