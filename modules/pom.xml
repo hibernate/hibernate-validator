@@ -22,7 +22,7 @@
         <hibernate.validator.module.xml>${module.xml.basedir}/org/hibernate/validator/module.xml</hibernate.validator.module.xml>
         <hibernate.validator.cdi.module.xml>${module.xml.basedir}/org/hibernate/validator/cdi/module.xml</hibernate.validator.cdi.module.xml>
         <validation.api.module.xml>${module.xml.basedir}/javax/validation/api/module.xml</validation.api.module.xml>
-        <layer.name>bean-validation-20</layer.name>
+        <layer.name>hibernate-validator-6.0</layer.name>
     </properties>
 
     <dependencyManagement/>
