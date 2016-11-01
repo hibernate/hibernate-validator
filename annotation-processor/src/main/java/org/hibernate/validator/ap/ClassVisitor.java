@@ -18,8 +18,10 @@ import javax.tools.Diagnostic;
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.classchecks.ClassCheck;
 import org.hibernate.validator.ap.classchecks.ClassCheckFactory;
+import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.Configuration;
+import org.hibernate.validator.ap.util.ConstraintHelper;
 import org.hibernate.validator.ap.util.MessagerAdapter;
 
 /**
@@ -44,7 +46,13 @@ public class ClassVisitor extends AbstractElementVisitor<Void, Void> {
 
 		this.factory = ClassCheckFactory.getInstance(
 				processingEnvironment.getTypeUtils(),
-				processingEnvironment.getElementUtils()
+				processingEnvironment.getElementUtils(),
+				new ConstraintHelper(
+						processingEnvironment.getTypeUtils(),
+						new AnnotationApiHelper(
+								processingEnvironment.getElementUtils(), processingEnvironment.getTypeUtils()
+						)
+				)
 		);
 	}
 
