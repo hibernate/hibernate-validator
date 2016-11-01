@@ -11,8 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import javax.lang.model.element.AnnotationMirror;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -24,6 +23,7 @@ import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.CollectionHelper;
+import org.hibernate.validator.ap.util.ConstraintHelper;
 
 /**
  * Abstract base class for {@link ClassCheck} implementations that check overridden methods.
@@ -34,15 +34,16 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 
 	private static final String JAVA_LANG_OBJECT = "java.lang.Object";
 
-	private static final String JAVAX_VALIDATION_CONSTRAINT = "javax.validation.Constraint";
-
 	private final Elements elementUtils;
 
 	private final Types typeUtils;
 
-	public AbstractMethodOverrideCheck(Elements elementUtils, Types typeUtils) {
+	protected ConstraintHelper constraintHelper;
+
+	public AbstractMethodOverrideCheck(Elements elementUtils, Types typeUtils, ConstraintHelper constraintHelper) {
 		this.elementUtils = elementUtils;
 		this.typeUtils = typeUtils;
+		this.constraintHelper = constraintHelper;
 	}
 
 	@Override
@@ -63,39 +64,18 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 			return Collections.emptySet();
 		}
 
-		// if there's more than one overridden originally declared method we need to make sure that all of them match
-		Set<ConstraintCheckIssue> errors = CollectionHelper.newHashSet();
-		for ( ExecutableElement firstExecutable : overriddenMethods.get( Boolean.TRUE ) ) {
-			// first we'll check if current method correctly overrides a method from interface
-			if ( !checkOverriddenMethod( currentMethod, firstExecutable ) ) {
-				return CollectionHelper.asSet( ConstraintCheckIssue.error( currentMethod, null, getErrorMessageKey(), getEnclosingTypeElementQualifiedName( firstExecutable ) ) );
-
-			}
-			// now we'll check if the parallel implementation of method is correct
-			for ( ExecutableElement secondExecutable : overriddenMethods.get( Boolean.TRUE ) ) {
-				if ( firstExecutable.equals( secondExecutable ) ) {
-					continue;
-				}
-				if ( !checkOverriddenMethod( firstExecutable, secondExecutable ) ) {
-					errors.add( ConstraintCheckIssue.error( currentMethod, null, getErrorMessageKey(), getEnclosingTypeElementQualifiedName( secondExecutable ) ) );
-				}
-			}
-		}
-
-		if ( !errors.isEmpty() ) {
-			return errors;
-		}
-
-		// if we reached this part of code it means we need to check if the current method 'correctly' overrides methods from super classes.
-		for ( ExecutableElement overriddenMethod : overriddenMethods.get( Boolean.FALSE ) ) {
-			if ( !checkOverriddenMethod( currentMethod, overriddenMethod ) ) {
-				return CollectionHelper.asSet( ConstraintCheckIssue.error( currentMethod, null, getErrorMessageKey(), getEnclosingTypeElementQualifiedName( overriddenMethod ) ) );
-
-			}
-		}
-
-		return Collections.emptySet();
+		return checkMethodInternal( currentMethod, overriddenMethods );
 	}
+
+	/**
+	 * Performs a real check of a method.
+	 *
+	 * @param currentMethod a method to check
+	 * @param overriddenMethods a map of overridden methods received by calling {@link AbstractMethodOverrideCheck#findAllOverriddenElements(TypeElement, ExecutableElement)}
+	 *
+	 * @return a collection of issues if there are any, an empty collection otherwise
+	 */
+	protected abstract Collection<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, Map<Boolean, List<ExecutableElement>> overriddenMethods);
 
 	/**
 	 * There can be situations in which no checks should be performed. So in such cases we will not look for any overridden
@@ -106,24 +86,6 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 	 * @return {@code true} if we should proceed with checks and {@code false} otherwise
 	 */
 	protected abstract boolean needToPerformAnyChecks(ExecutableElement currentMethod);
-
-	/**
-	 * Determine if one method 'correctly' overrides another one in terms of annotated parameters
-	 *
-	 * @param currentMethod method from a current subclass
-	 * @param overriddenMethod method from a super class
-	 *
-	 * @return {@code true} if method is overridden 'correctly', {@code false} otherwise
-	 */
-	protected abstract boolean checkOverriddenMethod(ExecutableElement currentMethod, ExecutableElement overriddenMethod);
-
-	/**
-	 * Method which returns a Error message key to be used if there's an error in method overriding.
-	 *
-	 * @return error message key
-	 */
-	protected abstract String getErrorMessageKey();
-
 
 	/**
 	 * Find a list of overridden methods from all super classes and all implemented interfaces. Overridden methods are grouped into two lists
@@ -258,70 +220,8 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 	 *
 	 * @return a class/interface qualified name represented by {@link String} to which a method belongs to
 	 */
-	private String getEnclosingTypeElementQualifiedName(ExecutableElement currentMethod) {
+	protected String getEnclosingTypeElementQualifiedName(ExecutableElement currentMethod) {
 		return getEnclosingTypeElement( currentMethod ).getQualifiedName().toString();
-	}
-
-	/**
-	 * Returns a list containing those annotation mirrors from the input list,
-	 * which are constraint annotations and filter out others. The input collection
-	 * remains untouched.
-	 *
-	 * @param collectionToFilter a list to be filtered
-	 *
-	 * @return a filtered list with constraint annotations only
-	 */
-	protected List<? extends AnnotationMirror> listOnlyConstraintAnnotations(List<? extends AnnotationMirror> collectionToFilter) {
-		if ( collectionToFilter.isEmpty() ) {
-			return Collections.emptyList();
-		}
-		List<AnnotationMirror> result = CollectionHelper.newArrayList();
-
-		for ( AnnotationMirror annotationMirror : collectionToFilter ) {
-			if ( isConstraintAnnotation( annotationMirror ) ) {
-				result.add( annotationMirror );
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * Checks if annotation is a constraint annotation or not.
-	 *
-	 * @param annotationMirror an annotation to check
-	 *
-	 * @return {@code true} if annotation is a constraint annotation, {@code false} otherwise
-	 */
-	private boolean isConstraintAnnotation(AnnotationMirror annotationMirror) {
-		for ( AnnotationMirror mirror : annotationMirror.getAnnotationType().asElement().getAnnotationMirrors() ) {
-			if ( JAVAX_VALIDATION_CONSTRAINT.equals( mirror.getAnnotationType().toString() ) ) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Checks if one list of annotation mirrors contains same kind of annotation as the other.
-	 *
-	 * @param listToCheck list that should contain annotations from the other one
-	 * @param listShouldContain list of annotation that should be present in the first one
-	 *
-	 * @return {@code true} if all annotations from the second list are present in the first one,
-	 * {@code false} otherwise
-	 */
-	protected boolean annotationMirrorContainsAll(List<? extends AnnotationMirror> listToCheck, List<? extends AnnotationMirror> listShouldContain) {
-		Set<String> namesOfAnnotations = CollectionHelper.newHashSet();
-		for ( AnnotationMirror annotationMirror : listToCheck ) {
-			namesOfAnnotations.add( annotationMirror.getAnnotationType().toString() );
-		}
-		for ( AnnotationMirror annotationMirror : listShouldContain ) {
-			if ( !namesOfAnnotations.contains( annotationMirror.getAnnotationType().toString() ) ) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**

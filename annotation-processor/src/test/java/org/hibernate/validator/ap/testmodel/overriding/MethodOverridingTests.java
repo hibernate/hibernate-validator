@@ -42,10 +42,10 @@ public class MethodOverridingTests {
 
 
 	/**
-	 * Case 2 : more annotation on overridden method parameters then on the parent - incorrect
+	 * Case 2 : Same set of annotations on overridden method parameters as on the parent - incorrect
 	 */
 	public static class MethodOverridingTestCase2 {
-		public void doSomething(@NotBlank String param) {
+		public void doSomething(@NotNull @NotBlank @Size(max = 10) String param) {
 
 		}
 	}
@@ -88,7 +88,7 @@ public class MethodOverridingTests {
 	public static class MethodOverridingTestCase4Sub implements MethodOverridingTestCase4Interface, MethodOverridingTestCase4OtherInterface {
 
 		@Override
-		public void doSomething(@NotBlank String param) {
+		public void doSomething(String param) {
 
 		}
 	}
@@ -111,7 +111,7 @@ public class MethodOverridingTests {
 	}
 
 	/**
-	 * Case 6 : Implementing interface with removing constraints on return value - incorrect
+	 * Case 6 : Implementing interface with constraints on return value in interface and implemented method - correct
 	 */
 	public interface MethodOverridingTestCase6 {
 		@NotBlank
@@ -273,9 +273,9 @@ public class MethodOverridingTests {
 
 		public interface SimpleOrderService {
 			void placeOrder(
-					@NotNull @Size(min = 3, max = 20) String customerCode,
-					@NotNull String item,
-					@Min(1) int quantity);
+					String customerCode,
+					String item,
+					int quantity);
 		}
 
 		public class SimpleOrderServiceImpl implements SimpleOrderService {
@@ -287,9 +287,9 @@ public class MethodOverridingTests {
 
 		public interface SomeOtherOrderService {
 			void placeOrder(
-					@NotNull @Size(min = 3, max = 20) String customerCode,
-					@NotNull String item,
-					@Min(1) int quantity);
+					String customerCode,
+					String item,
+					int quantity);
 		}
 
 		public class SomeOtherOrderServiceStrangeImpl extends SimpleOrderServiceImpl implements SomeOtherOrderService {
@@ -309,18 +309,18 @@ public class MethodOverridingTests {
 
 		public class BaseOrderServiceImpl {
 			public void placeOrder(
-					@NotNull @Size(min = 3, max = 20) String customerCode,
-					@NotNull String item,
-					@Min(1) int quantity) {
+					String customerCode,
+					String item,
+					int quantity) {
 
 			}
 		}
 
 		public interface SimpleOrderService {
 			void placeOrder(
-					@NotNull @Size(min = 3, max = 20) String customerCode,
-					@NotNull String item,
-					@Min(1) int quantity);
+					String customerCode,
+					String item,
+					int quantity);
 		}
 
 		public class SimpleOrderServiceImpl extends BaseOrderServiceImpl implements SimpleOrderService {
@@ -332,9 +332,9 @@ public class MethodOverridingTests {
 
 		public interface SomeOtherOrderService {
 			void placeOrder(
-					@NotNull @Size(min = 3, max = 20) String customerCode,
-					@NotNull String item,
-					@Min(1) int quantity);
+					String customerCode,
+					String item,
+					int quantity);
 		}
 
 		public class SomeOtherOrderServiceStrangeImpl extends SimpleOrderServiceImpl implements SomeOtherOrderService {
