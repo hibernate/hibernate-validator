@@ -444,11 +444,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 131,
 			value = "A method return value must not be marked for cascaded validation more than once in a class hierarchy, but the following two methods are marked as such: %s, %s.")
-	ConstraintDeclarationException getMethodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidationException(Member member1, Member member2);
+	ConstraintDeclarationException getMethodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidationException(@FormatWith(ExecutableFormatter.class) Executable executable1, @FormatWith(ExecutableFormatter.class) Executable executable2);
 
 	@Message(id = 132,
 			value = "Void methods must not be constrained or marked for cascaded validation, but method %s is.")
-	ConstraintDeclarationException getVoidMethodsMustNotBeConstrainedException(Member member);
+	ConstraintDeclarationException getVoidMethodsMustNotBeConstrainedException(@FormatWith(ExecutableFormatter.class) Executable executable);
 
 	@Message(id = 133, value = "%1$s does not contain a constructor with the parameter types %2$s.")
 	ValidationException getBeanDoesNotContainConstructorException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass,
@@ -483,7 +483,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 142,
 			value = "Cross parameter constraint %1$s is illegally placed on a parameterless method or constructor '%2$s'.")
 	ConstraintDeclarationException getCrossParameterConstraintOnMethodWithoutParametersException(
-			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint, Member member);
+			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint, @FormatWith(ExecutableFormatter.class) Executable executable);
 
 	@Message(id = 143,
 			value = "Cross parameter constraint %1$s is illegally placed on class level.")
@@ -515,11 +515,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 151,
 			value = "A method overriding another method must not alter the parameter constraint configuration, but method %2$s changes the configuration of %1$s.")
-	ConstraintDeclarationException getParameterConfigurationAlteredInSubTypeException(Member superMethod, Member subMethod);
+	ConstraintDeclarationException getParameterConfigurationAlteredInSubTypeException(@FormatWith(ExecutableFormatter.class) Executable superMethod, @FormatWith(ExecutableFormatter.class) Executable subMethod);
 
 	@Message(id = 152,
 			value = "Two methods defined in parallel types must not declare parameter constraints, if they are overridden by the same method, but methods %s and %s both define parameter constraints.")
-	ConstraintDeclarationException getParameterConstraintsDefinedInMethodsFromParallelTypesException(Member method1, Member method2);
+	ConstraintDeclarationException getParameterConstraintsDefinedInMethodsFromParallelTypesException(@FormatWith(ExecutableFormatter.class) Executable method1, @FormatWith(ExecutableFormatter.class) Executable method2);
 
 	@Message(id = 153,
 			value = "The constraint %1$s used ConstraintTarget#%2$s but is not specified on a method or constructor.")
@@ -561,15 +561,15 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 161,
 			value = "Two methods defined in parallel types must not define group conversions for a cascaded method return value, if they are overridden by the same method, but methods %s and %s both define parameter constraints.")
-	ConstraintDeclarationException getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(Member method1, Member method2);
+	ConstraintDeclarationException getMethodsFromParallelTypesMustNotDefineGroupConversionsForCascadedReturnValueException(@FormatWith(ExecutableFormatter.class) Executable method1, @FormatWith(ExecutableFormatter.class) Executable method2);
 
 	@Message(id = 162,
 			value = "The validated type %1$s does not specify the constructor/method: %2$s")
-	IllegalArgumentException getMethodOrConstructorNotDefinedByValidatedTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> validatedType, Member member);
+	IllegalArgumentException getMethodOrConstructorNotDefinedByValidatedTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> validatedType, @FormatWith(ExecutableFormatter.class) Executable executable);
 
 	@Message(id = 163,
 			value = "The actual parameter type '%1$s' is not assignable to the expected one '%2$s' for parameter %3$d of '%4$s'")
-	IllegalArgumentException getParameterTypesDoNotMatchException(@FormatWith(ClassObjectFormatter.class) Class<?> actualType, Type expectedType, int index, Member member);
+	IllegalArgumentException getParameterTypesDoNotMatchException(@FormatWith(ClassObjectFormatter.class) Class<?> actualType, Type expectedType, int index, @FormatWith(ExecutableFormatter.class) Executable executable);
 
 	@Message(id = 164, value = "%s has to be a auto-boxed type.")
 	IllegalArgumentException getHasToBeABoxedTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> clazz);
@@ -579,7 +579,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 166,
 			value = "@ValidateOnExecution is not allowed on methods overriding a superclass method or implementing an interface. Check configuration for %1$s")
-	ValidationException getValidateOnExecutionOnOverriddenOrInterfaceMethodException(Method m);
+	ValidationException getValidateOnExecutionOnOverriddenOrInterfaceMethodException(@FormatWith(ExecutableFormatter.class) Executable executable);
 
 	@Message(id = 167,
 			value = "A given constraint definition can only be overridden in one mapping file. %1$s is overridden in multiple files")

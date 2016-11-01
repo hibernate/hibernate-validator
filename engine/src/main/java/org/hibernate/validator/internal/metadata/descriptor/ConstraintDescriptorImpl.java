@@ -17,6 +17,7 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -458,7 +459,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		else if ( !hasParameters( member ) ) {
 			throw log.getCrossParameterConstraintOnMethodWithoutParametersException(
 					annotationType,
-					member
+					(Executable) member
 			);
 		}
 	}
