@@ -10,11 +10,12 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 
-import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
- * Provides information related to the location a constraint is declared on (e.g. a bean, field or method parameter).
+ * Represents the location (e.g. a bean, field or method parameter) of a constraint and provides logic related to it,
+ * e.g. for appending the location to a given property path.
  * <p>
  * Note that while the validation engine works on the aggregated meta-model (which e.g. provides a unified view for
  * properties, be them represented via fields or getter methods) most of the time, in some situations the physical
@@ -29,117 +30,54 @@ import org.hibernate.validator.internal.util.TypeHelper;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public class ConstraintLocation {
+public interface ConstraintLocation {
 
-	/**
-	 * The member the constraint was defined on.
-	 */
-	private final Member member;
-
-	/**
-	 * The property name associated with the member.
-	 */
-	private final String propertyName;
-
-	/**
-	 * The type hosting this location.
-	 */
-	private final Class<?> declaringClass;
-
-	/**
-	 * The type to be used for validator resolution for constraints at this location.
-	 */
-	private final Type typeForValidatorResolution;
-
-	public static ConstraintLocation forClass(Class<?> declaringClass) {
-		// HV-623 - create a ParameterizedType in case the class has type parameters. Needed for constraint validator
-		// resolution (HF)
-		Type type = declaringClass.getTypeParameters().length == 0 ?
-				declaringClass :
-				TypeHelper.parameterizedType( declaringClass, declaringClass.getTypeParameters() );
-
-		return new ConstraintLocation( declaringClass, null, type );
+	static ConstraintLocation forClass(Class<?> declaringClass) {
+		return new BeanConstraintLocation( declaringClass );
 	}
 
-	public static ConstraintLocation forProperty(Member member) {
-		return new ConstraintLocation(
-				member.getDeclaringClass(),
-				member,
-				ReflectionHelper.typeOf( member )
-		);
+	static PropertyConstraintLocation forProperty(Member member) {
+		return new PropertyConstraintLocation( member );
 	}
 
-	public static ConstraintLocation forTypeArgument(Member member, Type type) {
-		return new ConstraintLocation(
+	static ConstraintLocation forTypeArgument(Member member, Type type) {
+		return new TypeArgumentConstraintLocation(
 				member.getDeclaringClass(),
 				member,
 				type
 		);
 	}
 
-	public static ConstraintLocation forReturnValue(Executable executable) {
-		return new ConstraintLocation(
-				executable.getDeclaringClass(),
-				executable,
-				ReflectionHelper.typeOf( executable )
-		);
+	static ConstraintLocation forReturnValue(Executable executable) {
+		return new ReturnValueConstraintLocation( executable );
 	}
 
-	public static ConstraintLocation forCrossParameter(Executable executable) {
-		return new ConstraintLocation(
-				executable.getDeclaringClass(),
-				executable,
-				Object[].class
-		);
+	static ConstraintLocation forCrossParameter(Executable executable) {
+		return new CrossParameterConstraintLocation( executable );
 	}
 
-	public static ConstraintLocation forParameter(Executable executable, int index) {
-		return new ConstraintLocation(
-				executable.getDeclaringClass(),
-				executable,
-				ReflectionHelper.typeOf( executable, index )
-		);
-	}
-
-	private ConstraintLocation(Class<?> declaringClass, Member member, Type typeOfAnnotatedElement) {
-		this.declaringClass = declaringClass;
-		this.member = member;
-		this.propertyName = member == null ? null : ReflectionHelper.getPropertyName( member );
-
-		if ( typeOfAnnotatedElement instanceof Class && ( (Class<?>) typeOfAnnotatedElement ).isPrimitive() ) {
-			this.typeForValidatorResolution = ReflectionHelper.boxedType( (Class<?>) typeOfAnnotatedElement );
-		}
-		else {
-			this.typeForValidatorResolution = typeOfAnnotatedElement;
-		}
+	static ConstraintLocation forParameter(Executable executable, int index) {
+		return new ParameterConstraintLocation( executable, index );
 	}
 
 	/**
 	 * Returns the class hosting this location.
-	 *
-	 * @return the class hosting this location
 	 */
-	public Class<?> getDeclaringClass() {
-		return declaringClass;
-	}
+	Class<?> getDeclaringClass();
 
 	/**
 	 * Returns the member represented by this location.
 	 *
 	 * @return the member represented by this location. Will be {@code null} when this location represents a type.
 	 */
-	public Member getMember() {
-		return member;
-	}
+	Member getMember();
 
 	/**
 	 * Returns the property name of the member represented by this location.
 	 *
 	 * @return the property name of the member represented by this location. Will be {@code null} when this location represents a type.
 	 */
-	public String getPropertyName() {
-		return propertyName;
-	}
+	String getPropertyName();
 
 	/**
 	 * Returns the type to be used when resolving constraint validators for constraints at this location. Note that this
@@ -148,46 +86,10 @@ public class ConstraintLocation {
 	 *
 	 * @return The type to be used when resolving constraint validators for constraints at this location
 	 */
-	public Type getTypeForValidatorResolution() {
-		return typeForValidatorResolution;
-	}
+	Type getTypeForValidatorResolution();
 
-	@Override
-	public String toString() {
-		return "ConstraintLocation [member=" + member + ", declaringClass="
-				+ declaringClass + ", typeForValidatorResolution="
-				+ typeForValidatorResolution + "]";
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if ( this == o ) {
-			return true;
-		}
-		if ( o == null || getClass() != o.getClass() ) {
-			return false;
-		}
-
-		ConstraintLocation that = (ConstraintLocation) o;
-
-		if ( !declaringClass.equals( that.declaringClass ) ) {
-			return false;
-		}
-		if ( member != null ? !member.equals( that.member ) : that.member != null ) {
-			return false;
-		}
-		if ( !typeForValidatorResolution.equals( that.typeForValidatorResolution ) ) {
-			return false;
-		}
-
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = member != null ? member.hashCode() : 0;
-		result = 31 * result + declaringClass.hashCode();
-		result = 31 * result + typeForValidatorResolution.hashCode();
-		return result;
-	}
+	/**
+	 * Appends a node representing this location to the given property path.
+	 */
+	void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path);
 }

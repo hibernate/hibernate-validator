@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
@@ -32,6 +33,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -315,6 +317,18 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 					cascadingMember = ( (ConstrainedExecutable) constrainedElement ).getExecutable();
 				}
 			}
+		}
+
+		@Override
+		protected Set<MetaConstraint<?>> adaptConstraints(ConstrainedElementKind kind, Set<MetaConstraint<?>> constraints) {
+			if ( kind == ConstrainedElementKind.FIELD || kind == ConstrainedElementKind.TYPE ) {
+				return constraints;
+			}
+
+			// convert (getter) return value locations into property locations for usage within this meta-data
+			return constraints.stream()
+				.map( c -> new MetaConstraint<>( c.getDescriptor(), ConstraintLocation.forProperty( c.getLocation().getMember() ) ) )
+				.collect( Collectors.toSet() );
 		}
 
 		private String getPropertyName(ConstrainedElement constrainedElement) {

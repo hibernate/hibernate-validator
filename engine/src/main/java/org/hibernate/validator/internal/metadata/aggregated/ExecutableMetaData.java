@@ -38,8 +38,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * An aggregated view of the constraint related meta data for a given method or
@@ -59,8 +57,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Gunnar Morling
  */
 public class ExecutableMetaData extends AbstractConstraintMetaData {
-
-	private static final Log log = LoggerFactory.make();
 
 	private final Class<?>[] parameterTypes;
 	private final List<ParameterMetaData> parameterMetaDataList;

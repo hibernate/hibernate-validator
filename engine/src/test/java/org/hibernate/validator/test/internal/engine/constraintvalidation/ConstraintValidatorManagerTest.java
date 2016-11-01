@@ -26,11 +26,13 @@ import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -39,16 +41,17 @@ import org.testng.annotations.Test;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-@SuppressWarnings("unchecked")
 public class ConstraintValidatorManagerTest {
 	private ConstraintValidatorManager constraintValidatorManager;
 	private ConstraintValidatorFactory constraintValidatorFactory;
+	private ExecutableParameterNameProvider parameterNameProvider;
 	private Validator validator;
 
 	@BeforeMethod
 	public void setUp() {
 		constraintValidatorFactory = new ConstraintValidatorFactoryImpl();
 		constraintValidatorManager = new ConstraintValidatorManager( constraintValidatorFactory );
+		parameterNameProvider = new ExecutableParameterNameProvider( new DefaultParameterNameProvider() );
 		validator = getValidator();
 	}
 
@@ -63,7 +66,7 @@ public class ConstraintValidatorManagerTest {
 	@Test
 	public void testGetInitializedValidator() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
-		ValueContext valueContext = ValueContext.getLocalExecutionContext( new Foo(), null, null );
+		ValueContext<?, ?> valueContext = ValueContext.getLocalExecutionContext( parameterNameProvider, new Foo(), null, null );
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		ConstraintValidator<?, ?> constraintValidator = constraintValidatorManager.getInitializedValidator(
@@ -78,7 +81,7 @@ public class ConstraintValidatorManagerTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNullValidatedValueThrowsIllegalArgumentException() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
-		ValueContext valueContext = ValueContext.getLocalExecutionContext( new Foo(), null, null );
+		ValueContext<?, ?> valueContext = ValueContext.getLocalExecutionContext( parameterNameProvider, new Foo(), null, null );
 		valueContext.setDeclaredTypeOfValidatedElement( null );
 
 		constraintValidatorManager.getInitializedValidator(
@@ -90,7 +93,7 @@ public class ConstraintValidatorManagerTest {
 
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNullDescriptorThrowsIllegalArgumentException() {
-		ValueContext valueContext = ValueContext.getLocalExecutionContext( new Foo(), null, null );
+		ValueContext<?, ?> valueContext = ValueContext.getLocalExecutionContext( parameterNameProvider, new Foo(), null, null );
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		constraintValidatorManager.getInitializedValidator(
@@ -103,7 +106,7 @@ public class ConstraintValidatorManagerTest {
 	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void testNullFactoryThrowsIllegalArgumentException() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
-		ValueContext valueContext = ValueContext.getLocalExecutionContext( new Foo(), null, null );
+		ValueContext<?, ?> valueContext = ValueContext.getLocalExecutionContext( parameterNameProvider, new Foo(), null, null );
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		constraintValidatorManager.getInitializedValidator(
@@ -117,8 +120,8 @@ public class ConstraintValidatorManagerTest {
 	public void testUnexpectedTypeException() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s2" );
 
-		ValueContext valueContext = ValueContext.getLocalExecutionContext(
-				new Foo(), null, PathImpl.createPathFromString( "s2" )
+		ValueContext<?, ?> valueContext = ValueContext.getLocalExecutionContext(
+				parameterNameProvider, new Foo(), null, PathImpl.createPathFromString( "s2" )
 		);
 		valueContext.setDeclaredTypeOfValidatedElement( Object.class );
 
@@ -133,7 +136,7 @@ public class ConstraintValidatorManagerTest {
 	@Test
 	public void testConstraintValidatorInstancesAreCachedPerFactory() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
-		ValueContext valueContext = ValueContext.getLocalExecutionContext( new Foo(), null, null );
+		ValueContext<?, ?> valueContext = ValueContext.getLocalExecutionContext( parameterNameProvider, new Foo(), null, null );
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		ConstraintValidator<?, ?> constraintValidator1 = constraintValidatorManager.getInitializedValidator(
@@ -168,7 +171,7 @@ public class ConstraintValidatorManagerTest {
 	@Test
 	public void testOnlyTheInstancesForTheLeastRecentlyUsedCustomFactoryAreCached() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
-		ValueContext valueContext = ValueContext.getLocalExecutionContext( new Foo(), null, null );
+		ValueContext<?, ?> valueContext = ValueContext.getLocalExecutionContext( parameterNameProvider, new Foo(), null, null );
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		for ( int i = 0; i < 10; i++ ) {
@@ -204,7 +207,7 @@ public class ConstraintValidatorManagerTest {
 				.buildValidatorFactory()
 				.getValidator();
 
-		ValueContext valueContext = ValueContext.getLocalExecutionContext( new User(), null, null );
+		ValueContext<?, ?> valueContext = ValueContext.getLocalExecutionContext( parameterNameProvider, new User(), null, null );
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		ConstraintDescriptorImpl<?> notNullOnFirstNameDescriptor = getSingleConstraintDescriptorForProperty(
@@ -246,7 +249,7 @@ public class ConstraintValidatorManagerTest {
 				.buildValidatorFactory()
 				.getValidator();
 
-		ValueContext valueContext = ValueContext.getLocalExecutionContext( new User(), null, null );
+		ValueContext<?, ?> valueContext = ValueContext.getLocalExecutionContext( parameterNameProvider, new User(), null, null );
 		valueContext.setDeclaredTypeOfValidatedElement( String.class );
 
 		ConstraintDescriptorImpl<?> sizeOnMiddleNameDescriptor = getSingleConstraintDescriptorForProperty(

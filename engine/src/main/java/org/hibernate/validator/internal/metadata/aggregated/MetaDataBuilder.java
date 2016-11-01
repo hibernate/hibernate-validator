@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,12 +20,10 @@ import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Builds {@link ConstraintMetaData} instances for the
@@ -68,7 +69,7 @@ public abstract class MetaDataBuilder {
 	 * @param constrainedElement The element to add.
 	 */
 	public void add(ConstrainedElement constrainedElement) {
-		constraints.addAll( constrainedElement.getConstraints() );
+		constraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getConstraints() ) );
 		isCascading = isCascading || constrainedElement.isCascading();
 		unwrapMode = constrainedElement.unwrapMode();
 
@@ -153,7 +154,7 @@ public abstract class MetaDataBuilder {
 
 		Class<?> constraintClass = constraint.getLocation().getDeclaringClass();
 
-		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<A>(
+		ConstraintDescriptorImpl<A> descriptor = new ConstraintDescriptorImpl<>(
 				constraintHelper,
 				constraint.getLocation().getMember(),
 				constraint.getDescriptor().getAnnotation(),
@@ -163,10 +164,17 @@ public abstract class MetaDataBuilder {
 				constraint.getDescriptor().getConstraintType()
 		);
 
-		return new MetaConstraint<A>(
+		return new MetaConstraint<>(
 				descriptor,
 				constraint.getLocation()
 		);
+	}
+
+	/**
+	 * Allows specific sub-classes to customize the retrieved constraints.
+	 */
+	protected Set<MetaConstraint<?>> adaptConstraints(ConstrainedElementKind constrainedElementKind, Set<MetaConstraint<?>> constraints) {
+		return constraints;
 	}
 
 	/**

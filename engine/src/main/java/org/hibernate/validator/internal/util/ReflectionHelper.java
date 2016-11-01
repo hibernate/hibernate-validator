@@ -460,6 +460,18 @@ public final class ReflectionHelper {
 	}
 
 	/**
+	 * Returns the corresponding auto-boxed type if given a primitive type. Returns the given type itself otherwise.
+	 */
+	public static Type boxedType(Type type) {
+		if ( type instanceof Class && ( (Class<?>) type ).isPrimitive() ) {
+			return boxedType( (Class<?>) type );
+		}
+		else {
+			return type;
+		}
+	}
+
+	/**
 	 * Returns the primitive type for a boxed type.
 	 *
 	 * @param type the boxed type

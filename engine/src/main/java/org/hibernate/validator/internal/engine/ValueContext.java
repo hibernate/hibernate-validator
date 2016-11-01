@@ -15,6 +15,8 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
@@ -25,6 +27,9 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  * @author Gunnar Morling
  */
 public class ValueContext<T, V> {
+
+	private final ExecutableParameterNameProvider parameterNameProvider;
+
 	/**
 	 * The current bean which gets validated. This is the bean hosting the constraints which get validated.
 	 */
@@ -72,17 +77,18 @@ public class ValueContext<T, V> {
 	 */
 	private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(T value, Validatable validatable, PathImpl propertyPath) {
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) value.getClass();
-		return new ValueContext<>( value, rootBeanClass, validatable, propertyPath );
+		return new ValueContext<>( parameterNameProvider, value, rootBeanClass, validatable, propertyPath );
 	}
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(Class<T> type, Validatable validatable, PathImpl propertyPath) {
-		return new ValueContext<>( null, type, validatable, propertyPath );
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, Class<T> type, Validatable validatable, PathImpl propertyPath) {
+		return new ValueContext<>( parameterNameProvider, null, type, validatable, propertyPath );
 	}
 
-	private ValueContext(T currentBean, Class<T> currentBeanType, Validatable validatable, PathImpl propertyPath) {
+	private ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Class<T> currentBeanType, Validatable validatable, PathImpl propertyPath) {
+		this.parameterNameProvider = parameterNameProvider;
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
 		this.currentValidatable = validatable;
@@ -129,19 +135,10 @@ public class ValueContext<T, V> {
 		propertyPath = newPath;
 	}
 
-	public final void appendCollectionElementNode() {
-		propertyPath = PathImpl.createCopy( propertyPath );
-		propertyPath.addCollectionElementNode();
-	}
-
-	public final void appendBeanNode() {
-		propertyPath = PathImpl.createCopy( propertyPath );
-		propertyPath.addBeanNode();
-	}
-
-	public final void appendCrossParameterNode() {
-		propertyPath = PathImpl.createCopy( propertyPath );
-		propertyPath.addCrossParameterNode();
+	public final void appendNode(ConstraintLocation location) {
+		PathImpl newPath = PathImpl.createCopy( propertyPath );
+		location.appendTo( parameterNameProvider, newPath );
+		propertyPath = newPath;
 	}
 
 	public final void markCurrentPropertyAsIterable() {

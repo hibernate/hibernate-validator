@@ -63,6 +63,11 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	}
 
 	@Override
+	public String toString() {
+		return "ConstrainedField [field=" + field + "]";
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
