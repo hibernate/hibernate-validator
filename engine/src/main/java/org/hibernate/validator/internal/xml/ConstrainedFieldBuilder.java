@@ -75,7 +75,7 @@ class ConstrainedFieldBuilder {
 			// TODO HV-919 Support specification of type parameter constraints via XML and API
 			ConstrainedField constrainedField = new ConstrainedField(
 					ConfigurationSource.XML,
-					constraintLocation,
+					field,
 					metaConstraints,
 					Collections.<MetaConstraint<?>>emptySet(),
 					groupConversions,

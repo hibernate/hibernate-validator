@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 /**
  * Represents a Java type and all its associated meta-data relevant in the
@@ -22,24 +21,31 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
  */
 public class ConstrainedType extends AbstractConstrainedElement {
 
+	private final Class<?> beanClass;
+
 	/**
 	 * Creates a new type meta data object.
 	 *
 	 * @param source The source of meta data.
-	 * @param location The location of the represented type.
+	 * @param beanClass The represented type.
 	 * @param constraints The constraints of the represented type, if any.
 	 */
-	public ConstrainedType(ConfigurationSource source, ConstraintLocation location, Set<MetaConstraint<?>> constraints) {
+	public ConstrainedType(ConfigurationSource source, Class<?> beanClass, Set<MetaConstraint<?>> constraints) {
 
 		super(
 				source,
 				ConstrainedElementKind.TYPE,
-				location,
 				constraints,
 				Collections.<Class<?>, Class<?>>emptyMap(),
 				false,
 				UnwrapMode.AUTOMATIC
 		);
+
+		this.beanClass = beanClass;
+	}
+
+	public Class<?> getBeanClass() {
+		return beanClass;
 	}
 
 	@Override
@@ -47,7 +53,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result
-				+ ( ( getLocation().getDeclaringClass() == null ) ? 0 : getLocation().getDeclaringClass().hashCode() );
+				+ ( ( beanClass == null ) ? 0 : beanClass.hashCode() );
 		return result;
 	}
 
@@ -63,12 +69,12 @@ public class ConstrainedType extends AbstractConstrainedElement {
 			return false;
 		}
 		ConstrainedType other = (ConstrainedType) obj;
-		if ( getLocation().getDeclaringClass() == null ) {
-			if ( other.getLocation().getDeclaringClass() != null ) {
+		if ( beanClass == null ) {
+			if ( other.beanClass != null ) {
 				return false;
 			}
 		}
-		else if ( !getLocation().getDeclaringClass().equals( other.getLocation().getDeclaringClass() ) ) {
+		else if ( !beanClass.equals( other.beanClass ) ) {
 			return false;
 		}
 		return true;

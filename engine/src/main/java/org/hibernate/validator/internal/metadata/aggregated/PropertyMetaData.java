@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.validation.ElementKind;
@@ -241,8 +242,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );
 
-			this.propertyName = constrainedField.getLocation().getPropertyName();
-			this.propertyType = ReflectionHelper.typeOf( constrainedField.getLocation().getMember() );
+			this.propertyName = constrainedField.getField().getName();
+			this.propertyType = ReflectionHelper.typeOf( constrainedField.getField() );
 			add( constrainedField );
 		}
 
@@ -257,8 +258,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );
 
-			this.propertyName = constrainedMethod.getLocation().getPropertyName();
-			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getLocation().getMember() );
+			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getExecutable() );
+			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getExecutable() );
 			add( constrainedMethod );
 		}
 
@@ -273,10 +274,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				return false;
 			}
 
-			return equals(
-					constrainedElement.getLocation().getPropertyName(),
-					propertyName
-			);
+			return Objects.equals( getPropertyName( constrainedElement ), propertyName );
 		}
 
 		@Override
@@ -305,14 +303,29 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 				typeArgumentsConstraints.addAll( ( (ConstrainedField) constrainedElement ).getTypeArgumentsConstraints() );
+
+				if ( constrainedElement.isCascading() && cascadingMember == null ) {
+					cascadingMember = ( (ConstrainedField) constrainedElement ).getField();
+				}
 			}
 			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
 				typeArgumentsConstraints.addAll( ( (ConstrainedExecutable) constrainedElement ).getTypeArgumentsConstraints() );
+
+				if ( constrainedElement.isCascading() && cascadingMember == null ) {
+					cascadingMember = ( (ConstrainedExecutable) constrainedElement ).getExecutable();
+				}
+			}
+		}
+
+		private String getPropertyName(ConstrainedElement constrainedElement) {
+			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
+				return ReflectionHelper.getPropertyName( ( (ConstrainedField) constrainedElement ).getField() );
+			}
+			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
+				return ReflectionHelper.getPropertyName( ( (ConstrainedExecutable) constrainedElement ).getExecutable() );
 			}
 
-			if ( constrainedElement.isCascading() && cascadingMember == null ) {
-				cascadingMember = constrainedElement.getLocation().getMember();
-			}
+			return null;
 		}
 
 		@Override
@@ -331,10 +344,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 					cascadingMember,
 					unwrapMode()
 			);
-		}
-
-		private boolean equals(String s1, String s2) {
-			return ( s1 != null && s1.equals( s2 ) ) || ( s1 == null && s2 == null );
 		}
 	}
 }

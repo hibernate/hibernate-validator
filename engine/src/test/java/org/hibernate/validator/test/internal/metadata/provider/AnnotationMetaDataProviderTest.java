@@ -35,7 +35,6 @@ import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -107,9 +106,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		assertThat( createEvent.getConstraints() ).as( "No return value constraints expected" ).isEmpty();
 		assertThat( createEvent.getCrossParameterConstraints() ).hasSize( 1 );
 
-		ConstraintLocation location = createEvent.getLocation();
-
-		assertThat( location.getMember() ).isEqualTo(
+		assertThat( createEvent.getExecutable() ).isEqualTo(
 				Calendar.class.getMethod(
 						"createEvent",
 						DateMidnight.class,

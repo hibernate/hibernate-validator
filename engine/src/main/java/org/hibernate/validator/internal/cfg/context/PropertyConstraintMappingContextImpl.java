@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -19,7 +20,6 @@ import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -95,7 +95,7 @@ final class PropertyConstraintMappingContextImpl
 		if ( member instanceof Field ) {
 			return new ConstrainedField(
 					ConfigurationSource.API,
-					ConstraintLocation.forProperty( member ),
+					(Field) member,
 					getConstraints( constraintHelper ),
 					Collections.<MetaConstraint<?>>emptySet(),
 					groupConversions,
@@ -106,7 +106,7 @@ final class PropertyConstraintMappingContextImpl
 		else {
 			return new ConstrainedExecutable(
 					ConfigurationSource.API,
-					ConstraintLocation.forProperty( member ),
+					(Executable) member,
 					getConstraints( constraintHelper ),
 					groupConversions,
 					isCascading,

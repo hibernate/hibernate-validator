@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Collections;
 import java.util.Iterator;
@@ -164,12 +166,18 @@ public class TypeAnnotationMetaDataRetrievalTest {
 		);
 	}
 
-	private ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations,
-			Member member) {
+	protected ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Member member) {
 		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
 			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
-				if ( constrainedElement.getLocation().getMember().equals( member ) ) {
-					return constrainedElement;
+				if ( member instanceof Executable && constrainedElement instanceof ConstrainedExecutable ) {
+					if ( member.equals( ( (ConstrainedExecutable) constrainedElement ).getExecutable() ) ) {
+						return constrainedElement;
+					}
+				}
+				else if ( member instanceof Field && constrainedElement instanceof ConstrainedField ) {
+					if ( member.equals( ( (ConstrainedField) constrainedElement ).getField() ) ) {
+						return constrainedElement;
+					}
 				}
 			}
 		}

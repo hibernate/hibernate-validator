@@ -153,7 +153,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			ConstrainedType classLevelMetaData =
 					new ConstrainedType(
 							ConfigurationSource.ANNOTATION,
-							ConstraintLocation.forClass( beanClass ),
+							beanClass,
 							classLevelConstraints
 					);
 			constrainedElements.add( classLevelMetaData );
@@ -256,7 +256,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
-				ConstraintLocation.forProperty( field ),
+				field,
 				constraints,
 				typeArgumentsConstraints,
 				groupConversions,
@@ -393,7 +393,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		return new ConstrainedExecutable(
 				ConfigurationSource.ANNOTATION,
-				ConstraintLocation.forReturnValue( executable ),
+				executable,
 				parameterConstraints,
 				crossParameterConstraints,
 				returnValueConstraints,
@@ -457,7 +457,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				metaData.add(
 						new ConstrainedParameter(
 								ConfigurationSource.ANNOTATION,
-								ConstraintLocation.forParameter( executable, i ),
+								executable,
 								ReflectionHelper.typeOf( executable, i ),
 								i,
 								parameterName,
@@ -511,7 +511,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			metaData.add(
 					new ConstrainedParameter(
 							ConfigurationSource.ANNOTATION,
-							ConstraintLocation.forParameter( executable, i ),
+							executable,
 							ReflectionHelper.typeOf( executable, i ),
 							i,
 							parameterName,

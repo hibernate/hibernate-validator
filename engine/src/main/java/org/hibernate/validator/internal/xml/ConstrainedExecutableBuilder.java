@@ -220,7 +220,7 @@ class ConstrainedExecutableBuilder {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedExecutable(
 				ConfigurationSource.XML,
-				ConstraintLocation.forReturnValue( executable ),
+				executable,
 				parameterMetaData,
 				crossParameterConstraints,
 				returnValueConstraints,

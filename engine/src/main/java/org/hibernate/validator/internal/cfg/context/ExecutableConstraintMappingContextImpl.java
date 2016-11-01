@@ -18,7 +18,6 @@ import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -107,7 +106,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedExecutable(
 				ConfigurationSource.API,
-				ConstraintLocation.forReturnValue( executable ),
+				executable,
 				getParameters( constraintHelper, parameterNameProvider ),
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
@@ -130,7 +129,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 				constrainedParameters.add(
 						new ConstrainedParameter(
 								ConfigurationSource.API,
-								ConstraintLocation.forParameter( executable, i ),
+								executable,
 								ReflectionHelper.typeOf( executable, i ),
 								i,
 								parameterNameProvider.getParameterNames( executable ).get( i )

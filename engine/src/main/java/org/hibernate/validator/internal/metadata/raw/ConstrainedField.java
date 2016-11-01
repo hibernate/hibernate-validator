@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 /**
  * Represents a field of a Java type and all its associated meta-data relevant
@@ -22,13 +22,14 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
  */
 public class ConstrainedField extends AbstractConstrainedElement {
 
+	private final Field field;
 	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
 
 	/**
 	 * Creates a new field meta data object.
 	 *
 	 * @param source The source of meta data.
-	 * @param location The location of the represented field.
+	 * @param field The represented field.
 	 * @param constraints The constraints of the represented field, if any.
 	 * @param typeArgumentsConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented field, if any.
@@ -38,18 +39,23 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * unwrapping prior to validation.
 	 */
 	public ConstrainedField(ConfigurationSource source,
-							ConstraintLocation location,
+							Field field,
 							Set<MetaConstraint<?>> constraints,
 							Set<MetaConstraint<?>> typeArgumentsConstraints,
 							Map<Class<?>, Class<?>> groupConversions,
 							boolean isCascading,
 							UnwrapMode unwrapMode) {
 
-		super( source, ConstrainedElementKind.FIELD, location, constraints, groupConversions, isCascading, unwrapMode );
+		super( source, ConstrainedElementKind.FIELD, constraints, groupConversions, isCascading, unwrapMode );
 
+		this.field = field;
 		this.typeArgumentsConstraints = typeArgumentsConstraints != null ? Collections.unmodifiableSet(
 				typeArgumentsConstraints
 		) : Collections.<MetaConstraint<?>>emptySet();
+	}
+
+	public Field getField() {
+		return field;
 	}
 
 	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
@@ -60,7 +66,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ( ( getLocation().getMember() == null ) ? 0 : getLocation().getMember().hashCode() );
+		result = prime * result + ( ( field == null ) ? 0 : field.hashCode() );
 		return result;
 	}
 
@@ -76,12 +82,12 @@ public class ConstrainedField extends AbstractConstrainedElement {
 			return false;
 		}
 		ConstrainedField other = (ConstrainedField) obj;
-		if ( getLocation().getMember() == null ) {
-			if ( other.getLocation().getMember() != null ) {
+		if ( field == null ) {
+			if ( other.field != null ) {
 				return false;
 			}
 		}
-		else if ( !getLocation().getMember().equals( other.getLocation().getMember() ) ) {
+		else if ( !field.equals( other.field ) ) {
 			return false;
 		}
 		return true;

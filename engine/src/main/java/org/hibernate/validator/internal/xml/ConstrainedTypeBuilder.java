@@ -79,7 +79,7 @@ class ConstrainedTypeBuilder {
 
 		return new ConstrainedType(
 				ConfigurationSource.XML,
-				constraintLocation,
+				beanClass,
 				metaConstraints
 		);
 	}

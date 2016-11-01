@@ -359,7 +359,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		 * @param executable The executable to merge.
 		 */
 		private void addToExecutablesByDeclaringType(ConstrainedExecutable executable) {
-			Class<?> beanClass = executable.getLocation().getDeclaringClass();
+			Class<?> beanClass = executable.getExecutable().getDeclaringClass();
 			ConstrainedExecutable mergedExecutable = executablesByDeclaringType.get( beanClass );
 
 			if ( mergedExecutable != null ) {

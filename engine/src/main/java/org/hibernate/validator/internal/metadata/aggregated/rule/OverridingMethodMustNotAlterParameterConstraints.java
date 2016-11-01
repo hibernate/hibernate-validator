@@ -22,8 +22,8 @@ public class OverridingMethodMustNotAlterParameterConstraints extends MethodConf
 				otherMethod.hasParameterConstraints() &&
 				!method.isEquallyParameterConstrained( otherMethod ) ) {
 			throw log.getParameterConfigurationAlteredInSubTypeException(
-					method.getLocation().getMember(),
-					otherMethod.getLocation().getMember()
+					method.getExecutable(),
+					otherMethod.getExecutable()
 			);
 		}
 	}

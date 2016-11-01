@@ -21,8 +21,8 @@ public class ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine extends Me
 		if ( method.isCascading() && otherMethod.isCascading() &&
 				( isDefinedOnSubType( method, otherMethod ) || isDefinedOnSubType( otherMethod, method ) ) ) {
 			throw log.getMethodReturnValueMustNotBeMarkedMoreThanOnceForCascadedValidationException(
-					method.getLocation().getMember(),
-					otherMethod.getLocation().getMember()
+					method.getExecutable(),
+					otherMethod.getExecutable()
 			);
 		}
 	}

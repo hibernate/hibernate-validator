@@ -78,7 +78,7 @@ class ConstrainedGetterBuilder {
 			// TODO HV-919 Support specification of type parameter constraints via XML and API
 			ConstrainedExecutable constrainedGetter = new ConstrainedExecutable(
 					ConfigurationSource.XML,
-					constraintLocation,
+					getter,
 					Collections.<ConstrainedParameter>emptyList(),
 					Collections.<MetaConstraint<?>>emptySet(),
 					metaConstraints,

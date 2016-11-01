@@ -159,8 +159,8 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 			if ( constrainedParameter == null ) {
 				constrainedParameter = newConstrainedParameter;
 			}
-			else if ( newConstrainedParameter.getLocation().getDeclaringClass().isAssignableFrom(
-					constrainedParameter.getLocation().getDeclaringClass()
+			else if ( newConstrainedParameter.getExecutable().getDeclaringClass().isAssignableFrom(
+					constrainedParameter.getExecutable().getDeclaringClass()
 			) ) {
 				// If the current parameter is from a method hosted on a parent class,
 				// use this parent class parameter name instead of the more specific one.

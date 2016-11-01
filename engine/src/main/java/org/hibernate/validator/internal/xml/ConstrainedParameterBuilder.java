@@ -84,7 +84,7 @@ class ConstrainedParameterBuilder {
 			// TODO HV-919 Support specification of type parameter constraints via XML and API
 			ConstrainedParameter constrainedParameter = new ConstrainedParameter(
 					ConfigurationSource.XML,
-					constraintLocation,
+					executable,
 					ReflectionHelper.typeOf( executable, i ),
 					i,
 					parameterNames.get( i ),

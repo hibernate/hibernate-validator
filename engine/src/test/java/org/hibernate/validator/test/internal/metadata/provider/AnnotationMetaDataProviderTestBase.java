@@ -6,10 +6,13 @@
  */
 package org.hibernate.validator.test.internal.metadata.provider;
 
+import java.lang.reflect.Executable;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
@@ -46,9 +49,9 @@ public abstract class AnnotationMetaDataProviderTestBase {
 													  Class<? super T> type) {
 		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
 			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
-				if ( constrainedElement.getLocation().getMember() == null ) {
+				if ( constrainedElement.getKind() == ConstrainedElementKind.TYPE ) {
 					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
-					if ( constrainedType.getLocation().getDeclaringClass().equals( type ) ) {
+					if ( constrainedType.getBeanClass().equals( type ) ) {
 						return constrainedType;
 					}
 				}
@@ -62,8 +65,15 @@ public abstract class AnnotationMetaDataProviderTestBase {
 														Member member) {
 		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
 			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
-				if ( constrainedElement.getLocation().getMember().equals( member ) ) {
-					return constrainedElement;
+				if ( member instanceof Executable && constrainedElement instanceof ConstrainedExecutable ) {
+					if ( member.equals( ( (ConstrainedExecutable) constrainedElement ).getExecutable() ) ) {
+						return constrainedElement;
+					}
+				}
+				else if ( member instanceof Field && constrainedElement instanceof ConstrainedField ) {
+					if ( member.equals( ( (ConstrainedField) constrainedElement ).getField() ) ) {
+						return constrainedElement;
+					}
 				}
 			}
 		}

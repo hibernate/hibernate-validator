@@ -17,7 +17,6 @@ import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -100,7 +99,7 @@ final class ParameterConstraintMappingContextImpl
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedParameter(
 				ConfigurationSource.API,
-				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex ),
+				executableContext.getExecutable(),
 				ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex ),
 				parameterIndex,
 				parameterNameProvider.getParameterNames( executableContext.getExecutable() ).get( parameterIndex ),

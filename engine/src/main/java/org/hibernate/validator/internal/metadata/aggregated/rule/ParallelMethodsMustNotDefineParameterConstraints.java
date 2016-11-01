@@ -21,8 +21,8 @@ public class ParallelMethodsMustNotDefineParameterConstraints extends MethodConf
 		if ( isDefinedOnParallelType( method, otherMethod ) &&
 				( method.hasParameterConstraints() || otherMethod.hasParameterConstraints() ) ) {
 			throw log.getParameterConstraintsDefinedInMethodsFromParallelTypesException(
-					method.getLocation().getMember(),
-					otherMethod.getLocation().getMember()
+					method.getExecutable(),
+					otherMethod.getExecutable()
 			);
 		}
 	}

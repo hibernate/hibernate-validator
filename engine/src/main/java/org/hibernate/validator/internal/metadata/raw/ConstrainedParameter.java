@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
+import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Map;
@@ -13,10 +17,6 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
@@ -25,19 +25,20 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class ConstrainedParameter extends AbstractConstrainedElement {
 
+	private final Executable executable;
 	private final Type type;
 	private final String name;
 	private final int index;
 	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
 
 	public ConstrainedParameter(ConfigurationSource source,
-								ConstraintLocation location,
+								Executable executable,
 								Type type,
 								int index,
 								String name) {
 		this(
 				source,
-				location,
+				executable,
 				type,
 				index,
 				name,
@@ -53,7 +54,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * Creates a new parameter meta data object.
 	 *
 	 * @param source The source of meta data.
-	 * @param location The location of the represented method parameter.
+	 * @param  executable The executable of the represented method parameter.
 	 * @param type the parameter type
 	 * @param index the index of the parameter
 	 * @param name The name of the represented parameter.
@@ -67,7 +68,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * unwrapping prior to validation.
 	 */
 	public ConstrainedParameter(ConfigurationSource source,
-								ConstraintLocation location,
+								Executable executable,
 								Type type,
 								int index,
 								String name,
@@ -79,13 +80,13 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,
-				location,
 				constraints,
 				groupConversions,
 				isCascading,
 				unwrapMode
 		);
 
+		this.executable = executable;
 		this.type = type;
 		this.name = name;
 		this.index = index;
@@ -96,6 +97,10 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 	public Type getType() {
 		return type;
+	}
+
+	public Executable getExecutable() {
+		return executable;
 	}
 
 	public String getName() {
@@ -149,7 +154,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 		return new ConstrainedParameter(
 				mergedSource,
-				getLocation(),
+				executable,
 				type,
 				index,
 				mergedName,
@@ -173,7 +178,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 		String constraintsAsString = sb.length() > 0 ? sb.substring( 0, sb.length() - 2 ) : sb.toString();
 
-		return "ParameterMetaData [location=" + getLocation() + "], name=" + name + "], constraints=["
+		return "ParameterMetaData [executable=" + executable + "], name=" + name + "], constraints=["
 				+ constraintsAsString + "], isCascading=" + isCascading() + "]";
 	}
 
@@ -182,7 +187,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + index;
-		result = prime * result + ( ( getLocation().getMember() == null ) ? 0 : getLocation().getMember().hashCode() );
+		result = prime * result + ( ( executable == null ) ? 0 : executable.hashCode() );
 		return result;
 	}
 
@@ -201,12 +206,12 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		if ( index != other.index ) {
 			return false;
 		}
-		if ( getLocation().getMember() == null ) {
-			if ( other.getLocation().getMember() != null ) {
+		if ( executable == null ) {
+			if ( other.executable != null ) {
 				return false;
 			}
 		}
-		else if ( !getLocation().getMember().equals( other.getLocation().getMember() ) ) {
+		else if ( !executable.equals( other.executable ) ) {
 			return false;
 		}
 		return true;

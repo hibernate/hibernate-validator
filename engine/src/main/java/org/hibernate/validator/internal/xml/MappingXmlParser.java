@@ -36,7 +36,6 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
@@ -326,21 +325,18 @@ public class MappingXmlParser {
 
 	private void addConstrainedElements(Class<?> beanClass, Set<? extends ConstrainedElement> newConstrainedElements) {
 		if ( constrainedElements.containsKey( beanClass ) ) {
+
 			Set<ConstrainedElement> existingConstrainedElements = constrainedElements.get( beanClass );
+
 			for ( ConstrainedElement constrainedElement : newConstrainedElements ) {
-				for ( ConstrainedElement existingConstrainedElement : existingConstrainedElements ) {
-					if ( existingConstrainedElement.getLocation().getMember() != null &&
-							existingConstrainedElement.getLocation().getMember().equals(
-									constrainedElement.getLocation().getMember()
-							) ) {
-						ConstraintLocation location = constrainedElement.getLocation();
+				if ( existingConstrainedElements.contains( constrainedElement ) ) {
 						throw log.getConstrainedElementConfiguredMultipleTimesException(
-								location.getMember().toString()
+								constrainedElement.toString()
 						);
-					}
 				}
-				existingConstrainedElements.add( constrainedElement );
 			}
+
+			existingConstrainedElements.addAll( newConstrainedElements );
 		}
 		else {
 			Set<ConstrainedElement> tmpSet = newHashSet();

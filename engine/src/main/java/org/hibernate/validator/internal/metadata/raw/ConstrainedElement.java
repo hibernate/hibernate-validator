@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 /**
  * Represents a (potentially) constrained Java element such as a type, field or
@@ -55,13 +54,6 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 * @return The kind of this constrained element.
 	 */
 	ConstrainedElementKind getKind();
-
-	/**
-	 * Returns the location of this constrained element.
-	 *
-	 * @return The location of this constrained element.
-	 */
-	ConstraintLocation getLocation();
 
 	/**
 	 * Returns a set containing the constraints specified for this constrained

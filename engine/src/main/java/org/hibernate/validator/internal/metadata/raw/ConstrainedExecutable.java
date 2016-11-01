@@ -21,7 +21,6 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -56,7 +55,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * Creates a new executable meta data object for a parameter-less executable.
 	 *
 	 * @param source The source of meta data.
-	 * @param location The location of the represented executable.
+	 * @param executable The represented executable.
 	 * @param returnValueConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's
@@ -66,14 +65,14 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
-			ConstraintLocation location,
+			Executable executable,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
 			boolean isCascading,
 			UnwrapMode unwrapMode) {
 		this(
 				source,
-				location,
+				executable,
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
@@ -88,7 +87,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * Creates a new executable meta data object.
 	 *
 	 * @param source The source of meta data.
-	 * @param location The location of the represented executable.
+	 * @param executable The represented executable.
 	 * @param parameterMetaData A list with parameter meta data. The length must correspond
 	 * with the number of parameters of the represented executable. So
 	 * this list may be empty (in case of a parameterless executable),
@@ -106,7 +105,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
-			ConstraintLocation location,
+			Executable executable,
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
@@ -116,15 +115,14 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			UnwrapMode unwrapMode) {
 		super(
 				source,
-				( location.getMember() instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
-				location,
+				( executable instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				returnValueConstraints,
 				groupConversions,
 				isCascading,
 				unwrapMode
 		);
 
-		this.executable = (Executable) location.getMember();
+		this.executable = executable;
 
 		if ( parameterMetaData.size() != executable.getParameterTypes().length ) {
 			throw log.getInvalidLengthOfParameterMetaDataListException(
@@ -227,7 +225,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 	@Override
 	public String toString() {
-		return "ConstrainedExecutable [location=" + getLocation()
+		return "ConstrainedExecutable [executable=" + executable
 				+ ", parameterMetaData=" + parameterMetaData
 				+ ", hasParameterConstraints=" + hasParameterConstraints + "]";
 	}
@@ -312,7 +310,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 		return new ConstrainedExecutable(
 				mergedSource,
-				getLocation(),
+				executable,
 				mergedParameterMetaData,
 				mergedCrossParameterConstraints,
 				mergedReturnValueConstraints,
