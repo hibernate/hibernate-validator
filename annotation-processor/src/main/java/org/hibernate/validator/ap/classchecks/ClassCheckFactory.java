@@ -14,6 +14,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.util.CollectionHelper;
+import org.hibernate.validator.ap.util.ConstraintHelper;
 
 /**
  * A factory class that provides a collection of {@link ClassCheck}s based on the type of the element we need to check.
@@ -27,14 +28,14 @@ public class ClassCheckFactory {
 	 */
 	private final Collection<ClassCheck> methodChecks;
 
-	public ClassCheckFactory(Types typeUtils, Elements elementUtils) {
+	public ClassCheckFactory(Types typeUtils, Elements elementUtils, ConstraintHelper constraintHelper) {
 		methodChecks = CollectionHelper.newArrayList();
-		methodChecks.add( new ReturnValueMethodOverrideCheck( elementUtils, typeUtils ) );
-		methodChecks.add( new ParametersMethodOverrideCheck( elementUtils, typeUtils ) );
+		methodChecks.add( new ReturnValueMethodOverrideCheck( elementUtils, typeUtils, constraintHelper ) );
+		methodChecks.add( new ParametersMethodOverrideCheck( elementUtils, typeUtils, constraintHelper ) );
 	}
 
-	public static ClassCheckFactory getInstance(Types typeUtils, Elements elementUtils) {
-		return new ClassCheckFactory( typeUtils, elementUtils );
+	public static ClassCheckFactory getInstance(Types typeUtils, Elements elementUtils, ConstraintHelper constraintHelper) {
+		return new ClassCheckFactory( typeUtils, elementUtils, constraintHelper );
 	}
 
 	/**
