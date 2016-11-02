@@ -106,7 +106,7 @@ Similar to directly working with javac, the annotation processor can be added as
 argument when invoking the http://ant.apache.org/manual/CoreTasks/javac.html[javac task]
 for http://ant.apache.org/[Apache Ant]:
 
-.Using the annotation processor with An
+.Using the annotation processor with Ant
 ====
 [source, XML]
 [subs="verbatim,attributes"]
