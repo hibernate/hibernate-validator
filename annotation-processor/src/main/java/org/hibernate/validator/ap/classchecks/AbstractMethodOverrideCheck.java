@@ -59,12 +59,12 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 			return Collections.emptySet();
 		}
 		// find if there's a method that was overridden by the current one.
-		Map<Boolean, List<ExecutableElement>> overriddenMethods = findAllOverriddenElements( currentTypeElement, currentMethod );
-		if ( overriddenMethods.get( Boolean.TRUE ).isEmpty() && overriddenMethods.get( Boolean.FALSE ).isEmpty() ) {
+		InheritanceTree overriddenMethodsTree = findAllOverriddenElements( currentTypeElement, currentMethod );
+		if ( !overriddenMethodsTree.hasOverriddenMethods() ) {
 			return Collections.emptySet();
 		}
 
-		return checkMethodInternal( currentMethod, overriddenMethods );
+		return checkMethodInternal( currentMethod, overriddenMethodsTree );
 	}
 
 	/**
@@ -75,7 +75,7 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 	 *
 	 * @return a collection of issues if there are any, an empty collection otherwise
 	 */
-	protected abstract Collection<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, Map<Boolean, List<ExecutableElement>> overriddenMethods);
+	protected abstract Collection<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, InheritanceTree overriddenMethods);
 
 	/**
 	 * There can be situations in which no checks should be performed. So in such cases we will not look for any overridden
@@ -88,84 +88,76 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 	protected abstract boolean needToPerformAnyChecks(ExecutableElement currentMethod);
 
 	/**
-	 * Find a list of overridden methods from all super classes and all implemented interfaces. Overridden methods are grouped into two lists
-	 * with a predicate which determines whether a method is originally declared or is overriding some other method.
+	 * Find overridden methods from all super classes and all implemented interfaces. Results are returned as {@link InheritanceTree}
 	 *
 	 * @param currentTypeElement the class in which the method is located
 	 * @param currentMethod the method for which we want to find the overridden methods
 	 *
-	 * @return a map that contains a pairs of {@link Boolean} and lists of overridden methods if there are any and a map with empty value lists otherwise.
-	 * Both map keys will be present {@link Boolean#TRUE} and {@link Boolean#FALSE}. A list for {@link Boolean#TRUE} key will contain all overridden methods
-	 * from implemented interfaces as well as from a class where the method was originally declared. A list for {@link Boolean#FALSE} will contain a all overridden
-	 * methods that are overriding some other method on their own
+	 * @return an {@link InheritanceTree} containing overridden methods
 	 */
-	private Map<Boolean, List<ExecutableElement>> findAllOverriddenElements(
+	private InheritanceTree findAllOverriddenElements(
 			TypeElement currentTypeElement,
 			ExecutableElement currentMethod) {
-		Map<Boolean, List<ExecutableElement>> elements = CollectionHelper.newHashMap();
-
-		// get a super class. For interfaces this returns null
-		TypeElement parentTypeElement = (TypeElement) typeUtils.asElement( currentTypeElement.getSuperclass() );
-
-		// look for implemented interfaces:
-		elements.put( Boolean.TRUE, findOverriddenMethodInInterfaces(
-				currentTypeElement,
-				currentTypeElement.getInterfaces(),
-				currentMethod
-		) );
-		elements.put( Boolean.FALSE, CollectionHelper.newArrayList() );
-
-		// this variable is used to search for possible overridden method from a supper class
-		// and such that it is originally declared in that class and is not overriding any method
-		// from some other super class or any implemented interface
-		ExecutableElement possibleOriginalMethodFromClass = null;
-
-		// if super class is java.lang.Object, then there's no need to do any other work: no such method was found.
-		while ( !isJavaLangObjectOrNull( parentTypeElement ) ) {
-			// need to check all the implemented interfaces as well
-			List<ExecutableElement> overriddenInterfaceMethods = findOverriddenMethodInInterfaces( currentTypeElement, parentTypeElement.getInterfaces(), currentMethod );
-			elements.get( Boolean.TRUE ).addAll( overriddenInterfaceMethods );
-
-			ExecutableElement element = getOverriddenElement( currentTypeElement, parentTypeElement, currentMethod );
-			if ( element != null ) {
-				elements.get( Boolean.FALSE ).add( element );
-				if ( overriddenInterfaceMethods.isEmpty() ) {
-					possibleOriginalMethodFromClass = element;
-				}
-				else {
-					possibleOriginalMethodFromClass = null;
-				}
-			}
-
-			parentTypeElement = (TypeElement) typeUtils.asElement( parentTypeElement.getSuperclass() );
-		}
-		// if there's originally declared overridden method in some class we need to add it to corresponding list in the map
-		if ( possibleOriginalMethodFromClass != null ) {
-			elements.get( Boolean.TRUE ).add( possibleOriginalMethodFromClass );
-		}
-
-		return elements;
+		InheritanceTree tree = new InheritanceTree( currentMethod, currentTypeElement );
+		findAllOverriddenElementsRecursive( currentTypeElement, currentMethod, tree );
+		return tree;
 	}
 
 	/**
-	 * Find a list of overridden methods from implemented interfaces.
+	 * A recursive part of {@link AbstractMethodOverrideCheck#findAllOverriddenElements(TypeElement, ExecutableElement)}.
+	 *
+	 * @param currentTypeElement the class in which the method is located
+	 * @param currentMethod the method for which we want to find the overridden methods
+	 * @param tree a resulting inheritance tree
+	 */
+	private void findAllOverriddenElementsRecursive(
+			TypeElement currentTypeElement,
+			ExecutableElement currentMethod,
+			InheritanceTree tree) {
+
+		// look for implemented interfaces
+		for ( Map.Entry<TypeElement, ExecutableElement> entry : findOverriddenMethodInInterfacesPairs(
+				currentTypeElement,
+				currentTypeElement.getInterfaces(),
+				currentMethod
+		).entrySet() ) {
+			tree.addNode( entry.getValue(), entry.getKey() );
+			findAllOverriddenElementsRecursive( entry.getKey(), entry.getValue(), tree );
+		}
+
+		TypeElement superType = (TypeElement) typeUtils.asElement( currentTypeElement.getSuperclass() );
+		if ( isJavaLangObjectOrNull( superType ) ) {
+			return;
+		}
+
+		ExecutableElement element = getOverriddenElement( currentTypeElement, superType, currentMethod );
+		if ( element != null ) {
+			tree.addNode( element, superType, currentTypeElement );
+			findAllOverriddenElementsRecursive( superType, element, tree );
+		}
+	}
+
+	/**
+	 * Find pairs of enclosing type {@link TypeElement} and overridden method {@link ExecutableElement}  from implemented interfaces.
 	 *
 	 * @param currentTypeElement the class in which the method is located
 	 * @param interfaces a list of implemented interfaces
 	 * @param currentMethod the method for which we want to find the overridden methods
 	 *
-	 * @return a list of overridden methods if there are any, an empty list otherwise
+	 * @return a map of pairs of overridden methods (map key - an enclosing type, map value - overridden method in that type)
+	 * if there are any, an empty map otherwise
 	 */
-	private List<ExecutableElement> findOverriddenMethodInInterfaces(
+	private Map<TypeElement, ExecutableElement> findOverriddenMethodInInterfacesPairs(
 			TypeElement currentTypeElement,
 			List<? extends TypeMirror> interfaces,
 			ExecutableElement currentMethod) {
-		List<ExecutableElement> elements = CollectionHelper.newArrayList();
+		Map<TypeElement,ExecutableElement> elements = CollectionHelper.newHashMap();
 
 		for ( TypeMirror anInterface : interfaces ) {
-			ExecutableElement element = getOverriddenElement( currentTypeElement, (TypeElement) typeUtils.asElement( anInterface ), currentMethod );
+			TypeElement implementedInterface = (TypeElement) typeUtils.asElement( anInterface );
+			ExecutableElement element = getOverriddenElement( currentTypeElement, implementedInterface, currentMethod );
 			if ( element != null ) {
-				elements.add( element );
+				elements.put( implementedInterface, element );
 			}
 		}
 
