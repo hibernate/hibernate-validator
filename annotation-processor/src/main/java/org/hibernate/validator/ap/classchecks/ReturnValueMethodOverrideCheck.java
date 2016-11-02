@@ -7,8 +7,6 @@
 package org.hibernate.validator.ap.classchecks;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeKind;
@@ -36,17 +34,20 @@ public class ReturnValueMethodOverrideCheck extends AbstractMethodOverrideCheck 
 	}
 
 	@Override
-	protected Collection<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, Map<Boolean, List<ExecutableElement>> overriddenMethods) {
+	protected Collection<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, InheritanceTree overriddenMethods) {
 		// if this method gets executed it means that current method has a @Valid annotation and we
 		// need to check if there's no more @Valid annotations in the hierarchy for this method
 		Collection<ConstraintCheckIssue> issues = CollectionHelper.newArrayList();
-		for ( List<ExecutableElement> methods : overriddenMethods.values() ) {
-			for ( ExecutableElement overriddenMethod : methods ) {
-				if ( methodIsAnnotatedWithValid( overriddenMethod ) ) {
-					issues.add( ConstraintCheckIssue.error(
-							currentMethod, null, "INCORRECT_METHOD_RETURN_OVERRIDING", currentMethod.getSimpleName().toString(), getEnclosingTypeElementQualifiedName( currentMethod ), getEnclosingTypeElementQualifiedName( overriddenMethod )
-					) );
-				}
+		for ( ExecutableElement overriddenMethod : overriddenMethods ) {
+			if ( methodIsAnnotatedWithValid( overriddenMethod ) ) {
+				issues.add( ConstraintCheckIssue.error(
+						currentMethod,
+						null,
+						"INCORRECT_METHOD_RETURN_OVERRIDING",
+						currentMethod.getSimpleName().toString(),
+						getEnclosingTypeElementQualifiedName( currentMethod ),
+						getEnclosingTypeElementQualifiedName( overriddenMethod )
+				) );
 			}
 		}
 

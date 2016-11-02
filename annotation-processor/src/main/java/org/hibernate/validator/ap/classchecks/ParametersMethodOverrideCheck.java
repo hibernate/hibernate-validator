@@ -9,8 +9,6 @@ package org.hibernate.validator.ap.classchecks;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
@@ -45,10 +43,10 @@ public class ParametersMethodOverrideCheck extends AbstractMethodOverrideCheck {
 	}
 
 	@Override
-	protected Collection<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, Map<Boolean, List<ExecutableElement>> overriddenMethods) {
+	protected Collection<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, InheritanceTree overriddenMethods) {
 		// if you have 2 parallel hierarchies both of which implementing the same method,
 		// you can't define a parameter constraint at all for this method (anywhere in the hierarchy, not even once)
-		List<ExecutableElement> originalMethods = overriddenMethods.get( Boolean.TRUE );
+		Collection<ExecutableElement> originalMethods = overriddenMethods.getAllOriginallyDeclaredMethods();
 		if ( originalMethods.size() > 1 ) {
 			//it means we have more than one original method and as a result there cannot be any annotations present
 			Collection<ConstraintCheckIssue> issues = CollectionHelper.newArrayList();
@@ -70,9 +68,7 @@ public class ParametersMethodOverrideCheck extends AbstractMethodOverrideCheck {
 		}
 		// you can't define a constraint on a parameter of an overriding/implementing method
 		if ( hasAnnotationsOnParameters( currentMethod ) ) {
-			List<ExecutableElement> allOverriddenMethods = CollectionHelper.newArrayList();
-			allOverriddenMethods.addAll( originalMethods );
-			allOverriddenMethods.addAll( overriddenMethods.get( Boolean.FALSE ) );
+			Collection<ExecutableElement> allOverriddenMethods = overriddenMethods.getAllOverriddenMethodsWithoutHead();
 
 			return CollectionHelper.asSet( ConstraintCheckIssue.error(
 					currentMethod,
@@ -117,11 +113,11 @@ public class ParametersMethodOverrideCheck extends AbstractMethodOverrideCheck {
 	/**
 	 * Provides a formatted string containing qualified names of enclosing types of provided methods.
 	 *
-	 * @param methods a list of methods to convert to string of qualified names of enclosing types
+	 * @param methods a collection of methods to convert to string of qualified names of enclosing types
 	 *
 	 * @return string of qualified names of enclosing types
 	 */
-	private String getEnclosingTypeElementQualifiedNames(List<ExecutableElement> methods) {
+	private String getEnclosingTypeElementQualifiedNames(Collection<ExecutableElement> methods) {
 		StringBuilder sb = new StringBuilder( "[ " );
 		Iterator<ExecutableElement> iterator = methods.iterator();
 		while ( iterator.hasNext() ) {
