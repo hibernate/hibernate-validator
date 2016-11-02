@@ -124,7 +124,7 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 388 )
 		);
 
-		assertEquals( diagnostics.getDiagnostics().get( 0 ).getMessage( Locale.getDefault() ) , "Parameter constraints of \"doSomething\" must not be strengthened in subtype. In sub types, no parameter constraints may be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation. Method in org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1Sub violates this rule. Types that contain overridden method are: [ org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1; org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1 ]." );
+		assertEquals( diagnostics.getDiagnostics().get( 0 ).getMessage( Locale.getDefault() ) , "Parameter constraints of \"doSomething\" must not be strengthened in subtype. In sub types, no parameter constraints may be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation. Method in org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1Sub violates this rule. Types that contain overridden method are: [ org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1 ]." );
 	}
 
 	@Test
