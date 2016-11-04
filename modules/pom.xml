@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>hibernate-validator-modules</artifactId>
+    <packaging>pom</packaging>
 
     <name>Hibernate Validator WildFly Module</name>
     <description>Hibernate Validator modules creation to use in WildFly</description>
@@ -18,9 +19,10 @@
         <module.xml.basedir>${basedir}/src/main/modules</module.xml.basedir>
         <hibernate.validator.module.slot>main</hibernate.validator.module.slot>
         <hibernate.validator.cdi.module.slot>main</hibernate.validator.cdi.module.slot>
-        <hibernate.validator.module.xml>${module.xml.basedir}/org/hibernate/validator/module.xml</hibernate.validator.module.xml>
-        <hibernate.validator.cdi.module.xml>${module.xml.basedir}/org/hibernate/validator/cdi/module.xml</hibernate.validator.cdi.module.xml>
-        <layer.name>hibernate-validator-5.4</layer.name>
+        <javax.validation.api.module.slot>main</javax.validation.api.module.slot>
+        <wildflyOriginalTargetDir>${project.build.directory}/wildfly-original/wildfly-${wildfly.version}</wildflyOriginalTargetDir>
+        <wildflyPatchedTargetDir>${project.build.directory}/wildfly-patched/wildfly-${wildfly.version}</wildflyPatchedTargetDir>
+        <patchFile>${project.build.directory}/hv-patch.zip</patchFile>
     </properties>
 
     <dependencyManagement/>
@@ -52,22 +54,130 @@
                             <goal>parse-version</goal>
                         </goals>
                     </execution>
+                    <!-- attach the created patch file to the build so it gets installed and deployed -->
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>${patchFile}</file>
+                                    <type>zip</type>
+                                    <classifier>wildfly-10-patch</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>${basedir}/src/main/assembly/dist.xml</descriptor>
-                    </descriptors>
-                </configuration>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <!-- Extract WildFly twice: one copy to be left as is, the other to be updated with the new JARs -->
+                    <execution>
+                        <id>unpack-wildfly</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${wildfly.version}</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/wildfly-original</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.wildfly</groupId>
+                                    <artifactId>wildfly-dist</artifactId>
+                                    <version>${wildfly.version}</version>
+                                    <type>tar.gz</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/wildfly-patched</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <!-- Update the BV/HV JARs in the second WF copy -->
+                    <execution>
+                        <id>prepare-patch-jars</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>javax.validation</groupId>
+                                    <artifactId>validation-api</artifactId>
+                                    <version>${bv.api.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildflyPatchedTargetDir}/modules/system/layers/base/javax/validation/api/main</outputDirectory>
+                                    <!-- Specifying name to avoid timestamp in version on CI -->
+                                    <destFileName>validation-api-${bv.api.version}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-validator</artifactId>
+                                    <version>${project.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildflyPatchedTargetDir}/modules/system/layers/base/org/hibernate/validator/main</outputDirectory>
+                                    <destFileName>hibernate-validator-${project.version}.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-validator-cdi</artifactId>
+                                    <version>${project.version}</version>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${wildflyPatchedTargetDir}/modules/system/layers/base/org/hibernate/validator/cdi/main</outputDirectory>
+                                    <destFileName>hibernate-validator-cdi-${project.version}.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Update module.xml descriptors in the second WF copy -->
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
+                        <id>update-modules</id>
+                        <phase>prepare-package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>execute</goal>
                         </goals>
+                        <configuration>
+                            <source>${pom.basedir}/src/script/setupModules.groovy</source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Create the patch file, based on the diff of the original WF and the updated one -->
+            <plugin>
+                <groupId>org.jboss.as</groupId>
+                <artifactId>patch-gen-maven-plugin</artifactId>
+                <version>2.0.1.Alpha1</version>
+                <executions>
+                    <execution>
+                        <id>create-patch-file</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate-patch</goal>
+                        </goals>
+                        <configuration>
+                            <appliesToDist>${wildflyOriginalTargetDir}</appliesToDist>
+                            <patchConfig>${module.xml.basedir}/patch.xml</patchConfig>
+                            <updatedDist>${wildflyPatchedTargetDir}</updatedDist>
+                            <outputFile>${patchFile}</outputFile>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
