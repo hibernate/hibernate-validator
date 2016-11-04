@@ -42,7 +42,6 @@ public interface ConstraintLocation {
 
 	static ConstraintLocation forTypeArgument(Member member, Type type) {
 		return new TypeArgumentConstraintLocation(
-				member.getDeclaringClass(),
 				member,
 				type
 		);

@@ -26,23 +26,18 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 	private final Member member;
-	private final Class<?> declaringClass;
 	private String propertyName;
 	private final Type typeForValidatorResolution;
 
-	TypeArgumentConstraintLocation(Class<?> declaringClass, Member member, Type typeOfAnnotatedElement) {
-		this.declaringClass = declaringClass;
+	TypeArgumentConstraintLocation( Member member, Type typeOfAnnotatedElement) {
 		this.member = member;
 
-		Class<?> type;
+		Class<?> type = null;
 		if ( member instanceof Field ) {
 			type = ( (Field) member ).getType();
 		}
 		else if ( member instanceof Method ) {
 			type = ( (Method) member ).getReturnType();
-		}
-		else {
-			type = declaringClass;
 		}
 
 		if ( ReflectionHelper.isIterable( type ) || ReflectionHelper.isMap( type ) ) {
@@ -52,17 +47,12 @@ class TypeArgumentConstraintLocation implements ConstraintLocation {
 			this.propertyName = ReflectionHelper.getPropertyName( member );
 		}
 
-		if ( typeOfAnnotatedElement instanceof Class && ( (Class<?>) typeOfAnnotatedElement ).isPrimitive() ) {
-			this.typeForValidatorResolution = ReflectionHelper.boxedType( (Class<?>) typeOfAnnotatedElement );
-		}
-		else {
-			this.typeForValidatorResolution = typeOfAnnotatedElement;
-		}
+		this.typeForValidatorResolution = ReflectionHelper.boxedType( typeOfAnnotatedElement );
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
-		return declaringClass;
+		return member.getDeclaringClass();
 	}
 
 	@Override
@@ -92,8 +82,7 @@ class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public String toString() {
-		return "TypeArgumentValueConstraintLocation [member=" + member + ", declaringClass="
-				+ declaringClass + ", typeForValidatorResolution="
+		return "TypeArgumentValueConstraintLocation [member=" + member + ", typeForValidatorResolution="
 				+ typeForValidatorResolution + "]";
 	}
 
@@ -108,9 +97,6 @@ class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 		TypeArgumentConstraintLocation that = (TypeArgumentConstraintLocation) o;
 
-		if ( !declaringClass.equals( that.declaringClass ) ) {
-			return false;
-		}
 		if ( member != null ? !member.equals( that.member ) : that.member != null ) {
 			return false;
 		}
@@ -124,7 +110,6 @@ class TypeArgumentConstraintLocation implements ConstraintLocation {
 	@Override
 	public int hashCode() {
 		int result = member != null ? member.hashCode() : 0;
-		result = 31 * result + declaringClass.hashCode();
 		result = 31 * result + typeForValidatorResolution.hashCode();
 		return result;
 	}
