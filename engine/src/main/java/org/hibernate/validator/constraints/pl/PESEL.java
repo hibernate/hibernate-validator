@@ -27,7 +27,7 @@ import javax.validation.ReportAsSingleViolation;
  * Validates that a {@code CharSequence} is a PESEL (Polish national identification number).
  *
  * @author Marko Bekhta
- * @see <a href="https://https://pl.wikipedia.org/wiki/PESEL">PESEL</a> }
+ * @see <a href="https://pl.wikipedia.org/wiki/PESEL">PESEL</a>
  */
 @Documented
 @Constraint(validatedBy = { })

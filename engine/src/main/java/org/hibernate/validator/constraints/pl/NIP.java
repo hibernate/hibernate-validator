@@ -27,7 +27,7 @@ import javax.validation.ReportAsSingleViolation;
  * Validates that a {@code CharSequence} is a NIP number (9-digit Polish VAT identification number).
  *
  * @author Marko Bekhta
- * @see <a href="https://pl.wikipedia.org/wiki/NIP">NIP</a> }
+ * @see <a href="https://pl.wikipedia.org/wiki/NIP">NIP</a>
  */
 @Documented
 @Constraint(validatedBy = { })

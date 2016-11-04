@@ -27,7 +27,7 @@ import javax.validation.ReportAsSingleViolation;
  * Validates that a {@code CharSequence} is a REGON number (9/14-digit Polish Taxpayer Identification Number).
  *
  * @author Marko Bekhta
- * @see <a href="https://pl.wikipedia.org/wiki/REGON">REGON</a> }
+ * @see <a href="https://pl.wikipedia.org/wiki/REGON">REGON</a>
  */
 @Documented
 @Constraint(validatedBy = { })
