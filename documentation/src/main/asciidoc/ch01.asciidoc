@@ -114,6 +114,52 @@ All API invocations requiring special permissions are done via privileged action
 This means only Hibernate Validator and the Bean Validation API themselves need the listed permissions.
 You don't need to assign any permissions to other code bases calling Hibernate Validator.
 
+==== Updating Hibernate Validator in WildFly
+
+The http://wildfly.org/[WildFly application server] contains Hibernate Validator out of the box.
+In order to update the server modules for Bean Validation API and Hibernate Validator to the latest and greatest, the patch mechanism of WildFly can be used. 
+
+You can download the patch file from http://sourceforge.net/projects/hibernate/files/hibernate-validator[SourceForge] or from Maven Central using the following dependency:
+
+.Maven dependency for WildFly 10 patch file
+====
+[source, XML]
+[subs="verbatim,attributes"]
+----
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-validator-modules</artifactId>
+    <version>{hvVersion}</version>
+    <classifier>wildfly-10-patch</classifier>
+    <type>zip</type>
+</dependency>
+----
+====
+
+Having downloaded the patch file, you can apply it to WildFly by running this command:
+
+.Applying the WildFly patch
+====
+[source]
+[subs="verbatim,attributes"]
+----
+$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-{hvVersion}-wildfly-10-patch.zip
+----
+====
+
+In case you want to undo the patch and go back to the version of Hibernate Validator originally coming with the server, run the following command:
+
+.Rolling back the WildFly patch
+====
+[source]
+[subs="verbatim,attributes"]
+----
+$JBOSS_HOME/bin/jboss-cli.sh patch rollback --reset-configuration=true
+----
+====
+
+You can learn more about the WildFly patching infrastructure in general https://developer.jboss.org/wiki/SingleInstallationPatching/[here] and http://www.mastertheboss.com/jboss-server/jboss-configuration/managing-wildfly-and-eap-patches[here].
+
 [[validator-gettingstarted-createmodel]]
 === Applying constraints
 
