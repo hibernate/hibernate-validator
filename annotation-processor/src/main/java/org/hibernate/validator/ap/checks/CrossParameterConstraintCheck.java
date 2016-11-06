@@ -29,7 +29,6 @@ import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
 
 /**
  * Checks that a cross-parameter constraint is defined correctly with reference to the specifications.
- * <p>
  * <ul>
  * <li>It must have at most one cross-parameter validator.</li>
  * <li>The cross-parameter validator must resolve to Object or Object[].</li>
