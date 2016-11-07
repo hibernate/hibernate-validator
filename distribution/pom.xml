@@ -101,10 +101,9 @@
                         ${basedir}/../annotation-processor/src/main/java
                     </sourcepath>
                     <links>
-                        <link>http://docs.oracle.com/javase/6/docs/api</link>
+                        <link>http://docs.oracle.com/javase/8/docs/api</link>
                         <link>http://docs.oracle.com/javaee/7/api</link>
                         <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api</link>
-                        <link>http://docs.jboss.org/cdi/api/1.1-PFD</link>
                         <link>http://javamoney.github.io/apidocs</link>
                     </links>
                     <tags>
