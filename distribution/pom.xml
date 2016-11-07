@@ -105,6 +105,7 @@
                         <link>http://docs.oracle.com/javaee/7/api</link>
                         <link>http://docs.jboss.org/hibernate/stable/beanvalidation/api</link>
                         <link>http://docs.jboss.org/cdi/api/1.1-PFD</link>
+                        <link>http://javamoney.github.io/apidocs</link>
                     </links>
                     <tags>
                         <tag>
