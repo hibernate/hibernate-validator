@@ -214,6 +214,18 @@
                         <artifactId>wildfly-patching</artifactId>
                         <version>1.0.1.Final</version>
                     </dependency>
+                    <!-- The exclusion is needed to have the build work with JDK 9 -->
+                    <dependency>
+                        <groupId>org.wildfly.core</groupId>
+                        <artifactId>wildfly-cli</artifactId>
+                        <version>1.0.1.Final</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>sun.jdk</groupId>
+                                <artifactId>jconsole</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
                 </dependencies>
             </plugin>
         </plugins>
