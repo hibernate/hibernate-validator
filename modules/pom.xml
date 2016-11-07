@@ -180,6 +180,13 @@
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                <dependency>
+                    <groupId>com.fasterxml.woodstox</groupId>
+                    <artifactId>woodstox-core</artifactId>
+                    <version>5.0.3</version>
+                </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
