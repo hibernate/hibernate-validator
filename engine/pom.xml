@@ -240,10 +240,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>${basedir}/src/test/suite/unit-tests.xml</suiteXmlFile>
-                    </suiteXmlFiles>
-                    <parallel>methods</parallel>
+                    <parallel>tests</parallel>
                     <threadCount>4</threadCount>
                 </configuration>
             </plugin>
