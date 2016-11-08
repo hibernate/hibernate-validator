@@ -23,6 +23,7 @@
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.javadoc.skip>false</maven.javadoc.skip>
+        <javadoc.additional.param></javadoc.additional.param>
     </properties>
 
     <dependencies>
@@ -131,6 +132,7 @@
                             <packages>org.hibernate.validator.ap*</packages>
                         </group>
                     </groups>
+                    <additionalparam>${javadoc.additional.param}</additionalparam>
                 </configuration>
                 <executions>
                     <execution>
@@ -164,4 +166,15 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+    <profile>
+            <id>jdk9</id>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <properties>
+                <javadoc.additional.param>--add-modules=${jigsaw.modules}</javadoc.additional.param>
+            </properties>
+        </profile>
+    </profiles>
 </project>
