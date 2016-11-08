@@ -15,7 +15,7 @@ import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Year;
 import java.time.YearMonth;
-import java.time.chrono.ChronoZonedDateTime;
+import java.time.ZonedDateTime;
 import java.time.chrono.HijrahDate;
 import java.time.chrono.JapaneseDate;
 import java.time.chrono.MinguoDate;
@@ -176,7 +176,6 @@ public class ConstraintHelper {
 	 * {@code java.time} types supported by {@code @Past} and {@Future} annotations.
 	 */
 	private static final Class<?>[] JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS = new Class<?>[] {
-		ChronoZonedDateTime.class,
 		HijrahDate.class,
 		Instant.class,
 		JapaneseDate.class,
@@ -189,7 +188,8 @@ public class ConstraintHelper {
 		OffsetTime.class,
 		ThaiBuddhistDate.class,
 		Year.class,
-		YearMonth.class
+		YearMonth.class,
+		ZonedDateTime.class
 	};
 
 	/**

@@ -92,7 +92,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidat
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForCalendar;
-import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForChronoZonedDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForHijrahDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForInstant;
@@ -110,7 +110,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.future.Futu
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForYear;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForCalendar;
-import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForChronoZonedDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForHijrahDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForInstant;
@@ -204,7 +204,6 @@ public class ConstraintHelper {
 			futureValidators.add( FutureValidatorForReadablePartial.class );
 		}
 		// Java 8 date/time API validators
-		futureValidators.add( FutureValidatorForChronoZonedDateTime.class );
 		futureValidators.add( FutureValidatorForHijrahDate.class );
 		futureValidators.add( FutureValidatorForInstant.class );
 		futureValidators.add( FutureValidatorForJapaneseDate.class );
@@ -218,6 +217,7 @@ public class ConstraintHelper {
 		futureValidators.add( FutureValidatorForThaiBuddhistDate.class );
 		futureValidators.add( FutureValidatorForYear.class );
 		futureValidators.add( FutureValidatorForYearMonth.class );
+		futureValidators.add( FutureValidatorForZonedDateTime.class );
 
 		putConstraints( tmpConstraints, Future.class, futureValidators );
 
@@ -243,7 +243,6 @@ public class ConstraintHelper {
 			pastValidators.add( PastValidatorForReadablePartial.class );
 		}
 		// Java 8 date/time API validators
-		pastValidators.add( PastValidatorForChronoZonedDateTime.class );
 		pastValidators.add( PastValidatorForHijrahDate.class );
 		pastValidators.add( PastValidatorForInstant.class );
 		pastValidators.add( PastValidatorForJapaneseDate.class );
@@ -257,6 +256,7 @@ public class ConstraintHelper {
 		pastValidators.add( PastValidatorForThaiBuddhistDate.class );
 		pastValidators.add( PastValidatorForYear.class );
 		pastValidators.add( PastValidatorForYearMonth.class );
+		pastValidators.add( PastValidatorForZonedDateTime.class );
 
 		putConstraints( tmpConstraints, Past.class, pastValidators );
 
