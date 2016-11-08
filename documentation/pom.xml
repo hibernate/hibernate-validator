@@ -25,6 +25,7 @@
         <jdocbook.ignoreTranslations>false</jdocbook.ignoreTranslations>
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
+        <surefire.argLine>-Duser.language=en</surefire.argLine>
     </properties>
 
     <dependencies>
@@ -95,6 +96,13 @@
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jruby</groupId>
+                        <artifactId>jruby-complete</artifactId>
+                        <version>1.7.26</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
@@ -116,12 +124,6 @@
                   </configuration>
                 </execution>
               </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>-Duser.language=en</argLine>
-                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -132,8 +132,12 @@
         -->
         <maven.surefire.version>2.18.1</maven.surefire.version>
 
-        <!-- Used to add further arguments to the arg line for specific profiles -->
+        <!-- Used to add further arguments to the arg line for specific sub-modules and profiles -->
+        <surefire.argLine></surefire.argLine>
         <surefire.argLine.extension></surefire.argLine.extension>
+
+        <!-- Names of modules to be passed via "add-modules" option when forking java (through Surefire) or javadoc  on Java 9 -->
+        <jigsaw.modules>java.xml.bind</jigsaw.modules>
     </properties>
 
     <prerequisites>
@@ -487,6 +491,7 @@
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
+                        <argLine>${surefire.argLine} ${surefire.argLine.extension}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -874,7 +879,7 @@
                 <jdk>9</jdk>
             </activation>
             <properties>
-                <surefire.argLine.extension>--add-modules java.xml.bind</surefire.argLine.extension>
+                <surefire.argLine.extension>--add-modules ${jigsaw.modules}</surefire.argLine.extension>
             </properties>
         </profile>
     </profiles>

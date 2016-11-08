@@ -217,7 +217,6 @@
                                     <value>true</value>
                                 </property>
                             </systemProperties>
-                            <argLine>${surefire.argLine} ${surefire.argLine.extension}</argLine>
                         </configuration>
                     </plugin>
                 </plugins>
