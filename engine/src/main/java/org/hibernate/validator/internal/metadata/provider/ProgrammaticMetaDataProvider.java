@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.ParameterNameProvider;
-
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -36,10 +34,9 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
 	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper,
-										ParameterNameProvider parameterNameProvider,
+										ExecutableParameterNameProvider parameterNameProvider,
 										Set<DefaultConstraintMapping> constraintMappings) {
-		super( constraintHelper,
-				createBeanConfigurations( constraintMappings, constraintHelper, new ExecutableParameterNameProvider( parameterNameProvider ) ) );
+		super( constraintHelper, createBeanConfigurations( constraintMappings, constraintHelper, parameterNameProvider ) );
 		Contracts.assertNotNull( constraintMappings );
 
 		assertUniquenessOfConfiguredTypes( constraintMappings );

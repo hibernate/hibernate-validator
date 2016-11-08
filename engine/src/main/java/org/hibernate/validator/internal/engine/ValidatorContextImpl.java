@@ -16,6 +16,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
@@ -33,7 +34,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private MessageInterpolator messageInterpolator;
 	private TraversableResolver traversableResolver;
 	private ConstraintValidatorFactory constraintValidatorFactory;
-	private ParameterNameProvider parameterNameProvider;
+	private ExecutableParameterNameProvider parameterNameProvider;
 	private boolean failFast;
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 	private TimeProvider timeProvider;
@@ -45,7 +46,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.messageInterpolator = validatorFactory.getMessageInterpolator();
 		this.traversableResolver = validatorFactory.getTraversableResolver();
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
-		this.parameterNameProvider = validatorFactory.getParameterNameProvider();
+		this.parameterNameProvider = validatorFactory.getExecutableParameterNameProvider();
 		this.failFast = validatorFactory.isFailFast();
 		this.validatedValueHandlers = new ArrayList<>(
 				validatorFactory.getValidatedValueHandlers()
@@ -89,10 +90,10 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	@Override
 	public HibernateValidatorContext parameterNameProvider(ParameterNameProvider parameterNameProvider) {
 		if ( parameterNameProvider == null ) {
-			this.parameterNameProvider = validatorFactory.getParameterNameProvider();
+			this.parameterNameProvider = validatorFactory.getExecutableParameterNameProvider();
 		}
 		else {
-			this.parameterNameProvider = parameterNameProvider;
+			this.parameterNameProvider = new ExecutableParameterNameProvider( parameterNameProvider );
 		}
 		return this;
 	}

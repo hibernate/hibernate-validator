@@ -35,4 +35,13 @@ public class ExecutableParameterNameProvider {
 			return delegate.getParameterNames( (Constructor<?>) executable );
 		}
 	}
+
+	public ParameterNameProvider getDelegate() {
+		return delegate;
+	}
+
+	@Override
+	public String toString() {
+		return "ExecutableParameterNameProvider [delegate=" + delegate + "]";
+	}
 }

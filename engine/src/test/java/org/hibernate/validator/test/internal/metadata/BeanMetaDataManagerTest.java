@@ -6,6 +6,11 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotSame;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -23,14 +26,12 @@ import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotSame;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -47,7 +48,7 @@ public class BeanMetaDataManagerTest {
 		metaDataManager = new BeanMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
-				new DefaultParameterNameProvider(),
+				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				Collections.<MetaDataProvider>emptyList()
 		);
 	}
@@ -60,7 +61,7 @@ public class BeanMetaDataManagerTest {
 
 		try {
 			// help along the OutOfMemoryError by allocating extra memory and holding on to it in this list
-			List<Object> memoryConsumer = new ArrayList<Object>();
+			List<Object> memoryConsumer = new ArrayList<>();
 			for ( int i = 0; i < LOOP_COUNT; i++ ) {
 				Class<?> c = new CustomClassLoader().loadClass( Engine.class.getName() );
 				BeanMetaData<?> meta = metaDataManager.getBeanMetaData( c );

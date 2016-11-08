@@ -32,6 +32,7 @@ import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
@@ -181,7 +182,7 @@ public class PathImplTest {
 		BeanMetaDataManager beanMetaDataManager = new BeanMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
-				new DefaultParameterNameProvider(),
+				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				Collections.<MetaDataProvider>emptyList()
 		);
 

@@ -39,6 +39,7 @@ import org.hibernate.validator.internal.metadata.provider.MetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.ProgrammaticMetaDataProvider;
 import org.hibernate.validator.internal.metadata.provider.XmlMetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -76,7 +77,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	/**
 	 * The default parameter name provider for this factory.
 	 */
-	private final ParameterNameProvider parameterNameProvider;
+	private final ExecutableParameterNameProvider parameterNameProvider;
 
 	/**
 	 * Provider for the current time when validating {@code @Future} or code @Past}
@@ -131,7 +132,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * could be used. To still have the metadata static we create a {@code BeanMetaDataManager} per parameter name
 	 * provider. See also HV-659.
 	 */
-	private final Map<ParameterNameProvider, BeanMetaDataManager> beanMetaDataManagerMap;
+	private final Map<ExecutableParameterNameProvider, BeanMetaDataManager> beanMetaDataManagerMap;
 
 	/**
 	 * Contains handlers to be applied to the validated value when validating elements.
@@ -143,9 +144,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 		this.messageInterpolator = configurationState.getMessageInterpolator();
 		this.traversableResolver = configurationState.getTraversableResolver();
-		this.parameterNameProvider = configurationState.getParameterNameProvider();
+		this.parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
 		this.timeProvider = getTimeProvider( configurationState, externalClassLoader );
-		this.beanMetaDataManagerMap = Collections.synchronizedMap( new IdentityHashMap<ParameterNameProvider, BeanMetaDataManager>() );
+		this.beanMetaDataManagerMap = Collections.synchronizedMap( new IdentityHashMap<ExecutableParameterNameProvider, BeanMetaDataManager>() );
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
@@ -334,6 +335,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	@Override
 	public ParameterNameProvider getParameterNameProvider() {
+		return parameterNameProvider.getDelegate();
+	}
+
+	public ExecutableParameterNameProvider getExecutableParameterNameProvider() {
 		return parameterNameProvider;
 	}
 
@@ -377,7 +382,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	Validator createValidator(ConstraintValidatorFactory constraintValidatorFactory,
 			MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
-			ParameterNameProvider parameterNameProvider,
+			ExecutableParameterNameProvider parameterNameProvider,
 			boolean failFast,
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 			TimeProvider timeProvider,
@@ -412,7 +417,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 	}
 
-	private List<MetaDataProvider> buildDataProviders(ParameterNameProvider parameterNameProvider) {
+	private List<MetaDataProvider> buildDataProviders(ExecutableParameterNameProvider parameterNameProvider) {
 		List<MetaDataProvider> metaDataProviders = newArrayList();
 		if ( xmlMetaDataProvider != null ) {
 			metaDataProviders.add( xmlMetaDataProvider );

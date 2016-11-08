@@ -11,13 +11,9 @@ import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.O
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import javax.validation.ParameterNameProvider;
-
-import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -33,6 +29,7 @@ import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
  * This manager is in charge of providing all constraint related meta data
@@ -99,17 +96,6 @@ public class BeanMetaDataManager {
 	private final MethodValidationConfiguration methodValidationConfiguration;
 
 	/**
-	 * Creates a new {@code BeanMetaDataManager}. {@link DefaultParameterNameProvider} is used as parameter name
-	 * provider, no meta data providers besides the annotation-based providers are used.
-	 *
-	 * @param constraintHelper the constraint helper
-	 * @param executableHelper the executable helper
-	 */
-	public BeanMetaDataManager(ConstraintHelper constraintHelper, ExecutableHelper executableHelper) {
-		this( constraintHelper, executableHelper, new DefaultParameterNameProvider(), Collections.<MetaDataProvider>emptyList() );
-	}
-
-	/**
 	 * Creates a new {@code BeanMetaDataManager}.
 	 *
 	 * @param constraintHelper the constraint helper
@@ -119,7 +105,7 @@ public class BeanMetaDataManager {
 	 */
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
 			   ExecutableHelper executableHelper,
-			   ParameterNameProvider parameterNameProvider,
+			   ExecutableParameterNameProvider parameterNameProvider,
 			   List<MetaDataProvider> optionalMetaDataProviders) {
 		this(
 				constraintHelper, executableHelper,
@@ -130,7 +116,7 @@ public class BeanMetaDataManager {
 
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
 			ExecutableHelper executableHelper,
-			ParameterNameProvider parameterNameProvider,
+			ExecutableParameterNameProvider parameterNameProvider,
 			List<MetaDataProvider> optionalMetaDataProviders,
 			MethodValidationConfiguration methodValidationConfiguration) {
 		this.constraintHelper = constraintHelper;

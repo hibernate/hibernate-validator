@@ -32,6 +32,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -48,7 +49,7 @@ public class TypeAnnotationMetaDataRetrievalTest {
 	public void setup() {
 		provider = new AnnotationMetaDataProvider(
 				new ConstraintHelper(),
-				new DefaultParameterNameProvider(),
+				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}

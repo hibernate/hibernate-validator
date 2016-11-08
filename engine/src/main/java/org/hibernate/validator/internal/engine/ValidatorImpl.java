@@ -33,7 +33,6 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
 import javax.validation.MessageInterpolator;
-import javax.validation.ParameterNameProvider;
 import javax.validation.Path;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
@@ -158,7 +157,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
 			BeanMetaDataManager beanMetaDataManager,
-			ParameterNameProvider parameterNameProvider,
+			ExecutableParameterNameProvider parameterNameProvider,
 			TimeProvider timeProvider,
 			TypeResolutionHelper typeResolutionHelper,
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
@@ -168,7 +167,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.messageInterpolator = messageInterpolator;
 		this.traversableResolver = traversableResolver;
 		this.beanMetaDataManager = beanMetaDataManager;
-		this.parameterNameProvider = new ExecutableParameterNameProvider( parameterNameProvider );
+		this.parameterNameProvider = parameterNameProvider;
 		this.timeProvider = timeProvider;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.validatedValueHandlers = validatedValueHandlers;

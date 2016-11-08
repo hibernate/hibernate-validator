@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.ParameterNameProvider;
-
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -41,7 +39,7 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 	 * @param externalClassLoader user provided class loader for the loading of XML mapping files
 	 */
 	public XmlMetaDataProvider(ConstraintHelper constraintHelper,
-							   ParameterNameProvider parameterNameProvider,
+							   ExecutableParameterNameProvider parameterNameProvider,
 							   Set<InputStream> mappingStreams,
 							   ClassLoader externalClassLoader) {
 		this( constraintHelper, createMappingParser( constraintHelper, parameterNameProvider, mappingStreams, externalClassLoader ) );
@@ -52,10 +50,9 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}
 
-	private static MappingXmlParser createMappingParser(ConstraintHelper constraintHelper, ParameterNameProvider parameterNameProvider, Set<InputStream> mappingStreams,
+	private static MappingXmlParser createMappingParser(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider, Set<InputStream> mappingStreams,
 			ClassLoader externalClassLoader) {
-		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, new ExecutableParameterNameProvider( parameterNameProvider ),
-				externalClassLoader );
+		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, parameterNameProvider, externalClassLoader );
 		mappingParser.parse( mappingStreams );
 		return mappingParser;
 	}

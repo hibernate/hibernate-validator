@@ -35,7 +35,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.GroupSequence;
-import javax.validation.ParameterNameProvider;
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 
@@ -91,10 +90,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	protected final ExecutableParameterNameProvider parameterNameProvider;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
-			ParameterNameProvider parameterNameProvider,
+			ExecutableParameterNameProvider parameterNameProvider,
 			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
-		this.parameterNameProvider = new ExecutableParameterNameProvider( parameterNameProvider );
+		this.parameterNameProvider = parameterNameProvider;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 		configuredBeans = new ConcurrentReferenceHashMap<>(
 				DEFAULT_INITIAL_CAPACITY,
