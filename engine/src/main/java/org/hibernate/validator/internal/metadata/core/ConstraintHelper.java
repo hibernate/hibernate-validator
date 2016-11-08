@@ -94,17 +94,39 @@ import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidat
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForChronoZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForHijrahDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForInstant;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForJapaneseDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForLocalDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForLocalDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForLocalTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForMinguoDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForMonthDay;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForOffsetDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForOffsetTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForReadablePartial;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForThaiBuddhistDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForYear;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForCalendar;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForChronoZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForHijrahDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForInstant;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForJapaneseDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForLocalDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForLocalDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForLocalTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForMinguoDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForMonthDay;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForOffsetDateTime;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForOffsetTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForReadablePartial;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForThaiBuddhistDate;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForYear;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
@@ -181,11 +203,21 @@ public class ConstraintHelper {
 			futureValidators.add( FutureValidatorForReadableInstant.class );
 			futureValidators.add( FutureValidatorForReadablePartial.class );
 		}
-
 		// Java 8 date/time API validators
 		futureValidators.add( FutureValidatorForChronoZonedDateTime.class );
+		futureValidators.add( FutureValidatorForHijrahDate.class );
 		futureValidators.add( FutureValidatorForInstant.class );
+		futureValidators.add( FutureValidatorForJapaneseDate.class );
+		futureValidators.add( FutureValidatorForLocalDate.class );
+		futureValidators.add( FutureValidatorForLocalDateTime.class );
+		futureValidators.add( FutureValidatorForLocalTime.class );
+		futureValidators.add( FutureValidatorForMinguoDate.class );
+		futureValidators.add( FutureValidatorForMonthDay.class );
 		futureValidators.add( FutureValidatorForOffsetDateTime.class );
+		futureValidators.add( FutureValidatorForOffsetTime.class );
+		futureValidators.add( FutureValidatorForThaiBuddhistDate.class );
+		futureValidators.add( FutureValidatorForYear.class );
+		futureValidators.add( FutureValidatorForYearMonth.class );
 
 		putConstraints( tmpConstraints, Future.class, futureValidators );
 
@@ -212,8 +244,19 @@ public class ConstraintHelper {
 		}
 		// Java 8 date/time API validators
 		pastValidators.add( PastValidatorForChronoZonedDateTime.class );
+		pastValidators.add( PastValidatorForHijrahDate.class );
 		pastValidators.add( PastValidatorForInstant.class );
+		pastValidators.add( PastValidatorForJapaneseDate.class );
+		pastValidators.add( PastValidatorForLocalDate.class );
+		pastValidators.add( PastValidatorForLocalDateTime.class );
+		pastValidators.add( PastValidatorForLocalTime.class );
+		pastValidators.add( PastValidatorForMinguoDate.class );
+		pastValidators.add( PastValidatorForMonthDay.class );
 		pastValidators.add( PastValidatorForOffsetDateTime.class );
+		pastValidators.add( PastValidatorForOffsetTime.class );
+		pastValidators.add( PastValidatorForThaiBuddhistDate.class );
+		pastValidators.add( PastValidatorForYear.class );
+		pastValidators.add( PastValidatorForYearMonth.class );
 
 		putConstraints( tmpConstraints, Past.class, pastValidators );
 

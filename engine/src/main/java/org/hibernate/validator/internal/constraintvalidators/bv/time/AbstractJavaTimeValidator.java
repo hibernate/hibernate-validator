@@ -23,7 +23,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Alaa Nassef
  * @author Guillaume Smet
  */
-public abstract class AbstractJavaTimeValidator<C extends Annotation, T extends TemporalAccessor & Comparable<T>> implements ConstraintValidator<C, T> {
+public abstract class AbstractJavaTimeValidator<C extends Annotation, T extends TemporalAccessor & Comparable<? super T>> implements ConstraintValidator<C, T> {
 
 	private static final Log LOG = LoggerFactory.make();
 

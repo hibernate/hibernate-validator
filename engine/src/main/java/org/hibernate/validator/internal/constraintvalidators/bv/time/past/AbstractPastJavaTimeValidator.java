@@ -18,7 +18,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractJav
  * @author Alaa Nassef
  * @author Guillaume Smet
  */
-public abstract class AbstractPastJavaTimeValidator<T extends TemporalAccessor & Comparable<T>> extends AbstractJavaTimeValidator<Past, T> {
+public abstract class AbstractPastJavaTimeValidator<T extends TemporalAccessor & Comparable<? super T>> extends AbstractJavaTimeValidator<Past, T> {
 
 	@Override
 	protected boolean isValid(int result) {

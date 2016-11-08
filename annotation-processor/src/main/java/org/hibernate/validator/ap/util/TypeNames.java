@@ -80,12 +80,4 @@ public class TypeNames {
 		public static final String READABLE_INSTANT = ORG_JODA_TIME + ".ReadableInstant";
 	}
 
-	public static class Java8DateTime {
-
-		private static final String JAVA_TIME = "java.time";
-
-		public static final String CHRONO_ZONED_DATE_TIME = JAVA_TIME + ".chrono.ChronoZonedDateTime";
-		public static final String OFFSET_DATE_TIME = JAVA_TIME + ".OffsetDateTime";
-		public static final String INSTANT = JAVA_TIME + ".Instant";
-	}
 }

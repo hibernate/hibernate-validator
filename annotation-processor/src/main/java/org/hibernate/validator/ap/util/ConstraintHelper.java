@@ -6,6 +6,20 @@
  */
 package org.hibernate.validator.ap.util;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.chrono.ChronoZonedDateTime;
+import java.time.chrono.HijrahDate;
+import java.time.chrono.JapaneseDate;
+import java.time.chrono.MinguoDate;
+import java.time.chrono.ThaiBuddhistDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,7 +49,6 @@ import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
 import org.hibernate.validator.ap.util.TypeNames.HibernateValidatorTypes;
-import org.hibernate.validator.ap.util.TypeNames.Java8DateTime;
 import org.hibernate.validator.ap.util.TypeNames.JodaTypes;
 
 /**
@@ -45,6 +58,7 @@ import org.hibernate.validator.ap.util.TypeNames.JodaTypes;
  *
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Guillaume Smet
  */
 public class ConstraintHelper {
 
@@ -158,6 +172,25 @@ public class ConstraintHelper {
 		IMPLICIT
 	}
 
+	/**
+	 * {@code java.time} types supported by {@code @Past} and {@Future} annotations.
+	 */
+	private static final Class<?>[] JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS = new Class<?>[] {
+		ChronoZonedDateTime.class,
+		HijrahDate.class,
+		Instant.class,
+		JapaneseDate.class,
+		LocalDate.class,
+		LocalDateTime.class,
+		LocalTime.class,
+		MinguoDate.class,
+		MonthDay.class,
+		OffsetDateTime.class,
+		OffsetTime.class,
+		ThaiBuddhistDate.class,
+		Year.class,
+		YearMonth.class
+	};
 
 	/**
 	 * Contains the supported types for given constraints. Keyed by constraint
@@ -208,11 +241,11 @@ public class ConstraintHelper {
 				JodaTypes.READABLE_PARTIAL,
 				JodaTypes.READABLE_INSTANT
 		);
+
+
 		registerAllowedTypesForBuiltInConstraint(
 				BeanValidationTypes.FUTURE,
-				Java8DateTime.CHRONO_ZONED_DATE_TIME,
-				Java8DateTime.OFFSET_DATE_TIME,
-				Java8DateTime.INSTANT
+				JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS
 		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class );
@@ -226,9 +259,7 @@ public class ConstraintHelper {
 		);
 		registerAllowedTypesForBuiltInConstraint(
 				BeanValidationTypes.PAST,
-				Java8DateTime.CHRONO_ZONED_DATE_TIME,
-				Java8DateTime.OFFSET_DATE_TIME,
-				Java8DateTime.INSTANT
+				JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS
 		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PATTERN, String.class );
 		registerAllowedTypesForBuiltInConstraint(
