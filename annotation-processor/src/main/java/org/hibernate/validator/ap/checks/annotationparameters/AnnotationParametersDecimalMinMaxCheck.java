@@ -9,6 +9,7 @@ package org.hibernate.validator.ap.checks.annotationparameters;
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
+import org.hibernate.validator.ap.util.TypeNames;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -25,7 +26,7 @@ import java.util.Set;
 public class AnnotationParametersDecimalMinMaxCheck extends AnnotationParametersAbstractCheck {
 
 	public AnnotationParametersDecimalMinMaxCheck(AnnotationApiHelper annotationApiHelper) {
-		super( annotationApiHelper, "javax.validation.constraints.DecimalMin", "javax.validation.constraints.DecimalMax" );
+		super( annotationApiHelper, TypeNames.BeanValidationTypes.DECIMAL_MIN, TypeNames.BeanValidationTypes.DECIMAL_MAX );
 	}
 
 	@Override
