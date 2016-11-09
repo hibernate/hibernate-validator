@@ -14,6 +14,7 @@ import javax.lang.model.element.Element;
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
+import org.hibernate.validator.ap.util.TypeNames;
 
 /**
  * Checks that the parameters used on {@code org.hibernate.validator.constraints.ScriptAssert} annotations are valid.
@@ -23,7 +24,7 @@ import org.hibernate.validator.ap.util.CollectionHelper;
 public class AnnotationParametersScriptAssertCheck extends AnnotationParametersAbstractCheck {
 
 	public AnnotationParametersScriptAssertCheck(AnnotationApiHelper annotationApiHelper) {
-		super( annotationApiHelper, "org.hibernate.validator.constraints.ScriptAssert" );
+		super( annotationApiHelper, TypeNames.HibernateValidatorTypes.SCRIPT_ASSERT );
 	}
 
 	@Override
