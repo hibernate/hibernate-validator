@@ -27,10 +27,6 @@ public abstract class AbstractEpochBasedTimeValidator<C extends Annotation, T> i
 	private static final Log LOG = LoggerFactory.make();
 
 	@Override
-	public void initialize(C constraintAnnotation) {
-	}
-
-	@Override
 	public boolean isValid(T value, ConstraintValidatorContext context) {
 		// null values are valid
 		if ( value == null ) {

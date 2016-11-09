@@ -20,9 +20,16 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.AbstractJav
  */
 public abstract class AbstractPastJavaTimeValidator<T extends TemporalAccessor & Comparable<? super T>> extends AbstractJavaTimeValidator<Past, T> {
 
+	private boolean isPresentValid;
+
+	@Override
+	public void initialize(Past constraintAnnotation) {
+		isPresentValid = constraintAnnotation.orPresent();
+	}
+
 	@Override
 	protected boolean isValid(int result) {
-		return result < 0;
+		return isPresentValid ? ( result <= 0 ) : ( result < 0 );
 	}
 
 }
