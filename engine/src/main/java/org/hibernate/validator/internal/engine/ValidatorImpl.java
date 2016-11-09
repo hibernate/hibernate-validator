@@ -581,7 +581,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					elementType
 			) ) {
 
-				Object value = getBeanPropertyValue( validationContext, valueContext.getCurrentBean(), cascadable );
+				Object value = getCascadableValue( validationContext, valueContext.getCurrentBean(), cascadable );
 
 				if ( value != null ) {
 
@@ -1149,7 +1149,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					throw log.getInvalidPropertyPathException( validationContext.getRootBeanClass(), propertyPath.asString() );
 				}
 
-				value = getBeanPropertyValue( validationContext, value, propertyMetaData );
+				value = getCascadableValue( validationContext, value, propertyMetaData );
 				if ( value == null ) {
 					throw log.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
 				}
@@ -1374,7 +1374,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Object getBeanPropertyValue(ValidationContext<?> validationContext, Object object, Cascadable cascadable) {
+	private Object getCascadableValue(ValidationContext<?> validationContext, Object object, Cascadable cascadable) {
 		Object value = cascadable.getValue( object );
 
 		// Value can be wrapped (e.g. Optional<Address>). Try to unwrap it
