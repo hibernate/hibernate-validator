@@ -39,6 +39,7 @@ import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -175,7 +176,15 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				cascadedProperties.add( propertyMetaData );
 			}
 			else {
-				allMetaConstraints.addAll( propertyMetaData.getTypeArgumentsConstraints() );
+				Set<MetaConstraint<?>> typeConstraints = propertyMetaData.getTypeArgumentsConstraints().stream()
+					.map( c -> {
+						ConstraintLocation adaptedDelegate = ConstraintLocation.forProperty( c.getLocation().getMember() );
+						ConstraintLocation adaptedLocation = ConstraintLocation.forTypeArgument( adaptedDelegate, c.getLocation().getTypeForValidatorResolution() );
+						return new MetaConstraint<>( c.getDescriptor(), adaptedLocation );
+					} )
+					.collect( Collectors.toSet() );
+
+				allMetaConstraints.addAll( typeConstraints );
 			}
 
 			allMetaConstraints.addAll( propertyMetaData.getConstraints() );

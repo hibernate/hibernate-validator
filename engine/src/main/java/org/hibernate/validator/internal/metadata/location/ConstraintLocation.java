@@ -40,11 +40,8 @@ public interface ConstraintLocation {
 		return new PropertyConstraintLocation( member );
 	}
 
-	static ConstraintLocation forTypeArgument(Member member, Type type) {
-		return new TypeArgumentConstraintLocation(
-				member,
-				type
-		);
+	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, Type type) {
+		return new TypeArgumentConstraintLocation( delegate, type );
 	}
 
 	static ConstraintLocation forReturnValue(Executable executable) {
@@ -91,4 +88,11 @@ public interface ConstraintLocation {
 	 * Appends a node representing this location to the given property path.
 	 */
 	void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path);
+
+	/**
+	 * Obtains the value of this location from the parent. The type of the passed parent depends on the location type,
+	 * e.g. a bean would be passed for a {@link PropertyConstraintLocation} but an object array for a
+	 * {@link ParameterConstraintLocation}.
+	 */
+	Object getValue(Object parent);
 }

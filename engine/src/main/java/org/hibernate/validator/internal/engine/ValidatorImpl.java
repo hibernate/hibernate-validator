@@ -11,15 +11,10 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.ElementType;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.ConstraintViolation;
@@ -60,8 +54,6 @@ import org.hibernate.validator.internal.metadata.aggregated.ReturnValueMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
-import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
-import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -70,9 +62,6 @@ import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
@@ -148,11 +137,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
-	/**
-	 * Keeps an accessible version for each non-accessible member whose value needs to be accessed during validation.
-	 */
-	private final ConcurrentMap<Member, Member> accessibleMembers;
-
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 			MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
@@ -175,12 +159,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.failFast = failFast;
 
 		validationOrderGenerator = new ValidationOrderGenerator();
-
-		this.accessibleMembers = new ConcurrentReferenceHashMap<>(
-				100,
-				ReferenceType.SOFT,
-				ReferenceType.SOFT
-		);
 	}
 
 	@Override
@@ -572,7 +550,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 		}
 
-		validationSuccessful = validateMetaConstraint( validationContext, valueContext, metaConstraint );
+		validationSuccessful = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), metaConstraint );
 
 		// reset the unwrapping mode
 		valueContext.setUnwrapMode( UnwrapMode.AUTOMATIC );
@@ -592,24 +570,23 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		valueContext.setUnwrapMode( UnwrapMode.UNWRAP );
-		validationSuccessful = validateMetaConstraint( validationContext, valueContext, metaConstraint );
+		validationSuccessful = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), metaConstraint );
 		valueContext.setUnwrapMode( UnwrapMode.AUTOMATIC );
 
 		return validationSuccessful;
 	}
 
-	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, MetaConstraint<?> metaConstraint) {
-		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-			if ( valueContext.getCurrentBean() != null ) {
-				Object valueToValidate = getBeanMemberValue(
-						valueContext.getCurrentBean(),
-						metaConstraint.getLocation().getMember()
-				);
-				valueContext.setCurrentValidatedValue( valueToValidate );
-			}
-			return metaConstraint.validateConstraint( validationContext, valueContext );
+	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
+		if ( !isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
+			return true;
 		}
-		return true;
+
+		if ( parent != null ) {
+			Object valueToValidate = valueContext.getValue( parent, metaConstraint.getLocation() );
+			valueContext.setCurrentValidatedValue( valueToValidate );
+		}
+
+		return metaConstraint.validateConstraint( validationContext, valueContext );
 	}
 
 	/**
@@ -1202,11 +1179,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			MetaConstraint<?> firstConstraint = executableMetaData.getCrossParameterConstraints().iterator().next();
 			valueContext.appendNode( firstConstraint.getLocation() );
 
-			valueContext.setCurrentValidatedValue( parameterValues );
-
 			// 1. validate cross-parameter constraints
 			validateConstraintsForGroup(
-					validationContext, valueContext, executableMetaData.getCrossParameterConstraints()
+					validationContext, valueContext, parameterValues, executableMetaData.getCrossParameterConstraints()
 					);
 			if ( shouldFailFast( validationContext ) ) {
 				return;
@@ -1216,7 +1191,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ValueContext<T, Object> valueContext = getExecutableValueContext(
 				validationContext.getRootBean(), executableMetaData, currentValidatedGroup
 		);
-		valueContext.setCurrentValidatedValue( parameterValues );
 
 		// 2. validate parameter constraints
 		for ( int i = 0; i < parameterValues.length; i++ ) {
@@ -1245,10 +1219,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			valueContext.appendNode( parameterMetaData );
 			valueContext.setUnwrapMode( parameterMetaData.unwrapMode() );
-			valueContext.setCurrentValidatedValue( value );
 
 			validateConstraintsForGroup(
-					validationContext, valueContext, parameterMetaData
+					validationContext, valueContext, parameterValues, parameterMetaData
 			);
 			if ( shouldFailFast( validationContext ) ) {
 				return;
@@ -1256,7 +1229,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			if ( !parameterMetaData.isCascading() ) {
 				validateConstraintsForGroup(
-						validationContext, valueContext, parameterMetaData.getTypeArgumentsConstraints()
+						validationContext, valueContext, parameterValues, parameterMetaData.getTypeArgumentsConstraints()
 				);
 				if ( shouldFailFast( validationContext ) ) {
 					return;
@@ -1416,33 +1389,27 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				oneGroup
 		);
 
-		valueContext.setCurrentValidatedValue( value );
 		ReturnValueMetaData returnValueMetaData = executableMetaData.getReturnValueMetaData();
 		valueContext.appendNode( returnValueMetaData );
 		valueContext.setUnwrapMode( returnValueMetaData.unwrapMode() );
 
-		validateConstraintsForGroup( validationContext, valueContext, returnValueMetaData );
+		validateConstraintsForGroup( validationContext, valueContext, value, returnValueMetaData );
 		if ( shouldFailFast( validationContext ) ) {
 			return;
 		}
 
 		if ( !returnValueMetaData.isCascading() ) {
-			validateConstraintsForGroup( validationContext, valueContext, returnValueMetaData.getTypeArgumentsConstraints() );
+			validateConstraintsForGroup( validationContext, valueContext, value, returnValueMetaData.getTypeArgumentsConstraints() );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
 		}
 	}
 
-	private void validateConstraintsForGroup(ValidationContext<?> validationContext,
-			ValueContext<?, ?> valueContext,
+	private void validateConstraintsForGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent,
 			Iterable<MetaConstraint<?>> constraints) {
 		for ( MetaConstraint<?> metaConstraint : constraints ) {
-			if ( !isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-				continue;
-			}
-
-			metaConstraint.validateConstraint( validationContext, valueContext );
+			validateMetaConstraint( validationContext, valueContext, parent, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
 				break;
 			}
@@ -1712,66 +1679,5 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		return value;
-	}
-
-	private Object getBeanMemberValue(Object object, Member member) {
-		if ( member == null ) {
-			return object;
-		}
-
-		member = getAccessible( member );
-
-		if ( member instanceof Method ) {
-			return ReflectionHelper.getValue( (Method) member, object );
-		}
-		else if ( member instanceof Field ) {
-			return ReflectionHelper.getValue( (Field) member, object );
-		}
-		return null;
-	}
-
-	/**
-	 * Returns an accessible version of the given member. Will be the given member itself in case it is accessible,
-	 * otherwise a copy which is set accessible. These copies are maintained in the
-	 * {@link ValidatorImpl#accessibleMembers} cache.
-	 */
-	private Member getAccessible(Member original) {
-		if ( ( (AccessibleObject) original ).isAccessible() ) {
-			return original;
-		}
-
-		Member member = accessibleMembers.get( original );
-
-		if ( member != null ) {
-			return member;
-		}
-
-		Class<?> clazz = original.getDeclaringClass();
-
-		if ( original instanceof Field ) {
-			member = run( GetDeclaredField.action( clazz, original.getName() ) );
-		}
-		else {
-			member = run( GetDeclaredMethod.action( clazz, original.getName() ) );
-		}
-
-		run( SetAccessibility.action( member ) );
-
-		Member cached = accessibleMembers.putIfAbsent( original, member );
-		if ( cached != null ) {
-			member = cached;
-		}
-
-		return member;
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

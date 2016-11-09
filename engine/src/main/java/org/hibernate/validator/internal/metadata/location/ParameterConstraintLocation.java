@@ -59,6 +59,11 @@ class ParameterConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public Object getValue(Object parent) {
+		return ( (Object[]) parent )[index];
+	}
+
+	@Override
 	public String toString() {
 		return "ParameterConstraintLocation [executable=" + executable + ", index=" + index
 				+ ", typeForValidatorResolution=" + typeForValidatorResolution + "]";

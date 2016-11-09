@@ -218,4 +218,9 @@ public class ValueContext<T, V> {
 	public void setUnwrapMode(UnwrapMode unwrapMode) {
 		this.unwrapMode = unwrapMode;
 	}
+
+	public Object getValue(Object parent, ConstraintLocation location) {
+		// TODO: For BVAL-214 we'd get the value from a map or another alternative structure instead
+		return location.getValue( parent );
+	}
 }
