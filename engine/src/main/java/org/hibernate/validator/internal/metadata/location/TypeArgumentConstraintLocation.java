@@ -19,7 +19,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-class TypeArgumentConstraintLocation implements ConstraintLocation {
+public class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 	private final ConstraintLocation delegate;
 	private final Type typeForValidatorResolution;
@@ -64,6 +64,10 @@ class TypeArgumentConstraintLocation implements ConstraintLocation {
 	@Override
 	public Object getValue(Object parent) {
 		return delegate.getValue( parent );
+	}
+
+	public ConstraintLocation getDelegate() {
+		return delegate;
 	}
 
 	@Override

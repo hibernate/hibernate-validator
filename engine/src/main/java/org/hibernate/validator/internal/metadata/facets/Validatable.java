@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.internal.metadata.facets;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+
 /**
  * Provides a unified view on validatable elements of all kinds, be it Java
  * beans, the arguments passed to a method or the value returned from a method.
@@ -22,4 +25,10 @@ public interface Validatable {
 	 * @return The cascaded elements of this validatable.
 	 */
 	Iterable<Cascadable> getCascadables();
+
+	/**
+	 * Returns the unwrap mode to be applied for constraints at the given location (which must be a valid location for
+	 * this validatable).
+	 */
+	UnwrapMode getUnwrapMode(ConstraintLocation location);
 }

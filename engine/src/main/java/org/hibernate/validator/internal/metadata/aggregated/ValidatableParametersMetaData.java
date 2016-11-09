@@ -6,9 +6,16 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
-import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.ParameterConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 
 /**
  * Represents the constraint related meta data of the arguments of a method or
@@ -18,14 +25,41 @@ import org.hibernate.validator.internal.util.CollectionHelper;
  */
 public class ValidatableParametersMetaData implements Validatable {
 
+	private final List<ParameterMetaData> parameterMetaData;
 	private final Iterable<Cascadable> cascadables;
 
-	public ValidatableParametersMetaData(Iterable<? extends Cascadable> cascadables) {
-		this.cascadables = CollectionHelper.<Cascadable>newHashSet( cascadables );
+	public ValidatableParametersMetaData(List<ParameterMetaData> parameterMetaData) {
+		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
+		this.cascadables = Collections.unmodifiableList( parameterMetaData.stream()
+			.filter( p -> p.isCascading() )
+			.collect( Collectors.toList() ) );
 	}
 
 	@Override
 	public Iterable<Cascadable> getCascadables() {
 		return cascadables;
+	}
+
+	@Override
+	public UnwrapMode getUnwrapMode(ConstraintLocation location) {
+		ParameterConstraintLocation parameterConstraintLocation = getParameterConstraintLocation( location );
+
+		if ( parameterConstraintLocation != null ) {
+			return parameterMetaData.get( parameterConstraintLocation.getIndex() ).unwrapMode();
+		}
+
+		// cross-parameter
+		return UnwrapMode.AUTOMATIC;
+	}
+
+	private ParameterConstraintLocation getParameterConstraintLocation(ConstraintLocation location) {
+		if ( location instanceof ParameterConstraintLocation ) {
+			return (ParameterConstraintLocation) location;
+		}
+		else if ( location instanceof TypeArgumentConstraintLocation ) {
+			return (ParameterConstraintLocation) ( (TypeArgumentConstraintLocation) location ).getDelegate();
+		}
+
+		return null;
 	}
 }
