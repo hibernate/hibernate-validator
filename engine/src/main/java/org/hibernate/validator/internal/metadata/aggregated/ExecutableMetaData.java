@@ -152,15 +152,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	}
 
 	public ValidatableParametersMetaData getValidatableParametersMetaData() {
-		Set<ParameterMetaData> cascadedParameters = newHashSet();
-
-		for ( ParameterMetaData parameterMetaData : parameterMetaDataList ) {
-			if ( parameterMetaData.isCascading() ) {
-				cascadedParameters.add( parameterMetaData );
-			}
-		}
-
-		return new ValidatableParametersMetaData( cascadedParameters );
+		return new ValidatableParametersMetaData( parameterMetaDataList );
 	}
 
 	public ReturnValueMetaData getReturnValueMetaData() {

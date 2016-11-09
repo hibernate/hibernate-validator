@@ -20,7 +20,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-class ParameterConstraintLocation implements ConstraintLocation {
+public class ParameterConstraintLocation implements ConstraintLocation {
 
 	private final Executable executable;
 	private final int index;
@@ -50,6 +50,10 @@ class ParameterConstraintLocation implements ConstraintLocation {
 	@Override
 	public Type getTypeForValidatorResolution() {
 		return typeForValidatorResolution;
+	}
+
+	public int getIndex() {
+		return index;
 	}
 
 	@Override

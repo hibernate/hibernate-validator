@@ -524,43 +524,19 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			boolean propertyPathComplete,
 			MetaConstraint<?> metaConstraint) {
 
-		boolean validationSuccessful;
-
-		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
-			PropertyMetaData propertyMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() )
-					.getMetaDataFor( metaConstraint.getLocation().getPropertyName() );
-
-			if ( ElementType.TYPE_USE.equals( metaConstraint.getElementType() ) ) {
-				// TYPE_USE constraints always require UNWRAP
-				valueContext.setUnwrapMode( UnwrapMode.UNWRAP );
-			}
-			else {
-				// set the unwrapping mode for this validation
-				valueContext.setUnwrapMode( propertyMetaData.unwrapMode() );
-			}
-		}
-
-		validationSuccessful = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), propertyPathComplete, metaConstraint );
-
-		// reset the unwrapping mode
-		valueContext.setUnwrapMode( UnwrapMode.AUTOMATIC );
-		return validationSuccessful;
+		return validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), propertyPathComplete, metaConstraint );
 	}
 
 	private boolean validatePropertyTypeConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, boolean propertyPathComplete,
 			MetaConstraint<?> metaConstraint) {
 
-		boolean validationSuccessful;
-
-		valueContext.setUnwrapMode( UnwrapMode.UNWRAP );
-		validationSuccessful = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), propertyPathComplete, metaConstraint );
-		valueContext.setUnwrapMode( UnwrapMode.AUTOMATIC );
-
-		return validationSuccessful;
+		return validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), propertyPathComplete, metaConstraint );
 	}
 
 	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, boolean propertyPathComplete, MetaConstraint<?> metaConstraint) {
 		PathImpl currentPath = valueContext.getPropertyPath();
+		UnwrapMode currentUnwrapMode = valueContext.getUnwrapMode();
+
 		boolean success = true;
 
 		if ( !propertyPathComplete ) {
@@ -568,6 +544,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
+			valueContext.setUnwrapMode( valueContext.getCurrentValidatable().getUnwrapMode( metaConstraint.getLocation() ) );
+
 			if ( parent != null ) {
 				Object valueToValidate = valueContext.getValue( parent, metaConstraint.getLocation() );
 				valueContext.setCurrentValidatedValue( valueToValidate );
@@ -578,6 +556,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		// reset the path to the state before this call
 		valueContext.setPropertyPath( currentPath );
+		valueContext.setUnwrapMode( currentUnwrapMode );
 
 		return success;
 	}
@@ -1077,7 +1056,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				executableMetaData.getValidatableParametersMetaData(),
 				PathImpl.createPathForExecutable( executableMetaData )
 		);
-		cascadingValueContext.setUnwrapMode( executableMetaData.unwrapMode() );
 
 		groupIterator = validationOrder.getGroupIterator();
 		while ( groupIterator.hasNext() ) {
@@ -1166,7 +1144,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private <T> void validateParametersForSingleGroup(ValidationContext<T> validationContext, Object[] parameterValues, ExecutableMetaData executableMetaData, Class<?> currentValidatedGroup) {
 		if ( !executableMetaData.getCrossParameterConstraints().isEmpty() ) {
 			ValueContext<T, Object> valueContext = getExecutableValueContext(
-					validationContext.getRootBean(), executableMetaData, currentValidatedGroup
+					validationContext.getRootBean(), executableMetaData, executableMetaData.getValidatableParametersMetaData(), currentValidatedGroup
 			);
 
 			// 1. validate cross-parameter constraints
@@ -1179,7 +1157,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		ValueContext<T, Object> valueContext = getExecutableValueContext(
-				validationContext.getRootBean(), executableMetaData, currentValidatedGroup
+				validationContext.getRootBean(), executableMetaData, executableMetaData.getValidatableParametersMetaData(), currentValidatedGroup
 		);
 
 		// 2. validate parameter constraints
@@ -1205,8 +1183,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				}
 			}
 
-			valueContext.setUnwrapMode( parameterMetaData.unwrapMode() );
-
 			validateConstraintsForGroup(
 					validationContext, valueContext, parameterValues, parameterMetaData
 			);
@@ -1225,14 +1201,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	private <T> ValueContext<T, Object> getExecutableValueContext(T object, ExecutableMetaData executableMetaData, Class<?> group) {
+	private <T> ValueContext<T, Object> getExecutableValueContext(T object, ExecutableMetaData executableMetaData, Validatable validatable, Class<?> group) {
 		ValueContext<T, Object> valueContext;
 
 		if ( object != null ) {
 			valueContext = ValueContext.getLocalExecutionContext(
 					parameterNameProvider,
 					object,
-					null,
+					validatable,
 					PathImpl.createPathForExecutable( executableMetaData )
 			);
 		}
@@ -1240,7 +1216,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			valueContext = ValueContext.getLocalExecutionContext(
 					parameterNameProvider,
 					(Class<T>) null, //the type is not required in this case (only for cascaded validation)
-					null,
+					validatable,
 					PathImpl.createPathForExecutable( executableMetaData )
 			);
 		}
@@ -1371,11 +1347,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		ValueContext<?, Object> valueContext = getExecutableValueContext(
 				executableMetaData.getKind() == ElementKind.CONSTRUCTOR ? value : bean,
 				executableMetaData,
+				executableMetaData.getReturnValueMetaData(),
 				oneGroup
 		);
 
 		ReturnValueMetaData returnValueMetaData = executableMetaData.getReturnValueMetaData();
-		valueContext.setUnwrapMode( returnValueMetaData.unwrapMode() );
 
 		validateConstraintsForGroup( validationContext, valueContext, value, returnValueMetaData );
 		if ( shouldFailFast( validationContext ) ) {
@@ -1415,6 +1391,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			List<MetaConstraint<?>> metaConstraints,
 			List<MetaConstraint<?>> typeArgumentConstraints) {
 		Class<?> clazz = validationContext.getRootBeanClass();
+		BeanMetaData<?> beanMetaData = null;
 		Object value = validationContext.getRootBean();
 		PropertyMetaData propertyMetaData = null;
 
@@ -1423,7 +1400,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		while ( propertyPathIter.hasNext() ) {
 			// cast is ok, since we are dealing with engine internal classes
 			NodeImpl propertyPathNode = (NodeImpl) propertyPathIter.next();
-			propertyMetaData = getBeanPropertyMetaData( clazz, propertyPathNode );
+			beanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
+			propertyMetaData = getBeanPropertyMetaData( beanMetaData, propertyPathNode );
 
 			// if the property is not the leaf property, we set up the context for the next iteration
 			if ( propertyPathIter.hasNext() ) {
@@ -1457,7 +1435,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					}
 
 					clazz = value.getClass();
-					propertyMetaData = getBeanPropertyMetaData( clazz, propertyPathNode );
+					beanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
+					propertyMetaData = getBeanPropertyMetaData( beanMetaData, propertyPathNode );
 				}
 			}
 		}
@@ -1470,7 +1449,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		metaConstraints.addAll( propertyMetaData.getConstraints() );
 		typeArgumentConstraints.addAll( propertyMetaData.getTypeArgumentsConstraints() );
 
-		return ValueContext.getLocalExecutionContext( parameterNameProvider, value, null, propertyPath );
+		return ValueContext.getLocalExecutionContext( parameterNameProvider, value, beanMetaData, propertyPath );
 	}
 
 	/**
@@ -1491,6 +1470,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			List<MetaConstraint<?>> metaConstraints,
 			List<MetaConstraint<?>> typeArgumentConstraints) {
 		Class<?> clazz = validationContext.getRootBeanClass();
+		BeanMetaData<?> beanMetaData = null;
 		PropertyMetaData propertyMetaData = null;
 
 		Iterator<Path.Node> propertyPathIter = propertyPath.iterator();
@@ -1498,7 +1478,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		while ( propertyPathIter.hasNext() ) {
 			// cast is ok, since we are dealing with engine internal classes
 			NodeImpl propertyPathNode = (NodeImpl) propertyPathIter.next();
-			propertyMetaData = getBeanPropertyMetaData( clazz, propertyPathNode );
+			beanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
+			propertyMetaData = getBeanPropertyMetaData( beanMetaData, propertyPathNode );
 
 			// if the property is not the leaf property, we set up the context for the next iteration
 			if ( propertyPathIter.hasNext() ) {
@@ -1508,7 +1489,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					propertyPathNode = (NodeImpl) propertyPathIter.next();
 
 					clazz = ReflectionHelper.getClassFromType( ReflectionHelper.getIndexedType( propertyMetaData.getType() ) );
-					propertyMetaData = getBeanPropertyMetaData( clazz, propertyPathNode );
+					beanMetaData = beanMetaDataManager.getBeanMetaData( clazz );
+					propertyMetaData = getBeanPropertyMetaData( beanMetaData, propertyPathNode );
 				}
 				else {
 					clazz = ReflectionHelper.getClassFromType( propertyMetaData.getType() );
@@ -1524,7 +1506,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		metaConstraints.addAll( propertyMetaData.getConstraints() );
 		typeArgumentConstraints.addAll( propertyMetaData.getTypeArgumentsConstraints() );
 
-		return ValueContext.getLocalExecutionContext( parameterNameProvider, clazz, null, propertyPath );
+		return ValueContext.getLocalExecutionContext( parameterNameProvider, clazz, beanMetaData, propertyPath );
 	}
 
 	/**
@@ -1635,16 +1617,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return context.isFailFastModeEnabled() && !context.getFailingConstraints().isEmpty();
 	}
 
-	private PropertyMetaData getBeanPropertyMetaData( Class<?> beanClass, Path.Node propertyNode ) {
+	private PropertyMetaData getBeanPropertyMetaData(BeanMetaData<?> beanMetaData, Path.Node propertyNode ) {
 		if ( !ElementKind.PROPERTY.equals( propertyNode.getKind() ) ) {
-			throw log.getInvalidPropertyPathException( beanClass, propertyNode.getName() );
+			throw log.getInvalidPropertyPathException( beanMetaData.getBeanClass(), propertyNode.getName() );
 		}
 
-		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( beanClass );
 		PropertyMetaData propertyMetaData = beanMetaData.getMetaDataFor( propertyNode.getName() );
 
 		if ( propertyMetaData == null ) {
-			throw log.getInvalidPropertyPathException( beanClass, propertyNode.getName() );
+			throw log.getInvalidPropertyPathException( beanMetaData.getBeanClass(), propertyNode.getName() );
 		}
 		return propertyMetaData;
 	}

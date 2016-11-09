@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 /**
  * Represents the constraint related meta data of the return value of a method
@@ -116,5 +117,10 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	@Override
 	public void appendTo(PathImpl path) {
 		path.addReturnValueNode();
+	}
+
+	@Override
+	public UnwrapMode getUnwrapMode(ConstraintLocation location) {
+		return unwrapMode();
 	}
 }
