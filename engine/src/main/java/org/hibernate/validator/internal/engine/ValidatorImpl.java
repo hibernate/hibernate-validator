@@ -485,7 +485,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		boolean validationSuccessful = true;
 
 		valueContext.setCurrentGroup( defaultSequenceMember.getDefiningClass() );
-		PathImpl currentPath = valueContext.getPropertyPath();
 
 		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 			// HV-466, an interface implemented more than one time in the hierarchy has to be validated only one
@@ -505,22 +504,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			validationSuccessful = validationSuccessful && tmp;
-			// reset property path
-			valueContext.setPropertyPath( currentPath );
 		}
 		return validationSuccessful;
 	}
 
 	private void validateConstraintsForNonDefaultGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
-		PathImpl currentPath = valueContext.getPropertyPath();
 		for ( MetaConstraint<?> metaConstraint : beanMetaData.getMetaConstraints() ) {
 			validateConstraint( validationContext, valueContext, false, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
-			// reset the path to the state before this call
-			valueContext.setPropertyPath( currentPath );
 		}
 		validationContext.markCurrentBeanAsProcessed( valueContext );
 	}
@@ -531,10 +525,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			MetaConstraint<?> metaConstraint) {
 
 		boolean validationSuccessful;
-
-		if ( !propertyPathComplete ) {
-			valueContext.appendNode( metaConstraint.getLocation() );
-		}
 
 		if ( metaConstraint.getElementType() != ElementType.TYPE ) {
 			PropertyMetaData propertyMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() )
@@ -550,7 +540,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 		}
 
-		validationSuccessful = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), metaConstraint );
+		validationSuccessful = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), propertyPathComplete, metaConstraint );
 
 		// reset the unwrapping mode
 		valueContext.setUnwrapMode( UnwrapMode.AUTOMATIC );
@@ -562,31 +552,34 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		boolean validationSuccessful;
 
-		PropertyMetaData propertyMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() )
-				.getMetaDataFor( metaConstraint.getLocation().getPropertyName() );
-
-		if ( !propertyPathComplete ) {
-			valueContext.appendNode( propertyMetaData );
-		}
-
 		valueContext.setUnwrapMode( UnwrapMode.UNWRAP );
-		validationSuccessful = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), metaConstraint );
+		validationSuccessful = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), propertyPathComplete, metaConstraint );
 		valueContext.setUnwrapMode( UnwrapMode.AUTOMATIC );
 
 		return validationSuccessful;
 	}
 
-	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
-		if ( !isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
-			return true;
+	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, boolean propertyPathComplete, MetaConstraint<?> metaConstraint) {
+		PathImpl currentPath = valueContext.getPropertyPath();
+		boolean success = true;
+
+		if ( !propertyPathComplete ) {
+			valueContext.appendNode( metaConstraint.getLocation() );
 		}
 
-		if ( parent != null ) {
-			Object valueToValidate = valueContext.getValue( parent, metaConstraint.getLocation() );
-			valueContext.setCurrentValidatedValue( valueToValidate );
+		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
+			if ( parent != null ) {
+				Object valueToValidate = valueContext.getValue( parent, metaConstraint.getLocation() );
+				valueContext.setCurrentValidatedValue( valueToValidate );
+			}
+
+			success = metaConstraint.validateConstraint( validationContext, valueContext );
 		}
 
-		return metaConstraint.validateConstraint( validationContext, valueContext );
+		// reset the path to the state before this call
+		valueContext.setPropertyPath( currentPath );
+
+		return success;
 	}
 
 	/**
@@ -1176,9 +1169,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					validationContext.getRootBean(), executableMetaData, currentValidatedGroup
 			);
 
-			MetaConstraint<?> firstConstraint = executableMetaData.getCrossParameterConstraints().iterator().next();
-			valueContext.appendNode( firstConstraint.getLocation() );
-
 			// 1. validate cross-parameter constraints
 			validateConstraintsForGroup(
 					validationContext, valueContext, parameterValues, executableMetaData.getCrossParameterConstraints()
@@ -1194,8 +1184,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		// 2. validate parameter constraints
 		for ( int i = 0; i < parameterValues.length; i++ ) {
-			PathImpl originalPath = valueContext.getPropertyPath();
-
 			ParameterMetaData parameterMetaData = executableMetaData.getParameterMetaData( i );
 			Object value = parameterValues[i];
 
@@ -1217,7 +1205,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				}
 			}
 
-			valueContext.appendNode( parameterMetaData );
 			valueContext.setUnwrapMode( parameterMetaData.unwrapMode() );
 
 			validateConstraintsForGroup(
@@ -1235,8 +1222,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					return;
 				}
 			}
-
-			valueContext.setPropertyPath( originalPath );
 		}
 	}
 
@@ -1390,7 +1375,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		);
 
 		ReturnValueMetaData returnValueMetaData = executableMetaData.getReturnValueMetaData();
-		valueContext.appendNode( returnValueMetaData );
 		valueContext.setUnwrapMode( returnValueMetaData.unwrapMode() );
 
 		validateConstraintsForGroup( validationContext, valueContext, value, returnValueMetaData );
@@ -1409,7 +1393,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private void validateConstraintsForGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent,
 			Iterable<MetaConstraint<?>> constraints) {
 		for ( MetaConstraint<?> metaConstraint : constraints ) {
-			validateMetaConstraint( validationContext, valueContext, parent, metaConstraint );
+			validateMetaConstraint( validationContext, valueContext, parent, false, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
 				break;
 			}
