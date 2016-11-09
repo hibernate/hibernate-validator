@@ -147,6 +147,11 @@ public class ValidationContext<T> {
 
 	private final TimeProvider timeProvider;
 
+	/**
+	 * The name of the validated (leaf) property in case of a validateProperty()/validateValue() call.
+	 */
+	private String validatedProperty;
+
 	private ValidationContext(ConstraintValidatorManager constraintValidatorManager,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
@@ -394,6 +399,14 @@ public class ValidationContext<T> {
 		}
 
 		return null;
+	}
+
+	public String getValidatedProperty() {
+		return validatedProperty;
+	}
+
+	public void setValidatedProperty(String validatedProperty) {
+		this.validatedProperty = validatedProperty;
 	}
 
 	@Override
