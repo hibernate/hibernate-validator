@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.ap.checks.annotationparameters;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
@@ -20,6 +19,8 @@ import javax.lang.model.util.Types;
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
+import org.hibernate.validator.ap.util.ConstraintHelper;
+import org.hibernate.validator.ap.util.TypeNames;
 
 /**
  * Checks that the GroupSequence definition is valid.
@@ -27,18 +28,20 @@ import org.hibernate.validator.ap.util.CollectionHelper;
  * <li>the class list contains only interface</li>
  * <li>the defined group sequence is expandable (no cyclic definition)</li>
  * <li>the class list contains the hosting bean class (for default group sequence re-definition)</li>
+ * <li>the class list does not use interfaces that extend others</li>
  * </ul>
  *
  * @author Marko Bekhta
  */
 public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 
-	private static final String JAVAX_VALIDATION_GROUP_SEQUENCE = "javax.validation.GroupSequence";
 	private Types typeUtils;
+	private final ConstraintHelper constraintHelper;
 
-	public GroupSequenceCheck(AnnotationApiHelper annotationApiHelper, Types typeUtils) {
-		super( annotationApiHelper, JAVAX_VALIDATION_GROUP_SEQUENCE );
+	public GroupSequenceCheck(AnnotationApiHelper annotationApiHelper, Types typeUtils, ConstraintHelper constraintHelper) {
+		super( annotationApiHelper, TypeNames.BeanValidationTypes.GROUP_SEQUENCE );
 		this.typeUtils = typeUtils;
+		this.constraintHelper = constraintHelper;
 	}
 
 	@Override
@@ -49,38 +52,61 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 
 		boolean classForRedefiningGroupSequencePresent = false;
 
+		Set<String> qualifiedNames = CollectionHelper.newHashSet();
+
+		Set<ConstraintCheckIssue> issues = CollectionHelper.newHashSet();
+
 		for ( AnnotationValue value : annotationValue ) {
 			// 1. The class list contains only interface
 			TypeMirror typeMirror = (TypeMirror) value.getValue();
 			boolean isClassAndSameAsAnnotatedElement = isClassForRedefiningGroupSequence( annotatedElement, typeMirror );
 
 			if ( !annotationApiHelper.isInterface( typeMirror ) && !isClassAndSameAsAnnotatedElement ) {
-				return CollectionHelper.asSet( ConstraintCheckIssue.error(
+				issues.add( ConstraintCheckIssue.error(
 						element, annotation, "INVALID_GROUP_SEQUENCE_VALUE_NOT_INTERFACES_ANNOTATION_PARAMETERS"
 				) );
+				// if it's not an interface we will not do any other checks on it
+				continue;
 			}
 			// 2. the defined group sequence is expandable (no cyclic definition)
-			if ( ( isFromHierarchy( annotatedElement, typeMirror ) || isPartOfGroupSequence( annotatedElement, typeMirror ) ) && !isClassAndSameAsAnnotatedElement ) {
-				return CollectionHelper.asSet( ConstraintCheckIssue.error(
+			if ( ( typeUtils.isSameType( annotatedElement.asType(), typeMirror ) || isPartOfGroupSequence( annotatedElement, typeMirror ) ) && !isClassAndSameAsAnnotatedElement ) {
+				issues.add( ConstraintCheckIssue.error(
 						element, annotation, "INVALID_GROUP_SEQUENCE_VALUE_CYCLIC_DEFINITION_ANNOTATION_PARAMETERS"
 				) );
 			}
 			// 3. the class list contains the hosting bean class (for default group sequence re-definition)
 			classForRedefiningGroupSequencePresent = classForRedefiningGroupSequencePresent || isClassAndSameAsAnnotatedElement;
+			// 4. one interface should not be declared multiple times in a group sequence
+			String qualifiedName = ( (TypeElement) typeUtils.asElement( typeMirror ) ).getQualifiedName().toString();
+			if ( qualifiedNames.contains( qualifiedName ) ) {
+				issues.add( ConstraintCheckIssue.error(
+						element, annotation, "INVALID_GROUP_SEQUENCE_VALUE_MULTIPLE_DECLARATIONS_ANNOTATION_PARAMETERS", qualifiedName )
+				);
+			}
+			// 5. if interface extends other interfaces we need to produce a warning
+			if ( annotationApiHelper.isInterface( typeMirror ) && !( (TypeElement) typeUtils.asElement( typeMirror ) ).getInterfaces().isEmpty() ) {
+				issues.add( ConstraintCheckIssue.warning(
+						element,
+						annotation,
+						"INVALID_GROUP_SEQUENCE_VALUE_EXTENDED_INTERFACES_ANNOTATION_PARAMETERS",
+						qualifiedName
+				) );
+			}
+			qualifiedNames.add( qualifiedName );
 		}
 
 		// if the annotated element is a class and does not contain itself in a group then it's bad group redefinition
 		if ( ElementKind.CLASS.equals( annotatedElement.getKind() ) && !classForRedefiningGroupSequencePresent ) {
-			return CollectionHelper.asSet( ConstraintCheckIssue.error(
+			issues.add( ConstraintCheckIssue.error(
 					element, annotation, "INVALID_GROUP_SEQUENCE_VALUE_HOSTING_BEAN_ANNOTATION_PARAMETERS"
 			) );
 		}
 
-		return Collections.emptySet();
+		return issues;
 	}
 
 	/**
-	 * Checks if a given type element ({@link TypeElement}) is not a part of definition of a group sequence annotation declared on
+	 * Checks if a given type element ({@link TypeElement}) is a part of definition of a group sequence annotation declared on
 	 * a given group element {@link TypeMirror}
 	 *
 	 * @param typeElement an element to check if it is present or not in definition of a group sequence
@@ -89,18 +115,12 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 	 * @return {@code true} if given element is part of group sequence definition, and {@code false} otherwise
 	 */
 	private boolean isPartOfGroupSequence(TypeElement typeElement, TypeMirror groupElement) {
-		List<? extends AnnotationValue> annotationValue = null;
-		for ( AnnotationMirror annotationMirror : typeUtils.asElement( groupElement ).getAnnotationMirrors() ) {
-			if ( JAVAX_VALIDATION_GROUP_SEQUENCE.equals( ( (TypeElement) annotationMirror.getAnnotationType()
-					.asElement() ).getQualifiedName().toString() ) ) {
-				annotationValue = annotationApiHelper.getAnnotationArrayValue( annotationMirror, "value" );
-				break;
-			}
-		}
+		AnnotationMirror groupSequenceMirror = getGroupSequence( groupElement );
+		List<? extends AnnotationValue> annotationValue = annotationApiHelper.getAnnotationArrayValue( groupSequenceMirror, "value" );
 		if ( annotationValue != null ) {
 			for ( AnnotationValue value : annotationValue ) {
 				TypeMirror typeMirror = (TypeMirror) value.getValue();
-				if ( isFromHierarchy( (TypeElement) typeUtils.asElement( typeMirror ), typeElement.asType() ) ) {
+				if ( typeUtils.isSameType( typeMirror, typeElement.asType() ) ) {
 					return true;
 				}
 			}
@@ -109,29 +129,20 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 	}
 
 	/**
-	 * Checks if given element ({@link TypeElement}) is present somewhere in inheritance hierarchy of given type mirror ({@link TypeMirror}).
+	 * Finds a {@code javax.validation.GroupSequence} annotation if one is present on given type ({@link TypeMirror}.
 	 *
-	 * @param annotatedElement an element to check
-	 * @param typeMirror a mirror to check if element is present in its hierarchy
+	 * @param typeMirror a type on which to check for {@code javax.validation.GroupSequence} annotation
 	 *
-	 * @return {@code true} if annotated element is present somewhere in hierarchy of a given type mirror, {@code false} otherwise
+	 * @return {@link AnnotationMirror} that represents a {@code javax.validation.GroupSequence} if one was present on given type,
+	 * {@code null} otherwise
 	 */
-	private boolean isFromHierarchy(TypeElement annotatedElement, TypeMirror typeMirror) {
-
-		while ( annotatedElement != null && !"java.lang.Object".equals( annotatedElement.getQualifiedName().toString() ) ) {
-			if ( typeUtils.isSameType( annotatedElement.asType(), typeMirror ) ) {
-				return true;
+	private AnnotationMirror getGroupSequence(TypeMirror typeMirror) {
+		for ( AnnotationMirror annotationMirror : typeUtils.asElement( typeMirror ).getAnnotationMirrors() ) {
+			if ( ConstraintHelper.AnnotationType.GROUP_SEQUENCE_ANNOTATION.equals( constraintHelper.getAnnotationType( annotationMirror ) ) ) {
+				return annotationMirror;
 			}
-
-			for ( TypeMirror interfaceMirror : annotatedElement.getInterfaces() ) {
-				if ( typeUtils.isSubtype( interfaceMirror, typeMirror ) ) {
-					return true;
-				}
-			}
-			annotatedElement = (TypeElement) typeUtils.asElement( annotatedElement.getSuperclass() );
 		}
-
-		return false;
+		return null;
 	}
 
 	/**

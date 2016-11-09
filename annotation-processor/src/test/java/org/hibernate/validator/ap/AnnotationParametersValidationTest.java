@@ -320,18 +320,17 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 41 ),
-				new DiagnosticExpectation( Kind.ERROR, 45 ),
-				new DiagnosticExpectation( Kind.ERROR, 65 ),
-				new DiagnosticExpectation( Kind.ERROR, 69 ),
-				new DiagnosticExpectation( Kind.ERROR, 73 ),
-				new DiagnosticExpectation( Kind.ERROR, 84 ),
-				new DiagnosticExpectation( Kind.ERROR, 91 ),
-				new DiagnosticExpectation( Kind.ERROR, 98 ),
-				new DiagnosticExpectation( Kind.ERROR, 102 ),
-				new DiagnosticExpectation( Kind.ERROR, 145 ),
-				new DiagnosticExpectation( Kind.ERROR, 168 ),
-				new DiagnosticExpectation( Kind.ERROR, 172 )
+				new DiagnosticExpectation( Kind.ERROR, 29 ),
+				new DiagnosticExpectation( Kind.ERROR, 33 ),
+				new DiagnosticExpectation( Kind.ERROR, 48 ),
+				new DiagnosticExpectation( Kind.ERROR, 52 ),
+				new DiagnosticExpectation( Kind.ERROR, 61 ),
+				new DiagnosticExpectation( Kind.ERROR, 96 ),
+				new DiagnosticExpectation( Kind.ERROR, 105 ),
+				new DiagnosticExpectation( Kind.ERROR, 109 ),
+				new DiagnosticExpectation( Kind.ERROR, 124 ),
+				new DiagnosticExpectation( Kind.WARNING, 74 ),
+				new DiagnosticExpectation( Kind.WARNING, 78 )
 		);
 	}
 
