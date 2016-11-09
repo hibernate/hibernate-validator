@@ -765,18 +765,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			Sequence sequence = sequenceIterator.next();
 
 			for ( GroupWithInheritance groupOfGroups : sequence ) {
-				int numberOfConstraintViolations = 0;
+				int numberOfConstraintViolationsBefore = context.getFailingConstraints().size();
 
 				for ( Group group : groupOfGroups ) {
 					valueContext.setCurrentGroup( group.getDefiningClass() );
-					numberOfConstraintViolations += validatePropertyForCurrentGroup(
-							context, valueContext, metaConstraints, typeUseConstraints
-					);
+					validatePropertyForCurrentGroup( context, valueContext, metaConstraints, typeUseConstraints );
 					if ( shouldFailFast( context ) ) {
 						return context.getFailingConstraints();
 					}
 				}
-				if ( numberOfConstraintViolations > 0 ) {
+				if ( context.getFailingConstraints().size() > numberOfConstraintViolationsBefore ) {
 					break;
 				}
 			}
@@ -825,17 +823,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		while ( sequenceIterator.hasNext() ) {
 			Sequence sequence = sequenceIterator.next();
 			for ( GroupWithInheritance groupOfGroups : sequence ) {
-				int numberOfConstraintViolations = 0;
+				int numberOfConstraintViolationsBefore = context.getFailingConstraints().size();
 				for ( Group group : groupOfGroups ) {
 					valueContext.setCurrentGroup( group.getDefiningClass() );
-					numberOfConstraintViolations += validatePropertyForCurrentGroup(
+					validatePropertyForCurrentGroup(
 							context, valueContext, metaConstraints, typeArgumentConstraints
 					);
 					if ( shouldFailFast( context ) ) {
 						return context.getFailingConstraints();
 					}
 				}
-				if ( numberOfConstraintViolations > 0 ) {
+				if ( context.getFailingConstraints().size() > numberOfConstraintViolationsBefore ) {
 					break;
 				}
 			}
@@ -853,19 +851,20 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 *
 	 * @return The number of constraint violations raised when validating the {@code ValueContext} current group.
 	 */
-	private int validatePropertyForCurrentGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, List<MetaConstraint<?>> metaConstraints, List<MetaConstraint<?>> typeUseConstraints) {
+	private void validatePropertyForCurrentGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, List<MetaConstraint<?>> metaConstraints, List<MetaConstraint<?>> typeUseConstraints) {
 		// we do not validate the default group, nothing special to do
 		if ( !valueContext.validatingDefault() ) {
-			return validatePropertyForNonDefaultGroup(
+			validatePropertyForNonDefaultGroup(
 					validationContext,
 					valueContext,
 					metaConstraints,
 					typeUseConstraints
 			);
 		}
-
-		// we are validating the default group, we have to consider that a class in the hierarchy could redefine the default group sequence
-		return validatePropertyForDefaultGroup( validationContext, valueContext, metaConstraints, typeUseConstraints );
+		else {
+			// we are validating the default group, we have to consider that a class in the hierarchy could redefine the default group sequence
+			validatePropertyForDefaultGroup( validationContext, valueContext, metaConstraints, typeUseConstraints );
+		}
 	}
 
 	/**
@@ -877,27 +876,21 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @param valueContext The current validation context.
 	 * @param metaConstraints All constraints associated to the property.
 	 * @param typeArgumentConstraints All type argument constraints associated to the property
-	 *
-	 * @return The number of constraint violations raised when validating the {@code ValueContext} current group.
 	 */
-	private int validatePropertyForNonDefaultGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, List<MetaConstraint<?>> metaConstraints,
+	private void validatePropertyForNonDefaultGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, List<MetaConstraint<?>> metaConstraints,
 			List<MetaConstraint<?>> typeArgumentConstraints) {
-		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
 			validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), true, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
-				return validationContext.getFailingConstraints()
-						.size() - numberOfConstraintViolationsBefore;
+				return;
 			}
 		}
 		for ( MetaConstraint<?> metaConstraint : typeArgumentConstraints ) {
 			validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), true, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
-				return validationContext.getFailingConstraints()
-						.size() - numberOfConstraintViolationsBefore;
+				return;
 			}
 		}
-		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
 	}
 
 	/**
@@ -909,14 +902,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * @param validationContext The global validation context.
 	 * @param valueContext The current validation context.
 	 * @param constraintList All constraints associated to the property to check.
-	 *
-	 * @return The number of constraint violations raised when validating the default group.
 	 */
-	private <U> int validatePropertyForDefaultGroup(ValidationContext<?> validationContext,
+	private <U> void validatePropertyForDefaultGroup(ValidationContext<?> validationContext,
 			ValueContext<U, Object> valueContext,
 			List<MetaConstraint<?>> constraintList,
 			List<MetaConstraint<?>> typeUseConstraints) {
-		final int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 		final BeanMetaData<U> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		final Map<Class<?>, Class<?>> validatedInterfaces = newHashMap();
 
@@ -957,7 +947,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				break;
 			}
 		}
-		return validationContext.getFailingConstraints().size() - numberOfConstraintViolationsBefore;
 	}
 
 	private <U> boolean validatePropertyForSingleDefaultGroupElement(ValidationContext<?> validationContext, ValueContext<U, Object> valueContext,
