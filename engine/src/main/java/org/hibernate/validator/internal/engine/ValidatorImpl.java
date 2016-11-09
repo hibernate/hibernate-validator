@@ -498,7 +498,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				validatedInterfaces.put( declaringClass, clazz );
 			}
 
-			boolean tmp = validateConstraint( validationContext, valueContext, false, metaConstraint );
+			boolean tmp = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), false, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
 				return false;
 			}
@@ -511,26 +511,12 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private void validateConstraintsForNonDefaultGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
 		for ( MetaConstraint<?> metaConstraint : beanMetaData.getMetaConstraints() ) {
-			validateConstraint( validationContext, valueContext, false, metaConstraint );
+			validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), false, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
 		}
 		validationContext.markCurrentBeanAsProcessed( valueContext );
-	}
-
-	private boolean validateConstraint(ValidationContext<?> validationContext,
-			ValueContext<?, Object> valueContext,
-			boolean propertyPathComplete,
-			MetaConstraint<?> metaConstraint) {
-
-		return validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), propertyPathComplete, metaConstraint );
-	}
-
-	private boolean validatePropertyTypeConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, boolean propertyPathComplete,
-			MetaConstraint<?> metaConstraint) {
-
-		return validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), propertyPathComplete, metaConstraint );
 	}
 
 	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, boolean propertyPathComplete, MetaConstraint<?> metaConstraint) {
@@ -898,14 +884,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			List<MetaConstraint<?>> typeArgumentConstraints) {
 		int numberOfConstraintViolationsBefore = validationContext.getFailingConstraints().size();
 		for ( MetaConstraint<?> metaConstraint : metaConstraints ) {
-			validateConstraint( validationContext, valueContext, true, metaConstraint );
+			validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), true, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
 				return validationContext.getFailingConstraints()
 						.size() - numberOfConstraintViolationsBefore;
 			}
 		}
 		for ( MetaConstraint<?> metaConstraint : typeArgumentConstraints ) {
-			validatePropertyTypeConstraint( validationContext, valueContext, true, metaConstraint );
+			validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), true, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
 				return validationContext.getFailingConstraints()
 						.size() - numberOfConstraintViolationsBefore;
@@ -994,7 +980,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			if ( constraintList.contains( metaConstraint ) ) {
-				boolean tmp = validateConstraint( validationContext, valueContext, true, metaConstraint );
+				boolean tmp = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), true, metaConstraint );
 
 				validationSuccessful = validationSuccessful && tmp;
 				if ( shouldFailFast( validationContext ) ) {
@@ -1003,12 +989,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			if ( typeUseConstraints.contains( metaConstraint ) ) {
-				boolean tmp = validatePropertyTypeConstraint(
-						validationContext,
-						valueContext,
-						true,
-						metaConstraint
-						);
+				boolean tmp = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), true, metaConstraint );
 				validationSuccessful = validationSuccessful && tmp;
 				if ( shouldFailFast( validationContext ) ) {
 					return false;
