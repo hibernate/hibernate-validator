@@ -42,11 +42,6 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public String getPropertyName() {
-		return delegate.getPropertyName();
-	}
-
-	@Override
 	public Type getTypeForValidatorResolution() {
 		return typeForValidatorResolution;
 	}
