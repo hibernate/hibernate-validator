@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.reflect.Type;
 import java.util.List;
+
 import javax.validation.ElementKind;
 import javax.validation.metadata.ElementDescriptor;
 
@@ -75,7 +76,7 @@ public interface ConstraintMetaData extends Iterable<MetaConstraint<?>> {
 	ElementDescriptor asDescriptor(boolean defaultGroupSequenceRedefined, List<Class<?>> defaultGroupSequence);
 
 	/**
-	 * Defines how the validated values needs to be treated in case there is a potential unrapper specified for its type
+	 * Defines how the validated values needs to be treated in case there is a potential unwrapper specified for its type
 	 *
 	 * @return the {@code ValidatedValueUnwrapMode} to be used for this constraint.
 	 */
