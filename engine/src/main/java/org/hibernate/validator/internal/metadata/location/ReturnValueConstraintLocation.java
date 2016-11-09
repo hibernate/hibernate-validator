@@ -56,6 +56,11 @@ class ReturnValueConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public Object getValue(Object parent) {
+		return parent;
+	}
+
+	@Override
 	public String toString() {
 		return "ReturnValueConstraintLocation [executable=" + executable + "]";
 	}

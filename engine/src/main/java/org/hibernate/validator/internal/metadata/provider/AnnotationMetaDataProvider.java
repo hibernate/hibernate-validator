@@ -690,17 +690,20 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForMember(Member member) {
 		AnnotatedType annotatedType = null;
-
+		ConstraintLocation location = null;
 		if ( member instanceof Field ) {
 			annotatedType = ( (Field) member ).getAnnotatedType();
+			location = ConstraintLocation.forProperty( member );
 		}
 
 		if ( member instanceof Method ) {
 			annotatedType = ( (Method) member ).getAnnotatedReturnType();
+			location = ConstraintLocation.forReturnValue( (Executable) member );
 		}
 
 		return findTypeArgumentsConstraints(
 				member,
+				location,
 				annotatedType,
 				( (AccessibleObject) member ).isAnnotationPresent( Valid.class )
 		);
@@ -709,16 +712,17 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Finds type arguments constraints for parameters.
 	 *
-	 * @param member the method
+	 * @param executable the executable
 	 * @param i the parameter index
 	 *
 	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
 	 */
-	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Member member, int i) {
-		Parameter parameter = ( (Executable) member ).getParameters()[i];
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Executable executable, int i) {
+		Parameter parameter = executable.getParameters()[i];
 		try {
 			return findTypeArgumentsConstraints(
-					member,
+					executable,
+					ConstraintLocation.forParameter( executable, i ),
 					parameter.getAnnotatedType(),
 					parameter.isAnnotationPresent( Valid.class )
 			);
@@ -729,7 +733,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 	}
 
-	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, AnnotatedType annotatedType, boolean isCascaded) {
+	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, ConstraintLocation location, AnnotatedType annotatedType, boolean isCascaded) {
 		Optional<AnnotatedType> typeParameter = getTypeParameter( annotatedType );
 		if ( !typeParameter.isPresent() ) {
 			return Collections.emptySet();
@@ -758,7 +762,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		return convertToTypeArgumentMetaConstraints(
 				constraintDescriptors,
-				member,
+				location,
 				validatedType
 		);
 	}
@@ -779,10 +783,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Creates meta constraints for type arguments constraints.
 	 */
-	private Set<MetaConstraint<?>> convertToTypeArgumentMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Member member, Type type) {
+	private Set<MetaConstraint<?>> convertToTypeArgumentMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, ConstraintLocation location, Type type) {
 		Set<MetaConstraint<?>> constraints = newHashSet( constraintDescriptors.size() );
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
-			MetaConstraint<?> metaConstraint = createTypeArgumentMetaConstraint( member, constraintDescription, type );
+			MetaConstraint<?> metaConstraint = createTypeArgumentMetaConstraint( location, constraintDescription, type );
 			constraints.add( metaConstraint );
 		}
 		return constraints;
@@ -791,8 +795,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Creates a {@code MetaConstraint} for a type argument constraint.
 	 */
-	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor, Type type) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( member, type ) );
+	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(ConstraintLocation location, ConstraintDescriptorImpl<A> descriptor, Type type) {
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( location, type ) );
 	}
 
 	/**

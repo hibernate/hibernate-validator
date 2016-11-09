@@ -6,9 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -21,48 +19,31 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-// TODO the behavior should not be based on the property name; e.g. there will not be a property name for a type
-// constraint on a method parameter
 class TypeArgumentConstraintLocation implements ConstraintLocation {
 
-	private final Member member;
-	private String propertyName;
+	private final ConstraintLocation delegate;
 	private final Type typeForValidatorResolution;
+	private final boolean isCollection;
 
-	TypeArgumentConstraintLocation( Member member, Type typeOfAnnotatedElement) {
-		this.member = member;
-
-		Class<?> type = null;
-		if ( member instanceof Field ) {
-			type = ( (Field) member ).getType();
-		}
-		else if ( member instanceof Method ) {
-			type = ( (Method) member ).getReturnType();
-		}
-
-		if ( ReflectionHelper.isIterable( type ) || ReflectionHelper.isMap( type ) ) {
-			this.propertyName = null;
-		}
-		else {
-			this.propertyName = ReflectionHelper.getPropertyName( member );
-		}
-
+	TypeArgumentConstraintLocation(ConstraintLocation delegate, Type typeOfAnnotatedElement) {
+		this.delegate = delegate;
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( typeOfAnnotatedElement );
+		this.isCollection = ReflectionHelper.isIterable( delegate.getTypeForValidatorResolution() ) || ReflectionHelper.isMap( delegate.getTypeForValidatorResolution() );
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
-		return member.getDeclaringClass();
+		return delegate.getDeclaringClass();
 	}
 
 	@Override
 	public Member getMember() {
-		return member;
+		return delegate.getMember();
 	}
 
 	@Override
 	public String getPropertyName() {
-		return propertyName;
+		return delegate.getPropertyName();
 	}
 
 	@Override
@@ -72,17 +53,22 @@ class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
-		if ( propertyName != null ) {
-			path.addPropertyNode( propertyName );
+		if ( isCollection ) {
+			path.addCollectionElementNode();
 		}
 		else {
-			path.addCollectionElementNode();
+			delegate.appendTo( parameterNameProvider, path );
 		}
 	}
 
 	@Override
+	public Object getValue(Object parent) {
+		return delegate.getValue( parent );
+	}
+
+	@Override
 	public String toString() {
-		return "TypeArgumentValueConstraintLocation [member=" + member + ", typeForValidatorResolution="
+		return "TypeArgumentValueConstraintLocation [delegate=" + delegate + ", typeForValidatorResolution="
 				+ typeForValidatorResolution + "]";
 	}
 
@@ -97,7 +83,7 @@ class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 		TypeArgumentConstraintLocation that = (TypeArgumentConstraintLocation) o;
 
-		if ( member != null ? !member.equals( that.member ) : that.member != null ) {
+		if ( delegate != null ? !delegate.equals( that.delegate ) : that.delegate != null ) {
 			return false;
 		}
 		if ( !typeForValidatorResolution.equals( that.typeForValidatorResolution ) ) {
@@ -109,7 +95,7 @@ class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public int hashCode() {
-		int result = member != null ? member.hashCode() : 0;
+		int result = delegate != null ? delegate.hashCode() : 0;
 		result = 31 * result + typeForValidatorResolution.hashCode();
 		return result;
 	}

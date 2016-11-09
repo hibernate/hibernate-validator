@@ -67,6 +67,11 @@ class BeanConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
+	public Object getValue(Object parent) {
+		return parent;
+	}
+
+	@Override
 	public String toString() {
 		return "BeanConstraintLocation [declaringClass=" + declaringClass + ", typeForValidatorResolution=" + typeForValidatorResolution + "]";
 	}
