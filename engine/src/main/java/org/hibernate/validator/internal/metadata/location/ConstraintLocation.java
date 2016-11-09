@@ -69,13 +69,6 @@ public interface ConstraintLocation {
 	Member getMember();
 
 	/**
-	 * Returns the property name of the member represented by this location.
-	 *
-	 * @return the property name of the member represented by this location. Will be {@code null} when this location represents a type.
-	 */
-	String getPropertyName();
-
-	/**
 	 * Returns the type to be used when resolving constraint validators for constraints at this location. Note that this
 	 * is not always the same type as the type of the element described by this location; E.g. the wrapper type will is
 	 * used for constraint validator resolution, if a constraint is declared in an element with a primitive type.

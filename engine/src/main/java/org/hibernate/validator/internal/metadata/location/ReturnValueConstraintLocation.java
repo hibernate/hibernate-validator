@@ -41,11 +41,6 @@ class ReturnValueConstraintLocation implements ConstraintLocation {
 	}
 
 	@Override
-	public String getPropertyName() {
-		return null;
-	}
-
-	@Override
 	public Type getTypeForValidatorResolution() {
 		return typeForValidatorResolution;
 	}

@@ -28,7 +28,7 @@ import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-class PropertyConstraintLocation implements ConstraintLocation {
+public class PropertyConstraintLocation implements ConstraintLocation {
 
 	/**
 	 * The member the constraint was defined on.
@@ -65,7 +65,6 @@ class PropertyConstraintLocation implements ConstraintLocation {
 		return member;
 	}
 
-	@Override
 	public String getPropertyName() {
 		return propertyName;
 	}
