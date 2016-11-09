@@ -14,6 +14,7 @@ import javax.lang.model.element.Element;
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
+import org.hibernate.validator.ap.util.TypeNames;
 
 /**
  * Checks that the parameters used on {@code javax.validation.constraints.Digits} annotations are valid.
@@ -23,7 +24,7 @@ import org.hibernate.validator.ap.util.CollectionHelper;
 public class AnnotationParametersDigitsCheck extends AnnotationParametersAbstractCheck {
 
 	public AnnotationParametersDigitsCheck(AnnotationApiHelper annotationApiHelper) {
-		super( annotationApiHelper, "javax.validation.constraints.Digits" );
+		super( annotationApiHelper, TypeNames.BeanValidationTypes.DIGITS );
 	}
 
 	@Override

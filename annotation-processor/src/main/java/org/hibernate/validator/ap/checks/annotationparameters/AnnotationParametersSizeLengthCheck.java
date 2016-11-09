@@ -9,6 +9,7 @@ package org.hibernate.validator.ap.checks.annotationparameters;
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 import org.hibernate.validator.ap.util.AnnotationApiHelper;
 import org.hibernate.validator.ap.util.CollectionHelper;
+import org.hibernate.validator.ap.util.TypeNames;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -24,7 +25,7 @@ import java.util.Set;
 public class AnnotationParametersSizeLengthCheck extends AnnotationParametersAbstractCheck {
 
 	public AnnotationParametersSizeLengthCheck(AnnotationApiHelper annotationApiHelper) {
-		super( annotationApiHelper, "javax.validation.constraints.Size", "org.hibernate.validator.constraints.Length" );
+		super( annotationApiHelper, TypeNames.BeanValidationTypes.SIZE, TypeNames.HibernateValidatorTypes.LENGTH );
 	}
 
 	@Override
