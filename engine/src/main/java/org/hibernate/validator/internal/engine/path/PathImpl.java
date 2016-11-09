@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.engine.path;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,8 +23,6 @@ import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Default implementation of {@code javax.validation.Path}.
@@ -211,6 +211,13 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
+	public void removeLeafNode() {
+		if ( !nodeList.isEmpty() ) {
+			nodeList.remove( nodeList.size() - 1 );
+			currentLeafNode = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
+		}
+	}
+
 	public NodeImpl getLeafNode() {
 		return currentLeafNode;
 	}
@@ -305,12 +312,12 @@ public final class PathImpl implements Path, Serializable {
 	}
 
 	private PathImpl() {
-		nodeList = new ArrayList<Node>();
+		nodeList = new ArrayList<>();
 		this.hashCode = -1;
 	}
 
 	private PathImpl(List<Node> nodeList) {
-		this.nodeList = new ArrayList<Node>( nodeList );
+		this.nodeList = new ArrayList<>( nodeList );
 		this.hashCode = -1;
 	}
 

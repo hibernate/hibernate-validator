@@ -498,7 +498,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				validatedInterfaces.put( declaringClass, clazz );
 			}
 
-			boolean tmp = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), false, metaConstraint );
+			boolean tmp = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
 				return false;
 			}
@@ -510,30 +510,28 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private void validateConstraintsForNonDefaultGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
-		validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), false, beanMetaData.getMetaConstraints() );
+		validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), beanMetaData.getMetaConstraints() );
 		validationContext.markCurrentBeanAsProcessed( valueContext );
 	}
 
 	private void validateMetaConstraints(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent,
-			boolean propertyPathComplete, Iterable<MetaConstraint<?>> constraints) {
+			Iterable<MetaConstraint<?>> constraints) {
 
 		for ( MetaConstraint<?> metaConstraint : constraints ) {
-			validateMetaConstraint( validationContext, valueContext, parent, propertyPathComplete, metaConstraint );
+			validateMetaConstraint( validationContext, valueContext, parent, metaConstraint );
 			if ( shouldFailFast( validationContext ) ) {
 				break;
 			}
 		}
 	}
 
-	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, boolean propertyPathComplete, MetaConstraint<?> metaConstraint) {
+	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
 		PathImpl currentPath = valueContext.getPropertyPath();
 		UnwrapMode currentUnwrapMode = valueContext.getUnwrapMode();
 
 		boolean success = true;
 
-		if ( !propertyPathComplete ) {
-			valueContext.appendNode( metaConstraint.getLocation() );
-		}
+		valueContext.appendNode( metaConstraint.getLocation() );
 
 		if ( isValidationRequired( validationContext, valueContext, metaConstraint ) ) {
 			valueContext.setUnwrapMode( valueContext.getCurrentValidatable().getUnwrapMode( metaConstraint.getLocation() ) );
@@ -885,11 +883,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private void validatePropertyForNonDefaultGroup(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, List<MetaConstraint<?>> metaConstraints,
 			List<MetaConstraint<?>> typeArgumentConstraints) {
-		validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), true, metaConstraints );
+		validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), metaConstraints );
 		if ( shouldFailFast( validationContext ) ) {
 			return;
 		}
-		validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), true, typeArgumentConstraints );
+		validateMetaConstraints( validationContext, valueContext, valueContext.getCurrentBean(), typeArgumentConstraints );
 		if ( shouldFailFast( validationContext ) ) {
 			return;
 		}
@@ -971,7 +969,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			if ( constraintList.contains( metaConstraint ) ) {
-				boolean tmp = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), true, metaConstraint );
+				boolean tmp = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), metaConstraint );
 
 				validationSuccessful = validationSuccessful && tmp;
 				if ( shouldFailFast( validationContext ) ) {
@@ -980,7 +978,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			if ( typeUseConstraints.contains( metaConstraint ) ) {
-				boolean tmp = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), true, metaConstraint );
+				boolean tmp = validateMetaConstraint( validationContext, valueContext, valueContext.getCurrentBean(), metaConstraint );
 				validationSuccessful = validationSuccessful && tmp;
 				if ( shouldFailFast( validationContext ) ) {
 					return false;
@@ -1120,7 +1118,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 
 			// 1. validate cross-parameter constraints
-			validateMetaConstraints( validationContext, valueContext, parameterValues, false, executableMetaData.getCrossParameterConstraints() );
+			validateMetaConstraints( validationContext, valueContext, parameterValues, executableMetaData.getCrossParameterConstraints() );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
@@ -1153,13 +1151,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				}
 			}
 
-			validateMetaConstraints( validationContext, valueContext, parameterValues, false, parameterMetaData );
+			validateMetaConstraints( validationContext, valueContext, parameterValues, parameterMetaData );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
 
 			if ( !parameterMetaData.isCascading() ) {
-				validateMetaConstraints( validationContext, valueContext, parameterValues, false, parameterMetaData.getTypeArgumentsConstraints() );
+				validateMetaConstraints( validationContext, valueContext, parameterValues, parameterMetaData.getTypeArgumentsConstraints() );
 				if ( shouldFailFast( validationContext ) ) {
 					return;
 				}
@@ -1319,13 +1317,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		ReturnValueMetaData returnValueMetaData = executableMetaData.getReturnValueMetaData();
 
-		validateMetaConstraints( validationContext, valueContext, value, false, returnValueMetaData );
+		validateMetaConstraints( validationContext, valueContext, value, returnValueMetaData );
 		if ( shouldFailFast( validationContext ) ) {
 			return;
 		}
 
 		if ( !returnValueMetaData.isCascading() ) {
-			validateMetaConstraints( validationContext, valueContext, value, false, returnValueMetaData.getTypeArgumentsConstraints() );
+			validateMetaConstraints( validationContext, valueContext, value, returnValueMetaData.getTypeArgumentsConstraints() );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
@@ -1404,6 +1402,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		metaConstraints.addAll( propertyMetaData.getConstraints() );
 		typeArgumentConstraints.addAll( propertyMetaData.getTypeArgumentsConstraints() );
+		propertyPath.removeLeafNode();
 
 		return ValueContext.getLocalExecutionContext( parameterNameProvider, value, beanMetaData, propertyPath );
 	}
@@ -1461,6 +1460,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 		metaConstraints.addAll( propertyMetaData.getConstraints() );
 		typeArgumentConstraints.addAll( propertyMetaData.getTypeArgumentsConstraints() );
+		propertyPath.removeLeafNode();
 
 		return ValueContext.getLocalExecutionContext( parameterNameProvider, clazz, beanMetaData, propertyPath );
 	}
