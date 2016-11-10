@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.test.internal.engine;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -15,13 +16,19 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Set;
 
+import javax.el.ExpressionFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
+import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
@@ -32,10 +39,14 @@ import org.testng.annotations.Test;
  */
 public class ValidatorFactoryNoELBootstrapTest {
 
+	private final String EL_PACKAGE_PREFIX = "javax.el";
+
+	private final String EL_IMPL_PACKAGE_PREFIX = "com.sun.el";
+
 	@Test
 	@TestForIssue(jiraKey = "HV-793")
 	public void bootstrapFailsWhenUsingDefaultInterpolatorWithoutExpressionFactory() throws Throwable {
-		runWithoutElLibs( BootstrapFailsWhenUsingDefaultInterpolatorWithoutExpressionFactory.class );
+		runWithoutElLibs( BootstrapFailsWhenUsingDefaultInterpolatorWithoutExpressionFactory.class, EL_PACKAGE_PREFIX );
 	}
 
 	public static class BootstrapFailsWhenUsingDefaultInterpolatorWithoutExpressionFactory {
@@ -46,8 +57,9 @@ public class ValidatorFactoryNoELBootstrapTest {
 				fail( "An exception should have been thrown" );
 			}
 			catch (Throwable e) {
+				assertThat( e ).isInstanceOf( ValidationException.class );
 				assertTrue(
-						getRootCause( e ).getMessage().startsWith( "HV000183" ),
+						e.getMessage().startsWith( "HV000183" ),
 						"Bootstrapping in Validation should throw an unexpected exception: " + e.getMessage()
 				);
 			}
@@ -57,7 +69,7 @@ public class ValidatorFactoryNoELBootstrapTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-1131")
 	public void canUseParameterInterpolatorWithoutExpressionFactory() throws Throwable {
-		runWithoutElLibs( CanUseParameterInterpolatorWithoutExpressionFactory.class );
+		runWithoutElLibs( CanUseParameterInterpolatorWithoutExpressionFactory.class, EL_PACKAGE_PREFIX );
 	}
 
 	public static class CanUseParameterInterpolatorWithoutExpressionFactory {
@@ -76,6 +88,29 @@ public class ValidatorFactoryNoELBootstrapTest {
 		}
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1153")
+	public void missingImplementationThrowsValidationException() throws Throwable {
+		runWithoutElLibs( MissingImplementationThrowsValidationException.class, EL_IMPL_PACKAGE_PREFIX );
+	}
+
+	public static class MissingImplementationThrowsValidationException {
+
+		public void run() {
+			try {
+				Validation.buildDefaultValidatorFactory();
+				fail( "An exception should have been thrown" );
+			}
+			catch (Throwable e) {
+				assertThat( e ).isInstanceOf( ValidationException.class );
+				assertTrue(
+						e.getMessage().startsWith( "HV000183" ),
+						"Bootstrapping in Validation should throw an unexpected exception: " + e.getMessage()
+				);
+			}
+		}
+	}
+
 	public static class SomeBean {
 
 		@Min(42)
@@ -88,7 +123,6 @@ public class ValidatorFactoryNoELBootstrapTest {
 	 * classpath.
 	 */
 	private static class ELIgnoringClassLoader extends ClassLoader {
-		private final String EL_PACKAGE_PREFIX = "javax.el";
 		private final String[] PASS_THROUGH_PACKAGE_PREFIXES = new String[] {
 				"java.",
 				"javax.xml.",
@@ -98,14 +132,17 @@ public class ValidatorFactoryNoELBootstrapTest {
 				"jdk.internal"
 		};
 
-		public ELIgnoringClassLoader() {
+		private final String packageMissing;
+
+		public ELIgnoringClassLoader( String packageMissing ) {
 			super( ELIgnoringClassLoader.class.getClassLoader() );
+			this.packageMissing = packageMissing;
 		}
 
 		@Override
 		public Class<?> loadClass(String className) throws ClassNotFoundException {
 			// This is what we in the end want to achieve. Throw ClassNotFoundException for javax.el classes
-			if ( className.startsWith( EL_PACKAGE_PREFIX ) ) {
+			if ( className.startsWith( packageMissing ) ) {
 				throw new ClassNotFoundException();
 			}
 
@@ -179,24 +216,58 @@ public class ValidatorFactoryNoELBootstrapTest {
 
 	/**
 	 * Loads the given class using the EL-ignoring class loader and executes it.
+	 *
+	 * We need to override the Thread context class loader temporarily as {@link javax.el.FactoryFinder} is directly using it to load the
+	 * {@link ExpressionFactory} in {@link ExpressionFactory#newInstance(java.util.Properties)}.
 	 */
-	private void runWithoutElLibs(Class<?> delegateType) throws Throwable {
+	private void runWithoutElLibs(Class<?> delegateType, String packageMissing) throws Throwable {
 		try {
-			Object test = new ELIgnoringClassLoader().loadClass( delegateType.getName() ).newInstance();
-			test.getClass().getMethod( "run" ).invoke( test );
+			ClassLoader originClassLoader = run( GetClassLoader.fromContext() );
+			try {
+				ClassLoader classLoader = new ELIgnoringClassLoader( packageMissing );
+				run( SetClassLoader.ofContext( classLoader ) );
+
+				Object test = classLoader.loadClass( delegateType.getName() ).newInstance();
+				test.getClass().getMethod( "run" ).invoke( test );
+			}
+			finally {
+				run( SetClassLoader.ofContext( originClassLoader ) );
+			}
 		}
 		catch (InvocationTargetException ite) {
 			throw ite.getCause();
 		}
 	}
 
-	private static Throwable getRootCause(Throwable throwable) {
-		while ( true ) {
-			Throwable cause = throwable.getCause();
-			if ( cause == null ) {
-				return throwable;
-			}
-			throwable = cause;
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	}
+
+	/**
+	 * Privileged action used to set the Thread context class loader.
+	 */
+	private static final class SetClassLoader implements PrivilegedAction<Void> {
+		private final ClassLoader classLoader;
+
+		public static SetClassLoader ofContext(ClassLoader classLoader) {
+			Contracts.assertNotNull( classLoader, "class loader must not be null" );
+			return new SetClassLoader( classLoader );
+		}
+
+		private SetClassLoader(ClassLoader classLoader) {
+			this.classLoader = classLoader;
+		}
+
+		@Override
+		public Void run() {
+			Thread.currentThread().setContextClassLoader( classLoader );
+			return null;
 		}
 	}
 }
