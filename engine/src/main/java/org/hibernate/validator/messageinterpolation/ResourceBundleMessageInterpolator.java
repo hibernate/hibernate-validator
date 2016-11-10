@@ -23,6 +23,7 @@ import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
  * @author Adam Stawicki
+ * @author Guillaume Smet
  */
 public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolator {
 
@@ -73,9 +74,9 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 		try {
 			return ExpressionFactory.newInstance();
 		}
-		catch (NoClassDefFoundError e) {
+		catch (Throwable e) {
 			// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
-			throw LOG.getMissingELDependenciesException();
+			throw LOG.getUnableToInitializeELExpressionFactoryException( e );
 		}
 	}
 }

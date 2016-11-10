@@ -604,8 +604,8 @@ public interface Log extends BasicLogger {
 	ValidationException getNoUnwrapperFoundForTypeException(String typeName);
 
 	@Message(id = 183,
-			value = "Unable to load 'javax.el.ExpressionFactory'. Check that you have the EL dependencies on the classpath, or use ParameterMessageInterpolator instead")
-	ValidationException getMissingELDependenciesException();
+			value = "Unable to initialize 'javax.el.ExpressionFactory'. Check that you have the EL dependencies on the classpath, or use ParameterMessageInterpolator instead")
+	ValidationException getUnableToInitializeELExpressionFactoryException(@Cause Throwable e);
 
 	@LogMessage(level = WARN)
 	@Message(id = 184, value = "ParameterMessageInterpolator has been chosen, EL interpolation will not be supported")
