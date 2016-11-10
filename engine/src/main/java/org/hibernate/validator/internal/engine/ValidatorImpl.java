@@ -197,7 +197,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		PathImpl propertyPath = PathImpl.createPathFromString( propertyName );
-		ValueContext<?, Object> valueContext = collectMetaConstraintsForPathWithValue( context, propertyPath );
+		ValueContext<?, Object> valueContext = getValueContextForPropertyValidation( context, propertyPath );
 
 		if ( valueContext.getCurrentBean() == null ) {
 			throw log.getUnableToReachPropertyToValidateException( context.getRootBean(), propertyPath );
@@ -738,7 +738,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private <T> Set<ConstraintViolation<T>> validateValueInContext(ValidationContext<T> context, Object value, PathImpl propertyPath, ValidationOrder validationOrder) {
-		ValueContext<?, Object> valueContext = collectMetaConstraintsForPathWithoutValue( context, propertyPath );
+		ValueContext<?, Object> valueContext = getValueContextForValueValidation( context, propertyPath );
 		valueContext.setCurrentValidatedValue( value );
 
 		BeanMetaData<?> beanMetaData = beanMetaDataManager.getBeanMetaData( valueContext.getCurrentBeanType() );
@@ -1121,15 +1121,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	/**
-	 * Collects all {@code MetaConstraint}s which match the given property path relative to the specified root class for a given value.
+	 * Returns a value context pointing to the given property path relative to the specified root class for a given
+	 * value.
 	 *
 	 * @param validationContext The validation context.
 	 * @param propertyPath The property path for which constraints have to be collected.
-	 *
-	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to the given property path.
+	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to
+	 * the given property path.
 	 */
-	private <V> ValueContext<?, V> collectMetaConstraintsForPathWithValue(ValidationContext<?> validationContext,
-			PathImpl propertyPath) {
+	private <V> ValueContext<?, V> getValueContextForPropertyValidation(ValidationContext<?> validationContext, PathImpl propertyPath) {
 		Class<?> clazz = validationContext.getRootBeanClass();
 		BeanMetaData<?> beanMetaData = null;
 		Object value = validationContext.getRootBean();
@@ -1193,17 +1193,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	/**
-	 * Collects all {@code MetaConstraint}s which match the given property path relative to the specified root class without a value.
+	 * Returns a value context pointing to the given property path relative to the specified root class without a value.
 	 * <p>
 	 * We are only able to use the static types as we don't have the value.
 	 * </p>
 	 *
 	 * @param validationContext The validation context.
 	 * @param propertyPath The property path for which constraints have to be collected.
-	 *
-	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to the given property path.
+	 * @return Returns an instance of {@code ValueContext} which describes the local validation context associated to
+	 * the given property path.
 	 */
-	private <V> ValueContext<?, V> collectMetaConstraintsForPathWithoutValue(ValidationContext<?> validationContext,
+	private <V> ValueContext<?, V> getValueContextForValueValidation(ValidationContext<?> validationContext,
 			PathImpl propertyPath) {
 		Class<?> clazz = validationContext.getRootBeanClass();
 		BeanMetaData<?> beanMetaData = null;
