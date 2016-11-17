@@ -71,6 +71,20 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	}
 
 	private static ExpressionFactory buildExpressionFactory() {
+		final ExpressionFactory moduleLoadingAttempt = attemptLoadingFromModularCL();
+		if ( moduleLoadingAttempt != null ) {
+			//This approach is expected to work in sane modular environments,
+			//such as Jigsaw and WildFly
+			return moduleLoadingAttempt;
+		}
+		else {
+			//While this is an attempt to maintain compatibility
+			//with some OSGi environments
+			return attemptLoadingFromCurrentCL();
+		}
+	}
+
+	private static ExpressionFactory attemptLoadingFromCurrentCL() {
 		try {
 			return ExpressionFactory.newInstance();
 		}
@@ -79,4 +93,24 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			throw LOG.getUnableToInitializeELExpressionFactoryException( e );
 		}
 	}
+
+	private static ExpressionFactory attemptLoadingFromModularCL() {
+		final Thread currentThread = Thread.currentThread();
+		final ClassLoader originalContextClassLoader = currentThread.getContextClassLoader();
+		try {
+			// The javax.el FactoryFinder uses the TCCL to load the ExpressionFactory.
+			// We need to be sure the ExpressionFactory implementation is visible to the class loader
+			// so we set the TCCL to the class loader used to load this very class.
+			currentThread.setContextClassLoader( ResourceBundleMessageInterpolator.class.getClassLoader() );
+			return ExpressionFactory.newInstance();
+		}
+		catch (Throwable e) {
+			//Ignoring this one, we'll try a different strategy
+			return null;
+		}
+		finally {
+			currentThread.setContextClassLoader( originalContextClassLoader );
+		}
+	}
+
 }
