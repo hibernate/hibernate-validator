@@ -8,6 +8,8 @@ package org.hibernate.validator.ap;
 
 import java.util.Collection;
 import java.util.Set;
+
+import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.util.ElementKindVisitor6;
 
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
@@ -16,7 +18,7 @@ import org.hibernate.validator.ap.util.Configuration;
 import org.hibernate.validator.ap.util.MessagerAdapter;
 
 /**
- * An abstract {@link javax.lang.model.element.ElementVisitor} that should be used for implementation
+ * An abstract {@link ElementVisitor} that should be used for implementation
  * of any other element visitors. The only method present in this class ({@link AbstractElementVisitor#reportIssues(Collection)}
  * is used to report found {@link ConstraintCheckIssue}s. Each {@link ConstraintCheckIssue} occurred will be reported using the
  * {@link javax.annotation.processing.Messager} API.
