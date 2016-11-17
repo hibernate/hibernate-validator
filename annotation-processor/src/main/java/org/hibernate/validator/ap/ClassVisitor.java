@@ -60,6 +60,7 @@ public class ClassVisitor extends AbstractElementVisitor<Void, Void> {
 	 * Doesn't perform any checks at the moment but calls a visit methods on its own elements.
 	 *
 	 * @param element a class element to check
+	 * @param aVoid
 	 */
 	@Override
 	public Void visitTypeAsClass(TypeElement element, Void aVoid) {
@@ -72,6 +73,7 @@ public class ClassVisitor extends AbstractElementVisitor<Void, Void> {
 	 * Doesn't perform any checks at the moment but calls a visit methods on its own elements.
 	 *
 	 * @param element a class element to check
+	 * @param aVoid
 	 */
 	@Override
 	public Void visitTypeAsInterface(TypeElement element, Void aVoid) {

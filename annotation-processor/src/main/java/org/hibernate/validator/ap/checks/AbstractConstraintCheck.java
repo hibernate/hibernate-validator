@@ -25,7 +25,7 @@ import javax.lang.model.element.VariableElement;
  * and <code>checkMethod()</code>.
  * </p>
  * <p>
- * All check methods not overridden will return an empty list.
+ * All check methods not overridden will return an empty set.
  * </p>
  *
  * @author Gunnar Morling
@@ -34,27 +34,21 @@ public class AbstractConstraintCheck implements ConstraintCheck {
 
 	@Override
 	public Set<ConstraintCheckIssue> checkField(VariableElement element, AnnotationMirror annotation) {
-
 		return Collections.emptySet();
 	}
 
 	@Override
 	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element, AnnotationMirror annotation) {
-
 		return Collections.emptySet();
 	}
 
 	@Override
-	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element,
-														 AnnotationMirror annotation) {
-
+	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 		return Collections.emptySet();
 	}
 
 	@Override
-	public Set<ConstraintCheckIssue> checkNonAnnotationType(
-			TypeElement element, AnnotationMirror annotation) {
-
+	public Set<ConstraintCheckIssue> checkNonAnnotationType(TypeElement element, AnnotationMirror annotation) {
 		return Collections.emptySet();
 	}
 }

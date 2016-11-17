@@ -8,6 +8,8 @@ package org.hibernate.validator.ap.classchecks;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 
@@ -20,7 +22,7 @@ import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
  * supported element types.
  * </p>
  * <p>
- * All check methods not overridden will return an empty list.
+ * All check methods not overridden will return an empty set.
  * </p>
  *
  * @author Marko Bekhta
@@ -28,7 +30,7 @@ import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
 public abstract class AbstractClassCheck implements ClassCheck {
 
 	@Override
-	public Collection<ConstraintCheckIssue> checkMethod(ExecutableElement element) {
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement element) {
 		return Collections.emptySet();
 	}
 

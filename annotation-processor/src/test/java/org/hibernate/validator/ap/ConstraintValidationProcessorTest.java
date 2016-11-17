@@ -111,20 +111,33 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertFalse( compilationResult );
 		assertThatDiagnosticsMatch(
 				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 39 ),
 				new DiagnosticExpectation( Kind.ERROR, 56 ),
-				new DiagnosticExpectation( Kind.ERROR, 72 ),
-				new DiagnosticExpectation( Kind.ERROR, 91 ),
-				new DiagnosticExpectation( Kind.ERROR, 145 ),
-				new DiagnosticExpectation( Kind.ERROR, 153 ),
-				new DiagnosticExpectation( Kind.ERROR, 170 ),
-				new DiagnosticExpectation( Kind.ERROR, 192 ),
-				new DiagnosticExpectation( Kind.ERROR, 220 ),
-				new DiagnosticExpectation( Kind.ERROR, 374 ),
-				new DiagnosticExpectation( Kind.ERROR, 388 )
+				new DiagnosticExpectation( Kind.ERROR, 71 ),
+				new DiagnosticExpectation( Kind.ERROR, 90 ),
+				new DiagnosticExpectation( Kind.ERROR, 144 ),
+				new DiagnosticExpectation( Kind.ERROR, 152 ),
+				new DiagnosticExpectation( Kind.ERROR, 169 ),
+				new DiagnosticExpectation( Kind.ERROR, 191 ),
+				new DiagnosticExpectation( Kind.ERROR, 219 ),
+				new DiagnosticExpectation( Kind.ERROR, 373 ),
+				new DiagnosticExpectation( Kind.ERROR, 387 ),
+				new DiagnosticExpectation( Kind.ERROR, 409 ),
+				new DiagnosticExpectation( Kind.ERROR, 434 )
 		);
 
-		assertEquals( diagnostics.getDiagnostics().get( 0 ).getMessage( Locale.getDefault() ) , "Parameter constraints of \"doSomething\" must not be strengthened in subtype. In sub types, no parameter constraints may be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation. Method in org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1Sub violates this rule. Types that contain overridden method are: [ org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1 ]." );
+		assertEquals( diagnostics.getDiagnostics().get( 0 ).getMessage( Locale.getDefault() ),
+				"Parameters of method \"doSomething((@javax.validation.constraints.NotNull :: java.lang.String))\" do not respect the inheritance rules. " +
+				"In subtypes, no parameter constraints may be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation. " +
+				"Method in org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1Sub violates this rule. " +
+				"Types that contain the overridden methods are: [ org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1 ]." );
+
+		assertEquals( diagnostics.getDiagnostics().get( 11 ).getMessage( Locale.getDefault() ),
+				"Parameters of method \"equals((@javax.validation.constraints.NotNull :: java.lang.Object))\" do not respect inheritance rules. " +
+				"If a subtype overrides/implements a method originally defined in several parallel types of the hierarchy, " +
+				"no parameter constraints may be declared for that method nor parameters be marked for cascaded validation. " +
+				"Method in org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.Case15.SimpleServiceImpl violates this rule. " +
+				"Parallel method definitions are in: [ java.lang.Object, org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.Case15.SimpleService ]." );
 	}
 
 	@Test

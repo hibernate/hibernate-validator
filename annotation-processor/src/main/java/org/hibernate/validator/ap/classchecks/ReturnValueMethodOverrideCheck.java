@@ -6,7 +6,8 @@
  */
 package org.hibernate.validator.ap.classchecks;
 
-import java.util.Collection;
+import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeKind;
@@ -18,14 +19,16 @@ import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
 
 /**
- * Checks if the return value of overridden and overriding methods have correct set of annotations.
- * Return value constraints of must not be weakened in subtypes. One must not mark a method return value
+ * Checks if the return value of overridden and overriding methods respects the inheritance rules.
+ * <p>
+ * Return value constraints of a method must not be weakened in subtypes. One must not mark a method return value
  * for cascaded validation more than once in a line of a class hierarchy. In other words, overriding methods
- * on sub types (be it sub classes/interfaces or interface implementations) cannot mark the return value
+ * on subtypes (be it sub classes/interfaces or interface implementations) cannot mark the return value
  * for cascaded validation if the return value has already been marked on the overridden method of the super
  * type or interface.
  *
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public class ReturnValueMethodOverrideCheck extends AbstractMethodOverrideCheck {
 
@@ -34,11 +37,11 @@ public class ReturnValueMethodOverrideCheck extends AbstractMethodOverrideCheck 
 	}
 
 	@Override
-	protected Collection<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, InheritanceTree overriddenMethods) {
-		// if this method gets executed it means that current method has a @Valid annotation and we
-		// need to check if there's no more @Valid annotations in the hierarchy for this method
-		Collection<ConstraintCheckIssue> issues = CollectionHelper.newArrayList();
-		for ( ExecutableElement overriddenMethod : overriddenMethods ) {
+	protected Set<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, MethodInheritanceTree methodInheritanceTree) {
+		// if this method gets executed it means that the current method has a @Valid annotation and we
+		// need to check that there is no other @Valid annotations in the hierarchy of this method
+		Set<ConstraintCheckIssue> issues = CollectionHelper.newHashSet();
+		for ( ExecutableElement overriddenMethod : methodInheritanceTree.getOverriddenMethods() ) {
 			if ( methodIsAnnotatedWithValid( overriddenMethod ) ) {
 				issues.add( ConstraintCheckIssue.error(
 						currentMethod,
@@ -56,17 +59,18 @@ public class ReturnValueMethodOverrideCheck extends AbstractMethodOverrideCheck 
 
 	@Override
 	protected boolean needToPerformAnyChecks(ExecutableElement currentMethod) {
-		// if the method returns void, there's no need to check it
-		// and if method contains @Valid annotation we need to check it
+		// we only check the method if:
+		// - it does not return void
+		// - it is marked with @Valid
 		return !currentMethod.getReturnType().getKind().equals( TypeKind.VOID ) && methodIsAnnotatedWithValid( currentMethod );
 	}
 
 	/**
-	 * Check if there's a {@code @Valid} annotation present on return value of a given method.
+	 * Check if there is a {@code @Valid} annotation present on the method.
 	 *
 	 * @param method a method to check for annotation presence
-	 *
-	 * @return {@code true} if {@code @Valid} annotation is present on return value of a given method, {@code false} otherwise
+	 * @return {@code true} if {@code @Valid} annotation is present on return value of a given method, {@code false}
+	 * otherwise
 	 */
 	private boolean methodIsAnnotatedWithValid(ExecutableElement method) {
 		for ( AnnotationMirror annotationMirror : method.getAnnotationMirrors() ) {

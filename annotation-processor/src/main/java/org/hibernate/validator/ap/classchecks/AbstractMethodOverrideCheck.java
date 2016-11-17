@@ -7,10 +7,8 @@
 package org.hibernate.validator.ap.classchecks;
 
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -22,13 +20,13 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.checks.ConstraintCheckIssue;
-import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
 
 /**
  * Abstract base class for {@link ClassCheck} implementations that check overridden methods.
  *
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 
@@ -47,19 +45,13 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 	}
 
 	@Override
-	public Collection<ConstraintCheckIssue> checkMethod(ExecutableElement currentMethod) {
+	public Set<ConstraintCheckIssue> checkMethod(ExecutableElement currentMethod) {
 		if ( !needToPerformAnyChecks( currentMethod ) ) {
 			return Collections.emptySet();
 		}
 
-		TypeElement currentTypeElement = getEnclosingTypeElement( currentMethod );
-
-		// if current type is java.lang.Object then we can continue without doing any other checks
-		if ( isJavaLangObjectOrNull( currentTypeElement ) ) {
-			return Collections.emptySet();
-		}
 		// find if there's a method that was overridden by the current one.
-		InheritanceTree overriddenMethodsTree = findAllOverriddenElements( currentTypeElement, currentMethod );
+		MethodInheritanceTree overriddenMethodsTree = findAllOverriddenElements( currentMethod );
 		if ( !overriddenMethodsTree.hasOverriddenMethods() ) {
 			return Collections.emptySet();
 		}
@@ -68,18 +60,17 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 	}
 
 	/**
-	 * Performs a real check of a method.
+	 * Performs the check of a method.
 	 *
 	 * @param currentMethod a method to check
-	 * @param overriddenMethods a map of overridden methods received by calling {@link AbstractMethodOverrideCheck#findAllOverriddenElements(TypeElement, ExecutableElement)}
+	 * @param overriddenMethodsTree the {@link MethodInheritanceTree} of the method to check
 	 *
-	 * @return a collection of issues if there are any, an empty collection otherwise
+	 * @return a set of issues if there are any, an empty set otherwise
 	 */
-	protected abstract Collection<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, InheritanceTree overriddenMethods);
+	protected abstract Set<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, MethodInheritanceTree overriddenMethodsTree);
 
 	/**
-	 * There can be situations in which no checks should be performed. So in such cases we will not look for any overridden
-	 * methods and do any work at all.
+	 * There can be situations in which no checks should be performed. In such cases we will not perform any work at all.
 	 *
 	 * @param currentMethod the method under investigation
 	 *
@@ -88,105 +79,93 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 	protected abstract boolean needToPerformAnyChecks(ExecutableElement currentMethod);
 
 	/**
-	 * Find overridden methods from all super classes and all implemented interfaces. Results are returned as {@link InheritanceTree}
+	 * Find overridden methods from all super classes and all implemented interfaces. Results are returned as a {@link MethodInheritanceTree}.
 	 *
-	 * @param currentTypeElement the class in which the method is located
-	 * @param currentMethod the method for which we want to find the overridden methods
+	 * @param overridingMethod the method for which we want to find the overridden methods
 	 *
-	 * @return an {@link InheritanceTree} containing overridden methods
+	 * @return a {@link MethodInheritanceTree} containing overridden methods
 	 */
-	private InheritanceTree findAllOverriddenElements(
-			TypeElement currentTypeElement,
-			ExecutableElement currentMethod) {
-		InheritanceTree tree = new InheritanceTree( currentMethod, currentTypeElement );
-		findAllOverriddenElementsRecursive( currentTypeElement, currentMethod, tree );
-		return tree;
+	private MethodInheritanceTree findAllOverriddenElements(ExecutableElement overridingMethod) {
+		TypeElement currentTypeElement = getEnclosingTypeElement( overridingMethod );
+		MethodInheritanceTree.Builder methodInheritanceTreeBuilder = new MethodInheritanceTree.Builder( overridingMethod );
+
+		collectOverriddenMethods( overridingMethod, currentTypeElement, methodInheritanceTreeBuilder );
+
+		return methodInheritanceTreeBuilder.build();
 	}
 
 	/**
-	 * A recursive part of {@link AbstractMethodOverrideCheck#findAllOverriddenElements(TypeElement, ExecutableElement)}.
+	 * Collect all the overridden elements of the inheritance tree.
 	 *
-	 * @param currentTypeElement the class in which the method is located
-	 * @param currentMethod the method for which we want to find the overridden methods
-	 * @param tree a resulting inheritance tree
+	 * @param overridingMethod the method for which we want to find the overridden methods
+	 * @param currentTypeElement the class we are analyzing
+	 * @param methodInheritanceTreeBuilder the method inheritance tree builder
 	 */
-	private void findAllOverriddenElementsRecursive(
-			TypeElement currentTypeElement,
-			ExecutableElement currentMethod,
-			InheritanceTree tree) {
-
-		// look for implemented interfaces
-		for ( Map.Entry<TypeElement, ExecutableElement> entry : findOverriddenMethodInInterfacesPairs(
-				currentTypeElement,
-				currentTypeElement.getInterfaces(),
-				currentMethod
-		).entrySet() ) {
-			tree.addNode( entry.getValue(), entry.getKey() );
-			findAllOverriddenElementsRecursive( entry.getKey(), entry.getValue(), tree );
-		}
-
-		TypeElement superType = (TypeElement) typeUtils.asElement( currentTypeElement.getSuperclass() );
-		if ( isJavaLangObjectOrNull( superType ) ) {
+	private void collectOverriddenMethods( ExecutableElement overridingMethod, TypeElement currentTypeElement,
+			MethodInheritanceTree.Builder methodInheritanceTreeBuilder) {
+		if ( isJavaLangObjectOrNull( currentTypeElement ) ) {
 			return;
 		}
 
-		ExecutableElement element = getOverriddenElement( currentTypeElement, superType, currentMethod );
-		if ( element != null ) {
-			tree.addNode( element, superType, currentTypeElement );
-			findAllOverriddenElementsRecursive( superType, element, tree );
+		collectOverriddenMethodsInInterfaces( overridingMethod, currentTypeElement, methodInheritanceTreeBuilder );
+
+		TypeElement superclassTypeElement = (TypeElement) typeUtils.asElement( currentTypeElement.getSuperclass() );
+		if ( superclassTypeElement == null ) {
+			return;
 		}
+
+		ExecutableElement overriddenMethod = getOverriddenMethod( overridingMethod, superclassTypeElement );
+		if ( overriddenMethod != null ) {
+			methodInheritanceTreeBuilder.addOverriddenMethod( overridingMethod, overriddenMethod );
+			overridingMethod = overriddenMethod;
+		}
+
+		collectOverriddenMethods( overridingMethod, superclassTypeElement, methodInheritanceTreeBuilder );
 	}
 
 	/**
-	 * Find pairs of enclosing type {@link TypeElement} and overridden method {@link ExecutableElement}  from implemented interfaces.
+	 * Collect overridden methods in the interfaces of a given type.
 	 *
-	 * @param currentTypeElement the class in which the method is located
-	 * @param interfaces a list of implemented interfaces
-	 * @param currentMethod the method for which we want to find the overridden methods
-	 *
-	 * @return a map of pairs of overridden methods (map key - an enclosing type, map value - overridden method in that type)
-	 * if there are any, an empty map otherwise
+	 * @param overridingMethod the method for which we want to find the overridden methods
+	 * @param currentTypeElement the class we are currently analyzing
+	 * @param methodInheritanceTreeBuilder the method inheritance tree builder
 	 */
-	private Map<TypeElement, ExecutableElement> findOverriddenMethodInInterfacesPairs(
-			TypeElement currentTypeElement,
-			List<? extends TypeMirror> interfaces,
-			ExecutableElement currentMethod) {
-		Map<TypeElement,ExecutableElement> elements = CollectionHelper.newHashMap();
-
-		for ( TypeMirror anInterface : interfaces ) {
-			TypeElement implementedInterface = (TypeElement) typeUtils.asElement( anInterface );
-			ExecutableElement element = getOverriddenElement( currentTypeElement, implementedInterface, currentMethod );
-			if ( element != null ) {
-				elements.put( implementedInterface, element );
+	private void collectOverriddenMethodsInInterfaces(ExecutableElement overridingMethod, TypeElement currentTypeElement,
+			MethodInheritanceTree.Builder methodInheritanceTreeBuilder) {
+		for ( TypeMirror implementedInterface : currentTypeElement.getInterfaces() ) {
+			TypeElement interfaceTypeElement = (TypeElement) typeUtils.asElement( implementedInterface );
+			ExecutableElement overriddenMethod = getOverriddenMethod( overridingMethod, interfaceTypeElement );
+			ExecutableElement newOverridingMethod;
+			if ( overriddenMethod != null ) {
+				methodInheritanceTreeBuilder.addOverriddenMethod( overridingMethod, overriddenMethod );
+				newOverridingMethod = overriddenMethod;
 			}
+			else {
+				newOverridingMethod = overridingMethod;
+			}
+			collectOverriddenMethodsInInterfaces( newOverridingMethod, interfaceTypeElement, methodInheritanceTreeBuilder );
 		}
-
-		return elements;
 	}
 
 	/**
 	 * Find a method that is overridden by the one passed to this function.
 	 *
-	 * @param currentTypeElement a class in which method is located
-	 * @param otherTypeElement a class/interface on which to look for overridden method
 	 * @param currentMethod the method for which we want to find the overridden methods
-	 *
-	 * @return an overridden method if there's one, and {@code null} otherwise
+	 * @param typeElement the class or interface analyzed
+	 * @return the overridden method if there is one, and {@code null} otherwise
 	 */
-	private ExecutableElement getOverriddenElement(
-			TypeElement currentTypeElement,
-			TypeElement otherTypeElement,
-			ExecutableElement currentMethod) {
-
-		if ( isJavaLangObjectOrNull( otherTypeElement ) ) {
+	private ExecutableElement getOverriddenMethod(ExecutableElement currentMethod, TypeElement typeElement) {
+		if ( typeElement == null ) {
 			return null;
 		}
 
-		for ( Element element : elementUtils.getAllMembers( otherTypeElement ) ) {
+		TypeElement enclosingTypeElement = getEnclosingTypeElement( currentMethod );
+
+		for ( Element element : elementUtils.getAllMembers( typeElement ) ) {
 			if ( !element.getKind().equals( ElementKind.METHOD ) ) {
 				continue;
 			}
-			if ( elementUtils.overrides( currentMethod, (ExecutableElement) element, currentTypeElement ) ) {
+			if ( elementUtils.overrides( currentMethod, (ExecutableElement) element, enclosingTypeElement ) ) {
 				return (ExecutableElement) element;
 			}
 		}
@@ -195,21 +174,20 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 	}
 
 	/**
-	 * Find a {@link TypeElement} that enclose a given {@link ExecutableElement}.
+	 * Find the {@link TypeElement} that contains a given {@link ExecutableElement}.
 	 *
-	 * @param currentMethod a method that you want to find class/interface it belongs to
-	 *
-	 * @return a class/interface represented by {@link TypeElement} to which a method belongs to
+	 * @param currentMethod a method
+	 * @return the class/interface containing the method represented by a {@link TypeElement}
 	 */
 	private TypeElement getEnclosingTypeElement(ExecutableElement currentMethod) {
 		return (TypeElement) typeUtils.asElement( currentMethod.getEnclosingElement().asType() );
 	}
 
 	/**
-	 * Find a {@link String} representation of qualified name ({@link Name}) of corresponding {@link TypeElement} that enclose a given {@link ExecutableElement}.
+	 * Find a {@link String} representation of qualified name ({@link Name}) of corresponding {@link TypeElement} that
+	 * contains a given {@link ExecutableElement}.
 	 *
-	 * @param currentMethod a method that you want to find class/interface qualified name it belongs to
-	 *
+	 * @param currentMethod a method
 	 * @return a class/interface qualified name represented by {@link String} to which a method belongs to
 	 */
 	protected String getEnclosingTypeElementQualifiedName(ExecutableElement currentMethod) {
@@ -217,14 +195,13 @@ public abstract class AbstractMethodOverrideCheck extends AbstractClassCheck {
 	}
 
 	/**
-	 * Determine if provided type element ({@link TypeElement} represents a {@link java.lang.Object} or is {@code null}
+	 * Determine if the provided {@link TypeElement} represents a {@link java.lang.Object} or is {@code null}.
 	 *
-	 * @param typeElement an element to check
-	 *
-	 * @return {@code true} if provided element is {@link java.lang.Object} or is {@code null}, {@code false} otherwise
+	 * @param typeElement the element to check
+	 * @return {@code true} if the provided element is {@link java.lang.Object} or is {@code null}, {@code false} otherwise
 	 */
 	private boolean isJavaLangObjectOrNull(TypeElement typeElement) {
-		return typeElement == null || JAVA_LANG_OBJECT.equals( typeElement.toString() );
+		return typeElement == null || JAVA_LANG_OBJECT.contentEquals( typeElement.getQualifiedName() );
 	}
 
 }
