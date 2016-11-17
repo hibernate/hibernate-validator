@@ -14,6 +14,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 
 import java.lang.annotation.Target;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -24,7 +25,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public class MethodOverridingTests {
 
 	/**
-	 * Case 1 : annotation on overridden method parameters - incorrect
+	 * Case 1: annotation on overridden method parameters - incorrect
 	 */
 	public static class MethodOverridingTestCase1 {
 		public void doSomething(String param) {
@@ -40,9 +41,8 @@ public class MethodOverridingTests {
 		}
 	}
 
-
 	/**
-	 * Case 2 : Same set of annotations on overridden method parameters as on the parent - incorrect
+	 * Case 2: Same set of annotations on overridden method parameters as on the parent - incorrect
 	 */
 	public static class MethodOverridingTestCase2 {
 		public void doSomething(@NotNull @NotBlank @Size(max = 10) String param) {
@@ -58,9 +58,8 @@ public class MethodOverridingTests {
 		}
 	}
 
-
 	/**
-	 * Case 3 : Implementing interface with adding constraints on parameters - incorrect
+	 * Case 3: Implementing interface with adding constraints on parameters - incorrect
 	 */
 	public interface MethodOverridingTestCase3 {
 		void doSomething(String param);
@@ -75,7 +74,7 @@ public class MethodOverridingTests {
 	}
 
 	/**
-	 * Case 4 : Two interfaces with same method - one with parameter constraints other without - incorrect
+	 * Case 4: Two interfaces with same method (parallel definitions) - one with parameter constraints other without - incorrect
 	 */
 	public interface MethodOverridingTestCase4Interface {
 		void doSomething(@NotBlank String param);
@@ -94,7 +93,7 @@ public class MethodOverridingTests {
 	}
 
 	/**
-	 * Case 5 : Implementing interface with adding constraints on return value - correct
+	 * Case 5: Implementing interface with adding constraints on return value - correct
 	 */
 	public interface MethodOverridingTestCase5 {
 		String doSomething(String param);
@@ -111,7 +110,7 @@ public class MethodOverridingTests {
 	}
 
 	/**
-	 * Case 6 : Implementing interface with constraints on return value in interface and implemented method - correct
+	 * Case 6: Implementing interface with constraints on return value in interface and implemented method - correct
 	 */
 	public interface MethodOverridingTestCase6 {
 		@NotBlank
@@ -129,7 +128,7 @@ public class MethodOverridingTests {
 	}
 
 	/**
-	 * Case 7 : Deeper hierarchy: Implementing interfaces with different constraints on parameter - incorrect
+	 * Case 7: Deeper hierarchy: Implementing interfaces with different constraints on parameter - incorrect
 	 */
 	public interface MethodOverridingTestCase7Interface {
 		String doSomething(@NotBlank @Size(max = 10) String param);
@@ -390,6 +389,91 @@ public class MethodOverridingTests {
 			}
 		}
 
+	}
+
+	/**
+	 * Case 15: Parallel definitions of a java.lang.Object method - incorrect
+	 */
+	public static class Case15 {
+
+		public class BaseServiceImpl {
+		}
+
+		public interface SimpleService {
+			@Override
+			boolean equals(Object obj);
+		}
+
+		public class SimpleServiceImpl extends BaseServiceImpl implements SimpleService {
+			@Override
+			public boolean equals(@NotNull Object obj) {
+				return false;
+			}
+
+			@Override
+			public int hashCode() {
+				return super.hashCode();
+			}
+		}
+	}
+
+	/**
+	 * Case 16: one of the interface in the hierarchy does not override the method at hand but the super interface of this interface does - incorrect
+	 */
+	public static class Case16 {
+
+		public interface GenericService {
+			boolean someMethod(String someParameter);
+		}
+
+		public interface SimpleService extends GenericService {
+		}
+
+		public class SimpleServiceImpl implements SimpleService {
+			@Override
+			public boolean someMethod(@NotNull String someParameter) {
+				return false;
+			}
+		}
+	}
+
+	/**
+	 * Case 17: the constraint annotations are only on the super class - correct
+	 */
+	public static class Case17 {
+
+		public class BaseServiceImpl {
+			public boolean someMethod(@NotNull String someParameter) {
+				return false;
+			}
+		}
+
+		public class SimpleServiceImpl extends BaseServiceImpl {
+			@Override
+			public boolean someMethod(String someParameter) {
+				return true;
+			}
+		}
+	}
+
+	/**
+	 * Case 18: the constraint annotations are only on an interface and there are no parallel definitions - correct
+	 */
+	public static class Case18 {
+
+		public interface SimpleService {
+			boolean someMethod(@NotNull String someParameter);
+		}
+
+		public class BaseServiceImpl {
+		}
+
+		public class SimpleServiceImpl extends BaseServiceImpl implements SimpleService {
+			@Override
+			public boolean someMethod(String someParameter) {
+				return true;
+			}
+		}
 	}
 }
 
