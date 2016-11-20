@@ -193,7 +193,6 @@
                             javax.validation.*;version="[1.0.0,2.0.0)",
                             javax.xml.*;version="0",
                             javax.el.*;version="[2.0.0,4.0.0)";resolution:=optional,
-                            com.sun.el;version="[2.0.0,4.0.0)";resolution:=optional,
                             org.xml.sax.*;version="0",
                             org.jboss.logging.*;version="[3.1.0,4.0.0)",
                             com.fasterxml.classmate.*;version="[${classmate.version},2.0.0)",

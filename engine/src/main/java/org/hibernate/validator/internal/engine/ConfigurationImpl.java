@@ -553,7 +553,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 								ResourceBundleMessageInterpolator.CONTRIBUTOR_VALIDATION_MESSAGES,
 								externalClassLoader,
 								true
-						)
+						),
+						externalClassLoader
 				) :
 				getDefaultMessageInterpolator();
 	}

@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Locale;
@@ -13,6 +15,7 @@ import java.util.Locale;
 import javax.el.ExpressionFactory;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
@@ -36,31 +39,54 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	private final ExpressionFactory expressionFactory;
 
 	public ResourceBundleMessageInterpolator() {
+		this( (ClassLoader) null );
+	}
+
+	public ResourceBundleMessageInterpolator(ClassLoader externalClassLoader) {
 		super();
-		this.expressionFactory = buildExpressionFactory();
+		this.expressionFactory = buildExpressionFactory( getExpressionFactoryClassLoader( externalClassLoader ) );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
+		this( userResourceBundleLocator, (ClassLoader) null );
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, ClassLoader externalClassLoader) {
 		super( userResourceBundleLocator );
-		this.expressionFactory = buildExpressionFactory();
+		this.expressionFactory = buildExpressionFactory( getExpressionFactoryClassLoader( externalClassLoader ) );
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, ResourceBundleLocator contributorResourceBundleLocator) {
+		this( userResourceBundleLocator, contributorResourceBundleLocator, (ClassLoader) null );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
-			ResourceBundleLocator contributorResourceBundleLocator) {
+			ResourceBundleLocator contributorResourceBundleLocator,
+			ClassLoader externalClassLoader) {
 		super( userResourceBundleLocator, contributorResourceBundleLocator );
-		this.expressionFactory = buildExpressionFactory();
+		this.expressionFactory = buildExpressionFactory( getExpressionFactoryClassLoader( externalClassLoader ) );
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled) {
+		this( userResourceBundleLocator, null, cachingEnabled, (ClassLoader) null );
+	}
+
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled, ClassLoader externalClassLoader) {
+		this( userResourceBundleLocator, null, cachingEnabled, externalClassLoader );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator,
 			boolean cachingEnabled) {
-		super( userResourceBundleLocator, contributorResourceBundleLocator, cachingEnabled );
-		this.expressionFactory = buildExpressionFactory();
+		this( userResourceBundleLocator, contributorResourceBundleLocator, cachingEnabled, (ClassLoader) null );
 	}
 
-	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled) {
-		super( userResourceBundleLocator, null, cachingEnabled );
-		this.expressionFactory = buildExpressionFactory();
+	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator,
+			boolean cachingEnabled,
+			ClassLoader externalClassLoader) {
+		super( userResourceBundleLocator, contributorResourceBundleLocator, cachingEnabled );
+		this.expressionFactory = buildExpressionFactory( getExpressionFactoryClassLoader( externalClassLoader ) );
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, boolean cachingEnabled, ExpressionFactory expressionFactory) {
@@ -74,13 +100,22 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 		return expression.interpolate( context );
 	}
 
-	private static ExpressionFactory buildExpressionFactory() {
+	private static ClassLoader getExpressionFactoryClassLoader(ClassLoader externalClassLoader) {
+		if ( externalClassLoader == null ) {
+			return ResourceBundleMessageInterpolator.class.getClassLoader();
+		}
+		return externalClassLoader;
+	}
+
+	private static ExpressionFactory buildExpressionFactory(ClassLoader expressionFactoryClassLoader) {
+		Contracts.assertNotNull( expressionFactoryClassLoader, MESSAGES.parameterMustNotBeNull( "expressionFactoryClassLoader" ) );
+
 		final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
 		try {
 			// The javax.el FactoryFinder uses the TCCL to load the ExpressionFactory.
 			// We need to be sure the ExpressionFactory implementation is visible to the class loader
 			// so we set the TCCL to the class loader used to load this very class.
-			run( SetClassLoader.ofContext( ResourceBundleMessageInterpolator.class.getClassLoader() ) );
+			run( SetClassLoader.ofContext( expressionFactoryClassLoader ) );
 			return ExpressionFactory.newInstance();
 		}
 		catch (Throwable e) {
