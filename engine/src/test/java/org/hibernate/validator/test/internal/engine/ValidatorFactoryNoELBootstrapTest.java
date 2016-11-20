@@ -27,8 +27,8 @@ import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 
-import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.SetClassLoader;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
@@ -247,27 +247,5 @@ public class ValidatorFactoryNoELBootstrapTest {
 	 */
 	private <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
-	}
-
-	/**
-	 * Privileged action used to set the Thread context class loader.
-	 */
-	private static final class SetClassLoader implements PrivilegedAction<Void> {
-		private final ClassLoader classLoader;
-
-		public static SetClassLoader ofContext(ClassLoader classLoader) {
-			Contracts.assertNotNull( classLoader, "class loader must not be null" );
-			return new SetClassLoader( classLoader );
-		}
-
-		private SetClassLoader(ClassLoader classLoader) {
-			this.classLoader = classLoader;
-		}
-
-		@Override
-		public Void run() {
-			Thread.currentThread().setContextClassLoader( classLoader );
-			return null;
-		}
 	}
 }
