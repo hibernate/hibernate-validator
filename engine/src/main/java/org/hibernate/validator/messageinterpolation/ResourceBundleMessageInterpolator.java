@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Locale;
 
 import javax.el.ExpressionFactory;
@@ -13,6 +15,8 @@ import javax.el.ExpressionFactory;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -70,13 +74,49 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 		return expression.interpolate( context );
 	}
 
+	/**
+	 * The javax.el FactoryFinder uses the TCCL to load the {@link ExpressionFactory} implementation so we need to be
+	 * extra careful when initializing it.
+	 *
+	 * @return the {@link ExpressionFactory}
+	 */
 	private static ExpressionFactory buildExpressionFactory() {
+		Throwable threadContextClassLoaderThrowable;
+
+		// First, we try to load the instance from the TCCL.
 		try {
 			return ExpressionFactory.newInstance();
 		}
 		catch (Throwable e) {
+			threadContextClassLoaderThrowable = e;
+		}
+
+		// Then we try the Hibernate Validator class loader. In a fully-functional modular environment such as
+		// WildFly or Jigsaw, it is the way to go.
+		final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
+
+		try {
+			run( SetContextClassLoader.action( ResourceBundleMessageInterpolator.class.getClassLoader() ) );
+			return ExpressionFactory.newInstance();
+		}
+		catch (Throwable e) {
+			e.addSuppressed( threadContextClassLoaderThrowable );
+
 			// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
 			throw LOG.getUnableToInitializeELExpressionFactoryException( e );
 		}
+		finally {
+			run( SetContextClassLoader.action( originalContextClassLoader ) );
+		}
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
