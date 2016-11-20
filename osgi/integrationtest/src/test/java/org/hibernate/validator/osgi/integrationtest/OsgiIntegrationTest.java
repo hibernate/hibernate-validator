@@ -108,23 +108,28 @@ public class OsgiIntegrationTest {
 
 	@Test
 	public void canObtainValidatorFactoryAndPerformValidation() {
-		Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
+		ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
 
-		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byDefaultProvider()
-				.providerResolver( new MyValidationProviderResolver() )
-				.configure()
-				.buildValidatorFactory()
-				.getValidator()
-				.validate( new Customer() );
+		try {
+			Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
 
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage() );
+			Set<ConstraintViolation<Customer>> constraintViolations = Validation.byDefaultProvider()
+					.providerResolver( new MyValidationProviderResolver() )
+					.configure()
+					.buildValidatorFactory()
+					.getValidator()
+					.validate( new Customer() );
+
+			assertEquals( 1, constraintViolations.size() );
+			assertEquals( "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage() );
+		}
+		finally {
+			Thread.currentThread().setContextClassLoader( originalClassLoader );
+		}
 	}
 
 	@Test
 	public void canConfigureCustomConstraintValidatorFactoryViaValidationXml() {
-		Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
-
 		ExampleConstraintValidatorFactory.invocationCounter.set( 0 );
 
 		HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class )
@@ -150,8 +155,6 @@ public class OsgiIntegrationTest {
 
 	@Test
 	public void canConfigureConstraintViaXmlMapping() {
-		Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
-
 		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byProvider( HibernateValidator.class )
 				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
@@ -166,8 +169,6 @@ public class OsgiIntegrationTest {
 
 	@Test
 	public void canConfigureCustomConstraintViaXmlMapping() {
-		Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
-
 		Set<ConstraintViolation<Order>> constraintViolations = Validation.byProvider( HibernateValidator.class )
 				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
@@ -182,8 +183,6 @@ public class OsgiIntegrationTest {
 
 	@Test
 	public void canObtainValuesFromValidationMessages() {
-		Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
-
 		Set<ConstraintViolation<RetailOrder>> constraintViolations = Validation.byProvider( HibernateValidator.class )
 				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
