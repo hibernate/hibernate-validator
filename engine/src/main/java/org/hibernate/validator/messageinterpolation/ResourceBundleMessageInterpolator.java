@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Locale;
 
 import javax.el.ExpressionFactory;
@@ -13,6 +15,8 @@ import javax.el.ExpressionFactory;
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.SetClassLoader;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**
@@ -71,12 +75,30 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	}
 
 	private static ExpressionFactory buildExpressionFactory() {
+		final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
 		try {
+			// The javax.el FactoryFinder uses the TCCL to load the ExpressionFactory.
+			// We need to be sure the ExpressionFactory implementation is visible to the class loader
+			// so we set the TCCL to the class loader used to load this very class.
+			run( SetClassLoader.ofContext( ResourceBundleMessageInterpolator.class.getClassLoader() ) );
 			return ExpressionFactory.newInstance();
 		}
 		catch (Throwable e) {
 			// HV-793 - We fail eagerly in case we have no EL dependencies on the classpath
 			throw LOG.getUnableToInitializeELExpressionFactoryException( e );
 		}
+		finally {
+			run( SetClassLoader.ofContext( originalContextClassLoader ) );
+		}
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
