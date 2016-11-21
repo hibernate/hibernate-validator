@@ -121,12 +121,42 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	private static final Pattern SLASH = Pattern.compile( "\\\\", Pattern.LITERAL );
 	private static final Pattern DOLLAR = Pattern.compile( "\\$", Pattern.LITERAL );
 
+	/**
+	 * {@code MessageInterpolator} with default configuration.
+	 */
 	public AbstractMessageInterpolator() {
-		this( null );
+		this( (ClassLoader) null );
 	}
 
+	/**
+	 * {@code MessageInterpolator} with default configuration using a specific class loader to load the resource bundles.
+	 *
+	 * @param classLoader class loader used to load the resource bundles
+	 * @since 5.4
+	 */
+	public AbstractMessageInterpolator(ClassLoader classLoader) {
+		this( null, classLoader );
+	}
+
+	/**
+	 * {@code MessageInterpolator} taking a specific user resource bundle.
+	 *
+	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
+	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator) {
-		this( userResourceBundleLocator, null );
+		this( userResourceBundleLocator, (ClassLoader) null );
+	}
+
+	/**
+	 * {@code MessageInterpolator} taking a specific user resource bundle and using a specific class loader to load the
+	 * contributor resource bundle.
+	 *
+	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
+	 * @param classLoader class loader used to load the resource bundles
+	 * @since 5.4
+	 */
+	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, ClassLoader classLoader) {
+		this( userResourceBundleLocator, null, true, classLoader );
 	}
 
 	/**
@@ -146,16 +176,23 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 	 *
 	 * @param userResourceBundleLocator {@code ResourceBundleLocator} used to load user provided resource bundle
 	 * @param contributorResourceBundleLocator {@code ResourceBundleLocator} used to load resource bundle of constraint contributor
-	 * @param cacheMessages Whether resolved messages should be cached or not.
+	 * @param cacheMessages whether resolved messages should be cached or not
 	 * @since 5.2
 	 */
 	public AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
 			ResourceBundleLocator contributorResourceBundleLocator,
 			boolean cacheMessages) {
+		this( userResourceBundleLocator, contributorResourceBundleLocator, cacheMessages, null );
+	}
+
+	protected AbstractMessageInterpolator(ResourceBundleLocator userResourceBundleLocator,
+			ResourceBundleLocator contributorResourceBundleLocator,
+			boolean cacheMessages,
+			ClassLoader classLoader) {
 		defaultLocale = Locale.getDefault();
 
 		if ( userResourceBundleLocator == null ) {
-			this.userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES );
+			this.userResourceBundleLocator = new PlatformResourceBundleLocator( USER_VALIDATION_MESSAGES, classLoader );
 		}
 		else {
 			this.userResourceBundleLocator = userResourceBundleLocator;
@@ -164,7 +201,7 @@ public abstract class AbstractMessageInterpolator implements MessageInterpolator
 		if ( contributorResourceBundleLocator == null ) {
 			this.contributorResourceBundleLocator = new PlatformResourceBundleLocator(
 					CONTRIBUTOR_VALIDATION_MESSAGES,
-					null,
+					classLoader,
 					true
 			);
 		}

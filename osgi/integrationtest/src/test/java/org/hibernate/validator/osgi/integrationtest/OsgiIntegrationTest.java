@@ -107,19 +107,6 @@ public class OsgiIntegrationTest {
 	}
 
 	@Test
-	public void canObtainValidatorFactoryAndPerformValidation() {
-		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byDefaultProvider()
-				.providerResolver( new MyValidationProviderResolver() )
-				.configure()
-				.buildValidatorFactory()
-				.getValidator()
-				.validate( new Customer() );
-
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "must be greater than or equal to 1", constraintViolations.iterator().next().getMessage() );
-	}
-
-	@Test
 	public void canConfigureCustomConstraintValidatorFactoryViaValidationXml() {
 		ExampleConstraintValidatorFactory.invocationCounter.set( 0 );
 
