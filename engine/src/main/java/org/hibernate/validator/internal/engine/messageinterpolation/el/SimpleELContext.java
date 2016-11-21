@@ -7,11 +7,13 @@
 package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
 import java.lang.reflect.Method;
+
 import javax.el.ArrayELResolver;
 import javax.el.BeanELResolver;
 import javax.el.CompositeELResolver;
 import javax.el.ELContext;
 import javax.el.ELResolver;
+import javax.el.ExpressionFactory;
 import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 import javax.el.ResourceBundleELResolver;
@@ -37,7 +39,14 @@ public class SimpleELContext extends ELContext {
 	private final VariableMapper variableMapper;
 	private final ELResolver resolver;
 
-	public SimpleELContext() {
+	public SimpleELContext(ExpressionFactory expressionFactory) {
+		// In javax.el.ELContext, the ExpressionFactory is extracted from the context map. If it is not found, it
+		// defaults to ELUtil.getExpressionFactory() which, if we provided the ExpressionFactory to the
+		// ResourceBundleMessageInterpolator, might not be the same, thus potentially instantiating another
+		// ExpressionFactory outside of the boundaries of the class loader safe loading mechanism of
+		// ResourceBundleMessageInterpolator.
+		putContext( ExpressionFactory.class, expressionFactory );
+
 		functions = new MapBasedFunctionMapper();
 		variableMapper = new MapBasedVariableMapper();
 		resolver = DEFAULT_RESOLVER;

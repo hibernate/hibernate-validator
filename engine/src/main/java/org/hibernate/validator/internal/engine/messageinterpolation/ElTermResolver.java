@@ -59,7 +59,7 @@ public class ElTermResolver implements TermResolver {
 	@Override
 	public String interpolate(MessageInterpolator.Context context, String expression) {
 		String resolvedExpression = expression;
-		SimpleELContext elContext = new SimpleELContext();
+		SimpleELContext elContext = new SimpleELContext( expressionFactory );
 		try {
 			ValueExpression valueExpression = bindContextValues( expression, context, elContext );
 			resolvedExpression = (String) valueExpression.getValue( elContext );
