@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.el.ELManager;
 import javax.el.ExpressionFactory;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -221,7 +222,7 @@ public class OsgiIntegrationTest {
 		Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
 
 		try {
-			return ExpressionFactory.newInstance();
+			return ELManager.getExpressionFactory();
 		}
 		finally {
 			Thread.currentThread().setContextClassLoader( oldTccl );

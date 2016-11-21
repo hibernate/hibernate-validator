@@ -10,6 +10,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Locale;
 
+import javax.el.ELManager;
 import javax.el.ExpressionFactory;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.InterpolationTerm;
@@ -85,7 +86,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 		// First, we try to load the instance from the TCCL.
 		try {
-			return ExpressionFactory.newInstance();
+			return ELManager.getExpressionFactory();
 		}
 		catch (Throwable e) {
 			threadContextClassLoaderThrowable = e;
@@ -97,7 +98,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 
 		try {
 			run( SetContextClassLoader.action( ResourceBundleMessageInterpolator.class.getClassLoader() ) );
-			return ExpressionFactory.newInstance();
+			return ELManager.getExpressionFactory();
 		}
 		catch (Throwable e) {
 			e.addSuppressed( threadContextClassLoaderThrowable );
