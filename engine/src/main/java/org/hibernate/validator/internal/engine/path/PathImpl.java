@@ -363,7 +363,7 @@ public final class PathImpl implements Path, Serializable {
 
 	/**
 	 * Validate that the given identifier is a valid Java identifier according to the Java Language Specification,
-	 * <a href="http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#3.8">chapter 3.8</a>
+	 * <a href="http://docs.oracle.com/javase/specs/jls/se6/html/lexical.html#3.8">chapter 3.8</a>
 	 *
 	 * @param identifier string identifier to validate
 	 *

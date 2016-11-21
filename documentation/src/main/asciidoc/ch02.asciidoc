@@ -74,7 +74,7 @@ byte code enhancing library won't be able to determine a field access via reflec
 ==== Property-level constraints
 
 If your model class adheres to the
-http://java.sun.com/javase/technologies/desktop/javabeans/index.jsp[JavaBeans] standard, it
+http://www.oracle.com/technetwork/articles/javaee/spec-136004.html[JavaBeans] standard, it
 is also possible to annotate the properties of a bean class instead of its fields.
 <<example-property-level>> uses the same entity as in <<example-field-level>>, however, property level
 constraints are used.
