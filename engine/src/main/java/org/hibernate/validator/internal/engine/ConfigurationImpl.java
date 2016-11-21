@@ -38,7 +38,9 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
@@ -543,8 +545,12 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	 * Returns the default message interpolator, configured with the given user class loader, if present.
 	 */
 	private MessageInterpolator getDefaultMessageInterpolatorConfiguredWithClassLoader() {
-		return externalClassLoader != null ?
-				new ResourceBundleMessageInterpolator(
+		if ( externalClassLoader != null ) {
+			final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
+
+			try {
+				run( SetContextClassLoader.action( externalClassLoader ) );
+				return new ResourceBundleMessageInterpolator(
 						new PlatformResourceBundleLocator(
 								ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
 								externalClassLoader
@@ -554,8 +560,15 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 								externalClassLoader,
 								true
 						)
-				) :
-				getDefaultMessageInterpolator();
+				);
+			}
+			finally {
+				run( SetContextClassLoader.action( originalContextClassLoader ) );
+			}
+		}
+		else {
+			return getDefaultMessageInterpolator();
+		}
 	}
 
 	/**

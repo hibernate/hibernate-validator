@@ -108,15 +108,24 @@ public class OsgiIntegrationTest {
 
 	@Test
 	public void canObtainValidatorFactoryAndPerformValidation() {
-		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byDefaultProvider()
-				.providerResolver( new MyValidationProviderResolver() )
-				.configure()
-				.buildValidatorFactory()
-				.getValidator()
-				.validate( new Customer() );
+		ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
 
-		assertEquals( 1, constraintViolations.size() );
-		assertEquals( "must be greater than or equal to 1", constraintViolations.iterator().next().getMessage() );
+		try {
+			Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
+
+			Set<ConstraintViolation<Customer>> constraintViolations = Validation.byDefaultProvider()
+					.providerResolver( new MyValidationProviderResolver() )
+					.configure()
+					.buildValidatorFactory()
+					.getValidator()
+					.validate( new Customer() );
+
+			assertEquals( 1, constraintViolations.size() );
+			assertEquals( "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage() );
+		}
+		finally {
+			Thread.currentThread().setContextClassLoader( originalClassLoader );
+		}
 	}
 
 	@Test
