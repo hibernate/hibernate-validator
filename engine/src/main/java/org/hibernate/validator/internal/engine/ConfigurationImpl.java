@@ -544,18 +544,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	 */
 	private MessageInterpolator getDefaultMessageInterpolatorConfiguredWithClassLoader() {
 		return externalClassLoader != null ?
-				new ResourceBundleMessageInterpolator(
-						new PlatformResourceBundleLocator(
-								ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
-								externalClassLoader
-						),
-						new PlatformResourceBundleLocator(
-								ResourceBundleMessageInterpolator.CONTRIBUTOR_VALIDATION_MESSAGES,
-								externalClassLoader,
-								true
-						),
-						externalClassLoader
-				) :
+				new ResourceBundleMessageInterpolator( externalClassLoader ) :
 				getDefaultMessageInterpolator();
 	}
 

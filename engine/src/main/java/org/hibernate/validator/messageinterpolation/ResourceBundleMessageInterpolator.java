@@ -43,7 +43,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	}
 
 	public ResourceBundleMessageInterpolator(ClassLoader externalClassLoader) {
-		super();
+		super( externalClassLoader );
 		this.expressionFactory = buildExpressionFactory( getExpressionFactoryClassLoader( externalClassLoader ) );
 	}
 
@@ -52,7 +52,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	}
 
 	public ResourceBundleMessageInterpolator(ResourceBundleLocator userResourceBundleLocator, ClassLoader externalClassLoader) {
-		super( userResourceBundleLocator );
+		super( userResourceBundleLocator, externalClassLoader );
 		this.expressionFactory = buildExpressionFactory( getExpressionFactoryClassLoader( externalClassLoader ) );
 	}
 
@@ -85,7 +85,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 			ResourceBundleLocator contributorResourceBundleLocator,
 			boolean cachingEnabled,
 			ClassLoader externalClassLoader) {
-		super( userResourceBundleLocator, contributorResourceBundleLocator, cachingEnabled );
+		super( userResourceBundleLocator, contributorResourceBundleLocator, cachingEnabled, externalClassLoader );
 		this.expressionFactory = buildExpressionFactory( getExpressionFactoryClassLoader( externalClassLoader ) );
 	}
 
