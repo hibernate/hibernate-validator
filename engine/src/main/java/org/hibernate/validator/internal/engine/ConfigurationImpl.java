@@ -545,20 +545,25 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	 */
 	private MessageInterpolator getDefaultMessageInterpolatorConfiguredWithClassLoader() {
 		if ( externalClassLoader != null ) {
+			PlatformResourceBundleLocator userResourceBundleLocator = new PlatformResourceBundleLocator(
+					ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
+					externalClassLoader
+			);
+			PlatformResourceBundleLocator contributorResourceBundleLocator = new PlatformResourceBundleLocator(
+					ResourceBundleMessageInterpolator.CONTRIBUTOR_VALIDATION_MESSAGES,
+					externalClassLoader,
+					true
+			);
+
+			// Within RBMI, the expression factory implementation is loaded from the TCCL; thus we set the TCCL to the
+			// given external class loader for this call
 			final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
 
 			try {
 				run( SetContextClassLoader.action( externalClassLoader ) );
 				return new ResourceBundleMessageInterpolator(
-						new PlatformResourceBundleLocator(
-								ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
-								externalClassLoader
-						),
-						new PlatformResourceBundleLocator(
-								ResourceBundleMessageInterpolator.CONTRIBUTOR_VALIDATION_MESSAGES,
-								externalClassLoader,
-								true
-						)
+						userResourceBundleLocator,
+						contributorResourceBundleLocator
 				);
 			}
 			finally {

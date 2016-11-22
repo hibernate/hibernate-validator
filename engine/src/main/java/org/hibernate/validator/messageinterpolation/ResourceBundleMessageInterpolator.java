@@ -84,7 +84,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	private static ExpressionFactory buildExpressionFactory() {
 		Throwable threadContextClassLoaderThrowable;
 
-		// First, we try to load the instance from the TCCL.
+		// First, we try to load the instance from the original TCCL.
 		try {
 			return ELManager.getExpressionFactory();
 		}
