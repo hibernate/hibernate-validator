@@ -81,7 +81,7 @@ public class ResourceBundleMessageInterpolator extends AbstractMessageInterpolat
 	 * @return the {@link ExpressionFactory}
 	 */
 	private static ExpressionFactory buildExpressionFactory() {
-		// First, we try to load the instance from the TCCL.
+		// First, we try to load the instance from the original TCCL.
 		try {
 			return ExpressionFactory.newInstance();
 		}

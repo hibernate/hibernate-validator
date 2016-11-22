@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,10 +53,6 @@ import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Hibernate specific {@code Configuration} implementation.
@@ -98,7 +98,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
 	private ClassLoader externalClassLoader;
 	private TimeProvider timeProvider;
-	private MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
+	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -546,20 +546,25 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	 */
 	private MessageInterpolator getDefaultMessageInterpolatorConfiguredWithClassLoader() {
 		if ( externalClassLoader != null ) {
+			PlatformResourceBundleLocator userResourceBundleLocator = new PlatformResourceBundleLocator(
+					ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
+					externalClassLoader
+			);
+			PlatformResourceBundleLocator contributorResourceBundleLocator = new PlatformResourceBundleLocator(
+					ResourceBundleMessageInterpolator.CONTRIBUTOR_VALIDATION_MESSAGES,
+					externalClassLoader,
+					true
+			);
+
+			// Within RBMI, the expression factory implementation is loaded from the TCCL; thus we set the TCCL to the
+			// given external class loader for this call
 			final ClassLoader originalContextClassLoader = run( GetClassLoader.fromContext() );
 
 			try {
 				run( SetContextClassLoader.action( externalClassLoader ) );
 				return new ResourceBundleMessageInterpolator(
-						new PlatformResourceBundleLocator(
-								ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES,
-								externalClassLoader
-						),
-						new PlatformResourceBundleLocator(
-								ResourceBundleMessageInterpolator.CONTRIBUTOR_VALIDATION_MESSAGES,
-								externalClassLoader,
-								true
-						)
+						userResourceBundleLocator,
+						contributorResourceBundleLocator
 				);
 			}
 			finally {

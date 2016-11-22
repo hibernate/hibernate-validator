@@ -846,6 +846,7 @@ There are several cases in which Hibernate Validator needs to load resources or 
 * XML descriptors (_META-INF/validation.xml_ as well as XML constraint mappings)
 * classes specified by name in XML descriptors (e.g. custom message interpolators etc.)
 * the _ValidationMessages_ resource bundle
+* the `ExpressionFactory` implementation used for expression based message interpolation
 
 By default Hibernate Validator tries to load these resources via the current thread context classloader.
 If that's not successful, Hibernate Validator's own classloader will be tried as a fallback.

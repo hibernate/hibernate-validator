@@ -6,6 +6,18 @@
  */
 package org.hibernate.validator.osgi.integrationtest;
 
+import static org.junit.Assert.assertEquals;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.CoreOptions.options;
+import static org.ops4j.pax.exam.CoreOptions.when;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -38,18 +50,6 @@ import com.example.CustomerDecimalMin;
 import com.example.ExampleConstraintValidatorFactory;
 import com.example.Order;
 import com.example.RetailOrder;
-
-import static org.junit.Assert.assertEquals;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.CoreOptions.options;
-import static org.ops4j.pax.exam.CoreOptions.when;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 /**
  * Integration test for Bean Validation and Hibernate Validator under OSGi.
@@ -107,7 +107,7 @@ public class OsgiIntegrationTest {
 	}
 
 	@Test
-	public void canObtainValidatorFactoryAndPerformValidation() {
+	public void canObtainValidatorFactoryAndPerformValidationWithExpressionFactoryFromTccl() {
 		ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
 
 		try {
@@ -126,6 +126,20 @@ public class OsgiIntegrationTest {
 		finally {
 			Thread.currentThread().setContextClassLoader( originalClassLoader );
 		}
+	}
+
+	@Test
+	public void canObtainValidatorFactoryAndPerformValidationWithExpressionFactoryFromExternalClassLoader() {
+		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+				.providerResolver( new MyValidationProviderResolver() )
+				.configure()
+				.externalClassLoader( getClass().getClassLoader() )
+				.buildValidatorFactory()
+				.getValidator()
+				.validate( new Customer() );
+
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "must be greater than or equal to 2", constraintViolations.iterator().next().getMessage() );
 	}
 
 	@Test
@@ -196,7 +210,7 @@ public class OsgiIntegrationTest {
 	}
 
 	@Test
-	public void canUseExpressionLanguageInConstraintMessage() {
+	public void canUseExpressionLanguageInConstraintMessageWithExternallyConfiguredExpressionFactory() {
 		ExpressionFactory expressionFactory = buildExpressionFactory();
 
 		Set<ConstraintViolation<CustomerDecimalMin>> constraintViolations = Validation.byProvider( HibernateValidator.class )
