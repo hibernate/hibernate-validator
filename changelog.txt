@@ -1,6 +1,12 @@
 Hibernate Validator Changelog
 =============================
 
+5.3.3.Final (22-11-2016)
+-------------------------
+
+** Bug
+    * HV-1155 - engine - ClassLoader issues in modularized environments
+
 5.3.2.Final (10-11-2016)
 -------------------------
 
