@@ -687,11 +687,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					valueContext.getCurrentGroup(),
 					valueContext.getPropertyPath()
 			) ) {
+				ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
+
 				// Type arguments
-				validateTypeArgumentConstraints( context, buildNewLocalExecutionContext( valueContext, value ), value, typeArgumentsConstraint );
+				validateTypeArgumentConstraints( context, cascadedValueContext, value, typeArgumentsConstraint );
 
 				// Cascade validation
-				validateInContext( context, buildNewLocalExecutionContext( valueContext, value ), validationOrder );
+				validateInContext( context, cascadedValueContext, validationOrder );
 				if ( shouldFailFast( context ) ) {
 					return;
 				}
@@ -709,6 +711,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					beanMetaDataManager.getBeanMetaData( value.getClass() ),
 					valueContext.getPropertyPath()
 			);
+			newValueContext.setCurrentValidatedValue( value );
 		}
 		else {
 			newValueContext = ValueContext.getLocalExecutionContext(
@@ -726,7 +729,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			Object value,
 			Set<MetaConstraint<?>> typeArgumentsConstraints) {
 		PathImpl previousPath = valueContext.getPropertyPath();
-		valueContext.setCurrentValidatedValue( value );
 		for ( MetaConstraint<?> metaConstraint : typeArgumentsConstraints ) {
 			valueContext.appendNode( metaConstraint.getLocation() );
 			metaConstraint.validateConstraint( context, valueContext );
