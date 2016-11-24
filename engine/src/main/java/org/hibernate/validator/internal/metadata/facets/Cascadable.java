@@ -10,7 +10,6 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.util.Set;
 
-import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -54,20 +53,6 @@ public interface Cascadable {
 	 * @return Returns the element type of the cascadable.
 	 */
 	ElementType getElementType();
-
-	/**
-	 * Returns the name of this cascadable element.
-	 *
-	 * @return The name of this cascadable element.
-	 */
-	String getName();
-
-	/**
-	 * Returns the element kind of this cascadable.
-	 *
-	 * @return The kind of this cascadable.
-	 */
-	ElementKind getKind();
 
 	/**
 	 * Returns the type arguments constraints for this cascadable.
