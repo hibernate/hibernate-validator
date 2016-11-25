@@ -692,4 +692,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 202, value = "Unable to get the current time from the clock provider")
 	ValidationException getUnableToGetCurrentTimeFromClockProvider(@Cause Exception e);
+
+	@Message(id = 203, value = "Error parsing Jandex index file.")
+	ValidationException getParsingJandexIndexException(@Cause Exception e);
+
+	@Message(id = 204, value = "Unable to find class for a name: '%s'.")
+	ValidationException getFindingClassReflectionJandexIndexException(String className, @Cause Exception e);
 }
