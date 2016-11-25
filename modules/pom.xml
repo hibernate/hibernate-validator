@@ -16,7 +16,7 @@
     <description>Hibernate Validator modules creation to use in WildFly</description>
 
     <properties>
-        <module.xml.basedir>${basedir}/src/main/modules</module.xml.basedir>
+        <module.xml.targetdir>${project.build.directory}/modules</module.xml.targetdir>
         <hibernate.validator.module.slot>main</hibernate.validator.module.slot>
         <hibernate.validator.cdi.module.slot>main</hibernate.validator.cdi.module.slot>
         <javax.validation.api.module.slot>main</javax.validation.api.module.slot>
@@ -42,6 +42,27 @@
 
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>modules</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/modules</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${module.xml.targetdir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
@@ -174,7 +195,7 @@
                         </goals>
                         <configuration>
                             <appliesToDist>${wildflyOriginalTargetDir}</appliesToDist>
-                            <patchConfig>${module.xml.basedir}/patch.xml</patchConfig>
+                            <patchConfig>${module.xml.targetdir}/patch.xml</patchConfig>
                             <updatedDist>${wildflyPatchedTargetDir}</updatedDist>
                             <outputFile>${patchFile}</outputFile>
                         </configuration>
