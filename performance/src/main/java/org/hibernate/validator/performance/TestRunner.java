@@ -76,8 +76,8 @@ public final class TestRunner {
 						.resultFormat( ResultFormatType.JSON )
 						.result( "target/JmhResults.json" );
 		Arrays.stream( profilers )
-				.filter( profileKey -> PROFILERS.containsKey( profileKey ) )
-				.forEach( profileKey -> builder.addProfiler( PROFILERS.get( profileKey ) ) );
+				.filter( profilerKey -> PROFILERS.containsKey( profilerKey ) )
+				.forEach( profilerKey -> builder.addProfiler( PROFILERS.get( profilerKey ) ) );
 		Arrays.stream( classNames )
 				.forEach( className -> builder.include( className ) );
 
