@@ -31,7 +31,6 @@ public class GenericParameterTypeValidationUnitIT extends AbstractArquillianIT {
 	@Deployment
 	public static WebArchive deployment() {
 		return buildTestArchive( WAR_FILE_NAME )
-				.addAsWebInfResource( "jboss-deployment-structure.xml", "jboss-deployment-structure.xml" )
 				.addAsWebInfResource( EmptyAsset.INSTANCE, "beans.xml" )
 				.addPackage( GenericParameterTypeValidationUnitIT.class.getPackage() );
 	}
