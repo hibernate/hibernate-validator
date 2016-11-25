@@ -24,7 +24,11 @@ public enum ConfigurationSource {
 	/**
 	 * The source of configuration is the programmatic API
 	 */
-	API( 2 );
+	API( 2 ),
+	/**
+	 * The source of configuration is Jandex index.
+	 */
+	JANDEX( 3 );
 
 	private int priority;
 

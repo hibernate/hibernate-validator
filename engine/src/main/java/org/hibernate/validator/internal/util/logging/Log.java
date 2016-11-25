@@ -692,4 +692,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 196, value = "Unable to convert the Type %s to a Class.")
 	ValidationException getUnableToConvertTypeToClassException(Type type);
+
+	@Message(id = 197, value = "Error parsing Jandex index file.")
+	ValidationException getParsingJandexIndexException(@Cause Exception e);
+
+	@Message(id = 198, value = "Unable to find class for a name: '%s'.")
+	ValidationException getFindingClassReflectionJandexIndexException(String className, @Cause Exception e);
 }
