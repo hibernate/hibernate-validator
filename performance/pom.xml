@@ -146,7 +146,7 @@
                 </property>
             </activation>
             <properties>
-                <validator.version>5.3.0.Final</validator.version>
+                <validator.version>5.3.3.Final</validator.version>
             </properties>
             <dependencies>
                 <dependency>
