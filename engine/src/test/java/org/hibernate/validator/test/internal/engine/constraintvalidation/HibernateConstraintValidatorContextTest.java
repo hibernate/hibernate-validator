@@ -130,6 +130,21 @@ public class HibernateConstraintValidatorContextTest {
 		Assert.assertNull( hibernateConstraintViolation.getDynamicPayload( String.class ) );
 	}
 
+	@Test
+	@TestForIssue( jiraKey = "HV-1164")
+	public void testNullIsReturnedIfPayloadIsNull() {
+		Validator validator = getValidator();
+		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( QUESTION_1 ) );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+
+		ConstraintViolation<Foo> constraintViolation = constraintViolations.iterator().next();
+		@SuppressWarnings("unchecked")
+		HibernateConstraintViolation<Foo> hibernateConstraintViolation = constraintViolation.unwrap( HibernateConstraintViolation.class );
+
+		Assert.assertNull( hibernateConstraintViolation.getDynamicPayload( Object.class ) );
+	}
+
 	public class Foo {
 		@OracleConstraint
 		private final String question;
