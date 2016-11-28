@@ -228,8 +228,8 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 
 	@Override
 	public <C> C getDynamicPayload(Class<C> type) {
-		if ( dynamicPayload != null && type.isAssignableFrom( this.dynamicPayload.getClass() ) ) {
-			return type.cast( this.dynamicPayload );
+		if ( dynamicPayload != null && type.isAssignableFrom( dynamicPayload.getClass() ) ) {
+			return type.cast( dynamicPayload );
 		}
 		else {
 			return null;
