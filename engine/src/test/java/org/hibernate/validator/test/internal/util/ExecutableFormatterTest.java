@@ -22,7 +22,7 @@ public class ExecutableFormatterTest {
 
 	@Test
 	public void executableAsStringShouldReturnMethodNameWithBracesForParameterlessMethod() throws Exception {
-		assertEquals( new ExecutableFormatter( Foo.class.getMethod( "zap" ) ).toString(), "zap()" );
+		assertEquals( new ExecutableFormatter( Foo.class.getMethod( "zap" ) ).toString(), "Foo#zap()" );
 		assertEquals( new ExecutableFormatter( Bar.class.getConstructor() ).toString(), "Bar()" );
 	}
 
@@ -30,7 +30,7 @@ public class ExecutableFormatterTest {
 	public void executableAsStringShouldReturnMethodNameWithSimpleParamerTypeNames() throws Exception {
 		assertEquals(
 				new ExecutableFormatter( Bar.class.getMethod( "zap", int.class, Date.class ) ).toString(),
-				"zap(int, Date)"
+				"Bar#zap(int, Date)"
 		);
 		assertEquals(
 				new ExecutableFormatter( Bar.class.getConstructor( int.class, Date.class ) ).toString(),
