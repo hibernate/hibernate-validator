@@ -357,7 +357,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				mergedExecutable = executable;
 			}
 
-			executablesByDeclaringType.put( beanClass, mergedExecutable.merge( executable ) );
+			executablesByDeclaringType.put( beanClass, mergedExecutable );
 		}
 
 		@Override
