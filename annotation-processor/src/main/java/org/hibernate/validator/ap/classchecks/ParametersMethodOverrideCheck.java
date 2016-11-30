@@ -57,8 +57,6 @@ public class ParametersMethodOverrideCheck extends AbstractMethodOverrideCheck {
 							currentMethod,
 							null,
 							"INCORRECT_METHOD_PARAMETERS_PARALLEL_IMPLEMENTATION_OVERRIDING",
-							currentMethod.toString(),
-							getEnclosingTypeElementQualifiedName( method ),
 							getEnclosingTypeElementQualifiedNames( methodInheritanceTree.getTopLevelMethods() )
 					) );
 				}
@@ -76,8 +74,6 @@ public class ParametersMethodOverrideCheck extends AbstractMethodOverrideCheck {
 					currentMethod,
 					null,
 					"INCORRECT_METHOD_PARAMETERS_OVERRIDING",
-					currentMethod.toString(),
-					getEnclosingTypeElementQualifiedName( currentMethod ),
 					getEnclosingTypeElementQualifiedNames( overriddenMethods )
 			) );
 		}
