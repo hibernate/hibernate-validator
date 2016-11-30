@@ -176,7 +176,6 @@ public class HibernateConstraintValidatorContextTest {
 		public boolean isValid(String question, ConstraintValidatorContext context) {
 			HibernateConstraintValidatorContext hibernateContext = context.unwrap( HibernateConstraintValidatorContext.class );
 
-
 			if ( question.equals( QUESTION_1 ) ) {
 				createSingleConstraintViolation( hibernateContext );
 			}
@@ -219,5 +218,3 @@ public class HibernateConstraintValidatorContextTest {
 		}
 	}
 }
-
-

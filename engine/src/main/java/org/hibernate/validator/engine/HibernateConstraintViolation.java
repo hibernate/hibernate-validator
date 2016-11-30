@@ -8,17 +8,20 @@ package org.hibernate.validator.engine;
 
 import javax.validation.ConstraintViolation;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+
 /**
  * A custom {@link ConstraintViolation} which allows to get additional information for a constraint violation.
  *
  * @since 5.3
  */
 public interface HibernateConstraintViolation<T> extends ConstraintViolation<T> {
+
 	/**
 	 * @param type The type of payload to retrieve
-	 *
 	 * @return an instance of the specified type set by the user via
-	 * {@link org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext#withDynamicPayload(Object)}.
+	 * {@link HibernateConstraintValidatorContext#withDynamicPayload(Object)} or {@code null} if no constraint payload
+	 * if the given type has been set.
 	 */
 	<C> C getDynamicPayload(Class<C> type);
 }
