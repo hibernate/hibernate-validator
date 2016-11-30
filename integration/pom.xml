@@ -172,7 +172,6 @@
             <plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
-                <version>1.1.0.Alpha11</version>
                 <executions>
                     <!-- Currently the WF Maven plug-in cannot apply offline commands, although patch itself wouldn't require a running
                     server; see https://issues.jboss.org/projects/WFMP/issues/WFMP-11 -->
@@ -207,26 +206,6 @@
                 <configuration>
                     <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
                 </configuration>
-                <dependencies>
-                    <!-- Contains the patch command -->
-                    <dependency>
-                        <groupId>org.wildfly.core</groupId>
-                        <artifactId>wildfly-patching</artifactId>
-                        <version>1.0.1.Final</version>
-                    </dependency>
-                    <!-- The exclusion is needed to have the build work with JDK 9 -->
-                    <dependency>
-                        <groupId>org.wildfly.core</groupId>
-                        <artifactId>wildfly-cli</artifactId>
-                        <version>1.0.1.Final</version>
-                        <exclusions>
-                            <exclusion>
-                                <groupId>sun.jdk</groupId>
-                                <artifactId>jconsole</artifactId>
-                            </exclusion>
-                        </exclusions>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

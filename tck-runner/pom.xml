@@ -252,7 +252,7 @@
                         <artifactId>maven-dependency-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>unpack</id>
+                                <id>unpack-wildfly</id>
                                 <phase>generate-test-resources</phase>
                                 <goals>
                                     <goal>unpack</goal>
@@ -271,39 +271,20 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>copy-hv-snapshot</id>
-                                <phase>process-test-resources</phase>
+                                <id>copy-patch</id>
+                                <phase>generate-test-resources</phase>
                                 <goals>
                                     <goal>copy</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>
-                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/main
-                                    </outputDirectory>
-                                    <stripVersion>false</stripVersion>
                                     <artifactItems>
                                         <artifactItem>
                                             <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-validator</artifactId>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>copy-hv-cdi-snapshot</id>
-                                <phase>process-test-resources</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>
-                                        ${project.build.directory}/wildfly-${wildfly.version}/modules/system/layers/base/org/hibernate/validator/cdi/main
-                                    </outputDirectory>
-                                    <stripVersion>false</stripVersion>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.hibernate</groupId>
-                                            <artifactId>hibernate-validator-cdi</artifactId>
+                                            <artifactId>hibernate-validator-modules</artifactId>
+                                            <version>${project.version}</version>
+                                            <classifier>wildfly-${wildfly.version}-patch</classifier>
+                                            <type>zip</type>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
                                         </artifactItem>
                                     </artifactItems>
                                 </configuration>
@@ -311,20 +292,42 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.codehaus.gmaven</groupId>
-                        <artifactId>gmaven-plugin</artifactId>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
                         <executions>
+                            <!-- Currently the WF Maven plug-in cannot apply offline commands, although patch itself wouldn't require a running
+                            server; see https://issues.jboss.org/projects/WFMP/issues/WFMP-11 -->
                             <execution>
-                                <id>update-modules</id>
+                                <id>start-wildfly-for-patching</id>
                                 <phase>generate-test-resources</phase>
                                 <goals>
-                                    <goal>execute</goal>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>apply-patch-file</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>execute-commands</goal>
                                 </goals>
                                 <configuration>
-                                    <source>${pom.basedir}/src/script/setupModules.groovy</source>
+                                    <fail-on-error>false</fail-on-error>
+                                    <commands>
+                                        <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly.version}-patch.zip</command>
+                                    </commands>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>shutdown-wildfly-for-patching</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>shutdown</goal>
+                                </goals>
+                            </execution>
                         </executions>
+                        <configuration>
+                            <jbossHome>${project.build.directory}/wildfly-${wildfly.version}/</jbossHome>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
