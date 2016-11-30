@@ -160,7 +160,7 @@
                                     <groupId>org.hibernate</groupId>
                                     <artifactId>hibernate-validator-modules</artifactId>
                                     <version>${project.version}</version>
-                                    <classifier>wildfly-10-patch</classifier>
+                                    <classifier>wildfly-${wildfly.version}-patch</classifier>
                                     <type>zip</type>
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
@@ -192,7 +192,7 @@
                         <configuration>
                             <fail-on-error>false</fail-on-error>
                             <commands>
-                                <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-10-patch.zip</command>
+                                <command>patch apply --path ${project.build.directory}/hibernate-validator-modules-${project.version}-wildfly-${wildfly.version}-patch.zip</command>
                             </commands>
                         </configuration>
                     </execution>

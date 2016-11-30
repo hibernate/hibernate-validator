@@ -87,7 +87,7 @@
                                 <artifact>
                                     <file>${patchFile}</file>
                                     <type>zip</type>
-                                    <classifier>wildfly-10-patch</classifier>
+                                    <classifier>wildfly-${wildfly.version}-patch</classifier>
                                 </artifact>
                             </artifacts>
                         </configuration>
