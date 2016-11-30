@@ -1,11 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <patch-config xmlns="urn:jboss:patch-config:1.0">
-    <name>wildfly-10-hibernate-validator-${project.version}</name>
-    <description>This patch upgrades Hibernate Validator ${project.version} within WildFly 10 installation</description>
-    <one-off />
-    <element patch-id="layer-base-wildfly-10-hibernate-validor-${project.version}">
+    <name>wildfly-${wildfly.version}-hibernate-validator-${project.version}</name>
+    <description>This patch upgrades Hibernate Validator ${project.version} within WildFly ${wildfly.version} installation</description>
+    <element patch-id="layer-base-wildfly-${wildfly.version}-hibernate-validor-${project.version}">
         <one-off name="base" />
-        <description>This patch upgrades Hibernate Validator ${project.version} within WildFly 10 installation</description>
+        <description>This patch upgrades Hibernate Validator ${project.version} within WildFly ${wildfly.version} installation</description>
         <specified-content>
             <modules>
                 <updated name="javax.validation.api" />
