@@ -84,7 +84,7 @@ public class HibernateConstraintValidatorContextTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-951")
+	@TestForIssue(jiraKey = "HV-951")
 	public void testExpressionVariablesAreExposedInConstraintViolation() throws Exception {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( QUESTION_1 ) );
@@ -99,7 +99,7 @@ public class HibernateConstraintValidatorContextTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1020")
+	@TestForIssue(jiraKey = "HV-1020")
 	public void testDynamicPayloadExposedInHibernateConstraintViolation() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( QUESTION_4 ) );
@@ -116,7 +116,7 @@ public class HibernateConstraintValidatorContextTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1020")
+	@TestForIssue(jiraKey = "HV-1020")
 	public void testNullIsReturnedForNonExistingPayloadType() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( QUESTION_4 ) );
@@ -131,7 +131,7 @@ public class HibernateConstraintValidatorContextTest {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1164")
+	@TestForIssue(jiraKey = "HV-1164")
 	public void testNullIsReturnedIfPayloadIsNull() {
 		Validator validator = getValidator();
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo( QUESTION_1 ) );
