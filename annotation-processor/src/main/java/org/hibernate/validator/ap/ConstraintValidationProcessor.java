@@ -117,6 +117,12 @@ public class ConstraintValidationProcessor extends AbstractProcessor {
 			}
 		}
 
+		// now let's find all classes and interfaces and go through their methods to check if they are correctly overridden:
+		ElementVisitor<Void, Void> classVisitor = new ClassVisitor( processingEnv, messager, configuration );
+		for ( Element element : roundEnvironment.getRootElements() ) {
+			element.accept( classVisitor, null );
+		}
+
 		return ANNOTATIONS_CLAIMED_EXCLUSIVELY;
 	}
 

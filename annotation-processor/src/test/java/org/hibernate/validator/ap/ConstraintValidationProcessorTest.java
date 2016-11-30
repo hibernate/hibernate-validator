@@ -7,11 +7,13 @@
 package org.hibernate.validator.ap;
 
 import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.util.EnumSet;
+import java.util.Locale;
 import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
 
@@ -69,8 +71,10 @@ import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.Size;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForCollection;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSerializable;
 import org.hibernate.validator.ap.testmodel.nouniquevalidatorresolution.SizeValidatorForSet;
+import org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests;
 import org.hibernate.validator.ap.testutil.CompilerTestHelper.Library;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.Test;
 
@@ -96,10 +100,35 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		);
 	}
 
-	/**
-	 * HV-567
-	 */
+
 	@Test
+	@TestForIssue( jiraKey = "HV-840" )
+	public void overridingMethodParameterConstraintsTest() {
+		File sourceFile = compilerHelper.getSourceFile( MethodOverridingTests.class );
+
+		boolean compilationResult = compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 38 ),
+				new DiagnosticExpectation( Kind.ERROR, 56 ),
+				new DiagnosticExpectation( Kind.ERROR, 72 ),
+				new DiagnosticExpectation( Kind.ERROR, 91 ),
+				new DiagnosticExpectation( Kind.ERROR, 145 ),
+				new DiagnosticExpectation( Kind.ERROR, 153 ),
+				new DiagnosticExpectation( Kind.ERROR, 170 ),
+				new DiagnosticExpectation( Kind.ERROR, 192 ),
+				new DiagnosticExpectation( Kind.ERROR, 220 ),
+				new DiagnosticExpectation( Kind.ERROR, 374 ),
+				new DiagnosticExpectation( Kind.ERROR, 388 )
+		);
+
+		assertEquals( diagnostics.getDiagnostics().get( 0 ).getMessage( Locale.getDefault() ) , "Parameter constraints of \"doSomething\" must not be strengthened in subtype. In sub types, no parameter constraints may be declared on overridden or implemented methods, nor may parameters be marked for cascaded validation. Method in org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1Sub violates this rule. Types that contain overridden method are: [ org.hibernate.validator.ap.testmodel.overriding.MethodOverridingTests.MethodOverridingTestCase1 ]." );
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HV-567" )
 	public void hibernateValidatorProvidedCustomConstraints() {
 		File sourceFile = compilerHelper.getSourceFile( HibernateValidatorProvidedCustomConstraints.class );
 

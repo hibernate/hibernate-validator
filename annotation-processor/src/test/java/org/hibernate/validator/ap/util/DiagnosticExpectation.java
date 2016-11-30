@@ -13,7 +13,7 @@ import javax.tools.Diagnostic.Kind;
  *
  * @author Gunnar Morling
  */
-public class DiagnosticExpectation {
+public class DiagnosticExpectation implements Comparable<DiagnosticExpectation> {
 
 	private final Kind kind;
 
@@ -65,5 +65,18 @@ public class DiagnosticExpectation {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public int compareTo(DiagnosticExpectation o) {
+		if ( o == null ) {
+			return 1;
+		}
+		if ( lineNumber == o.getLineNumber() ) {
+			return kind.compareTo( o.getKind() );
+		}
+		else {
+			return (int) ( lineNumber - o.getLineNumber() );
+		}
 	}
 }
