@@ -97,10 +97,11 @@ public class OsgiIntegrationTest {
 				when( DEBUG ).useOptions( keepRuntimeFolder() ),
 				logLevel( LogLevelOption.LogLevel.INFO ),
 				// avoiding additional boot features; specifically "enterprise" which already comes with a HV feature
+				// "system" is the absolute minimum, but enough for our purposes
 				editConfigurationFilePut(
 						"etc/org.apache.karaf.features.cfg",
 						"featuresBoot",
-						"standard"
+						"system"
 				),
 				features( hibernateValidatorFeature, "hibernate-validator" )
 		);
