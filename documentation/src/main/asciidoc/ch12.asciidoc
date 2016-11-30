@@ -15,8 +15,8 @@ annotations are incorrectly used.
 ====
 You can find the Hibernate Validator Annotation Processor as part of the distribution bundle on
 http://sourceforge.net/projects/hibernate/files/hibernate-validator[Sourceforge] or in the
-usual Maven repositories such as Maven Central under the GAV `org.hibernate:hibernate-validator-
-annotation-processor:{hvVersion}`.
+usual Maven repositories such as Maven Central under the GAV
+`org.hibernate:hibernate-validator-annotation-processor:{hvVersion}`.
 ====
 
 [[validator-annotationprocessor-prerequisites]]
