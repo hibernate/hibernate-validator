@@ -134,6 +134,12 @@
         <wildfly-arquillian.version>2.0.0.Final</wildfly-arquillian.version>
         <jboss-ejb-api_3.2_spec.version>1.0.0.Final</jboss-ejb-api_3.2_spec.version>
 
+        <!-- WildFly patching infrastructure -->
+        <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha1</wildfly-patch-gen-maven-plugin.version>
+        <wildfly-patch-gen-maven-plugin.woodstox.version>5.0.3</wildfly-patch-gen-maven-plugin.woodstox.version>
+        <wildfly-maven-plugin.version>1.1.0.Alpha11</wildfly-maven-plugin.version>
+        <wildfly-core.version>1.0.1.Final</wildfly-core.version>
+
         <arquillian.version>1.1.11.Final</arquillian.version>
 
         <!-- OSGi dependencies -->
@@ -720,6 +726,50 @@
                         </parameter>
                     </configuration>
                 </plugin>
+                <!-- Used to build the JMH jars -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>2.2</version>
+                </plugin>
+                <!-- WildFly patching infrastructure plugins -->
+                <plugin>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>patch-gen-maven-plugin</artifactId>
+                    <version>${wildfly-patch-gen-maven-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.fasterxml.woodstox</groupId>
+                            <artifactId>woodstox-core</artifactId>
+                            <version>${wildfly-patch-gen-maven-plugin.woodstox.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.wildfly.plugins</groupId>
+                    <artifactId>wildfly-maven-plugin</artifactId>
+                    <version>${wildfly-maven-plugin.version}</version>
+                    <dependencies>
+                        <!-- Contains the patch command -->
+                        <dependency>
+                            <groupId>org.wildfly.core</groupId>
+                            <artifactId>wildfly-patching</artifactId>
+                            <version>${wildfly-core.version}</version>
+                        </dependency>
+                        <!-- The exclusion is needed to have the build work with JDK 9 -->
+                        <dependency>
+                            <groupId>org.wildfly.core</groupId>
+                            <artifactId>wildfly-cli</artifactId>
+                            <version>${wildfly-core.version}</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>sun.jdk</groupId>
+                                    <artifactId>jconsole</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                    </dependencies>
+                </plugin>
                 <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -817,11 +867,6 @@
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-shade-plugin</artifactId>
-                    <version>2.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
