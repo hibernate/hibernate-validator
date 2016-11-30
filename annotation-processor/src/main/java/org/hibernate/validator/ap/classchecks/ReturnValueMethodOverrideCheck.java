@@ -46,9 +46,7 @@ public class ReturnValueMethodOverrideCheck extends AbstractMethodOverrideCheck 
 				issues.add( ConstraintCheckIssue.error(
 						currentMethod,
 						null,
-						"INCORRECT_METHOD_RETURN_OVERRIDING",
-						currentMethod.getSimpleName().toString(),
-						getEnclosingTypeElementQualifiedName( currentMethod ),
+						"INCORRECT_METHOD_RETURN_VALUE_OVERRIDING",
 						getEnclosingTypeElementQualifiedName( overriddenMethod )
 				) );
 			}
