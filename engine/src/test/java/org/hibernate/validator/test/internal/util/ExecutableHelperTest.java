@@ -216,7 +216,7 @@ public class ExecutableHelperTest {
 	}
 
 	@Test
-	public void executableAsStringShouldReturnMethodNameWithSimpleParamerTypeNames() throws Exception {
+	public void executableAsStringShouldReturnMethodNameWithSimpleParameterTypeNames() throws Exception {
 		assertEquals( ExecutableHelper.getExecutableAsString( "foo", int.class, Foo.class ), "foo(int, Foo)" );
 	}
 

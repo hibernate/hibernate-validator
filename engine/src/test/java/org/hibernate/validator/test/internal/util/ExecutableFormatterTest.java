@@ -27,7 +27,7 @@ public class ExecutableFormatterTest {
 	}
 
 	@Test
-	public void executableAsStringShouldReturnMethodNameWithSimpleParamerTypeNames() throws Exception {
+	public void executableAsStringShouldReturnMethodNameWithSimpleParameterTypeNames() throws Exception {
 		assertEquals(
 				new ExecutableFormatter( Bar.class.getMethod( "zap", int.class, Date.class ) ).toString(),
 				"Bar#zap(int, Date)"
