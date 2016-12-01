@@ -10,6 +10,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -31,6 +32,8 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
@@ -49,22 +52,21 @@ public class ConstrainedFieldJandexBuilder {
 
 	private static final Log log = LoggerFactory.make();
 
-	private Map<String, Boolean> constraintAnnotationCache = CollectionHelper.newConcurrentHashMap();
-
 	protected final ConstraintHelper constraintHelper;
 
-	private ConstrainedFieldJandexBuilder() {
-		//TODO: need to pass constraintHelper as a parameter and init the variable correctly
-		constraintHelper = null;
+	private ConstrainedFieldJandexBuilder(ConstraintHelper constraintHelper) {
+		this.constraintHelper = constraintHelper;
 	}
 
 	/**
 	 * Creates an instance of a {@link ConstrainedFieldJandexBuilder}.
 	 *
+	 * @param constraintHelper an instance of {@link ConstraintHelper}
+	 *
 	 * @return a new instance of {@link ConstrainedFieldJandexBuilder}
 	 */
-	public static ConstrainedFieldJandexBuilder getInstance() {
-		return new ConstrainedFieldJandexBuilder();
+	public static ConstrainedFieldJandexBuilder getInstance(ConstraintHelper constraintHelper) {
+		return new ConstrainedFieldJandexBuilder( constraintHelper );
 	}
 
 	/**
@@ -137,6 +139,7 @@ public class ConstrainedFieldJandexBuilder {
 	}
 
 	private Set<MetaConstraint<?>> findTypeAnnotationConstraintsForMember(FieldInfo fieldInfo) {
+		//TODO: Add implementation
 		return Collections.emptySet();
 	}
 
@@ -221,25 +224,6 @@ public class ConstrainedFieldJandexBuilder {
 	 * single nor multi-valued annotation.
 	 */
 	protected Stream<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member, AnnotationInstance annotationInstance) {
-
-		//TODO: probably need to do something similar to what is done in MetaConstraintBuilder#buildMetaConstraint to get the "Annotation"s
-
-//		List<Annotation> constraints = newArrayList();
-//		Class<? extends Annotation> annotationType = annotation.annotationType();
-//		if ( constraintHelper.isConstraintAnnotation( annotationType ) ) {
-//			constraints.add( annotation );
-//		}
-//		else if ( constraintHelper.isMultiValueConstraint( annotationType ) ) {
-//			constraints.addAll( constraintHelper.getConstraintsFromMultiValueConstraint( annotation ) );
-//		}
-//
-//		for ( Annotation constraint : constraints ) {
-//			final ConstraintDescriptorImpl<?> constraintDescriptor = buildConstraintDescriptor(
-//					member, constraint, type
-//			);
-//			constraintDescriptors.add( constraintDescriptor );
-//		}
-
 		return instanceToAnnotations( annotationInstance ).map( constraint -> buildConstraintDescriptor( member, constraint, ElementType.FIELD ) );
 	}
 
@@ -252,16 +236,74 @@ public class ConstrainedFieldJandexBuilder {
 	 * it will contain it. If given instance is a multivalued constraint - it will be unwrapped and stream will contain annotations
 	 * from that multivalued one.
 	 */
-	private Stream<Annotation> instanceToAnnotations(AnnotationInstance annotationInstance) {
+	private <A extends Annotation> Stream<Annotation> instanceToAnnotations(AnnotationInstance annotationInstance) {
+		Class<A> annotationClass = (Class<A>) JandexUtils.getClassForName( annotationInstance.name().toString() );
+		if ( constraintHelper.isMultiValueConstraint( annotationClass ) ) {
+			return Arrays.stream( (AnnotationValue[]) annotationInstance.value().value() )
+					.map( annotationValue -> instanceToAnnotation( annotationValue.asNested() ) );
+		}
+		else if ( constraintHelper.isConstraintAnnotation( annotationClass ) ) {
+			return Stream.of( instanceToAnnotation( annotationClass, annotationInstance ) );
+		}
+		else {
+			return Stream.empty();
+		}
+	}
 
-//		if ( constraintHelper.isConstraintAnnotation( annotationType ) ) {
-//			constraints.add( annotation );
-//		}
-//		else if ( constraintHelper.isMultiValueConstraint( annotationType ) ) {
-//			constraints.addAll( constraintHelper.getConstraintsFromMultiValueConstraint( annotation ) );
-//		}
+	/**
+	 * Converts given annotation instance of ({@link AnnotationInstance}) type to its {@link Annotation} representation.
+	 *
+	 * @param annotationInstance annotation instance to convert
+	 *
+	 * @return an annotation based on input parameters
+	 */
+	private <A extends Annotation> A instanceToAnnotation(AnnotationInstance annotationInstance) {
+		return instanceToAnnotation( (Class<A>) JandexUtils.getClassForName( annotationInstance.name().toString() ), annotationInstance );
+	}
 
-		return Stream.empty();
+	/**
+	 * Converts given annotation instance of ({@link AnnotationInstance}) type to its {@link Annotation} representation.
+	 *
+	 * @param annotationClass a class of annotation to convert to
+	 * @param annotationInstance annotation instance to convert
+	 *
+	 * @return an annotation based on input parameters
+	 */
+	private <A extends Annotation> A instanceToAnnotation(Class<A> annotationClass, AnnotationInstance annotationInstance) {
+		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<>( annotationClass );
+
+		annotationInstance.values().stream()
+				.forEach( annotationValue -> annotationDescriptor.setValue( annotationValue.name(), convertAnnotationValue( annotationValue ) ) );
+
+		A annotation;
+		try {
+			annotation = AnnotationFactory.create( annotationDescriptor );
+		}
+		catch (RuntimeException e) {
+			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
+		}
+		return annotation;
+	}
+
+	/**
+	 * Converts annotation value to a value usable for {@link Annotation}.
+	 *
+	 * @param annotationValue annotation value to convert
+	 *
+	 * @return converted value
+	 */
+	private Object convertAnnotationValue(AnnotationValue annotationValue) {
+		if ( AnnotationValue.Kind.ARRAY.equals( annotationValue.kind() ) ) {
+			if ( AnnotationValue.Kind.CLASS.equals( annotationValue.componentKind() ) ) {
+				return Arrays.stream( annotationValue.asClassArray() )
+						.map( type -> JandexUtils.getClassForName( type.name().toString() ) )
+						.toArray( size -> new Class[size] );
+			}
+		}
+		else if ( AnnotationValue.Kind.CLASS.equals( annotationValue.kind() ) ) {
+			return JandexUtils.getClassForName( annotationValue.asClass().name().toString() );
+		}
+		return annotationValue.value();
 	}
 
 	/**

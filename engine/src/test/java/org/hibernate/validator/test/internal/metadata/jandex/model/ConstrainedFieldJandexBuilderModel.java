@@ -23,11 +23,11 @@ import org.hibernate.validator.test.internal.metadata.jandex.ConstrainedFieldJan
  */
 public class ConstrainedFieldJandexBuilderModel {
 
-	@Max(1)
+	@Max(value = 1, groups = { Group1.class })
 	@ConvertGroup(from = Group1.class, to = Group2.class)
 	private String var1;
 
-	@Min(2)
+	@Min(value = 2, groups = Group3.class)
 	@ConvertGroup.List({ @ConvertGroup(from = Group1.class, to = Group2.class), @ConvertGroup(from = Group3.class, to = Group2.class) })
 	private String var2;
 

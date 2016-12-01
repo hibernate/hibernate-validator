@@ -42,11 +42,11 @@ public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
 			ConstraintHelper constraintHelper,
 			InputStream jandexIndexStreamResource,
 			AnnotationProcessingOptions annotationProcessingOptions) {
-		super( constraintHelper, readJandexIndex( jandexIndexStreamResource ) );
+		super( constraintHelper, readJandexIndex( constraintHelper, jandexIndexStreamResource ) );
 		this.annotationProcessingOptions = annotationProcessingOptions;
 	}
 
-	private static Map<String, BeanConfiguration<?>> readJandexIndex(InputStream jandexIndexStreamResource) {
+	private static Map<String, BeanConfiguration<?>> readJandexIndex(ConstraintHelper constraintHelper, InputStream jandexIndexStreamResource) {
 		IndexReader jandexReader = new IndexReader( jandexIndexStreamResource );
 		Index index = null;
 		try {
@@ -60,17 +60,17 @@ public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 		// go through all classes (and interfaces ?) to build configuration map
 		for ( ClassInfo classInfo : index.getKnownClasses() ) {
-			beanConfigurationMap.put( classInfo.name().toString(), getBeanConfiguration( index, classInfo ) );
+			beanConfigurationMap.put( classInfo.name().toString(), getBeanConfiguration( constraintHelper, index, classInfo ) );
 		}
 
 		return null;
 	}
 
-	private static BeanConfiguration getBeanConfiguration(Index jandexIndex, ClassInfo classInfo) {
+	private static BeanConfiguration getBeanConfiguration(ConstraintHelper constraintHelper, Index jandexIndex, ClassInfo classInfo) {
 		return new BeanConfiguration(
 				ConfigurationSource.JANDEX,
 				JandexUtils.getClassForName( classInfo.name().toString() ),
-				getConstrainedElements( jandexIndex, classInfo ),
+				getConstrainedElements( constraintHelper, classInfo ),
 				getDefaultGroupSequence( jandexIndex, classInfo ),
 				getDefaultGroupSequenceProvider()
 		);
@@ -84,10 +84,10 @@ public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
 		return null;
 	}
 
-	private static Set<? extends ConstrainedElement> getConstrainedElements(Index jandexIndex, ClassInfo classInfo) {
+	private static Set<? extends ConstrainedElement> getConstrainedElements(ConstraintHelper constraintHelper, ClassInfo classInfo) {
 
 		//get constrained fields
-		Collection<ConstrainedElement> constrainedFields = ConstrainedFieldJandexBuilder.getInstance()
+		Collection<ConstrainedElement> constrainedFields = ConstrainedFieldJandexBuilder.getInstance( constraintHelper )
 				.getConstrainedFields( classInfo, JandexUtils.getClassForName( classInfo.name().toString() ) );
 
 		return null;

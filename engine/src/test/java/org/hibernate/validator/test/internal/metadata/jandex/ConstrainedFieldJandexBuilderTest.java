@@ -9,6 +9,7 @@ package org.hibernate.validator.test.internal.metadata.jandex;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.jandex.ConstrainedFieldJandexBuilder;
 import org.hibernate.validator.test.internal.metadata.jandex.model.ConstrainedFieldJandexBuilderModel;
 
@@ -44,7 +45,7 @@ public class ConstrainedFieldJandexBuilderTest {
 	 */
 	@Test
 	public void testGetConstrainedFields() {
-		ConstrainedFieldJandexBuilder.getInstance().getConstrainedFields(
+		ConstrainedFieldJandexBuilder.getInstance( new ConstraintHelper() ).getConstrainedFields(
 				index.getClassByName( DotName.createSimple( ConstrainedFieldJandexBuilderModel.class.getName() ) ),
 				ConstrainedFieldJandexBuilderModel.class
 		);
