@@ -34,6 +34,8 @@ public final class JandexUtils {
 	 * @return a found {@link Class}
 	 */
 	public static Class<?> getClassForName(String name) {
+		// TODO: change how class are loaded (from GM: Using this one without passing a classloader may give us trouble due to classes not being visible to
+		// the implicitly used loader. You can check out org.hibernate.validator.internal.util.privilegedactions.LoadClass and its usage as a starting point.
 		try {
 			return Class.forName( name.toString() );
 		}
@@ -52,5 +54,29 @@ public final class JandexUtils {
 	public static boolean isIndexable(Type type) {
 		// TODO: Can this property be somehow determined from a type parameter and without converting it to a class ???
 		return ReflectionHelper.isIndexable( getClassForName( type.name().toString() ) );
+	}
+
+	/**
+	 * Checks if given type is a {@link Map} implementation.
+	 *
+	 * @param type a type to check
+	 *
+	 * @return {@code true} if given type is an implementation of a {@link Map}, {@code false} otherwise
+	 */
+	public static boolean isMap(Type type) {
+		// TODO: Can this property be somehow determined from a type parameter and without converting it to a class ???
+		return ReflectionHelper.isMap( getClassForName( type.name().toString() ) );
+	}
+
+	/**
+	 * Checks if given type is an {@link Iterable} implementation.
+	 *
+	 * @param type a type to check
+	 *
+	 * @return {@code true} if given type is an implementation of an {@link Iterable}, {@code false} otherwise
+	 */
+	public static boolean isIterable(Type type) {
+		// TODO: Can this property be somehow determined from a type parameter and without converting it to a class ???
+		return ReflectionHelper.isIterable( getClassForName( type.name().toString() ) );
 	}
 }

@@ -6,14 +6,16 @@
  */
 package org.hibernate.validator.test.internal.metadata.jandex.model;
 
-
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import javax.validation.groups.ConvertGroup;
 
+import org.hibernate.validator.test.internal.engine.serialization.Email;
 import org.hibernate.validator.test.internal.metadata.jandex.ConstrainedFieldJandexBuilderTest;
 
 /**
@@ -33,15 +35,19 @@ public class ConstrainedFieldJandexBuilderModel {
 
 	private Optional<String> optional;
 
-	private List<String> list;
+	@Valid
+	private List<@NotNull String> list;
 
 	private interface Group1 {
+
 	}
 
 	private interface Group2 {
+
 	}
 
 	private interface Group3 {
+
 	}
 
 }

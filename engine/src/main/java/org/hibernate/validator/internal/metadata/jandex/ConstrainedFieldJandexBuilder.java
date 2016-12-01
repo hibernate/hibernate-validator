@@ -12,13 +12,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 
@@ -42,6 +41,7 @@ import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.FieldInfo;
+import org.jboss.jandex.Type;
 
 /**
  * Builder for constrained fields that uses Jandex index.
@@ -75,12 +75,11 @@ public class ConstrainedFieldJandexBuilder {
 	 * @param classInfo a class in which to look for constrained fileds
 	 * @param beanClass same class as {@code classInfo} but represented as {@link Class}
 	 *
-	 * @return a collection of {@link ConstrainedElement}s that represents fields
+	 * @return a stream of {@link ConstrainedElement}s that represents fields
 	 */
-	public Collection<ConstrainedElement> getConstrainedFields(ClassInfo classInfo, Class<?> beanClass) {
+	public Stream<ConstrainedElement> getConstrainedFields(ClassInfo classInfo, Class<?> beanClass) {
 		return classInfo.fields().stream()
-				.map( fieldInfo -> toConstrainedField( beanClass, fieldInfo ) )
-				.collect( Collectors.toSet() );
+				.map( fieldInfo -> toConstrainedField( beanClass, fieldInfo ) );
 	}
 
 	/**
@@ -101,7 +100,8 @@ public class ConstrainedFieldJandexBuilder {
 		);
 
 		boolean isCascading = findAnnotation( fieldInfo.annotations(), Valid.class ).isPresent();
-		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForMember( fieldInfo );
+		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForMember( fieldInfo, beanClass, isCascading )
+				.collect( Collectors.toSet() );
 
 		boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
 		UnwrapMode unwrapMode = determineUnwrapMode( fieldInfo, typeArgumentAnnotated );
@@ -138,9 +138,50 @@ public class ConstrainedFieldJandexBuilder {
 		return UnwrapMode.AUTOMATIC;
 	}
 
-	private Set<MetaConstraint<?>> findTypeAnnotationConstraintsForMember(FieldInfo fieldInfo) {
-		//TODO: Add implementation
-		return Collections.emptySet();
+	private Stream<MetaConstraint<?>> findTypeAnnotationConstraintsForMember(FieldInfo fieldInfo, Class<?> beanClass, boolean isCascaded) {
+		//TODO: Do we need to include Type.Kind.WILDCARD_TYPE ?
+		if ( !Type.Kind.PARAMETERIZED_TYPE.equals( fieldInfo.type().kind() ) ) {
+			return Stream.empty();
+		}
+
+		List<Type> arguments = fieldInfo.type().asParameterizedType().arguments();
+		Optional<Type> argument;
+		Stream<ConstraintDescriptorImpl<?>> constraintDescriptors = Stream.empty();
+		if ( arguments.size() == 1 ) {
+			argument = Optional.of( arguments.get( 0 ) );
+		}
+		else if ( JandexUtils.isMap( fieldInfo.type() ) ) {
+			argument = Optional.of( arguments.get( 1 ) );
+		}
+		else {
+			argument = Optional.empty();
+		}
+		if ( argument.isPresent() ) {
+			Field field = findField( beanClass, fieldInfo );
+			constraintDescriptors = findConstrainAnnotations(
+					argument.get().annotations() )
+					.flatMap( annotationInstance -> findConstraintAnnotations( field, annotationInstance ) );
+
+			// HV-925
+			// We need to determine the validated type used for constraint validator resolution.
+			// Iterables and maps need special treatment at this point, since the validated type is the type of the
+			// specified type parameter. In the other cases the validated type is the parameterized type, eg Optional<String>.
+			// In the latter case a value unwrapping has to occur
+			Type validatedType = fieldInfo.type();
+			if ( JandexUtils.isIterable( fieldInfo.type() ) || JandexUtils.isMap( fieldInfo.type() ) ) {
+				if ( !isCascaded ) {
+					throw log.getTypeAnnotationConstraintOnIterableRequiresUseOfValidAnnotationException(
+							beanClass,
+							fieldInfo.name()
+					);
+				}
+				validatedType = argument.get();
+			}
+			Class<?> fieldType = JandexUtils.getClassForName( validatedType.name().toString() );
+			return constraintDescriptors.map( constraintDescriptor -> createTypeArgumentMetaConstraint( field, constraintDescriptor, fieldType ) );
+		}
+
+		return Stream.empty();
 	}
 
 	/**
@@ -176,7 +217,7 @@ public class ConstrainedFieldJandexBuilder {
 		groupConversionMap.merge(
 				from,
 				JandexUtils.getClassForName( annotation.value( "to" ).asClass().name().toString() ),
-				( val1, val2 ) -> {
+				(val1, val2) -> {
 					throw log.getMultipleGroupConversionsForSameSourceException(
 							from,
 							CollectionHelper.asSet( val1, val2 )
@@ -373,9 +414,16 @@ public class ConstrainedFieldJandexBuilder {
 		return true;
 	}
 
-
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<>( descriptor, ConstraintLocation.forProperty( member ) );
+	}
+
+	/**
+	 * Creates a {@code MetaConstraint} for a type argument constraint.
+	 */
+	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor,
+			java.lang.reflect.Type type) {
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( member, type ) );
 	}
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(

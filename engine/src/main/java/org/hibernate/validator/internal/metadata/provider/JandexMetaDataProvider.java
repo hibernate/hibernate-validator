@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -87,7 +88,7 @@ public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
 	private static Set<? extends ConstrainedElement> getConstrainedElements(ConstraintHelper constraintHelper, ClassInfo classInfo) {
 
 		//get constrained fields
-		Collection<ConstrainedElement> constrainedFields = ConstrainedFieldJandexBuilder.getInstance( constraintHelper )
+		Stream<ConstrainedElement> constrainedFields = ConstrainedFieldJandexBuilder.getInstance( constraintHelper )
 				.getConstrainedFields( classInfo, JandexUtils.getClassForName( classInfo.name().toString() ) );
 
 		return null;
