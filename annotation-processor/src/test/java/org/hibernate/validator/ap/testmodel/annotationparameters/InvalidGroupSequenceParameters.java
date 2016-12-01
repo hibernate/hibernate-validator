@@ -125,4 +125,27 @@ public class InvalidGroupSequenceParameters {
 		public interface MySequence {
 		}
 	}
+
+	/**
+	 * Case 7: Deeper cyclic definition - incorrect
+	 */
+	public static class Case7 {
+		public interface Group1 {
+		}
+
+		public interface Group2 {
+		}
+
+		@GroupSequence(value = { Group1.class, Group4.class })
+		public interface Group3 {
+		}
+
+		@GroupSequence(value = Group5.class)
+		public interface Group4 {
+		}
+
+		@GroupSequence(value = { Group2.class, Group3.class })
+		public interface Group5 {
+		}
+	}
 }
