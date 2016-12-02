@@ -6,6 +6,12 @@
  */
 package org.hibernate.validator.test.internal.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -14,23 +20,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeSet;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 /**
  * Tests for the {@code ReflectionHelper}.
  *
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class ReflectionHelperTest {
 
@@ -51,6 +53,54 @@ public class ReflectionHelperTest {
 	}
 
 	@Test
+	public void testIsCollection() throws Exception {
+		assertTrue( ReflectionHelper.isCollection( Iterable.class ) );
+		assertTrue( ReflectionHelper.isCollection( Collection.class ) );
+
+		assertTrue( ReflectionHelper.isCollection( List.class ) );
+		Type type = TestTypes.class.getField( "stringList" ).getGenericType();
+		assertTrue( ReflectionHelper.isCollection( type ) );
+
+		assertTrue( ReflectionHelper.isCollection( TreeSet.class ) );
+		assertTrue( ReflectionHelper.isCollection( HashSet.class ) );
+		type = TestTypes.class.getField( "floatSet" ).getGenericType();
+		assertTrue( ReflectionHelper.isCollection( type ) );
+
+		assertTrue( ReflectionHelper.isCollection( Map.class ) );
+		assertTrue( ReflectionHelper.isCollection( SortedMap.class ) );
+		type = TestTypes.class.getField( "objectMap" ).getGenericType();
+		assertTrue( ReflectionHelper.isCollection( type ) );
+
+		assertTrue( ReflectionHelper.isCollection( int[].class ) );
+		assertTrue( ReflectionHelper.isCollection( String[].class ) );
+		type = TestTypes.class.getField( "stringArray" ).getGenericType();
+		assertTrue( ReflectionHelper.isCollection( type ) );
+		type = TestTypes.class.getField( "intArray" ).getGenericType();
+		assertTrue( ReflectionHelper.isCollection( type ) );
+
+		assertFalse( ReflectionHelper.isCollection( null ) );
+		assertFalse( ReflectionHelper.isCollection( Object.class ) );
+	}
+
+	@Test
+	public void testGetCollectionElementType() throws Exception {
+		Type type = TestTypes.class.getField( "stringList" ).getGenericType();
+		assertThat( ReflectionHelper.getCollectionElementType( type ) ).isEqualTo( String.class );
+
+		type = TestTypes.class.getField( "floatSet" ).getGenericType();
+		assertThat( ReflectionHelper.getCollectionElementType( type ) ).isEqualTo( Float.class );
+
+		type = TestTypes.class.getField( "stringArray" ).getGenericType();
+		assertThat( ReflectionHelper.getCollectionElementType( type ) ).isEqualTo( String.class );
+
+		type = TestTypes.class.getField( "objectMap" ).getGenericType();
+		assertThat( ReflectionHelper.getCollectionElementType( type ) ).isEqualTo( Object.class );
+
+		type = TestTypes.class.getField( "intArray" ).getGenericType();
+		assertThat( ReflectionHelper.getCollectionElementType( type ) ).isEqualTo( int.class );
+	}
+
+	@Test
 	public void testIsMap() throws Exception {
 		assertTrue( ReflectionHelper.isMap( Map.class ) );
 		assertTrue( ReflectionHelper.isMap( SortedMap.class ) );
@@ -60,18 +110,6 @@ public class ReflectionHelperTest {
 
 		assertFalse( ReflectionHelper.isMap( null ) );
 		assertFalse( ReflectionHelper.isMap( Object.class ) );
-	}
-
-	@Test
-	public void testGetIndexedType() throws Exception {
-		Type type = TestTypes.class.getField( "stringList" ).getGenericType();
-		assertEquals( String.class, ReflectionHelper.getIndexedType( type ) );
-
-		type = TestTypes.class.getField( "objectMap" ).getGenericType();
-		assertEquals( Object.class, ReflectionHelper.getIndexedType( type ) );
-
-		type = TestTypes.class.getField( "stringArray" ).getGenericType();
-		assertEquals( String.class, ReflectionHelper.getIndexedType( type ) );
 	}
 
 	@Test
@@ -123,8 +161,10 @@ public class ReflectionHelperTest {
 	@SuppressWarnings("unused")
 	private static class TestTypes {
 		public List<String> stringList;
+		public Set<Float> floatSet;
 		public Map<String, Object> objectMap;
 		public String[] stringArray;
+		public int[] intArray;
 	}
 
 	@SuppressWarnings("unused")

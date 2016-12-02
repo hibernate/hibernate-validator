@@ -1549,7 +1549,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				if ( propertyPathNode.isIterable() ) {
 					propertyPathNode = (NodeImpl) propertyPathIter.next();
 
-					clazz = ReflectionHelper.getClassFromType( ReflectionHelper.getIndexedType( propertyMetaData.getType() ) );
+					clazz = ReflectionHelper.getClassFromType( ReflectionHelper.getCollectionElementType( propertyMetaData.getType() ) );
 					propertyMetaData = getBeanPropertyMetaData( clazz, propertyPathNode );
 				}
 				else {

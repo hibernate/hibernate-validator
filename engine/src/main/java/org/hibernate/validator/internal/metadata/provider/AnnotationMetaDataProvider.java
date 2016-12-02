@@ -258,15 +258,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private UnwrapMode unwrapMode(Field field, boolean typeArgumentAnnotated) {
-		boolean indexable = ReflectionHelper.isIndexable( ReflectionHelper.typeOf( field ) );
+		boolean isCollection = ReflectionHelper.isCollection( ReflectionHelper.typeOf( field ) );
 		UnwrapValidatedValue unwrapValidatedValue = field.getAnnotation( UnwrapValidatedValue.class );
-		return unwrapMode( typeArgumentAnnotated, indexable, unwrapValidatedValue );
+		return unwrapMode( typeArgumentAnnotated, isCollection, unwrapValidatedValue );
 	}
 
 	private UnwrapMode unwrapMode(ExecutableElement executable, boolean typeArgumentAnnotated) {
-		boolean indexable = ReflectionHelper.isIndexable( ReflectionHelper.typeOf( executable.getMember() ) );
+		boolean isCollection = ReflectionHelper.isCollection( ReflectionHelper.typeOf( executable.getMember() ) );
 		UnwrapValidatedValue unwrapValidatedValue = executable.getAccessibleObject().getAnnotation( UnwrapValidatedValue.class );
-		return unwrapMode( typeArgumentAnnotated, indexable, unwrapValidatedValue );
+		return unwrapMode( typeArgumentAnnotated, isCollection, unwrapValidatedValue );
 	}
 
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
@@ -278,8 +278,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return constraints;
 	}
 
-	private UnwrapMode unwrapMode(boolean typeArgumentAnnotated, boolean indexable, UnwrapValidatedValue unwrapValidatedValue) {
-		if ( unwrapValidatedValue == null && typeArgumentAnnotated && !indexable ) {
+	private UnwrapMode unwrapMode(boolean typeArgumentAnnotated, boolean isCollection, UnwrapValidatedValue unwrapValidatedValue) {
+		if ( unwrapValidatedValue == null && typeArgumentAnnotated && !isCollection ) {
 			/*
 			 * Optional<@NotNull String> exampleValue
 			 */
@@ -497,8 +497,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 			typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable.getMember(), i );
 			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
-			boolean indexable = ReflectionHelper.isIndexable( ReflectionHelper.typeOf( executable, i ) );
-			UnwrapMode unwrapMode = unwrapMode( typeArgumentAnnotated, indexable, unwrapValidatedValue );
+			boolean isCollection = ReflectionHelper.isCollection( ReflectionHelper.typeOf( executable, i ) );
+			UnwrapMode unwrapMode = unwrapMode( typeArgumentAnnotated, isCollection, unwrapValidatedValue );
 
 			metaData.add(
 					new ConstrainedParameter(
