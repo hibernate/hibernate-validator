@@ -34,6 +34,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Guillaume Smet
  */
 public final class ReflectionHelper {
 
@@ -259,36 +260,19 @@ public final class ReflectionHelper {
 	}
 
 	/**
-	 * Indicates if the type is considered indexable (ie is an {@code Iterable}, an array or a {@code Map}).
-	 *
-	 * @param type the type to inspect.
-	 *
-	 * @return Returns true if the type is indexable.
+	 * Indicates whether the given type represents a collection of elements or not (i.e. whether it is an
+	 * {@code Iterable}, {@code Map} or array type).
 	 */
-	public static boolean isIndexable(Type type) {
-		boolean isIndexable = false;
-		if ( ReflectionHelper.isList( type ) ) {
-			isIndexable = true;
-		}
-		else if ( ReflectionHelper.isMap( type ) ) {
-			isIndexable = true;
-		}
-		else if ( TypeHelper.isArray( type ) ) {
-			isIndexable = true;
-		}
-		return isIndexable;
+	public static boolean isCollection(Type type) {
+		return isIterable( type ) ||
+				isMap( type ) ||
+				TypeHelper.isArray( type );
 	}
 
-
 	/**
-	 * Determines the type of elements of an <code>Iterable</code>, array or the value of a <code>Map</code>.
-	 *
-	 * @param type the type to inspect
-	 *
-	 * @return Returns the type of elements of an <code>Iterable</code>, array or the value of a <code>Map</code>. <code>
-	 *         null</code> is returned in case the type is not indexable (in the context of JSR 380).
+	 * Determines the type of the elements of an {@code Iterable}, array or the value of a {@code Map}.
 	 */
-	public static Type getIndexedType(Type type) {
+	public static Type getCollectionElementType(Type type) {
 		Type indexedType = null;
 		if ( isIterable( type ) && type instanceof ParameterizedType ) {
 			ParameterizedType paramType = (ParameterizedType) type;
@@ -302,6 +286,21 @@ public final class ReflectionHelper {
 			indexedType = TypeHelper.getComponentType( type );
 		}
 		return indexedType;
+	}
+
+	/**
+	 * Indicates if the type is considered indexable (ie is a {@code List}, an array or a {@code Map}).
+	 * <p>
+	 * Note that it does not include {@code Set}s as they are not indexable.
+	 *
+	 * @param type the type to inspect.
+	 *
+	 * @return Returns true if the type is indexable.
+	 */
+	public static boolean isIndexable(Type type) {
+		return isList( type ) ||
+				isMap( type ) ||
+				TypeHelper.isArray( type );
 	}
 
 	/**
