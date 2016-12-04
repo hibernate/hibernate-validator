@@ -19,11 +19,18 @@ import org.jboss.jandex.Type;
  *
  * @author Marko Bekhta
  */
-public final class JandexUtils {
+public final class JandexHelper {
 
 	private static final Log log = LoggerFactory.make();
 
-	private JandexUtils() {
+	private JandexHelper() {
+	}
+
+	/**
+	 * @return an instance of {@link JandexHelper}
+	 */
+	public static JandexHelper getInstance() {
+		return new JandexHelper();
 	}
 
 	/**
@@ -33,7 +40,7 @@ public final class JandexUtils {
 	 *
 	 * @return a found {@link Class}
 	 */
-	public static Class<?> getClassForName(String name) {
+	public Class<?> getClassForName(String name) {
 		// TODO: change how class are loaded (from GM: Using this one without passing a classloader may give us trouble due to classes not being visible to
 		// the implicitly used loader. You can check out org.hibernate.validator.internal.util.privilegedactions.LoadClass and its usage as a starting point.
 		try {
@@ -51,7 +58,7 @@ public final class JandexUtils {
 	 *
 	 * @return Returns {@code true} if the type is indexable.
 	 */
-	public static boolean isIndexable(Type type) {
+	public boolean isIndexable(Type type) {
 		// TODO: Can this property be somehow determined from a type parameter and without converting it to a class ???
 		return ReflectionHelper.isIndexable( getClassForName( type.name().toString() ) );
 	}
@@ -63,7 +70,7 @@ public final class JandexUtils {
 	 *
 	 * @return {@code true} if given type is an implementation of a {@link Map}, {@code false} otherwise
 	 */
-	public static boolean isMap(Type type) {
+	public boolean isMap(Type type) {
 		// TODO: Can this property be somehow determined from a type parameter and without converting it to a class ???
 		return ReflectionHelper.isMap( getClassForName( type.name().toString() ) );
 	}
@@ -75,7 +82,7 @@ public final class JandexUtils {
 	 *
 	 * @return {@code true} if given type is an implementation of an {@link Iterable}, {@code false} otherwise
 	 */
-	public static boolean isIterable(Type type) {
+	public boolean isIterable(Type type) {
 		// TODO: Can this property be somehow determined from a type parameter and without converting it to a class ???
 		return ReflectionHelper.isIterable( getClassForName( type.name().toString() ) );
 	}

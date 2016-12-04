@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.metadata.provider;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +16,7 @@ import java.util.stream.Stream;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.jandex.ConstrainedFieldJandexBuilder;
-import org.hibernate.validator.internal.metadata.jandex.util.JandexUtils;
+import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -41,13 +40,14 @@ public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 	public JandexMetaDataProvider(
 			ConstraintHelper constraintHelper,
+			JandexHelper jandexHelper,
 			InputStream jandexIndexStreamResource,
 			AnnotationProcessingOptions annotationProcessingOptions) {
-		super( constraintHelper, readJandexIndex( constraintHelper, jandexIndexStreamResource ) );
+		super( constraintHelper, readJandexIndex( constraintHelper, jandexHelper, jandexIndexStreamResource ) );
 		this.annotationProcessingOptions = annotationProcessingOptions;
 	}
 
-	private static Map<String, BeanConfiguration<?>> readJandexIndex(ConstraintHelper constraintHelper, InputStream jandexIndexStreamResource) {
+	private static Map<String, BeanConfiguration<?>> readJandexIndex(ConstraintHelper constraintHelper, JandexHelper jandexHelper, InputStream jandexIndexStreamResource) {
 		IndexReader jandexReader = new IndexReader( jandexIndexStreamResource );
 		Index index = null;
 		try {
@@ -61,17 +61,17 @@ public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 		// go through all classes (and interfaces ?) to build configuration map
 		for ( ClassInfo classInfo : index.getKnownClasses() ) {
-			beanConfigurationMap.put( classInfo.name().toString(), getBeanConfiguration( constraintHelper, index, classInfo ) );
+			beanConfigurationMap.put( classInfo.name().toString(), getBeanConfiguration( constraintHelper, jandexHelper, index, classInfo ) );
 		}
 
 		return null;
 	}
 
-	private static BeanConfiguration getBeanConfiguration(ConstraintHelper constraintHelper, Index jandexIndex, ClassInfo classInfo) {
+	private static BeanConfiguration getBeanConfiguration(ConstraintHelper constraintHelper, JandexHelper jandexHelper, Index jandexIndex, ClassInfo classInfo) {
 		return new BeanConfiguration(
 				ConfigurationSource.JANDEX,
-				JandexUtils.getClassForName( classInfo.name().toString() ),
-				getConstrainedElements( constraintHelper, classInfo ),
+				jandexHelper.getClassForName( classInfo.name().toString() ),
+				getConstrainedElements( constraintHelper, jandexHelper, classInfo ),
 				getDefaultGroupSequence( jandexIndex, classInfo ),
 				getDefaultGroupSequenceProvider()
 		);
@@ -85,11 +85,11 @@ public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
 		return null;
 	}
 
-	private static Set<? extends ConstrainedElement> getConstrainedElements(ConstraintHelper constraintHelper, ClassInfo classInfo) {
+	private static Set<? extends ConstrainedElement> getConstrainedElements(ConstraintHelper constraintHelper, JandexHelper jandexHelper, ClassInfo classInfo) {
 
 		//get constrained fields
-		Stream<ConstrainedElement> constrainedFields = ConstrainedFieldJandexBuilder.getInstance( constraintHelper )
-				.getConstrainedFields( classInfo, JandexUtils.getClassForName( classInfo.name().toString() ) );
+		Stream<ConstrainedElement> constrainedFields = ConstrainedFieldJandexBuilder.getInstance( constraintHelper, jandexHelper )
+				.getConstrainedFields( classInfo, jandexHelper.getClassForName( classInfo.name().toString() ) );
 
 		return null;
 	}

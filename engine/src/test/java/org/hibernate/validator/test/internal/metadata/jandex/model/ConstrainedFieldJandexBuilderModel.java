@@ -13,9 +13,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import javax.validation.groups.ConvertGroup;
 
-import org.hibernate.validator.test.internal.engine.serialization.Email;
 import org.hibernate.validator.test.internal.metadata.jandex.ConstrainedFieldJandexBuilderTest;
 
 /**
@@ -30,13 +30,22 @@ public class ConstrainedFieldJandexBuilderModel {
 	private String var1;
 
 	@Min(value = 2, groups = Group3.class)
-	@ConvertGroup.List({ @ConvertGroup(from = Group1.class, to = Group2.class), @ConvertGroup(from = Group3.class, to = Group2.class) })
+	@ConvertGroup.List({
+			@ConvertGroup(from = Group1.class, to = Group2.class),
+			@ConvertGroup(from = Group3.class, to = Group2.class)
+	})
 	private String var2;
 
 	private Optional<String> optional;
 
 	@Valid
 	private List<@NotNull String> list;
+
+	@Valid
+	@NotNull
+	public String someMethod1(@NotNull String param1, @Valid @NotNull @Size(min = 5) List<@NotNull String> param2) {
+		return "";
+	}
 
 	private interface Group1 {
 
