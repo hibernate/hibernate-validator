@@ -10,10 +10,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.stream.Collectors;
 
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.jandex.ClassConstrainsJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.ConstrainedFieldJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.ConstrainedMethodJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
 import org.hibernate.validator.test.internal.metadata.jandex.model.ConstrainedFieldJandexBuilderModel;
 
 import org.jboss.jandex.DotName;
@@ -50,13 +54,21 @@ public class ConstrainedFieldJandexBuilderTest {
 	 */
 	@Test
 	public void testGetConstrainedFields() {
-		ConstrainedFieldJandexBuilder.getInstance( new ConstraintHelper(), JandexHelper.getInstance() ).getConstrainedFields(
+		ConstrainedFieldJandexBuilder.getInstance( new ConstraintHelper(), JandexHelper.getInstance(), new AnnotationProcessingOptionsImpl() )
+				.getConstrainedFields(
+						index.getClassByName( DotName.createSimple( ConstrainedFieldJandexBuilderModel.class.getName() ) ),
+						ConstrainedFieldJandexBuilderModel.class
+				).collect( Collectors.toSet() );
+
+		ConstrainedMethodJandexBuilder.getInstance( new ConstraintHelper(), JandexHelper.getInstance(), new AnnotationProcessingOptionsImpl(),
+				new ExecutableParameterNameProvider( new ParanamerParameterNameProvider() )
+		).getConstrainedExecutables(
 				index.getClassByName( DotName.createSimple( ConstrainedFieldJandexBuilderModel.class.getName() ) ),
 				ConstrainedFieldJandexBuilderModel.class
 		).collect( Collectors.toSet() );
 
-		ConstrainedMethodJandexBuilder.getInstance( new ConstraintHelper(), JandexHelper.getInstance() )
-				.getConstrainedExecutables(
+		ClassConstrainsJandexBuilder.getInstance( new ConstraintHelper(), JandexHelper.getInstance(), new AnnotationProcessingOptionsImpl() )
+				.getClassConstrains(
 						index.getClassByName( DotName.createSimple( ConstrainedFieldJandexBuilderModel.class.getName() ) ),
 						ConstrainedFieldJandexBuilderModel.class
 				).collect( Collectors.toSet() );

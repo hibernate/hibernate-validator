@@ -7,18 +7,21 @@
 package org.hibernate.validator.internal.metadata.jandex;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.validation.Valid;
 
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 
+import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.FieldInfo;
 
@@ -29,19 +32,22 @@ import org.jboss.jandex.FieldInfo;
  */
 public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJandexBuilder {
 
-	private ConstrainedFieldJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper) {
-		super( constraintHelper, jandexHelper );
+	private ConstrainedFieldJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
+			AnnotationProcessingOptions annotationProcessingOptions) {
+		super( constraintHelper, jandexHelper, annotationProcessingOptions );
 	}
 
 	/**
 	 * Creates an instance of a {@link ConstrainedFieldJandexBuilder}.
 	 *
 	 * @param constraintHelper an instance of {@link ConstraintHelper}
+	 * @param jandexHelper an instance of {@link JandexHelper}
 	 *
 	 * @return a new instance of {@link ConstrainedFieldJandexBuilder}
 	 */
-	public static ConstrainedFieldJandexBuilder getInstance(ConstraintHelper constraintHelper, JandexHelper jandexHelper) {
-		return new ConstrainedFieldJandexBuilder( constraintHelper, jandexHelper );
+	public static ConstrainedFieldJandexBuilder getInstance(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
+			AnnotationProcessingOptions annotationProcessingOptions) {
+		return new ConstrainedFieldJandexBuilder( constraintHelper, jandexHelper, annotationProcessingOptions );
 	}
 
 	/**
@@ -67,9 +73,9 @@ public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJan
 	 */
 	private ConstrainedField toConstrainedField(Class<?> beanClass, FieldInfo fieldInfo) {
 		Field field = findField( beanClass, fieldInfo );
-		Set<MetaConstraint<?>> constraints = findConstraints( fieldInfo.annotations(), field ).collect( Collectors.toSet() );
+		Set<MetaConstraint<?>> constraints = findMetaConstraints( fieldInfo.annotations(), field ).collect( Collectors.toSet() );
 
-		boolean isCascading = findAnnotation( fieldInfo.annotations(), Valid.class ).isPresent();
+		boolean isCascading = jandexHelper.isCascading( fieldInfo.annotations() );
 		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForMember(
 				new MemberInformation(
 						fieldInfo.type(),
@@ -80,8 +86,11 @@ public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJan
 				isCascading
 		).collect( Collectors.toSet() );
 
-		CommonConstraintInformation commonInformation = findCommonConstraintInformation( fieldInfo.type(), fieldInfo.annotations(),
-				!typeArgumentsConstraints.isEmpty(), isCascading
+		CommonConstraintInformation commonInformation = findCommonConstraintInformation(
+				fieldInfo.type(),
+				fieldInfo.annotations(),
+				!typeArgumentsConstraints.isEmpty(),
+				isCascading
 		);
 		return new ConstrainedField(
 				ConfigurationSource.JANDEX,
@@ -94,34 +103,18 @@ public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJan
 		);
 	}
 
-	//	/**
-	//	 * Converts a stream of constraint annotations to a set of {@link MetaConstraint}s.
-	//	 *
-	//	 * @param beanClass a {@link Class} in which field is located
-	//	 * @param fieldInfo a field on which constraints are defined
-	//	 *
-	//	 * @return a set of {@link MetaConstraint}s based on provided parameters
-	//	 */
-	//	private Set<MetaConstraint<?>> convertToMetaConstraints(Class<?> beanClass, FieldInfo fieldInfo) {
-	//		Field field = findField( beanClass, fieldInfo );
-	//		return findConstraints( fieldInfo, field )
-	//				.map( descriptor -> createMetaConstraint( field, descriptor ) )
-	//				.collect( Collectors.<MetaConstraint<?>>toSet() );
-	//	}
-	//
-	//	/**
-	//	 * Finds all constraint annotations defined for the given field and returns them as a stream of
-	//	 * constraint descriptors.
-	//	 *
-	//	 * @param fieldInfo a {@link FieldInfo} representation of a given field.
-	//	 * @param field a {@link Field} representation of a given field.
-	//	 *
-	//	 * @return A stream of constraint descriptors for all constraint specified for the given member.
-	//	 */
-	//	private Stream<ConstraintDescriptorImpl<?>> findConstraints(FieldInfo fieldInfo, Field field) {
-	//		return findConstrainAnnotations( fieldInfo.annotations() )
-	//				.flatMap( annotationInstance -> findConstraintAnnotations( field, annotationInstance ) );
-	//	}
+	/**
+	 * Converts {@link ConstraintDescriptorImpl} to {@link MetaConstraint}.
+	 *
+	 * @param annotationInstances collection of annotations declared on a field
+	 * @param field a field under investigation
+	 *
+	 * @return a stream of {@link MetaConstraint}s for a given field
+	 */
+	private Stream<MetaConstraint<?>> findMetaConstraints(Collection<AnnotationInstance> annotationInstances, Field field) {
+		return findConstraints( annotationInstances, field )
+				.map( descriptor -> createMetaConstraint( field, descriptor ) );
+	}
 
 	/**
 	 * Find a {@link Field} by given bean class and field information.
@@ -139,8 +132,7 @@ public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJan
 		}
 		catch (NoSuchFieldException e) {
 			throw new IllegalArgumentException(
-					String.format( "Wasn't able to find a filed for a given parameters. Field name - %s in bean - %s", fieldInfo
-							.name(), beanClass.getName() ),
+					String.format( "Wasn't able to find a filed for a given parameters. Field name - %s in bean - %s", fieldInfo.name(), beanClass.getName() ),
 					e
 			);
 		}

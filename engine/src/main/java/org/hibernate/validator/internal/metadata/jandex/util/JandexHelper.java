@@ -6,12 +6,19 @@
  */
 package org.hibernate.validator.internal.metadata.jandex.util;
 
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
+import javax.validation.Valid;
 
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import org.jboss.jandex.AnnotationInstance;
+import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.Type;
 
 /**
@@ -85,5 +92,53 @@ public final class JandexHelper {
 	public boolean isIterable(Type type) {
 		// TODO: Can this property be somehow determined from a type parameter and without converting it to a class ???
 		return ReflectionHelper.isIterable( getClassForName( type.name().toString() ) );
+	}
+
+	/**
+	 * Finds an annotation of a given type inside provided collection.
+	 *
+	 * @param annotations a collection of annotation in which to look for a provided annotation type
+	 * @param aClass a type of annotation to look for.
+	 *
+	 * @return an {@link Optional < AnnotationInstance >} which will contain a found annotation, an empty {@link Optional}
+	 * if none was found. Also if there are more than one annotation of provided type present in the collection there's
+	 * no guarantee which one will be returned.
+	 */
+	public Optional<AnnotationInstance> findAnnotation(Collection<AnnotationInstance> annotations, Class<?> aClass) {
+		return annotations.stream()
+				.filter( annotation -> annotation.name().toString().equals( aClass.getName() ) )
+				.findAny();
+	}
+
+	/**
+	 * Converts annotation value to a value usable for {@link Annotation}.
+	 *
+	 * @param annotationValue annotation value to convert
+	 *
+	 * @return converted value
+	 */
+	public Object convertAnnotationValue(AnnotationValue annotationValue) {
+		if ( AnnotationValue.Kind.ARRAY.equals( annotationValue.kind() ) ) {
+			if ( AnnotationValue.Kind.CLASS.equals( annotationValue.componentKind() ) ) {
+				return Arrays.stream( annotationValue.asClassArray() )
+						.map( type -> getClassForName( type.name().toString() ) )
+						.toArray( size -> new Class[size] );
+			}
+		}
+		else if ( AnnotationValue.Kind.CLASS.equals( annotationValue.kind() ) ) {
+			return getClassForName( annotationValue.asClass().name().toString() );
+		}
+		return annotationValue.value();
+	}
+
+	/**
+	 * Checks if there's a {@link Valid} annotation present in the collection.
+	 *
+	 * @param annotations a collection of {@link AnnotationInstance}s to check in
+	 *
+	 * @return {@code true} if {@link Valid} is present in collection, {@code false} otherwise
+	 */
+	public boolean isCascading(Collection<AnnotationInstance> annotations) {
+		return findAnnotation( annotations, Valid.class ).isPresent();
 	}
 }

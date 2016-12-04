@@ -8,6 +8,8 @@ package org.hibernate.validator.internal.metadata.jandex;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,25 +18,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
-import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.CollectionHelper;
-import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import org.jboss.jandex.AnnotationInstance;
@@ -54,16 +52,13 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 
 	protected final JandexHelper jandexHelper;
 
-	protected final ExecutableParameterNameProvider parameterNameProvider;
-
 	protected final AnnotationProcessingOptions annotationProcessingOptions;
 
-	protected AbstractConstrainedElementJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper) {
+	protected AbstractConstrainedElementJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
+			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.jandexHelper = jandexHelper;
 		this.constraintHelper = constraintHelper;
-		//TODO: init correctly this is just for testing
-		this.parameterNameProvider = new ExecutableParameterNameProvider( new ParanamerParameterNameProvider() );
-		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
+		this.annotationProcessingOptions = annotationProcessingOptions;
 	}
 
 	/**
@@ -77,7 +72,7 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 	 */
 	protected UnwrapMode determineUnwrapMode(Type type, Collection<AnnotationInstance> annotationInstances, boolean typeArgumentAnnotated) {
 		boolean indexable = jandexHelper.isIndexable( type );
-		Optional<AnnotationInstance> unwrapValidatedValue = findAnnotation( annotationInstances, UnwrapValidatedValue.class );
+		Optional<AnnotationInstance> unwrapValidatedValue = jandexHelper.findAnnotation( annotationInstances, UnwrapValidatedValue.class );
 
 		if ( !unwrapValidatedValue.isPresent() && typeArgumentAnnotated && !indexable ) {
 			return UnwrapMode.UNWRAP;
@@ -131,17 +126,16 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 	}
 
 	/**
-	 * Finds and converts constraint annotations to {@link MetaConstraint}
+	 * Finds and converts constraint annotations to {@link ConstraintDescriptorImpl}
 	 *
 	 * @param annotationInstances a collection of annotation instances
 	 * @param member a {@link Member} under investigation
 	 *
 	 * @return a stream of {@link MetaConstraint}s based on input parameters
 	 */
-	protected Stream<MetaConstraint<?>> findConstraints(Collection<AnnotationInstance> annotationInstances, Member member) {
+	protected Stream<ConstraintDescriptorImpl<?>> findConstraints(Collection<AnnotationInstance> annotationInstances, Member member) {
 		return findConstrainAnnotations( annotationInstances )
-				.flatMap( annotationInstance -> findConstraintAnnotations( member, annotationInstance ) )
-				.map( descriptor -> createMetaConstraint( member, descriptor ) );
+				.flatMap( annotationInstance -> findConstraintAnnotations( member, annotationInstance ) );
 	}
 
 	/**
@@ -204,7 +198,7 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<>( annotationClass );
 
 		annotationInstance.values().stream()
-				.forEach( annotationValue -> annotationDescriptor.setValue( annotationValue.name(), convertAnnotationValue( annotationValue ) ) );
+				.forEach( annotationValue -> annotationDescriptor.setValue( annotationValue.name(), jandexHelper.convertAnnotationValue( annotationValue ) ) );
 
 		A annotation;
 		try {
@@ -214,43 +208,6 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
 		}
 		return annotation;
-	}
-
-	/**
-	 * Converts annotation value to a value usable for {@link Annotation}.
-	 *
-	 * @param annotationValue annotation value to convert
-	 *
-	 * @return converted value
-	 */
-	protected Object convertAnnotationValue(AnnotationValue annotationValue) {
-		if ( AnnotationValue.Kind.ARRAY.equals( annotationValue.kind() ) ) {
-			if ( AnnotationValue.Kind.CLASS.equals( annotationValue.componentKind() ) ) {
-				return Arrays.stream( annotationValue.asClassArray() )
-						.map( type -> jandexHelper.getClassForName( type.name().toString() ) )
-						.toArray( size -> new Class[size] );
-			}
-		}
-		else if ( AnnotationValue.Kind.CLASS.equals( annotationValue.kind() ) ) {
-			return jandexHelper.getClassForName( annotationValue.asClass().name().toString() );
-		}
-		return annotationValue.value();
-	}
-
-	/**
-	 * Finds an annotation of a given type inside provided collection.
-	 *
-	 * @param annotations a collection of annotation in which to look for a provided annotation type
-	 * @param aClass a type of annotation to look for.
-	 *
-	 * @return an {@link Optional<AnnotationInstance>} which will contain a found annotation, an empty {@link Optional}
-	 * if none was found. Also if there are more than one annotation of provided type present in the collection there's
-	 * no guarantee which one will be returned.
-	 */
-	protected Optional<AnnotationInstance> findAnnotation(Collection<AnnotationInstance> annotations, Class<?> aClass) {
-		return annotations.stream()
-				.filter( annotation -> annotation.name().toString().equals( aClass.getName() ) )
-				.findAny();
 	}
 
 	/**
@@ -348,20 +305,72 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 			boolean typeArgumentAnnotated, boolean isCascading) {
 		return new CommonConstraintInformation(
 				getGroupConversions(
-						findAnnotation( annotationInstances, ConvertGroup.class ),
-						findAnnotation( annotationInstances, ConvertGroup.List.class )
+						jandexHelper.findAnnotation( annotationInstances, ConvertGroup.class ),
+						jandexHelper.findAnnotation( annotationInstances, ConvertGroup.List.class )
 				),
-				findAnnotation( annotationInstances, Valid.class ).isPresent(),
+				isCascading,
 				determineUnwrapMode( type, annotationInstances, typeArgumentAnnotated )
 		);
 	}
 
-	protected <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor) {
+	/**
+	 * Creates {@link MetaConstraint} based on given {@link ConstraintDescriptorImpl}.
+	 *
+	 * @param declaringClass a class on which constraints are defined
+	 * @param descriptor a descriptor to convert
+	 *
+	 * @return {@link MetaConstraint} created based on given parameters
+	 */
+	protected <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forClass( declaringClass ) );
+	}
+
+	/**
+	 * Creates {@link MetaConstraint} based on given {@link ConstraintDescriptorImpl}.
+	 *
+	 * @param member a field on which constraints are defined
+	 * @param descriptor a descriptor to convert
+	 *
+	 * @return {@link MetaConstraint} created based on given parameters
+	 */
+	protected <A extends Annotation> MetaConstraint<?> createMetaConstraint(Field member, ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<>( descriptor, ConstraintLocation.forProperty( member ) );
 	}
 
 	/**
-	 * Creates a {@code MetaConstraint} for a type argument constraint.
+	 * Creates {@link MetaConstraint} based on given {@link ConstraintDescriptorImpl}.
+	 *
+	 * @param member an executable on which constraints are defined (for return value)
+	 * @param descriptor a descriptor to convert
+	 *
+	 * @return {@link MetaConstraint} created based on given parameters
+	 */
+	protected <A extends Annotation> MetaConstraint<A> createMetaConstraint(Executable member, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<>(
+				descriptor,
+				ConstraintDescriptorImpl.ConstraintType.GENERIC.equals( descriptor.getConstraintType() ) ?
+						ConstraintLocation.forReturnValue( member ) : ConstraintLocation.forCrossParameter( member )
+		);
+	}
+
+	/**
+	 * Creates {@link MetaConstraint} based on given {@link ConstraintDescriptorImpl}.
+	 *
+	 * @param member an executable of iterest
+	 * @param parameterIndex index of executable parameter on which constraints are defined
+	 * @param descriptor a descriptor to convert
+	 *
+	 * @return {@link MetaConstraint} created based on given parameters
+	 */
+	protected <A extends Annotation> MetaConstraint<A> createMetaConstraint(Executable member, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<>(
+				descriptor,
+				ConstraintLocation.forParameter( member, parameterIndex )
+		);
+	}
+
+	/**
+	 * Creates a {@link MetaConstraint} for a type argument constraint.
 	 */
 	protected <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(
 			Member member, ConstraintDescriptorImpl<A> descriptor,

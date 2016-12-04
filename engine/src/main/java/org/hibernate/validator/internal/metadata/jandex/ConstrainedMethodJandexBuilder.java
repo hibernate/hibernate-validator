@@ -8,14 +8,15 @@ package org.hibernate.validator.internal.metadata.jandex;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.validation.Valid;
 
+import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -25,7 +26,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
+import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.Type;
@@ -37,19 +40,25 @@ import org.jboss.jandex.Type;
  */
 public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJandexBuilder {
 
-	private ConstrainedMethodJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper) {
-		super( constraintHelper, jandexHelper );
+	protected final ExecutableParameterNameProvider parameterNameProvider;
+
+	private ConstrainedMethodJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
+			AnnotationProcessingOptions annotationProcessingOptions, ExecutableParameterNameProvider parameterNameProvider) {
+		super( constraintHelper, jandexHelper, annotationProcessingOptions );
+		this.parameterNameProvider = parameterNameProvider;
 	}
 
 	/**
 	 * Creates an instance of a {@link ConstrainedMethodJandexBuilder}.
 	 *
 	 * @param constraintHelper an instance of {@link ConstraintHelper}
+	 * @param jandexHelper an instance of {@link JandexHelper}
 	 *
 	 * @return a new instance of {@link ConstrainedMethodJandexBuilder}
 	 */
-	public static ConstrainedMethodJandexBuilder getInstance(ConstraintHelper constraintHelper, JandexHelper jandexHelper) {
-		return new ConstrainedMethodJandexBuilder( constraintHelper, jandexHelper );
+	public static ConstrainedMethodJandexBuilder getInstance(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
+			AnnotationProcessingOptions annotationProcessingOptions, ExecutableParameterNameProvider parameterNameProvider) {
+		return new ConstrainedMethodJandexBuilder( constraintHelper, jandexHelper, annotationProcessingOptions, parameterNameProvider );
 	}
 
 	/**
@@ -92,7 +101,7 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 		Stream<ConstrainedParameter> parameterConstraints = getParameterMetaData( beanClass, executable, methodInfo );
 		Set<MetaConstraint<?>> crossParameterConstraints;
 		Map<ConstraintDescriptorImpl.ConstraintType, Set<MetaConstraint<?>>> executableConstraints =
-				findConstraints( methodInfo.annotations(), executable )
+				findMetaConstraints( methodInfo.annotations(), executable )
 						.collect( Collectors.groupingBy( constraint -> constraint.getDescriptor().getConstraintType(), Collectors.toSet() ) );
 
 		if ( annotationProcessingOptions.areCrossParameterConstraintsIgnoredFor( executable ) ) {
@@ -111,7 +120,7 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 			commonInformation = new CommonConstraintInformation();
 		}
 		else {
-			boolean isCascading = findAnnotation( methodInfo.annotations(), Valid.class ).isPresent();
+			boolean isCascading = jandexHelper.isCascading( methodInfo.annotations() );
 			typeArgumentsConstraints = findTypeAnnotationConstraintsForMember(
 					new MemberInformation(
 							methodInfo.returnType(),
@@ -191,7 +200,7 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 			commonInformation = new CommonConstraintInformation();
 		}
 		else {
-			boolean isCascading = findAnnotation( parameterInformation.getType().annotations(), Valid.class ).isPresent();
+			boolean isCascading = jandexHelper.isCascading( parameterInformation.getType().annotations() );
 			typeArgumentsConstraints = findTypeAnnotationConstraintsForMember(
 					new MemberInformation(
 							parameterInformation.getType(),
@@ -209,9 +218,7 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 					isCascading
 			);
 
-			parameterConstraints = findConstrainAnnotations( parameterInformation.getType().annotations() )
-					.flatMap( annotationInstance -> findConstraintAnnotations( executable, annotationInstance ) )
-					.map( descriptor -> createMetaConstraint( executable, descriptor ) );
+			parameterConstraints = findMetaConstraints( parameterInformation, executable );
 		}
 
 		return new ConstrainedParameter(
@@ -226,6 +233,32 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 				commonInformation.isCascading(),
 				commonInformation.getUnwrapMode()
 		);
+	}
+
+	/**
+	 * Converts {@link ConstraintDescriptorImpl} to {@link MetaConstraint}.
+	 *
+	 * @param annotationInstances collection of annotations declared on an executable
+	 * @param executable an executable under investigation
+	 *
+	 * @return a stream of {@link MetaConstraint}s for a given executable
+	 */
+	private Stream<MetaConstraint<?>> findMetaConstraints(Collection<AnnotationInstance> annotationInstances, Executable executable) {
+		return findConstraints( annotationInstances, executable )
+				.map( descriptor -> createMetaConstraint( executable, descriptor ) );
+	}
+
+	/**
+	 * Converts {@link ConstraintDescriptorImpl} to {@link MetaConstraint}.
+	 *
+	 * @param parameterInformation parameter information
+	 * @param executable an executable under investigation
+	 *
+	 * @return a stream of {@link MetaConstraint}s for a given parameter executable
+	 */
+	private Stream<MetaConstraint<?>> findMetaConstraints(ParameterInformation parameterInformation, Executable executable) {
+		return findConstraints( parameterInformation.getType().annotations(), executable )
+				.map( descriptor -> createMetaConstraint( executable, parameterInformation.getIndex(), descriptor ) );
 	}
 
 	/**
