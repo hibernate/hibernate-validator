@@ -28,9 +28,10 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 /**
  * Represents a method or constructor of a Java type and all its associated
  * meta-data relevant in the context of bean validation, for instance the
- * constraints at it's parameters or return value.
+ * constraints at its parameters or return value.
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ConstrainedExecutable extends AbstractConstrainedElement {
 
@@ -88,18 +89,16 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 *
 	 * @param source The source of meta data.
 	 * @param executable The represented executable.
-	 * @param parameterMetaData A list with parameter meta data. The length must correspond
-	 * with the number of parameters of the represented executable. So
-	 * this list may be empty (in case of a parameterless executable),
-	 * but never {@code null}.
+	 * @param parameterMetaData A list with parameter meta data. The length must correspond with the number of
+	 * parameters of the represented executable. So this list may be empty (in case of a parameterless executable), but
+	 * never {@code null}.
 	 * @param crossParameterConstraints the cross parameter constraints
-	 * @param returnValueConstraints The return value constraints of the represented executable, if
-	 * any.
-	 * @param typeArgumentsConstraints The return value constraints of the represented executable, if
-	 * any.
+	 * @param returnValueConstraints The return value constraints of the represented executable, if any.
+	 * @param typeArgumentsConstraints The type argument constraints on the return value of the represented executable,
+	 * if any.
 	 * @param groupConversions The group conversions of the represented executable, if any.
-	 * @param isCascading Whether a cascaded validation of the represented executable's
-	 * return value shall be performed or not.
+	 * @param isCascading Whether a cascaded validation of the represented executable's return value shall be performed
+	 * or not.
 	 * @param unwrapMode Determines how the value of the executable's return value must be handled in regards to
 	 * unwrapping prior to validation.
 	 */
@@ -191,7 +190,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	@Override
 	public boolean isConstrained() {
-		return super.isConstrained() || hasParameterConstraints;
+		return super.isConstrained() || !typeArgumentsConstraints.isEmpty() || hasParameterConstraints;
 	}
 
 	/**
@@ -220,7 +219,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	}
 
 	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
-		return this.typeArgumentsConstraints;
+		return typeArgumentsConstraints;
 	}
 
 	@Override

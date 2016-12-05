@@ -22,6 +22,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
  * Contains constraint-related meta-data for one method parameter.
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ConstrainedParameter extends AbstractConstrainedElement {
 
@@ -112,7 +113,12 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	}
 
 	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
-		return this.typeArgumentsConstraints;
+		return typeArgumentsConstraints;
+	}
+
+	@Override
+	public boolean isConstrained() {
+		return super.isConstrained() || !typeArgumentsConstraints.isEmpty();
 	}
 
 	/**
