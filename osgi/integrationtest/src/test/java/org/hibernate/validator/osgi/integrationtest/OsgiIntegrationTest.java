@@ -133,7 +133,6 @@ public class OsgiIntegrationTest {
 	@Test
 	public void canObtainValidatorFactoryAndPerformValidationWithExpressionFactoryFromExternalClassLoader() {
 		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byProvider( HibernateValidator.class )
-				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
 				.buildValidatorFactory()
@@ -149,7 +148,6 @@ public class OsgiIntegrationTest {
 		ExampleConstraintValidatorFactory.invocationCounter.set( 0 );
 
 		HibernateValidatorConfiguration configuration = Validation.byProvider( HibernateValidator.class )
-				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() );
 
@@ -172,7 +170,6 @@ public class OsgiIntegrationTest {
 	@Test
 	public void canConfigureConstraintViaXmlMapping() {
 		Set<ConstraintViolation<Customer>> constraintViolations = Validation.byProvider( HibernateValidator.class )
-				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
 				.buildValidatorFactory()
@@ -186,7 +183,6 @@ public class OsgiIntegrationTest {
 	@Test
 	public void canConfigureCustomConstraintViaXmlMapping() {
 		Set<ConstraintViolation<Order>> constraintViolations = Validation.byProvider( HibernateValidator.class )
-				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
 				.buildValidatorFactory()
@@ -200,7 +196,6 @@ public class OsgiIntegrationTest {
 	@Test
 	public void canObtainValuesFromValidationMessages() {
 		Set<ConstraintViolation<RetailOrder>> constraintViolations = Validation.byProvider( HibernateValidator.class )
-				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
 				.buildValidatorFactory()
@@ -216,7 +211,6 @@ public class OsgiIntegrationTest {
 		ExpressionFactory expressionFactory = buildExpressionFactory();
 
 		Set<ConstraintViolation<CustomerDecimalMin>> constraintViolations = Validation.byProvider( HibernateValidator.class )
-				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
 				.messageInterpolator( new ResourceBundleMessageInterpolator(
