@@ -564,6 +564,327 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
+	// Array
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void field_constraint_provided_on_type_parameter_of_an_array_gets_validated() {
+		TypeWithArray1 a = new TypeWithArray1();
+		a.names = new String[]{ "First", "", null };
+
+		Set<ConstraintViolation<TypeWithArray1>> constraintViolations = validator.validate( a );
+
+		assertNumberOfViolations( constraintViolations, 3 );
+		assertCorrectPropertyPaths( constraintViolations, "names[1].<collection element>", "names[2].<collection element>", "names[2].<collection element>" );
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlank.class,
+				NotBlank.class,
+				NotNull.class
+		);
+	}
+
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000187.*")
+	@TestForIssue(jiraKey = "HV-1175")
+	public void valid_annotation_required_for_constraint_on_type_parameter_of_array() {
+		TypeWithArray2 a = new TypeWithArray2();
+		a.names = new String[]{ "First", "", null };
+		validator.validate( a );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void constraint_provided_on_custom_bean_used_as_array_parameter_gets_validated() {
+		TypeWithArray3 a = new TypeWithArray3();
+		a.bars = new Bar[]{ new Bar( 2 ), null };
+		Set<ConstraintViolation<TypeWithArray3>> constraintViolations = validator.validate( a );
+		assertNumberOfViolations( constraintViolations, 2 );
+		assertCorrectPropertyPaths( constraintViolations, "bars[1].<collection element>", "bars[0].number" );
+		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void constraints_specified_on_array_and_on_type_parameter_of_array_get_validated() {
+		TypeWithArray4 a = new TypeWithArray4();
+		a.names = new String[]{ "First", "", null };
+		Set<ConstraintViolation<TypeWithArray4>> constraintViolations = validator.validate( a );
+		assertNumberOfViolations( constraintViolations, 2 );
+		assertCorrectPropertyPaths( constraintViolations, "names[1].<collection element>", "names[2].<collection element>" );
+		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotBlank.class );
+
+		a = new TypeWithArray4();
+		a.names = new String[0];
+		constraintViolations = validator.validate( a );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "names" );
+		assertCorrectConstraintTypes( constraintViolations, Size.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void getter_constraint_provided_on_type_parameter_of_an_array_gets_validated() {
+		TypeWithArray5 a = new TypeWithArray5();
+		a.strings = new String[]{ "", "First", null };
+
+		Set<ConstraintViolation<TypeWithArray5>> constraintViolations = validator.validate( a );
+
+		assertNumberOfViolations( constraintViolations, 3 );
+		assertCorrectPropertyPaths( constraintViolations, "strings[0].<collection element>", "strings[2].<collection element>", "strings[2].<collection element>" );
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlank.class,
+				NotBlank.class,
+				NotNull.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void return_value_constraint_provided_on_type_parameter_of_an_array_gets_validated() throws Exception {
+		Method method = TypeWithArray6.class.getDeclaredMethod( "returnStrings" );
+		Set<ConstraintViolation<TypeWithArray6>> constraintViolations = validator.forExecutables().validateReturnValue(
+				new TypeWithArray6(),
+				method,
+				new String[]{ "First", "", null }
+		);
+		assertNumberOfViolations( constraintViolations, 3 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"returnStrings.<return value>[1].<collection element>",
+				"returnStrings.<return value>[2].<collection element>",
+				"returnStrings.<return value>[2].<collection element>"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlank.class,
+				NotBlank.class,
+				NotNull.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void property_path_contains_index_information_for_array() {
+		TypeWithArray1 a = new TypeWithArray1();
+		a.names = new String[]{ "" };
+
+		Set<ConstraintViolation<TypeWithArray1>> constraintViolations = validator.validate( a );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+
+		Iterator<Path.Node> propertyPathIterator = constraintViolations.iterator().next().getPropertyPath().iterator();
+
+		Path.Node firstNode = propertyPathIterator.next();
+		assertThat( firstNode.getIndex() ).isNull();
+		assertThat( firstNode.getName() ).isEqualTo( "names" );
+		assertThat( firstNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
+
+		Path.Node secondNode = propertyPathIterator.next();
+		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
+		assertThat( secondNode.getName() ).isEqualTo( "<collection element>" );
+		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void method_parameter_constraint_provided_as_type_parameter_of_an_array_gets_validated() throws Exception {
+		Method method = TypeWithArray7.class.getDeclaredMethod( "setValues", String[].class );
+		Object[] values = new Object[] { new String[]{ "", "First", null } };
+
+		Set<ConstraintViolation<TypeWithArray7>> constraintViolations = validator.forExecutables().validateParameters(
+				new TypeWithArray7(),
+				method,
+				values
+		);
+		assertNumberOfViolations( constraintViolations, 3 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"setValues.arrayParameter[0].<collection element>",
+				"setValues.arrayParameter[2].<collection element>",
+				"setValues.arrayParameter[2].<collection element>"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlank.class,
+				NotBlank.class,
+				NotNull.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void constructor_parameter_constraint_provided_on_type_parameter_of_an_array_gets_validated() throws Exception {
+		Constructor<TypeWithArray8> constructor = TypeWithArray8.class.getDeclaredConstructor( String[].class );
+		Object[] values = new Object[] { new String[]{ "", "First", null } };
+
+		Set<ConstraintViolation<TypeWithArray8>> constraintViolations = validator.forExecutables().validateConstructorParameters(
+				constructor,
+				values
+		);
+		assertNumberOfViolations( constraintViolations, 3 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"TypeWithArray8.arrayParameter[0].<collection element>",
+				"TypeWithArray8.arrayParameter[2].<collection element>",
+				"TypeWithArray8.arrayParameter[2].<collection element>"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlank.class,
+				NotBlank.class,
+				NotNull.class
+		);
+	}
+
+	// Array of primitives
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void field_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated() {
+		TypeWithArrayOfPrimitives1 a = new TypeWithArrayOfPrimitives1();
+		a.ints = new int[]{ 6, 1 };
+
+		Set<ConstraintViolation<TypeWithArrayOfPrimitives1>> constraintViolations = validator.validate( a );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "ints[1].<collection element>" );
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				Min.class
+		);
+	}
+
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000187.*")
+	@TestForIssue(jiraKey = "HV-1175")
+	public void valid_annotation_required_for_constraint_on_type_parameter_of_array_of_primitives() {
+		TypeWithArrayOfPrimitives2 a = new TypeWithArrayOfPrimitives2();
+		a.ints = new int[]{ 6, 1 };
+		validator.validate( a );
+	}
+
+	// case 3 does not make sense here so we skip it
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void constraints_specified_on_array_and_on_type_parameter_of_array_of_primitives_get_validated() {
+		TypeWithArrayOfPrimitives4 a = new TypeWithArrayOfPrimitives4();
+		a.ints = new int[]{ 6, 1 };
+		Set<ConstraintViolation<TypeWithArrayOfPrimitives4>> constraintViolations = validator.validate( a );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "ints[1].<collection element>" );
+		assertCorrectConstraintTypes( constraintViolations, Min.class );
+
+		a = new TypeWithArrayOfPrimitives4();
+		a.ints = new int[0];
+		constraintViolations = validator.validate( a );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "ints" );
+		assertCorrectConstraintTypes( constraintViolations, Size.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void getter_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated() {
+		TypeWithArrayOfPrimitives5 a = new TypeWithArrayOfPrimitives5();
+		a.ints = new int[]{ 6, 1 };
+
+		Set<ConstraintViolation<TypeWithArrayOfPrimitives5>> constraintViolations = validator.validate( a );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "ints[1].<collection element>" );
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				Min.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void return_value_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated() throws Exception {
+		Method method = TypeWithArrayOfPrimitives6.class.getDeclaredMethod( "returnInts" );
+		Set<ConstraintViolation<TypeWithArrayOfPrimitives6>> constraintViolations = validator.forExecutables().validateReturnValue(
+				new TypeWithArrayOfPrimitives6(),
+				method,
+				new int[]{ 6, 1 }
+		);
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"returnInts.<return value>[1].<collection element>"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				Min.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void property_path_contains_index_information_for_array_of_primitives() {
+		TypeWithArrayOfPrimitives1 a = new TypeWithArrayOfPrimitives1();
+		a.ints = new int[]{ 1 };
+
+		Set<ConstraintViolation<TypeWithArrayOfPrimitives1>> constraintViolations = validator.validate( a );
+
+		assertNumberOfViolations( constraintViolations, 1 );
+
+		Iterator<Path.Node> propertyPathIterator = constraintViolations.iterator().next().getPropertyPath().iterator();
+
+		Path.Node firstNode = propertyPathIterator.next();
+		assertThat( firstNode.getIndex() ).isNull();
+		assertThat( firstNode.getName() ).isEqualTo( "ints" );
+		assertThat( firstNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
+
+		Path.Node secondNode = propertyPathIterator.next();
+		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
+		assertThat( secondNode.getName() ).isEqualTo( "<collection element>" );
+		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void method_parameter_constraint_provided_as_type_parameter_of_an_array_of_primitives_gets_validated() throws Exception {
+		Method method = TypeWithArrayOfPrimitives7.class.getDeclaredMethod( "setValues", int[].class );
+		Object[] values = new Object[] { new int[]{ 6, 1 } };
+
+		Set<ConstraintViolation<TypeWithArrayOfPrimitives7>> constraintViolations = validator.forExecutables().validateParameters(
+				new TypeWithArrayOfPrimitives7(),
+				method,
+				values
+		);
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"setValues.arrayParameter[1].<collection element>"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				Min.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1175")
+	public void constructor_parameter_constraint_provided_on_type_parameter_of_an_array_of_primitives_gets_validated() throws Exception {
+		Constructor<TypeWithArrayOfPrimitives8> constructor = TypeWithArrayOfPrimitives8.class.getDeclaredConstructor( int[].class );
+		Object[] values = new Object[] { new int[]{ 6, 1 } };
+
+		Set<ConstraintViolation<TypeWithArrayOfPrimitives8>> constraintViolations = validator.forExecutables().validateConstructorParameters(
+				constructor,
+				values
+		);
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"TypeWithArrayOfPrimitives8.arrayParameter[1].<collection element>"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				Min.class
+		);
+	}
+
 	// Optional
 
 	@Test
@@ -794,6 +1115,103 @@ public class TypeAnnotationConstraintTest {
 
 	static class TypeWithMap8 {
 		public TypeWithMap8(@Valid Map<String, @NotNull @NotBlank String> mapParameter) {
+		}
+	}
+
+	// Array of objects
+
+	static class TypeWithArray1 {
+		@Valid
+		String @NotNull @NotBlank [] names;
+	}
+
+	static class TypeWithArray2 {
+		String @NotNull @NotBlank [] names;
+	}
+
+	static class TypeWithArray3 {
+		@Valid
+		Bar @NotNull [] bars;
+	}
+
+	static class TypeWithArray4 {
+		@Valid
+		@Size(min = 1)
+		String @NotBlank [] names;
+	}
+
+	static class TypeWithArray5 {
+		String[] strings;
+
+		@Valid
+		public String @NotNull @NotBlank [] getStrings() {
+			return strings;
+		}
+	}
+
+	static class TypeWithArray6 {
+		String[] strings;
+
+		@Valid
+		public String @NotNull @NotBlank [] returnStrings() {
+			return strings;
+		}
+	}
+
+	static class TypeWithArray7 {
+		public void setValues(@Valid String @NotNull @NotBlank [] arrayParameter) {
+		}
+	}
+
+	static class TypeWithArray8 {
+		public TypeWithArray8(@Valid String @NotNull @NotBlank [] arrayParameter) {
+		}
+	}
+
+	// Array of primitives
+
+	static class TypeWithArrayOfPrimitives1 {
+		@Valid
+		int @Min(4) [] ints;
+	}
+
+	static class TypeWithArrayOfPrimitives2 {
+		int @Min(4) [] ints;
+	}
+
+	// case 3 does not make sense here so we skip it
+
+	static class TypeWithArrayOfPrimitives4 {
+		@Valid
+		@Size(min = 2)
+		int @Min(4) [] ints;
+	}
+
+	static class TypeWithArrayOfPrimitives5 {
+		int[] ints;
+
+		@Valid
+		public int @Min(4) [] getInts() {
+			return ints;
+		}
+	}
+
+	static class TypeWithArrayOfPrimitives6 {
+		int[] ints;
+
+		@Valid
+		public int @Min(4) [] returnInts() {
+			return ints;
+		}
+	}
+
+	static class TypeWithArrayOfPrimitives7 {
+		public void setValues(@Valid int @Min(4) [] arrayParameter) {
+		}
+	}
+
+	static class TypeWithArrayOfPrimitives8 {
+		public TypeWithArrayOfPrimitives8(@Valid int @Min(4) [] arrayParameter) {
 		}
 	}
 

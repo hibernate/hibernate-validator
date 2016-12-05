@@ -15,6 +15,7 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedArrayType;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Executable;
@@ -734,30 +735,39 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, ConstraintLocation location, AnnotatedType annotatedType, boolean isCascaded) {
-		Optional<AnnotatedType> typeParameter = getTypeParameter( annotatedType );
-		if ( !typeParameter.isPresent() ) {
+		Optional<AnnotatedType> annotationCarryingTypeParameter = getAnnotationCarryingTypeParameter( annotatedType );
+		if ( !annotationCarryingTypeParameter.isPresent() ) {
 			return Collections.emptySet();
 		}
 
-		List<ConstraintDescriptorImpl<?>> constraintDescriptors = findTypeUseConstraints( member, typeParameter.get() );
+		List<ConstraintDescriptorImpl<?>> constraintDescriptors = findTypeUseConstraints( member, annotationCarryingTypeParameter.get() );
 		if ( constraintDescriptors.isEmpty() ) {
 			return Collections.emptySet();
 		}
 
-		// HV-925
-		// We need to determine the validated type used for constraint validator resolution.
-		// Iterables and maps need special treatment at this point, since the validated type is the type of the
-		// specified type parameter. In the other cases the validated type is the parameterized type, eg Optional<String>.
-		// In the latter case a value unwrapping has to occur
 		Type validatedType = annotatedType.getType();
-		if ( ReflectionHelper.isIterable( annotatedType.getType() ) || ReflectionHelper.isMap( annotatedType.getType() ) ) {
+		if ( ReflectionHelper.isCollection( annotatedType.getType() ) ) {
+			// HV-925
+			// We need to determine the validated type used for constraint validator resolution.
+			// Iterables, maps and arrays need special treatment at this point, since the validated type is the type of
+			// the specified type parameter. In the other cases the validated type is the parameterized type, eg
+			// Optional<String>.
+			// In the latter case a value unwrapping has to occur.
+
 			if ( !isCascaded ) {
 				throw log.getTypeAnnotationConstraintOnIterableRequiresUseOfValidAnnotationException(
 						member.getDeclaringClass(),
-						member.getName()
-				);
+						member.getName() );
 			}
-			validatedType = typeParameter.get().getType();
+
+			if ( TypeHelper.isAssignable( AnnotatedArrayType.class, annotatedType.getClass() ) ) {
+				// in the case of an array, we need to unwrap the type as it was not unwrapped before as
+				// only the wrapper type carries the type annotations
+				validatedType = ( (AnnotatedArrayType) annotationCarryingTypeParameter.get() ).getAnnotatedGenericComponentType().getType();
+			}
+			else {
+				validatedType = annotationCarryingTypeParameter.get().getType();
+			}
 		}
 
 		return convertToTypeArgumentMetaConstraints(
@@ -804,32 +814,35 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * type argument. If the type has more than one type argument and is not a Map, the method returns an empty {@code
 	 * Optional}.
 	 */
-	private Optional<AnnotatedType> getTypeParameter(AnnotatedType annotatedType) {
+	private Optional<AnnotatedType> getAnnotationCarryingTypeParameter(AnnotatedType annotatedType) {
 		if ( annotatedType == null ) {
 			return Optional.empty();
 		}
 
-		if ( !TypeHelper.isAssignable( AnnotatedParameterizedType.class, annotatedType.getClass() ) ) {
-			return Optional.empty();
-		}
+		if ( TypeHelper.isAssignable( AnnotatedParameterizedType.class, annotatedType.getClass() ) ) {
+			AnnotatedType[] annotatedArguments = ( (AnnotatedParameterizedType) annotatedType ).getAnnotatedActualTypeArguments();
 
-		AnnotatedType[] annotatedArguments = ( (AnnotatedParameterizedType) annotatedType ).getAnnotatedActualTypeArguments();
-
-		// One type argument, return it
-		if ( annotatedArguments.length == 1 ) {
-			return Optional.of( annotatedArguments[0] );
-		}
-
-		// More than one type argument
-		if ( annotatedArguments.length > 1 ) {
-
-			// If it is a Map, return the value type argument
-			if ( ReflectionHelper.isMap( annotatedType.getType() ) ) {
-				return Optional.of( annotatedArguments[1] );
+			// One type argument, return it
+			if ( annotatedArguments.length == 1 ) {
+				return Optional.of( annotatedArguments[0] );
 			}
 
-			// If it is not a Map, log a message and ignore
-			log.parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported( annotatedType.getType() );
+			// More than one type argument
+			if ( annotatedArguments.length > 1 ) {
+
+				// If it is a Map, return the value type argument
+				if ( ReflectionHelper.isMap( annotatedType.getType() ) ) {
+					return Optional.of( annotatedArguments[1] );
+				}
+
+				// If it is not a Map, log a message and ignore
+				log.parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported( annotatedType.getType() );
+			}
+		}
+		else if ( TypeHelper.isAssignable( AnnotatedArrayType.class, annotatedType.getClass() ) ) {
+			// in the case of an array, the unwrapped type does not carry the annotations
+			// so we have to return the wrapper type: we will unwrap it later
+			return Optional.of( annotatedType );
 		}
 
 		return Optional.empty();

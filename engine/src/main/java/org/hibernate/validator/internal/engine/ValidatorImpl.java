@@ -56,6 +56,7 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.PropertyConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -595,8 +596,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 					Type type = value.getClass();
 
-					// HV-902: First, validate the properties for beans that implements Iterable and Map
-					if ( ReflectionHelper.isIterable( type ) || ReflectionHelper.isMap( type ) ) {
+					// HV-902: First, validate the properties for beans that are an Iterable, a Map or an array
+					if ( ReflectionHelper.isCollection( type ) ) {
 						Iterator<?> valueIter = Collections.singletonList( value ).iterator();
 						validateCascadedConstraint(
 								validationContext,
@@ -656,8 +657,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			valueContext.markCurrentPropertyAsIterable();
 		}
 		else if ( TypeHelper.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( (Object[]) value );
-			iter = arrayList.iterator();
+			iter = CollectionHelper.iteratorFromArray( value );
 			valueContext.markCurrentPropertyAsIterable();
 		}
 		else {
