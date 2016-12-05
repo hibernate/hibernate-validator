@@ -19,6 +19,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
  * in the context of bean validation, for instance its constraints.
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ConstrainedField extends AbstractConstrainedElement {
 
@@ -53,7 +54,12 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	}
 
 	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
-		return this.typeArgumentsConstraints;
+		return typeArgumentsConstraints;
+	}
+
+	@Override
+	public boolean isConstrained() {
+		return super.isConstrained() || !typeArgumentsConstraints.isEmpty();
 	}
 
 	@Override

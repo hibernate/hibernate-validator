@@ -624,6 +624,68 @@ public class TypeAnnotationConstraintTest {
 		);
 	}
 
+	@Test
+	public void return_value_constraint_provided_on_type_parameter_of_an_optional_gets_validated() throws Exception {
+		Method method = TypeWithOptional6.class.getDeclaredMethod( "returnStringOptional" );
+		Set<ConstraintViolation<TypeWithOptional6>> constraintViolations = validator.forExecutables().validateReturnValue(
+				new TypeWithOptional6(),
+				method,
+				Optional.of( "" )
+		);
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"returnStringOptional.<return value>"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlankTypeUse.class
+		);
+	}
+
+	@Test
+	public void method_parameter_constraint_provided_as_type_parameter_of_an_optional_gets_validated()
+			throws Exception {
+		Method method = TypeWithOptional7.class.getDeclaredMethod( "setValues", Optional.class );
+		Object[] values = new Object[] { Optional.of( "" ) };
+
+		Set<ConstraintViolation<TypeWithOptional7>> constraintViolations = validator.forExecutables().validateParameters(
+				new TypeWithOptional7(),
+				method,
+				values
+		);
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"setValues.arg0"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlankTypeUse.class
+		);
+	}
+
+	@Test
+	public void constructor_parameter_constraint_provided_on_type_parameter_of_an_optional_gets_validated()
+			throws Exception {
+		Constructor<TypeWithOptional8> constructor = TypeWithOptional8.class.getDeclaredConstructor( Optional.class );
+		Object[] values = new Object[] { Optional.of( "" ) };
+
+		Set<ConstraintViolation<TypeWithOptional8>> constraintViolations = validator.forExecutables().validateConstructorParameters(
+				constructor,
+				values
+		);
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"TypeWithOptional8.arg0"
+		);
+		assertCorrectConstraintTypes(
+				constraintViolations,
+				NotBlankTypeUse.class
+		);
+	}
+
 	// No unwrapper available
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000182.*")
@@ -819,6 +881,24 @@ public class TypeAnnotationConstraintTest {
 
 		public Optional<@NotNullTypeUse @NotBlankTypeUse String> getStringOptional() {
 			return stringOptional;
+		}
+	}
+
+	static class TypeWithOptional6 {
+		Optional<String> stringOptional;
+
+		public Optional<@NotNullTypeUse @NotBlankTypeUse String> returnStringOptional() {
+			return stringOptional;
+		}
+	}
+
+	static class TypeWithOptional7 {
+		public void setValues(Optional<@NotBlankTypeUse String> optionalParameter) {
+		}
+	}
+
+	static class TypeWithOptional8 {
+		public TypeWithOptional8(Optional<@NotBlankTypeUse String> optionalParameter) {
 		}
 	}
 
