@@ -17,6 +17,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
@@ -81,6 +82,7 @@ public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJan
 						fieldInfo.type(),
 						fieldInfo.name(),
 						field,
+						ConstraintLocation.forProperty( field ),
 						beanClass
 				),
 				isCascading

@@ -21,6 +21,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -126,6 +127,7 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 							methodInfo.returnType(),
 							methodInfo.name(),
 							executable,
+							ConstraintLocation.forReturnValue( executable ),
 							beanClass
 					),
 					isCascading
@@ -206,6 +208,7 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 							parameterInformation.getType(),
 							parameterInformation.getName(),
 							executable,
+							ConstraintLocation.forParameter( executable, parameterInformation.getIndex() ),
 							parameterInformation.getBeanClass()
 					),
 					isCascading

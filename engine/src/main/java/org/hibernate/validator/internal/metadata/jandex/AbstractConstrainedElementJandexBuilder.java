@@ -285,7 +285,7 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 			Class<?> memberType = jandexHelper.getClassForName( validatedType.name().toString() );
 			return findConstrainAnnotations( argument.get().annotations() )
 					.flatMap( annotationInstance -> findConstraintAnnotations( information.getMember(), annotationInstance ) )
-					.map( constraintDescriptor -> createTypeArgumentMetaConstraint( information.getMember(), constraintDescriptor, memberType ) );
+					.map( constraintDescriptor -> createTypeArgumentMetaConstraint( information.getConstraintLocation(), constraintDescriptor, memberType ) );
 		}
 
 		return Stream.empty();
@@ -373,9 +373,11 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 	 * Creates a {@link MetaConstraint} for a type argument constraint.
 	 */
 	protected <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(
-			Member member, ConstraintDescriptorImpl<A> descriptor,
-			java.lang.reflect.Type type) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( member, type ) );
+			ConstraintLocation location,
+			ConstraintDescriptorImpl<A> descriptor,
+			java.lang.reflect.Type type
+	) {
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( location, type ) );
 	}
 
 	protected <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(
@@ -433,12 +435,14 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 		private String name;
 		private Member member;
 		private Class<?> beanClass;
+		private ConstraintLocation constraintLocation;
 
-		public MemberInformation(Type type, String name, Member member, Class<?> beanClass) {
+		public MemberInformation(Type type, String name, Member member,ConstraintLocation constraintLocation, Class<?> beanClass) {
 			this.type = type;
 			this.name = name;
 			this.member = member;
 			this.beanClass = beanClass;
+			this.constraintLocation = constraintLocation;
 		}
 
 		public Type getType() {
@@ -455,6 +459,10 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 
 		public Class<?> getBeanClass() {
 			return beanClass;
+		}
+
+		public ConstraintLocation getConstraintLocation() {
+			return constraintLocation;
 		}
 	}
 
