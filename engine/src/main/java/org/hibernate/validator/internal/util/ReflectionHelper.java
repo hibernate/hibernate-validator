@@ -18,7 +18,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -398,8 +397,7 @@ public final class ReflectionHelper {
 			iter = ( (Iterable<?>) value ).iterator();
 		}
 		else if ( TypeHelper.isArray( type ) ) {
-			List<?> arrayList = Arrays.asList( value );
-			iter = arrayList.iterator();
+			iter = CollectionHelper.iteratorFromArray( value );
 		}
 		else {
 			return null;
@@ -491,4 +489,5 @@ public final class ReflectionHelper {
 
 		return wrapperType;
 	}
+
 }
