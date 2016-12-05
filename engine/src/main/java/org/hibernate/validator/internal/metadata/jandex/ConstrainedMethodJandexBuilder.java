@@ -115,12 +115,13 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 		Set<MetaConstraint<?>> returnValueConstraints;
 		Set<MetaConstraint<?>> typeArgumentsConstraints;
 		CommonConstraintInformation commonInformation;
-		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable ) ) {
+		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable ) || Type.Kind.VOID.equals( methodInfo.returnType().kind() ) ) {
 			returnValueConstraints = Collections.emptySet();
 			typeArgumentsConstraints = Collections.emptySet();
 			commonInformation = new CommonConstraintInformation();
 		}
 		else {
+			// check for any constraints on return type only if it is not void
 			boolean isCascading = jandexHelper.isCascading( methodInfo.annotations() );
 			typeArgumentsConstraints = findTypeAnnotationConstraintsForMember(
 					new MemberInformation(
@@ -276,12 +277,20 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 	 */
 	private Executable findExecutable(Class<?> beanClass, MethodInfo methodInfo) {
 		try {
-			return beanClass.getDeclaredMethod(
-					methodInfo.name(),
-					methodInfo.parameters().stream()
-							.map( type -> jandexHelper.getClassForName( type.name().toString() ) )
-							.toArray( size -> new Class<?>[size] )
-			);
+			if ( "<init>".equals( methodInfo.name() ) ) {
+				// it means it is a constructor:
+				return beanClass.getDeclaredConstructor( methodInfo.parameters().stream()
+						.map( type -> jandexHelper.getClassForName( type.name().toString() ) )
+						.toArray( size -> new Class<?>[size] ) );
+			}
+			else {
+				return beanClass.getDeclaredMethod(
+						methodInfo.name(),
+						methodInfo.parameters().stream()
+								.map( type -> jandexHelper.getClassForName( type.name().toString() ) )
+								.toArray( size -> new Class<?>[size] )
+				);
+			}
 		}
 		catch (NoSuchMethodException e) {
 			throw new IllegalArgumentException(

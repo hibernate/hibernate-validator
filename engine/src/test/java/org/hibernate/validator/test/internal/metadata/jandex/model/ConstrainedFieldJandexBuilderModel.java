@@ -41,6 +41,11 @@ public class ConstrainedFieldJandexBuilderModel {
 	@Valid
 	private List<@NotNull String> list;
 
+	public ConstrainedFieldJandexBuilderModel(@Max(value = 1, groups = { Group1.class }) String var1, @Min(value = 2, groups = Group3.class) String var2) {
+		this.var1 = var1;
+		this.var2 = var2;
+	}
+
 	@Valid
 	@NotNull
 	public String someMethod1(@NotNull String param1, @Valid @NotNull @Size(min = 5) List<@NotNull String> param2) {
