@@ -17,7 +17,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.jandex.ClassConstrainsJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.ConstrainedFieldJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.ConstrainedMethodJandexBuilder;
-import org.hibernate.validator.internal.metadata.jandex.GroupSequenceJandexHelper;
+import org.hibernate.validator.internal.metadata.jandex.util.GroupSequenceJandexHelper;
 import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -108,7 +108,6 @@ public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
 				jandexHelper,
 				annotationProcessingOptions
 		).getConstrainedFields( classInfo, bean );
-		//TODO: need to check what is happening with constructors.
 		//get constrained methods/constructors ?
 		Stream.concat( constrainedElementStream, ConstrainedMethodJandexBuilder.getInstance(
 				constraintHelper,

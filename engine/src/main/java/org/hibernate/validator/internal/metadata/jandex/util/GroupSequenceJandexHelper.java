@@ -4,7 +4,7 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.metadata.jandex;
+package org.hibernate.validator.internal.metadata.jandex.util;
 
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 import javax.validation.GroupSequence;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
-import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
@@ -85,30 +84,16 @@ public class GroupSequenceJandexHelper {
 		return null;
 	}
 
-	// TODO: next two methods are copied over from AnnotationMetaDataProvider. Is there anything to be done with them ?
-	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<?> beanClass,
-			Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
-		Method[] providerMethods = run( GetMethods.action( providerClass ) );
+	// TODO: this method is copied over from AnnotationMetaDataProvider. Is there anything to be done about it ?
+	private <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<?> beanClass, Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
+		Method[] providerMethods = jandexHelper.run( GetMethods.action( providerClass ) );
 		for ( Method method : providerMethods ) {
 			Class<?>[] paramTypes = method.getParameterTypes();
 			if ( "getValidationGroups".equals( method.getName() ) && !method.isBridge()
 					&& paramTypes.length == 1 && paramTypes[0].isAssignableFrom( beanClass ) ) {
-
-				return run(
-						NewInstance.action( providerClass, "the default group sequence provider" )
-				);
+				return jandexHelper.run( NewInstance.action( providerClass, "the default group sequence provider" ) );
 			}
 		}
-
 		throw log.getWrongDefaultGroupSequenceProviderTypeException( beanClass );
-	}
-
-	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
-	 */
-	private <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }
