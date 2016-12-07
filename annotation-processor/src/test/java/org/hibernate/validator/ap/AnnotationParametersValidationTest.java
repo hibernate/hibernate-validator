@@ -11,18 +11,17 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
 import java.io.File;
+
 import javax.tools.Diagnostic.Kind;
 
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidDecimalMinMaxParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidDigitsParameters;
-import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidGroupSequenceParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidLengthParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidPatternParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidScriptAssertParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidSizeParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidDecimalMinMaxParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidDigitsParameters;
-import org.hibernate.validator.ap.testmodel.annotationparameters.ValidGroupSequenceParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidGroupsParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidLengthParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidMessageParameters;
@@ -31,7 +30,6 @@ import org.hibernate.validator.ap.testmodel.annotationparameters.ValidScriptAsse
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidSizeParameters;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.testng.annotations.Test;
 
 /**
@@ -294,46 +292,6 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.WARNING, 110 ),
 				new DiagnosticExpectation( Kind.WARNING, 122 )
 
-		);
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-451")
-	public void testValidGroupSequenceParameter() {
-		File sourceFile = compilerHelper.getSourceFile( ValidGroupSequenceParameters.class );
-
-		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
-
-		assertTrue( compilationResult );
-		assertThatDiagnosticsMatch( diagnostics );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-451")
-	public void testInvalidGroupSequenceParameter() {
-		File sourceFile = compilerHelper.getSourceFile( InvalidGroupSequenceParameters.class );
-
-		boolean compilationResult =
-				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
-
-		assertFalse( compilationResult );
-		assertThatDiagnosticsMatch(
-				diagnostics,
-				new DiagnosticExpectation( Kind.ERROR, 29 ),
-				new DiagnosticExpectation( Kind.ERROR, 33 ),
-				new DiagnosticExpectation( Kind.ERROR, 48 ),
-				new DiagnosticExpectation( Kind.ERROR, 52 ),
-				new DiagnosticExpectation( Kind.ERROR, 61 ),
-				new DiagnosticExpectation( Kind.ERROR, 96 ),
-				new DiagnosticExpectation( Kind.ERROR, 105 ),
-				new DiagnosticExpectation( Kind.ERROR, 109 ),
-				new DiagnosticExpectation( Kind.ERROR, 124 ),
-				new DiagnosticExpectation( Kind.ERROR, 139 ),
-				new DiagnosticExpectation( Kind.ERROR, 143 ),
-				new DiagnosticExpectation( Kind.ERROR, 147 ),
-				new DiagnosticExpectation( Kind.WARNING, 74 ),
-				new DiagnosticExpectation( Kind.WARNING, 78 )
 		);
 	}
 

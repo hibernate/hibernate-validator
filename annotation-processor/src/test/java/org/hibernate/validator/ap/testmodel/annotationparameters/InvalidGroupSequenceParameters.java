@@ -55,33 +55,22 @@ public class InvalidGroupSequenceParameters {
 	}
 
 	/**
-	 * Case 3: Cyclic groups
+	 * Case 3: Group sequence extending another interface
 	 */
 	public static class Case3 {
-		@GroupSequence(value = Group1.class)
 		public interface Group1 {
 		}
 
-		public interface Group2 {
+		public interface ParentInterface {
 		}
 
-		public interface Group3 extends Group2 {
-		}
-
-		public interface Group4 extends Group3 {
-		}
-
-		@GroupSequence(value = Group3.class)
-		public interface Group5 extends Group4, Group3 {
-		}
-
-		@GroupSequence(value = Group5.class)
-		public interface Group6 {
+		@GroupSequence(value = Group1.class)
+		public interface GroupSequence1 extends ParentInterface {
 		}
 	}
 
 	/**
-	 * Case 4: Example of redefining a group sequence without using a class in a list
+	 * Case 4: Example of redefining a group sequence without declaring the class in the group sequence
 	 */
 	public static class Case4 {
 		public interface RentalChecks {
@@ -102,12 +91,12 @@ public class InvalidGroupSequenceParameters {
 	 * Case 5: Group sequence cyclic definition - incorrect
 	 */
 	public static class Case5 {
-		@GroupSequence(Group2.class)
-		public interface Group1 {
+		@GroupSequence(GroupSequence2.class)
+		public interface GroupSequence1 {
 		}
 
-		@GroupSequence(Group1.class)
-		public interface Group2 {
+		@GroupSequence(GroupSequence1.class)
+		public interface GroupSequence2 {
 		}
 	}
 
@@ -136,16 +125,34 @@ public class InvalidGroupSequenceParameters {
 		public interface Group2 {
 		}
 
-		@GroupSequence(value = { Group1.class, Group4.class })
-		public interface Group3 {
+		@GroupSequence(value = { Group1.class, GroupSequence2.class })
+		public interface GroupSequence1 {
 		}
 
-		@GroupSequence(value = Group5.class)
-		public interface Group4 {
+		@GroupSequence(value = GroupSequence3.class)
+		public interface GroupSequence2 {
 		}
 
-		@GroupSequence(value = { Group2.class, Group3.class })
-		public interface Group5 {
+		@GroupSequence(value = { Group2.class, GroupSequence1.class })
+		public interface GroupSequence3 {
 		}
+	}
+
+	/**
+	 * Case 8: Cyclic definition due to group inheritance - incorrect
+	 *
+	 * XXX: currently, it does not throw an error
+	 */
+	public static class Case8 {
+		public interface Group1 extends Group2 {
+		}
+
+		public interface Group2 {
+		}
+
+		@GroupSequence(value = { Group1.class, Group2.class })
+		public interface GroupSequence1 {
+		}
+
 	}
 }

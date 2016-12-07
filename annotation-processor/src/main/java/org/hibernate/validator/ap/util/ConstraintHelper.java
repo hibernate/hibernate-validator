@@ -264,7 +264,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given type element represents a constraint annotation
+	 * Checks whether the given type element represents a constraint annotation
 	 * or not. That's the case, if the given element is annotated with the
 	 * {@code @Constraint} meta-annotation (which is only allowed at annotation
 	 * declarations).
@@ -394,7 +394,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given type element represents a composed constraint or not.
+	 * Checks whether the given type element represents a composed constraint or not.
 	 *
 	 * @param element The type element of interest. Must not be null.
 	 *
@@ -533,7 +533,7 @@ public class ConstraintHelper {
 	// ==================================
 
 	/**
-	 * Checks, whether the given annotation mirror represents a constraint
+	 * Checks whether the given annotation mirror represents a constraint
 	 * annotation or not. That's the case, if the given mirror is annotated with
 	 * the {@code @Constraint} meta-annotation (which is only allowed at
 	 * annotation declarations).
@@ -548,7 +548,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given annotation mirror represents the {@code @Constraint}
+	 * Checks whether the given annotation mirror represents the {@code @Constraint}
 	 * meta-annotation or not.
 	 *
 	 * @param annotationMirror The annotation mirror of interest.
@@ -561,7 +561,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given annotation mirror represents a multi-valued
+	 * Checks whether the given annotation mirror represents a multi-valued
 	 * constraint such as {@link javax.validation.constraints.Pattern.List}.
 	 * That is the case if the annotation has an array-typed attribute with name
 	 * "value", that exclusively contains constraint annotations.
@@ -606,7 +606,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given mirror represents the {@code Valid} annotation.
+	 * Checks whether the given mirror represents the {@code Valid} annotation.
 	 *
 	 * @param annotationMirror The annotation mirror of interest.
 	 *
@@ -620,12 +620,10 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given mirror represents the {@code @GroupSequence} annotation.
+	 * Checks whether the given mirror represents the {@code @GroupSequence} annotation.
 	 *
-	 * @param annotationMirror The annotation mirror of interest.
-	 *
-	 * @return True, if the given mirror represents the {@code @GroupSequence} annotation, false
-	 *         otherwise.
+	 * @param annotationMirror the annotation mirror of interest
+	 * @return true, if the given mirror represents the {@code @GroupSequence} annotation, false otherwise
 	 */
 	private boolean isGroupSequenceAnnotation(
 			AnnotationMirror annotationMirror) {
@@ -634,7 +632,7 @@ public class ConstraintHelper {
 	}
 
 	/**
-	 * Checks, whether the given mirror represents the {@code @GroupSequenceProvider} annotation.
+	 * Checks whether the given mirror represents the {@code @GroupSequenceProvider} annotation.
 	 *
 	 * @param annotationMirror The annotation mirror of interest.
 	 *

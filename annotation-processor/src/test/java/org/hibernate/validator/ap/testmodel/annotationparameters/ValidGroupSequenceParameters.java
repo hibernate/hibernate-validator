@@ -101,4 +101,22 @@ public class ValidGroupSequenceParameters {
 		}
 	}
 
+	/**
+	 * Case 3: Hierarchy of groups
+	 */
+	public static class Case3 {
+		public interface Group1 {
+		}
+
+		public interface Group2 extends Group1 {
+		}
+
+		public interface Group3 {
+		}
+
+		@GroupSequence(value = { Group2.class, Group3.class })
+		public interface GroupSequence1 {
+		}
+	}
+
 }

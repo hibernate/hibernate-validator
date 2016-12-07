@@ -332,14 +332,17 @@ public class AnnotationApiHelper {
 	}
 
 	/**
-	 * Checks if the given {@link TypeMirror} represents an interface or not.
-	 *
-	 * @param typeMirror a {@link TypeMirror} to check
-	 *
-	 * @return {@code true} if given value is an interface, {@code false} otherwise
+	 * Test if the given {@link TypeMirror} represents an interface or not.
 	 */
 	public boolean isInterface(TypeMirror typeMirror) {
 		return TypeKind.DECLARED.equals( typeMirror.getKind() ) && ( (DeclaredType) typeMirror ).asElement().getKind().isInterface();
+	}
+
+	/**
+	 * Test if the given {@link TypeMirror} represents a class or not.
+	 */
+	public boolean isClass(TypeMirror typeMirror) {
+		return TypeKind.DECLARED.equals( typeMirror.getKind() ) && ( (DeclaredType) typeMirror ).asElement().getKind().isClass();
 	}
 
 }
