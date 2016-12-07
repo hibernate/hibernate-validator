@@ -121,7 +121,7 @@ In order to update the server modules for Bean Validation API and Hibernate Vali
 
 You can download the patch file from http://sourceforge.net/projects/hibernate/files/hibernate-validator[SourceForge] or from Maven Central using the following dependency:
 
-.Maven dependency for WildFly 10 patch file
+.Maven dependency for WildFly {wildflyVersion} patch file
 ====
 [source, XML]
 [subs="verbatim,attributes"]
@@ -130,7 +130,7 @@ You can download the patch file from http://sourceforge.net/projects/hibernate/f
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-modules</artifactId>
     <version>{hvVersion}</version>
-    <classifier>wildfly-10-patch</classifier>
+    <classifier>wildfly-{wildflyVersion}-patch</classifier>
     <type>zip</type>
 </dependency>
 ----
@@ -143,7 +143,7 @@ Having downloaded the patch file, you can apply it to WildFly by running this co
 [source]
 [subs="verbatim,attributes"]
 ----
-$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-{hvVersion}-wildfly-10-patch.zip
+$JBOSS_HOME/bin/jboss-cli.sh patch apply hibernate-validator-modules-{hvVersion}-wildfly-{wildflyVersion}-patch.zip
 ----
 ====
 
