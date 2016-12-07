@@ -21,6 +21,7 @@
         <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
         <bundle>mvn:javax.money/money-api/${javax-money.version}</bundle>
         <bundle>mvn:org.javamoney/moneta/${moneta.version}</bundle>
+        <bundle>mvn:javax.annotation/javax.annotation-api/${javax-annotation.version}</bundle>
     </feature>
     <feature name="hibernate-validator-paranamer" version="${project.version}">
         <feature prerequisite="true">wrap</feature>
