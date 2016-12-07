@@ -27,13 +27,13 @@ import org.hibernate.validator.ap.util.TypeNames;
 /**
  * Checks that the GroupSequence definition is valid.
  * <ul>
- * <li>the class list contains only interface</li>
+ * <li>the class list contains only interfaces (except for the hosting bean in the case of default group sequence redefinition)</li>
  * <li>the defined group sequence is expandable (no cyclic definition)</li>
- * <li>the class list contains the hosting bean class (for default group sequence re-definition)</li>
- * <li>the class list does not use interfaces that extend others</li>
+ * <li>the group sequence does not extend other interfaces</li>
  * </ul>
  *
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 
@@ -52,57 +52,59 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 
 		TypeElement annotatedElement = (TypeElement) element;
 
-		boolean classForRedefiningGroupSequencePresent = false;
+		boolean isDefaultGroupSequenceRedefinition = false;
 
 		Set<String> qualifiedNames = CollectionHelper.newHashSet();
 
 		Set<ConstraintCheckIssue> issues = CollectionHelper.newHashSet();
 
 		for ( AnnotationValue value : annotationValue ) {
-			// 1. The class list contains only interface
 			TypeMirror typeMirror = (TypeMirror) value.getValue();
-			boolean isClassAndSameAsAnnotatedElement = isClassForRedefiningGroupSequence( annotatedElement, typeMirror );
 
-			if ( !annotationApiHelper.isInterface( typeMirror ) && !isClassAndSameAsAnnotatedElement ) {
+			// 1. if it is a class, it has to be the hosting bean class (for default group sequence redefinition)
+			if ( annotationApiHelper.isClass( typeMirror ) && redefinesDefaultGroupSequence( annotatedElement, typeMirror ) ) {
+				isDefaultGroupSequenceRedefinition = true;
+			}
+			else if ( !annotationApiHelper.isInterface( typeMirror ) ) {
 				issues.add( ConstraintCheckIssue.error(
-						element, annotation, "INVALID_GROUP_SEQUENCE_VALUE_NOT_INTERFACES_ANNOTATION_PARAMETERS"
+						element, annotation, "INVALID_GROUP_SEQUENCE_VALUE_NOT_INTERFACES"
 				) );
-				// if it's not an interface we will not do any other checks on it
+				// it is not an interface or a class used to redefine the default group, we will not do any other
+				// checks on it and report the error straight away
 				continue;
 			}
-			// 3. the class list contains the hosting bean class (for default group sequence re-definition)
-			classForRedefiningGroupSequencePresent = classForRedefiningGroupSequencePresent || isClassAndSameAsAnnotatedElement;
-			// 4. one interface should not be declared multiple times in a group sequence
+
+			// 2. an interface should not be declared multiple times in a group sequence
 			String qualifiedName = ( (TypeElement) typeUtils.asElement( typeMirror ) ).getQualifiedName().toString();
 			if ( qualifiedNames.contains( qualifiedName ) ) {
 				issues.add( ConstraintCheckIssue.error(
-						element, annotation, "INVALID_GROUP_SEQUENCE_VALUE_MULTIPLE_DECLARATIONS_ANNOTATION_PARAMETERS", qualifiedName )
+						element, annotation, "INVALID_GROUP_SEQUENCE_VALUE_MULTIPLE_DECLARATIONS_OF_THE_SAME_INTERFACE", qualifiedName )
 				);
-			}
-			// 5. if interface extends other interfaces we need to produce a warning
-			if ( annotationApiHelper.isInterface( typeMirror ) && !( (TypeElement) typeUtils.asElement( typeMirror ) ).getInterfaces().isEmpty() ) {
-				issues.add( ConstraintCheckIssue.warning(
-						element,
-						annotation,
-						"INVALID_GROUP_SEQUENCE_VALUE_EXTENDED_INTERFACES_ANNOTATION_PARAMETERS",
-						qualifiedName
-				) );
 			}
 			qualifiedNames.add( qualifiedName );
 		}
 
-		// 2. the defined group sequence is expandable (no cyclic definition)
-		ConstraintCheckIssue cyclicIssue = checkForCyclicDefinition( CollectionHelper.newHashSet(), annotatedElement.asType(), annotatedElement, annotation );
-		if ( cyclicIssue != null ) {
-			issues.add( cyclicIssue );
-		}
-
-		// if the annotated element is a class and does not contain itself in a group then it's bad group redefinition
-		if ( ElementKind.CLASS.equals( annotatedElement.getKind() ) && !classForRedefiningGroupSequencePresent ) {
-			issues.add( ConstraintCheckIssue.error(
-					element, annotation, "INVALID_GROUP_SEQUENCE_VALUE_HOSTING_BEAN_ANNOTATION_PARAMETERS"
+		// 3. if the group sequence extends other interfaces we need to produce a warning
+		if ( ElementKind.INTERFACE.equals( annotatedElement.getKind() ) && !annotatedElement.getInterfaces().isEmpty() ) {
+			issues.add( ConstraintCheckIssue.warning(
+					element,
+					annotation,
+					"INVALID_GROUP_SEQUENCE_EXTEND_INTERFACES"
 			) );
 		}
+
+		// 4. if the annotated element is a class and the group sequence does not contain it then the group sequence redefinition is invalid
+		if ( ElementKind.CLASS.equals( annotatedElement.getKind() ) && !isDefaultGroupSequenceRedefinition ) {
+			issues.add( ConstraintCheckIssue.error( element, annotation, "INVALID_GROUP_SEQUENCE_VALUE_MISSING_HOSTING_BEAN_DECLARATION" ) );
+		}
+
+		// 5. the defined group sequence is expandable (no cyclic definition)
+		ConstraintCheckIssue cyclicDefinitionIssue = checkForCyclicDefinition( CollectionHelper.newHashSet(), annotatedElement.asType(), annotatedElement, annotation );
+		if ( cyclicDefinitionIssue != null ) {
+			issues.add( cyclicDefinitionIssue );
+		}
+
+
 
 		return issues;
 	}
@@ -110,26 +112,29 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 	/**
 	 * Checks if there are any cyclic definitions for a given type element {@link TypeElement}.
 	 *
-	 * @param processedTypes for initial call of this functions this can be an empty {@link Set}. It contains all already processed types. Used for recursion
-	 * @param typeMirror a current type mirror under investigation
-	 * @param originalElement an original annotated element to be used in reported error if there's one
-	 * @param annotation an original annotation mirror passed to a check method to be used in reported error if there's one
-	 *
-	 * @return {@code null} if there was no cyclic issue found, {@link ConstraintCheckIssue} describing a cyclic issue if one was found.
+	 * @param processedTypes for initial call of this functions this can be an empty {@link Set}. It contains all
+	 * already processed types. Used for recursion
+	 * @param currentTypeMirror the current type mirror under investigation
+	 * @param originalElement an original annotated element to be used in reported error if there is one
+	 * @param annotation an original annotation mirror passed to a check method to be used in reported error if there is
+	 * one
+	 * @return {@code null} if there was no cyclic issue found, {@link ConstraintCheckIssue} describing a cyclic issue
+	 * if one was found.
 	 */
-	private ConstraintCheckIssue checkForCyclicDefinition(Set<TypeMirror> processedTypes, TypeMirror typeMirror, TypeElement originalElement, AnnotationMirror annotation) {
-		if ( processedTypes.contains( typeMirror ) ) {
-			if ( !isClassForRedefiningGroupSequence( originalElement, typeMirror ) ) {
-				return ConstraintCheckIssue.error( originalElement, annotation, "INVALID_GROUP_SEQUENCE_VALUE_CYCLIC_DEFINITION_ANNOTATION_PARAMETERS" );
+	private ConstraintCheckIssue checkForCyclicDefinition(Set<TypeMirror> processedTypes, TypeMirror currentTypeMirror,
+			TypeElement originalElement, AnnotationMirror annotation) {
+		if ( processedTypes.contains( currentTypeMirror ) ) {
+			if ( !redefinesDefaultGroupSequence( originalElement, currentTypeMirror ) ) {
+				return ConstraintCheckIssue.error( originalElement, annotation, "INVALID_GROUP_SEQUENCE_VALUE_CYCLIC_DEFINITION" );
 			}
 			else {
 				return null;
 			}
 		}
 		else {
-			processedTypes.add( typeMirror );
+			processedTypes.add( currentTypeMirror );
 
-			AnnotationMirror groupSequenceMirror = getGroupSequence( typeMirror );
+			AnnotationMirror groupSequenceMirror = getGroupSequence( currentTypeMirror );
 			List<? extends AnnotationValue> annotationValue = annotationApiHelper.getAnnotationArrayValue( groupSequenceMirror, "value" );
 			if ( annotationValue != null ) {
 				for ( AnnotationValue value : annotationValue ) {
@@ -145,15 +150,10 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 	}
 
 	/**
-	 * Finds a {@code javax.validation.GroupSequence} annotation if one is present on given type ({@link TypeMirror}.
-	 *
-	 * @param typeMirror a type on which to check for {@code javax.validation.GroupSequence} annotation
-	 *
-	 * @return {@link AnnotationMirror} that represents a {@code javax.validation.GroupSequence} if one was present on given type,
-	 * {@code null} otherwise
+	 * Find a {@code javax.validation.GroupSequence} annotation if one is present on given type ({@link TypeMirror}).
 	 */
 	private AnnotationMirror getGroupSequence(TypeMirror typeMirror) {
-		// other annotations can be present only on TypeKind.DECLARED things so need to check to prevent NPE
+		// the annotation can be present only on TypeKind.DECLARED elements
 		if ( TypeKind.DECLARED.equals( typeMirror.getKind() ) ) {
 			for ( AnnotationMirror annotationMirror : typeUtils.asElement( typeMirror ).getAnnotationMirrors() ) {
 				if ( ConstraintHelper.AnnotationType.GROUP_SEQUENCE_ANNOTATION.equals( constraintHelper.getAnnotationType( annotationMirror ) ) ) {
@@ -165,15 +165,11 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 	}
 
 	/**
-	 * Checks if a given {@link TypeMirror} is not a class used for redefining a group sequence.
-	 *
-	 * @param annotatedElement an element on which a redefined group sequence annotation is present
-	 * @param typeMirror a type mirror to check
-	 *
-	 * @return {@code true} if the given annotated element is class and is the same type as provided
-	 * type mirror
+	 * Check if the given {@link TypeMirror} redefines the default group sequence for the annotated class.
+	 * <p>
+	 * Note that it is only the case if the annotated element is a class.
 	 */
-	private boolean isClassForRedefiningGroupSequence(TypeElement annotatedElement, TypeMirror typeMirror) {
+	private boolean redefinesDefaultGroupSequence(TypeElement annotatedElement, TypeMirror typeMirror) {
 		return ElementKind.CLASS.equals( annotatedElement.getKind() ) && typeUtils.isSameType( annotatedElement.asType(), typeMirror );
 	}
 
