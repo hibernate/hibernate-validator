@@ -95,16 +95,18 @@
                 <exclude>.git</exclude>
                 <exclude>.gitignore</exclude>
                 <exclude>**/target/**</exclude>
+                <exclude>**/test-output/**</exclude>
                 <exclude>**/.settings/**</exclude>
                 <exclude>**/.project</exclude>
                 <exclude>**/.classpath</exclude>
+                <exclude>**/.checkstyle</exclude>
                 <exclude>**/.idea/**</exclude>
                 <exclude>.sonar-ide.properties</exclude>
                 <exclude>**/*.iml</exclude>
                 <exclude>**/*.ipr</exclude>
                 <exclude>**/*.iws</exclude>
-                <exclude>**/performance/jmeter/**</exclude>
-                <exclude>**/performance/jmeter/*.log</exclude>
+                <exclude>**/performance/hibernate-validator.log</exclude>
+                <exclude>**/performance/dependency-reduced-pom.xml</exclude>
             </excludes>
         </fileSet>
 
