@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import javax.el.ExpressionFactory;
+import javax.money.spi.Bootstrap;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidationProviderResolver;
@@ -34,6 +35,8 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.javamoney.moneta.Money;
+import org.javamoney.moneta.spi.MonetaryConfig;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +53,8 @@ import com.example.CustomerDecimalMin;
 import com.example.ExampleConstraintValidatorFactory;
 import com.example.Order;
 import com.example.RetailOrder;
+import com.example.money.ClassLoaderAwareJavaxMoneyServiceProvider;
+import com.example.money.JavaxMoneyOrder;
 
 /**
  * Integration test for Bean Validation and Hibernate Validator under OSGi.
@@ -228,6 +233,21 @@ public class OsgiIntegrationTest {
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "must be greater than or equal to 1.00", constraintViolations.iterator().next().getMessage() );
+	}
+
+	@Test
+	public void canUseJavaxMoneyConstraints() {
+		Bootstrap.init( new ClassLoaderAwareJavaxMoneyServiceProvider( MonetaryConfig.class.getClassLoader() ) );
+
+		Set<ConstraintViolation<JavaxMoneyOrder>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.externalClassLoader( getClass().getClassLoader() )
+				.buildValidatorFactory()
+				.getValidator()
+				.validate( new JavaxMoneyOrder( "Order 1", Money.of( 0, "EUR" ) ) );
+
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "must be greater than or equal to 100", constraintViolations.iterator().next().getMessage() );
 	}
 
 	private ExpressionFactory buildExpressionFactory() {
