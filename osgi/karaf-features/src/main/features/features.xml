@@ -19,6 +19,8 @@
         <bundle>mvn:org.glassfish/javax.el/${javax.el.version}</bundle>
         <bundle>mvn:org.jsoup/jsoup/${jsoup.version}</bundle>
         <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
+        <bundle>mvn:javax.money/money-api/${javax-money.version}</bundle>
+        <bundle>mvn:org.javamoney/moneta/${moneta.version}</bundle>
     </feature>
     <feature name="hibernate-validator-paranamer" version="${project.version}">
         <feature prerequisite="true">wrap</feature>

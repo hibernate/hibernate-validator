@@ -51,6 +51,18 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- javax.money -->
+        <dependency>
+            <groupId>javax.money</groupId>
+            <artifactId>money-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.javamoney</groupId>
+            <artifactId>moneta</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Pax Exam -->
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
