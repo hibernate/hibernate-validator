@@ -28,7 +28,7 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	TypeArgumentConstraintLocation(ConstraintLocation delegate, Type typeOfAnnotatedElement) {
 		this.delegate = delegate;
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( typeOfAnnotatedElement );
-		this.isCollection = ReflectionHelper.isCollection( delegate.getTypeForValidatorResolution() ) || ReflectionHelper.isMap( delegate.getTypeForValidatorResolution() );
+		this.isCollection = ReflectionHelper.isCollection( delegate.getTypeForValidatorResolution() );
 	}
 
 	@Override
