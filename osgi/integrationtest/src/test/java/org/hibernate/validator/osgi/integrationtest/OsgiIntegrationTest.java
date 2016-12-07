@@ -240,6 +240,7 @@ public class OsgiIntegrationTest {
 		Bootstrap.init( new ClassLoaderAwareJavaxMoneyServiceProvider( MonetaryConfig.class.getClassLoader() ) );
 
 		Set<ConstraintViolation<JavaxMoneyOrder>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+				.providerResolver( new MyValidationProviderResolver() )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
 				.buildValidatorFactory()
