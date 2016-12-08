@@ -101,7 +101,7 @@
         -->
         <classmate.version>1.3.1</classmate.version>
         <jsoup.version>1.8.3</jsoup.version>
-        <joda-time.version>2.7</joda-time.version>
+        <joda-time.version>2.9.5</joda-time.version>
         <slf4j.version>1.7.7</slf4j.version> <!-- Note: Wildfly 10.1.0.Final uses a custom jboss version -->
         <hibernate-jpa-2.1-api.version>1.0.0.Final</hibernate-jpa-2.1-api.version>
 
