@@ -61,7 +61,9 @@ public class GroupSequenceValidationTest extends ConstraintValidationProcessorTe
 				new DiagnosticExpectation( Kind.ERROR, 113 ),
 				new DiagnosticExpectation( Kind.ERROR, 128 ),
 				new DiagnosticExpectation( Kind.ERROR, 132 ),
-				new DiagnosticExpectation( Kind.ERROR, 136 )
+				new DiagnosticExpectation( Kind.ERROR, 136 ),
+				new DiagnosticExpectation( Kind.ERROR, 151 ),
+				new DiagnosticExpectation( Kind.ERROR, 174 )
 		);
 	}
 
