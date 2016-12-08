@@ -1,6 +1,17 @@
 Hibernate Validator Changelog
 =============================
 
+5.3.4.Final (08-12-2016)
+-------------------------
+
+** Bug
+    * HV-1176 - engine     - Type argument constraints for Optional are ignored for method parameters and return value if there are no other constraints
+    * HV-1165 - engine     - Use type annotations for Set values with @NotNull annotation on the Set
+    * HV-1164 - engine     - getDynamicPayload(Class<C> type) throws Nullpointerexception
+
+** Task
+    * HV-1183 - validators - Upgrade JodaTime to 2.9.5
+
 5.3.3.Final (22-11-2016)
 -------------------------
 
