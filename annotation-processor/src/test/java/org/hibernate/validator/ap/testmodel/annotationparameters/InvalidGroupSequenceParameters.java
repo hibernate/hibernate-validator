@@ -140,8 +140,6 @@ public class InvalidGroupSequenceParameters {
 
 	/**
 	 * Case 8: Cyclic definition due to group inheritance - incorrect
-	 *
-	 * XXX: currently, it does not throw an error
 	 */
 	public static class Case8 {
 		public interface Group1 extends Group2 {
@@ -152,6 +150,29 @@ public class InvalidGroupSequenceParameters {
 
 		@GroupSequence(value = { Group1.class, Group2.class })
 		public interface GroupSequence1 {
+		}
+	}
+
+	/**
+	 * Case 9: Cyclic definition due to group inheritance and group sequence inheritance - incorrect
+	 */
+	public static class Case9 {
+		public interface Group1 extends Group2 {
+		}
+
+		public interface Group2 {
+		}
+
+		@GroupSequence(value = Group1.class)
+		public interface GroupSequence1 {
+		}
+
+		@GroupSequence(value = GroupSequence1.class)
+		public interface GroupSequence2 {
+		}
+
+		@GroupSequence(value = { Group2.class, GroupSequence2.class })
+		public interface GroupSequence3 {
 		}
 
 	}
