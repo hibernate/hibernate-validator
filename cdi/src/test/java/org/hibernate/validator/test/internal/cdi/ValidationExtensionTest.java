@@ -18,6 +18,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.ProcessBean;
 import javax.enterprise.util.AnnotationLiteral;
+import javax.validation.ValidationProviderResolver;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
@@ -49,6 +50,7 @@ public class ValidationExtensionTest {
 	private Bean<ValidatorFactory> validatorFactoryBeanMock;
 	private Bean<Validator> validatorBeanMock;
 	private BeanManager beanManagerMock;
+	private ValidationProviderResolver validationProviderResolverMock;
 
 	@SuppressWarnings("unchecked")
 	@Before
@@ -59,6 +61,7 @@ public class ValidationExtensionTest {
 		beanManagerMock = createMock( BeanManager.class );
 		validatorFactoryBeanMock = createMock( Bean.class );
 		validatorBeanMock = createMock( Bean.class );
+		validationProviderResolverMock = createMock( ValidationProviderResolver.class );
 	}
 
 	@Test
@@ -101,7 +104,8 @@ public class ValidationExtensionTest {
 		expect( processBeanMock.getBean() ).andReturn(
 				new ValidatorFactoryBean(
 						beanManagerMock,
-						validationProviderHelper
+						validationProviderHelper,
+						validationProviderResolverMock
 				)
 		);
 		expect( processBeanMock.getBean() ).andReturn(
