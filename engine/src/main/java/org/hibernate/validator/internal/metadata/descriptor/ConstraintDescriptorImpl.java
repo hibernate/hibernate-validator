@@ -558,7 +558,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		Map<String, Object> parameters = newHashMap( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
 			//HV-1184 Add check for synthetic
-			if (!m.isSynthetic()) {
+			if ( !m.isSynthetic() ) {
 				Object value = run(GetAnnotationParameter.action(annotation, m.getName(), Object.class));
 				parameters.put(m.getName(), value);
 			}
