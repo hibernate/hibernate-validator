@@ -94,6 +94,11 @@
             <artifactId>money-api</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jandex</artifactId>
+            <optional>true</optional>
+        </dependency>
 
         <!--
         Test dependencies
