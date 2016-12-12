@@ -559,8 +559,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		for ( Method m : declaredMethods ) {
 			//HV-1184 Add check for synthetic
 			if ( !m.isSynthetic() ) {
-				Object value = run(GetAnnotationParameter.action(annotation, m.getName(), Object.class));
-				parameters.put(m.getName(), value);
+				Object value = run( GetAnnotationParameter.action( annotation, m.getName(), Object.class ) );
+				parameters.put( m.getName() , value );
 			}
 		}
 		return Collections.unmodifiableMap( parameters );
