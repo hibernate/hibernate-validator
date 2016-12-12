@@ -557,11 +557,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		final Method[] declaredMethods = run( GetDeclaredMethods.action( annotation.annotationType() ) );
 		Map<String, Object> parameters = newHashMap( declaredMethods.length );
 		for ( Method m : declaredMethods ) {
-		    // Add check for synthetic
-            if (!m.isSynthetic()) {
-                Object value = run(GetAnnotationParameter.action(annotation, m.getName(), Object.class));
-                parameters.put(m.getName(), value);
-            }
+			//HV-1184 Add check for synthetic
+			if (!m.isSynthetic()) {
+				Object value = run(GetAnnotationParameter.action(annotation, m.getName(), Object.class));
+				parameters.put(m.getName(), value);
+			}
 		}
 		return Collections.unmodifiableMap( parameters );
 	}
