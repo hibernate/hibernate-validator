@@ -37,7 +37,7 @@ import org.hibernate.validator.ap.util.TypeNames;
  */
 public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 
-	private Types typeUtils;
+	private final Types typeUtils;
 	private final ConstraintHelper constraintHelper;
 
 	public GroupSequenceCheck(AnnotationApiHelper annotationApiHelper, Types typeUtils, ConstraintHelper constraintHelper) {
@@ -123,6 +123,11 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 	 */
 	private ConstraintCheckIssue checkForCyclicDefinition(Set<TypeMirror> processedTypes, TypeMirror currentTypeMirror,
 			TypeElement originalElement, AnnotationMirror annotation) {
+		// if passed currentTypeMirror is not a class/interface than - we will not do anything about it, as
+		// such error was already processed by another part of code and if do not ignore them then Types#asElement will fail
+		if ( !TypeKind.DECLARED.equals( currentTypeMirror.getKind() ) ) {
+			return null;
+		}
 		if ( processedTypes.contains( currentTypeMirror ) ) {
 			if ( !redefinesDefaultGroupSequence( originalElement, currentTypeMirror ) ) {
 				return ConstraintCheckIssue.error( originalElement, annotation, "INVALID_GROUP_SEQUENCE_VALUE_CYCLIC_DEFINITION" );
@@ -133,9 +138,8 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 		}
 		else {
 			processedTypes.add( currentTypeMirror );
-
-			AnnotationMirror groupSequenceMirror = getGroupSequence( currentTypeMirror );
-			List<? extends AnnotationValue> annotationValue = annotationApiHelper.getAnnotationArrayValue( groupSequenceMirror, "value" );
+			// check if there is a @GroupSequence annotation on a currentTypeMirror and check it values if present
+			List<? extends AnnotationValue> annotationValue = annotationApiHelper.getAnnotationArrayValue( getGroupSequence( currentTypeMirror ), "value" );
 			if ( annotationValue != null ) {
 				for ( AnnotationValue value : annotationValue ) {
 					TypeMirror groupTypeMirror = (TypeMirror) value.getValue();
@@ -143,6 +147,13 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 					if ( issue != null ) {
 						return issue;
 					}
+				}
+			}
+			// check if currentTypeMirror extends any other interfaces and if so - check them if they are not in the sequence already
+			for ( TypeMirror extendedInterfaceTypeMirror : ( (TypeElement) typeUtils.asElement( currentTypeMirror ) ).getInterfaces() ) {
+				ConstraintCheckIssue issue = checkForCyclicDefinition( processedTypes, extendedInterfaceTypeMirror, originalElement, annotation );
+				if ( issue != null ) {
+					return issue;
 				}
 			}
 		}
