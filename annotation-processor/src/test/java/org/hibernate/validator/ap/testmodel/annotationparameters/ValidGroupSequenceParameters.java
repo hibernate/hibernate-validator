@@ -15,6 +15,7 @@ import javax.validation.constraints.Size;
 
 /**
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public class ValidGroupSequenceParameters {
 
@@ -117,6 +118,30 @@ public class ValidGroupSequenceParameters {
 		@GroupSequence(value = { Group2.class, Group3.class })
 		public interface GroupSequence1 {
 		}
+	}
+
+	/**
+	 * Case 4: Hierarchy of groups and group sequences
+	 */
+	public static class Case4 {
+		public interface Group1 {
+		}
+
+		public interface Group2 {
+		}
+
+		@GroupSequence(value = Group1.class)
+		public interface GroupSequence1 {
+		}
+
+		@GroupSequence(value = GroupSequence1.class)
+		public interface GroupSequence2 {
+		}
+
+		@GroupSequence(value = { Group2.class, GroupSequence2.class })
+		public interface GroupSequence3 {
+		}
+
 	}
 
 }
