@@ -44,6 +44,11 @@ public final class GetAnnotationParameters implements PrivilegedAction<Annotatio
 		Map<String, Object> parameters = newHashMap( declaredMethods.length );
 
 		for ( Method m : declaredMethods ) {
+			// HV-1184 Exclude synthetic methods potentially introduced by jacoco
+			if ( m.isSynthetic() ) {
+				continue;
+			}
+
 			m.setAccessible( true );
 
 			String parameterName = m.getName();
