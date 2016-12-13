@@ -675,15 +675,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForMember(Member member) {
 		AnnotatedType annotatedType = null;
-		ConstraintLocation location = null;
+		TypeArgumentLocation location = null;
 		if ( member instanceof Field ) {
 			annotatedType = ( (Field) member ).getAnnotatedType();
-			location = ConstraintLocation.forProperty( member );
+			location = new TypeArgumentPropertyLocation( member );
 		}
-
-		if ( member instanceof Method ) {
+		else if ( member instanceof Method ) {
 			annotatedType = ( (Method) member ).getAnnotatedReturnType();
-			location = ConstraintLocation.forReturnValue( (Executable) member );
+			location = new TypeArgumentReturnValueLocation( (Executable) member );
 		}
 
 		return findTypeArgumentsConstraints(
@@ -707,7 +706,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		try {
 			return findTypeArgumentsConstraints(
 					executable,
-					ConstraintLocation.forParameter( executable, i ),
+					new TypeArgumentExecutableParameterLocation( executable, i ),
 					parameter.getAnnotatedType(),
 					parameter.isAnnotationPresent( Valid.class )
 			);
@@ -718,7 +717,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 	}
 
-	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, ConstraintLocation location, AnnotatedType annotatedType, boolean isCascaded) {
+	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, TypeArgumentLocation location, AnnotatedType annotatedType, boolean isCascaded) {
 		Optional<AnnotatedType> annotationCarryingTypeParameter = getAnnotationCarryingTypeParameter( annotatedType );
 		if ( !annotationCarryingTypeParameter.isPresent() ) {
 			return Collections.emptySet();
@@ -777,10 +776,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Creates meta constraints for type arguments constraints.
 	 */
-	private Set<MetaConstraint<?>> convertToTypeArgumentMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, ConstraintLocation location, Type type) {
+	private Set<MetaConstraint<?>> convertToTypeArgumentMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, TypeArgumentLocation location, Type type) {
 		Set<MetaConstraint<?>> constraints = newHashSet( constraintDescriptors.size() );
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
-			MetaConstraint<?> metaConstraint = createTypeArgumentMetaConstraint( location, constraintDescription, type );
+			MetaConstraint<?> metaConstraint = createTypeArgumentMetaConstraint( constraintDescription, location, type );
 			constraints.add( metaConstraint );
 		}
 		return constraints;
@@ -789,8 +788,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Creates a {@code MetaConstraint} for a type argument constraint.
 	 */
-	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(ConstraintLocation location, ConstraintDescriptorImpl<A> descriptor, Type type) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( location, type ) );
+	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(ConstraintDescriptorImpl<A> descriptor, TypeArgumentLocation location, Type type) {
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( location.toConstraintLocation(), type ) );
 	}
 
 	/**
@@ -830,5 +829,58 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		return Optional.empty();
+	}
+
+	/**
+	 * The location of a type argument before it is really considered a constraint location.
+	 * <p>
+	 * It avoids initializing a constraint location if we did not find any constraints. This is especially useful in
+	 * a Java 9 environment as {@link ConstraintLocation#forProperty(Member) tries to make the {@code Member} accessible
+	 * which might not be possible (for instance for {@code java.util} classes).
+	 */
+	private interface TypeArgumentLocation {
+		ConstraintLocation toConstraintLocation();
+	}
+
+	private static class TypeArgumentExecutableParameterLocation implements TypeArgumentLocation {
+		private final Executable executable;
+
+		private final int index;
+
+		private TypeArgumentExecutableParameterLocation(Executable executable, int index) {
+			this.executable = executable;
+			this.index = index;
+		}
+
+		@Override
+		public ConstraintLocation toConstraintLocation() {
+			return ConstraintLocation.forParameter( executable, index );
+		}
+	}
+
+	private static class TypeArgumentPropertyLocation implements TypeArgumentLocation {
+		private final Member member;
+
+		private TypeArgumentPropertyLocation(Member member) {
+			this.member = member;
+		}
+
+		@Override
+		public ConstraintLocation toConstraintLocation() {
+			return ConstraintLocation.forProperty( member );
+		}
+	}
+
+	private static class TypeArgumentReturnValueLocation implements TypeArgumentLocation {
+		private final Executable executable;
+
+		private TypeArgumentReturnValueLocation(Executable executable) {
+			this.executable = executable;
+		}
+
+		@Override
+		public ConstraintLocation toConstraintLocation() {
+			return ConstraintLocation.forReturnValue( executable );
+		}
 	}
 }
