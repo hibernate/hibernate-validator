@@ -178,7 +178,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			if ( propertyMetaData.isCascading() ) {
 				cascadedProperties.add( propertyMetaData );
 			}
-			else {
+			else if ( !propertyMetaData.getTypeArgumentsConstraints().isEmpty() ) {
 				Set<MetaConstraint<?>> typeConstraints = propertyMetaData.getTypeArgumentsConstraints().stream()
 					.map( c -> {
 						ConstraintLocation adaptedDelegate = ConstraintLocation.forProperty( c.getLocation().getMember() );

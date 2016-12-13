@@ -213,8 +213,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		// HV-262
 		List<ConstraintDescriptorImpl<?>> classMetaData = findClassLevelConstraints( clazz );
 
+		ConstraintLocation location = ConstraintLocation.forClass( clazz );
+
 		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetaData ) {
-			classLevelConstraints.add( createMetaConstraint( clazz, constraintDescription ) );
+			classLevelConstraints.add( new MetaConstraint<>( constraintDescription, location ) );
 		}
 
 		return classLevelConstraints;
@@ -280,8 +282,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
+		ConstraintLocation location = ConstraintLocation.forProperty( field );
+
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
-			constraints.add( createMetaConstraint( field, constraintDescription ) );
+			constraints.add( new MetaConstraint<>( constraintDescription, location ) );
 		}
 		return constraints;
 	}
@@ -411,11 +415,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
+		ConstraintLocation returnValueLocation = ConstraintLocation.forReturnValue( executable );
+		ConstraintLocation crossParameterLocation = ConstraintLocation.forCrossParameter( executable );
+
 		for ( ConstraintDescriptorImpl<?> constraintDescriptor : constraintsDescriptors ) {
 			constraints.add(
-					constraintDescriptor.getConstraintType() == ConstraintType.GENERIC ?
-							createReturnValueMetaConstraint( executable, constraintDescriptor ) :
-							createCrossParameterMetaConstraint( executable, constraintDescriptor )
+					new MetaConstraint<>(
+							constraintDescriptor,
+							constraintDescriptor.getConstraintType() == ConstraintType.GENERIC ? returnValueLocation : crossParameterLocation
+					)
 			);
 		}
 
@@ -473,6 +481,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			}
 
 			UnwrapValidatedValue unwrapValidatedValue = null;
+
+			ConstraintLocation location = ConstraintLocation.forParameter( executable, i );
+
 			for ( Annotation parameterAnnotation : parameterAnnotations ) {
 				//1. mark parameter as cascading if this annotation is the @Valid annotation
 				if ( parameterAnnotation.annotationType().equals( Valid.class ) ) {
@@ -498,7 +509,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					parameterConstraints.add(
-							createParameterMetaConstraint( executable, i, constraintDescriptorImpl )
+							new MetaConstraint<>( constraintDescriptorImpl, location )
 					);
 				}
 			}
@@ -632,33 +643,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		return groupConversions;
-	}
-
-	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass,
-			ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forClass( declaringClass ) );
-	}
-
-	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Member member, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forProperty( member ) );
-	}
-
-	private <A extends Annotation> MetaConstraint<A> createParameterMetaConstraint(Executable member,
-			int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<>(
-				descriptor,
-				ConstraintLocation.forParameter( member, parameterIndex )
-		);
-	}
-
-	private <A extends Annotation> MetaConstraint<A> createReturnValueMetaConstraint(Executable member,
-			ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forReturnValue( member ) );
-	}
-
-	private <A extends Annotation> MetaConstraint<A> createCrossParameterMetaConstraint(Executable member,
-			ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forCrossParameter( member ) );
 	}
 
 	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(Member member,

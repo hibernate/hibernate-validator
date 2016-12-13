@@ -327,8 +327,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 			// convert (getter) return value locations into property locations for usage within this meta-data
 			return constraints.stream()
-				.map( c -> new MetaConstraint<>( c.getDescriptor(), ConstraintLocation.forProperty( c.getLocation().getMember() ) ) )
-				.collect( Collectors.toSet() );
+					.map( c -> new MetaConstraint<>( c.getDescriptor(), ConstraintLocation.forProperty( c.getLocation().getMember() ) ) )
+					.collect( Collectors.toSet() );
 		}
 
 		private String getPropertyName(ConstrainedElement constrainedElement) {
