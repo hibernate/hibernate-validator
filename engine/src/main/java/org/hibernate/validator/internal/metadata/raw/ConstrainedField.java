@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.util.StringHelper;
 
 /**
  * Represents a field of a Java type and all its associated meta-data relevant
@@ -70,7 +71,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 
 	@Override
 	public String toString() {
-		return "ConstrainedField [field=" + field + "]";
+		return "ConstrainedField [field=" + StringHelper.toShortString( field ) + "]";
 	}
 
 	@Override

@@ -17,6 +17,7 @@ import java.security.PrivilegedAction;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
@@ -94,8 +95,8 @@ public class PropertyConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public String toString() {
-		return "PropertyConstraintLocation [member=" + member + ", typeForValidatorResolution="
-				+ typeForValidatorResolution + "]";
+		return "PropertyConstraintLocation [member=" + StringHelper.toShortString( member ) + ", typeForValidatorResolution="
+				+ StringHelper.toShortString( typeForValidatorResolution ) + "]";
 	}
 
 	@Override

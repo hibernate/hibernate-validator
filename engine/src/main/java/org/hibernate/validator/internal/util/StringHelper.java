@@ -6,8 +6,15 @@
  */
 package org.hibernate.validator.internal.util;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Helper class dealing with strings.
@@ -15,6 +22,8 @@ import java.util.Locale;
  * @author Gunnar Morling
  */
 public class StringHelper {
+
+	private static final Pattern DOT = Pattern.compile( "\\." );
 
 	private StringHelper() {
 	}
@@ -94,6 +103,87 @@ public class StringHelper {
 	 */
 	public static boolean isNullOrEmptyString(String value) {
 		return value == null || value.trim().isEmpty();
+	}
+
+	/**
+	 * Creates a compact string representation of the given member, useful for debugging or toString() methods. Package
+	 * names are shortened, e.g. "org.hibernate.validator.internal.engine" becomes "o.h.v.i.e". Not to be used for
+	 * user-visible log messages.
+	 */
+	public static String toShortString(Member member) {
+		if ( member instanceof Field ) {
+			return toShortString( (Field) member );
+		}
+		else if ( member instanceof Method ) {
+			return toShortString( (Method) member );
+		}
+		else {
+			return member.toString();
+		}
+	}
+
+	private static String toShortString(Field field) {
+		return toShortString( field.getGenericType() ) + " " + toShortString( field.getDeclaringClass() ) + "#" + field.getName();
+	}
+
+	private static String toShortString(Method method) {
+		return toShortString( method.getGenericReturnType() ) + " " +
+				method.getName() +
+				Arrays.stream( method.getGenericParameterTypes() )
+					.map( StringHelper::toShortString )
+					.collect( Collectors.joining( ", ", "(", ")" ) );
+	}
+
+	/**
+	 * Creates a compact string representation of the given type, useful for debugging or toString() methods. Package
+	 * names are shortened, e.g. "org.hibernate.validator.internal.engine" becomes "o.h.v.i.e". Not to be used for
+	 * user-visible log messages.
+	 */
+	public static String toShortString(Type type) {
+		if ( type instanceof Class ) {
+			return toShortString( (Class<?>) type );
+		}
+		else if ( type instanceof ParameterizedType ) {
+			return toShortString( (ParameterizedType) type );
+		}
+		else {
+			return type.toString();
+		}
+	}
+
+	private static String toShortString(Class<?> type) {
+		if ( type.isArray() ) {
+			return toShortString( type.getComponentType() ) + "[]";
+		}
+		else if ( type.getEnclosingClass() != null ) {
+			return toShortString( type.getEnclosingClass() ) + "$" + type.getSimpleName();
+		}
+		else if ( type.getPackage() == null ) {
+			return type.getName();
+		}
+
+		return toShortString( type.getPackage() ) + "." + type.getSimpleName();
+	}
+
+	private static String toShortString(ParameterizedType parameterizedType) {
+		Class<?> rawType = ReflectionHelper.getClassFromType( parameterizedType );
+		if ( rawType.getPackage() == null ) {
+			return parameterizedType.toString();
+		}
+
+		String typeArgumentsString = Arrays.stream( parameterizedType.getActualTypeArguments() )
+			.map( t -> toShortString( t ) )
+			.collect( Collectors.joining( ", ", "<", ">" ) );
+
+		return toShortString( rawType ) + typeArgumentsString;
+	}
+
+	private static String toShortString(Package pakkage) {
+		String[] packageParts = DOT.split( pakkage.getName() );
+
+		return Arrays.stream( packageParts )
+			.map( n -> n.substring( 0, 1 ) )
+			.collect( Collectors.joining( "." ) );
 	}
 
 	private static boolean startsWithSeveralUpperCaseLetters(String string) {

@@ -22,6 +22,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -224,7 +225,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 	@Override
 	public String toString() {
-		return "ConstrainedExecutable [executable=" + executable
+		return "ConstrainedExecutable [executable=" + StringHelper.toShortString( executable )
 				+ ", parameterMetaData=" + parameterMetaData
 				+ ", hasParameterConstraints=" + hasParameterConstraints + "]";
 	}

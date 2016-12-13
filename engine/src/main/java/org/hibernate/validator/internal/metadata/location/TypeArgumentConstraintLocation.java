@@ -12,6 +12,7 @@ import java.lang.reflect.Type;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.StringHelper;
 
 /**
  * Type argument constraint location.
@@ -68,7 +69,7 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	@Override
 	public String toString() {
 		return "TypeArgumentValueConstraintLocation [delegate=" + delegate + ", typeForValidatorResolution="
-				+ typeForValidatorResolution + "]";
+				+ StringHelper.toShortString( typeForValidatorResolution ) + "]";
 	}
 
 	@Override
