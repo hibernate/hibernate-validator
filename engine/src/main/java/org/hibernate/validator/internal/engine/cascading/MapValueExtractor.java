@@ -1,0 +1,28 @@
+/*
+ * Hibernate Validator, declare and validate application constraints
+ *
+ * License: Apache License, Version 2.0
+ * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+ */
+package org.hibernate.validator.internal.engine.cascading;
+
+import java.util.Map;
+
+import org.hibernate.validator.spi.cascading.ValueExtractor;
+
+class MapValueExtractor implements ValueExtractor<Map<?, ?>> {
+
+	static final MapValueExtractor INSTANCE = new MapValueExtractor();
+
+	private MapValueExtractor() {
+	}
+
+	@Override
+	public void extractValues(Map<?, ?> originalValue, ValueReceiver receiver) {
+		receiver.objectValue( originalValue );
+
+		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
+			receiver.mapValue( entry.getKey(), entry.getValue() );
+		}
+	}
+}

@@ -13,7 +13,6 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +33,7 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
@@ -56,7 +56,6 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.PropertyConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -65,6 +64,7 @@ import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
@@ -585,7 +585,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				Object value = getCascadableValue( validationContext, valueContext.getCurrentBean(), cascadable );
 
 				if ( value != null ) {
-
 					// expand the group only if was created by group conversion;
 					// otherwise we're looping through the right validation order
 					// already and need only to pass the current element
@@ -594,39 +593,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							group != originalGroup
 					);
 
-					Type type = value.getClass();
-
-					// HV-902: First, validate the properties for beans that are an Iterable, a Map or an array
-					if ( ReflectionHelper.isCollection( type ) ) {
-						Iterator<?> valueIter = Collections.singletonList( value ).iterator();
-						validateCascadedConstraint(
-								validationContext,
-								valueContext,
-								valueIter,
-								false,
-								validationOrder,
-								Collections.<MetaConstraint<?>>emptySet()
-						);
-						if ( shouldFailFast( validationContext ) ) {
-							return;
-						}
-					}
-
-					// Second, validate the content of the value
-					Iterator<?> elementsIter = createIteratorForCascadedValue( valueContext, type, value );
-					boolean isIndexable = ReflectionHelper.isIndexable( type );
-
-					validateCascadedConstraint(
-							validationContext,
-							valueContext,
-							elementsIter,
-							isIndexable,
-							validationOrder,
-							cascadable.getTypeArgumentsConstraints()
-					);
-					if ( shouldFailFast( validationContext ) ) {
-						return;
-					}
+					validateCascadedValues( value, validationContext, valueContext, validationOrder, cascadable.getTypeArgumentsConstraints() );
 				}
 			}
 
@@ -636,73 +603,77 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	/**
-	 * Called when processing cascaded constraints. This methods inspects the type of the cascaded constraints and in case
-	 * of a list or array creates an iterator in order to validate each element.
-	 * @param valueContext context object containing state about the currently validated instance
-	 * @param type the type of the cascaded field or property.
-	 * @param value the actual value.
-	 *
-	 * @return An iterator over the value of a cascaded property.
-	 */
-	private Iterator<?> createIteratorForCascadedValue(ValueContext<?, ?> valueContext, Type type, Object value) {
-		Iterator<?> iter;
-		if ( ReflectionHelper.isIterable( type ) ) {
-			iter = ( (Iterable<?>) value ).iterator();
-			valueContext.markCurrentPropertyAsIterable();
-		}
-		else if ( ReflectionHelper.isMap( type ) ) {
-			Map<?, ?> map = (Map<?, ?>) value;
-			iter = map.entrySet().iterator();
-			valueContext.markCurrentPropertyAsIterable();
-		}
-		else if ( TypeHelper.isArray( type ) ) {
-			iter = CollectionHelper.iteratorFromArray( value );
-			valueContext.markCurrentPropertyAsIterable();
-		}
-		else {
-			iter = Collections.singletonList( value ).iterator();
-		}
-		return iter;
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void validateCascadedValues(Object value, ValidationContext<?> context, ValueContext<?, ?> valueContext, ValidationOrder validationOrder,
+			Set<MetaConstraint<?>> typeArgumentConstraints) {
+
+		ValueExtractor extractor = ValueExtractors.getCascadedValueExtractor( value );
+		ValueReceiverImpl receiver = new ValueReceiverImpl( context, valueContext, validationOrder, typeArgumentConstraints );
+
+		extractor.extractValues( value, receiver );
 	}
 
-	private void validateCascadedConstraint(ValidationContext<?> context, ValueContext<?, Object> valueContext, Iterator<?> iter, boolean isIndexable,
-			ValidationOrder validationOrder, Set<MetaConstraint<?>> typeArgumentsConstraint) {
-		Object value;
-		Object mapKey;
-		int i = 0;
-		while ( iter.hasNext() ) {
-			value = iter.next();
-			if ( value instanceof Map.Entry ) {
-				mapKey = ( (Map.Entry<?, ?>) value ).getKey();
-				valueContext.setKey( mapKey );
-				value = ( (Map.Entry<?, ?>) value ).getValue();
-			}
-			else if ( isIndexable ) {
-				valueContext.setIndex( i );
+	private class ValueReceiverImpl implements ValueExtractor.ValueReceiver {
+
+		private final ValidationContext<?> context;
+		private final ValueContext<?, ?> valueContext;
+		ValidationOrder validationOrder;
+		Set<MetaConstraint<?>> typeArgumentsConstraint;
+
+		public ValueReceiverImpl(ValidationContext<?> context, ValueContext<?, ?> valueContext, ValidationOrder validationOrder,
+				Set<MetaConstraint<?>> typeArgumentsConstraint) {
+			this.context = context;
+			this.valueContext = valueContext;
+			this.validationOrder = validationOrder;
+			this.typeArgumentsConstraint = typeArgumentsConstraint;
+		}
+
+		@Override
+		public void objectValue(Object value) {
+			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) || shouldFailFast( context ) ) {
+				return;
 			}
 
-			if ( !context.isBeanAlreadyValidated(
-					value,
-					valueContext.getCurrentGroup(),
-					valueContext.getPropertyPath()
-			) ) {
-				ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
+			// Cascade validation
+			validateInContext( context, buildNewLocalExecutionContext( valueContext, value ), validationOrder );
+		}
 
-				// Type arguments
-				validateTypeArgumentConstraints( context, cascadedValueContext, value, typeArgumentsConstraint );
+		@Override
+		public void iterableValue(Object value) {
+			valueContext.markCurrentPropertyAsIterable();
+			doValidate( value );
+		}
 
-				// Cascade validation
-				validateInContext( context, cascadedValueContext, validationOrder );
-				if ( shouldFailFast( context ) ) {
-					return;
-				}
+		@Override
+		public void listValue(int index, Object value) {
+			valueContext.markCurrentPropertyAsIterable();
+			valueContext.setIndex( index );
+			doValidate( value );
+		}
+
+		@Override
+		public void mapValue(Object key, Object value) {
+			valueContext.markCurrentPropertyAsIterable();
+			valueContext.setKey( key );
+			doValidate( value );
+		}
+
+		private void doValidate(Object value) {
+			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) || shouldFailFast( context ) ) {
+				return;
 			}
-			i++;
+
+			ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
+
+			// Type arguments
+			validateTypeArgumentConstraints( context, cascadedValueContext, value, typeArgumentsConstraint );
+
+			// Cascade validation
+			validateInContext( context, cascadedValueContext, validationOrder );
 		}
 	}
 
-	private ValueContext<?, Object> buildNewLocalExecutionContext(ValueContext<?, Object> valueContext, Object value) {
+	private ValueContext<?, Object> buildNewLocalExecutionContext(ValueContext<?, ?> valueContext, Object value) {
 		ValueContext<?, Object> newValueContext;
 		if ( value != null ) {
 			newValueContext = ValueContext.getLocalExecutionContext(
