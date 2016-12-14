@@ -304,14 +304,14 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 			}
 
 			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
-				typeArgumentsConstraints.addAll( ( (ConstrainedField) constrainedElement ).getTypeArgumentsConstraints() );
+				typeArgumentsConstraints.addAll( ( (ConstrainedField) constrainedElement ).getTypeArgumentConstraints() );
 
 				if ( constrainedElement.isCascading() && cascadingMember == null ) {
 					cascadingMember = ( (ConstrainedField) constrainedElement ).getField();
 				}
 			}
 			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
-				typeArgumentsConstraints.addAll( ( (ConstrainedExecutable) constrainedElement ).getTypeArgumentsConstraints() );
+				typeArgumentsConstraints.addAll( ( (ConstrainedExecutable) constrainedElement ).getTypeArgumentConstraints() );
 
 				if ( constrainedElement.isCascading() && cascadingMember == null ) {
 					cascadingMember = ( (ConstrainedExecutable) constrainedElement ).getExecutable();

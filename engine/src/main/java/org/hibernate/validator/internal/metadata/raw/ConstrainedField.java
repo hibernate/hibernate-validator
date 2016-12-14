@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.metadata.raw;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +24,6 @@ import org.hibernate.validator.internal.util.StringHelper;
 public class ConstrainedField extends AbstractConstrainedElement {
 
 	private final Field field;
-	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
 
 	/**
 	 * Creates a new field meta data object.
@@ -33,7 +31,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param source The source of meta data.
 	 * @param field The represented field.
 	 * @param constraints The constraints of the represented field, if any.
-	 * @param typeArgumentsConstraints Type arguments constraints, if any.
+	 * @param typeArgumentConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented field, if any.
 	 * @param isCascading Whether a cascaded validation of the represented field shall
 	 * be performed or not.
@@ -43,30 +41,18 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	public ConstrainedField(ConfigurationSource source,
 							Field field,
 							Set<MetaConstraint<?>> constraints,
-							Set<MetaConstraint<?>> typeArgumentsConstraints,
+							Set<MetaConstraint<?>> typeArgumentConstraints,
 							Map<Class<?>, Class<?>> groupConversions,
 							boolean isCascading,
 							UnwrapMode unwrapMode) {
 
-		super( source, ConstrainedElementKind.FIELD, constraints, groupConversions, isCascading, unwrapMode );
+		super( source, ConstrainedElementKind.FIELD, constraints, typeArgumentConstraints, groupConversions, isCascading, unwrapMode );
 
 		this.field = field;
-		this.typeArgumentsConstraints = typeArgumentsConstraints != null ? Collections.unmodifiableSet(
-				typeArgumentsConstraints
-		) : Collections.<MetaConstraint<?>>emptySet();
 	}
 
 	public Field getField() {
 		return field;
-	}
-
-	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
-		return typeArgumentsConstraints;
-	}
-
-	@Override
-	public boolean isConstrained() {
-		return super.isConstrained() || !typeArgumentsConstraints.isEmpty();
 	}
 
 	@Override

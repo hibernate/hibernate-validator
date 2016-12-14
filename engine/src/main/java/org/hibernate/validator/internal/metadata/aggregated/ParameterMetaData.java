@@ -154,7 +154,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 			ConstrainedParameter newConstrainedParameter = (ConstrainedParameter) constrainedElement;
 
-			typeArgumentsConstraints.addAll( newConstrainedParameter.getTypeArgumentsConstraints() );
+			typeArgumentsConstraints.addAll( newConstrainedParameter.getTypeArgumentConstraints() );
 
 			if ( constrainedParameter == null ) {
 				constrainedParameter = newConstrainedParameter;

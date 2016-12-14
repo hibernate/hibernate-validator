@@ -326,7 +326,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
-			typeArgumentsConstraints.addAll( constrainedExecutable.getTypeArgumentsConstraints() );
+			typeArgumentsConstraints.addAll( constrainedExecutable.getTypeArgumentConstraints() );
 
 			addToExecutablesByDeclaringType( constrainedExecutable );
 

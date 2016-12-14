@@ -36,6 +36,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 				source,
 				ConstrainedElementKind.TYPE,
 				constraints,
+				Collections.emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
 				false,
 				UnwrapMode.AUTOMATIC

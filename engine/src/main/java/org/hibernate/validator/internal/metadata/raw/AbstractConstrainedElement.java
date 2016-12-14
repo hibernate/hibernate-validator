@@ -25,18 +25,22 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	protected final ConfigurationSource source;
 	protected final Set<MetaConstraint<?>> constraints;
 	protected final Map<Class<?>, Class<?>> groupConversions;
+	protected final Set<MetaConstraint<?>> typeArgumentConstraints;
 	protected final boolean isCascading;
 	protected final UnwrapMode unwrapMode;
 
 	public AbstractConstrainedElement(ConfigurationSource source,
 									  ConstrainedElementKind kind,
 									  Set<MetaConstraint<?>> constraints,
+									  Set<MetaConstraint<?>> typeArgumentConstraints,
 									  Map<Class<?>, Class<?>> groupConversions,
 									  boolean isCascading,
 									  UnwrapMode unwrapMode) {
 		this.kind = kind;
 		this.source = source;
 		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
+		this.typeArgumentConstraints = typeArgumentConstraints != null ? Collections.unmodifiableSet( typeArgumentConstraints )
+				: Collections.<MetaConstraint<?>>emptySet();
 		this.groupConversions = Collections.unmodifiableMap( groupConversions );
 		this.isCascading = isCascading;
 		this.unwrapMode = unwrapMode;
@@ -58,6 +62,11 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	}
 
 	@Override
+	public Set<MetaConstraint<?>> getTypeArgumentConstraints() {
+		return typeArgumentConstraints;
+	}
+
+	@Override
 	public Map<Class<?>, Class<?>> getGroupConversions() {
 		return groupConversions;
 	}
@@ -69,7 +78,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 
 	@Override
 	public boolean isConstrained() {
-		return isCascading || !constraints.isEmpty();
+		return isCascading || !constraints.isEmpty() || !typeArgumentConstraints.isEmpty();
 	}
 
 	@Override

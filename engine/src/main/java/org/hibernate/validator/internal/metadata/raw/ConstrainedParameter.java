@@ -30,7 +30,6 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	private final Type type;
 	private final String name;
 	private final int index;
-	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
 
 	public ConstrainedParameter(ConfigurationSource source,
 								Executable executable,
@@ -61,7 +60,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param name The name of the represented parameter.
 	 * @param constraints The constraints of the represented method parameter, if
 	 * any.
-	 * @param typeArgumentsConstraints Type arguments constraints, if any.
+	 * @param typeArgumentConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented method parameter, if any.
 	 * @param isCascading Whether a cascaded validation of the represented method
 	 * parameter shall be performed or not.
@@ -74,7 +73,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 								int index,
 								String name,
 								Set<MetaConstraint<?>> constraints,
-								Set<MetaConstraint<?>> typeArgumentsConstraints,
+								Set<MetaConstraint<?>> typeArgumentConstraints,
 								Map<Class<?>, Class<?>> groupConversions,
 								boolean isCascading,
 								UnwrapMode unwrapMode) {
@@ -82,6 +81,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				source,
 				ConstrainedElementKind.PARAMETER,
 				constraints,
+				typeArgumentConstraints,
 				groupConversions,
 				isCascading,
 				unwrapMode
@@ -91,9 +91,6 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		this.type = type;
 		this.name = name;
 		this.index = index;
-		this.typeArgumentsConstraints = typeArgumentsConstraints != null ? Collections.unmodifiableSet(
-				typeArgumentsConstraints
-		) : Collections.<MetaConstraint<?>>emptySet();
 	}
 
 	public Type getType() {
@@ -110,15 +107,6 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 
 	public int getIndex() {
 		return index;
-	}
-
-	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
-		return typeArgumentsConstraints;
-	}
-
-	@Override
-	public boolean isConstrained() {
-		return super.isConstrained() || !typeArgumentsConstraints.isEmpty();
 	}
 
 	/**
@@ -152,8 +140,8 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedConstraints = newHashSet( constraints );
 		mergedConstraints.addAll( other.constraints );
 
-		Set<MetaConstraint<?>> mergedTypeArgumentsConstraints = newHashSet( typeArgumentsConstraints );
-		mergedTypeArgumentsConstraints.addAll( other.typeArgumentsConstraints );
+		Set<MetaConstraint<?>> mergedTypeArgumentConstraints = newHashSet( typeArgumentConstraints );
+		mergedTypeArgumentConstraints.addAll( other.typeArgumentConstraints );
 
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );
@@ -165,7 +153,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				index,
 				mergedName,
 				mergedConstraints,
-				mergedTypeArgumentsConstraints,
+				mergedTypeArgumentConstraints,
 				mergedGroupConversions,
 				isCascading || other.isCascading,
 				mergedUnwrapMode

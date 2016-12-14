@@ -65,6 +65,11 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	Set<MetaConstraint<?>> getConstraints();
 
 	/**
+	 * Returns the type argument constraints of this element, if any.
+	 */
+	Set<MetaConstraint<?>> getTypeArgumentConstraints();
+
+	/**
 	 * Returns a map with the group conversions for this constrained element, as
 	 * e.g. given using the {@code @ConvertGroup} annotation.
 	 *

@@ -61,8 +61,8 @@ public class TypeAnnotationMetaDataRetrievalTest {
 		);
 
 		ConstrainedField field = findConstrainedField( beanConfigurations, A.class, "names" );
-		assertThat( field.getTypeArgumentsConstraints() ).hasSize( 2 );
-		assertThat( getAnnotationsTypes( field.getTypeArgumentsConstraints() ) ).contains(
+		assertThat( field.getTypeArgumentConstraints() ).hasSize( 2 );
+		assertThat( getAnnotationsTypes( field.getTypeArgumentConstraints() ) ).contains(
 				NotNull.class, NotBlank.class
 		);
 	}
@@ -74,8 +74,8 @@ public class TypeAnnotationMetaDataRetrievalTest {
 		);
 
 		ConstrainedExecutable executable = findConstrainedMethod( beanConfigurations, B.class, "getNames" );
-		assertThat( executable.getTypeArgumentsConstraints() ).hasSize( 2 );
-		assertThat( getAnnotationsTypes( executable.getTypeArgumentsConstraints() ) ).contains(
+		assertThat( executable.getTypeArgumentConstraints() ).hasSize( 2 );
+		assertThat( getAnnotationsTypes( executable.getTypeArgumentConstraints() ) ).contains(
 				NotNull.class, NotBlank.class
 		);
 	}
@@ -87,8 +87,8 @@ public class TypeAnnotationMetaDataRetrievalTest {
 		);
 
 		ConstrainedExecutable executable = findConstrainedMethod( beanConfigurations, C.class, "returnNames" );
-		assertThat( executable.getTypeArgumentsConstraints() ).hasSize( 2 );
-		assertThat( getAnnotationsTypes( executable.getTypeArgumentsConstraints() ) ).contains(
+		assertThat( executable.getTypeArgumentConstraints() ).hasSize( 2 );
+		assertThat( getAnnotationsTypes( executable.getTypeArgumentConstraints() ) ).contains(
 				NotNull.class, NotBlank.class
 		);
 	}
@@ -108,8 +108,8 @@ public class TypeAnnotationMetaDataRetrievalTest {
 				List.class
 		);
 		ConstrainedParameter parameter = executable.getParameterMetaData( 2 );
-		assertThat( parameter.getTypeArgumentsConstraints() ).hasSize( 2 );
-		assertThat( getAnnotationsTypes( parameter.getTypeArgumentsConstraints() ) ).contains(
+		assertThat( parameter.getTypeArgumentConstraints() ).hasSize( 2 );
+		assertThat( getAnnotationsTypes( parameter.getTypeArgumentConstraints() ) ).contains(
 				NotNull.class, NotBlank.class
 		);
 	}
@@ -129,8 +129,8 @@ public class TypeAnnotationMetaDataRetrievalTest {
 		);
 
 		ConstrainedParameter parameter = executable.getParameterMetaData( 2 );
-		assertThat( parameter.getTypeArgumentsConstraints() ).hasSize( 2 );
-		assertThat( getAnnotationsTypes( parameter.getTypeArgumentsConstraints() ) ).contains(
+		assertThat( parameter.getTypeArgumentConstraints() ).hasSize( 2 );
+		assertThat( getAnnotationsTypes( parameter.getTypeArgumentConstraints() ) ).contains(
 				NotNull.class, NotBlank.class
 		);
 	}

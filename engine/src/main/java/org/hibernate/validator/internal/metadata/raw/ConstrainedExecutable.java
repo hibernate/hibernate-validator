@@ -45,8 +45,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	private final List<ConstrainedParameter> parameterMetaData;
 
-	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
-
 	private final boolean hasParameterConstraints;
 
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
@@ -95,7 +93,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * never {@code null}.
 	 * @param crossParameterConstraints the cross parameter constraints
 	 * @param returnValueConstraints The return value constraints of the represented executable, if any.
-	 * @param typeArgumentsConstraints The type argument constraints on the return value of the represented executable,
+	 * @param typeArgumentConstraints The type argument constraints on the return value of the represented executable,
 	 * if any.
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param isCascading Whether a cascaded validation of the represented executable's return value shall be performed
@@ -109,7 +107,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
-			Set<MetaConstraint<?>> typeArgumentsConstraints,
+			Set<MetaConstraint<?>> typeArgumentConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
 			boolean isCascading,
 			UnwrapMode unwrapMode) {
@@ -117,6 +115,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				source,
 				( executable instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				returnValueConstraints,
+				typeArgumentConstraints,
 				groupConversions,
 				isCascading,
 				unwrapMode
@@ -132,9 +131,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			);
 		}
 
-		this.typeArgumentsConstraints = typeArgumentsConstraints != null ? Collections.unmodifiableSet(
-				typeArgumentsConstraints
-		) : Collections.<MetaConstraint<?>>emptySet();
 		this.crossParameterConstraints = crossParameterConstraints;
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
@@ -191,7 +187,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 */
 	@Override
 	public boolean isConstrained() {
-		return super.isConstrained() || !typeArgumentsConstraints.isEmpty() || hasParameterConstraints;
+		return super.isConstrained() || hasParameterConstraints;
 	}
 
 	/**
@@ -217,10 +213,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 
 	public Executable getExecutable() {
 		return executable;
-	}
-
-	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
-		return typeArgumentsConstraints;
 	}
 
 	@Override
@@ -293,8 +285,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedReturnValueConstraints = newHashSet( constraints );
 		mergedReturnValueConstraints.addAll( other.constraints );
 
-		Set<MetaConstraint<?>> mergedTypeArgumentsConstraints = newHashSet( typeArgumentsConstraints );
-		mergedTypeArgumentsConstraints.addAll( other.typeArgumentsConstraints );
+		Set<MetaConstraint<?>> mergedTypeArgumentConstraints = newHashSet( typeArgumentConstraints );
+		mergedTypeArgumentConstraints.addAll( other.typeArgumentConstraints );
 
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );
@@ -314,7 +306,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				mergedParameterMetaData,
 				mergedCrossParameterConstraints,
 				mergedReturnValueConstraints,
-				mergedTypeArgumentsConstraints,
+				mergedTypeArgumentConstraints,
 				mergedGroupConversions,
 				isCascading || other.isCascading,
 				mergedUnwrapMode
