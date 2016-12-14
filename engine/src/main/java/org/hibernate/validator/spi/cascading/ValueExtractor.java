@@ -16,7 +16,9 @@ public interface ValueExtractor<T> {
 
 		void listValue(int i, Object object);
 
-		void mapValue(Object key, Object object);
+		void mapValue(Object object, Object key);
+
+		void mapKey(Object key);
 
 		void iterableValue(Object object);
 	}

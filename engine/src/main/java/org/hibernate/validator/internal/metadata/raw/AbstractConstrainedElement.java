@@ -6,8 +6,10 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
+import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,7 +28,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	protected final Set<MetaConstraint<?>> constraints;
 	protected final Map<Class<?>, Class<?>> groupConversions;
 	protected final Set<MetaConstraint<?>> typeArgumentConstraints;
-	protected final boolean isCascading;
+	protected final List<TypeVariable<?>> cascadingTypeParameters;
 	protected final UnwrapMode unwrapMode;
 
 	public AbstractConstrainedElement(ConfigurationSource source,
@@ -34,7 +36,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 									  Set<MetaConstraint<?>> constraints,
 									  Set<MetaConstraint<?>> typeArgumentConstraints,
 									  Map<Class<?>, Class<?>> groupConversions,
-									  boolean isCascading,
+									  List<TypeVariable<?>> cascadingTypeParameters,
 									  UnwrapMode unwrapMode) {
 		this.kind = kind;
 		this.source = source;
@@ -42,7 +44,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		this.typeArgumentConstraints = typeArgumentConstraints != null ? Collections.unmodifiableSet( typeArgumentConstraints )
 				: Collections.<MetaConstraint<?>>emptySet();
 		this.groupConversions = Collections.unmodifiableMap( groupConversions );
-		this.isCascading = isCascading;
+		this.cascadingTypeParameters = cascadingTypeParameters;
 		this.unwrapMode = unwrapMode;
 	}
 
@@ -73,12 +75,17 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 
 	@Override
 	public boolean isCascading() {
-		return isCascading;
+		return !cascadingTypeParameters.isEmpty();
+	}
+
+	@Override
+	public List<TypeVariable<?>> getCascadingTypeParameters() {
+		return cascadingTypeParameters;
 	}
 
 	@Override
 	public boolean isConstrained() {
-		return isCascading || !constraints.isEmpty() || !typeArgumentConstraints.isEmpty();
+		return isCascading() || !constraints.isEmpty() || !typeArgumentConstraints.isEmpty();
 	}
 
 	@Override
@@ -91,7 +98,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		return "AbstractConstrainedElement [kind=" + kind + ", source="
 				+ source + ", constraints="
 				+ constraints + ", groupConversions=" + groupConversions
-				+ ", isCascading=" + isCascading + ", unwrapMode="
+				+ ", cascadingTypeParameters=" + cascadingTypeParameters + ", unwrapMode="
 				+ unwrapMode + "]";
 	}
 

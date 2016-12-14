@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -45,10 +46,12 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	 */
 	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
 
+	private final List<TypeVariable<?>> cascadingTypeParameters;
+
 	public ReturnValueMetaData(Type type,
 							   Set<MetaConstraint<?>> constraints,
 							   Set<MetaConstraint<?>> typeArgumentsConstraints,
-							   boolean isCascading,
+							   List<TypeVariable<?>> cascadingTypeParameters,
 							   Map<Class<?>, Class<?>> groupConversions,
 							   UnwrapMode unwrapMode) {
 		super(
@@ -56,13 +59,14 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				type,
 				constraints,
 				ElementKind.RETURN_VALUE,
-				isCascading,
-				!constraints.isEmpty() || isCascading || !typeArgumentsConstraints.isEmpty(),
+				!cascadingTypeParameters.isEmpty(),
+				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty() || !typeArgumentsConstraints.isEmpty(),
 				unwrapMode
 		);
 
 		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
-		this.cascadables = Collections.unmodifiableList( isCascading ? Arrays.<Cascadable>asList( this ) : Collections.<Cascadable>emptyList() );
+		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
+		this.cascadables = Collections.unmodifiableList( isCascading() ? Arrays.<Cascadable>asList( this ) : Collections.<Cascadable>emptyList() );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}
@@ -122,5 +126,10 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	@Override
 	public UnwrapMode getUnwrapMode(ConstraintLocation location) {
 		return unwrapMode();
+	}
+
+	@Override
+	public List<TypeVariable<?>> getCascadingTypeParameters() {
+		return cascadingTypeParameters;
 	}
 }

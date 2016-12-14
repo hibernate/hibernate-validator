@@ -178,7 +178,7 @@ public final class TypeHelper {
 		return type;
 	}
 
-	private static Class<?> getErasedReferenceType(Type type) {
+	public static Class<?> getErasedReferenceType(Type type) {
 		Contracts.assertTrue( isReferenceType( type ), "type is not a reference type: " + type );
 		return (Class<?>) getErasedType( type );
 	}

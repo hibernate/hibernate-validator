@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -79,7 +80,7 @@ class ConstrainedFieldBuilder {
 					metaConstraints,
 					Collections.<MetaConstraint<?>>emptySet(),
 					groupConversions,
-					fieldType.getValid() != null,
+					fieldType.getValid() != null ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
 					UnwrapMode.AUTOMATIC
 			);
 			constrainedFields.add( constrainedField );

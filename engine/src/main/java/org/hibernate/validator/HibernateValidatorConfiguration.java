@@ -9,6 +9,7 @@ package org.hibernate.validator;
 import javax.validation.Configuration;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
@@ -149,6 +150,8 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @hv.experimental This API is considered experimental and may change in future revisions
 	 */
 	HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler);
+
+	HibernateValidatorConfiguration addCascadedValueExtractor(ValueExtractor<?> extractor);
 
 	/**
 	 * Sets the class loader to be used for loading user-provided resources:

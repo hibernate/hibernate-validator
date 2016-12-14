@@ -7,6 +7,8 @@
 package org.hibernate.validator.internal.metadata.raw;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.TypeVariable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,8 +35,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param constraints The constraints of the represented field, if any.
 	 * @param typeArgumentConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented field, if any.
-	 * @param isCascading Whether a cascaded validation of the represented field shall
-	 * be performed or not.
+	 * @param cascadingTypeParameters The type parameters marked for cascaded validation, if any.
 	 * @param unwrapMode Determines how the value of the field must be handled in regards to
 	 * unwrapping prior to validation.
 	 */
@@ -43,10 +44,10 @@ public class ConstrainedField extends AbstractConstrainedElement {
 							Set<MetaConstraint<?>> constraints,
 							Set<MetaConstraint<?>> typeArgumentConstraints,
 							Map<Class<?>, Class<?>> groupConversions,
-							boolean isCascading,
+							List<TypeVariable<?>> cascadingTypeParameters,
 							UnwrapMode unwrapMode) {
 
-		super( source, ConstrainedElementKind.FIELD, constraints, typeArgumentConstraints, groupConversions, isCascading, unwrapMode );
+		super( source, ConstrainedElementKind.FIELD, constraints, typeArgumentConstraints, groupConversions, cascadingTypeParameters, unwrapMode );
 
 		this.field = field;
 	}

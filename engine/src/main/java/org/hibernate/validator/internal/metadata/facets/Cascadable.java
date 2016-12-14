@@ -7,7 +7,10 @@
 package org.hibernate.validator.internal.metadata.facets;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.metadata.GroupConversionDescriptor;
@@ -86,4 +89,11 @@ public interface Cascadable {
 	 * Appends this cascadable element to the given path.
 	 */
 	void appendTo(PathImpl path);
+
+	/**
+	 * Returns the type parameters of the represented element that are marked for cascaded validation, if any. The
+	 * returned list will contain the special {@link AnnotatedElement} marker in case the element itself has been
+	 * marked.
+	 */
+	List<TypeVariable<?>> getCascadingTypeParameters();
 }

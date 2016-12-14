@@ -13,12 +13,15 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
+import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.validation.ConstraintValidatorFactory;
@@ -33,6 +36,7 @@ import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -62,6 +66,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.cascading.ValueExtractor;
@@ -140,6 +145,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
+	private final ValueExtractors valueExtractors;
+
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 			MessageInterpolator messageInterpolator,
 			TraversableResolver traversableResolver,
@@ -148,6 +155,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			TimeProvider timeProvider,
 			TypeResolutionHelper typeResolutionHelper,
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
+			ValueExtractors valueExtractors,
 			ConstraintValidatorManager constraintValidatorManager,
 			boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -158,6 +166,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.timeProvider = timeProvider;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.validatedValueHandlers = validatedValueHandlers;
+		this.valueExtractors = valueExtractors;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
 
@@ -593,7 +602,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							group != originalGroup
 					);
 
-					validateCascadedValues( value, validationContext, valueContext, validationOrder, cascadable.getTypeArgumentsConstraints() );
+					validateCascadedValues( value, validationContext, valueContext, cascadable, validationOrder );
 				}
 			}
 
@@ -604,28 +613,66 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void validateCascadedValues(Object value, ValidationContext<?> context, ValueContext<?, ?> valueContext, ValidationOrder validationOrder,
-			Set<MetaConstraint<?>> typeArgumentConstraints) {
+	private void validateCascadedValues(Object value, ValidationContext<?> context, ValueContext<?, ?> valueContext, Cascadable cascadable, ValidationOrder validationOrder) {
+		for ( TypeVariable<?> cascadingTypeParameter : cascadable.getCascadingTypeParameters() ) {
+			List<TypeVariable<?>> cascadingTypeParametersOfValueType = getCorrespondingTypeParametersInSubType(
+					value.getClass(),
+					TypeHelper.getErasedReferenceType( cascadable.getCascadableType() ),
+					cascadingTypeParameter
+			);
 
-		ValueExtractor extractor = ValueExtractors.getCascadedValueExtractor( value );
-		ValueReceiverImpl receiver = new ValueReceiverImpl( context, valueContext, validationOrder, typeArgumentConstraints );
+			for ( TypeVariable<?> cascadingTypeParameterOfValueType : cascadingTypeParametersOfValueType ) {
+				ValueExtractor<?> extractor = valueExtractors.getCascadedValueExtractor(
+						value.getClass(),
+						cascadingTypeParameterOfValueType
+				);
+				ValueReceiverImpl receiver = new ValueReceiverImpl( context, valueContext, validationOrder, cascadable.getTypeArgumentsConstraints() );
 
-		extractor.extractValues( value, receiver );
+				( (ValueExtractor) extractor ).extractValues( value, receiver );
+			}
+		}
+	}
+
+	/**
+	 * Returns those type parameter(s) of the given value type which correspond to the given type variable of the given
+	 * super-type.
+	 */
+	private List<TypeVariable<?>> getCorrespondingTypeParametersInSubType(Class<?> subType, Class<?> superType, TypeVariable<?> typeParameterOfSuperType) {
+		if ( typeParameterOfSuperType == AnnotatedObject.INSTANCE ) {
+			return Collections.singletonList( AnnotatedObject.INSTANCE );
+		}
+
+		List<TypeVariable<?>> correspondingTypeParameters = new ArrayList<>();
+
+		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = TypeVariableBindings.getTypeVariableBindings( subType );
+		Map<TypeVariable<?>, TypeVariable<?>> bindingsOfSuperType = allBindings.get( superType );
+
+		// collect all type parameters of the sub-type that map to the given type parameter of the super-type
+		// TODO should only be null until migrated off of value unwrappers
+		if ( bindingsOfSuperType != null ) {
+			for ( Entry<TypeVariable<?>, TypeVariable<?>> binding : bindingsOfSuperType.entrySet() ) {
+				if ( typeParameterOfSuperType == binding.getValue() ) {
+					correspondingTypeParameters.add( binding.getKey() );
+				}
+			}
+		}
+
+		return correspondingTypeParameters;
 	}
 
 	private class ValueReceiverImpl implements ValueExtractor.ValueReceiver {
 
 		private final ValidationContext<?> context;
 		private final ValueContext<?, ?> valueContext;
-		ValidationOrder validationOrder;
-		Set<MetaConstraint<?>> typeArgumentsConstraint;
+		private final ValidationOrder validationOrder;
+		private final Set<MetaConstraint<?>> typeArgumentConstraints;
 
 		public ValueReceiverImpl(ValidationContext<?> context, ValueContext<?, ?> valueContext, ValidationOrder validationOrder,
-				Set<MetaConstraint<?>> typeArgumentsConstraint) {
+				Set<MetaConstraint<?>> typeArgumentConstraints) {
 			this.context = context;
 			this.valueContext = valueContext;
 			this.validationOrder = validationOrder;
-			this.typeArgumentsConstraint = typeArgumentsConstraint;
+			this.typeArgumentConstraints = typeArgumentConstraints;
 		}
 
 		@Override
@@ -652,10 +699,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		@Override
-		public void mapValue(Object key, Object value) {
+		public void mapValue(Object value, Object key) {
 			valueContext.markCurrentPropertyAsIterable();
 			valueContext.setKey( key );
 			doValidate( value );
+		}
+
+		@Override
+		public void mapKey(Object key) {
+			valueContext.markCurrentPropertyAsIterable();
+			valueContext.setKey( "key(" + key + ")" );
+			doValidate( key );
 		}
 
 		private void doValidate(Object value) {
@@ -666,7 +720,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
 
 			// Type arguments
-			validateTypeArgumentConstraints( context, cascadedValueContext, typeArgumentsConstraint );
+			validateTypeArgumentConstraints( context, cascadedValueContext, typeArgumentConstraints );
 
 			// Cascade validation
 			validateInContext( context, cascadedValueContext, validationOrder );

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +50,7 @@ import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
+import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.time.TimeProvider;
@@ -96,6 +98,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private boolean failFast;
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
+	private final List<ValueExtractor<?>> cascadedValueExtractors = new ArrayList<>();
 	private ClassLoader externalClassLoader;
 	private TimeProvider timeProvider;
 	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
@@ -283,6 +286,15 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
+	@Override
+	public HibernateValidatorConfiguration addCascadedValueExtractor(ValueExtractor<?> extractor) {
+		Contracts.assertNotNull( extractor, MESSAGES.parameterMustNotBeNull( "extractor" ) );
+		cascadedValueExtractors.add( extractor );
+
+		return this;
+	}
+
+
 	public final ConstraintMappingContributor getServiceLoaderBasedConstraintMappingContributor() {
 		return serviceLoaderBasedConstraintMappingContributor;
 	}
@@ -401,6 +413,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
 		return validatedValueHandlers;
+	}
+
+	public List<ValueExtractor<?>> getCascadedValueExtractors() {
+		return cascadedValueExtractors;
 	}
 
 	public TimeProvider getTimeProvider() {

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -91,7 +92,7 @@ class ConstrainedParameterBuilder {
 					metaConstraints,
 					Collections.<MetaConstraint<?>>emptySet(),
 					groupConversions,
-					parameterType.getValid() != null,
+					parameterType.getValid() != null ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
 					UnwrapMode.AUTOMATIC
 			);
 			constrainedParameters.add( constrainedParameter );

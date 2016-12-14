@@ -6,11 +6,16 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -19,14 +24,9 @@ import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.Validator;
 
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -42,13 +42,41 @@ public class CascadedClassConstraintTest {
 		assertCorrectPropertyPaths( violations, "foos[0]", "foos[1]" );
 	}
 
+	@Test
+	public void testCascadedValidationViaTypeParameterOnField() {
+		Validator validator = ValidatorUtil.getValidator();
+		Set<ConstraintViolation<BarUsingTypeParameterOnField>> violations = validator.validate( new BarUsingTypeParameterOnField() );
+
+		assertCorrectPropertyPaths( violations, "foos[0]", "foos[1]" );
+	}
+
+	@Test
+	public void testCascadedValidationViaTypeParameterOnGetter() {
+		Validator validator = ValidatorUtil.getValidator();
+		Set<ConstraintViolation<BarUsingTypeParameterOnGetter>> violations = validator.validate( new BarUsingTypeParameterOnGetter() );
+
+		assertCorrectPropertyPaths( violations, "foos[0]", "foos[1]" );
+	}
+
 	@ValidFoo
 	private static class Foo {
 	}
 
 	private static class Bar {
 		@Valid
-		private List<Foo> foos = Arrays.asList( new Foo(), new Foo() );
+		private final List<Foo> foos = Arrays.asList( new Foo(), new Foo() );
+	}
+
+	private static class BarUsingTypeParameterOnField {
+
+		private final List<@Valid Foo> foos = Arrays.asList( new Foo(), new Foo() );
+	}
+
+	private static class BarUsingTypeParameterOnGetter {
+
+		private List<@Valid Foo> getFoos() {
+			return Arrays.asList( new Foo(), new Foo() );
+		}
 	}
 
 	@Constraint(validatedBy = { ValidFooValidator.class })

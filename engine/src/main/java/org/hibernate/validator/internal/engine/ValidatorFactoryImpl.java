@@ -12,6 +12,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.time.DefaultTimeProvider;
@@ -46,6 +48,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
@@ -139,6 +142,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 
+	private final ValueExtractors valueExtractors;
+
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
 
@@ -177,7 +182,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		boolean tmpAllowParallelMethodsDefineParameterConstraints = false;
 
 		List<ValidatedValueUnwrapper<?>> tmpValidatedValueHandlers = newArrayList( 5 );
-
+		List<ValueExtractor<?>> cascadedValueExtractors = null;
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
@@ -195,6 +200,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 							.isAllowParallelMethodsDefineParameterConstraints();
 
 			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
+
+			cascadedValueExtractors = new ArrayList<>( hibernateSpecificConfig.getCascadedValueExtractors() );
 		}
 
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
@@ -206,7 +213,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				)
 		);
 		this.validatedValueHandlers = Collections.unmodifiableList( tmpValidatedValueHandlers );
-
+		this.valueExtractors = new ValueExtractors( cascadedValueExtractors );
 		tmpFailFast = checkPropertiesForBoolean( properties, HibernateValidatorConfiguration.FAIL_FAST, tmpFailFast );
 		this.failFast = tmpFailFast;
 
@@ -313,6 +320,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				parameterNameProvider,
 				failFast,
 				validatedValueHandlers,
+				valueExtractors,
 				timeProvider,
 				methodValidationConfiguration
 		);
@@ -350,6 +358,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return validatedValueHandlers;
 	}
 
+	ValueExtractors getValueExtractors() {
+		return valueExtractors;
+	}
+
 	TimeProvider getTimeProvider() {
 		return timeProvider;
 	}
@@ -385,6 +397,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ExecutableParameterNameProvider parameterNameProvider,
 			boolean failFast,
 			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
+			ValueExtractors valueExtractors,
 			TimeProvider timeProvider,
 			MethodValidationConfiguration methodValidationConfiguration) {
 
@@ -412,6 +425,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				timeProvider,
 				typeResolutionHelper,
 				validatedValueHandlers,
+				valueExtractors,
 				constraintValidatorManager,
 				failFast
 		);

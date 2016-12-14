@@ -22,6 +22,7 @@ import java.util.Set;
 
 import javax.validation.ValidationException;
 
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -226,7 +227,7 @@ class ConstrainedExecutableBuilder {
 				returnValueConstraints,
 				Collections.<MetaConstraint<?>>emptySet(),
 				groupConversions,
-				isCascaded,
+				isCascaded ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
 				UnwrapMode.AUTOMATIC
 		);
 	}

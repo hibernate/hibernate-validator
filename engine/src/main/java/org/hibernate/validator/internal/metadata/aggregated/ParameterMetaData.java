@@ -10,6 +10,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,13 +47,14 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	 * Type arguments constraints for this parameter
 	 */
 	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+	private final List<TypeVariable<?>> cascadingTypeParameters;
 
 	private ParameterMetaData(int index,
 							  String name,
 							  Type type,
 							  Set<MetaConstraint<?>> constraints,
 							  Set<MetaConstraint<?>> typeArgumentsConstraints,
-							  boolean isCascading,
+							  List<TypeVariable<?>> cascadingTypeParameters,
 							  Map<Class<?>, Class<?>> groupConversions,
 							  UnwrapMode unwrapMode) {
 		super(
@@ -59,14 +62,15 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				type,
 				constraints,
 				ElementKind.PARAMETER,
-				isCascading,
-				!constraints.isEmpty() || isCascading || !typeArgumentsConstraints.isEmpty(),
+				!cascadingTypeParameters.isEmpty(),
+				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty() || !typeArgumentsConstraints.isEmpty(),
 				unwrapMode
 		);
 
 		this.index = index;
 
 		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
+		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}
@@ -124,11 +128,17 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		path.addParameterNode( getName(), getIndex() );
 	}
 
+	@Override
+	public List<TypeVariable<?>> getCascadingTypeParameters() {
+		return cascadingTypeParameters;
+	}
+
 	public static class Builder extends MetaDataBuilder {
 		private final Type parameterType;
 		private final int parameterIndex;
 		private ConstrainedParameter constrainedParameter;
 		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
+		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 
 		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );
@@ -155,6 +165,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 			ConstrainedParameter newConstrainedParameter = (ConstrainedParameter) constrainedElement;
 
 			typeArgumentsConstraints.addAll( newConstrainedParameter.getTypeArgumentConstraints() );
+			cascadingTypeParameters.addAll( newConstrainedParameter.getCascadingTypeParameters() );
 
 			if ( constrainedParameter == null ) {
 				constrainedParameter = newConstrainedParameter;
@@ -178,7 +189,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					parameterType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					typeArgumentsConstraints,
-					isCascading(),
+					cascadingTypeParameters,
 					getGroupConversions(),
 					unwrapMode()
 			);

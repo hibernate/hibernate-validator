@@ -620,7 +620,7 @@ public abstract class AbstractMethodValidationTest {
 		customerRepository.findCustomerByName( "Bob" );
 	}
 
-	private void assertMethod(ConstraintViolation<?> constraintViolation, String methodName, Class<?>... parameterTypes) {
+	protected void assertMethod(ConstraintViolation<?> constraintViolation, String methodName, Class<?>... parameterTypes) {
 		Iterator<Path.Node> nodeIterator = constraintViolation.getPropertyPath().iterator();
 
 		Path.Node node = nodeIterator.next();
@@ -630,7 +630,7 @@ public abstract class AbstractMethodValidationTest {
 		assertEquals( node.as( Path.MethodNode.class ).getParameterTypes(), Arrays.asList( parameterTypes ) );
 	}
 
-	private void assertParameterIndex(ConstraintViolation<?> constraintViolation, Integer index) {
+	protected void assertParameterIndex(ConstraintViolation<?> constraintViolation, Integer index) {
 		Iterator<Path.Node> nodeIterator = constraintViolation.getPropertyPath().iterator();
 
 		// first node is method descriptor
@@ -640,7 +640,7 @@ public abstract class AbstractMethodValidationTest {
 		assertEquals( parameterNode.getParameterIndex(), index.intValue() );
 	}
 
-	private void assertMethodValidationType(ConstraintViolation<?> constraintViolation, ElementKind kind) {
+	protected void assertMethodValidationType(ConstraintViolation<?> constraintViolation, ElementKind kind) {
 		Iterator<Path.Node> nodeIterator = constraintViolation.getPropertyPath().iterator();
 
 		// first node is method descriptor

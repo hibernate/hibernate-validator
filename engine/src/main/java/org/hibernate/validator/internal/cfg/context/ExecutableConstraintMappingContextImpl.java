@@ -15,6 +15,7 @@ import java.util.List;
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -112,7 +113,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
-				returnValueContext != null ? returnValueContext.isCascading() : false,
+				returnValueContext != null && returnValueContext.isCascading() ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
 				returnValueContext != null ? returnValueContext.unwrapMode() : UnwrapMode.AUTOMATIC
 		);
 	}

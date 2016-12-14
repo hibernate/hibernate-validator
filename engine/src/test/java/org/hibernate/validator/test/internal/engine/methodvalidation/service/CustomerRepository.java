@@ -8,14 +8,14 @@ package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import org.joda.time.DateMidnight;
-
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
+import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling
@@ -30,6 +30,8 @@ public interface CustomerRepository extends RepositoryBase<Customer> {
 	void cascadingMapParameter(@Valid Map<String, Customer> customer);
 
 	void cascadingIterableParameter(@Valid List<Customer> customer);
+
+	void iterableParameterWithCascadingTypeParameter(List<@Valid Customer> customer);
 
 	void cascadingArrayParameter(@Valid Customer... customer);
 

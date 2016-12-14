@@ -14,8 +14,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -72,6 +74,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 	private final Type cascadableType;
 
+	private final List<TypeVariable<?>> cascadingTypeParameters;
+
 	private final ElementType elementType;
 
 	private final GroupConversionHelper groupConversionHelper;
@@ -87,6 +91,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 							 Set<MetaConstraint<?>> typeArgumentsConstraints,
 							 Map<Class<?>, Class<?>> groupConversions,
 							 Member cascadingMember,
+							 List<TypeVariable<?>> cascadingTypeParameters,
 							 UnwrapMode unwrapMode) {
 		super(
 				propertyName,
@@ -110,6 +115,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		}
 
 		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
+		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}
@@ -191,6 +197,11 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		path.addPropertyNode( getName() );
 	}
 
+	@Override
+	public List<TypeVariable<?>> getCascadingTypeParameters() {
+		return cascadingTypeParameters;
+	}
+
 	/**
 	 * Runs the given privileged action, using a privileged block if required.
 	 * <p>
@@ -237,6 +248,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		private final String propertyName;
 		private final Type propertyType;
 		private Member cascadingMember;
+		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 		private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 		private boolean unwrapModeExplicitlyConfigured = false;
@@ -308,6 +320,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 				if ( constrainedElement.isCascading() && cascadingMember == null ) {
 					cascadingMember = ( (ConstrainedField) constrainedElement ).getField();
+					cascadingTypeParameters.addAll( ( (ConstrainedField) constrainedElement ).getCascadingTypeParameters() );
 				}
 			}
 			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
@@ -315,6 +328,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 				if ( constrainedElement.isCascading() && cascadingMember == null ) {
 					cascadingMember = ( (ConstrainedExecutable) constrainedElement ).getExecutable();
+					cascadingTypeParameters.addAll( ( (ConstrainedExecutable) constrainedElement ).getCascadingTypeParameters() );
 				}
 			}
 		}
@@ -356,6 +370,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 					typeArgumentsConstraints,
 					getGroupConversions(),
 					cascadingMember,
+					cascadingTypeParameters,
 					unwrapMode()
 			);
 		}

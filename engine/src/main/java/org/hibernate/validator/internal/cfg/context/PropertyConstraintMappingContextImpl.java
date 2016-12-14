@@ -17,6 +17,7 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
@@ -99,7 +100,7 @@ final class PropertyConstraintMappingContextImpl
 					getConstraints( constraintHelper ),
 					Collections.<MetaConstraint<?>>emptySet(),
 					groupConversions,
-					isCascading,
+					isCascading ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
 					unwrapMode()
 			);
 		}
@@ -109,7 +110,7 @@ final class PropertyConstraintMappingContextImpl
 					(Executable) member,
 					getConstraints( constraintHelper ),
 					groupConversions,
-					isCascading,
+					isCascading ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
 					unwrapMode()
 			);
 		}

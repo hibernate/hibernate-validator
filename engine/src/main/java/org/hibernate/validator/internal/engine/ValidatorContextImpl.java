@@ -16,6 +16,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.spi.time.TimeProvider;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
@@ -37,6 +38,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ExecutableParameterNameProvider parameterNameProvider;
 	private boolean failFast;
 	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
+	private final ValueExtractors valueExtractors;
 	private TimeProvider timeProvider;
 	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
 
@@ -51,6 +53,8 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.validatedValueHandlers = new ArrayList<>(
 				validatorFactory.getValidatedValueHandlers()
 		);
+		// TODO make overwritable per this context
+		this.valueExtractors = validatorFactory.getValueExtractors();
 		this.timeProvider = validatorFactory.getTimeProvider();
 	}
 
@@ -148,6 +152,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				parameterNameProvider,
 				failFast,
 				validatedValueHandlers,
+				valueExtractors,
 				timeProvider,
 				methodValidationConfiguration
 		);

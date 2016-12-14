@@ -6,8 +6,12 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
+import java.lang.reflect.TypeVariable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.validation.Valid;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -86,6 +90,13 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 *         element shall be performed, <code>false</code> otherwise.
 	 */
 	boolean isCascading();
+
+	/**
+	 * The type variables of the represented element that are marked for cascaded validation. An empty list will be
+	 * returned in case this element is not cascading. {@code null} will be contained in the returned list if the
+	 * element itself has been marked for cascaded validation (i.e. classic usage of {@link Valid}.
+	 */
+	List<TypeVariable<?>> getCascadingTypeParameters();
 
 	/**
 	 * Whether this element is constrained or not. This is the case, if this

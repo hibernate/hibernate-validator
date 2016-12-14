@@ -11,7 +11,10 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,7 +48,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
-				false,
+				Collections.<TypeVariable<?>>emptyList(),
 				UnwrapMode.AUTOMATIC
 		);
 	}
@@ -62,8 +65,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * any.
 	 * @param typeArgumentConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented method parameter, if any.
-	 * @param isCascading Whether a cascaded validation of the represented method
-	 * parameter shall be performed or not.
+	 * @param cascadingTypeParameters The type parameters marked for cascaded validation, if any.
 	 * @param unwrapMode Determines how the value of the parameter must be handled in regards to
 	 * unwrapping prior to validation.
 	 */
@@ -75,7 +77,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 								Set<MetaConstraint<?>> constraints,
 								Set<MetaConstraint<?>> typeArgumentConstraints,
 								Map<Class<?>, Class<?>> groupConversions,
-								boolean isCascading,
+								List<TypeVariable<?>> cascadingTypeParameters,
 								UnwrapMode unwrapMode) {
 		super(
 				source,
@@ -83,7 +85,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				constraints,
 				typeArgumentConstraints,
 				groupConversions,
-				isCascading,
+				cascadingTypeParameters,
 				unwrapMode
 		);
 
@@ -146,6 +148,9 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );
 
+		List<TypeVariable<?>> mergedCascadingTypeParameters = new ArrayList<>( cascadingTypeParameters );
+		mergedCascadingTypeParameters.addAll( other.cascadingTypeParameters );
+
 		return new ConstrainedParameter(
 				mergedSource,
 				executable,
@@ -155,7 +160,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				mergedConstraints,
 				mergedTypeArgumentConstraints,
 				mergedGroupConversions,
-				isCascading || other.isCascading,
+				mergedCascadingTypeParameters,
 				mergedUnwrapMode
 		);
 	}

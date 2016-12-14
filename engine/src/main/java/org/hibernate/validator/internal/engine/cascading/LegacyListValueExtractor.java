@@ -6,20 +6,25 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
-import org.hibernate.validator.spi.cascading.ExtractedValue;
+import java.util.List;
+
 import org.hibernate.validator.spi.cascading.ValueExtractor;
 
-class IterableValueExtractor implements ValueExtractor<Iterable<@ExtractedValue ?>> {
+class LegacyListValueExtractor implements ValueExtractor<List<?>> {
 
-	static final IterableValueExtractor INSTANCE = new IterableValueExtractor();
+	static final LegacyListValueExtractor INSTANCE = new LegacyListValueExtractor();
 
-	private IterableValueExtractor() {
+	private LegacyListValueExtractor() {
 	}
 
 	@Override
-	public void extractValues(Iterable<?> originalValue, ValueReceiver receiver) {
+	public void extractValues(List<?> originalValue, ValueReceiver receiver) {
+		receiver.objectValue( originalValue );
+
+		int i = 0;
 		for ( Object object : originalValue ) {
-			receiver.iterableValue( object );
+			receiver.listValue( i, object );
+			i++;
 		}
 	}
 }

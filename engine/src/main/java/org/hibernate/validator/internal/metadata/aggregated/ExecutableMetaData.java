@@ -14,8 +14,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -83,7 +85,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> typeArgumentsConstraints,
 			Map<Class<?>, Class<?>> returnValueGroupConversions,
-			boolean isCascading,
+			List<TypeVariable<?>> cascadingTypeParameters,
 			boolean isConstrained,
 			boolean isGetter,
 			UnwrapMode unwrapMode) {
@@ -92,7 +94,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				returnType,
 				returnValueConstraints,
 				kind,
-				isCascading,
+				!cascadingTypeParameters.isEmpty(),
 				isConstrained,
 				unwrapMode
 		);
@@ -105,7 +107,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				returnType,
 				returnValueConstraints,
 				typeArgumentsConstraints,
-				isCascading,
+				cascadingTypeParameters,
 				returnValueGroupConversions,
 				unwrapMode
 		);
@@ -253,6 +255,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private final boolean isGetterMethod;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
 		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
+		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
 
@@ -327,6 +330,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
 			typeArgumentsConstraints.addAll( constrainedExecutable.getTypeArgumentConstraints() );
+			cascadingTypeParameters.addAll( constrainedExecutable.getCascadingTypeParameters() );
 
 			addToExecutablesByDeclaringType( constrainedExecutable );
 
@@ -375,7 +379,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
 					typeArgumentsConstraints,
 					getGroupConversions(),
-					isCascading(),
+					cascadingTypeParameters,
 					isConstrained,
 					isGetterMethod,
 					unwrapMode()

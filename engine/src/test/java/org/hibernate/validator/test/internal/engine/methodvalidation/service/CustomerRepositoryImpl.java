@@ -6,11 +6,17 @@
  */
 package org.hibernate.validator.test.internal.engine.methodvalidation.service;
 
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -18,14 +24,8 @@ import javax.validation.Payload;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-import org.joda.time.DateMidnight;
-
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
-
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling
@@ -61,6 +61,10 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 	@Override
 	public void cascadingIterableParameter(List<Customer> customer) {
+	}
+
+	@Override
+	public void iterableParameterWithCascadingTypeParameter(List<Customer> customer) {
 	}
 
 	@Override
