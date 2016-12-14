@@ -17,6 +17,6 @@ public class ReferenceValueExtractor implements ValueExtractor<Reference<@Extrac
 
 	@Override
 	public void extractValues(Reference<?> originalValue, ValueExtractor.ValueReceiver receiver) {
-		receiver.objectValue( originalValue.getValue() );
+		receiver.value( originalValue.getValue(), null );
 	}
 }

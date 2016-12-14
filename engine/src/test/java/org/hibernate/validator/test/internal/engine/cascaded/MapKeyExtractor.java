@@ -17,7 +17,7 @@ class MapKeyExtractor implements ValueExtractor<Map<@ExtractedValue ?, ?>> {
 	@Override
 	public void extractValues(Map<?, ?> originalValue, ValueExtractor.ValueReceiver receiver) {
 		for ( Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.mapKey( entry.getKey() );
+			receiver.keyedValue( entry.getKey(), "map_key", "key(" + entry.getKey() + ")" );
 		}
 	}
 }

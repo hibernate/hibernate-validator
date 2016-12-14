@@ -19,7 +19,7 @@ class IntArrayValueExtractor implements ValueExtractor<int[]> {
 	public void extractValues(int[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( int object : originalValue ) {
-			receiver.listValue( i, object );
+			receiver.indexedValue( object, "<collection element>", i );
 			i++;
 		}
 	}

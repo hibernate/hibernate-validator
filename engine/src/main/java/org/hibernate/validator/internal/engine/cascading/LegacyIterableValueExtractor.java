@@ -17,10 +17,10 @@ class LegacyIterableValueExtractor implements ValueExtractor<Iterable<?>> {
 
 	@Override
 	public void extractValues(Iterable<?> originalValue, ValueReceiver receiver) {
-		receiver.objectValue( originalValue );
+		receiver.value( originalValue, null );
 
 		for ( Object object : originalValue ) {
-			receiver.iterableValue( object );
+			receiver.iterableValue( object, "<collection element>" );
 		}
 	}
 }

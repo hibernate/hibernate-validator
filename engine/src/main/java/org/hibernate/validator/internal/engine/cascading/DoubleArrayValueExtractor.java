@@ -19,7 +19,7 @@ class DoubleArrayValueExtractor implements ValueExtractor<double[]> {
 	public void extractValues(double[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( double object : originalValue ) {
-			receiver.listValue( i, object );
+			receiver.indexedValue( object, "<collection element>", i );
 			i++;
 		}
 	}

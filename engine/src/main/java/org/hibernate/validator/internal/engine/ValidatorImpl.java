@@ -699,7 +699,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		@Override
-		public void objectValue(Object value) {
+		public void value(Object value, String nodeName) {
 			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath(), valueContext.getCurrentTypeParameter() ) || shouldFailFast( context ) ) {
 				return;
 			}
@@ -711,33 +711,26 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		@Override
-		public void iterableValue(Object value) {
+		public void iterableValue(Object value, String nodeName) {
 			valueContext.markCurrentPropertyAsIterable();
-			doValidate( value );
+			doValidate( value, nodeName );
 		}
 
 		@Override
-		public void listValue(int index, Object value) {
+		public void indexedValue(Object value, String nodeName, int index) {
 			valueContext.markCurrentPropertyAsIterable();
 			valueContext.setIndex( index );
-			doValidate( value );
+			doValidate( value, nodeName );
 		}
 
 		@Override
-		public void mapValue(Object value, Object key) {
+		public void keyedValue(Object value, String nodeName, Object key) {
 			valueContext.markCurrentPropertyAsIterable();
 			valueContext.setKey( key );
-			doValidate( value );
+			doValidate( value, nodeName );
 		}
 
-		@Override
-		public void mapKey(Object key) {
-			valueContext.markCurrentPropertyAsIterable();
-			valueContext.setKey( "key(" + key + ")" );
-			doValidate( key );
-		}
-
-		private void doValidate(Object value) {
+		private void doValidate(Object value, String nodeName) {
 			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath(), valueContext.getCurrentTypeParameter() ) || shouldFailFast( context ) ) {
 				return;
 			}
@@ -745,12 +738,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
 
 			// Type arguments
-			validateTypeArgumentConstraints( context, cascadedValueContext, typeArgumentConstraints );
+			validateTypeArgumentConstraints( context, cascadedValueContext, nodeName, typeArgumentConstraints );
 
 			// Cascade validation
 			if ( isCascaded ) {
 				validateInContext( context, cascadedValueContext, validationOrder );
 			}
+
 		}
 	}
 
@@ -780,16 +774,19 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private void validateTypeArgumentConstraints(ValidationContext<?> context,
 			ValueContext<?, Object> valueContext,
+			String nodeName,
 			Set<MetaConstraint<?>> typeArgumentsConstraints) {
 		PathImpl previousPath = valueContext.getPropertyPath();
+		valueContext.appendTypeParameterNode( nodeName );
+
 		for ( MetaConstraint<?> metaConstraint : typeArgumentsConstraints ) {
-			valueContext.appendNode( metaConstraint.getLocation() );
 			metaConstraint.validateConstraint( context, valueContext );
-			valueContext.setPropertyPath( previousPath );
 			if ( shouldFailFast( context ) ) {
-				return;
+				break;
 			}
 		}
+
+		valueContext.setPropertyPath( previousPath );
 	}
 
 	private <T> Set<ConstraintViolation<T>> validateValueInContext(ValidationContext<T> context, Object value, PathImpl propertyPath, ValidationOrder validationOrder) {

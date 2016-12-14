@@ -19,7 +19,7 @@ class CharArrayValueExtractor implements ValueExtractor<char[]> {
 	public void extractValues(char[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( char object : originalValue ) {
-			receiver.listValue( i, object );
+			receiver.indexedValue( object, "<collection element>", i );
 			i++;
 		}
 	}

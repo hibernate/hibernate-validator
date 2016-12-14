@@ -148,6 +148,12 @@ public class ValueContext<T, V> {
 		propertyPath = newPath;
 	}
 
+	public final void appendTypeParameterNode(String nodeName) {
+		PathImpl newPath = PathImpl.createCopy( propertyPath );
+		newPath.addTypeParameterNode( nodeName );
+		propertyPath = newPath;
+	}
+
 	public final void markCurrentPropertyAsIterable() {
 		propertyPath.makeLeafNodeIterable();
 	}

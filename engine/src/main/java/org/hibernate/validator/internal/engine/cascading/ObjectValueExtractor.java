@@ -17,6 +17,6 @@ class ObjectValueExtractor implements ValueExtractor<Object> {
 
 	@Override
 	public void extractValues(Object originalValue, ValueReceiver receiver) {
-		receiver.objectValue( originalValue );
+		receiver.value( originalValue, null );
 	}
 }

@@ -12,14 +12,12 @@ public interface ValueExtractor<T> {
 
 	interface ValueReceiver {
 
-		void objectValue(Object object);
+		void value(Object object, String nodeName);
 
-		void listValue(int i, Object object);
+		void iterableValue(Object object, String nodeName);
 
-		void mapValue(Object object, Object key);
+		void indexedValue(Object object, String nodeName, int i);
 
-		void mapKey(Object key);
-
-		void iterableValue(Object object);
+		void keyedValue(Object object, String nodeName, Object key);
 	}
 }

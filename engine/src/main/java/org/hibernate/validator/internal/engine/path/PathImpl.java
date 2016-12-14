@@ -119,9 +119,9 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	public NodeImpl addCollectionElementNode() {
+	public NodeImpl addTypeParameterNode(String nodeName) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-		currentLeafNode = NodeImpl.createCollectionElementNode( parent );
+		currentLeafNode = NodeImpl.createTypeParameterNode( nodeName, parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;

@@ -19,7 +19,7 @@ class BooleanArrayValueExtractor implements ValueExtractor<boolean[]> {
 	public void extractValues(boolean[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( boolean object : originalValue ) {
-			receiver.listValue( i, object );
+			receiver.indexedValue( object, "<collection element>", i );
 			i++;
 		}
 	}

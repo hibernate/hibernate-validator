@@ -19,10 +19,10 @@ class LegacyMapValueExtractor implements ValueExtractor<Map<?, ?>> {
 
 	@Override
 	public void extractValues(Map<?, ?> originalValue, ValueReceiver receiver) {
-		receiver.objectValue( originalValue );
+		receiver.value( originalValue, null );
 
 		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.mapValue( entry.getValue(), entry.getKey() );
+			receiver.keyedValue( entry.getValue(), "<collection element>", entry.getKey() );
 		}
 	}
 }

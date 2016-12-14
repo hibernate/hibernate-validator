@@ -73,7 +73,7 @@ public class CustomValueExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithConstrainedKeys>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[key(too short)].<collection element>", "addressByType[key(too small)].<collection element>" );
+		assertCorrectPropertyPaths( violations, "addressByType[key(too short)].map_key", "addressByType[key(too small)].map_key" );
 	}
 
 	@Test
@@ -118,7 +118,7 @@ public class CustomValueExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithConstrainedKeysAndValues>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[key(too short)].<collection element>", "addressByType[key(too small)].<collection element>", "addressByType[long enough].<collection element>" );
+		assertCorrectPropertyPaths( violations, "addressByType[key(too short)].map_key", "addressByType[key(too small)].map_key", "addressByType[long enough].<collection element>" );
 	}
 
 	private static class CustomerWithCascadingKeys {

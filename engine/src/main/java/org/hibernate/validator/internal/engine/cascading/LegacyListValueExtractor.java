@@ -19,11 +19,11 @@ class LegacyListValueExtractor implements ValueExtractor<List<?>> {
 
 	@Override
 	public void extractValues(List<?> originalValue, ValueReceiver receiver) {
-		receiver.objectValue( originalValue );
+		receiver.value( originalValue, null );
 
 		int i = 0;
 		for ( Object object : originalValue ) {
-			receiver.listValue( i, object );
+			receiver.indexedValue( object, "<collection element>", i );
 			i++;
 		}
 	}

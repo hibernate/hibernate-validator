@@ -19,7 +19,7 @@ class ObjectArrayValueExtractor implements ValueExtractor<Object[]> {
 	public void extractValues(Object[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( Object object : originalValue ) {
-			receiver.listValue( i, object );
+			receiver.indexedValue( object, "<collection element>", i );
 			i++;
 		}
 	}

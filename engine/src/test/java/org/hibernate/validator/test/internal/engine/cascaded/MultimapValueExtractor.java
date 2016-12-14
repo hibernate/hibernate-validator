@@ -18,7 +18,7 @@ class MultimapValueExtractor implements ValueExtractor<Multimap<?, @ExtractedVal
 	@Override
 	public void extractValues(Multimap<?, ?> originalValue, ValueExtractor.ValueReceiver receiver) {
 		for ( Entry<?, ?> entry : originalValue.entries() ) {
-			receiver.mapValue( entry.getValue(), entry.getKey() );
+			receiver.keyedValue( entry.getValue(), "multimap_value", entry.getKey() );
 		}
 	}
 }

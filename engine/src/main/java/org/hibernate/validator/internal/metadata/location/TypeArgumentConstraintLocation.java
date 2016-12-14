@@ -49,12 +49,7 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
-		if ( isCollection ) {
-			path.addCollectionElementNode();
-		}
-		else {
-			delegate.appendTo( parameterNameProvider, path );
-		}
+		delegate.appendTo( parameterNameProvider, path );
 	}
 
 	@Override
