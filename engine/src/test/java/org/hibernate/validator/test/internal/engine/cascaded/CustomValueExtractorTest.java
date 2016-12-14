@@ -20,6 +20,9 @@ import javax.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
 import org.testng.annotations.Test;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+
 /**
  * @author Gunnar Morling
  */
@@ -56,6 +59,36 @@ public class CustomValueExtractorTest {
 		assertCorrectPropertyPaths( violations, "addressByType[key(too short)].value", "addressByType[key(too small)].value" );
 	}
 
+	@Test
+	public void canUseCustomValueExtractorForMultimaps() throws Exception {
+		CustomerWithMultimap bob = new CustomerWithMultimap();
+
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.addCascadedValueExtractor( new MultimapValueExtractor() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<CustomerWithMultimap>> violations = validator.validate( bob );
+
+		assertCorrectPropertyPaths( violations, "addressByType[work].value", "addressByType[work].value" );
+	}
+
+	@Test
+	public void canUseKeyAndValueExtractorForMap() throws Exception {
+		CustomerWithCascadingKeyAndValueMap bob = new CustomerWithCascadingKeyAndValueMap();
+
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.addCascadedValueExtractor( new MapKeyExtractor() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<CustomerWithCascadingKeyAndValueMap>> violations = validator.validate( bob );
+
+		assertCorrectPropertyPaths( violations, "addressByType[too small].value", "addressByType[long enough].value", "addressByType[key(too small)].value", "addressByType[key(too short)].value" );
+	}
+
 	private static class CustomerWithCascadingKeys {
 
 		Map<@Valid AddressType, String> addressByType;
@@ -65,6 +98,31 @@ public class CustomValueExtractorTest {
 			addressByType.put( new AddressType( "too short" ), "work@bob.de" );
 			addressByType.put( new AddressType( "too small" ), "work@bob.de" );
 			addressByType.put( new AddressType( "long enough" ), "work@bob.de" );
+		}
+	}
+
+	private static class CustomerWithMultimap {
+
+		ListMultimap<String, @Valid EmailAddress> addressByType;
+
+		public CustomerWithMultimap() {
+			addressByType = ArrayListMultimap.create();
+			addressByType.put( "work", new EmailAddress( "work@bob.de" ) );
+			addressByType.put( "work", new EmailAddress( "invalid" ) );
+			addressByType.put( "work", new EmailAddress( "alsoinvalid" ) );
+			addressByType.put( "home", new EmailAddress( "home@bob.de" ) );
+		}
+	}
+
+	private static class CustomerWithCascadingKeyAndValueMap {
+
+		Map<@Valid AddressType, @Valid EmailAddress> addressByType;
+
+		public CustomerWithCascadingKeyAndValueMap() {
+			addressByType = new HashMap<>();
+			addressByType.put( new AddressType( "too short" ), new EmailAddress( "work@bob.de" ) );
+			addressByType.put( new AddressType( "too small" ), new EmailAddress( "invalid" ) );
+			addressByType.put( new AddressType( "long enough" ), new EmailAddress( "alsoinvalid" ) );
 		}
 	}
 }
