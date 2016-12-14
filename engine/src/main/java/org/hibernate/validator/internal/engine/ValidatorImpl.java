@@ -666,7 +666,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
 
 			// Type arguments
-			validateTypeArgumentConstraints( context, cascadedValueContext, value, typeArgumentsConstraint );
+			validateTypeArgumentConstraints( context, cascadedValueContext, typeArgumentsConstraint );
 
 			// Cascade validation
 			validateInContext( context, cascadedValueContext, validationOrder );
@@ -697,7 +697,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private void validateTypeArgumentConstraints(ValidationContext<?> context,
 			ValueContext<?, Object> valueContext,
-			Object value,
 			Set<MetaConstraint<?>> typeArgumentsConstraints) {
 		PathImpl previousPath = valueContext.getPropertyPath();
 		for ( MetaConstraint<?> metaConstraint : typeArgumentsConstraints ) {
