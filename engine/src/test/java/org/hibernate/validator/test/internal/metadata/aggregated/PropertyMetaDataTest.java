@@ -52,14 +52,14 @@ public class PropertyMetaDataTest {
 	public void locallyDefinedGroupConversion() {
 		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( User1.class ).getMetaDataFor( "addresses" );
 
-		assertThat( property.convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
+		assertThat( property.getCascadables().iterator().next().convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
 	}
 
 	@Test
 	public void groupConversionDefinedInHierarchy() {
 		PropertyMetaData property = beanMetaDataManager.getBeanMetaData( User2.class ).getMetaDataFor( "addresses" );
 
-		assertThat( property.convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
+		assertThat( property.getCascadables().iterator().next().convertGroup( Default.class ) ).isEqualTo( BasicPostal.class );
 	}
 
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000124.*")

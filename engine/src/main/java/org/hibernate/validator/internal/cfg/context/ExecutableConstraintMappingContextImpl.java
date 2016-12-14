@@ -9,6 +9,8 @@ package org.hibernate.validator.internal.cfg.context;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.lang.reflect.Executable;
+import java.lang.reflect.Method;
+import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,6 +18,7 @@ import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContex
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -27,6 +30,8 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+
+import com.google.common.collect.ImmutableSetMultimap;
 
 /**
  * A constraint mapping creational context which allows to select the parameter or
@@ -111,9 +116,9 @@ abstract class ExecutableConstraintMappingContextImpl {
 				getParameters( constraintHelper, parameterNameProvider ),
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
-				Collections.<MetaConstraint<?>>emptySet(),
+				ImmutableSetMultimap.of(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
-				returnValueContext != null && returnValueContext.isCascading() ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
+				getCascadedTypeParameters( executable, returnValueContext != null && returnValueContext.isCascading() ),
 				returnValueContext != null ? returnValueContext.unwrapMode() : UnwrapMode.AUTOMATIC
 		);
 	}
@@ -140,5 +145,15 @@ abstract class ExecutableConstraintMappingContextImpl {
 		}
 
 		return constrainedParameters;
+	}
+
+	private List<TypeVariable<?>> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
+		if ( isCascaded ) {
+			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
+			return Collections.singletonList( isArray ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 }

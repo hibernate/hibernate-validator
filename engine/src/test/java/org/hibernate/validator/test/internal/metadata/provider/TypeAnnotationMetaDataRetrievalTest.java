@@ -7,16 +7,15 @@
 package org.hibernate.validator.test.internal.metadata.provider;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -61,8 +60,8 @@ public class TypeAnnotationMetaDataRetrievalTest {
 		);
 
 		ConstrainedField field = findConstrainedField( beanConfigurations, A.class, "names" );
-		assertThat( field.getTypeArgumentConstraints() ).hasSize( 2 );
-		assertThat( getAnnotationsTypes( field.getTypeArgumentConstraints() ) ).contains(
+		assertThat( field.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
+		assertThat( getAnnotationsTypes( field.getTypeArgumentConstraints().values() ) ).contains(
 				NotNull.class, NotBlank.class
 		);
 	}
@@ -74,8 +73,8 @@ public class TypeAnnotationMetaDataRetrievalTest {
 		);
 
 		ConstrainedExecutable executable = findConstrainedMethod( beanConfigurations, B.class, "getNames" );
-		assertThat( executable.getTypeArgumentConstraints() ).hasSize( 2 );
-		assertThat( getAnnotationsTypes( executable.getTypeArgumentConstraints() ) ).contains(
+		assertThat( executable.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
+		assertThat( getAnnotationsTypes( executable.getTypeArgumentConstraints().values() ) ).contains(
 				NotNull.class, NotBlank.class
 		);
 	}
@@ -87,8 +86,8 @@ public class TypeAnnotationMetaDataRetrievalTest {
 		);
 
 		ConstrainedExecutable executable = findConstrainedMethod( beanConfigurations, C.class, "returnNames" );
-		assertThat( executable.getTypeArgumentConstraints() ).hasSize( 2 );
-		assertThat( getAnnotationsTypes( executable.getTypeArgumentConstraints() ) ).contains(
+		assertThat( executable.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
+		assertThat( getAnnotationsTypes( executable.getTypeArgumentConstraints().values() ) ).contains(
 				NotNull.class, NotBlank.class
 		);
 	}
@@ -108,8 +107,8 @@ public class TypeAnnotationMetaDataRetrievalTest {
 				List.class
 		);
 		ConstrainedParameter parameter = executable.getParameterMetaData( 2 );
-		assertThat( parameter.getTypeArgumentConstraints() ).hasSize( 2 );
-		assertThat( getAnnotationsTypes( parameter.getTypeArgumentConstraints() ) ).contains(
+		assertThat( parameter.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
+		assertThat( getAnnotationsTypes( parameter.getTypeArgumentConstraints().values() ) ).contains(
 				NotNull.class, NotBlank.class
 		);
 	}
@@ -129,19 +128,16 @@ public class TypeAnnotationMetaDataRetrievalTest {
 		);
 
 		ConstrainedParameter parameter = executable.getParameterMetaData( 2 );
-		assertThat( parameter.getTypeArgumentConstraints() ).hasSize( 2 );
-		assertThat( getAnnotationsTypes( parameter.getTypeArgumentConstraints() ) ).contains(
+		assertThat( parameter.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
+		assertThat( getAnnotationsTypes( parameter.getTypeArgumentConstraints().values() ) ).contains(
 				NotNull.class, NotBlank.class
 		);
 	}
 
-	private List<Class<? extends Annotation>> getAnnotationsTypes(Set<MetaConstraint<?>> metaConstraints) {
-		List<Class<? extends Annotation>> annotationsTypes = newArrayList();
-		Iterator<MetaConstraint<?>> iter = metaConstraints.iterator();
-		while ( iter.hasNext() ) {
-			annotationsTypes.add( iter.next().getDescriptor().getAnnotation().annotationType() );
-		}
-		return annotationsTypes;
+	private List<Class<? extends Annotation>> getAnnotationsTypes(Collection<MetaConstraint<?>> metaConstraints) {
+		return metaConstraints.stream()
+			.map( m -> m.getDescriptor().getAnnotationType() )
+			.collect( Collectors.toList() );
 	}
 
 	private <T> ConstrainedField findConstrainedField(Iterable<BeanConfiguration<? super T>> beanConfigurations,

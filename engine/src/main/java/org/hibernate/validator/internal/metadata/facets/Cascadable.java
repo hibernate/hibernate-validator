@@ -11,6 +11,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.metadata.GroupConversionDescriptor;
@@ -18,6 +19,8 @@ import javax.validation.metadata.GroupConversionDescriptor;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+
+import com.google.common.collect.SetMultimap;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
@@ -63,7 +66,7 @@ public interface Cascadable {
 	 * @return the type arguments constraints for this cascadable, or an empty set if no constrained type arguments are
 	 * found
 	 */
-	Set<MetaConstraint<?>> getTypeArgumentsConstraints();
+	SetMultimap<TypeVariable<?>, MetaConstraint<?>> getTypeArgumentsConstraints();
 
 	/**
 	 * Defines how the validated values needs to be treated in case there is a potential unwrapper specified for its type
@@ -96,4 +99,14 @@ public interface Cascadable {
 	 * marked.
 	 */
 	List<TypeVariable<?>> getCascadingTypeParameters();
+
+	public interface Builder {
+
+		void addGroupConversions(Map<Class<?>, Class<?>> groupConversions);
+		void addCascadingTypeParameters(List<TypeVariable<?>> cascadingTypeParameters);
+		void addTypeArgumentConstraints(SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints);
+		void unwrapMode(UnwrapMode unwrapMode);
+		Cascadable build();
+
+	}
 }

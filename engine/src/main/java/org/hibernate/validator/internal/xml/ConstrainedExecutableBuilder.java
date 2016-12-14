@@ -13,6 +13,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
+import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import java.util.Set;
 import javax.validation.ValidationException;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -43,6 +45,8 @@ import org.hibernate.validator.internal.xml.binding.CrossParameterType;
 import org.hibernate.validator.internal.xml.binding.MethodType;
 import org.hibernate.validator.internal.xml.binding.ParameterType;
 import org.hibernate.validator.internal.xml.binding.ReturnValueType;
+
+import com.google.common.collect.ImmutableSetMultimap;
 
 /**
  * Builder for constrained methods and constructors.
@@ -225,9 +229,9 @@ class ConstrainedExecutableBuilder {
 				parameterMetaData,
 				crossParameterConstraints,
 				returnValueConstraints,
-				Collections.<MetaConstraint<?>>emptySet(),
+				ImmutableSetMultimap.of(),
 				groupConversions,
-				isCascaded ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
+				getCascadedTypeParameters( executable, isCascaded ),
 				UnwrapMode.AUTOMATIC
 		);
 	}
@@ -320,6 +324,16 @@ class ConstrainedExecutableBuilder {
 		}
 
 		return parameterTypes;
+	}
+
+	private List<TypeVariable<?>> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
+		if ( isCascaded ) {
+			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
+			return Collections.singletonList( isArray ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
 	/**

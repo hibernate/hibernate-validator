@@ -73,7 +73,8 @@ public class ValueExtractors {
 			}
 		}
 
-		throw new IllegalArgumentException( "No extractor found" );
+		// TODO should only happen during transition off value unwrappers
+		return null;
 	}
 
 	private TypeVariable<?> bind(TypeVariable<?> typeParameter, Map<TypeVariable<?>, TypeVariable<?>> bindings) {
@@ -83,6 +84,6 @@ public class ValueExtractors {
 			bound = bindings.get( typeParameter );
 		}
 
-		return bound != null ? bound : AnnotatedObject.INSTANCE;
+		return bound != null ? bound : typeParameter == AnnotatedObject.INSTANCE ? AnnotatedObject.INSTANCE : ArrayElement.INSTANCE;
 	}
 }

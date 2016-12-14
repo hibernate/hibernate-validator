@@ -11,20 +11,24 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.TypeVariable;
 import java.util.Collections;
+import java.util.List;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+
+import com.google.common.collect.ImmutableSetMultimap;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -98,9 +102,9 @@ final class PropertyConstraintMappingContextImpl
 					ConfigurationSource.API,
 					(Field) member,
 					getConstraints( constraintHelper ),
-					Collections.<MetaConstraint<?>>emptySet(),
+					ImmutableSetMultimap.of(),
 					groupConversions,
-					isCascading ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
+					getCascadedTypeParameters( (Field) member, isCascading ),
 					unwrapMode()
 			);
 		}
@@ -110,9 +114,28 @@ final class PropertyConstraintMappingContextImpl
 					(Executable) member,
 					getConstraints( constraintHelper ),
 					groupConversions,
-					isCascading ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
+					getCascadedTypeParameters( (Executable) member, isCascading ),
 					unwrapMode()
 			);
+		}
+	}
+
+	private List<TypeVariable<?>> getCascadedTypeParameters(Field field, boolean isCascaded) {
+		if ( isCascaded ) {
+			return Collections.singletonList( field.getType().isArray() ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+		}
+		else {
+			return Collections.emptyList();
+		}
+	}
+
+	private List<TypeVariable<?>> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
+		if ( isCascaded ) {
+			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
+			return Collections.singletonList( isArray ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+		}
+		else {
+			return Collections.emptyList();
 		}
 	}
 

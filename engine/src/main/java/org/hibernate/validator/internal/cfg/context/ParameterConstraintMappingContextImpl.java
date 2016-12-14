@@ -6,7 +6,10 @@
  */
 package org.hibernate.validator.internal.cfg.context;
 
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collections;
+import java.util.List;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
@@ -15,13 +18,15 @@ import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+
+import com.google.common.collect.ImmutableSetMultimap;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
@@ -98,18 +103,29 @@ final class ParameterConstraintMappingContextImpl
 
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
+		Type parameterType = ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex );
+
 		return new ConstrainedParameter(
 				ConfigurationSource.API,
 				executableContext.getExecutable(),
-				ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex ),
+				parameterType,
 				parameterIndex,
 				parameterNameProvider.getParameterNames( executableContext.getExecutable() ).get( parameterIndex ),
 				getConstraints( constraintHelper ),
-				Collections.<MetaConstraint<?>>emptySet(),
+				ImmutableSetMultimap.of(),
 				groupConversions,
-				isCascading ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
+				getCascadedTypeParameters( parameterType, isCascading ),
 				unwrapMode()
 		);
+	}
+
+	private List<TypeVariable<?>> getCascadedTypeParameters(Type parameterType, boolean isCascaded) {
+		if ( isCascaded ) {
+			return Collections.singletonList( ReflectionHelper.getClassFromType( parameterType ).isArray() ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
 	@Override

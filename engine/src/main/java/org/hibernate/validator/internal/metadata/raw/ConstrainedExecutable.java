@@ -28,6 +28,10 @@ import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
+
 /**
  * Represents a method or constructor of a Java type and all its associated
  * meta-data relevant in the context of bean validation, for instance the
@@ -77,7 +81,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
-				Collections.<MetaConstraint<?>>emptySet(),
+				ImmutableSetMultimap.of(),
 				groupConversions,
 				cascadingTypeParameters,
 				unwrapMode
@@ -107,7 +111,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
-			Set<MetaConstraint<?>> typeArgumentConstraints,
+			SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
 			List<TypeVariable<?>> cascadingTypeParameters,
 			UnwrapMode unwrapMode) {
@@ -285,8 +289,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedReturnValueConstraints = newHashSet( constraints );
 		mergedReturnValueConstraints.addAll( other.constraints );
 
-		Set<MetaConstraint<?>> mergedTypeArgumentConstraints = newHashSet( typeArgumentConstraints );
-		mergedTypeArgumentConstraints.addAll( other.typeArgumentConstraints );
+		SetMultimap<TypeVariable<?>, MetaConstraint<?>> mergedTypeArgumentConstraints = HashMultimap.create( typeArgumentConstraints );
+		mergedTypeArgumentConstraints.putAll( other.typeArgumentConstraints );
 
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );

@@ -6,20 +6,13 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
-import java.lang.annotation.ElementType;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,9 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.ElementKind;
-import javax.validation.metadata.GroupConversionDescriptor;
 
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -44,9 +35,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
-import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
  * Represents the constraint related meta data for a JavaBeans property.
@@ -63,105 +51,27 @@ import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
  *
  * @author Gunnar Morling
  */
-public class PropertyMetaData extends AbstractConstraintMetaData implements Cascadable {
+public class PropertyMetaData extends AbstractConstraintMetaData {
+
 	private static final Log log = LoggerFactory.make();
-
-	/**
-	 * The member marked as cascaded (either field or getter). Used to retrieve
-	 * this property's value during cascaded validation.
-	 */
-	private final Member cascadingMember;
-
-	private final Type cascadableType;
-
-	private final List<TypeVariable<?>> cascadingTypeParameters;
-
-	private final ElementType elementType;
-
-	private final GroupConversionHelper groupConversionHelper;
-
-	/**
-	 * Type arguments constraints for this property
-	 */
-	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+	private final Set<Cascadable> cascadables;
 
 	private PropertyMetaData(String propertyName,
 							 Type type,
 							 Set<MetaConstraint<?>> constraints,
-							 Set<MetaConstraint<?>> typeArgumentsConstraints,
-							 Map<Class<?>, Class<?>> groupConversions,
-							 Member cascadingMember,
-							 List<TypeVariable<?>> cascadingTypeParameters,
+							 Set<Cascadable> cascadables,
 							 UnwrapMode unwrapMode) {
 		super(
 				propertyName,
 				type,
 				constraints,
 				ElementKind.PROPERTY,
-				cascadingMember != null,
-				cascadingMember != null || !constraints.isEmpty() || !typeArgumentsConstraints.isEmpty(),
+				!cascadables.isEmpty(),
+				!cascadables.isEmpty() || !constraints.isEmpty(),
 				unwrapMode
 		);
 
-		if ( cascadingMember != null ) {
-			this.cascadingMember = getAccessible( cascadingMember );
-			this.cascadableType = ReflectionHelper.typeOf( cascadingMember );
-			this.elementType = cascadingMember instanceof Field ? ElementType.FIELD : ElementType.METHOD;
-		}
-		else {
-			this.cascadingMember = null;
-			this.cascadableType =  null;
-			this.elementType = ElementType.TYPE;
-		}
-
-		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
-		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
-		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
-		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
-	}
-
-	/**
-	 * Returns an accessible version of the given member. Will be the given member itself in case it is accessible,
-	 * otherwise a copy which is set accessible.
-	 */
-	private static Member getAccessible(Member original) {
-		if ( ( (AccessibleObject) original ).isAccessible() ) {
-			return original;
-		}
-
-		Class<?> clazz = original.getDeclaringClass();
-		Member member;
-
-		if ( original instanceof Field ) {
-			member = run( GetDeclaredField.action( clazz, original.getName() ) );
-		}
-		else {
-			member = run( GetDeclaredMethod.action( clazz, original.getName() ) );
-		}
-
-		run( SetAccessibility.action( member ) );
-
-		return member;
-	}
-
-	@Override
-	public ElementType getElementType() {
-		return elementType;
-	}
-
-	@Override
-	public Class<?> convertGroup(Class<?> from) {
-		return groupConversionHelper.convertGroup( from );
-	}
-
-	@Override
-	public Set<GroupConversionDescriptor> getGroupConversionDescriptors() {
-		return groupConversionHelper.asDescriptors();
-	}
-
-	@Override
-	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
-		return this.typeArgumentsConstraints;
+		this.cascadables = cascadables;
 	}
 
 	@Override
@@ -173,49 +83,30 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				isCascading(),
 				defaultGroupSequenceRedefined,
 				defaultGroupSequence,
-				getGroupConversionDescriptors()
+				// TODO which one to use ???
+				cascadables.isEmpty() ? Collections.emptySet() : cascadables.iterator().next().getGroupConversionDescriptors()
 		);
 	}
 
-	@Override
-	public Object getValue(Object parent) {
-		if ( elementType == ElementType.METHOD ) {
-			return ReflectionHelper.getValue( (Method) cascadingMember, parent );
-		}
-		else {
-			return ReflectionHelper.getValue( (Field) cascadingMember, parent );
-		}
-	}
-
-	@Override
-	public Type getCascadableType() {
-		return cascadableType;
-	}
-
-	@Override
-	public void appendTo(PathImpl path) {
-		path.addPropertyNode( getName() );
-	}
-
-	@Override
-	public List<TypeVariable<?>> getCascadingTypeParameters() {
-		return cascadingTypeParameters;
-	}
-
 	/**
-	 * Runs the given privileged action, using a privileged block if required.
-	 * <p>
-	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-	 * privileged actions within HV's protection domain.
+	 * Returns the cascadables of this property, if any. Often, there will be just a single element returned. Several
+	 * elements may be returned in the following cases:
+	 * <ul>
+	 * <li>a property's field has been marked with {@code @Valid} but type-level constraints have been given on the
+	 * getter</li>
+	 * <li>one type parameter of a property has been marked with {@code @Valid} on the field (e.g. a map's key) but
+	 * another type parameter has been marked with {@code @Valid} on the property (e.g. the map's value)</li>
+	 * <li>a (shaded) private field in a super-type and another field of the same name in a sub-type are both marked
+	 * with {@code @Valid}</li>
+	 * </ul>
 	 */
-	private static <T> T run(PrivilegedAction<T> action) {
-		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
+	public Set<Cascadable> getCascadables() {
+		return cascadables;
 	}
 
 	@Override
 	public String toString() {
-		return "PropertyMetaData [type=" + getType() + ", propertyName="
-				+ getName() + ", cascadingMember=[" + cascadingMember + "]]";
+		return "PropertyMetaData [type=" + getType() + ", propertyName=" + getName() + "]]";
 	}
 
 	@Override
@@ -246,10 +137,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		);
 
 		private final String propertyName;
+		private final Map<Member, Cascadable.Builder> cascadableBuilders = new HashMap<>();
 		private final Type propertyType;
-		private Member cascadingMember;
-		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
-		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
 		private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 		private boolean unwrapModeExplicitlyConfigured = false;
 
@@ -315,20 +204,34 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 				}
 			}
 
-			if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
-				typeArgumentsConstraints.addAll( ( (ConstrainedField) constrainedElement ).getTypeArgumentConstraints() );
+			if ( constrainedElement.isCascading() || !constrainedElement.getGroupConversions().isEmpty() || !constrainedElement.getTypeArgumentConstraints().isEmpty() ) {
+				if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
+					Field field = ( (ConstrainedField) constrainedElement ).getField();
+					Cascadable.Builder builder = cascadableBuilders.get( field );
 
-				if ( constrainedElement.isCascading() && cascadingMember == null ) {
-					cascadingMember = ( (ConstrainedField) constrainedElement ).getField();
-					cascadingTypeParameters.addAll( ( (ConstrainedField) constrainedElement ).getCascadingTypeParameters() );
+					if ( builder == null ) {
+						builder = new FieldCascadable.Builder( field );
+						cascadableBuilders.put( field, builder );
+					}
+
+					builder.unwrapMode( unwrapMode );
+					builder.addGroupConversions( constrainedElement.getGroupConversions() );
+					builder.addTypeArgumentConstraints( constrainedElement.getTypeArgumentConstraints() );
+					builder.addCascadingTypeParameters( constrainedElement.getCascadingTypeParameters() );
 				}
-			}
-			else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
-				typeArgumentsConstraints.addAll( ( (ConstrainedExecutable) constrainedElement ).getTypeArgumentConstraints() );
+				else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
+					Method method = (Method) ( (ConstrainedExecutable) constrainedElement ).getExecutable();
+					Cascadable.Builder builder = cascadableBuilders.get( method );
 
-				if ( constrainedElement.isCascading() && cascadingMember == null ) {
-					cascadingMember = ( (ConstrainedExecutable) constrainedElement ).getExecutable();
-					cascadingTypeParameters.addAll( ( (ConstrainedExecutable) constrainedElement ).getCascadingTypeParameters() );
+					if ( builder == null ) {
+						builder = new GetterCascadable.Builder( method );
+						cascadableBuilders.put( method, builder );
+					}
+
+					builder.unwrapMode( unwrapMode );
+					builder.addGroupConversions( constrainedElement.getGroupConversions() );
+					builder.addTypeArgumentConstraints( constrainedElement.getTypeArgumentConstraints() );
+					builder.addCascadingTypeParameters( constrainedElement.getCascadingTypeParameters() );
 				}
 			}
 		}
@@ -363,14 +266,16 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 
 		@Override
 		public PropertyMetaData build() {
+			Set<Cascadable> cascadables = cascadableBuilders.values()
+					.stream()
+					.map( b -> b.build() )
+					.collect( Collectors.toSet() );
+
 			return new PropertyMetaData(
 					propertyName,
 					propertyType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
-					typeArgumentsConstraints,
-					getGroupConversions(),
-					cascadingMember,
-					cascadingTypeParameters,
+					cascadables,
 					unwrapMode()
 			);
 		}

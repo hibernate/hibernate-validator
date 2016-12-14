@@ -21,6 +21,10 @@ import java.util.Set;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
+
 /**
  * Contains constraint-related meta-data for one method parameter.
  *
@@ -46,7 +50,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				index,
 				name,
 				Collections.<MetaConstraint<?>>emptySet(),
-				Collections.<MetaConstraint<?>>emptySet(),
+				ImmutableSetMultimap.of(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
 				Collections.<TypeVariable<?>>emptyList(),
 				UnwrapMode.AUTOMATIC
@@ -75,7 +79,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 								int index,
 								String name,
 								Set<MetaConstraint<?>> constraints,
-								Set<MetaConstraint<?>> typeArgumentConstraints,
+								SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentConstraints,
 								Map<Class<?>, Class<?>> groupConversions,
 								List<TypeVariable<?>> cascadingTypeParameters,
 								UnwrapMode unwrapMode) {
@@ -142,8 +146,8 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedConstraints = newHashSet( constraints );
 		mergedConstraints.addAll( other.constraints );
 
-		Set<MetaConstraint<?>> mergedTypeArgumentConstraints = newHashSet( typeArgumentConstraints );
-		mergedTypeArgumentConstraints.addAll( other.typeArgumentConstraints );
+		SetMultimap<TypeVariable<?>, MetaConstraint<?>> mergedTypeArgumentConstraints = HashMultimap.create( typeArgumentConstraints );
+		mergedTypeArgumentConstraints.putAll( other.typeArgumentConstraints );
 
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );

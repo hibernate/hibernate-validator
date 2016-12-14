@@ -27,6 +27,9 @@ import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
+
 /**
  * Represents the constraint related meta data of the return value of a method
  * or constructor.
@@ -44,13 +47,13 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	/**
 	 * Type arguments constraints for this return value
 	 */
-	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+	private final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints;
 
 	private final List<TypeVariable<?>> cascadingTypeParameters;
 
 	public ReturnValueMetaData(Type type,
 							   Set<MetaConstraint<?>> constraints,
-							   Set<MetaConstraint<?>> typeArgumentsConstraints,
+							   SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints,
 							   List<TypeVariable<?>> cascadingTypeParameters,
 							   Map<Class<?>, Class<?>> groupConversions,
 							   UnwrapMode unwrapMode) {
@@ -64,7 +67,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				unwrapMode
 		);
 
-		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
+		this.typeArgumentsConstraints = ImmutableSetMultimap.copyOf( typeArgumentsConstraints );
 		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
 		this.cascadables = Collections.unmodifiableList( isCascading() ? Arrays.<Cascadable>asList( this ) : Collections.<Cascadable>emptyList() );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
@@ -92,7 +95,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	}
 
 	@Override
-	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
+	public SetMultimap<TypeVariable<?>, MetaConstraint<?>> getTypeArgumentsConstraints() {
 		return this.typeArgumentsConstraints;
 	}
 

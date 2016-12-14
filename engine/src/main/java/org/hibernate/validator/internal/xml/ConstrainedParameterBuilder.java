@@ -11,12 +11,15 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Executable;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -27,6 +30,8 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.ParameterType;
+
+import com.google.common.collect.ImmutableSetMultimap;
 
 /**
  * Builder for constraint parameters.
@@ -82,17 +87,18 @@ class ConstrainedParameterBuilder {
 				);
 			}
 
+			Type type = ReflectionHelper.typeOf( executable, i );
 			// TODO HV-919 Support specification of type parameter constraints via XML and API
 			ConstrainedParameter constrainedParameter = new ConstrainedParameter(
 					ConfigurationSource.XML,
 					executable,
-					ReflectionHelper.typeOf( executable, i ),
+					type,
 					i,
 					parameterNames.get( i ),
 					metaConstraints,
-					Collections.<MetaConstraint<?>>emptySet(),
+					ImmutableSetMultimap.of(),
 					groupConversions,
-					parameterType.getValid() != null ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
+					getCascadedTypeParameters( type, parameterType.getValid() != null ),
 					UnwrapMode.AUTOMATIC
 			);
 			constrainedParameters.add( constrainedParameter );
@@ -101,6 +107,13 @@ class ConstrainedParameterBuilder {
 
 		return constrainedParameters;
 	}
+
+	private List<TypeVariable<?>> getCascadedTypeParameters(Type parameterType, boolean isCascaded) {
+		if ( isCascaded ) {
+			return Collections.singletonList( ReflectionHelper.getClassFromType( parameterType ).isArray() ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+		}
+		else {
+			return Collections.emptyList();
+		}
+	}
 }
-
-

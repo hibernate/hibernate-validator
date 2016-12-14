@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
@@ -591,19 +593,19 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					elementType
 			) ) {
 
-				Object value = getCascadableValue( validationContext, valueContext.getCurrentBean(), cascadable );
+					Object value = getCascadableValue( validationContext, valueContext.getCurrentBean(), cascadable );
 
-				if ( value != null ) {
-					// expand the group only if was created by group conversion;
-					// otherwise we're looping through the right validation order
-					// already and need only to pass the current element
-					ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder(
-							group,
-							group != originalGroup
-					);
+					if ( value != null ) {
+						// expand the group only if was created by group conversion;
+						// otherwise we're looping through the right validation order
+						// already and need only to pass the current element
+						ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder(
+								group,
+								group != originalGroup
+								);
 
-					validateCascadedValues( value, validationContext, valueContext, cascadable, validationOrder );
-				}
+						validateCascadedValues( value, validationContext, valueContext, cascadable, validationOrder );
+					}
 			}
 
 			// reset the path
@@ -614,19 +616,35 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void validateCascadedValues(Object value, ValidationContext<?> context, ValueContext<?, ?> valueContext, Cascadable cascadable, ValidationOrder validationOrder) {
-		for ( TypeVariable<?> cascadingTypeParameter : cascadable.getCascadingTypeParameters() ) {
-			List<TypeVariable<?>> cascadingTypeParametersOfValueType = getCorrespondingTypeParametersInSubType(
+		Set<TypeVariable<?>> cascadingOrConstrainedTypeParameters = new HashSet<>( cascadable.getCascadingTypeParameters() );
+		cascadingOrConstrainedTypeParameters.addAll( cascadable.getTypeArgumentsConstraints().keySet() );
+
+		for ( TypeVariable<?> cascadingOrConstrainedTypeParameter : cascadingOrConstrainedTypeParameters ) {
+			List<TypeVariable<?>> cascadingOrConstrainedTypeParametersOfValueType = getCorrespondingTypeParametersInSubType(
 					value.getClass(),
 					TypeHelper.getErasedReferenceType( cascadable.getCascadableType() ),
-					cascadingTypeParameter
+					cascadingOrConstrainedTypeParameter
 			);
 
-			for ( TypeVariable<?> cascadingTypeParameterOfValueType : cascadingTypeParametersOfValueType ) {
+			for ( TypeVariable<?> cascadingOrConstrainedTypeParameterOfValueType : cascadingOrConstrainedTypeParametersOfValueType ) {
 				ValueExtractor<?> extractor = valueExtractors.getCascadedValueExtractor(
 						value.getClass(),
-						cascadingTypeParameterOfValueType
+						cascadingOrConstrainedTypeParameterOfValueType
 				);
-				ValueReceiverImpl receiver = new ValueReceiverImpl( context, valueContext, validationOrder, cascadable.getTypeArgumentsConstraints() );
+				valueContext.setCurrentTypeParameter( cascadingOrConstrainedTypeParameterOfValueType );
+
+				// TODO should only happen during transition off of value unwrappers
+				if ( extractor == null ) {
+					continue;
+				}
+
+				ValueReceiverImpl receiver = new ValueReceiverImpl(
+						context,
+						valueContext,
+						validationOrder,
+						cascadable.getCascadingTypeParameters().contains( cascadingOrConstrainedTypeParameter ),
+						cascadable.getTypeArgumentsConstraints().get( cascadingOrConstrainedTypeParameter )
+				);
 
 				( (ValueExtractor) extractor ).extractValues( value, receiver );
 			}
@@ -640,6 +658,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	private List<TypeVariable<?>> getCorrespondingTypeParametersInSubType(Class<?> subType, Class<?> superType, TypeVariable<?> typeParameterOfSuperType) {
 		if ( typeParameterOfSuperType == AnnotatedObject.INSTANCE ) {
 			return Collections.singletonList( AnnotatedObject.INSTANCE );
+		}
+		else if ( typeParameterOfSuperType == ArrayElement.INSTANCE ) {
+			return Collections.singletonList( ArrayElement.INSTANCE );
 		}
 
 		List<TypeVariable<?>> correspondingTypeParameters = new ArrayList<>();
@@ -665,24 +686,28 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		private final ValidationContext<?> context;
 		private final ValueContext<?, ?> valueContext;
 		private final ValidationOrder validationOrder;
+		private final boolean isCascaded;
 		private final Set<MetaConstraint<?>> typeArgumentConstraints;
 
 		public ValueReceiverImpl(ValidationContext<?> context, ValueContext<?, ?> valueContext, ValidationOrder validationOrder,
-				Set<MetaConstraint<?>> typeArgumentConstraints) {
+				boolean isCascaded, Set<MetaConstraint<?>> typeArgumentConstraints) {
 			this.context = context;
 			this.valueContext = valueContext;
 			this.validationOrder = validationOrder;
+			this.isCascaded = isCascaded;
 			this.typeArgumentConstraints = typeArgumentConstraints;
 		}
 
 		@Override
 		public void objectValue(Object value) {
-			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) || shouldFailFast( context ) ) {
+			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath(), valueContext.getCurrentTypeParameter() ) || shouldFailFast( context ) ) {
 				return;
 			}
 
 			// Cascade validation
-			validateInContext( context, buildNewLocalExecutionContext( valueContext, value ), validationOrder );
+			if ( isCascaded ) {
+				validateInContext( context, buildNewLocalExecutionContext( valueContext, value ), validationOrder );
+			}
 		}
 
 		@Override
@@ -713,7 +738,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		private void doValidate(Object value) {
-			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) || shouldFailFast( context ) ) {
+			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath(), valueContext.getCurrentTypeParameter() ) || shouldFailFast( context ) ) {
 				return;
 			}
 
@@ -723,7 +748,9 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			validateTypeArgumentConstraints( context, cascadedValueContext, typeArgumentConstraints );
 
 			// Cascade validation
-			validateInContext( context, cascadedValueContext, validationOrder );
+			if ( isCascaded ) {
+				validateInContext( context, cascadedValueContext, validationOrder );
+			}
 		}
 	}
 
@@ -746,6 +773,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					valueContext.getPropertyPath()
 			);
 		}
+
+		newValueContext.setCurrentTypeParameter( valueContext.getCurrentTypeParameter() );
 		return newValueContext;
 	}
 
@@ -973,7 +1002,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			if ( !parameterMetaData.isCascading() ) {
-				validateMetaConstraints( validationContext, valueContext, parameterValues, parameterMetaData.getTypeArgumentsConstraints() );
+				// TODO evaluate per type variable
+				validateMetaConstraints( validationContext, valueContext, parameterValues, parameterMetaData.getTypeArgumentsConstraints().values() );
 				if ( shouldFailFast( validationContext ) ) {
 					return;
 				}
@@ -1139,7 +1169,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		if ( !returnValueMetaData.isCascading() ) {
-			validateMetaConstraints( validationContext, valueContext, value, returnValueMetaData.getTypeArgumentsConstraints() );
+			// TODO evaluate per type variable
+			validateMetaConstraints( validationContext, valueContext, value, returnValueMetaData.getTypeArgumentsConstraints().values() );
 			if ( shouldFailFast( validationContext ) ) {
 				return;
 			}
@@ -1175,7 +1206,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					throw log.getInvalidPropertyPathException( validationContext.getRootBeanClass(), propertyPath.asString() );
 				}
 
-				value = getCascadableValue( validationContext, value, propertyMetaData );
+				// TODO which cascadable???
+				value = getCascadableValue( validationContext, value, propertyMetaData.getCascadables().iterator().next() );
 				if ( value == null ) {
 					throw log.getUnableToReachPropertyToValidateException( validationContext.getRootBean(), propertyPath );
 				}

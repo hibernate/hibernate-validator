@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -31,6 +29,10 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
+
 /**
  * An aggregated view of the constraint related meta data for a single method
  * parameter.
@@ -46,14 +48,14 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	/**
 	 * Type arguments constraints for this parameter
 	 */
-	private final Set<MetaConstraint<?>> typeArgumentsConstraints;
+	private final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints;
 	private final List<TypeVariable<?>> cascadingTypeParameters;
 
 	private ParameterMetaData(int index,
 							  String name,
 							  Type type,
 							  Set<MetaConstraint<?>> constraints,
-							  Set<MetaConstraint<?>> typeArgumentsConstraints,
+							  SetMultimap<TypeVariable<?>,MetaConstraint<?>> typeArgumentsConstraints,
 							  List<TypeVariable<?>> cascadingTypeParameters,
 							  Map<Class<?>, Class<?>> groupConversions,
 							  UnwrapMode unwrapMode) {
@@ -69,7 +71,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 		this.index = index;
 
-		this.typeArgumentsConstraints = Collections.unmodifiableSet( typeArgumentsConstraints );
+		this.typeArgumentsConstraints = ImmutableSetMultimap.copyOf( typeArgumentsConstraints );
 		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
@@ -95,7 +97,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	}
 
 	@Override
-	public Set<MetaConstraint<?>> getTypeArgumentsConstraints() {
+	public SetMultimap<TypeVariable<?>, MetaConstraint<?>> getTypeArgumentsConstraints() {
 		return this.typeArgumentsConstraints;
 	}
 
@@ -137,7 +139,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		private final Type parameterType;
 		private final int parameterIndex;
 		private ConstrainedParameter constrainedParameter;
-		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
+		private final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints = HashMultimap.create();
 		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 
 		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
@@ -164,7 +166,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 			ConstrainedParameter newConstrainedParameter = (ConstrainedParameter) constrainedElement;
 
-			typeArgumentsConstraints.addAll( newConstrainedParameter.getTypeArgumentConstraints() );
+			typeArgumentsConstraints.putAll( newConstrainedParameter.getTypeArgumentConstraints() );
 			cascadingTypeParameters.addAll( newConstrainedParameter.getCascadingTypeParameters() );
 
 			if ( constrainedParameter == null ) {

@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
+import java.lang.reflect.AnnotatedArrayType;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
@@ -50,6 +51,9 @@ class ValueExtractorDescriptor {
 				}
 				i++;
 			}
+		}
+		else if ( extractedType instanceof AnnotatedArrayType ) {
+			return ArrayElement.INSTANCE;
 		}
 
 		return AnnotatedObject.INSTANCE;

@@ -5,7 +5,6 @@
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
 package org.hibernate.validator.internal.util.logging;
-import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
@@ -657,14 +656,6 @@ public interface Log extends BasicLogger {
 	UnexpectedTypeException getConstraintValidatorExistsForWrapperAndWrappedValueException(Path property,
 			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint,
 			@FormatWith(ClassObjectFormatter.class) Class<? extends ValidatedValueUnwrapper> valueHandler);
-
-	@Message(id = 187,
-			value = "When using type annotation constraints on parameterized iterables or map @Valid must be used. Check %s#%s")
-	ValidationException getTypeAnnotationConstraintOnIterableRequiresUseOfValidAnnotationException(@FormatWith(ClassObjectFormatter.class) Class<?> declaringClass, String name);
-
-	@LogMessage(level = DEBUG)
-	@Message(id = 188, value = "Parameterized type with more than one argument is not supported: %s")
-	void parameterizedTypeWithMoreThanOneTypeArgumentIsNotSupported(Type type);
 
 	@Message(id = 189,
 			value = "The configuration of value unwrapping for property '%s' of bean '%s' is inconsistent between the field and its getter.")

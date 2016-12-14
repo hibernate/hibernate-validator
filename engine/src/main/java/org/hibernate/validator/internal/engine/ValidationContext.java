@@ -11,6 +11,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -28,6 +29,8 @@ import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
@@ -98,7 +101,7 @@ public class ValidationContext<T> {
 	/**
 	 * Maps an object to a list of paths in which it has been validated. The objects are the bean instances.
 	 */
-	private final Map<Object, Set<PathImpl>> processedPathsPerBean;
+	private final Map<Object, Set<PathAndTypeParameter>> processedPathsPerBean;
 
 	/**
 	 * Maps processed constraints to the bean and path for which they have been processed.
@@ -270,19 +273,20 @@ public class ValidationContext<T> {
 		return constraintValidatorFactory;
 	}
 
-	public boolean isBeanAlreadyValidated(Object value, Class<?> group, PathImpl path) {
+	public boolean isBeanAlreadyValidated(Object value, Class<?> group, PathImpl path, TypeVariable<?> typeParameter) {
 		boolean alreadyValidated;
 		alreadyValidated = isAlreadyValidatedForCurrentGroup( value, group );
 
 		if ( alreadyValidated ) {
-			alreadyValidated = isAlreadyValidatedForPath( value, path );
+			alreadyValidated = isAlreadyValidatedForPathAndTypeParameter( value, path, typeParameter );
 		}
+
 		return alreadyValidated;
 	}
 
 	public void markCurrentBeanAsProcessed(ValueContext<?, ?> valueContext) {
 		markCurrentBeanAsProcessedForCurrentGroup( valueContext.getCurrentBean(), valueContext.getCurrentGroup() );
-		markCurrentBeanAsProcessedForCurrentPath( valueContext.getCurrentBean(), valueContext.getPropertyPath() );
+		markCurrentBeanAsProcessedForCurrentPath( valueContext.getCurrentBean(), valueContext.getPropertyPath(), valueContext.getCurrentTypeParameter() );
 	}
 
 	public void addConstraintFailures(Set<ConstraintViolation<T>> failingConstraintViolations) {
@@ -443,15 +447,18 @@ public class ValidationContext<T> {
 		}
 	}
 
-	private boolean isAlreadyValidatedForPath(Object value, PathImpl path) {
-		Set<PathImpl> pathSet = processedPathsPerBean.get( value );
+	private boolean isAlreadyValidatedForPathAndTypeParameter(Object value, PathImpl path, TypeVariable<?> typeParameter) {
+		Set<PathAndTypeParameter> pathSet = processedPathsPerBean.get( value );
 		if ( pathSet == null ) {
 			return false;
 		}
 
-		for ( PathImpl p : pathSet ) {
-			if ( path.isRootPath() || p.isRootPath() || isSubPathOf( path, p ) || isSubPathOf( p, path ) ) {
-				return true;
+		for ( PathAndTypeParameter p : pathSet ) {
+			if ( path.isRootPath() || p.path.isRootPath() || isSubPathOf( path, p.path ) || isSubPathOf( p.path, path ) ) {
+				if ( typeParameter == p.typeParameter ||
+						( p.typeParameter == null && ( typeParameter == AnnotatedObject.INSTANCE || typeParameter == ArrayElement.INSTANCE ) ) ) {
+					return true;
+				}
 			}
 		}
 
@@ -479,16 +486,16 @@ public class ValidationContext<T> {
 		return objectsProcessedInCurrentGroups != null && objectsProcessedInCurrentGroups.contains( value );
 	}
 
-	private void markCurrentBeanAsProcessedForCurrentPath(Object value, PathImpl path) {
+	private void markCurrentBeanAsProcessedForCurrentPath(Object value, PathImpl path, TypeVariable<?> typeParameter) {
 		// HV-1031 The path object is mutated as we traverse the object tree, hence copy it before saving it
 		path = PathImpl.createCopy( path );
 
 		if ( processedPathsPerBean.containsKey( value ) ) {
-			processedPathsPerBean.get( value ).add( path );
+			processedPathsPerBean.get( value ).add( new PathAndTypeParameter( path, typeParameter ) );
 		}
 		else {
-			Set<PathImpl> set = new HashSet<>();
-			set.add( path );
+			Set<PathAndTypeParameter> set = new HashSet<>();
+			set.add( new PathAndTypeParameter( path, typeParameter ) );
 			processedPathsPerBean.put( value, set );
 		}
 	}
@@ -691,6 +698,49 @@ public class ValidationContext<T> {
 			int result = System.identityHashCode( bean );
 			result = 31 * result + path.hashCode();
 			return result;
+		}
+	}
+
+	private static final class PathAndTypeParameter {
+		private final PathImpl path;
+		private final TypeVariable<?> typeParameter;
+		private final int hashCode;
+
+		public PathAndTypeParameter(PathImpl path, TypeVariable<?> typeParameter) {
+			this.path = path;
+			this.typeParameter = typeParameter;
+			this.hashCode = buildHashCode( path, typeParameter );
+		}
+
+		private static int buildHashCode(PathImpl path, TypeVariable<?> typeParameter) {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ( ( typeParameter == null ) ? 0 : typeParameter.hashCode() );
+			result = prime * result + path.hashCode();
+			return result;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			PathAndTypeParameter other = (PathAndTypeParameter) obj;
+			if ( typeParameter != other.typeParameter ) { // instance equality
+					return false;
+			}
+			return path.equals( other.path );
 		}
 	}
 }

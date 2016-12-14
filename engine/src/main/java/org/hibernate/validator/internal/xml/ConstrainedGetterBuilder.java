@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -30,6 +32,8 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.GetterType;
+
+import com.google.common.collect.ImmutableSetMultimap;
 
 /**
  * Builder for constraint getters.
@@ -83,9 +87,9 @@ class ConstrainedGetterBuilder {
 					Collections.<ConstrainedParameter>emptyList(),
 					Collections.<MetaConstraint<?>>emptySet(),
 					metaConstraints,
-					Collections.<MetaConstraint<?>>emptySet(),
+					ImmutableSetMultimap.of(),
 					groupConversions,
-					getterType.getValid() != null ? Collections.singletonList( AnnotatedObject.INSTANCE ) : Collections.emptyList(),
+					getCascadedTypeParameters( getter, getterType.getValid() != null ),
 					UnwrapMode.AUTOMATIC
 			);
 			constrainedExecutables.add( constrainedGetter );
@@ -100,6 +104,15 @@ class ConstrainedGetterBuilder {
 		}
 
 		return constrainedExecutables;
+	}
+
+	private List<TypeVariable<?>> getCascadedTypeParameters(Method method, boolean isCascaded) {
+		if ( isCascaded ) {
+			return Collections.singletonList( method.getReturnType().isArray() ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
 	private static Method findGetter(Class<?> beanClass, String getterName, List<String> alreadyProcessedGetterNames) {

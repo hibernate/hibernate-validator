@@ -41,6 +41,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
+
 /**
  * An aggregated view of the constraint related meta data for a given method or
  * constructors and in (case of methods) all the methods in the inheritance
@@ -83,7 +86,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
-			Set<MetaConstraint<?>> typeArgumentsConstraints,
+			SetMultimap<TypeVariable<?>,MetaConstraint<?>> typeArgumentsConstraints,
 			Map<Class<?>, Class<?>> returnValueGroupConversions,
 			List<TypeVariable<?>> cascadingTypeParameters,
 			boolean isConstrained,
@@ -254,7 +257,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private Executable executable;
 		private final boolean isGetterMethod;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
-		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
+		private final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints = HashMultimap.create();
 		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
@@ -329,7 +332,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
-			typeArgumentsConstraints.addAll( constrainedExecutable.getTypeArgumentConstraints() );
+			typeArgumentsConstraints.putAll( constrainedExecutable.getTypeArgumentConstraints() );
 			cascadingTypeParameters.addAll( constrainedExecutable.getCascadingTypeParameters() );
 
 			addToExecutablesByDeclaringType( constrainedExecutable );

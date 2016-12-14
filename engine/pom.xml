@@ -138,10 +138,10 @@
             <artifactId>moneta</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Using it in main for Multimap support temporarily; TODO: replace by own implementation or extract via ProGuard -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
