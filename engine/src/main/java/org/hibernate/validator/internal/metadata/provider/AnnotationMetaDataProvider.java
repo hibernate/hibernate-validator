@@ -280,6 +280,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
+		if ( constraintDescriptors.isEmpty() ) {
+			return Collections.emptySet();
+		}
+
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
 		ConstraintLocation location = ConstraintLocation.forProperty( field );
