@@ -184,8 +184,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.gmaven</groupId>
-                        <artifactId>gmaven-plugin</artifactId>
+                        <groupId>org.codehaus.gmavenplus</groupId>
+                        <artifactId>gmavenplus-plugin</artifactId>
                         <executions>
                             <execution>
                                 <id>configure-properties</id>
@@ -194,11 +194,13 @@
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
-                                    <source><![CDATA[
-                                        project.properties['arquillian.protocol'] = Boolean.valueOf(pom.properties['with-security-manager']) ? 'LocalSecurityManagerTesting' : 'Local';
-                                        project.properties['surefire.argLine'] = Boolean.valueOf(pom.properties['with-security-manager']) ? '-Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Djava.security.debug=access' : '';
-                                        ]]>
-                                    </source>
+                                    <scripts>
+                                        <script><![CDATA[
+                                            project.properties['arquillian.protocol'] = Boolean.valueOf(project.properties['with-security-manager']) ? 'LocalSecurityManagerTesting' : 'Local';
+                                            project.properties['surefire.argLine'] = Boolean.valueOf(project.properties['with-security-manager']) ? '-Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/test.policy -Djava.security.debug=access' : '';
+                                            ]]>
+                                        </script>
+                                    </scripts>
                                 </configuration>
                             </execution>
                         </executions>
@@ -241,6 +243,7 @@
                 </property>
             </activation>
             <properties>
+                <maven-surefire-plugin.argLine.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</maven-surefire-plugin.argLine.add-opens>
                 <arquillian.protocol>Servlet 3.0</arquillian.protocol>
             </properties>
             <dependencies>
@@ -315,8 +318,8 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.codehaus.gmaven</groupId>
-                        <artifactId>gmaven-plugin</artifactId>
+                        <groupId>org.codehaus.gmavenplus</groupId>
+                        <artifactId>gmavenplus-plugin</artifactId>
                         <executions>
                             <execution>
                                 <id>update-modules</id>
@@ -325,7 +328,9 @@
                                     <goal>execute</goal>
                                 </goals>
                                 <configuration>
-                                    <source>${pom.basedir}/src/script/setupModules.groovy</source>
+                                    <scripts>
+                                        <script>file://${pom.basedir}/src/script/setupModules.groovy</script>
+                                    </scripts>
                                 </configuration>
                             </execution>
                         </executions>
@@ -334,7 +339,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <argLine>-Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager ${surefire.argLine.extension}</argLine>
+                            <argLine>-Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
                             <forkMode>once</forkMode>
                             <systemPropertyVariables>
                                 <arquillian.launch>incontainer</arquillian.launch>
