@@ -738,7 +738,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/constraint
 If your validator implementation is rather simple (i.e. no initialization from the annotation is needed,
 and `ConstraintValidatorContext` is not used), you also can use this alternative API to specify the constraint logic using a Lambda expression or method reference:
 
-[[example-using-constraint-definition-api]]
+[[example-using-constraint-definition-api-lambda]]
 .Adding constraint definition with a Lambda expression
 ====
 [source, JAVA, indent=0]
