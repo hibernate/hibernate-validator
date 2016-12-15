@@ -14,7 +14,6 @@ import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -129,8 +128,7 @@ public class PropertyConstraintLocation implements ConstraintLocation {
 
 	/**
 	 * Returns an accessible version of the given member. Will be the given member itself in case it is accessible,
-	 * otherwise a copy which is set accessible. These copies are maintained in the
-	 * {@link ValidatorImpl#accessibleMembers} cache.
+	 * otherwise a copy which is set accessible.
 	 */
 	private static Member getAccessible(Member original) {
 		if ( ( (AccessibleObject) original ).isAccessible() ) {
