@@ -23,6 +23,8 @@
         <wildflyOriginalTargetDir>${project.build.directory}/wildfly-original/wildfly-${wildfly.version}</wildflyOriginalTargetDir>
         <wildflyPatchedTargetDir>${project.build.directory}/wildfly-patched/wildfly-${wildfly.version}</wildflyPatchedTargetDir>
         <patchFile>${project.build.directory}/hv-patch.zip</patchFile>
+
+        <patch-gen-maven-plugin.argLine.add-opens></patch-gen-maven-plugin.argLine.add-opens>
     </properties>
 
     <dependencyManagement/>
@@ -166,8 +168,8 @@
             </plugin>
             <!-- Update module.xml descriptors in the second WF copy -->
             <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>update-modules</id>
@@ -176,7 +178,9 @@
                             <goal>execute</goal>
                         </goals>
                         <configuration>
-                            <source>${pom.basedir}/src/script/setupModules.groovy</source>
+                            <scripts>
+                                <script>file:///${pom.basedir}/src/script/setupModules.groovy</script>
+                            </scripts>
                         </configuration>
                     </execution>
                 </executions>
@@ -193,6 +197,7 @@
                             <goal>generate-patch</goal>
                         </goals>
                         <configuration>
+                            <argLine>${patch-gen-maven-plugin.argLine.add-opens}</argLine>
                             <appliesToDist>${wildflyOriginalTargetDir}</appliesToDist>
                             <patchConfig>${module.xml.targetdir}/patch.xml</patchConfig>
                             <updatedDist>${wildflyPatchedTargetDir}</updatedDist>
@@ -203,4 +208,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>jdk9</id>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <properties>
+                <patch-gen-maven-plugin.argLine.add-opens>--add-opens=java.base/java.lang=ALL-UNNAMED</patch-gen-maven-plugin.argLine.add-opens>
+            </properties>
+        </profile>
+    </profiles>
 </project>

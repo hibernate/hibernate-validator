@@ -31,6 +31,18 @@
                         <updatePolicy>never</updatePolicy>
                     </snapshots>
                 </repository>
+                <repository>
+                    <id>jfrog-snapshots</id>
+                    <name>JFrog snapshots repository for Groovy</name>
+                    <url>https://oss.jfrog.org/oss-snapshot-local/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
             </repositories>
             <pluginRepositories>
                 <!-- Use Central first -->
@@ -51,6 +63,18 @@
                     <releases>
                         <enabled>true</enabled>
                         <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>jfrog-snapshots</id>
+                    <name>JFrog snapshots repository for Groovy</name>
+                    <url>https://oss.jfrog.org/oss-snapshot-local/</url>
+                    <releases>
+                        <enabled>false</enabled>
                     </releases>
                     <snapshots>
                         <enabled>true</enabled>

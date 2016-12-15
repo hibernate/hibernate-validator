@@ -20,7 +20,8 @@
         <!-- Takes no effect - ARQ-579 -->
         <configuration>
             <property name="jbossHome">${wildflyTargetDir}</property>
-            <property name="javaVmArguments">-Xmx1024m -XX:MaxPermSize=512m ${remote.debug}
+            <property name="javaVmArguments">${arquillian.javaVmArguments.add-opens}
+                -Xmx1024m -XX:MaxPermSize=512m ${remote.debug}
                 -Dvalidation.provider=${validation.provider}
             </property>
             <property name="allowConnectingToRunningServer">true</property>

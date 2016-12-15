@@ -136,7 +136,7 @@
         <jboss-ejb-api_3.2_spec.version>1.0.0.Final</jboss-ejb-api_3.2_spec.version>
 
         <!-- WildFly patching infrastructure -->
-        <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha1</wildfly-patch-gen-maven-plugin.version>
+        <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha3-SNAPSHOT</wildfly-patch-gen-maven-plugin.version>
         <wildfly-patch-gen-maven-plugin.woodstox.version>5.0.3</wildfly-patch-gen-maven-plugin.woodstox.version>
         <wildfly-maven-plugin.version>1.1.0.Alpha11</wildfly-maven-plugin.version>
         <wildfly-core.version>1.0.1.Final</wildfly-core.version>
@@ -151,18 +151,28 @@
 
         <puppycrawl.checkstyle.version>7.1</puppycrawl.checkstyle.version>
 
+        <groovy.version>2.4.8-SNAPSHOT</groovy.version>
+
         <!--
         Do not upgrade Surefire and Failsafe to 2.19+.
         See https://hibernate.atlassian.net/browse/HV-1117
         -->
-        <maven.surefire.version>2.18.1</maven.surefire.version>
+        <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
 
         <!-- Used to add further arguments to the arg line for specific sub-modules and profiles -->
-        <surefire.argLine></surefire.argLine>
-        <surefire.argLine.extension></surefire.argLine.extension>
+        <maven-surefire-plugin.argLine></maven-surefire-plugin.argLine>
+        <maven-surefire-plugin.argLine.add-modules></maven-surefire-plugin.argLine.add-modules>
+        <maven-surefire-plugin.argLine.add-opens></maven-surefire-plugin.argLine.add-opens>
 
-        <!-- Names of modules to be passed via "add-modules" option when forking java (through Surefire) or javadoc  on Java 9 -->
-        <jigsaw.modules>java.xml.bind</jigsaw.modules>
+        <!--
+        Names of modules to be passed via "add-modules" option when forking java through Surefire and javadoc
+        plugins on Java 9
+        -->
+        <maven-surefire-plugin.jigsaw.modules>java.xml.bind</maven-surefire-plugin.jigsaw.modules>
+        <maven-javadoc-plugin.jigsaw.modules>java.xml.bind</maven-javadoc-plugin.jigsaw.modules>
+        
+        <!-- add-opens options required for Arquillian and WildFly -->
+        <arquillian.javaVmArguments.add-opens></arquillian.javaVmArguments.add-opens>
     </properties>
 
     <prerequisites>
@@ -274,7 +284,7 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-jsr223</artifactId>
-                <version>2.4.7</version>
+                <version>${groovy.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.easymock</groupId>
@@ -513,19 +523,19 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven.surefire.version}</version>
+                    <version>${maven-surefire-plugin.version}</version>
                     <configuration>
                         <forkMode>once</forkMode>
                         <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
-                        <argLine>${surefire.argLine} ${surefire.argLine.extension}</argLine>
+                        <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>${maven.surefire.version}</version>
+                    <version>${maven-surefire-plugin.version}</version>
                     <executions>
                         <execution>
                             <id>generate-test-report</id>
@@ -542,7 +552,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${maven.surefire.version}</version>
+                    <version>${maven-surefire-plugin.version}</version>
                     <executions>
                         <execution>
                             <id>integration-test</id>
@@ -550,6 +560,9 @@
                                 <goal>integration-test</goal>
                                 <goal>verify</goal>
                             </goals>
+                            <configuration>
+                                <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -683,9 +696,16 @@
                     <version>${org.codehaus.mojo.chronos.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.gmaven</groupId>
-                    <artifactId>gmaven-plugin</artifactId>
+                    <groupId>org.codehaus.gmavenplus</groupId>
+                    <artifactId>gmavenplus-plugin</artifactId>
                     <version>1.5</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-all</artifactId>
+                            <version>${groovy.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.servicemix.tooling</groupId>
@@ -953,8 +973,41 @@
                 <jdk>9</jdk>
             </activation>
             <properties>
-                <surefire.argLine.extension>--add-modules ${jigsaw.modules}</surefire.argLine.extension>
+                <maven-surefire-plugin.argLine.add-modules>--add-modules=${maven-surefire-plugin.jigsaw.modules}</maven-surefire-plugin.argLine.add-modules>
+                <arquillian.javaVmArguments.add-opens>
+                    --add-opens=java.base/java.lang=ALL-UNNAMED
+                    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+                    --add-opens=java.base/java.security=ALL-UNNAMED
+                    --add-opens=java.base/java.math=ALL-UNNAMED
+                    --add-opens=java.base/java.io=ALL-UNNAMED
+                    --add-opens=java.base/java.net=ALL-UNNAMED
+                    --add-opens=java.base/java.util=ALL-UNNAMED
+                    --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+                    --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED
+                    --add-opens=java.base/java.util.concurrent.locks=ALL-UNNAMED
+                    --add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED
+                    --add-opens=java.management/javax.management=ALL-UNNAMED
+                    --add-opens=java.management/javax.management.openmbean=ALL-UNNAMED
+                    --add-opens=java.naming/javax.naming=ALL-UNNAMED
+                </arquillian.javaVmArguments.add-opens>
             </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.wildfly.plugins</groupId>
+                            <artifactId>wildfly-maven-plugin</artifactId>
+                            <configuration>
+                                <javaOpts>
+                                    <javaOpt>--add-opens=java.base/java.lang=ALL-UNNAMED</javaOpt>
+                                    <javaOpt>--add-opens=java.base/java.security=ALL-UNNAMED</javaOpt>
+                                    <javaOpt>--add-opens=java.base/java.io=ALL-UNNAMED</javaOpt>
+                                </javaOpts>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
     </profiles>
 </project>
