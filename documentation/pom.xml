@@ -25,7 +25,7 @@
         <jdocbook.ignoreTranslations>false</jdocbook.ignoreTranslations>
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
-        <surefire.argLine>-Duser.language=en</surefire.argLine>
+        <maven-surefire-plugin.argLine>-Duser.language=en</maven-surefire-plugin.argLine>
     </properties>
 
     <dependencies>

@@ -209,4 +209,16 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>jdk9</id>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <properties>
+                <!-- required by Arquillian to connect to the JMX interface of WildFly -->
+                <maven-surefire-plugin.argLine.add-opens>--add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED</maven-surefire-plugin.argLine.add-opens>
+            </properties>
+        </profile>
+    </profiles>
 </project>
