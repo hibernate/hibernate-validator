@@ -90,7 +90,7 @@ public class MethodInheritanceTree {
 	}
 
 	private Set<ExecutableElement> buildOverriddenMethodSet() {
-		Set<ExecutableElement> overriddenMethods = CollectionHelper.newHashSet();
+		Set<ExecutableElement> overriddenMethods = CollectionHelper.newLinkedHashSet();
 		for ( ExecutableElement method : methodNodeMapping.keySet() ) {
 			if ( !rootMethodNode.getMethod().equals( method ) ) {
 				overriddenMethods.add( method );
@@ -100,7 +100,7 @@ public class MethodInheritanceTree {
 	}
 
 	private Set<ExecutableElement> buildTopLevelMethodSet() {
-		Set<ExecutableElement> methods = CollectionHelper.newHashSet();
+		Set<ExecutableElement> methods = CollectionHelper.newLinkedHashSet();
 		for ( MethodNode methodNode : methodNodeMapping.values() ) {
 			if ( !methodNode.isOverriding() ) {
 				methods.add( methodNode.getMethod() );
@@ -150,7 +150,7 @@ public class MethodInheritanceTree {
 
 		private MethodNode(ExecutableElement method) {
 			this.method = method;
-			this.overriddenMethodNodes = CollectionHelper.newHashSet();
+			this.overriddenMethodNodes = CollectionHelper.newLinkedHashSet();
 		}
 
 		private boolean isOverriding() {

@@ -54,7 +54,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 /**
  * A CDI portable extension which integrates Bean Validation with CDI. It registers the following objects:
@@ -237,7 +237,7 @@ public class ValidationExtension implements Extension {
 	}
 
 	private <T> Set<AnnotatedCallable<? super T>> determineConstrainedCallables(AnnotatedType<T> type) {
-		Set<AnnotatedCallable<? super T>> callables = newHashSet();
+		Set<AnnotatedCallable<? super T>> callables = newLinkedHashSet();
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( type.getJavaClass() );
 
 		determineConstrainedConstructors( type, beanDescriptor, callables );

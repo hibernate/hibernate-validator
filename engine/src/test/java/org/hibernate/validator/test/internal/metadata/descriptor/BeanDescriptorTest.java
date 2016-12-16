@@ -8,7 +8,7 @@ package org.hibernate.validator.test.internal.metadata.descriptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -373,7 +373,7 @@ public class BeanDescriptorTest {
 	}
 
 	private Set<String> getMethodNames(Set<MethodDescriptor> descriptors) {
-		Set<String> methodNames = newHashSet();
+		Set<String> methodNames = newLinkedHashSet();
 
 		for ( MethodDescriptor methodDescriptor : descriptors ) {
 			methodNames.add( methodDescriptor.getName() );
@@ -383,7 +383,7 @@ public class BeanDescriptorTest {
 	}
 
 	private Set<List<Class<?>>> getSignatures(Set<ConstructorDescriptor> descriptors) {
-		Set<List<Class<?>>> signatures = newHashSet();
+		Set<List<Class<?>>> signatures = newLinkedHashSet();
 
 		for ( ConstructorDescriptor methodDescriptor : descriptors ) {
 			List<Class<?>> parameterTypes = newArrayList();

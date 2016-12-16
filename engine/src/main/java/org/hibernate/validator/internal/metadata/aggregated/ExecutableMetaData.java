@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -18,7 +18,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -242,17 +242,17 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 	 * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
 	 */
 	public static class Builder extends MetaDataBuilder {
-		private final Set<String> signatures = newHashSet();
+		private final Set<String> signatures = newLinkedHashSet();
 
 		/**
 		 * Either CONSTRUCTOR or METHOD.
 		 */
 		private final ConstrainedElement.ConstrainedElementKind kind;
-		private final Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
+		private final Set<ConstrainedExecutable> constrainedExecutables = newLinkedHashSet();
 		private Executable executable;
 		private final boolean isGetterMethod;
-		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
-		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
+		private final Set<MetaConstraint<?>> crossParameterConstraints = newLinkedHashSet();
+		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newLinkedHashSet();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
 
@@ -287,7 +287,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			this.executableHelper = executableHelper;
 			this.kind = constrainedExecutable.getKind();
 			this.executable = constrainedExecutable.getExecutable();
-			this.rules = new HashSet<>( methodValidationConfiguration.getConfiguredRuleSet() );
+			this.rules = new LinkedHashSet<>( methodValidationConfiguration.getConfiguredRuleSet() );
 			this.isGetterMethod = constrainedExecutable.isGetterMethod();
 
 			add( constrainedExecutable );

@@ -32,7 +32,7 @@ import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 /**
  * A {@link Bean} representing a {@link ValidatorFactory}. There is one instance of this type representing the default
@@ -51,10 +51,10 @@ public class ValidatorFactoryBean implements Bean<ValidatorFactory>, Passivation
 
 	public ValidatorFactoryBean(BeanManager beanManager, ValidationProviderHelper validationProviderHelper) {
 		this.beanManager = beanManager;
-		this.destructibleResources = newHashSet( 4 );
+		this.destructibleResources = newLinkedHashSet( 4 );
 		this.validationProviderHelper = validationProviderHelper;
 		this.types = Collections.unmodifiableSet(
-				CollectionHelper.<Type>newHashSet(
+				CollectionHelper.<Type>newLinkedHashSet(
 						ClassHierarchyHelper.getHierarchy( validationProviderHelper.getValidatorFactoryBeanClass() )
 				)
 		);

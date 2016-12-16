@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.metadata.provider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 import static org.hibernate.validator.internal.util.ConcurrentReferenceHashMap.ReferenceType.SOFT;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -208,7 +208,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			return Collections.emptySet();
 		}
 
-		Set<MetaConstraint<?>> classLevelConstraints = newHashSet();
+		Set<MetaConstraint<?>> classLevelConstraints = newLinkedHashSet();
 
 		// HV-262
 		List<ConstraintDescriptorImpl<?>> classMetaData = findClassLevelConstraints( clazz );
@@ -221,7 +221,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<ConstrainedElement> getFieldMetaData(Class<?> beanClass) {
-		Set<ConstrainedElement> propertyMetaData = newHashSet();
+		Set<ConstrainedElement> propertyMetaData = newLinkedHashSet();
 
 		for ( Field field : run( GetDeclaredFields.action( beanClass ) ) ) {
 			// HV-172
@@ -278,7 +278,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
-		Set<MetaConstraint<?>> constraints = newHashSet();
+		Set<MetaConstraint<?>> constraints = newLinkedHashSet();
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
 			constraints.add( createMetaConstraint( field, constraintDescription ) );
@@ -323,7 +323,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	private Set<ConstrainedExecutable> getMetaData(Executable[] executableElements) {
-		Set<ConstrainedExecutable> executableMetaData = newHashSet();
+		Set<ConstrainedExecutable> executableMetaData = newLinkedHashSet();
 
 		for ( Executable executable : executableElements ) {
 			// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
@@ -409,7 +409,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			return Collections.emptySet();
 		}
 
-		Set<MetaConstraint<?>> constraints = newHashSet();
+		Set<MetaConstraint<?>> constraints = newLinkedHashSet();
 
 		for ( ConstraintDescriptorImpl<?> constraintDescriptor : constraintsDescriptors ) {
 			constraints.add(
@@ -448,8 +448,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 			boolean parameterIsCascading = false;
 			String parameterName = parameterNames.get( i );
-			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
-			Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
+			Set<MetaConstraint<?>> parameterConstraints = newLinkedHashSet();
+			Set<MetaConstraint<?>> typeArgumentsConstraints = newLinkedHashSet();
 			ConvertGroup groupConversion = null;
 			ConvertGroup.List groupConversionList = null;
 
@@ -794,7 +794,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * Creates meta constraints for type arguments constraints.
 	 */
 	private Set<MetaConstraint<?>> convertToTypeArgumentMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, ConstraintLocation location, Type type) {
-		Set<MetaConstraint<?>> constraints = newHashSet( constraintDescriptors.size() );
+		Set<MetaConstraint<?>> constraints = newLinkedHashSet( constraintDescriptors.size() );
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
 			MetaConstraint<?> metaConstraint = createTypeArgumentMetaConstraint( location, constraintDescription, type );
 			constraints.add( metaConstraint );

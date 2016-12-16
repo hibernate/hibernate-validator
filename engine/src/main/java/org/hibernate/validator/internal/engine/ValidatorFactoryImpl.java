@@ -7,7 +7,7 @@
 package org.hibernate.validator.internal.engine;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
@@ -247,7 +247,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	}
 
 	private static Set<DefaultConstraintMapping> getConstraintMappings(ConfigurationState configurationState, ClassLoader externalClassLoader) {
-		Set<DefaultConstraintMapping> constraintMappings = newHashSet();
+		Set<DefaultConstraintMapping> constraintMappings = newLinkedHashSet();
 
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateConfiguration = (ConfigurationImpl) configurationState;
@@ -509,7 +509,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static void registerCustomConstraintValidators(Set<DefaultConstraintMapping> constraintMappings,
 			ConstraintHelper constraintHelper) {
-		Set<Class<?>> definedConstraints = newHashSet();
+		Set<Class<?>> definedConstraints = newLinkedHashSet();
 		for ( DefaultConstraintMapping constraintMapping : constraintMappings ) {
 			for ( ConstraintDefinitionContribution<?> contribution : constraintMapping.getConstraintDefinitionContributions() ) {
 				processConstraintDefinitionContribution( contribution, constraintHelper, definedConstraints );

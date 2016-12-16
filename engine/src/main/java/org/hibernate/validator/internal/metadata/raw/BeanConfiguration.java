@@ -53,7 +53,7 @@ public class BeanConfiguration<T> {
 
 		this.source = source;
 		this.beanClass = beanClass;
-		this.constrainedElements = CollectionHelper.<ConstrainedElement>newHashSet( constrainedElements );
+		this.constrainedElements = CollectionHelper.<ConstrainedElement>newLinkedHashSet( constrainedElements );
 		this.defaultGroupSequence = defaultGroupSequence;
 		this.defaultGroupSequenceProvider = defaultGroupSequenceProvider;
 	}

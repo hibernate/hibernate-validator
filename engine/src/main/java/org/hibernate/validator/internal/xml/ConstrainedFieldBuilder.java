@@ -7,7 +7,7 @@
 package org.hibernate.validator.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.lang.reflect.Field;
 import java.security.AccessController;
@@ -51,12 +51,12 @@ class ConstrainedFieldBuilder {
 	Set<ConstrainedField> buildConstrainedFields(List<FieldType> fields,
 															   Class<?> beanClass,
 															   String defaultPackage) {
-		Set<ConstrainedField> constrainedFields = newHashSet();
+		Set<ConstrainedField> constrainedFields = newLinkedHashSet();
 		List<String> alreadyProcessedFieldNames = newArrayList();
 		for ( FieldType fieldType : fields ) {
 			Field field = findField( beanClass, fieldType.getName(), alreadyProcessedFieldNames );
 			ConstraintLocation constraintLocation = ConstraintLocation.forProperty( field );
-			Set<MetaConstraint<?>> metaConstraints = newHashSet();
+			Set<MetaConstraint<?>> metaConstraints = newLinkedHashSet();
 			for ( ConstraintType constraint : fieldType.getConstraint() ) {
 				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,

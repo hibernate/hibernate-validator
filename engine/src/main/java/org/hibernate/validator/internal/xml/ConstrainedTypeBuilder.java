@@ -7,7 +7,7 @@
 package org.hibernate.validator.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.util.List;
 import java.util.Map;
@@ -57,7 +57,7 @@ class ConstrainedTypeBuilder {
 
 		// constraints
 		ConstraintLocation constraintLocation = ConstraintLocation.forClass( beanClass );
-		Set<MetaConstraint<?>> metaConstraints = newHashSet();
+		Set<MetaConstraint<?>> metaConstraints = newLinkedHashSet();
 		for ( ConstraintType constraint : classType.getConstraint() ) {
 			MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 					constraintLocation,

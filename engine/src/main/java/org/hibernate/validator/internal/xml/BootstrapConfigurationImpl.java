@@ -14,7 +14,7 @@ import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 /**
  * Wrapper class for the bootstrap parameters defined in <i>validation.xml</i>
@@ -65,7 +65,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.parameterNameProviderClassName = null;
 		this.validatedExecutableTypes = DEFAULT_VALIDATED_EXECUTABLE_TYPES;
 		this.isExecutableValidationEnabled = true;
-		this.constraintMappingResourcePaths = newHashSet();
+		this.constraintMappingResourcePaths = newLinkedHashSet();
 		this.properties = newHashMap();
 	}
 
@@ -135,7 +135,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 
 	@Override
 	public Set<String> getConstraintMappingResourcePaths() {
-		return newHashSet( constraintMappingResourcePaths );
+		return newLinkedHashSet( constraintMappingResourcePaths );
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 
 	@Override
 	public Set<ExecutableType> getDefaultValidatedExecutableTypes() {
-		return newHashSet( validatedExecutableTypes );
+		return newLinkedHashSet( validatedExecutableTypes );
 	}
 
 	@Override

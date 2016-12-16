@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -45,26 +45,26 @@ public final class CollectionHelper {
 		return new ConcurrentHashMap<K, V>();
 	}
 
-	public static <T> HashSet<T> newHashSet() {
-		return new HashSet<T>();
+	public static <T> LinkedHashSet<T> newLinkedHashSet() {
+		return new LinkedHashSet<T>();
 	}
 
-	public static <T> HashSet<T> newHashSet(int size) {
-		return new HashSet<T>( size );
+	public static <T> LinkedHashSet<T> newLinkedHashSet(int size) {
+		return new LinkedHashSet<T>( size );
 	}
 
-	public static <T> HashSet<T> newHashSet(Collection<? extends T> c) {
-		return new HashSet<T>( c );
+	public static <T> LinkedHashSet<T> newLinkedHashSet(Collection<? extends T> c) {
+		return new LinkedHashSet<T>( c );
 	}
 
-	public static <T> HashSet<T> newHashSet(Collection<? extends T> s1, Collection<? extends T> s2) {
-		HashSet<T> set = CollectionHelper.<T>newHashSet( s1 );
+	public static <T> LinkedHashSet<T> newLinkedHashSet(Collection<? extends T> s1, Collection<? extends T> s2) {
+		LinkedHashSet<T> set = CollectionHelper.<T>newLinkedHashSet( s1 );
 		set.addAll( s2 );
 		return set;
 	}
 
-	public static <T> HashSet<T> newHashSet(Iterable<? extends T> iterable) {
-		HashSet<T> set = newHashSet();
+	public static <T> LinkedHashSet<T> newLinkedHashSet(Iterable<? extends T> iterable) {
+		LinkedHashSet<T> set = newLinkedHashSet();
 		for ( T t : iterable ) {
 			set.add( t );
 		}
@@ -92,7 +92,7 @@ public final class CollectionHelper {
 
 	@SafeVarargs
 	public static <T> Set<T> asSet(T... ts) {
-		return new HashSet<>( Arrays.asList( ts ) );
+		return new LinkedHashSet<>( Arrays.asList( ts ) );
 	}
 
 	/**

@@ -50,7 +50,7 @@ public class ParametersMethodOverrideCheck extends AbstractMethodOverrideCheck {
 		// you can't define a parameter constraint at all for this method (anywhere in the hierarchy, not even once)
 		if ( methodInheritanceTree.hasParallelDefinitions() ) {
 			// it means we have more than one top level method and as a result there cannot be any annotations present in the hierarchy
-			Set<ConstraintCheckIssue> issues = CollectionHelper.newHashSet();
+			Set<ConstraintCheckIssue> issues = CollectionHelper.newLinkedHashSet();
 			for ( ExecutableElement method : methodInheritanceTree.getAllMethods() ) {
 				if ( hasAnnotationsOnParameters( method ) ) {
 					issues.add( ConstraintCheckIssue.error(

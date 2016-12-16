@@ -17,7 +17,7 @@ import org.hibernate.validator.internal.metadata.descriptor.GroupConversionDescr
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 /**
  * Provides group conversion functionality to {@link org.hibernate.validator.cfg.context.Cascadable}s.
@@ -55,7 +55,7 @@ public class GroupConversionHelper {
 	 *         {@code null}.
 	 */
 	public Set<GroupConversionDescriptor> asDescriptors() {
-		Set<GroupConversionDescriptor> descriptors = newHashSet( groupConversions.size() );
+		Set<GroupConversionDescriptor> descriptors = newLinkedHashSet( groupConversions.size() );
 
 		for ( Entry<Class<?>, Class<?>> conversion : groupConversions.entrySet() ) {
 			descriptors.add(

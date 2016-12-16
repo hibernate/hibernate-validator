@@ -40,7 +40,7 @@ public class MultiValuedChecks implements ConstraintChecks {
 
 	@Override
 	public Set<ConstraintCheckIssue> execute(Element element, AnnotationMirror annotation) {
-		Set<ConstraintCheckIssue> theValue = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> theValue = CollectionHelper.newLinkedHashSet();
 
 		//execute the checks on each element of the multi-valued constraint
 		for ( AnnotationMirror onePartOfMultiValuedConstraint :

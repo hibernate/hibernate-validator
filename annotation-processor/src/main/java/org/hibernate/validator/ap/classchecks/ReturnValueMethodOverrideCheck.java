@@ -40,7 +40,7 @@ public class ReturnValueMethodOverrideCheck extends AbstractMethodOverrideCheck 
 	protected Set<ConstraintCheckIssue> checkMethodInternal(ExecutableElement currentMethod, MethodInheritanceTree methodInheritanceTree) {
 		// if this method gets executed it means that the current method has a @Valid annotation and we
 		// need to check that there is no other @Valid annotations in the hierarchy of this method
-		Set<ConstraintCheckIssue> issues = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> issues = CollectionHelper.newLinkedHashSet();
 		for ( ExecutableElement overriddenMethod : methodInheritanceTree.getOverriddenMethods() ) {
 			if ( methodIsAnnotatedWithValid( overriddenMethod ) ) {
 				issues.add( ConstraintCheckIssue.error(

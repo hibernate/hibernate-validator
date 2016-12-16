@@ -48,7 +48,7 @@ public class SingleValuedChecks implements ConstraintChecks {
 
 	@Override
 	public Set<ConstraintCheckIssue> execute(Element element, AnnotationMirror annotation) {
-		Set<ConstraintCheckIssue> theValue = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> theValue = CollectionHelper.newLinkedHashSet();
 
 		//for each check execute the check method appropriate for the kind of
 		//the given element

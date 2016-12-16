@@ -54,9 +54,9 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 
 		boolean isDefaultGroupSequenceRedefinition = false;
 
-		Set<String> qualifiedNames = CollectionHelper.newHashSet();
+		Set<String> qualifiedNames = CollectionHelper.newLinkedHashSet();
 
-		Set<ConstraintCheckIssue> issues = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> issues = CollectionHelper.newLinkedHashSet();
 
 		for ( AnnotationValue value : annotationValue ) {
 			TypeMirror typeMirror = (TypeMirror) value.getValue();
@@ -99,7 +99,7 @@ public class GroupSequenceCheck extends AnnotationParametersAbstractCheck {
 		}
 
 		// 5. the defined group sequence is expandable (no cyclic definition)
-		ConstraintCheckIssue cyclicDefinitionIssue = checkForCyclicDefinition( CollectionHelper.newHashSet(), annotatedElement.asType(), annotatedElement, annotation );
+		ConstraintCheckIssue cyclicDefinitionIssue = checkForCyclicDefinition( CollectionHelper.newLinkedHashSet(), annotatedElement.asType(), annotatedElement, annotation );
 		if ( cyclicDefinitionIssue != null ) {
 			issues.add( cyclicDefinitionIssue );
 		}

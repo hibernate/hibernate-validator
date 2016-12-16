@@ -42,7 +42,7 @@ public class ValidatorBean implements Bean<Validator>, PassivationCapable {
 		this.validatorFactoryBean = validatorFactoryBean;
 		this.validationProviderHelper = validationProviderHelper;
 		this.types = Collections.unmodifiableSet(
-				CollectionHelper.<Type>newHashSet(
+				CollectionHelper.<Type>newLinkedHashSet(
 						ClassHierarchyHelper.getHierarchy( validationProviderHelper.getValidatorBeanClass() )
 				)
 		);
