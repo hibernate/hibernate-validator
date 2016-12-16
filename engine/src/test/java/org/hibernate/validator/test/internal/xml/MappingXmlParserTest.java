@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.test.internal.xml;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -54,7 +54,7 @@ public class MappingXmlParserTest {
 		assertFalse( validatorDescriptors.isEmpty(), "Wrong number of default validators" );
 		assertEquals( getIndex( validatorDescriptors, DecimalMinValidatorForFoo.class ), -1, "The custom validator must be absent" );
 
-		Set<InputStream> mappingStreams = newHashSet();
+		Set<InputStream> mappingStreams = newLinkedHashSet();
 		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-1.xml" ) );
 
 		xmlMappingParser.parse( mappingStreams );
@@ -82,7 +82,7 @@ public class MappingXmlParserTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-782")
 	public void testOverridingOfConstraintValidatorsFromMultipleMappingFilesThrowsException() {
-		Set<InputStream> mappingStreams = newHashSet();
+		Set<InputStream> mappingStreams = newLinkedHashSet();
 		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-1.xml" ) );
 		mappingStreams.add( MappingXmlParserTest.class.getResourceAsStream( "decimal-min-mapping-2.xml" ) );
 

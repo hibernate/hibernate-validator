@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.cdi;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Default;
@@ -21,7 +21,7 @@ import org.hibernate.validator.cdi.HibernateValidator;
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 /**
  * Provides functionality for dealing with validation provider types.
@@ -110,7 +110,7 @@ public class ValidationProviderHelper {
 	@SuppressWarnings("serial")
 	private static Set<Annotation> determineRequiredQualifiers(boolean isDefaultProvider,
 			boolean isHibernateValidator) {
-		HashSet<Annotation> qualifiers = newHashSet( 3 );
+		LinkedHashSet<Annotation> qualifiers = newLinkedHashSet( 3 );
 
 		if ( isDefaultProvider ) {
 			qualifiers.add(

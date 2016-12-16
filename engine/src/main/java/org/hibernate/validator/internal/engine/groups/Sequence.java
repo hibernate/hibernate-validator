@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.engine.groups;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -67,7 +67,7 @@ public class Sequence implements Iterable<GroupWithInheritance> {
 		ArrayList<Group> tmpGroups = new ArrayList<Group>();
 
 		for ( Group group : groups ) {
-			HashSet<Group> groupsOfGroup = new HashSet<Group>();
+			LinkedHashSet<Group> groupsOfGroup = new LinkedHashSet<Group>();
 
 			groupsOfGroup.add( group );
 			addInheritedGroups( group, groupsOfGroup );

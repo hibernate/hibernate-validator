@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 import static org.hibernate.validator.testutils.ValidatorUtil.getBeanDescriptor;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
@@ -49,11 +49,11 @@ public class ConstraintDescriptorTest {
 		ConstraintDescriptor<?> constraintDescriptor = constraintDescriptors.iterator().next();
 		assertEquals( constraintDescriptor.getMessageTemplate(), "bar", "Wrong message" );
 
-		Set<Class<?>> groups = newHashSet();
+		Set<Class<?>> groups = newLinkedHashSet();
 		groups.add( SnafuGroup.class );
 		assertEquals( constraintDescriptor.getGroups(), groups, "Wrong groups" );
 
-		Set<Class<?>> payloads = newHashSet();
+		Set<Class<?>> payloads = newLinkedHashSet();
 		payloads.add( Payload22.class );
 		assertEquals( constraintDescriptor.getPayload(), payloads, "Wrong payload" );
 

@@ -46,8 +46,8 @@ public class AbstractElementVisitor<T, V> extends ElementKindVisitor6<T, V> {
 	 * @param foundIssues a collection of issues to be reported
 	 */
 	protected void reportIssues(Collection<ConstraintCheckIssue> foundIssues) {
-		Set<ConstraintCheckIssue> warnings = CollectionHelper.newHashSet();
-		Set<ConstraintCheckIssue> errors = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> warnings = CollectionHelper.newLinkedHashSet();
+		Set<ConstraintCheckIssue> errors = CollectionHelper.newLinkedHashSet();
 
 		for ( ConstraintCheckIssue issue : foundIssues ) {
 			if ( issue.isError() ) {

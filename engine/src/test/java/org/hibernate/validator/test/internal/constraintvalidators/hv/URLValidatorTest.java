@@ -32,7 +32,7 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
 import static java.lang.annotation.ElementType.METHOD;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.testng.Assert.assertEquals;
@@ -391,7 +391,7 @@ public class URLValidatorTest {
 	}
 
 	private static class DelegatingConstraintValidatorFactory implements ConstraintValidatorFactory {
-		private final Set<Class<?>> requestedConstraintValidators = newHashSet();
+		private final Set<Class<?>> requestedConstraintValidators = newLinkedHashSet();
 		private final ConstraintValidatorFactory delegate;
 
 		private DelegatingConstraintValidatorFactory(ConstraintValidatorFactory delegate) {

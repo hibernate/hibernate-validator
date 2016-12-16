@@ -7,7 +7,7 @@
 package org.hibernate.validator.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -52,14 +52,14 @@ class ConstrainedGetterBuilder {
 	Set<ConstrainedExecutable> buildConstrainedGetters(List<GetterType> getterList,
 																	 Class<?> beanClass,
 																	 String defaultPackage) {
-		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
+		Set<ConstrainedExecutable> constrainedExecutables = newLinkedHashSet();
 		List<String> alreadyProcessedGetterNames = newArrayList();
 		for ( GetterType getterType : getterList ) {
 			String getterName = getterType.getName();
 			Method getter = findGetter( beanClass, getterName, alreadyProcessedGetterNames );
 			ConstraintLocation constraintLocation = ConstraintLocation.forProperty( getter );
 
-			Set<MetaConstraint<?>> metaConstraints = newHashSet();
+			Set<MetaConstraint<?>> metaConstraints = newLinkedHashSet();
 			for ( ConstraintType constraint : getterType.getConstraint() ) {
 				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,

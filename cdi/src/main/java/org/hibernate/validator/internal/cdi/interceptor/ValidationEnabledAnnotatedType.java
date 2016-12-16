@@ -27,8 +27,8 @@ public class ValidationEnabledAnnotatedType<T> implements AnnotatedType<T> {
 
 	public ValidationEnabledAnnotatedType(AnnotatedType<T> type, Set<AnnotatedCallable<? super T>> constrainedCallables) {
 		this.wrappedType = type;
-		this.wrappedMethods = CollectionHelper.newHashSet();
-		this.wrappedConstructors = CollectionHelper.newHashSet();
+		this.wrappedMethods = CollectionHelper.newLinkedHashSet();
+		this.wrappedConstructors = CollectionHelper.newLinkedHashSet();
 		buildWrappedCallable( constrainedCallables );
 	}
 

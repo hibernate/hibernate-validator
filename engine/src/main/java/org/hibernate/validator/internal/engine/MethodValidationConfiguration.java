@@ -7,7 +7,7 @@
 package org.hibernate.validator.internal.engine;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
@@ -17,7 +17,7 @@ import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethods
 import org.hibernate.validator.internal.metadata.aggregated.rule.ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine;
 import org.hibernate.validator.internal.metadata.aggregated.rule.VoidMethodsMustNotBeReturnValueConstrained;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 /**
  * These properties modify the behavior of the {@code }Validator} with respect to the Bean Validation
@@ -127,7 +127,7 @@ public class MethodValidationConfiguration {
 	 * @return a set of method configuration rules based on this configuration state
 	 */
 	public Set<MethodConfigurationRule> getConfiguredRuleSet() {
-		HashSet<MethodConfigurationRule> result = newHashSet();
+		LinkedHashSet<MethodConfigurationRule> result = newLinkedHashSet();
 
 		if ( !this.isAllowOverridingMethodAlterParameterConstraint() ) {
 			result.add( new OverridingMethodMustNotAlterParameterConstraints() );

@@ -48,7 +48,7 @@ public class AnnotationTypeMemberCheck extends AbstractConstraintCheck {
 	@Override
 	public Set<ConstraintCheckIssue> checkAnnotationType(TypeElement element, AnnotationMirror annotation) {
 
-		Set<ConstraintCheckIssue> theValue = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> theValue = CollectionHelper.newLinkedHashSet();
 
 		theValue.addAll( checkMessageAttribute( element ) );
 		theValue.addAll( checkGroupsAttribute( element ) );

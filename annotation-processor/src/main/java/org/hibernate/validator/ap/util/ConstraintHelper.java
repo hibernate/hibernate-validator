@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -788,7 +788,7 @@ public class ConstraintHelper {
 				constraintMetaAnnotation
 		);
 
-		Set<TypeMirror> supportedTypes = CollectionHelper.newHashSet();
+		Set<TypeMirror> supportedTypes = CollectionHelper.newLinkedHashSet();
 
 		for ( AnnotationValue oneValidatorClassReference : validatorClassReferences ) {
 
@@ -972,7 +972,7 @@ public class ConstraintHelper {
 	 */
 	private Set<TypeMirror> getAssignableTypes(Set<TypeMirror> types, TypeMirror type) {
 
-		Set<TypeMirror> theValue = CollectionHelper.newHashSet();
+		Set<TypeMirror> theValue = CollectionHelper.newLinkedHashSet();
 
 		for ( TypeMirror supportedType : types ) {
 			if ( typeUtils.isAssignable( type, supportedType ) ) {
@@ -1002,7 +1002,7 @@ public class ConstraintHelper {
 		Set<TypeMirror> types = supportedTypesByConstraint.get( key );
 
 		if ( types == null ) {
-			supportedTypesByConstraint.put( key, new HashSet<TypeMirror>( supportedTypes ) );
+			supportedTypesByConstraint.put( key, new LinkedHashSet<TypeMirror>( supportedTypes ) );
 		}
 		else {
 			types.addAll( supportedTypes );
@@ -1032,7 +1032,7 @@ public class ConstraintHelper {
 			return composingConstraints;
 		}
 
-		composingConstraints = CollectionHelper.newHashSet();
+		composingConstraints = CollectionHelper.newLinkedHashSet();
 
 		List<? extends AnnotationMirror> annotationMirrors = constraintAnnotationType.asElement()
 				.getAnnotationMirrors();

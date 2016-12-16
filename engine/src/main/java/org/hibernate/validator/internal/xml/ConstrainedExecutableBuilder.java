@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -76,7 +76,7 @@ class ConstrainedExecutableBuilder {
 	Set<ConstrainedExecutable> buildMethodConstrainedExecutable(List<MethodType> methods,
 																			  Class<?> beanClass,
 																			  String defaultPackage) {
-		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
+		Set<ConstrainedExecutable> constrainedExecutables = newLinkedHashSet();
 		List<Method> alreadyProcessedMethods = newArrayList();
 		for ( MethodType methodType : methods ) {
 			// parse the parameters
@@ -135,7 +135,7 @@ class ConstrainedExecutableBuilder {
 	Set<ConstrainedExecutable> buildConstructorConstrainedExecutable(List<ConstructorType> constructors,
 																				   Class<?> beanClass,
 																				   String defaultPackage) {
-		Set<ConstrainedExecutable> constrainedExecutables = newHashSet();
+		Set<ConstrainedExecutable> constrainedExecutables = newLinkedHashSet();
 		List<Constructor<?>> alreadyProcessedConstructors = newArrayList();
 		for ( ConstructorType constructorType : constructors ) {
 			// parse the parameters
@@ -206,7 +206,7 @@ class ConstrainedExecutableBuilder {
 		);
 
 		// parse the return value
-		Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
+		Set<MetaConstraint<?>> returnValueConstraints = newLinkedHashSet();
 		Map<Class<?>, Class<?>> groupConversions = newHashMap();
 		boolean isCascaded = parseReturnValueType(
 				returnValueType,
@@ -235,7 +235,7 @@ class ConstrainedExecutableBuilder {
 																		 CrossParameterType crossParameterType,
 																		 Executable executable) {
 
-		Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
+		Set<MetaConstraint<?>> crossParameterConstraints = newLinkedHashSet();
 		if ( crossParameterType == null ) {
 			return crossParameterConstraints;
 		}

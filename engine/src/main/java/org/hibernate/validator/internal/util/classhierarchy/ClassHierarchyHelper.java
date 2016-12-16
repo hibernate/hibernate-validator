@@ -13,7 +13,7 @@ import java.util.Set;
 import org.hibernate.validator.internal.util.Contracts;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 /**
  * Helper class for dealing with inheritance hierarchies of given types which
@@ -108,7 +108,7 @@ public class ClassHierarchyHelper {
 	public static <T> Set<Class<? super T>> getDirectlyImplementedInterfaces(Class<T> clazz) {
 		Contracts.assertNotNull( clazz );
 
-		Set<Class<? super T>> classes = newHashSet();
+		Set<Class<? super T>> classes = newLinkedHashSet();
 		getImplementedInterfaces( clazz, classes );
 		return classes;
 	}

@@ -36,7 +36,7 @@ public class AnnotationParametersGroupsCheck extends AnnotationParametersAbstrac
 	@Override
 	protected Set<ConstraintCheckIssue> doCheck(Element element, AnnotationMirror annotation) {
 		List<? extends AnnotationValue> annotationValue = annotationApiHelper.getAnnotationArrayValue( annotation, "groups" );
-		Set<ConstraintCheckIssue> issues = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> issues = CollectionHelper.newLinkedHashSet();
 
 		for ( AnnotationValue value : annotationValue ) {
 			if ( !annotationApiHelper.isInterface( (TypeMirror) value.getValue() ) ) {

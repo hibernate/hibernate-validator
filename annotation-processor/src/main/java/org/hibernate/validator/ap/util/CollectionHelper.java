@@ -9,7 +9,7 @@ package org.hibernate.validator.ap.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -28,8 +28,8 @@ public class CollectionHelper {
 		return new HashMap<K, V>();
 	}
 
-	public static <T> HashSet<T> newHashSet() {
-		return new HashSet<T>();
+	public static <T> LinkedHashSet<T> newLinkedHashSet() {
+		return new LinkedHashSet<T>();
 	}
 
 	public static <T> TreeSet<T> newTreeSet() {
@@ -42,7 +42,7 @@ public class CollectionHelper {
 
 	public static <T> Set<T> asSet(T... ts) {
 
-		return new HashSet<T>( Arrays.asList( ts ) );
+		return new LinkedHashSet<T>( Arrays.asList( ts ) );
 	}
 
 	public static <T> Set<T> asTreeSet(T... ts) {

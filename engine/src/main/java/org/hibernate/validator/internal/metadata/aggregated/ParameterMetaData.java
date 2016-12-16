@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
@@ -128,7 +128,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		private final Type parameterType;
 		private final int parameterIndex;
 		private ConstrainedParameter constrainedParameter;
-		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
+		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newLinkedHashSet();
 
 		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
 			super( beanClass, constraintHelper );

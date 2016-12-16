@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AccessibleObject;
@@ -237,7 +237,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData implements Casc
 		private final String propertyName;
 		private final Type propertyType;
 		private Member cascadingMember;
-		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newHashSet();
+		private final Set<MetaConstraint<?>> typeArgumentsConstraints = newLinkedHashSet();
 		private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 		private boolean unwrapModeExplicitlyConfigured = false;
 

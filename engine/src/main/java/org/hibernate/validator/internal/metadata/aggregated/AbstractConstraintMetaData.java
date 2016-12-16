@@ -16,7 +16,7 @@ import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 /**
  * Base implementation for {@link ConstraintMetaData} with attributes common
@@ -130,7 +130,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	}
 
 	protected Set<ConstraintDescriptorImpl<?>> asDescriptors(Set<MetaConstraint<?>> constraints) {
-		Set<ConstraintDescriptorImpl<?>> theValue = newHashSet();
+		Set<ConstraintDescriptorImpl<?>> theValue = newLinkedHashSet();
 
 		for ( MetaConstraint<?> oneConstraint : constraints ) {
 			theValue.add( oneConstraint.getDescriptor() );

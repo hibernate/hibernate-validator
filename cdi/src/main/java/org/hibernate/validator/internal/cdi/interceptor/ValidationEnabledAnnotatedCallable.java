@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.cdi.interceptor;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import javax.enterprise.inject.spi.AnnotatedCallable;
@@ -68,7 +68,7 @@ public abstract class ValidationEnabledAnnotatedCallable<T> implements Annotated
 
 	@Override
 	public Set<Annotation> getAnnotations() {
-		Set<Annotation> annotations = new HashSet<Annotation>( wrappedCallable.getAnnotations() );
+		Set<Annotation> annotations = new LinkedHashSet<Annotation>( wrappedCallable.getAnnotations() );
 		annotations.add( methodValidationAnnotation );
 		return annotations;
 	}

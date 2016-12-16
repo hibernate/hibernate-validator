@@ -27,7 +27,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 /**
  * @author Hardy Ferentschik
@@ -42,7 +42,7 @@ public class ValidationBootstrapParameters {
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = newHashMap();
-	private final Set<InputStream> mappings = newHashSet();
+	private final Set<InputStream> mappings = newLinkedHashSet();
 
 	public ValidationBootstrapParameters() {
 	}

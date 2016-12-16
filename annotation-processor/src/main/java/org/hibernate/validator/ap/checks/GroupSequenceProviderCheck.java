@@ -59,7 +59,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 
 	@Override
 	public Set<ConstraintCheckIssue> checkNonAnnotationType(TypeElement element, AnnotationMirror annotation) {
-		Set<ConstraintCheckIssue> errors = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> errors = CollectionHelper.newLinkedHashSet();
 
 		errors.addAll( checkHostingElement( element, annotation ) );
 		errors.addAll( checkAnnotationValue( element, annotation ) );
@@ -94,7 +94,7 @@ public class GroupSequenceProviderCheck extends AbstractConstraintCheck {
 	}
 
 	private Set<ConstraintCheckIssue> checkAnnotationValue(TypeElement element, AnnotationMirror annotation) {
-		Set<ConstraintCheckIssue> errors = CollectionHelper.newHashSet();
+		Set<ConstraintCheckIssue> errors = CollectionHelper.newLinkedHashSet();
 		AnnotationValue value = annotationApiHelper.getAnnotationValue( annotation, "value" );
 		TypeMirror valueType = (TypeMirror) value.getValue();
 		TypeElement valueElement = (TypeElement) typeUtils.asElement( valueType );

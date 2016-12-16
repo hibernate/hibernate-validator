@@ -21,7 +21,7 @@ import javax.validation.metadata.PropertyDescriptor;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -64,7 +64,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 
 	@Override
 	public final Set<PropertyDescriptor> getConstrainedProperties() {
-		return newHashSet( constrainedProperties.values() );
+		return newLinkedHashSet( constrainedProperties.values() );
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 
 	@Override
 	public Set<ConstructorDescriptor> getConstrainedConstructors() {
-		return newHashSet( constrainedConstructors.values() );
+		return newLinkedHashSet( constrainedConstructors.values() );
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 			}
 		}
 
-		Set<MethodDescriptor> matchingMethodDescriptors = newHashSet();
+		Set<MethodDescriptor> matchingMethodDescriptors = newLinkedHashSet();
 		for ( ExecutableDescriptorImpl constrainedMethod : constrainedMethods.values() ) {
 			boolean addToSet = false;
 			if ( ( constrainedMethod.isGetter() && includeGetters ) || ( !constrainedMethod.isGetter() && includeNonGetters ) ) {

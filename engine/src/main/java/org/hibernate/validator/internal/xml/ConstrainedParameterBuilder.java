@@ -7,7 +7,7 @@
 package org.hibernate.validator.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Executable;
@@ -56,7 +56,7 @@ class ConstrainedParameterBuilder {
 		List<String> parameterNames = parameterNameProvider.getParameterNames( executable );
 		for ( ParameterType parameterType : parameterList ) {
 			ConstraintLocation constraintLocation = ConstraintLocation.forParameter( executable, i );
-			Set<MetaConstraint<?>> metaConstraints = newHashSet();
+			Set<MetaConstraint<?>> metaConstraints = newLinkedHashSet();
 			for ( ConstraintType constraint : parameterType.getConstraint() ) {
 				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,

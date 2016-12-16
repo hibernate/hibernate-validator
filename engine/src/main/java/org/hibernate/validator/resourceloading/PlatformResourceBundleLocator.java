@@ -24,7 +24,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetResources;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.jboss.logging.Logger;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
@@ -204,7 +204,7 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 
 		@Override
 		public Enumeration<String> getKeys() {
-			Set<String> keySet = newHashSet();
+			Set<String> keySet = newLinkedHashSet();
 			keySet.addAll( properties.stringPropertyNames() );
 			if ( parent != null ) {
 				keySet.addAll( Collections.list( parent.getKeys() ) );

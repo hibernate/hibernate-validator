@@ -18,7 +18,7 @@
 package org.hibernate.validator.internal.util;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.CollectionHelper.newLinkedHashSet;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -391,7 +391,7 @@ public final class TypeHelper {
 
 	private static void putPrimitiveSubtypes(Map<Class<?>, Set<Class<?>>> subtypesByPrimitive, Class<?> primitiveType,
 											 Class<?>... directSubtypes) {
-		Set<Class<?>> subtypes = newHashSet();
+		Set<Class<?>> subtypes = newLinkedHashSet();
 
 		for ( Class<?> directSubtype : directSubtypes ) {
 			subtypes.add( directSubtype );
