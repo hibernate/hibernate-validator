@@ -134,7 +134,7 @@
         <jboss-ejb-api_3.2_spec.version>1.0.0.Final</jboss-ejb-api_3.2_spec.version>
 
         <!-- WildFly patching infrastructure -->
-        <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha3-SNAPSHOT</wildfly-patch-gen-maven-plugin.version>
+        <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha3</wildfly-patch-gen-maven-plugin.version>
         <wildfly-patch-gen-maven-plugin.woodstox.version>5.0.3</wildfly-patch-gen-maven-plugin.woodstox.version>
         <wildfly-maven-plugin.version>1.1.0.Alpha11</wildfly-maven-plugin.version>
         <wildfly-core.version>1.0.1.Final</wildfly-core.version>
