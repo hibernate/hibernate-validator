@@ -83,21 +83,21 @@ public class ElTermResolver implements TermResolver {
 				messageInterpolatorContext.getValidatedValue(),
 				Object.class
 		);
-		elContext.setVariable( VALIDATED_VALUE_NAME, valueExpression );
+		elContext.getVariableMapper().setVariable( VALIDATED_VALUE_NAME, valueExpression );
 
 		// bind a formatter instantiated with proper locale
 		valueExpression = expressionFactory.createValueExpression(
 				new FormatterWrapper( locale ),
 				FormatterWrapper.class
 		);
-		elContext.setVariable( RootResolver.FORMATTER, valueExpression );
+		elContext.getVariableMapper().setVariable( RootResolver.FORMATTER, valueExpression );
 
 		// map the annotation values
 		for ( Map.Entry<String, Object> entry : messageInterpolatorContext.getConstraintDescriptor()
 				.getAttributes()
 				.entrySet() ) {
 			valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
-			elContext.setVariable( entry.getKey(), valueExpression );
+			elContext.getVariableMapper().setVariable( entry.getKey(), valueExpression );
 		}
 
 		// check for custom parameters provided by HibernateConstraintValidatorContext
@@ -105,7 +105,7 @@ public class ElTermResolver implements TermResolver {
 			MessageInterpolatorContext internalContext = (MessageInterpolatorContext) messageInterpolatorContext;
 			for ( Map.Entry<String, Object> entry : internalContext.getMessageParameters().entrySet() ) {
 				valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
-				elContext.setVariable( entry.getKey(), valueExpression );
+				elContext.getVariableMapper().setVariable( entry.getKey(), valueExpression );
 			}
 		}
 

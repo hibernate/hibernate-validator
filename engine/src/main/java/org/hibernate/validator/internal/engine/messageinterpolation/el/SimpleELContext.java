@@ -6,74 +6,52 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
-import java.lang.reflect.Method;
-
 import javax.el.ArrayELResolver;
 import javax.el.BeanELResolver;
 import javax.el.CompositeELResolver;
-import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.ListELResolver;
 import javax.el.MapELResolver;
 import javax.el.ResourceBundleELResolver;
-import javax.el.ValueExpression;
-import javax.el.VariableMapper;
+import javax.el.StandardELContext;
+import javax.el.StaticFieldELResolver;
 
 /**
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
-public class SimpleELContext extends ELContext {
+public class SimpleELContext extends StandardELContext {
 	private static final ELResolver DEFAULT_RESOLVER = new CompositeELResolver() {
 		{
 			add( new RootResolver() );
-			add( new ArrayELResolver( false ) );
-			add( new ListELResolver( false ) );
-			add( new MapELResolver( false ) );
+			add( new StaticFieldELResolver() );
+			add( new ArrayELResolver( true ) );
+			add( new ListELResolver( true ) );
+			add( new MapELResolver( true ) );
 			add( new ResourceBundleELResolver() );
-			add( new BeanELResolver( false ) );
+			add( new BeanELResolver( true ) );
 		}
 	};
 
-	private final MapBasedFunctionMapper functions;
-	private final VariableMapper variableMapper;
-	private final ELResolver resolver;
-
 	public SimpleELContext(ExpressionFactory expressionFactory) {
+		super( expressionFactory );
+
 		// In javax.el.ELContext, the ExpressionFactory is extracted from the context map. If it is not found, it
 		// defaults to ELUtil.getExpressionFactory() which, if we provided the ExpressionFactory to the
-		// ResourceBundleMessageInterpolator, might not be the same, thus potentially instantiating another
-		// ExpressionFactory outside of the boundaries of the class loader safe loading mechanism of
-		// ResourceBundleMessageInterpolator.
+		// ResourceBundleMessageInterpolator, might not be the same. Thus, we inject the ExpressionFactory in the
+		// context.
 		putContext( ExpressionFactory.class, expressionFactory );
+	}
 
-		functions = new MapBasedFunctionMapper();
-		variableMapper = new MapBasedVariableMapper();
-		resolver = DEFAULT_RESOLVER;
+	@Override
+	public void addELResolver(ELResolver cELResolver) {
+		throw new UnsupportedOperationException( getClass().getSimpleName() + " does not support addELResolver." );
 	}
 
 	@Override
 	public ELResolver getELResolver() {
-		return resolver;
+		return DEFAULT_RESOLVER;
 	}
 
-	@Override
-	public MapBasedFunctionMapper getFunctionMapper() {
-		return functions;
-	}
-
-	@Override
-	public VariableMapper getVariableMapper() {
-		return variableMapper;
-	}
-
-	public ValueExpression setVariable(String name, ValueExpression expression) {
-		return variableMapper.setVariable( name, expression );
-	}
-
-	public void setFunction(String prefix, String localName, Method method) {
-		functions.setFunction( prefix, localName, method );
-	}
 }
-
-
