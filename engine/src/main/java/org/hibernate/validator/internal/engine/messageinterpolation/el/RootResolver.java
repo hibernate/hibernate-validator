@@ -7,21 +7,19 @@
 package org.hibernate.validator.internal.engine.messageinterpolation.el;
 
 import java.beans.FeatureDescriptor;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.Iterator;
-import java.util.Map;
+
 import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ELResolver;
-import javax.el.PropertyNotFoundException;
-import javax.validation.ValidationException;
+import javax.el.PropertyNotWritableException;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.FormatterWrapper;
 
 /**
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class RootResolver extends ELResolver {
 	/**
@@ -30,11 +28,9 @@ public class RootResolver extends ELResolver {
 	public static final String FORMATTER = "formatter";
 	private static final String FORMAT = "format";
 
-	private final Map<String, Object> map = Collections.synchronizedMap( new HashMap<String, Object>() );
-
 	@Override
 	public Class<?> getCommonPropertyType(ELContext context, Object base) {
-		return base == null ? String.class : null;
+		return null;
 	}
 
 	@Override
@@ -44,47 +40,33 @@ public class RootResolver extends ELResolver {
 
 	@Override
 	public Class<?> getType(ELContext context, Object base, Object property) {
-		return resolve( context, base, property ) ? Object.class : null;
+		return null;
 	}
 
 	@Override
 	public Object getValue(ELContext context, Object base, Object property) {
-		if ( resolve( context, base, property ) ) {
-			if ( !isProperty( (String) property ) ) {
-				throw new PropertyNotFoundException( "Cannot find property " + property );
-			}
-			return getProperty( (String) property );
-		}
 		return null;
 	}
 
 	@Override
 	public boolean isReadOnly(ELContext context, Object base, Object property) {
-		return false;
+		return true;
 	}
 
 	@Override
 	public void setValue(ELContext context, Object base, Object property, Object value) {
-		if ( resolve( context, base, property ) ) {
-			setProperty( (String) property, value );
-		}
+		throw new PropertyNotWritableException();
 	}
 
 	@Override
 	public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
-		if ( resolve( context, base, method ) ) {
-			throw new ValidationException( "Invalid property" );
+		if ( !( base instanceof FormatterWrapper ) ) {
+			return null;
 		}
-
-		Object returnValue = null;
 
 		// due to bugs in most EL implementations when it comes to evaluating varargs we take care of the formatter call
 		// ourselves.
-		if ( base instanceof FormatterWrapper ) {
-			returnValue = evaluateFormatExpression( context, method, params );
-		}
-
-		return returnValue;
+		return evaluateFormatExpression( context, method, params );
 	}
 
 	private Object evaluateFormatExpression(ELContext context, Object method, Object[] params) {
@@ -118,23 +100,4 @@ public class RootResolver extends ELResolver {
 		return returnValue;
 	}
 
-	private Object getProperty(String property) {
-		return map.get( property );
-	}
-
-	private void setProperty(String property, Object value) {
-		map.put( property, value );
-	}
-
-	private boolean isProperty(String property) {
-		return map.containsKey( property );
-	}
-
-	private boolean resolve(ELContext context, Object base, Object property) {
-		context.setPropertyResolved( base == null && property instanceof String );
-		return context.isPropertyResolved();
-	}
 }
-
-
-
