@@ -842,13 +842,13 @@
                                 <pluginExecution>
                                     <pluginExecutionFilter>
                                         <groupId>
-                                            org.codehaus.gmaven
+                                            org.codehaus.gmavenplus
                                         </groupId>
                                         <artifactId>
-                                            gmaven-plugin
+                                            gmavenplus-plugin
                                         </artifactId>
                                         <versionRange>
-                                            [1.4,)
+                                            [1.5,)
                                         </versionRange>
                                         <goals>
                                             <goal>execute</goal>
