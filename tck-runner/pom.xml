@@ -239,7 +239,7 @@
                 </property>
             </activation>
             <properties>
-                <maven-surefire-plugin.argLine.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</maven-surefire-plugin.argLine.add-opens>
+                <maven-surefire-plugin.argLine>-Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager</maven-surefire-plugin.argLine>
                 <arquillian.protocol>Servlet 3.0</arquillian.protocol>
             </properties>
             <dependencies>
@@ -336,7 +336,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <argLine>-Xmx1024m -Djava.util.logging.manager=org.jboss.logmanager.LogManager ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
                             <forkMode>once</forkMode>
                             <systemPropertyVariables>
                                 <arquillian.launch>incontainer</arquillian.launch>
@@ -352,6 +351,7 @@
                 <jdk>9</jdk>
             </activation>
             <properties>
+                <maven-surefire-plugin.argLine.add-opens>--add-opens java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</maven-surefire-plugin.argLine.add-opens>
                 <tck.suite.file>${project.build.directory}/test-classes/tck-tests-jdk9.xml</tck.suite.file>
             </properties>
         </profile>
