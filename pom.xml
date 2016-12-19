@@ -502,7 +502,7 @@
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
-                        <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
+                        <argLine>${maven-surefire-plugin.argLine}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -924,6 +924,19 @@
                 <!-- Use Groovy 2.4.8-SNAPSHOT for JDK 9. To be removed once 2.4.8 is officially released. -->
                 <groovy.version>2.4.8-SNAPSHOT</groovy.version>
             </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <version>${maven-surefire-plugin.version}</version>
+                            <configuration>
+                                <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
             <!--
             Add JFrog snapshots repository for Groovy 2.4.8-SNAPSHOT.
             To be removed once 2.4.8 is officially released.
