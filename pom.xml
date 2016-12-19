@@ -531,7 +531,7 @@
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
-                        <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
+                        <argLine>${maven-surefire-plugin.argLine}</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1001,6 +1001,13 @@
             <build>
                 <pluginManagement>
                     <plugins>
+                        <plugin>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <version>${maven-surefire-plugin.version}</version>
+                            <configuration>
+                                <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.argLine.add-modules} ${maven-surefire-plugin.argLine.add-opens}</argLine>
+                            </configuration>
+                        </plugin>
                         <plugin>
                             <groupId>org.wildfly.plugins</groupId>
                             <artifactId>wildfly-maven-plugin</artifactId>
