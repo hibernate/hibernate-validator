@@ -680,5 +680,5 @@ public interface Log extends BasicLogger {
 	ValidationException getNoValueExtractorFoundForUnwrapException(Type type);
 
 	@Message(id = 199, value = "Cannot extract value for type %1$s with more than one type parameters.")
-	ValidationException getUnableToExtractValueForTypeWithMultipleTypeParameterException(Type type);
+	ValidationException getUnableToExtractValueForTypeWithMultipleTypeParametersException(Type type);
 }

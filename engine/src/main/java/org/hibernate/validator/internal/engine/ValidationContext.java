@@ -260,7 +260,7 @@ public class ValidationContext<T> {
 		alreadyValidated = isAlreadyValidatedForCurrentGroup( value, group );
 
 		if ( alreadyValidated ) {
-			alreadyValidated = isAlreadyValidatedForPathAndTypeParameter( value, path );
+			alreadyValidated = isAlreadyValidatedForPath( value, path );
 		}
 
 		return alreadyValidated;
@@ -404,7 +404,7 @@ public class ValidationContext<T> {
 		}
 	}
 
-	private boolean isAlreadyValidatedForPathAndTypeParameter(Object value, PathImpl path) {
+	private boolean isAlreadyValidatedForPath(Object value, PathImpl path) {
 		Set<PathImpl> pathSet = processedPathsPerBean.get( value );
 		if ( pathSet == null ) {
 			return false;

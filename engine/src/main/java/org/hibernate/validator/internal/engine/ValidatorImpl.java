@@ -575,8 +575,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return success;
 	}
 
-	// TODO the value extractor should be retrieved at meta-data instantation and be cached (unlike cascades, constraint
-	// validator resolution is based on the static type of an element
+	// TODO the value extractor should be retrieved at meta-data instantiation and be cached (unlike cascades, constraint
+	// validator resolution is based on the static type of an element)
 	private boolean validateTypeParameterConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, MetaConstraint<?> metaConstraint,
 			Object valueToValidate) {
 		TypeArgumentConstraintLocation typeArgumentConstraintLocation = (TypeArgumentConstraintLocation) metaConstraint.getLocation();
@@ -596,7 +596,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return receiver.isSuccess();
 	}
 
-	// TODO the value extractor should be retrieved at meta-data instantation and be cached (unlike cascades, constraint
+	// TODO the value extractor should be retrieved at meta-data instantiation and be cached (unlike cascades, constraint
 	// validator resolution is based on the static type of an element
 	private boolean validateConstraintRequiringUnwrapping(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, MetaConstraint<?> metaConstraint,
 			Object valueToValidate) {
@@ -630,7 +630,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			throw log.getNoValueExtractorFoundForUnwrapException( subType );
 		}
 		else if ( resolvedTypeParameters.size() > 1 ) {
-			throw log.getUnableToExtractValueForTypeWithMultipleTypeParameterException(  subType );
+			throw log.getUnableToExtractValueForTypeWithMultipleTypeParametersException(  subType );
 		}
 		else {
 			return resolvedTypeParameters.iterator().next().getErasedType();

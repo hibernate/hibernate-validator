@@ -12,8 +12,8 @@ import org.hibernate.validator.spi.cascading.ValueExtractor;
 
 /**
  * Extractor for supporting the legacy construct {@code @Valid Optional<Foo>}.
- * @author Gunnar Morling
  *
+ * @author Gunnar Morling
  */
 // TODO should we keep that, or only support {@code Optional<@Valid Foo>}.
 public class LegacyOptionalValueExtractor implements ValueExtractor<Optional<?>> {

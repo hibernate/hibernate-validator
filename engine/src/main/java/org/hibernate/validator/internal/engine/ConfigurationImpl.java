@@ -254,7 +254,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
-
 	@Override
 	public HibernateValidatorConfiguration addCascadedValueExtractor(ValueExtractor<?> extractor) {
 		Contracts.assertNotNull( extractor, MESSAGES.parameterMustNotBeNull( "extractor" ) );
@@ -262,7 +261,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 		return this;
 	}
-
 
 	public final ConstraintMappingContributor getServiceLoaderBasedConstraintMappingContributor() {
 		return serviceLoaderBasedConstraintMappingContributor;

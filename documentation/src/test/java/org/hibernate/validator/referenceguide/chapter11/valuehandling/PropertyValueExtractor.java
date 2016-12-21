@@ -9,6 +9,7 @@ package org.hibernate.validator.referenceguide.chapter11.valuehandling;
 
 import org.hibernate.validator.spi.cascading.ExtractedValue;
 import org.hibernate.validator.spi.cascading.ValueExtractor;
+//end::include[]
 
 /**
  * @author Gunnar Morling
