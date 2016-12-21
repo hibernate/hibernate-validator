@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
@@ -51,7 +50,6 @@ import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.hibernate.validator.spi.time.TimeProvider;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * Hibernate specific {@code Configuration} implementation.
@@ -63,8 +61,6 @@ import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
  * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
  */
 public class ConfigurationImpl implements HibernateValidatorConfiguration, ConfigurationState {
-
-	private static final String JFX_UNWRAPPER_CLASS = "org.hibernate.validator.internal.engine.valuehandling.JavaFXPropertyValueUnwrapper";
 
 	static {
 		Version.touch();
@@ -94,7 +90,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private boolean failFast;
-	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers = newArrayList();
 	private final List<ValueExtractor<?>> cascadedValueExtractors = new ArrayList<>();
 	private ClassLoader externalClassLoader;
 	private TimeProvider timeProvider;
@@ -261,14 +256,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 
 	@Override
-	public HibernateValidatorConfiguration addValidatedValueHandler(ValidatedValueUnwrapper<?> handler) {
-		Contracts.assertNotNull( handler, MESSAGES.parameterMustNotBeNull( "handler" ) );
-		validatedValueHandlers.add( handler );
-
-		return this;
-	}
-
-	@Override
 	public HibernateValidatorConfiguration addCascadedValueExtractor(ValueExtractor<?> extractor) {
 		Contracts.assertNotNull( extractor, MESSAGES.parameterMustNotBeNull( "extractor" ) );
 		cascadedValueExtractors.add( extractor );
@@ -391,10 +378,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public ParameterNameProvider getParameterNameProvider() {
 		return validationBootstrapParameters.getParameterNameProvider();
-	}
-
-	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
-		return validatedValueHandlers;
 	}
 
 	public List<ValueExtractor<?>> getCascadedValueExtractors() {

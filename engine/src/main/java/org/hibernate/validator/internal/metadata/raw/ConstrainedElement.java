@@ -109,13 +109,10 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	boolean isConstrained();
 
 	/**
-	 * Determines how to handle unwrapping of validated values. Per default unwrapping occurs automatically
-	 * based on the validated type and registered {@code ValidatedValueUnwrapper}s. It can also be explcitly configured
-	 * using {@code UnwrapValidatedValue}.
+	 * Determines how to handle unwrapping of validated values as configured via {@code UnwrapValidatedValue}.
 	 *
 	 * @return Returns the unwrapping mode for this constrained element.
 	 * @see org.hibernate.validator.valuehandling.UnwrapValidatedValue
-	 * @see org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper
 	 */
 	UnwrapMode unwrapMode();
 

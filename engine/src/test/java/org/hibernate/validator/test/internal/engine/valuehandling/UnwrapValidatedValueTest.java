@@ -203,10 +203,10 @@ public class UnwrapValidatedValueTest {
 	// TODO property-based config not supported yet for value extractors
 	public void shouldUnwrapPropertyValuesUsingUnwrapperGivenViaProperty() {
 		Validator validator = ValidatorUtil.getConfiguration()
-				.addProperty(
-						HibernateValidatorConfiguration.VALIDATED_VALUE_HANDLERS,
-						PropertyValueExtractor.class.getName() + "," + UiInputValueExtractor.class.getName()
-				)
+//				.addProperty(
+//						HibernateValidatorConfiguration.VALIDATED_VALUE_HANDLERS,
+//						PropertyValueExtractor.class.getName() + "," + UiInputValueExtractor.class.getName()
+//				)
 				.buildValidatorFactory()
 				.getValidator();
 

@@ -13,7 +13,7 @@ public class UnwrapValidatedValueTest {
 		//tag::unwrapValidated[]
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidatedValueHandler( new PropertyValueUnwrapper() )
+				.addCascadedValueExtractor( new PropertyValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 		//end::unwrapValidated[]

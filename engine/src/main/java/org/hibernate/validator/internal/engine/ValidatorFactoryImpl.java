@@ -51,7 +51,6 @@ import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.time.TimeProvider;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * Factory returning initialized {@code Validator} instances. This is the Hibernate Validator default
@@ -137,11 +136,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private final Map<ExecutableParameterNameProvider, BeanMetaDataManager> beanMetaDataManagerMap;
 
-	/**
-	 * Contains handlers to be applied to the validated value when validating elements.
-	 */
-	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
-
 	private final ValueExtractors valueExtractors;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
@@ -181,7 +175,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		boolean tmpAllowMultipleCascadedValidationOnReturnValues = false;
 		boolean tmpAllowParallelMethodsDefineParameterConstraints = false;
 
-		List<ValidatedValueUnwrapper<?>> tmpValidatedValueHandlers = newArrayList( 5 );
 		List<ValueExtractor<?>> tmpCascadedValueExtractors = new ArrayList<>( 5 );
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
@@ -199,20 +192,11 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 					hibernateSpecificConfig.getMethodValidationConfiguration()
 							.isAllowParallelMethodsDefineParameterConstraints();
 
-			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
-
 			tmpCascadedValueExtractors = new ArrayList<>( hibernateSpecificConfig.getCascadedValueExtractors() );
 		}
 
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
-		tmpValidatedValueHandlers.addAll(
-				getPropertyConfiguredValidatedValueHandlers(
-						properties,
-						externalClassLoader
-				)
-		);
-		this.validatedValueHandlers = Collections.unmodifiableList( tmpValidatedValueHandlers );
 		this.valueExtractors = new ValueExtractors( tmpCascadedValueExtractors );
 		tmpFailFast = checkPropertiesForBoolean( properties, HibernateValidatorConfiguration.FAIL_FAST, tmpFailFast );
 		this.failFast = tmpFailFast;
@@ -319,7 +303,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
-				validatedValueHandlers,
 				valueExtractors,
 				timeProvider,
 				methodValidationConfiguration
@@ -352,10 +335,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	public boolean isFailFast() {
 		return failFast;
-	}
-
-	public List<ValidatedValueUnwrapper<?>> getValidatedValueHandlers() {
-		return validatedValueHandlers;
 	}
 
 	ValueExtractors getValueExtractors() {
@@ -396,7 +375,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
 			boolean failFast,
-			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 			ValueExtractors valueExtractors,
 			TimeProvider timeProvider,
 			MethodValidationConfiguration methodValidationConfiguration) {
@@ -424,7 +402,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				parameterNameProvider,
 				timeProvider,
 				typeResolutionHelper,
-				validatedValueHandlers,
 				valueExtractors,
 				constraintValidatorManager,
 				failFast
@@ -461,35 +438,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			value = configurationValue;
 		}
 		return value;
-	}
-
-	/**
-	 * Returns a list with {@link ValidatedValueUnwrapper}s configured via the
-	 * {@link HibernateValidatorConfiguration#VALIDATED_VALUE_HANDLERS} property.
-	 *
-	 * @param properties the properties used to bootstrap the factory
-	 *
-	 * @return a list with property-configured {@link ValidatedValueUnwrapper}s; May be empty but never {@code null}
-	 */
-	private static List<ValidatedValueUnwrapper<?>> getPropertyConfiguredValidatedValueHandlers(
-			Map<String, String> properties, ClassLoader externalClassLoader) {
-		String propertyValue = properties.get( HibernateValidatorConfiguration.VALIDATED_VALUE_HANDLERS );
-
-		if ( propertyValue == null || propertyValue.isEmpty() ) {
-			return Collections.emptyList();
-		}
-
-		String[] handlerNames = propertyValue.split( "," );
-		List<ValidatedValueUnwrapper<?>> handlers = newArrayList( handlerNames.length );
-
-		for ( String handlerName : handlerNames ) {
-			@SuppressWarnings("unchecked")
-			Class<? extends ValidatedValueUnwrapper<?>> handlerType = (Class<? extends ValidatedValueUnwrapper<?>>)
-					run( LoadClass.action( handlerName, externalClassLoader ) );
-			handlers.add( run( NewInstance.action( handlerType, "validated value handler class" ) ) );
-		}
-
-		return handlers;
 	}
 
 	/**

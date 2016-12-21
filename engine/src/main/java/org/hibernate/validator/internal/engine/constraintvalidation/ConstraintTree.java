@@ -24,11 +24,9 @@ import javax.validation.ConstraintViolation;
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * Due to constraint composition a single constraint annotation can lead to a whole constraint tree being validated.
@@ -150,61 +148,6 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	private <T, V> ConstraintValidator<A, ?> getInitializedConstraintValidator(ValidationContext<T> validationContext,
-			ValueContext<?, V> valueContext) {
-		Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
-		@SuppressWarnings("unchecked")
-		ValidatedValueUnwrapper<V> validatedValueUnwrapper = (ValidatedValueUnwrapper<V>) validationContext
-				.getValidatedValueUnwrapper( validatedValueType );
-
-		// AUTOMATIC mode, need to determine which types of constraint validators are available
-		if ( valueContext.getUnwrapMode().equals( UnwrapMode.AUTOMATIC ) ) {
-			return getConstraintValidatorInstanceForAutomaticUnwrapping(
-					validationContext,
-					valueContext
-			);
-		}
-		// TYPE_USE requires implicitly unwrapping
-		else if ( UnwrapMode.UNWRAP.equals( valueContext.getUnwrapMode() ) ) {
-			return getInitializedValidatorInstanceForWrappedInstance(
-					validationContext,
-					valueContext,
-					validatedValueType,
-					validatedValueUnwrapper
-			);
-
-		}
-		// UnwrapMode.SKIP_UNWRAP
-		else {
-			return getConstraintValidatorNoUnwrapping( validationContext, valueContext );
-		}
-	}
-
-	private <T, V> ConstraintValidator<A, ?> getInitializedValidatorInstanceForWrappedInstance(ValidationContext<T> validationContext, ValueContext<?, V> valueContext, Type validatedValueType, ValidatedValueUnwrapper<V> validatedValueUnwrapper) {
-		// make sure that unwrapper is set
-		if ( validatedValueUnwrapper == null ) {
-			throw log.getNoUnwrapperFoundForTypeException(
-					valueContext.getDeclaredTypeOfValidatedElement()
-			);
-		}
-
-		valueContext.setValidatedValueHandler( validatedValueUnwrapper );
-		validatedValueType = validatedValueUnwrapper.getValidatedValueType( validatedValueType );
-
-		ConstraintValidator<A, ?> validator = validationContext.getConstraintValidatorManager()
-				.getInitializedValidator(
-						validatedValueType,
-						descriptor,
-						validationContext.getConstraintValidatorFactory()
-				);
-
-		if ( validator == null ) {
-			throwExceptionForNullValidator( validatedValueType, valueContext.getPropertyPath().asString() );
-		}
-
-		return validator;
-	}
-
 	private void throwExceptionForNullValidator(Type validatedValueType, String path) {
 		if ( descriptor.getConstraintType() == ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER ) {
 			throw log.getValidatorForCrossParameterConstraintMustEitherValidateObjectOrObjectArrayException(
@@ -226,74 +169,9 @@ public class ConstraintTree<A extends Annotation> {
 		}
 	}
 
-	private <T, V> ConstraintValidator<A, ?> getConstraintValidatorInstanceForAutomaticUnwrapping(
-			ValidationContext<T> validationContext,
-			ValueContext<?, V> valueContext
-	) {
-		Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
-		@SuppressWarnings("unchecked")
-		ValidatedValueUnwrapper<V> validatedValueUnwrapper = (ValidatedValueUnwrapper<V>) validationContext
-				.getValidatedValueUnwrapper( validatedValueType );
 
-		// no unwrapper, get a validator for the validated type
-		if ( validatedValueUnwrapper == null ) {
-			return getConstraintValidatorNoUnwrapping( validationContext, valueContext );
-		}
-
-		// there is an unwrapper - need to find out for which type (wrapper or wrapped value there
-		// are constraint validators available
-		ConstraintValidator<A, ?> validatorForWrappedValue = validationContext.getConstraintValidatorManager()
-				.getInitializedValidator(
-						validatedValueUnwrapper.getValidatedValueType( validatedValueType ),
-						descriptor,
-						validationContext.getConstraintValidatorFactory()
-				);
-
-
-		ConstraintValidator<A, ?> validatorForWrapper = validationContext.getConstraintValidatorManager()
-				.getInitializedValidator(
-						valueContext.getDeclaredTypeOfValidatedElement(),
-						descriptor,
-						validationContext.getConstraintValidatorFactory()
-				);
-
-		// validator for wrapper and wrapped value is ambiguous -> exception!
-		if ( validatorForWrappedValue != null && validatorForWrapper != null ) {
-			throw log.getConstraintValidatorExistsForWrapperAndWrappedValueException(
-					valueContext.getPropertyPath(),
-					descriptor.getAnnotationType(),
-					validatedValueUnwrapper.getClass()
-			);
-		}
-
-		// neither a validator for wrapper not wrapped value -> exception!
-		if ( validatorForWrappedValue == null && validatorForWrapper == null ) {
-			throw log.getNoValidatorFoundForTypeException(
-					descriptor.getAnnotationType(),
-					validatedValueType.toString(),
-					valueContext.getPropertyPath().toString()
-			);
-		}
-
-		// we have a validator for the wrapped value
-		// -> make sure the unwrapper is set and return proper validator
-		if ( validatorForWrappedValue != null ) {
-			valueContext.setValidatedValueHandler( validatedValueUnwrapper );
-			return validatorForWrappedValue;
-		}
-		else {
-			// there is only a validator for the wrapper type
-			// -> make sure the value handler is unset and return validator for wrapper type
-			valueContext.setValidatedValueHandler( null );
-			return validatorForWrapper;
-		}
-	}
-
-	private <T> ConstraintValidator<A, ?> getConstraintValidatorNoUnwrapping(ValidationContext<T> validationContext,
+	private <T> ConstraintValidator<A, ?> getInitializedConstraintValidator(ValidationContext<T> validationContext,
 			ValueContext<?, ?> valueContext) {
-		// make sure no unwrapper is set
-		valueContext.setValidatedValueHandler( null );
-
 		Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
 		ConstraintValidator<A, ?> validator = validationContext.getConstraintValidatorManager()
 				.getInitializedValidator(

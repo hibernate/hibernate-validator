@@ -74,7 +74,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.time.TimeProvider;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 import com.fasterxml.classmate.ResolvedType;
 
@@ -145,11 +144,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final TypeResolutionHelper typeResolutionHelper;
 
-	/**
-	 * Contains handlers to be applied prior to validation when validating elements.
-	 */
-	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
-
 	private final ValueExtractors valueExtractors;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
@@ -159,7 +153,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ExecutableParameterNameProvider parameterNameProvider,
 			TimeProvider timeProvider,
 			TypeResolutionHelper typeResolutionHelper,
-			List<ValidatedValueUnwrapper<?>> validatedValueHandlers,
 			ValueExtractors valueExtractors,
 			ConstraintValidatorManager constraintValidatorManager,
 			boolean failFast) {
@@ -170,7 +163,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.parameterNameProvider = parameterNameProvider;
 		this.timeProvider = timeProvider;
 		this.typeResolutionHelper = typeResolutionHelper;
-		this.validatedValueHandlers = validatedValueHandlers;
 		this.valueExtractors = valueExtractors;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
@@ -345,7 +337,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				constraintValidatorFactory,
 				getCachingTraversableResolver(),
 				timeProvider,
-				validatedValueHandlers,
 				typeResolutionHelper,
 				failFast
 		);
@@ -572,12 +563,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// regular constraint
 			else {
 				valueContext.setDeclaredTypeOfValidatedElement( metaConstraint.getLocation().getTypeForValidatorResolution() );
-
-				// TODO remove legacy unwrap implementation
-				UnwrapMode currentUnwrapMode = valueContext.getUnwrapMode();
-				valueContext.setUnwrapMode( valueContext.getCurrentValidatable().getUnwrapMode( metaConstraint.getLocation() ) );
 				success = metaConstraint.validateConstraint( validationContext, valueContext );
-				valueContext.setUnwrapMode( currentUnwrapMode );
 			}
 
 			validationContext.markConstraintProcessed( valueContext.getCurrentBean(), valueContext.getPropertyPath(), metaConstraint );
@@ -1498,20 +1484,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		return propertyMetaData;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Object getCascadableValue(ValidationContext<?> validationContext, Object object, Cascadable cascadable) {
-		Object value = cascadable.getValue( object );
-
-		// Value can be wrapped (e.g. Optional<Address>). Try to unwrap it
-		UnwrapMode unwrapMode = cascadable.unwrapMode();
-		if ( UnwrapMode.UNWRAP.equals( unwrapMode ) || UnwrapMode.AUTOMATIC.equals( unwrapMode ) ) {
-			ValidatedValueUnwrapper valueHandler = validationContext.getValidatedValueUnwrapper( cascadable.getCascadableType() );
-			if ( valueHandler != null ) {
-				value = valueHandler.handleValidatedValue( value );
-			}
-		}
-
-		return value;
+		return cascadable.getValue( object );
 	}
 
 	private String getPropertyName(ConstraintLocation location) {

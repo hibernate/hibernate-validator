@@ -11,14 +11,14 @@ package org.hibernate.validator.internal.engine.valuehandling;
  *
  * @author Hardy Ferentschik
  * @see org.hibernate.validator.valuehandling.UnwrapValidatedValue
- * @see org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper
  */
 public enum UnwrapMode {
+
 	/**
-	 * Automatic occurs if there is no explicit {@code UnwrapValidatedValue} annotation. Whether unwrapping occurs depends
-	 * on the number and type of the registered {@code ValidatedValueUnwrapper} instances and the available constraint
-	 * validator instances for the wrapper as well as wrapped value.
+	 * Automatic occurs if there is no explicit {@code UnwrapValidatedValue} annotation.
+	 *
 	 */
+	// TODO not currently used atm.
 	AUTOMATIC,
 	/**
 	 * Unwrapping of the value is explicitly configured, eg via {@code UnwrapValidatedValue}

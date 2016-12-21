@@ -43,7 +43,6 @@ import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormat
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
@@ -649,13 +648,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = 185, value = "Message contains EL expression: %1s, which is unsupported with chosen Interpolator")
 	void getElUnsupported(String expression);
-
-	@SuppressWarnings("rawtypes")
-	@Message(id = 186,
-			value = "The constraint of type '%2$s' defined on '%1$s' has multiple matching constraint validators which is due to an additional value handler of type '%3$s'. It is unclear which value needs validating. Clarify configuration via @UnwrapValidatedValue.")
-	UnexpectedTypeException getConstraintValidatorExistsForWrapperAndWrappedValueException(Path property,
-			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint,
-			@FormatWith(ClassObjectFormatter.class) Class<? extends ValidatedValueUnwrapper> valueHandler);
 
 	@Message(id = 189,
 			value = "The configuration of value unwrapping for property '%s' of bean '%s' is inconsistent between the field and its getter.")

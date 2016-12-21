@@ -6,9 +6,6 @@
  */
 package org.hibernate.validator.internal.engine;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
@@ -19,7 +16,6 @@ import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.spi.time.TimeProvider;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 
 /**
  * @author Emmanuel Bernard
@@ -37,7 +33,6 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ConstraintValidatorFactory constraintValidatorFactory;
 	private ExecutableParameterNameProvider parameterNameProvider;
 	private boolean failFast;
-	private final List<ValidatedValueUnwrapper<?>> validatedValueHandlers;
 	private final ValueExtractors valueExtractors;
 	private TimeProvider timeProvider;
 	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
@@ -50,9 +45,6 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.constraintValidatorFactory = validatorFactory.getConstraintValidatorFactory();
 		this.parameterNameProvider = validatorFactory.getExecutableParameterNameProvider();
 		this.failFast = validatorFactory.isFailFast();
-		this.validatedValueHandlers = new ArrayList<>(
-				validatorFactory.getValidatedValueHandlers()
-		);
 		// TODO make overwritable per this context
 		this.valueExtractors = validatorFactory.getValueExtractors();
 		this.timeProvider = validatorFactory.getTimeProvider();
@@ -109,12 +101,6 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
-	public HibernateValidatorContext addValidationValueHandler(ValidatedValueUnwrapper<?> handler) {
-		this.validatedValueHandlers.add( handler );
-		return this;
-	}
-
-	@Override
 	public HibernateValidatorContext timeProvider(TimeProvider timeProvider) {
 		if ( timeProvider == null ) {
 			this.timeProvider = validatorFactory.getTimeProvider();
@@ -151,7 +137,6 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				traversableResolver,
 				parameterNameProvider,
 				failFast,
-				validatedValueHandlers,
 				valueExtractors,
 				timeProvider,
 				methodValidationConfiguration

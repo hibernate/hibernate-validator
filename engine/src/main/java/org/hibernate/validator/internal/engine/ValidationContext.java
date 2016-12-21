@@ -10,7 +10,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Executable;
-import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -35,15 +34,10 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.IdentitySet;
-import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.spi.time.TimeProvider;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
-
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.TypeResolver;
 
 /**
  * Context object keeping track of all required data for a validation call.
@@ -131,11 +125,6 @@ public class ValidationContext<T> {
 	private final ExecutableParameterNameProvider parameterNameProvider;
 
 	/**
-	 * List of value un-wrappers.
-	 */
-	private final List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers;
-
-	/**
 	 * Used for resolving generic type information.
 	 */
 	private final TypeResolutionHelper typeResolutionHelper;
@@ -158,7 +147,6 @@ public class ValidationContext<T> {
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
 			TimeProvider timeProvider,
-			List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
 			TypeResolutionHelper typeResolutionHelper,
 			boolean failFast,
 			T rootBean,
@@ -172,7 +160,6 @@ public class ValidationContext<T> {
 		this.traversableResolver = traversableResolver;
 		this.parameterNameProvider = parameterNameProvider;
 		this.timeProvider = timeProvider;
-		this.validatedValueUnwrappers = validatedValueUnwrappers;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.failFast = failFast;
 
@@ -194,7 +181,6 @@ public class ValidationContext<T> {
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
 			TimeProvider timeProvider,
-			List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
 			TypeResolutionHelper typeResolutionHelper,
 			boolean failFast) {
 
@@ -204,7 +190,6 @@ public class ValidationContext<T> {
 				constraintValidatorFactory,
 				traversableResolver,
 				timeProvider,
-				validatedValueUnwrappers,
 				typeResolutionHelper,
 				failFast
 		);
@@ -377,31 +362,6 @@ public class ValidationContext<T> {
 		}
 	}
 
-	/**
-	 * Returns the first validated value handler found which supports the given type.
-	 * <p>
-	 * If required this could be enhanced to search for the most-specific handler and raise an exception in case more
-	 * than one matching handler is found (or a scheme of prioritizing handlers to process several handlers in order.
-	 *
-	 * @param type the type to be handled
-	 *
-	 * @return the handler for the given type or {@code null} if no matching handler was found
-	 */
-	public ValidatedValueUnwrapper<?> getValidatedValueUnwrapper(Type type) {
-		TypeResolver typeResolver = typeResolutionHelper.getTypeResolver();
-
-		for ( ValidatedValueUnwrapper<?> handler : validatedValueUnwrappers ) {
-			ResolvedType handlerType = typeResolver.resolve( handler.getClass() );
-			List<ResolvedType> typeParameters = handlerType.typeParametersFor( ValidatedValueUnwrapper.class );
-
-			if ( TypeHelper.isAssignable( typeParameters.get( 0 ).getErasedType(), type ) ) {
-				return handler;
-			}
-		}
-
-		return null;
-	}
-
 	public String getValidatedProperty() {
 		return validatedProperty;
 	}
@@ -516,7 +476,6 @@ public class ValidationContext<T> {
 		private final ConstraintValidatorFactory constraintValidatorFactory;
 		private final TraversableResolver traversableResolver;
 		private final TimeProvider timeProvider;
-		private final List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers;
 		private final TypeResolutionHelper typeResolutionHelper;
 		private final boolean failFast;
 
@@ -526,7 +485,6 @@ public class ValidationContext<T> {
 				ConstraintValidatorFactory constraintValidatorFactory,
 				TraversableResolver traversableResolver,
 				TimeProvider timeProvider,
-				List<ValidatedValueUnwrapper<?>> validatedValueUnwrappers,
 				TypeResolutionHelper typeResolutionHelper,
 				boolean failFast) {
 			this.constraintValidatorManager = constraintValidatorManager;
@@ -534,7 +492,6 @@ public class ValidationContext<T> {
 			this.constraintValidatorFactory = constraintValidatorFactory;
 			this.traversableResolver = traversableResolver;
 			this.timeProvider = timeProvider;
-			this.validatedValueUnwrappers = validatedValueUnwrappers;
 			this.typeResolutionHelper = typeResolutionHelper;
 			this.failFast = failFast;
 		}
@@ -549,7 +506,6 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider,
 					timeProvider,
-					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
 					rootBean,
@@ -570,7 +526,6 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider,
 					timeProvider,
-					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
 					rootBean,
@@ -589,7 +544,6 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					timeProvider,
-					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
 					null, //root bean
@@ -614,7 +568,6 @@ public class ValidationContext<T> {
 					traversableResolver,
 					parameterNameProvider,
 					timeProvider,
-					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
 					rootBean,
@@ -638,7 +591,6 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					timeProvider,
-					validatedValueUnwrappers,
 					typeResolutionHelper,
 					failFast,
 					rootBean,

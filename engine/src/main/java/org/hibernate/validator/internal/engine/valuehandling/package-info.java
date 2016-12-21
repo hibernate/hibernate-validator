@@ -6,6 +6,6 @@
  */
 
 /**
- * Implementations for {@link org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper}
+ * Implementations related to value extraction.
  */
 package org.hibernate.validator.internal.engine.valuehandling;

@@ -7,28 +7,18 @@
 //tag::include[]
 package org.hibernate.validator.referenceguide.chapter11.valuehandling;
 
-//end::include[]
-
-import java.lang.reflect.Type;
-
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
+import org.hibernate.validator.spi.cascading.ExtractedValue;
+import org.hibernate.validator.spi.cascading.ValueExtractor;
 
 /**
  * @author Gunnar Morling
  */
 //tag::include[]
-public class PropertyValueUnwrapper extends ValidatedValueUnwrapper<Property<?>> {
+public class PropertyValueExtractor implements ValueExtractor<Property<@ExtractedValue ?>> {
 
 	@Override
-	public Object handleValidatedValue(Property<?> value) {
-		//...
-		return null;
-	}
-
-	@Override
-	public Type getValidatedValueType(Type valueType) {
-		//...
-		return null;
+	public void extractValues(Property<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
+		receiver.value( originalValue.getValue(), null );
 	}
 }
 //end::include[]
