@@ -215,7 +215,7 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 	 *
 	 * @param allAnnotations collection to look for constraints in
 	 *
-	 * @return a {@link Stream<AnnotationInstance>} representing constraint annotations
+	 * @return a {@link Stream} of the constraint annotations
 	 */
 	protected Stream<AnnotationInstance> findConstrainAnnotations(Collection<AnnotationInstance> allAnnotations) {
 		return allAnnotations.stream().filter( this::isConstraintAnnotation );

@@ -7,11 +7,10 @@
 package org.hibernate.validator.internal.metadata.jandex.util;
 
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import javax.validation.GroupSequence;
 
 import org.hibernate.validator.group.GroupSequenceProvider;
@@ -20,7 +19,6 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
 

@@ -69,6 +69,10 @@
             <artifactId>jsoup</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.jboss</groupId>
+            <artifactId>jandex</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.thoughtworks.paranamer</groupId>
             <artifactId>paranamer</artifactId>
         </dependency>

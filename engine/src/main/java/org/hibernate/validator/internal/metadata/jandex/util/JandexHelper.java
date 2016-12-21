@@ -46,7 +46,7 @@ public final class JandexHelper {
 	 * @return an instance of {@link JandexHelper}
 	 */
 	public static JandexHelper getInstance(ClassLoader classLoader) {
-		return new JandexHelper(classLoader);
+		return new JandexHelper( classLoader );
 	}
 
 	public static JandexHelper getInstance() {
@@ -108,18 +108,17 @@ public final class JandexHelper {
 	}
 
 	/**
-	 * Finds an annotation of a given type inside provided collection.
+	 * Finds an annotation of a given type inside the provided collection of annotations.
 	 *
 	 * @param annotations a collection of annotation in which to look for a provided annotation type
-	 * @param aClass a type of annotation to look for.
-	 *
-	 * @return an {@link Optional<AnnotationInstance>} which will contain a found annotation, an empty {@link Optional}
-	 * if none was found. Also if there are more than one annotation of provided type present in the collection there's
-	 * no guarantee which one will be returned.
+	 * @param clazz a type of annotation to look for
+	 * @return an {@code Optional<AnnotationInstance>} which will contain a found annotation, the {@code Optional} being
+	 * empty if none was found. Also if there are more than one annotation of the provided type present in the
+	 * collection there's no guarantee which one will be returned.
 	 */
-	public Optional<AnnotationInstance> findAnnotation(Collection<AnnotationInstance> annotations, Class<?> aClass) {
+	public Optional<AnnotationInstance> findAnnotation(Collection<AnnotationInstance> annotations, Class<?> clazz) {
 		return annotations.stream()
-				.filter( annotation -> annotation.name().toString().equals( aClass.getName() ) )
+				.filter( annotation -> annotation.name().toString().equals( clazz.getName() ) )
 				.findAny();
 	}
 
