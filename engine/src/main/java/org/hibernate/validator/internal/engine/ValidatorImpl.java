@@ -600,8 +600,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		valueContext.setDeclaredTypeOfValidatedElement( typeArgumentConstraintLocation.getTypeForValidatorResolution() );
 		ValueExtractorDescriptor extractor = valueExtractors.getCascadedValueExtractor( declaredType, typeParameter );
 
-		valueContext.setCurrentTypeParameter( typeParameter );
-
 		if ( extractor == null ) {
 			throw log.getNoValueExtractorFoundForTypeException( declaredType, typeParameter );
 		}
@@ -770,7 +768,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						value.getClass(),
 						cascadingTypeParameterOfValueType
 				);
-				valueContext.setCurrentTypeParameter( cascadingTypeParameterOfValueType );
 
 				// TODO should only happen during transition off of value unwrappers
 				if ( extractor == null ) {
@@ -852,7 +849,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		private void doValidate(Object value, String nodeName) {
-			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath(), valueContext.getCurrentTypeParameter() ) || shouldFailFast( context ) ) {
+			if ( context.isBeanAlreadyValidated( value, valueContext.getCurrentGroup(), valueContext.getPropertyPath() ) || shouldFailFast( context ) ) {
 				return;
 			}
 
@@ -883,7 +880,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 		}
 
-		newValueContext.setCurrentTypeParameter( valueContext.getCurrentTypeParameter() );
 		return newValueContext;
 	}
 

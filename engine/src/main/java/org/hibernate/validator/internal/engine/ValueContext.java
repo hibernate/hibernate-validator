@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.engine;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 
 import javax.validation.groups.Default;
 
@@ -78,8 +77,6 @@ public class ValueContext<T, V> {
 	 */
 	private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 
-	private TypeVariable<?> currentTypeParameter;
-
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
 		Class<T> rootBeanClass = (Class<T>) value.getClass();
@@ -116,10 +113,6 @@ public class ValueContext<T, V> {
 
 	public Validatable getCurrentValidatable() {
 		return currentValidatable;
-	}
-
-	public TypeVariable<?> getCurrentTypeParameter() {
-		return currentTypeParameter;
 	}
 
 	/**
@@ -168,10 +161,6 @@ public class ValueContext<T, V> {
 
 	public final void setCurrentGroup(Class<?> currentGroup) {
 		this.currentGroup = currentGroup;
-	}
-
-	public void setCurrentTypeParameter(TypeVariable<?> currentTypeParameter) {
-		this.currentTypeParameter = currentTypeParameter;
 	}
 
 	public final void setCurrentValidatedValue(V currentValue) {
