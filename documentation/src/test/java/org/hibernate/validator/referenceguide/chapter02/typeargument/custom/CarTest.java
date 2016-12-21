@@ -21,7 +21,7 @@ public class CarTest {
 	public static void setUpValidator() {
 		ValidatorFactory factory = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addValidatedValueHandler( new GearBoxUnwrapper() )
+				.addCascadedValueExtractor( new GearBoxExtractor() )
 				.buildValidatorFactory();
 		validator = factory.getValidator();
 	}
