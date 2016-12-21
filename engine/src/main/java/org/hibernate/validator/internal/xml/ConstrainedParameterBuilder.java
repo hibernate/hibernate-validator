@@ -31,8 +31,6 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.ParameterType;
 
-import com.google.common.collect.ImmutableSetMultimap;
-
 /**
  * Builder for constraint parameters.
  *
@@ -96,7 +94,7 @@ class ConstrainedParameterBuilder {
 					i,
 					parameterNames.get( i ),
 					metaConstraints,
-					ImmutableSetMultimap.of(),
+					Collections.emptySet(),
 					groupConversions,
 					getCascadedTypeParameters( type, parameterType.getValid() != null ),
 					UnwrapMode.AUTOMATIC

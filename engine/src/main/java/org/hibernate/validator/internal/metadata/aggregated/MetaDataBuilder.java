@@ -10,7 +10,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -73,7 +72,7 @@ public abstract class MetaDataBuilder {
 	 */
 	public void add(ConstrainedElement constrainedElement) {
 		constraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getConstraints() ) );
-		constraints.addAll( adaptConstraints( constrainedElement.getKind(), new HashSet<>( constrainedElement.getTypeArgumentConstraints().values() ) ) );
+		constraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getTypeArgumentConstraints() ) );
 		isCascading = isCascading || constrainedElement.isCascading();
 
 		if ( unwrapMode == null || constrainedElement.getSource().getPriority() > unwrapModeSource.getPriority() ) {

@@ -28,8 +28,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 
-import com.google.common.collect.ImmutableSetMultimap;
-
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
  *
@@ -102,7 +100,7 @@ final class PropertyConstraintMappingContextImpl
 					ConfigurationSource.API,
 					(Field) member,
 					getConstraints( constraintHelper ),
-					ImmutableSetMultimap.of(),
+					Collections.emptySet(),
 					groupConversions,
 					getCascadedTypeParameters( (Field) member, isCascading ),
 					unwrapMode()

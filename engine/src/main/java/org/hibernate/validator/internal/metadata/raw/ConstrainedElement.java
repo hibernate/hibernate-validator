@@ -16,8 +16,6 @@ import javax.validation.Valid;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
-import com.google.common.collect.SetMultimap;
-
 /**
  * Represents a (potentially) constrained Java element such as a type, field or
  * method. Such an element has a set of {@link org.hibernate.validator.internal.metadata.core.MetaConstraint}s and can be
@@ -73,7 +71,7 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	/**
 	 * Returns the type argument constraints of this element, if any.
 	 */
-	SetMultimap<TypeVariable<?>, MetaConstraint<?>> getTypeArgumentConstraints();
+	Set<MetaConstraint<?>> getTypeArgumentConstraints();
 
 	/**
 	 * Returns a map with the group conversions for this constrained element, as

@@ -16,8 +16,6 @@ import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.StringHelper;
 
-import com.google.common.collect.SetMultimap;
-
 /**
  * Represents a field of a Java type and all its associated meta-data relevant
  * in the context of bean validation, for instance its constraints.
@@ -44,7 +42,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	public ConstrainedField(ConfigurationSource source,
 							Field field,
 							Set<MetaConstraint<?>> constraints,
-							SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentConstraints,
+							Set<MetaConstraint<?>> typeArgumentConstraints,
 							Map<Class<?>, Class<?>> groupConversions,
 							List<TypeVariable<?>> cascadingTypeParameters,
 							UnwrapMode unwrapMode) {

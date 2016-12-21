@@ -33,8 +33,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromProp
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.GetterType;
 
-import com.google.common.collect.ImmutableSetMultimap;
-
 /**
  * Builder for constraint getters.
  *
@@ -87,7 +85,7 @@ class ConstrainedGetterBuilder {
 					Collections.<ConstrainedParameter>emptyList(),
 					Collections.<MetaConstraint<?>>emptySet(),
 					metaConstraints,
-					ImmutableSetMultimap.of(),
+					Collections.emptySet(),
 					groupConversions,
 					getCascadedTypeParameters( getter, getterType.getValid() != null ),
 					UnwrapMode.AUTOMATIC

@@ -14,16 +14,13 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.SetMultimap;
 
 /**
  * Contains constraint-related meta-data for one method parameter.
@@ -50,7 +47,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				index,
 				name,
 				Collections.<MetaConstraint<?>>emptySet(),
-				ImmutableSetMultimap.of(),
+				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
 				Collections.<TypeVariable<?>>emptyList(),
 				UnwrapMode.AUTOMATIC
@@ -79,7 +76,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 								int index,
 								String name,
 								Set<MetaConstraint<?>> constraints,
-								SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentConstraints,
+								Set<MetaConstraint<?>> typeArgumentConstraints,
 								Map<Class<?>, Class<?>> groupConversions,
 								List<TypeVariable<?>> cascadingTypeParameters,
 								UnwrapMode unwrapMode) {
@@ -146,8 +143,8 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedConstraints = newHashSet( constraints );
 		mergedConstraints.addAll( other.constraints );
 
-		SetMultimap<TypeVariable<?>, MetaConstraint<?>> mergedTypeArgumentConstraints = HashMultimap.create( typeArgumentConstraints );
-		mergedTypeArgumentConstraints.putAll( other.typeArgumentConstraints );
+		Set<MetaConstraint<?>> mergedTypeArgumentConstraints = new HashSet<>( typeArgumentConstraints );
+		mergedTypeArgumentConstraints.addAll( other.typeArgumentConstraints );
 
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );

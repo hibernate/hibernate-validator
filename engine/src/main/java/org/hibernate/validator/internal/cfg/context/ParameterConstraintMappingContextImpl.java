@@ -26,8 +26,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
-import com.google.common.collect.ImmutableSetMultimap;
-
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
  *
@@ -112,7 +110,7 @@ final class ParameterConstraintMappingContextImpl
 				parameterIndex,
 				parameterNameProvider.getParameterNames( executableContext.getExecutable() ).get( parameterIndex ),
 				getConstraints( constraintHelper ),
-				ImmutableSetMultimap.of(),
+				Collections.emptySet(),
 				groupConversions,
 				getCascadedTypeParameters( parameterType, isCascading ),
 				unwrapMode()

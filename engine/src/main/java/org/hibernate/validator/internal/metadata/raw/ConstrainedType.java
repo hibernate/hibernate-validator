@@ -12,8 +12,6 @@ import java.util.Set;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
-import com.google.common.collect.ImmutableSetMultimap;
-
 /**
  * Represents a Java type and all its associated meta-data relevant in the
  * context of bean validation, for instance its constraints. Only class level
@@ -38,7 +36,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 				source,
 				ConstrainedElementKind.TYPE,
 				constraints,
-				ImmutableSetMultimap.of(),
+				Collections.emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
 				Collections.emptyList(),
 				UnwrapMode.AUTOMATIC

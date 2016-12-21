@@ -31,8 +31,6 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
-import com.google.common.collect.ImmutableSetMultimap;
-
 /**
  * A constraint mapping creational context which allows to select the parameter or
  * return value to which the next operations shall apply.
@@ -116,7 +114,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 				getParameters( constraintHelper, parameterNameProvider ),
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
-				ImmutableSetMultimap.of(),
+				Collections.emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
 				getCascadedTypeParameters( executable, returnValueContext != null && returnValueContext.isCascading() ),
 				returnValueContext != null ? returnValueContext.unwrapMode() : UnwrapMode.AUTOMATIC

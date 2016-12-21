@@ -32,6 +32,7 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,10 +75,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.SetMultimap;
 
 /**
  * {@code MetaDataProvider} which reads the metadata from annotations which is the default configuration source.
@@ -258,7 +255,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		);
 
 		List<TypeVariable<?>> cascadingTypeVariables = findCascadingTypeParameters( field );
-		SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraints( field );
+		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraints( field );
 
 		boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
 		UnwrapMode unwrapMode = unwrapMode( field, typeArgumentAnnotated );
@@ -380,14 +377,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 
 		Set<MetaConstraint<?>> returnValueConstraints;
-		SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints;
+		Set<MetaConstraint<?>> typeArgumentsConstraints;
 		Map<Class<?>, Class<?>> groupConversions;
 		List<TypeVariable<?>> cascadingTypeVariables;
 
 		UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable ) ) {
 			returnValueConstraints = Collections.emptySet();
-			typeArgumentsConstraints = ImmutableSetMultimap.of();
+			typeArgumentsConstraints = Collections.emptySet();
 			groupConversions = Collections.emptyMap();
 			cascadingTypeVariables = Collections.emptyList();
 		}
@@ -479,7 +476,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 								i,
 								parameterName,
 								parameterConstraints,
-								ImmutableSetMultimap.of(),
+								Collections.emptySet(),
 								getGroupConversions( groupConversion, groupConversionList ),
 								Collections.emptyList(),
 								UnwrapMode.AUTOMATIC
@@ -518,7 +515,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				}
 			}
 
-			SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable, i );
+			Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraintsForExecutableParameter( executable, i );
 			List<TypeVariable<?>> cascadingTypeParameters = findCascadingTypeParameters( parameter );
 			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
 			boolean isCollection = ReflectionHelper.isCollection( ReflectionHelper.typeOf( executable, i ) );
@@ -674,7 +671,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Finds type arguments constraints for fields.
 	 */
-	protected SetMultimap<TypeVariable<?>, MetaConstraint<?>> findTypeAnnotationConstraints(Field field) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Field field) {
 		return findTypeArgumentsConstraints(
 			field,
 			new TypeArgumentPropertyLocation( field ),
@@ -686,7 +683,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Finds type arguments constraints for method return values.
 	 */
-	protected SetMultimap<TypeVariable<?>, MetaConstraint<?>> findTypeAnnotationConstraints(Executable executable) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Executable executable) {
 		TypeVariable<?>[] typeParameters;
 		if ( executable instanceof Method ) {
 			typeParameters = ( (Method) executable ).getReturnType().getTypeParameters();
@@ -785,7 +782,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 *
 	 * @return a set of type arguments constraints, or an empty set if no constrained type arguments are found
 	 */
-	protected SetMultimap<TypeVariable<?>, MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Executable executable, int i) {
+	protected Set<MetaConstraint<?>> findTypeAnnotationConstraintsForExecutableParameter(Executable executable, int i) {
 		Parameter parameter = executable.getParameters()[i];
 		try {
 			return findTypeArgumentsConstraints(
@@ -797,13 +794,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
 			log.warn( MESSAGES.constraintOnConstructorOfNonStaticInnerClass(), ex );
-			return ImmutableSetMultimap.of();
+			return Collections.emptySet();
 		}
 	}
 
-	private SetMultimap<TypeVariable<?>, MetaConstraint<?>> findTypeArgumentsConstraints(Member member, TypeArgumentLocation location, AnnotatedType annotatedType, TypeVariable<?>[] typeParameters) {
+	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, TypeArgumentLocation location, AnnotatedType annotatedType, TypeVariable<?>[] typeParameters) {
 		if ( annotatedType instanceof AnnotatedParameterizedType ) {
-			SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentConstraints = HashMultimap.create();
+			Set<MetaConstraint<?>> typeArgumentConstraints = new HashSet<>();
 
 			AnnotatedParameterizedType annotatedParameterizedType = (AnnotatedParameterizedType) annotatedType;
 
@@ -818,7 +815,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				// In the latter case a value unwrapping has to occur
 				Type validatedType = annotatedTypeParameter.getType();
 
-				typeArgumentConstraints.putAll( typeVariable, findTypeUseConstraints( member, annotatedTypeParameter, typeVariable, location, validatedType ) );
+				typeArgumentConstraints.addAll( findTypeUseConstraints( member, annotatedTypeParameter, typeVariable, location, validatedType ) );
 
 				i++;
 			}
@@ -826,15 +823,15 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			return typeArgumentConstraints;
 		}
 		else if ( annotatedType instanceof AnnotatedArrayType ) {
-			SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentConstraints = HashMultimap.create();
+			Set<MetaConstraint<?>> typeArgumentConstraints = new HashSet<>();
 			AnnotatedArrayType annotatedArrayType = (AnnotatedArrayType) annotatedType;
 			Type validatedType = annotatedArrayType.getAnnotatedGenericComponentType().getType();
 
-			typeArgumentConstraints.putAll( ArrayElement.INSTANCE, findTypeUseConstraints( member, annotatedArrayType, ArrayElement.INSTANCE, location, validatedType ) );
+			typeArgumentConstraints.addAll( findTypeUseConstraints( member, annotatedArrayType, ArrayElement.INSTANCE, location, validatedType ) );
 			return typeArgumentConstraints;
 		}
 		else {
-			return ImmutableSetMultimap.of();
+			return Collections.emptySet();
 		}
 	}
 

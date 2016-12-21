@@ -15,6 +15,7 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,10 +28,6 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.SetMultimap;
 
 /**
  * Represents a method or constructor of a Java type and all its associated
@@ -81,7 +78,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
-				ImmutableSetMultimap.of(),
+				Collections.emptySet(),
 				groupConversions,
 				cascadingTypeParameters,
 				unwrapMode
@@ -111,7 +108,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			List<ConstrainedParameter> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Set<MetaConstraint<?>> returnValueConstraints,
-			SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentConstraints,
+			Set<MetaConstraint<?>> typeArgumentConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
 			List<TypeVariable<?>> cascadingTypeParameters,
 			UnwrapMode unwrapMode) {
@@ -289,8 +286,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		Set<MetaConstraint<?>> mergedReturnValueConstraints = newHashSet( constraints );
 		mergedReturnValueConstraints.addAll( other.constraints );
 
-		SetMultimap<TypeVariable<?>, MetaConstraint<?>> mergedTypeArgumentConstraints = HashMultimap.create( typeArgumentConstraints );
-		mergedTypeArgumentConstraints.putAll( other.typeArgumentConstraints );
+		Set<MetaConstraint<?>> mergedTypeArgumentConstraints = new HashSet<>( typeArgumentConstraints );
+		mergedTypeArgumentConstraints.addAll( other.typeArgumentConstraints );
 
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );

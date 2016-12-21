@@ -32,8 +32,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.FieldType;
 
-import com.google.common.collect.ImmutableSetMultimap;
-
 /**
  * Builder for constraint fields.
  *
@@ -82,7 +80,7 @@ class ConstrainedFieldBuilder {
 					ConfigurationSource.XML,
 					field,
 					metaConstraints,
-					ImmutableSetMultimap.of(),
+					Collections.emptySet(),
 					groupConversions,
 					getCascadedTypeParameters( field, fieldType.getValid() != null ),
 					UnwrapMode.AUTOMATIC

@@ -46,8 +46,6 @@ import org.hibernate.validator.internal.xml.binding.MethodType;
 import org.hibernate.validator.internal.xml.binding.ParameterType;
 import org.hibernate.validator.internal.xml.binding.ReturnValueType;
 
-import com.google.common.collect.ImmutableSetMultimap;
-
 /**
  * Builder for constrained methods and constructors.
  *
@@ -229,7 +227,7 @@ class ConstrainedExecutableBuilder {
 				parameterMetaData,
 				crossParameterConstraints,
 				returnValueConstraints,
-				ImmutableSetMultimap.of(),
+				Collections.emptySet(),
 				groupConversions,
 				getCascadedTypeParameters( executable, isCascaded ),
 				UnwrapMode.AUTOMATIC

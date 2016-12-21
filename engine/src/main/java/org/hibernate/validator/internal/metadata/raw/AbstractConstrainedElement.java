@@ -16,10 +16,6 @@ import java.util.Set;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.SetMultimap;
-
 /**
  * Base implementation of with functionality common to all {@link ConstrainedElement} implementations.
  *
@@ -32,21 +28,20 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	protected final Set<MetaConstraint<?>> constraints;
 	protected final Map<Class<?>, Class<?>> groupConversions;
 	protected final List<TypeVariable<?>> cascadingTypeParameters;
-	protected final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentConstraints;
+	protected final Set<MetaConstraint<?>> typeArgumentConstraints;
 	protected final UnwrapMode unwrapMode;
 
 	public AbstractConstrainedElement(ConfigurationSource source,
 									  ConstrainedElementKind kind,
 									  Set<MetaConstraint<?>> constraints,
-									  SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentConstraints,
+									  Set<MetaConstraint<?>> typeArgumentConstraints,
 									  Map<Class<?>, Class<?>> groupConversions,
 									  List<TypeVariable<?>> cascadingTypeParameters,
 									  UnwrapMode unwrapMode) {
 		this.kind = kind;
 		this.source = source;
 		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
-		this.typeArgumentConstraints = typeArgumentConstraints != null ? Multimaps.unmodifiableSetMultimap( typeArgumentConstraints )
-				: ImmutableSetMultimap.of();
+		this.typeArgumentConstraints = typeArgumentConstraints != null ? Collections.unmodifiableSet( typeArgumentConstraints ) : Collections.<MetaConstraint<?>>emptySet();
 		this.groupConversions = Collections.unmodifiableMap( groupConversions );
 		this.cascadingTypeParameters = cascadingTypeParameters;
 
@@ -69,7 +64,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	}
 
 	@Override
-	public SetMultimap<TypeVariable<?>, MetaConstraint<?>> getTypeArgumentConstraints() {
+	public Set<MetaConstraint<?>> getTypeArgumentConstraints() {
 		return typeArgumentConstraints;
 	}
 
