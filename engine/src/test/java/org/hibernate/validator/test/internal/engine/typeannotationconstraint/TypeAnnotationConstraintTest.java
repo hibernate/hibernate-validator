@@ -963,7 +963,7 @@ public class TypeAnnotationConstraintTest {
 
 	// No unwrapper available
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000182.*")
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000197.*")
 	public void custom_generic_type_with_type_annotation_constraint_but_no_unwrapper_throws_exception() {
 		// No unwrapper is registered for Baz
 		BazHolder bazHolder = new BazHolder();

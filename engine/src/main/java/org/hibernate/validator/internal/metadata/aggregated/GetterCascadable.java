@@ -24,7 +24,6 @@ import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -32,10 +31,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.SetMultimap;
 
 /**
  * A {@link Cascadable} backed by a property getter of a Java bean.
@@ -47,16 +42,14 @@ public class GetterCascadable implements Cascadable {
 	private final Method method;
 	private final String propertyName;
 	private final Type cascadableType;
-	private final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints;
 	private final List<TypeVariable<?>> cascadingTypeParameters;
 	private final GroupConversionHelper groupConversionHelper;
 	private final UnwrapMode unwrapMode;
 
-	GetterCascadable(Method method, SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints, List<TypeVariable<?>> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions, UnwrapMode unwrapMode) {
+	GetterCascadable(Method method, List<TypeVariable<?>> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions, UnwrapMode unwrapMode) {
 		this.method = method;
 		this.propertyName = ReflectionHelper.getPropertyName( method );
 		this.cascadableType = ReflectionHelper.typeOf( method );
-		this.typeArgumentsConstraints = ImmutableSetMultimap.copyOf( typeArgumentsConstraints );
 		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( !cascadingTypeParameters.isEmpty(), method.toString() );
@@ -76,11 +69,6 @@ public class GetterCascadable implements Cascadable {
 	@Override
 	public ElementType getElementType() {
 		return ElementType.METHOD;
-	}
-
-	@Override
-	public SetMultimap<TypeVariable<?>, MetaConstraint<?>> getTypeArgumentsConstraints() {
-		return typeArgumentsConstraints;
 	}
 
 	@Override
@@ -113,7 +101,6 @@ public class GetterCascadable implements Cascadable {
 		private static final Log LOG = LoggerFactory.make();
 
 		private final Method method;
-		private final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints = HashMultimap.create();
 		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 		private final Map<Class<?>, Class<?>> groupConversions = new HashMap<>();
 
@@ -121,11 +108,6 @@ public class GetterCascadable implements Cascadable {
 
 		public Builder(Method method) {
 			this.method = method;
-		}
-
-		@Override
-		public void addTypeArgumentConstraints(SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints) {
-			this.typeArgumentsConstraints.putAll( typeArgumentsConstraints );
 		}
 
 		@Override
@@ -158,7 +140,7 @@ public class GetterCascadable implements Cascadable {
 
 		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( getAccessible( method ), typeArgumentsConstraints, cascadingTypeParameters, groupConversions, unwrapMode );
+			return new GetterCascadable( getAccessible( method ), cascadingTypeParameters, groupConversions, unwrapMode );
 		}
 
 		/**

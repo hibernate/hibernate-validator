@@ -25,7 +25,6 @@ import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -33,10 +32,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.SetMultimap;
 
 /**
  * A {@link Cascadable} backed by a field of a Java bean.
@@ -48,16 +43,14 @@ public class FieldCascadable implements Cascadable {
 	private final Field field;
 	private final String propertyName;
 	private final Type cascadableType;
-	private final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints;
 	private final List<TypeVariable<?>> cascadingTypeParameters;
 	private final GroupConversionHelper groupConversionHelper;
 	private final UnwrapMode unwrapMode;
 
-	FieldCascadable(Field field, SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints, List<TypeVariable<?>> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions, UnwrapMode unwrapMode) {
+	FieldCascadable(Field field, List<TypeVariable<?>> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions, UnwrapMode unwrapMode) {
 		this.field = field;
 		this.propertyName = field.getName();
 		this.cascadableType = ReflectionHelper.typeOf( field );
-		this.typeArgumentsConstraints = ImmutableSetMultimap.copyOf( typeArgumentsConstraints );
 		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( !cascadingTypeParameters.isEmpty(), field.toString() );
@@ -77,11 +70,6 @@ public class FieldCascadable implements Cascadable {
 	@Override
 	public ElementType getElementType() {
 		return ElementType.FIELD;
-	}
-
-	@Override
-	public SetMultimap<TypeVariable<?>, MetaConstraint<?>> getTypeArgumentsConstraints() {
-		return typeArgumentsConstraints;
 	}
 
 	@Override
@@ -114,7 +102,6 @@ public class FieldCascadable implements Cascadable {
 		private static final Log LOG = LoggerFactory.make();
 
 		private final Field field;
-		private final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints = HashMultimap.create();
 		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 		private final Map<Class<?>, Class<?>> groupConversions = new HashMap<>();
 
@@ -122,11 +109,6 @@ public class FieldCascadable implements Cascadable {
 
 		public Builder(Field field) {
 			this.field = field;
-		}
-
-		@Override
-		public void addTypeArgumentConstraints(SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints) {
-			this.typeArgumentsConstraints.putAll( typeArgumentsConstraints );
 		}
 
 		@Override
@@ -159,7 +141,7 @@ public class FieldCascadable implements Cascadable {
 
 		@Override
 		public FieldCascadable build() {
-			return new FieldCascadable( getAccessible( field ), typeArgumentsConstraints, cascadingTypeParameters, groupConversions, unwrapMode );
+			return new FieldCascadable( getAccessible( field ), cascadingTypeParameters, groupConversions, unwrapMode );
 		}
 
 		/**

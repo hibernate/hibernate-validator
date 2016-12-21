@@ -683,4 +683,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 196, value = "Unable to convert the Type %s to a Class.")
 	ValidationException getUnableToConvertTypeToClassException(Type type);
+
+	@Message(id = 197, value = "No value extractor found type parameter '%2$s' of type %1$s.")
+	ValidationException getNoValueExtractorFoundForTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> type, TypeVariable<?> typeParameter);
 }

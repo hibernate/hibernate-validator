@@ -50,23 +50,33 @@ public class ValueExtractors {
 		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyIterableValueExtractor.INSTANCE ) );
 		tmpValueExtractors.add( new ValueExtractorDescriptor( IterableValueExtractor.INSTANCE ) );
 
+		tmpValueExtractors.add( new ValueExtractorDescriptor( OptionalValueExtractor.INSTANCE ) );
 		tmpValueExtractors.add( new ValueExtractorDescriptor( ObjectValueExtractor.INSTANCE ) );
 
 		valueExtractors = Collections.unmodifiableList( tmpValueExtractors );
 	}
 
 	public ValueExtractor<?> getCascadedValueExtractor(Class<?> valueType, TypeVariable<?> cascadingTypeParameter) {
-		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = TypeVariableBindings.getTypeVariableBindings( valueType );
+		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = null;
+
+		if ( cascadingTypeParameter != AnnotatedObject.INSTANCE && cascadingTypeParameter != ArrayElement.INSTANCE ) {
+			allBindings = TypeVariableBindings.getTypeVariableBindings( (Class<?>) cascadingTypeParameter.getGenericDeclaration() );
+		}
 
 		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.stream()
-			.filter( e -> TypeHelper.isAssignable( e.getExtractedType(), valueType ) )
+			.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getExtractedType() ), valueType ) )
 			.collect( Collectors.toList() );
 
-
 		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
-			Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( TypeHelper.getErasedReferenceType( extractorDescriptor.getExtractedType() ) );
+			TypeVariable<?> cascadingParameterBoundToExtractorType;
+			if ( cascadingTypeParameter != AnnotatedObject.INSTANCE && cascadingTypeParameter != ArrayElement.INSTANCE ) {
+				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( TypeHelper.getErasedReferenceType( extractorDescriptor.getExtractedType() ) );
+				cascadingParameterBoundToExtractorType = bind( cascadingTypeParameter, bindingsForExtractorType );
+			}
+			else {
+				cascadingParameterBoundToExtractorType = cascadingTypeParameter;
+			}
 
-			TypeVariable<?> cascadingParameterBoundToExtractorType = bind( cascadingTypeParameter, bindingsForExtractorType );
 			if ( cascadingParameterBoundToExtractorType.equals( extractorDescriptor.extractedTypeParameter() ) ) {
 				// TODO implement selection of most specific extractor per requested type parameter
 				return extractorDescriptor.getValueExtractor();

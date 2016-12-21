@@ -27,6 +27,7 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -204,7 +205,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				}
 			}
 
-			if ( constrainedElement.isCascading() || !constrainedElement.getGroupConversions().isEmpty() || !constrainedElement.getTypeArgumentConstraints().isEmpty() ) {
+			if ( constrainedElement.isCascading() || !constrainedElement.getGroupConversions().isEmpty() ) {
 				if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 					Field field = ( (ConstrainedField) constrainedElement ).getField();
 					Cascadable.Builder builder = cascadableBuilders.get( field );
@@ -216,7 +217,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 					builder.unwrapMode( unwrapMode );
 					builder.addGroupConversions( constrainedElement.getGroupConversions() );
-					builder.addTypeArgumentConstraints( constrainedElement.getTypeArgumentConstraints() );
 					builder.addCascadingTypeParameters( constrainedElement.getCascadingTypeParameters() );
 				}
 				else if ( constrainedElement.getKind() == ConstrainedElementKind.METHOD ) {
@@ -230,7 +230,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 					builder.unwrapMode( unwrapMode );
 					builder.addGroupConversions( constrainedElement.getGroupConversions() );
-					builder.addTypeArgumentConstraints( constrainedElement.getTypeArgumentConstraints() );
 					builder.addCascadingTypeParameters( constrainedElement.getCascadingTypeParameters() );
 				}
 			}
@@ -244,8 +243,25 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 
 			// convert (getter) return value locations into property locations for usage within this meta-data
 			return constraints.stream()
-					.map( c -> new MetaConstraint<>( c.getDescriptor(), ConstraintLocation.forProperty( c.getLocation().getMember() ) ) )
-					.collect( Collectors.toSet() );
+				.map( this::withAdaptedLocation )
+				.collect( Collectors.toSet() );
+		}
+
+		private MetaConstraint<?> withAdaptedLocation(MetaConstraint<?> constraint) {
+			ConstraintLocation adaptedLocation;
+
+			if ( constraint.getLocation() instanceof TypeArgumentConstraintLocation ) {
+				ConstraintLocation adaptedDelegate = ConstraintLocation.forProperty( constraint.getLocation().getMember() );
+				adaptedLocation = ConstraintLocation.forTypeArgument( adaptedDelegate,
+						( (TypeArgumentConstraintLocation) constraint.getLocation() ).getTypeParameter(),
+						constraint.getLocation().getTypeForValidatorResolution()
+				);
+			}
+			else {
+				adaptedLocation = ConstraintLocation.forProperty( constraint.getLocation().getMember() );
+			}
+
+			return new MetaConstraint<>( constraint.getDescriptor(), adaptedLocation );
 		}
 
 		private String getPropertyName(ConstrainedElement constrainedElement) {

@@ -51,7 +51,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -175,29 +174,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		for ( PropertyMetaData propertyMetaData : propertyMetaDataSet ) {
 			propertyMetaDataMap.put( propertyMetaData.getName(), propertyMetaData );
-
 			cascadedProperties.addAll( propertyMetaData.getCascadables() );
-
-			for ( Cascadable cascadable : propertyMetaData.getCascadables() ) {
-				// TODO that's just a hack to make things somehow work as long as there is ValueExtractor and ValueUnwrapper; the latter
-				// requires feeding of type constraints into regular property ones
-				if ( !ReflectionHelper.isCollection( propertyMetaData.getType() ) ) {
-					if ( cascadable.getCascadingTypeParameters().isEmpty() ) {
-						Set<MetaConstraint<?>> typeConstraints = cascadable.getTypeArgumentsConstraints()
-								.values()
-								.stream()
-								.map( c -> {
-									ConstraintLocation adaptedDelegate = ConstraintLocation.forProperty( c.getLocation().getMember() );
-									ConstraintLocation adaptedLocation = ConstraintLocation.forTypeArgument( adaptedDelegate, c.getLocation().getTypeForValidatorResolution() );
-									return new MetaConstraint<>( c.getDescriptor(), adaptedLocation );
-								} )
-								.collect( Collectors.toSet() );
-
-							allMetaConstraints.addAll( typeConstraints );
-					}
-				}
-			}
-
 			allMetaConstraints.addAll( propertyMetaData.getConstraints() );
 		}
 

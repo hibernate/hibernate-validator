@@ -27,9 +27,6 @@ import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.SetMultimap;
-
 /**
  * Represents the constraint related meta data of the return value of a method
  * or constructor.
@@ -44,16 +41,10 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	private final List<Cascadable> cascadables;
 	private final GroupConversionHelper groupConversionHelper;
 
-	/**
-	 * Type arguments constraints for this return value
-	 */
-	private final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints;
-
 	private final List<TypeVariable<?>> cascadingTypeParameters;
 
 	public ReturnValueMetaData(Type type,
 							   Set<MetaConstraint<?>> constraints,
-							   SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints,
 							   List<TypeVariable<?>> cascadingTypeParameters,
 							   Map<Class<?>, Class<?>> groupConversions,
 							   UnwrapMode unwrapMode) {
@@ -63,11 +54,10 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				constraints,
 				ElementKind.RETURN_VALUE,
 				!cascadingTypeParameters.isEmpty(),
-				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty() || !typeArgumentsConstraints.isEmpty(),
+				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty(),
 				unwrapMode
 		);
 
-		this.typeArgumentsConstraints = ImmutableSetMultimap.copyOf( typeArgumentsConstraints );
 		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
 		this.cascadables = Collections.unmodifiableList( isCascading() ? Arrays.<Cascadable>asList( this ) : Collections.<Cascadable>emptyList() );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
@@ -92,11 +82,6 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	@Override
 	public ElementType getElementType() {
 		return ElementType.METHOD;
-	}
-
-	@Override
-	public SetMultimap<TypeVariable<?>, MetaConstraint<?>> getTypeArgumentsConstraints() {
-		return this.typeArgumentsConstraints;
 	}
 
 	@Override

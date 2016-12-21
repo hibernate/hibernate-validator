@@ -36,6 +36,8 @@ import javax.validation.constraints.Null;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.spi.cascading.ExtractedValue;
+import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
@@ -63,6 +65,7 @@ public class UnwrapModesTest {
 
 		validatorWithUnwrapper = ValidatorUtil.getConfiguration()
 				.addValidatedValueHandler( new ValueHolderUnwrapper() )
+				.addCascadedValueExtractor( new ValueHolderExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 	}
@@ -128,36 +131,36 @@ public class UnwrapModesTest {
 	public class Foo {
 		// no constraint validator defined for @DummyConstraint and no unwrapper for ValueHolder
 		@DummyConstraint
-		private ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
+		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
 	public class Fubar {
 		// @UnwrapValidatedValue annotation optional
 		@Future // there is no future validator for integers!
-		private ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
+		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
 	public class Foobar {
 		@UnwrapValidatedValue
 		@Min(10)
-		private ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
+		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
 	public class Bar {
 		@Min(10)
-		private ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
+		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 
-		private ValueHolder<@NotBlank String> stringHolder = new ValueHolder<>( "" );
+		private final ValueHolder<@NotBlank String> stringHolder = new ValueHolder<>( "" );
 	}
 
 	public class Baz {
 		@Null
-		private ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
+		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
 	public class Qux {
 		@ValueHolderConstraint
-		private ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
+		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
 	class ValueHolder<T> {
@@ -166,7 +169,7 @@ public class UnwrapModesTest {
 			this.value = value;
 		}
 
-		private T value;
+		private final T value;
 
 		public T getValue() {
 			return value;
@@ -223,6 +226,14 @@ public class UnwrapModesTest {
 		public Type getValidatedValueType(Type valueType) {
 			ResolvedType resolvedType = typeResolver.resolve( valueType );
 			return resolvedType.typeParametersFor( ValueHolder.class ).get( 0 ).getErasedType();
+		}
+	}
+
+	class ValueHolderExtractor implements ValueExtractor<ValueHolder<@ExtractedValue ?>> {
+
+		@Override
+		public void extractValues(ValueHolder<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
+			receiver.value( originalValue.value, null );
 		}
 	}
 

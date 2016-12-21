@@ -13,7 +13,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -166,8 +165,7 @@ public class ConstraintTree<A extends Annotation> {
 			);
 		}
 		// TYPE_USE requires implicitly unwrapping
-		else if ( UnwrapMode.UNWRAP.equals( valueContext.getUnwrapMode() )
-				|| ElementType.TYPE_USE.equals( valueContext.getElementType() ) ) {
+		else if ( UnwrapMode.UNWRAP.equals( valueContext.getUnwrapMode() ) ) {
 			return getInitializedValidatorInstanceForWrappedInstance(
 					validationContext,
 					valueContext,

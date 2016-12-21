@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.location;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -40,8 +41,8 @@ public interface ConstraintLocation {
 		return new PropertyConstraintLocation( member );
 	}
 
-	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, Type type) {
-		return new TypeArgumentConstraintLocation( delegate, type );
+	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type type) {
+		return new TypeArgumentConstraintLocation( delegate, typeParameter, type );
 	}
 
 	static ConstraintLocation forReturnValue(Executable executable) {

@@ -18,9 +18,6 @@ import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
-import org.hibernate.validator.internal.metadata.core.MetaConstraint;
-
-import com.google.common.collect.SetMultimap;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
@@ -61,14 +58,6 @@ public interface Cascadable {
 	ElementType getElementType();
 
 	/**
-	 * Returns the type arguments constraints for this cascadable.
-	 *
-	 * @return the type arguments constraints for this cascadable, or an empty set if no constrained type arguments are
-	 * found
-	 */
-	SetMultimap<TypeVariable<?>, MetaConstraint<?>> getTypeArgumentsConstraints();
-
-	/**
 	 * Defines how the validated values needs to be treated in case there is a potential unwrapper specified for its type
 	 *
 	 * @return the {@code ValidatedValueUnwrapMode} to be used for this constraint.
@@ -104,9 +93,7 @@ public interface Cascadable {
 
 		void addGroupConversions(Map<Class<?>, Class<?>> groupConversions);
 		void addCascadingTypeParameters(List<TypeVariable<?>> cascadingTypeParameters);
-		void addTypeArgumentConstraints(SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints);
 		void unwrapMode(UnwrapMode unwrapMode);
 		Cascadable build();
-
 	}
 }

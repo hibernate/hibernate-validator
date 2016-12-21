@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.metadata.location;
 
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
@@ -23,13 +24,13 @@ import org.hibernate.validator.internal.util.StringHelper;
 public class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 	private final ConstraintLocation delegate;
+	private final TypeVariable<?> typeParameter;
 	private final Type typeForValidatorResolution;
-	private final boolean isCollection;
 
-	TypeArgumentConstraintLocation(ConstraintLocation delegate, Type typeOfAnnotatedElement) {
+	TypeArgumentConstraintLocation(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
 		this.delegate = delegate;
+		this.typeParameter = typeParameter;
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( typeOfAnnotatedElement );
-		this.isCollection = ReflectionHelper.isCollection( delegate.getTypeForValidatorResolution() );
 	}
 
 	@Override
@@ -40,6 +41,10 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 	@Override
 	public Member getMember() {
 		return delegate.getMember();
+	}
+
+	public TypeVariable<?> getTypeParameter() {
+		return typeParameter;
 	}
 
 	@Override

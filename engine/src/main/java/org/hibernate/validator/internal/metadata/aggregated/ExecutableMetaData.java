@@ -15,8 +15,6 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,9 +38,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.SetMultimap;
 
 /**
  * An aggregated view of the constraint related meta data for a given method or
@@ -86,7 +81,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
-			SetMultimap<TypeVariable<?>,MetaConstraint<?>> typeArgumentsConstraints,
 			Map<Class<?>, Class<?>> returnValueGroupConversions,
 			List<TypeVariable<?>> cascadingTypeParameters,
 			boolean isConstrained,
@@ -109,7 +103,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,
 				returnValueConstraints,
-				typeArgumentsConstraints,
 				cascadingTypeParameters,
 				returnValueGroupConversions,
 				unwrapMode
@@ -257,7 +250,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private Executable executable;
 		private final boolean isGetterMethod;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
-		private final SetMultimap<TypeVariable<?>, MetaConstraint<?>> typeArgumentsConstraints = HashMultimap.create();
 		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
@@ -332,7 +324,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			constrainedExecutables.add( constrainedExecutable );
 			isConstrained = isConstrained || constrainedExecutable.isConstrained();
 			crossParameterConstraints.addAll( constrainedExecutable.getCrossParameterConstraints() );
-			typeArgumentsConstraints.putAll( constrainedExecutable.getTypeArgumentConstraints() );
 			cascadingTypeParameters.addAll( constrainedExecutable.getCascadingTypeParameters() );
 
 			addToExecutablesByDeclaringType( constrainedExecutable );
@@ -380,7 +371,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					findParameterMetaData(),
 					adaptOriginsAndImplicitGroups( crossParameterConstraints ),
-					typeArgumentsConstraints,
 					getGroupConversions(),
 					cascadingTypeParameters,
 					isConstrained,
@@ -455,16 +445,6 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 					}
 				}
 			}
-		}
-
-		/**
-		 * Runs the given privileged action, using a privileged block if required.
-		 * <p>
-		 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
-		 * privileged actions within HV's protection domain.
-		 */
-		private <T> T run(PrivilegedAction<T> action) {
-			return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 		}
 	}
 }

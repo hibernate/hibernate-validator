@@ -816,12 +816,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				// Iterables and maps need special treatment at this point, since the validated type is the type of the
 				// specified type parameter. In the other cases the validated type is the parameterized type, eg Optional<String>.
 				// In the latter case a value unwrapping has to occur
-				Type validatedType = annotatedType.getType();
-				if ( ReflectionHelper.isCollection( annotatedType.getType() ) ) {
-					validatedType = annotatedTypeParameter.getType();
-				}
+				Type validatedType = annotatedTypeParameter.getType();
 
-				typeArgumentConstraints.putAll( typeVariable, findTypeUseConstraints( member, annotatedTypeParameter, location, validatedType ) );
+				typeArgumentConstraints.putAll( typeVariable, findTypeUseConstraints( member, annotatedTypeParameter, typeVariable, location, validatedType ) );
 
 				i++;
 			}
@@ -833,7 +830,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			AnnotatedArrayType annotatedArrayType = (AnnotatedArrayType) annotatedType;
 			Type validatedType = annotatedArrayType.getAnnotatedGenericComponentType().getType();
 
-			typeArgumentConstraints.putAll( ArrayElement.INSTANCE, findTypeUseConstraints( member, annotatedArrayType, location, validatedType ) );
+			typeArgumentConstraints.putAll( ArrayElement.INSTANCE, findTypeUseConstraints( member, annotatedArrayType, ArrayElement.INSTANCE, location, validatedType ) );
 			return typeArgumentConstraints;
 		}
 		else {
@@ -844,10 +841,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Finds type use annotation constraints defined on the type argument.
 	 */
-	private Set<MetaConstraint<?>> findTypeUseConstraints(Member member, AnnotatedType typeArgument, TypeArgumentLocation location, Type type) {
+	private Set<MetaConstraint<?>> findTypeUseConstraints(Member member, AnnotatedType typeArgument, TypeVariable<?> typeVariable, TypeArgumentLocation location, Type type) {
 		Set<MetaConstraint<?>> constraints = Arrays.stream( typeArgument.getAnnotations() )
 			.flatMap( a -> findConstraintAnnotations( member, a, ElementType.TYPE_USE ).stream() )
-			.map( d -> createTypeArgumentMetaConstraint( d, location, type ) )
+			.map( d -> createTypeArgumentMetaConstraint( d, location, typeVariable, type ) )
 			.collect( Collectors.toSet() );
 
 		return constraints;
@@ -856,8 +853,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Creates a {@code MetaConstraint} for a type argument constraint.
 	 */
-	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(ConstraintDescriptorImpl<A> descriptor, TypeArgumentLocation location, Type type) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( location.toConstraintLocation(), type ) );
+	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(ConstraintDescriptorImpl<A> descriptor, TypeArgumentLocation location, TypeVariable<?> typeVariable, Type type) {
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( location.toConstraintLocation(), typeVariable, type ) );
 	}
 
 	/**

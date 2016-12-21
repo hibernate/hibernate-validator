@@ -45,7 +45,7 @@ public class MetaConstraint<A extends Annotation> {
 	 * @param location meta data about constraint placement
 	 */
 	public MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location) {
-		this.constraintTree = new ConstraintTree<A>( constraintDescriptor );
+		this.constraintTree = new ConstraintTree<>( constraintDescriptor );
 		this.constraintDescriptor = constraintDescriptor;
 		this.location = location;
 	}
@@ -71,7 +71,6 @@ public class MetaConstraint<A extends Annotation> {
 		valueContext.setDeclaredTypeOfValidatedElement( location.getTypeForValidatorResolution() );
 
 		boolean validationResult = constraintTree.validateConstraints( executionContext, valueContext );
-		executionContext.markConstraintProcessed( valueContext.getCurrentBean(), valueContext.getPropertyPath(), this );
 
 		return validationResult;
 	}
