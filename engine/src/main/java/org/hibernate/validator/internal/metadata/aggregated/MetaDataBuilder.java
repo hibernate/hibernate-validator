@@ -20,6 +20,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -43,7 +44,8 @@ public abstract class MetaDataBuilder {
 	private final Set<MetaConstraint<?>> constraints = newHashSet();
 	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
-	private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
+	private UnwrapMode unwrapMode;
+	private ConfigurationSource unwrapModeSource;
 
 	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper) {
 		this.beanClass = beanClass;
@@ -73,7 +75,11 @@ public abstract class MetaDataBuilder {
 		constraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getConstraints() ) );
 		constraints.addAll( adaptConstraints( constrainedElement.getKind(), new HashSet<>( constrainedElement.getTypeArgumentConstraints().values() ) ) );
 		isCascading = isCascading || constrainedElement.isCascading();
-		unwrapMode = constrainedElement.unwrapMode();
+
+		if ( unwrapMode == null || constrainedElement.getSource().getPriority() > unwrapModeSource.getPriority() ) {
+			unwrapMode = constrainedElement.unwrapMode();
+			unwrapModeSource = constrainedElement.getSource();
+		}
 
 		addGroupConversions( constrainedElement.getGroupConversions() );
 	}

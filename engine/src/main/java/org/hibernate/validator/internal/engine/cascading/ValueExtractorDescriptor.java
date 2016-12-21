@@ -22,7 +22,7 @@ import org.hibernate.validator.spi.cascading.ValueExtractor;
  *
  * @author Gunnar Morling
  */
-class ValueExtractorDescriptor {
+public class ValueExtractorDescriptor {
 
 	private final ValueExtractor<?> valueExtractor;
 	private final Type extractedType;
@@ -66,14 +66,15 @@ class ValueExtractorDescriptor {
 		return extractedType.getType();
 	}
 
-	Type getExtractedType() {
+	public Type getExtractedType() {
 		return extractedType;
 	}
-	TypeVariable<?> extractedTypeParameter() {
+
+	public TypeVariable<?> extractedTypeParameter() {
 		return extractedTypeParameter;
 	}
 
-	ValueExtractor<?> getValueExtractor() {
+	public ValueExtractor<?> getValueExtractor() {
 		return valueExtractor;
 	}
 

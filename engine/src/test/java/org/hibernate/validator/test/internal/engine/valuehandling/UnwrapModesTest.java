@@ -19,7 +19,6 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Type;
 import java.util.Set;
 
 import javax.validation.Constraint;
@@ -35,18 +34,13 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Null;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.spi.cascading.ExtractedValue;
 import org.hibernate.validator.spi.cascading.ValueExtractor;
-import org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import com.fasterxml.classmate.ResolvedType;
-import com.fasterxml.classmate.TypeResolver;
 
 /**
  * Test the various scenarios for explicit and implicit unwrapping of values.
@@ -64,7 +58,6 @@ public class UnwrapModesTest {
 		validatorWithoutUnwrapper = ValidatorUtil.getValidator();
 
 		validatorWithUnwrapper = ValidatorUtil.getConfiguration()
-				.addValidatedValueHandler( new ValueHolderUnwrapper() )
 				.addCascadedValueExtractor( new ValueHolderExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
@@ -80,12 +73,13 @@ public class UnwrapModesTest {
 		validatorWithUnwrapper.validate( new Fubar() );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000182.*")
+	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000198.*")
 	public void missing_value_unwrapper_throws_exception() {
 		validatorWithoutUnwrapper.validate( new Foobar() );
 	}
 
-	@Test
+	@Test(enabled = false)
+	// TODO implicit unwrapping not supported
 	public void unwrapped_values_get_validated() {
 		Set<ConstraintViolation<Bar>> constraintViolations = validatorWithUnwrapper.validate( new Bar() );
 		assertNumberOfViolations( constraintViolations, 2 );
@@ -123,7 +117,8 @@ public class UnwrapModesTest {
 		assertCorrectConstraintTypes( constraintViolations, Null.class );
 	}
 
-	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000186.*")
+	@Test(enabled = false, expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000186.*")
+	// TODO implicit unwrapping not supported for now
 	public void constraint_declaration_exception_if_there_are_validators_for_wrapper_and_wrapped_value() {
 		validatorWithUnwrapper.validate( new Baz() );
 	}
@@ -211,21 +206,6 @@ public class UnwrapModesTest {
 		@Override
 		public boolean isValid(ValueHolder value, ConstraintValidatorContext context) {
 			return false;
-		}
-	}
-
-	class ValueHolderUnwrapper extends ValidatedValueUnwrapper<ValueHolder> {
-		TypeResolver typeResolver = new TypeResolutionHelper().getTypeResolver();
-
-		@Override
-		public Object handleValidatedValue(ValueHolder valueHolder) {
-			return valueHolder.getValue();
-		}
-
-		@Override
-		public Type getValidatedValueType(Type valueType) {
-			ResolvedType resolvedType = typeResolver.resolve( valueType );
-			return resolvedType.typeParametersFor( ValueHolder.class ).get( 0 ).getErasedType();
 		}
 	}
 

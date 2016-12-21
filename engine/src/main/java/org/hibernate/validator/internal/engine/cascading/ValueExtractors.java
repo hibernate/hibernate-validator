@@ -7,14 +7,19 @@
 package org.hibernate.validator.internal.engine.cascading;
 
 import java.lang.reflect.TypeVariable;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.validation.ValidationException;
+
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
+import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.spi.cascading.ValueExtractor;
 
 /**
@@ -29,6 +34,10 @@ public class ValueExtractors {
 
 		for ( ValueExtractor<?> valueExtractor : externalExtractors ) {
 			tmpValueExtractors.add( new ValueExtractorDescriptor( valueExtractor ) );
+		}
+
+		if ( isJavaFxInClasspath() ) {
+			tmpValueExtractors.add( new ValueExtractorDescriptor( ObservableValueExtractor.INSTANCE ) );
 		}
 
 		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyListValueExtractor.INSTANCE ) );
@@ -50,13 +59,33 @@ public class ValueExtractors {
 		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyIterableValueExtractor.INSTANCE ) );
 		tmpValueExtractors.add( new ValueExtractorDescriptor( IterableValueExtractor.INSTANCE ) );
 
+		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyOptionalValueExtractor.INSTANCE ) );
 		tmpValueExtractors.add( new ValueExtractorDescriptor( OptionalValueExtractor.INSTANCE ) );
 		tmpValueExtractors.add( new ValueExtractorDescriptor( ObjectValueExtractor.INSTANCE ) );
 
 		valueExtractors = Collections.unmodifiableList( tmpValueExtractors );
 	}
 
-	public ValueExtractor<?> getCascadedValueExtractor(Class<?> valueType, TypeVariable<?> cascadingTypeParameter) {
+	/**
+	 * Returns the most specific value extractor extracting the given type or {@code null} if none was found.
+	 */
+	public ValueExtractorDescriptor getValueExtractor(Class<?> valueType) {
+		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.stream()
+				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getExtractedType() ), valueType ) )
+				.collect( Collectors.toList() );
+
+		// TODO
+		// * keep most specific one
+		// * if several extractors are found for the most specific type, e.g. key and value extractors for Map, raise an exception
+		if ( typeCompatibleExtractors.isEmpty() ) {
+			return null;
+		}
+		else {
+			return typeCompatibleExtractors.iterator().next();
+		}
+	}
+
+	public ValueExtractorDescriptor getCascadedValueExtractor(Class<?> valueType, TypeVariable<?> cascadingTypeParameter) {
 		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = null;
 
 		if ( cascadingTypeParameter != AnnotatedObject.INSTANCE && cascadingTypeParameter != ArrayElement.INSTANCE ) {
@@ -79,7 +108,7 @@ public class ValueExtractors {
 
 			if ( cascadingParameterBoundToExtractorType.equals( extractorDescriptor.extractedTypeParameter() ) ) {
 				// TODO implement selection of most specific extractor per requested type parameter
-				return extractorDescriptor.getValueExtractor();
+				return extractorDescriptor;
 			}
 		}
 
@@ -95,5 +124,29 @@ public class ValueExtractors {
 		}
 
 		return bound != null ? bound : typeParameter == AnnotatedObject.INSTANCE ? AnnotatedObject.INSTANCE : ArrayElement.INSTANCE;
+	}
+
+	private boolean isJavaFxInClasspath() {
+		return isClassPresent( "javafx.application.Application", false );
+	}
+
+	private boolean isClassPresent(String className, boolean fallbackOnTCCL) {
+		try {
+			run( LoadClass.action( className, getClass().getClassLoader(), fallbackOnTCCL ) );
+			return true;
+		}
+		catch (ValidationException e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

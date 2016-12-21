@@ -665,9 +665,6 @@ public interface Log extends BasicLogger {
 	@Message(id = 190, value = "Unable to parse %s.")
 	ValidationException getUnableToCreateXMLEventReader(String file, @Cause Exception e);
 
-	@Message(id = 191, value = "Error creating unwrapper: %s")
-	ValidationException validatedValueUnwrapperCannotBeCreated(String className, @Cause Exception e);
-
 	@LogMessage(level = WARN)
 	@Message(id = 192, value = "Couldn't determine Java version from value %1s; Not enabling features requiring Java 8")
 	void unknownJvmVersion(String vmVersionStr);
@@ -686,4 +683,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 197, value = "No value extractor found type parameter '%2$s' of type %1$s.")
 	ValidationException getNoValueExtractorFoundForTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> type, TypeVariable<?> typeParameter);
+
+	@Message(id = 198, value = "No suitable value extractor found for type %1$s.")
+	ValidationException getNoValueExtractorFoundForUnwrapException(Type type);
+
+	@Message(id = 199, value = "Cannot extract value for type %1$s with more than one type parameters.")
+	ValidationException getUnableToExtractValueForTypeWithMultipleTypeParameterException(Type type);
 }

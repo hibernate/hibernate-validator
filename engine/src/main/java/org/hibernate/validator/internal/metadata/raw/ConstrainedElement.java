@@ -120,4 +120,9 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 * @see org.hibernate.validator.spi.valuehandling.ValidatedValueUnwrapper
 	 */
 	UnwrapMode unwrapMode();
+
+	/**
+	 * Returns the configuration source contributing this constrained element.
+	 */
+	ConfigurationSource getSource();
 }

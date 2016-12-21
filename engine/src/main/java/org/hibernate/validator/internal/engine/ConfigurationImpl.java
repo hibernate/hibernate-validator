@@ -25,7 +25,6 @@ import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
-import javax.validation.ValidationException;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.BootstrapState;
@@ -37,14 +36,12 @@ import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
-import org.hibernate.validator.internal.engine.valuehandling.OptionalValueUnwrapper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.Version;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
@@ -125,10 +122,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private ConfigurationImpl() {
 		this.validationBootstrapParameters = new ValidationBootstrapParameters();
 		TypeResolutionHelper typeResolutionHelper = new TypeResolutionHelper();
-		if ( isJavaFxInClasspath() ) {
-			validatedValueHandlers.add( createJavaFXUnwrapperClass( typeResolutionHelper ) );
-		}
-		validatedValueHandlers.add( new OptionalValueUnwrapper( typeResolutionHelper ) );
 
 		this.defaultResourceBundleLocator = new PlatformResourceBundleLocator(
 				ResourceBundleMessageInterpolator.USER_VALIDATION_MESSAGES
@@ -139,17 +132,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		this.serviceLoaderBasedConstraintMappingContributor = new ServiceLoaderBasedConstraintMappingContributor(
 				typeResolutionHelper
 		);
-	}
-
-	private ValidatedValueUnwrapper<?> createJavaFXUnwrapperClass(TypeResolutionHelper typeResolutionHelper) {
-		try {
-			Class<?> jfxUnwrapperClass = run( LoadClass.action( JFX_UNWRAPPER_CLASS, getClass().getClassLoader() ) );
-			return (ValidatedValueUnwrapper<?>) ( jfxUnwrapperClass.getConstructor( TypeResolutionHelper.class )
-					.newInstance( typeResolutionHelper ) );
-		}
-		catch (Exception e) {
-			throw log.validatedValueUnwrapperCannotBeCreated( JFX_UNWRAPPER_CLASS, e );
-		}
 	}
 
 	@Override
@@ -539,20 +521,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			if ( validationBootstrapParameters.getConfigProperties().get( entry.getKey() ) == null ) {
 				validationBootstrapParameters.addConfigProperty( entry.getKey(), entry.getValue() );
 			}
-		}
-	}
-
-	private boolean isJavaFxInClasspath() {
-		return isClassPresent( "javafx.application.Application", false );
-	}
-
-	private boolean isClassPresent(String className, boolean fallbackOnTCCL) {
-		try {
-			run( LoadClass.action( className, getClass().getClassLoader(), fallbackOnTCCL ) );
-			return true;
-		}
-		catch (ValidationException e) {
-			return false;
 		}
 	}
 

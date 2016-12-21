@@ -99,6 +99,11 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	}
 
 	@Override
+	public ConfigurationSource getSource() {
+		return source;
+	}
+
+	@Override
 	public String toString() {
 		return "AbstractConstrainedElement [kind=" + kind + ", source="
 				+ source + ", constraints="
