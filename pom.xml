@@ -118,8 +118,6 @@
         <classmate.version>1.3.1</classmate.version>
         <jsoup.version>1.8.3</jsoup.version>
         <joda-time.version>2.9.5</joda-time.version>
-        <javax-money.version>1.0.1</javax-money.version>
-        <moneta.version>1.1</moneta.version>
         <slf4j.version>1.7.7</slf4j.version> <!-- Note: Wildfly 10.1.0.Final uses a custom jboss version -->
         <hibernate-jpa-2.1-api.version>1.0.0.Final</hibernate-jpa-2.1-api.version>
 
@@ -132,6 +130,10 @@
         <weld.version>2.3.5.Final</weld.version>
         <wildfly-arquillian.version>2.0.0.Final</wildfly-arquillian.version>
         <jboss-ejb-api_3.2_spec.version>1.0.0.Final</jboss-ejb-api_3.2_spec.version>
+
+        <!-- JavaMoney dependencies -->
+        <javax-money.version>1.0.1</javax-money.version>
+        <moneta.version>1.1</moneta.version>
 
         <!-- WildFly patching infrastructure -->
         <wildfly-patch-gen-maven-plugin.version>2.0.1.Alpha3</wildfly-patch-gen-maven-plugin.version>
