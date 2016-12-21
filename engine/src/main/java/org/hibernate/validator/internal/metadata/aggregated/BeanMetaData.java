@@ -67,14 +67,10 @@ public interface BeanMetaData<T> extends Validatable {
 	List<Class<?>> getDefaultGroupSequence(T beanState);
 
 	/**
-	 * Returns a {@link org.hibernate.validator.internal.engine.groups.ValidationOrder} representing the default
-	 * validation group sequence as configured through {@code @GroupSequence}/{@code @DefaultGroupSequenceProvider}. If
-	 * this bean type does not re-declare the default validation group sequence {@link org.hibernate.validator.internal.engine.groups.ValidationOrder#DEFAULT_SEQUENCE}
-	 * will be returned.
+	 * Returns an iterator over the default validation group sequence as configured through {@code @GroupSequence}/{@code @DefaultGroupSequenceProvider}.
+	 * If this bean type does not re-declare the default validation group sequence,
+	 * {@link org.hibernate.validator.internal.engine.groups.ValidationOrder#DEFAULT_SEQUENCE} will be returned.
 	 */
-	// TODO: Ideally, a plain Sequence object should be returned here; I am using ValidationOrder for now to keep
-	// backporting to 4.3 manageable. The expansion of sequences/groups should be moved from ValidationOrder into
-	// Sequence and Group, respectively.
 	Iterator<Sequence> getDefaultValidationSequence(T beanState);
 
 	/**
