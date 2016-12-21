@@ -182,7 +182,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		boolean tmpAllowParallelMethodsDefineParameterConstraints = false;
 
 		List<ValidatedValueUnwrapper<?>> tmpValidatedValueHandlers = newArrayList( 5 );
-		List<ValueExtractor<?>> cascadedValueExtractors = null;
+		List<ValueExtractor<?>> tmpCascadedValueExtractors = new ArrayList<>( 5 );
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
@@ -201,7 +201,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 			tmpValidatedValueHandlers.addAll( hibernateSpecificConfig.getValidatedValueHandlers() );
 
-			cascadedValueExtractors = new ArrayList<>( hibernateSpecificConfig.getCascadedValueExtractors() );
+			tmpCascadedValueExtractors = new ArrayList<>( hibernateSpecificConfig.getCascadedValueExtractors() );
 		}
 
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
@@ -213,7 +213,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				)
 		);
 		this.validatedValueHandlers = Collections.unmodifiableList( tmpValidatedValueHandlers );
-		this.valueExtractors = new ValueExtractors( cascadedValueExtractors );
+		this.valueExtractors = new ValueExtractors( tmpCascadedValueExtractors );
 		tmpFailFast = checkPropertiesForBoolean( properties, HibernateValidatorConfiguration.FAIL_FAST, tmpFailFast );
 		this.failFast = tmpFailFast;
 

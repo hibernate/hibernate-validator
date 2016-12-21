@@ -726,26 +726,21 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			valueContext.setCurrentGroup( group );
 
 			ElementType elementType = cascadable.getElementType();
-			if ( isCascadeRequired(
-					validationContext,
-					valueContext.getCurrentBean(),
-					valueContext.getPropertyPath(),
-					elementType
-			) ) {
+			if ( isCascadeRequired( validationContext, valueContext.getCurrentBean(), valueContext.getPropertyPath(), elementType ) ) {
 
-					Object value = getCascadableValue( validationContext, valueContext.getCurrentBean(), cascadable );
+				Object value = getCascadableValue( validationContext, valueContext.getCurrentBean(), cascadable );
 
-					if ( value != null ) {
-						// expand the group only if was created by group conversion;
-						// otherwise we're looping through the right validation order
-						// already and need only to pass the current element
-						ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder(
-								group,
-								group != originalGroup
-								);
+				if ( value != null ) {
+					// expand the group only if was created by group conversion;
+					// otherwise we're looping through the right validation order
+					// already and need only to pass the current element
+					ValidationOrder validationOrder = validationOrderGenerator.getValidationOrder(
+							group,
+							group != originalGroup
+							);
 
-						validateCascadedValues( value, validationContext, valueContext, cascadable, validationOrder );
-					}
+					validateCascadedValues( value, validationContext, valueContext, cascadable, validationOrder );
+				}
 			}
 
 			// reset the path

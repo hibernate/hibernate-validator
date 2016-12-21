@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
 /**
- * A pseudo type variable used for to express that the annotated element itself (e.g. a list) has been marked for
+ * A pseudo type variable used to express that the annotated element itself (e.g. a list) has been marked for
  * cascaded validation.
  *
  * @author Gunnar Morling
