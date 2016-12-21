@@ -535,6 +535,7 @@ code at build time (via `DefaultParanamer`) and debug symbols (via `BytecodeRead
 Alternatively you can specify a `Paranamer` implementation of your choice when creating a
 `ParanamerParameterNameProvider` instance.
 
+////
 [[section-value-handling]]
 === Unwrapping values
 
@@ -672,6 +673,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/valuehandl
 include::{sourcedir}/org/hibernate/validator/referenceguide/chapter11/valuehandling/graph/Person.java[tags=include]
 ----
 ====
+////
 
 [[section-constraint-definition-contribution]]
 === Providing constraint definitions
