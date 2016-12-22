@@ -37,6 +37,7 @@ import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationValue;
+import org.jboss.jandex.DotName;
 import org.jboss.jandex.Type;
 
 /**
@@ -54,11 +55,14 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 
 	protected final AnnotationProcessingOptions annotationProcessingOptions;
 
+	private final List<DotName> constraintAnnotations;
+
 	protected AbstractConstrainedElementJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
-			AnnotationProcessingOptions annotationProcessingOptions) {
+			AnnotationProcessingOptions annotationProcessingOptions, List<DotName> constraintAnnotations) {
 		this.jandexHelper = jandexHelper;
 		this.constraintHelper = constraintHelper;
 		this.annotationProcessingOptions = annotationProcessingOptions;
+		this.constraintAnnotations = constraintAnnotations;
 	}
 
 	/**
@@ -229,16 +233,7 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 	 * @return {@code true} if given annotation is a constraint, {@code false} otherwise
 	 */
 	protected boolean isConstraintAnnotation(AnnotationInstance annotationInstance) {
-		// HV-1049 Ignore annotations from jdk.internal.*; They cannot be constraint annotations so skip them right
-		// here, as for the proper check we'd need package access permission for "jdk.internal"
-		if ( "jdk.internal".equals( annotationInstance.name().prefix().toString() ) ) {
-			return false;
-		}
-		// TODO: need to find a way to determine if an annotation is a constraint or not
-
-		// constraintAnnotationCache.computeIfAbsent( annotationInstance.name().toString(), ???)
-
-		return true;
+		return constraintAnnotations.contains( annotationInstance.name() );
 	}
 
 	/**

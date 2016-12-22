@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.jandex;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,6 +25,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
+import org.jboss.jandex.DotName;
 import org.jboss.jandex.FieldInfo;
 
 /**
@@ -33,28 +35,15 @@ import org.jboss.jandex.FieldInfo;
  */
 public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJandexBuilder {
 
-	private ConstrainedFieldJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
-			AnnotationProcessingOptions annotationProcessingOptions) {
-		super( constraintHelper, jandexHelper, annotationProcessingOptions );
-	}
-
-	/**
-	 * Creates an instance of a {@link ConstrainedFieldJandexBuilder}.
-	 *
-	 * @param constraintHelper an instance of {@link ConstraintHelper}
-	 * @param jandexHelper an instance of {@link JandexHelper}
-	 *
-	 * @return a new instance of {@link ConstrainedFieldJandexBuilder}
-	 */
-	public static ConstrainedFieldJandexBuilder getInstance(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
-			AnnotationProcessingOptions annotationProcessingOptions) {
-		return new ConstrainedFieldJandexBuilder( constraintHelper, jandexHelper, annotationProcessingOptions );
+	public ConstrainedFieldJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
+			AnnotationProcessingOptions annotationProcessingOptions, List<DotName> constraintAnnotations) {
+		super( constraintHelper, jandexHelper, annotationProcessingOptions, constraintAnnotations );
 	}
 
 	/**
 	 * Gets {@link ConstrainedField}s from a given class.
 	 *
-	 * @param classInfo a class in which to look for constrained fileds
+	 * @param classInfo a class in which to look for constrained fields
 	 * @param beanClass same class as {@code classInfo} but represented as {@link Class}
 	 *
 	 * @return a stream of {@link ConstrainedElement}s that represents fields

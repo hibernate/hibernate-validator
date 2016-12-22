@@ -6,15 +6,19 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.io.IOException;
-import java.io.InputStream;
+import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.validation.Constraint;
+
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.jandex.ClassConstrainsJandexBuilder;
+import org.hibernate.validator.internal.metadata.jandex.ClassConstraintsJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.ConstrainedFieldJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.ConstrainedMethodJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.util.GroupSequenceJandexHelper;
@@ -22,72 +26,74 @@ import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
+import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
+import org.jboss.jandex.AnnotationTarget.Kind;
 import org.jboss.jandex.ClassInfo;
-import org.jboss.jandex.Index;
-import org.jboss.jandex.IndexReader;
+import org.jboss.jandex.DotName;
+import org.jboss.jandex.IndexView;
 
 /**
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
-public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
+public class JandexMetaDataProvider implements MetaDataProvider {
 
-	private static final Log log = LoggerFactory.make();
+	private static final DotName CONSTRAINT_ANNOTATION = DotName.createSimple( Constraint.class.getName() );
 
-	private AnnotationProcessingOptions annotationProcessingOptions;
-	protected final ExecutableParameterNameProvider parameterNameProvider;
+	private final Map<DotName, BeanConfiguration<?>> configuredBeans;
+
+	private final AnnotationProcessingOptions annotationProcessingOptions;
 
 	public JandexMetaDataProvider(
 			ConstraintHelper constraintHelper,
 			JandexHelper jandexHelper,
-			InputStream jandexIndexStreamResource,
+			IndexView indexView,
 			AnnotationProcessingOptions annotationProcessingOptions,
 			ExecutableParameterNameProvider parameterNameProvider) {
-		super( constraintHelper,
-				readJandexIndex( constraintHelper, jandexHelper, jandexIndexStreamResource, annotationProcessingOptions, parameterNameProvider )
-		);
 		this.annotationProcessingOptions = annotationProcessingOptions;
-		this.parameterNameProvider = parameterNameProvider;
+
+		List<DotName> constraintAnnotations = Collections.unmodifiableList( extractConstraintAnnotations( indexView ) );
+
+		this.configuredBeans = Collections.unmodifiableMap( extractConfiguredBeans( indexView,
+				constraintHelper, jandexHelper,
+				annotationProcessingOptions, parameterNameProvider,
+				constraintAnnotations ) );
 	}
 
-	private static Map<String, BeanConfiguration<?>> readJandexIndex(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
-			InputStream jandexIndexStreamResource, AnnotationProcessingOptions annotationProcessingOptions,
-			ExecutableParameterNameProvider parameterNameProvider) {
-		IndexReader jandexReader = new IndexReader( jandexIndexStreamResource );
-		Index index;
-		try {
-			index = jandexReader.read();
-		}
-		catch (IOException e) {
-			throw log.getParsingJandexIndexException( e );
-		}
+	private static List<DotName> extractConstraintAnnotations(IndexView indexView) {
+		return indexView.getAnnotations( CONSTRAINT_ANNOTATION ).stream()
+				.filter( ai -> Kind.CLASS.equals( ai.target().kind() ) )
+				.map( ai -> ai.target().asClass().name() )
+				.collect( Collectors.toList() );
+	}
 
-		// go through all classes (and interfaces ?) to build configuration map
-		return index.getKnownClasses().stream()
+	private static Map<DotName, BeanConfiguration<?>> extractConfiguredBeans(IndexView indexView, ConstraintHelper constraintHelper, JandexHelper jandexHelper,
+			AnnotationProcessingOptions annotationProcessingOptions, ExecutableParameterNameProvider parameterNameProvider, List<DotName> constraintAnnotations) {
+		return indexView.getKnownClasses().stream()
 				.collect( Collectors.toMap(
-						classInfo -> classInfo.name().toString(),
+						classInfo -> classInfo.name(),
 						classInfo -> getBeanConfiguration(
 								constraintHelper,
 								jandexHelper,
 								classInfo,
 								annotationProcessingOptions,
-								parameterNameProvider
+								parameterNameProvider,
+								constraintAnnotations
 						)
 				) );
-
 	}
 
-	private static BeanConfiguration getBeanConfiguration(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
-			ClassInfo classInfo, AnnotationProcessingOptions annotationProcessingOptions, ExecutableParameterNameProvider parameterNameProvider) {
+	private static BeanConfiguration<?> getBeanConfiguration(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
+			ClassInfo classInfo, AnnotationProcessingOptions annotationProcessingOptions, ExecutableParameterNameProvider parameterNameProvider,
+			List<DotName> constraintAnnotations) {
 		GroupSequenceJandexHelper groupSequenceJandexHelper = GroupSequenceJandexHelper.getInstance( jandexHelper );
 		Class<?> bean = jandexHelper.getClassForName( classInfo.name().toString() );
-		return new BeanConfiguration(
+		return new BeanConfiguration<>(
 				ConfigurationSource.JANDEX,
 				bean,
-				getConstrainedElements( constraintHelper, jandexHelper, classInfo, bean, annotationProcessingOptions, parameterNameProvider )
+				getConstrainedElements( constraintHelper, jandexHelper, classInfo, bean, annotationProcessingOptions, parameterNameProvider, constraintAnnotations )
 						.collect( Collectors.toSet() ),
 				groupSequenceJandexHelper.getGroupSequence( classInfo ).collect( Collectors.toList() ),
 				groupSequenceJandexHelper.getGroupSequenceProvider( classInfo )
@@ -100,27 +106,31 @@ public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
 			ClassInfo classInfo,
 			Class<?> bean,
 			AnnotationProcessingOptions annotationProcessingOptions,
-			ExecutableParameterNameProvider parameterNameProvider
+			ExecutableParameterNameProvider parameterNameProvider,
+			List<DotName> constraintAnnotations
 	) {
 		//get constrained fields
-		Stream<ConstrainedElement> constrainedElementStream = ConstrainedFieldJandexBuilder.getInstance(
-				constraintHelper,
-				jandexHelper,
-				annotationProcessingOptions
-		).getConstrainedFields( classInfo, bean );
-		//get constrained methods/constructors ?
-		Stream.concat( constrainedElementStream, ConstrainedMethodJandexBuilder.getInstance(
+		Stream<ConstrainedElement> constrainedElementStream = new ConstrainedFieldJandexBuilder(
 				constraintHelper,
 				jandexHelper,
 				annotationProcessingOptions,
-				parameterNameProvider
-		).getConstrainedExecutables( classInfo, bean ) );
-		//get class level constraints
-		Stream.concat( constrainedElementStream, ClassConstrainsJandexBuilder.getInstance(
+				constraintAnnotations
+		).getConstrainedFields( classInfo, bean );
+		//get constrained methods/constructors ?
+		Stream.concat( constrainedElementStream, new ConstrainedMethodJandexBuilder(
 				constraintHelper,
 				jandexHelper,
-				annotationProcessingOptions
-		).getClassConstrains( classInfo, bean ) );
+				annotationProcessingOptions,
+				parameterNameProvider,
+				constraintAnnotations
+		).getConstrainedExecutables( classInfo, bean ) );
+		//get class level constraints
+		Stream.concat( constrainedElementStream, new ClassConstraintsJandexBuilder(
+				constraintHelper,
+				jandexHelper,
+				annotationProcessingOptions,
+				constraintAnnotations
+		).getClassConstraints( classInfo, bean ) );
 
 		return constrainedElementStream;
 	}
@@ -128,5 +138,25 @@ public class JandexMetaDataProvider extends MetaDataProviderKeyedByClassName {
 	@Override
 	public AnnotationProcessingOptions getAnnotationProcessingOptions() {
 		return annotationProcessingOptions;
+	}
+
+	@Override
+	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
+		List<BeanConfiguration<? super T>> configurations = newArrayList();
+
+		for ( Class<? super T> clazz : ClassHierarchyHelper.getHierarchy( beanClass ) ) {
+			BeanConfiguration<? super T> configuration = getBeanConfiguration( clazz );
+			if ( configuration != null ) {
+				configurations.add( configuration );
+			}
+		}
+
+		return configurations;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
+		Contracts.assertNotNull( beanClass );
+		return (BeanConfiguration<T>) configuredBeans.get( DotName.createSimple( beanClass.getName() ) );
 	}
 }

@@ -28,9 +28,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
+import org.jboss.jandex.DotName;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.Type;
 
@@ -43,23 +43,11 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 
 	protected final ExecutableParameterNameProvider parameterNameProvider;
 
-	private ConstrainedMethodJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
-			AnnotationProcessingOptions annotationProcessingOptions, ExecutableParameterNameProvider parameterNameProvider) {
-		super( constraintHelper, jandexHelper, annotationProcessingOptions );
+	public ConstrainedMethodJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
+			AnnotationProcessingOptions annotationProcessingOptions, ExecutableParameterNameProvider parameterNameProvider,
+			List<DotName> constraintAnnotations) {
+		super( constraintHelper, jandexHelper, annotationProcessingOptions, constraintAnnotations );
 		this.parameterNameProvider = parameterNameProvider;
-	}
-
-	/**
-	 * Creates an instance of a {@link ConstrainedMethodJandexBuilder}.
-	 *
-	 * @param constraintHelper an instance of {@link ConstraintHelper}
-	 * @param jandexHelper an instance of {@link JandexHelper}
-	 *
-	 * @return a new instance of {@link ConstrainedMethodJandexBuilder}
-	 */
-	public static ConstrainedMethodJandexBuilder getInstance(ConstraintHelper constraintHelper, JandexHelper jandexHelper,
-			AnnotationProcessingOptions annotationProcessingOptions, ExecutableParameterNameProvider parameterNameProvider) {
-		return new ConstrainedMethodJandexBuilder( constraintHelper, jandexHelper, annotationProcessingOptions, parameterNameProvider );
 	}
 
 	/**

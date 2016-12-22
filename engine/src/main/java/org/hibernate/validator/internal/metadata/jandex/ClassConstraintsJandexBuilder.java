@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.metadata.jandex;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,31 +19,20 @@ import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.ClassInfo;
+import org.jboss.jandex.DotName;
 
 /**
  * Builder for class level constrains that uses Jandex index.
  *
  * @author Marko Bekhta
  */
-public class ClassConstrainsJandexBuilder extends AbstractConstrainedElementJandexBuilder {
+public class ClassConstraintsJandexBuilder extends AbstractConstrainedElementJandexBuilder {
 
-	private ClassConstrainsJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper, AnnotationProcessingOptions annotationProcessingOptions) {
-		super( constraintHelper, jandexHelper, annotationProcessingOptions );
-	}
-
-	/**
-	 * Creates an instance of a {@link ClassConstrainsJandexBuilder}.
-	 *
-	 * @param constraintHelper an instance of {@link ConstraintHelper}
-	 * @param jandexHelper an instance of {@link JandexHelper}
-	 *
-	 * @return a new instance of {@link ClassConstrainsJandexBuilder}
-	 */
-	public static ClassConstrainsJandexBuilder getInstance(ConstraintHelper constraintHelper, JandexHelper jandexHelper, AnnotationProcessingOptions annotationProcessingOptions) {
-		return new ClassConstrainsJandexBuilder( constraintHelper, jandexHelper, annotationProcessingOptions );
+	public ClassConstraintsJandexBuilder(ConstraintHelper constraintHelper, JandexHelper jandexHelper, AnnotationProcessingOptions annotationProcessingOptions,
+			List<DotName> constraintAnnotations) {
+		super( constraintHelper, jandexHelper, annotationProcessingOptions, constraintAnnotations );
 	}
 
 	/**
@@ -53,7 +43,7 @@ public class ClassConstrainsJandexBuilder extends AbstractConstrainedElementJand
 	 *
 	 * @return a stream of {@link ConstrainedElement}s that represent class type
 	 */
-	public Stream<ConstrainedElement> getClassConstrains(ClassInfo classInfo, Class<?> beanClass) {
+	public Stream<ConstrainedElement> getClassConstraints(ClassInfo classInfo, Class<?> beanClass) {
 		if ( annotationProcessingOptions.areClassLevelConstraintsIgnoredFor( beanClass ) ) {
 			return Stream.empty();
 		}

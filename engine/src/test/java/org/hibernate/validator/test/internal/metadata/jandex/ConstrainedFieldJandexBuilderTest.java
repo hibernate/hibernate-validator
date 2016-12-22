@@ -10,32 +10,30 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.stream.Collectors;
 
+import org.assertj.core.api.ListAssert;
+import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
-import org.hibernate.validator.internal.metadata.jandex.ClassConstrainsJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.ConstrainedFieldJandexBuilder;
-import org.hibernate.validator.internal.metadata.jandex.ConstrainedMethodJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
+import org.hibernate.validator.internal.metadata.provider.JandexMetaDataProvider;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
-import org.hibernate.validator.parameternameprovider.ParanamerParameterNameProvider;
 import org.hibernate.validator.test.internal.metadata.jandex.model.ConstrainedFieldJandexBuilderModel;
-
 import org.jboss.jandex.DotName;
-import org.jboss.jandex.Index;
+import org.jboss.jandex.IndexView;
 import org.jboss.jandex.Indexer;
 import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.Type;
-
-import org.assertj.core.api.ListAssert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public class ConstrainedFieldJandexBuilderTest {
 
-	private Index index;
+	private IndexView indexView;
 
 	@BeforeClass
 	public void setUp() throws IOException {
@@ -45,7 +43,7 @@ public class ConstrainedFieldJandexBuilderTest {
 				"org/hibernate/validator/test/internal/metadata/jandex/model/ConstrainedFieldJandexBuilderModel.class" )
 		) {
 			indexer.index( stream );
-			index = indexer.complete();
+			indexView = indexer.complete();
 		}
 	}
 
@@ -54,29 +52,15 @@ public class ConstrainedFieldJandexBuilderTest {
 	 */
 	@Test
 	public void testGetConstrainedFields() {
-		ConstrainedFieldJandexBuilder.getInstance( new ConstraintHelper(), JandexHelper.getInstance(), new AnnotationProcessingOptionsImpl() )
-				.getConstrainedFields(
-						index.getClassByName( DotName.createSimple( ConstrainedFieldJandexBuilderModel.class.getName() ) ),
-						ConstrainedFieldJandexBuilderModel.class
-				).collect( Collectors.toSet() );
+		JandexMetaDataProvider jandexMetaDataProvider = new JandexMetaDataProvider( new ConstraintHelper(), JandexHelper.getInstance(), indexView,
+				new AnnotationProcessingOptionsImpl(), new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ) );
 
-		ConstrainedMethodJandexBuilder.getInstance( new ConstraintHelper(), JandexHelper.getInstance(), new AnnotationProcessingOptionsImpl(),
-				new ExecutableParameterNameProvider( new ParanamerParameterNameProvider() )
-		).getConstrainedExecutables(
-				index.getClassByName( DotName.createSimple( ConstrainedFieldJandexBuilderModel.class.getName() ) ),
-				ConstrainedFieldJandexBuilderModel.class
-		).collect( Collectors.toSet() );
-
-		ClassConstrainsJandexBuilder.getInstance( new ConstraintHelper(), JandexHelper.getInstance(), new AnnotationProcessingOptionsImpl() )
-				.getClassConstrains(
-						index.getClassByName( DotName.createSimple( ConstrainedFieldJandexBuilderModel.class.getName() ) ),
-						ConstrainedFieldJandexBuilderModel.class
-				).collect( Collectors.toSet() );
+		jandexMetaDataProvider.getBeanConfigurationForHierarchy( ConstrainedFieldJandexBuilderModel.class );
 	}
 
 	@Test
 	public void validAnnotationIsMissing() {
-		MethodInfo method = index.getClassByName( DotName.createSimple( ConstrainedFieldJandexBuilderModel.class.getName() ) )
+		MethodInfo method = indexView.getClassByName( DotName.createSimple( ConstrainedFieldJandexBuilderModel.class.getName() ) )
 				.methods().stream().filter( methodInfo -> methodInfo.name().equals( "someMethod1" ) )
 				.findAny().get();
 		ListAssert<Type> parametersAssert = new ListAssert<>( method.parameters() );
@@ -93,7 +77,6 @@ public class ConstrainedFieldJandexBuilderTest {
 				.collect( Collectors.toList() ) );
 		annotations.hasSize( 3 );
 		annotations.contains( "javax.validation.constraints.NotNull", "javax.validation.constraints.Size", "javax.validation.Valid" );
-
 	}
 
 }
