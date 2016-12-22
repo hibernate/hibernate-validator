@@ -38,8 +38,12 @@ import org.jboss.jandex.Type;
  * Builder for constrained methods that uses Jandex index.
  *
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJandexBuilder {
+
+	private static final int SYNTHETIC = 0x1000;
+	private static final int BRIDGE = 0x0040;
 
 	protected final ExecutableParameterNameProvider parameterNameProvider;
 
@@ -61,11 +65,9 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 	public Stream<ConstrainedElement> getConstrainedExecutables(ClassInfo classInfo, Class<?> beanClass) {
 		// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
 		// anyway and possibly hide the actual method with the same signature in the built meta model
-		//TODO: check for synthetic somehow ?
-		// void <init>() - such method is included in the method list but how to filter it out ?
 
 		return classInfo.methods().stream()
-				.filter( methodInfo -> !Modifier.isStatic( methodInfo.flags() ) /*&& !Modifier.isSynthetic( methodInfo.flags() )*/ )
+				.filter( methodInfo -> !Modifier.isStatic( methodInfo.flags() ) && !isSynthetic( methodInfo ) )
 				.map( methodInfo -> toConstrainedExecutable( beanClass, methodInfo ) );
 	}
 
@@ -78,16 +80,10 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 	 * @return {@link ConstrainedExecutable} representation of a given method
 	 */
 	private ConstrainedExecutable toConstrainedExecutable(Class<?> beanClass, MethodInfo methodInfo) {
-		Executable executable = null;
-		//TODO: this try/catch should be removed once filtering of methods is fixed.
-		try {
-			executable = findExecutable( beanClass, methodInfo );
-		}
-		catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			return null;
-		}
+		Executable executable = findExecutable( beanClass, methodInfo );
+
 		Stream<ConstrainedParameter> parameterConstraints = getParameterMetaData( beanClass, executable, methodInfo );
+
 		Set<MetaConstraint<?>> crossParameterConstraints;
 		Map<ConstraintDescriptorImpl.ConstraintType, Set<MetaConstraint<?>>> executableConstraints =
 				findMetaConstraints( methodInfo.annotations(), executable )
@@ -271,8 +267,7 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 	 */
 	private Executable findExecutable(Class<?> beanClass, MethodInfo methodInfo) {
 		try {
-			if ( "<init>".equals( methodInfo.name() ) ) {
-				// it means it is a constructor:
+			if ( isConstructor( methodInfo ) ) {
 				return beanClass.getDeclaredConstructor( methodInfo.parameters().stream()
 						.map( type -> jandexHelper.getClassForName( type.name().toString() ) )
 						.toArray( size -> new Class<?>[size] ) );
@@ -294,6 +289,16 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 					e
 			);
 		}
+	}
+
+	private boolean isConstructor(MethodInfo methodInfo) {
+		// currently, Jandex does not expose this in a practical way
+		return "<init>".equals( methodInfo.name() );
+	}
+
+	private boolean isSynthetic(MethodInfo methodInfo) {
+		// currently, Jandex does not expose this in a practical way
+		return ( methodInfo.flags() & ( SYNTHETIC | BRIDGE ) ) != 0;
 	}
 
 	/**
