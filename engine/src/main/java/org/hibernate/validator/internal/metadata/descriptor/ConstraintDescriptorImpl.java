@@ -56,7 +56,7 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 
 /**
- * Describes a single constraint (including it's composing constraints).
+ * Describes a single constraint (including its composing constraints).
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
