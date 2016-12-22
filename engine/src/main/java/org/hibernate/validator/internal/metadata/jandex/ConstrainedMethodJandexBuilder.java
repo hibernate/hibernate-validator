@@ -97,7 +97,9 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 			crossParameterConstraints = Collections.emptySet();
 		}
 		else {
-			crossParameterConstraints = executableConstraints.get( ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER );
+			crossParameterConstraints = executableConstraints.containsKey( ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER ) ?
+					executableConstraints.get( ConstraintDescriptorImpl.ConstraintType.CROSS_PARAMETER ) :
+					Collections.emptySet();
 		}
 
 		Set<MetaConstraint<?>> returnValueConstraints;
@@ -129,7 +131,9 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 					isCascading
 			);
 
-			returnValueConstraints = executableConstraints.get( ConstraintDescriptorImpl.ConstraintType.GENERIC );
+			returnValueConstraints = executableConstraints.containsKey( ConstraintDescriptorImpl.ConstraintType.GENERIC ) ?
+					executableConstraints.get( ConstraintDescriptorImpl.ConstraintType.GENERIC ) :
+					Collections.emptySet();
 		}
 
 		return new ConstrainedExecutable(
