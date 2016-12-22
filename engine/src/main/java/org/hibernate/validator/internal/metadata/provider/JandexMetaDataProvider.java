@@ -109,30 +109,34 @@ public class JandexMetaDataProvider implements MetaDataProvider {
 			ExecutableParameterNameProvider parameterNameProvider,
 			List<DotName> constraintAnnotations
 	) {
-		//get constrained fields
-		Stream<ConstrainedElement> constrainedElementStream = new ConstrainedFieldJandexBuilder(
+		// get constrained fields
+		Stream<ConstrainedElement> constrainedFieldStream = new ConstrainedFieldJandexBuilder(
 				constraintHelper,
 				jandexHelper,
 				annotationProcessingOptions,
 				constraintAnnotations
 		).getConstrainedFields( classInfo, bean );
-		//get constrained methods/constructors ?
-		Stream.concat( constrainedElementStream, new ConstrainedMethodJandexBuilder(
+
+		//get constrained methods/constructors
+		Stream<ConstrainedElement> constrainedMethodStream = new ConstrainedMethodJandexBuilder(
 				constraintHelper,
 				jandexHelper,
 				annotationProcessingOptions,
 				parameterNameProvider,
 				constraintAnnotations
-		).getConstrainedExecutables( classInfo, bean ) );
-		//get class level constraints
-		Stream.concat( constrainedElementStream, new ClassConstraintsJandexBuilder(
+		).getConstrainedExecutables( classInfo, bean );
+
+		// get class level constraints
+		Stream<ConstrainedElement> constrainedClassStream = new ClassConstraintsJandexBuilder(
 				constraintHelper,
 				jandexHelper,
 				annotationProcessingOptions,
 				constraintAnnotations
-		).getClassConstraints( classInfo, bean ) );
+		).getClassConstraints( classInfo, bean );
 
-		return constrainedElementStream;
+		return Stream.of( constrainedClassStream, constrainedFieldStream, constrainedMethodStream )
+				.reduce( Stream::concat )
+				.orElse( Stream.empty() );
 	}
 
 	@Override
