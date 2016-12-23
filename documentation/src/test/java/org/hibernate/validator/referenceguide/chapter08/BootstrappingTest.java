@@ -10,9 +10,12 @@ import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.cfg.ConstraintMapping;
+import org.junit.Test;
 
 public class BootstrappingTest {
 
+	@Test
+	@SuppressWarnings("unused")
 	public void buildDefaultValidatorFactory() {
 		//tag::buildDefaultValidatorFactory[]
 		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -20,6 +23,8 @@ public class BootstrappingTest {
 		//end::buildDefaultValidatorFactory[]
 	}
 
+	@Test
+	@SuppressWarnings("unused")
 	public void byProvider() {
 		//tag::byProvider[]
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
@@ -29,6 +34,8 @@ public class BootstrappingTest {
 		//end::byProvider[]
 	}
 
+	@Test
+	@SuppressWarnings("unused")
 	public void byDefaultProvider() {
 		//tag::byDefaultProvider[]
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
@@ -38,6 +45,10 @@ public class BootstrappingTest {
 		//end::byDefaultProvider[]
 	}
 
+	/**
+	 * This one cannot be tested
+	 */
+	@SuppressWarnings("unused")
 	public void providerResolver() {
 		//tag::providerResolver[]
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
@@ -48,6 +59,8 @@ public class BootstrappingTest {
 		//end::providerResolver[]
 	}
 
+	@Test
+	@SuppressWarnings("unused")
 	public void messageInterpolator() {
 		//tag::messageInterpolator[]
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
@@ -58,6 +71,8 @@ public class BootstrappingTest {
 		//end::messageInterpolator[]
 	}
 
+	@Test
+	@SuppressWarnings("unused")
 	public void traversableResolver() {
 		//tag::traversableResolver[]
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
@@ -68,6 +83,8 @@ public class BootstrappingTest {
 		//end::traversableResolver[]
 	}
 
+	@Test
+	@SuppressWarnings("unused")
 	public void clockProvider() {
 		//tag::clockProvider[]
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
@@ -78,6 +95,8 @@ public class BootstrappingTest {
 		//end::clockProvider[]
 	}
 
+	@Test
+	@SuppressWarnings("unused")
 	public void constraintValidatorFactory() {
 		//tag::constraintValidatorFactory[]
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
@@ -88,6 +107,8 @@ public class BootstrappingTest {
 		//end::constraintValidatorFactory[]
 	}
 
+	@Test
+	@SuppressWarnings("unused")
 	public void parameterNameProvider() {
 		//tag::parameterNameProvider[]
 		ValidatorFactory validatorFactory = Validation.byDefaultProvider()
@@ -98,6 +119,10 @@ public class BootstrappingTest {
 		//end::parameterNameProvider[]
 	}
 
+	/**
+	 * This one cannot be tested
+	 */
+	@SuppressWarnings("unused")
 	public void addMapping() {
 		//tag::addMapping[]
 		InputStream constraintMapping1 = null;
@@ -111,6 +136,10 @@ public class BootstrappingTest {
 		//end::addMapping[]
 	}
 
+	/**
+	 * This one cannot be tested
+	 */
+	@SuppressWarnings("unused")
 	public void providerSpecificOptions() {
 		//tag::providerSpecificOptions[]
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
@@ -122,6 +151,8 @@ public class BootstrappingTest {
 		//end::providerSpecificOptions[]
 	}
 
+	@Test
+	@SuppressWarnings("unused")
 	public void providerSpecificOptionViaAddProperty() {
 		//tag::providerSpecificOptionViaAddProperty[]
 		ValidatorFactory validatorFactory = Validation.byProvider( HibernateValidator.class )
@@ -132,6 +163,8 @@ public class BootstrappingTest {
 		//end::providerSpecificOptionViaAddProperty[]
 	}
 
+	@Test
+	@SuppressWarnings("unused")
 	public void usingContext() {
 		//tag::usingContext[]
 		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
