@@ -34,7 +34,7 @@ public final class CollectionHelper {
 	}
 
 	public static <K, V> HashMap<K, V> newHashMap(int size) {
-		return new HashMap<K, V>( size );
+		return new HashMap<K, V>( getInitialCapacityFromExpectedSize( size ) );
 	}
 
 	public static <K, V> HashMap<K, V> newHashMap(Map<K, V> map) {
@@ -50,7 +50,7 @@ public final class CollectionHelper {
 	}
 
 	public static <T> HashSet<T> newHashSet(int size) {
-		return new HashSet<T>( size );
+		return new HashSet<T>( getInitialCapacityFromExpectedSize( size ) );
 	}
 
 	public static <T> HashSet<T> newHashSet(Collection<? extends T> c) {
@@ -76,7 +76,7 @@ public final class CollectionHelper {
 	}
 
 	public static <T> ArrayList<T> newArrayList(int size) {
-		return new ArrayList<T>( size );
+		return new ArrayList<T>( getInitialCapacityFromExpectedSize( size ) );
 	}
 
 	@SafeVarargs
@@ -134,6 +134,21 @@ public final class CollectionHelper {
 			throw new IllegalArgumentException( "Provided object " + object + " is not a supported array type" );
 		}
 		return iterator;
+	}
+
+	/**
+	 * As the default loadFactor is of 0.75, we need to calculate the initial capacity from the expected size to avoid
+	 * resizing the collection when we populate the collection with all the initial elements. We use a calculation
+	 * similar to what is done in {@link HashMap#putAll(Map)}.
+	 *
+	 * @param expectedSize the expected size of the collection
+	 * @return the initial capacity of the collection
+	 */
+	private static int getInitialCapacityFromExpectedSize(int expectedSize) {
+		if ( expectedSize < 3 ) {
+			return expectedSize + 1;
+		}
+		return (int) ( (float) expectedSize / 0.75f + 1.0f );
 	}
 
 	private static class ObjectArrayIterator implements Iterator<Object> {
