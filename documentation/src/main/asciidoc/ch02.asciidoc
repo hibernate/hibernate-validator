@@ -195,7 +195,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargume
 
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/GearBoxUnwrapper.java[tags=include]
+include::{sourcedir}/org/hibernate/validator/referenceguide/chapter02/typeargument/custom/GearBoxExtractor.java[tags=include]
 ----
 
 [source, JAVA, indent=0]
