@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.jandex;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,9 +30,10 @@ import org.jboss.jandex.DotName;
 import org.jboss.jandex.FieldInfo;
 
 /**
- * Builder for constrained fields that uses Jandex index.
+ * Builder used to extract field constraints from the Jandex index.
  *
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJandexBuilder {
 
@@ -40,27 +42,11 @@ public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJan
 		super( constraintHelper, jandexHelper, annotationProcessingOptions, constraintAnnotations );
 	}
 
-	/**
-	 * Gets {@link ConstrainedField}s from a given class.
-	 *
-	 * @param classInfo a class in which to look for constrained fields
-	 * @param beanClass same class as {@code classInfo} but represented as {@link Class}
-	 *
-	 * @return a stream of {@link ConstrainedElement}s that represents fields
-	 */
 	public Stream<ConstrainedElement> getConstrainedFields(ClassInfo classInfo, Class<?> beanClass) {
 		return classInfo.fields().stream()
 				.map( fieldInfo -> toConstrainedField( beanClass, fieldInfo ) );
 	}
 
-	/**
-	 * Converts given field to {@link ConstrainedField}.
-	 *
-	 * @param beanClass a {@link Class} where {@code fieldInfo} is located
-	 * @param fieldInfo a field to convert
-	 *
-	 * @return {@link ConstrainedField} representation of a given field
-	 */
 	private ConstrainedField toConstrainedField(Class<?> beanClass, FieldInfo fieldInfo) {
 		Field field = findField( beanClass, fieldInfo );
 		Set<MetaConstraint<?>> constraints = findMetaConstraints( fieldInfo.annotations(), field ).collect( Collectors.toSet() );
@@ -95,39 +81,21 @@ public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJan
 		);
 	}
 
-	/**
-	 * Converts {@link ConstraintDescriptorImpl} to {@link MetaConstraint}.
-	 *
-	 * @param annotationInstances collection of annotations declared on a field
-	 * @param field a field under investigation
-	 *
-	 * @return a stream of {@link MetaConstraint}s for a given field
-	 */
 	private Stream<MetaConstraint<?>> findMetaConstraints(Collection<AnnotationInstance> annotationInstances, Field field) {
 		return findConstraints( annotationInstances, field )
 				.map( descriptor -> createMetaConstraint( field, descriptor ) );
 	}
 
-	/**
-	 * Find a {@link Field} by given bean class and field information.
-	 *
-	 * @param beanClass a bean class in which to look for the field
-	 * @param fieldInfo {@link FieldInfo} representing information about the field
-	 *
-	 * @return a {@link Field} for the given information
-	 *
-	 * @throws IllegalArgumentException if no filed was found for a given bean class and field information
-	 */
 	private Field findField(Class<?> beanClass, FieldInfo fieldInfo) {
 		try {
 			return beanClass.getDeclaredField( fieldInfo.name() );
 		}
 		catch (NoSuchFieldException e) {
-			throw new IllegalArgumentException(
-					String.format( "Wasn't able to find a filed for a given parameters. Field name - %s in bean - %s", fieldInfo.name(), beanClass.getName() ),
-					e
-			);
+			throw LOG.getUnableToFindFieldReferencedInJandexIndex( beanClass, fieldInfo.name().toString(), e );
 		}
 	}
 
+	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Field member, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<>( descriptor, ConstraintLocation.forProperty( member ) );
+	}
 }

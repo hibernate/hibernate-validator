@@ -16,10 +16,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.groups.ConvertGroup;
 
-import org.hibernate.validator.test.internal.metadata.jandex.ConstrainedFieldJandexBuilderTest;
+import org.hibernate.validator.test.internal.metadata.jandex.JandexMetaDataProviderTest;
 
 /**
- * Simple bean class to be used in {@link ConstrainedFieldJandexBuilderTest}.
+ * Simple bean class to be used in {@link JandexMetaDataProviderTest}.
  *
  * @author Marko Bekhta
  */

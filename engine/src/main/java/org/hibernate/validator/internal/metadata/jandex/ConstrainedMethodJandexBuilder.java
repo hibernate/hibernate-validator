@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.internal.metadata.jandex;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -35,7 +36,7 @@ import org.jboss.jandex.MethodInfo;
 import org.jboss.jandex.Type;
 
 /**
- * Builder for constrained methods that uses Jandex index.
+ * Builder used to extract builder and method constraints from the Jandex index.
  *
  * @author Marko Bekhta
  * @author Guillaume Smet
@@ -54,14 +55,6 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 		this.parameterNameProvider = parameterNameProvider;
 	}
 
-	/**
-	 * Gets {@link ConstrainedExecutable}s from a given class.
-	 *
-	 * @param classInfo a class in which to look for constrained fields
-	 * @param beanClass same class as {@code classInfo} but represented as {@link Class}
-	 *
-	 * @return a stream of {@link ConstrainedElement}s that represents fields
-	 */
 	public Stream<ConstrainedElement> getConstrainedExecutables(ClassInfo classInfo, Class<?> beanClass) {
 		// HV-172; ignoring synthetic methods (inserted by the compiler), as they can't have any constraints
 		// anyway and possibly hide the actual method with the same signature in the built meta model
@@ -71,14 +64,6 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 				.map( methodInfo -> toConstrainedExecutable( beanClass, methodInfo ) );
 	}
 
-	/**
-	 * Converts given method to {@link ConstrainedExecutable}.
-	 *
-	 * @param beanClass a {@link Class} where {@code methodInfo} is located
-	 * @param methodInfo a method to convert
-	 *
-	 * @return {@link ConstrainedExecutable} representation of a given method
-	 */
 	private ConstrainedExecutable toConstrainedExecutable(Class<?> beanClass, MethodInfo methodInfo) {
 		Executable executable = findExecutable( beanClass, methodInfo );
 
@@ -146,15 +131,6 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 		);
 	}
 
-	/**
-	 * Provides a stream of parameter constraints for a given method.
-	 *
-	 * @param beanClass a hosting class of a given method
-	 * @param executable an executable member that represents {@code methodInfo}
-	 * @param methodInfo method to retrieve parameters from
-	 *
-	 * @return a {@link Stream} of {@link ConstrainedParameter} for a given method
-	 */
 	private Stream<ConstrainedParameter> getParameterMetaData(Class<?> beanClass, Executable executable, MethodInfo methodInfo) {
 		if ( methodInfo.parameters().isEmpty() ) {
 			return Stream.empty();
@@ -172,19 +148,11 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 				.map( parameterInformation -> toConstrainedParameter( parameterInformation, executable ) );
 	}
 
-	/**
-	 * Converts given parameter information to {@link ConstrainedParameter}.
-	 *
-	 * @param parameterInformation {@link ParameterInformation} containing parameter information
-	 * @param executable represents a method of interest
-	 *
-	 * @return an instance of {@link ConstrainedParameter} based on input parameters
-	 */
 	private ConstrainedParameter toConstrainedParameter(ParameterInformation parameterInformation, Executable executable) {
 		CommonConstraintInformation commonInformation;
 		Stream<MetaConstraint<?>> parameterConstraints;
 		Set<MetaConstraint<?>> typeArgumentsConstraints;
-		Class<?> parameterType = jandexHelper.getClassForName( parameterInformation.getType().name().toString() );
+		Class<?> parameterType = jandexHelper.getClassForName( parameterInformation.getType().name() );
 
 		if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( executable, parameterInformation.getIndex() ) ) {
 			parameterConstraints = Stream.empty();
@@ -229,66 +197,51 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 		);
 	}
 
-	/**
-	 * Converts {@link ConstraintDescriptorImpl} to {@link MetaConstraint}.
-	 *
-	 * @param annotationInstances collection of annotations declared on an executable
-	 * @param executable an executable under investigation
-	 *
-	 * @return a stream of {@link MetaConstraint}s for a given executable
-	 */
 	private Stream<MetaConstraint<?>> findMetaConstraints(Collection<AnnotationInstance> annotationInstances, Executable executable) {
 		return findConstraints( annotationInstances, executable )
 				.map( descriptor -> createMetaConstraint( executable, descriptor ) );
 	}
 
-	/**
-	 * Converts {@link ConstraintDescriptorImpl} to {@link MetaConstraint}.
-	 *
-	 * @param parameterInformation parameter information
-	 * @param executable an executable under investigation
-	 *
-	 * @return a stream of {@link MetaConstraint}s for a given parameter executable
-	 */
 	private Stream<MetaConstraint<?>> findMetaConstraints(ParameterInformation parameterInformation, Executable executable) {
 		return findConstraints( parameterInformation.getType().annotations(), executable )
 				.map( descriptor -> createMetaConstraint( executable, parameterInformation.getIndex(), descriptor ) );
 	}
 
-	/**
-	 * Find an {@link Executable} by given bean class and method information.
-	 *
-	 * @param beanClass a bean class in which to look for the executable
-	 * @param methodInfo {@link MethodInfo} representing information about the executable
-	 *
-	 * @return a {@link Executable} for the given information
-	 *
-	 * @throws IllegalArgumentException if no executable was found for a given bean class and method information
-	 */
 	private Executable findExecutable(Class<?> beanClass, MethodInfo methodInfo) {
 		try {
 			if ( isConstructor( methodInfo ) ) {
 				return beanClass.getDeclaredConstructor( methodInfo.parameters().stream()
-						.map( type -> jandexHelper.getClassForName( type.name().toString() ) )
+						.map( type -> jandexHelper.getClassForName( type.name() ) )
 						.toArray( size -> new Class<?>[size] ) );
 			}
 			else {
 				return beanClass.getDeclaredMethod(
 						methodInfo.name(),
 						methodInfo.parameters().stream()
-								.map( type -> jandexHelper.getClassForName( type.name().toString() ) )
+								.map( type -> jandexHelper.getClassForName( type.name() ) )
 								.toArray( size -> new Class<?>[size] )
 				);
 			}
 		}
 		catch (NoSuchMethodException e) {
-			throw new IllegalArgumentException(
-					String.format( "Wasn't able to find a executable for a given parameters. Executable name - %s in bean - %s", methodInfo.name(),
-							beanClass.getName()
-					),
-					e
-			);
+			// TODO add the parameter information to the log. It would probably be nice if Jandex could expose a method for that.
+			throw LOG.getUnableToFindMethodReferencedInJandexIndex( beanClass, methodInfo.name(), e );
 		}
+	}
+
+	private <A extends Annotation> MetaConstraint<A> createMetaConstraint(Executable member, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<>(
+				descriptor,
+				ConstraintDescriptorImpl.ConstraintType.GENERIC.equals( descriptor.getConstraintType() ) ?
+						ConstraintLocation.forReturnValue( member ) : ConstraintLocation.forCrossParameter( member )
+		);
+	}
+
+	private <A extends Annotation> MetaConstraint<A> createMetaConstraint(Executable member, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
+		return new MetaConstraint<>(
+				descriptor,
+				ConstraintLocation.forParameter( member, parameterIndex )
+		);
 	}
 
 	private boolean isConstructor(MethodInfo methodInfo) {

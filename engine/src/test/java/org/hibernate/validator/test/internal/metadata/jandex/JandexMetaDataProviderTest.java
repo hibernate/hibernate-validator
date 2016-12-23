@@ -6,9 +6,16 @@
  */
 package org.hibernate.validator.test.internal.metadata.jandex;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import org.assertj.core.api.ListAssert;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
@@ -17,6 +24,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.jandex.ConstrainedFieldJandexBuilder;
 import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
 import org.hibernate.validator.internal.metadata.provider.JandexMetaDataProvider;
+import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.test.internal.metadata.jandex.model.ConstrainedFieldJandexBuilderModel;
 import org.jboss.jandex.DotName;
@@ -31,20 +39,27 @@ import org.testng.annotations.Test;
  * @author Marko Bekhta
  * @author Guillaume Smet
  */
-public class ConstrainedFieldJandexBuilderTest {
+public class JandexMetaDataProviderTest {
 
 	private IndexView indexView;
 
 	@BeforeClass
 	public void setUp() throws IOException {
+		Class<?>[] classesToIndex = {
+				Min.class,
+				Max.class,
+				NotNull.class,
+				ConstrainedFieldJandexBuilderModel.class
+		};
+
 		Indexer indexer = new Indexer();
-		// Normally a direct file is opened, but class-loader backed streams work as well.
-		try ( InputStream stream = getClass().getClassLoader().getResourceAsStream(
-				"org/hibernate/validator/test/internal/metadata/jandex/model/ConstrainedFieldJandexBuilderModel.class" )
-		) {
-			indexer.index( stream );
-			indexView = indexer.complete();
+		// Normally a direct file is opened, but classloader backed streams work as well.
+		for ( Class<?> classToIndex : classesToIndex ) {
+			try ( InputStream stream = getClass().getClassLoader().getResourceAsStream( classToIndex.getCanonicalName().replace( '.', '/' ) + ".class" ) ) {
+				indexer.index( stream );
+			}
 		}
+		indexView = indexer.complete();
 	}
 
 	/**
@@ -52,10 +67,13 @@ public class ConstrainedFieldJandexBuilderTest {
 	 */
 	@Test
 	public void testGetConstrainedFields() {
-		JandexMetaDataProvider jandexMetaDataProvider = new JandexMetaDataProvider( new ConstraintHelper(), JandexHelper.getInstance(), indexView,
+		JandexMetaDataProvider jandexMetaDataProvider = new JandexMetaDataProvider( new ConstraintHelper(), new JandexHelper(), indexView,
 				new AnnotationProcessingOptionsImpl(), new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ) );
 
-		jandexMetaDataProvider.getBeanConfigurationForHierarchy( ConstrainedFieldJandexBuilderModel.class );
+		List<BeanConfiguration<? super ConstrainedFieldJandexBuilderModel>> beanConfigurations =
+				jandexMetaDataProvider.getBeanConfigurationForHierarchy( ConstrainedFieldJandexBuilderModel.class );
+
+		assertThat( beanConfigurations ).isNotEmpty();
 	}
 
 	@Test

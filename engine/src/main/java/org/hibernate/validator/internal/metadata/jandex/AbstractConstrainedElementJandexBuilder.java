@@ -8,8 +8,6 @@ package org.hibernate.validator.internal.metadata.jandex;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Collection;
@@ -18,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.validation.Valid;
+
 import javax.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
@@ -28,28 +26,29 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.jandex.util.JandexHelper;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Type;
 
 /**
- * Base builder for constrained elements that uses Jandex index.
+ * Abstract builder exploiting the Jandex index to build {@link ConstrainedElement}s.
  *
  * @author Marko Bekhta
+ * @author Guillaume Smet
  */
 public abstract class AbstractConstrainedElementJandexBuilder {
 
-	protected static final Log log = LoggerFactory.make();
+	protected static final Log LOG = LoggerFactory.make();
 
-	protected final ConstraintHelper constraintHelper;
+	private final ConstraintHelper constraintHelper;
 
 	protected final JandexHelper jandexHelper;
 
@@ -65,185 +64,11 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 		this.constraintAnnotations = constraintAnnotations;
 	}
 
-	/**
-	 * Determine the unwrap mode.
-	 *
-	 * @param type a {@link Type} of an element
-	 * @param annotationInstances a {@link Collection} of annotations present on that element
-	 * @param typeArgumentAnnotated ?
-	 *
-	 * @return {@link UnwrapMode} for a given field
-	 */
-	protected UnwrapMode determineUnwrapMode(Type type, Collection<AnnotationInstance> annotationInstances, boolean typeArgumentAnnotated) {
-		boolean indexable = jandexHelper.isIndexable( type );
-		Optional<AnnotationInstance> unwrapValidatedValue = jandexHelper.findAnnotation( annotationInstances, UnwrapValidatedValue.class );
-
-		if ( !unwrapValidatedValue.isPresent() && typeArgumentAnnotated && !indexable ) {
-			return UnwrapMode.UNWRAP;
-		}
-		else if ( unwrapValidatedValue.isPresent() ) {
-			return unwrapValidatedValue.get().value().asBoolean() ? UnwrapMode.UNWRAP : UnwrapMode.SKIP_UNWRAP;
-		}
-		return UnwrapMode.AUTOMATIC;
-	}
-
-	/**
-	 * Builds a map of group conversions based on given {@link ConvertGroup} and {@link ConvertGroup.List} parameters.
-	 *
-	 * @param convertGroup an optional for {@link ConvertGroup}
-	 * @param convertGroupList an optional for {@link ConvertGroup.List}
-	 *
-	 * @return a {@link Map} containing group conversions
-	 */
-	protected Map<Class<?>, Class<?>> getGroupConversions(Optional<AnnotationInstance> convertGroup, Optional<AnnotationInstance> convertGroupList) {
-		Map<Class<?>, Class<?>> groupConversionMap = CollectionHelper.newHashMap();
-
-		convertGroup.ifPresent( annotation -> addToConversionGroup( groupConversionMap, annotation ) );
-
-		convertGroupList.ifPresent( nestedAnnotations -> {
-			for ( AnnotationValue annotationValue : (AnnotationValue[]) nestedAnnotations.value().value() ) {
-				addToConversionGroup( groupConversionMap, annotationValue.asNested() );
-			}
-		} );
-
-		return groupConversionMap;
-	}
-
-	/**
-	 * Adds a conversion group ot a given map from an annotation that represents {@link ConvertGroup}.
-	 *
-	 * @param groupConversionMap a group conversion map to which to add new value
-	 * @param annotation an annotation {@link AnnotationInstance} that represents {@link ConvertGroup}
-	 */
-	private void addToConversionGroup(Map<Class<?>, Class<?>> groupConversionMap, AnnotationInstance annotation) {
-		Class<?> from = jandexHelper.getClassForName( annotation.value( "from" ).asClass().name().toString() );
-		groupConversionMap.merge(
-				from,
-				jandexHelper.getClassForName( annotation.value( "to" ).asClass().name().toString() ),
-				( val1, val2 ) -> {
-					throw log.getMultipleGroupConversionsForSameSourceException(
-							from,
-							CollectionHelper.asSet( val1, val2 )
-					);
-				}
-		);
-	}
-
-	/**
-	 * Finds and converts constraint annotations to {@link ConstraintDescriptorImpl}
-	 *
-	 * @param annotationInstances a collection of annotation instances
-	 * @param member a {@link Member} under investigation
-	 *
-	 * @return a stream of {@link MetaConstraint}s based on input parameters
-	 */
 	protected Stream<ConstraintDescriptorImpl<?>> findConstraints(Collection<AnnotationInstance> annotationInstances, Member member) {
 		return findConstrainAnnotations( annotationInstances )
 				.flatMap( annotationInstance -> findConstraintAnnotations( member, annotationInstance ) );
 	}
 
-	/**
-	 * Examines the given annotation to see whether it is a single- or multi-valued constraint annotation.
-	 *
-	 * @param member The member to check for constraints annotations
-	 * @param annotationInstance The annotation to examine
-	 *
-	 * @return A stream of constraint descriptors or the empty stream in case given {@code annotationInstance} is neither a
-	 * single nor multi-valued annotation.
-	 */
-	protected Stream<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member, AnnotationInstance annotationInstance) {
-		return instanceToAnnotations( annotationInstance ).map( constraint -> buildConstraintDescriptor( member, constraint, ElementType.FIELD ) );
-	}
-
-	/**
-	 * Converts a given annotation instance of ({@link AnnotationInstance}) to a stream of {@link Annotation}s
-	 *
-	 * @param annotationInstance instance to convert
-	 *
-	 * @return a stream that contains {@link Annotation}s based on given instance. If given instance is a simple constraint annotation
-	 * it will contain it. If given instance is a multivalued constraint - it will be unwrapped and stream will contain annotations
-	 * from that multivalued one.
-	 */
-	protected <A extends Annotation> Stream<Annotation> instanceToAnnotations(AnnotationInstance annotationInstance) {
-		Class<A> annotationClass = (Class<A>) jandexHelper.getClassForName( annotationInstance.name().toString() );
-		if ( constraintHelper.isMultiValueConstraint( annotationClass ) ) {
-			return Arrays.stream( (AnnotationValue[]) annotationInstance.value().value() )
-					.map( annotationValue -> instanceToAnnotation( annotationValue.asNested() ) );
-		}
-		else if ( constraintHelper.isConstraintAnnotation( annotationClass ) ) {
-			return Stream.of( instanceToAnnotation( annotationClass, annotationInstance ) );
-		}
-		else {
-			return Stream.empty();
-		}
-	}
-
-	/**
-	 * Converts given annotation instance of ({@link AnnotationInstance}) type to its {@link Annotation} representation.
-	 *
-	 * @param annotationInstance annotation instance to convert
-	 *
-	 * @return an annotation based on input parameters
-	 */
-	protected <A extends Annotation> A instanceToAnnotation(AnnotationInstance annotationInstance) {
-		return instanceToAnnotation( (Class<A>) jandexHelper.getClassForName( annotationInstance.name()
-				.toString() ), annotationInstance );
-	}
-
-	/**
-	 * Converts given annotation instance of ({@link AnnotationInstance}) type to its {@link Annotation} representation.
-	 *
-	 * @param annotationClass a class of annotation to convert to
-	 * @param annotationInstance annotation instance to convert
-	 *
-	 * @return an annotation based on input parameters
-	 */
-	protected <A extends Annotation> A instanceToAnnotation(Class<A> annotationClass, AnnotationInstance annotationInstance) {
-		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<>( annotationClass );
-
-		annotationInstance.values().stream()
-				.forEach( annotationValue -> annotationDescriptor.setValue( annotationValue.name(), jandexHelper.convertAnnotationValue( annotationValue ) ) );
-
-		A annotation;
-		try {
-			annotation = AnnotationFactory.create( annotationDescriptor );
-		}
-		catch (RuntimeException e) {
-			throw log.getUnableToCreateAnnotationForConfiguredConstraintException( e );
-		}
-		return annotation;
-	}
-
-	/**
-	 * Finds all constrain annotations in given collection.
-	 *
-	 * @param allAnnotations collection to look for constraints in
-	 *
-	 * @return a {@link Stream} of the constraint annotations
-	 */
-	protected Stream<AnnotationInstance> findConstrainAnnotations(Collection<AnnotationInstance> allAnnotations) {
-		return allAnnotations.stream().filter( this::isConstraintAnnotation );
-	}
-
-	/**
-	 * Checks if given annotation is a constraint or not.
-	 *
-	 * @param annotationInstance an annotation to check
-	 *
-	 * @return {@code true} if given annotation is a constraint, {@code false} otherwise
-	 */
-	protected boolean isConstraintAnnotation(AnnotationInstance annotationInstance) {
-		return constraintAnnotations.contains( annotationInstance.name() );
-	}
-
-	/**
-	 * Provides a {@link Stream} of type constraints based on given member information.
-	 *
-	 * @param information information about member of interest
-	 * @param isCascaded if member is marked with {@link Valid}
-	 *
-	 * @return a stream of {@link MetaConstraint}s
-	 */
 	protected Stream<MetaConstraint<?>> findTypeAnnotationConstraintsForMember(MemberInformation information, boolean isCascaded) {
 		//TODO: Do we need to include Type.Kind.WILDCARD_TYPE ?
 		if ( !Type.Kind.PARAMETERIZED_TYPE.equals( information.getType().kind() ) ) {
@@ -271,7 +96,7 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 			if ( jandexHelper.isIterable( validatedType ) || jandexHelper.isMap( validatedType ) ) {
 				validatedType = argument.get();
 			}
-			Class<?> memberType = jandexHelper.getClassForName( validatedType.name().toString() );
+			Class<?> memberType = jandexHelper.getClassForName( validatedType.name() );
 			return findConstrainAnnotations( argument.get().annotations() )
 					.flatMap( annotationInstance -> findConstraintAnnotations( information.getMember(), annotationInstance ) )
 					.map( constraintDescriptor -> createTypeArgumentMetaConstraint( information.getConstraintLocation(), constraintDescriptor, memberType ) );
@@ -280,16 +105,6 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 		return Stream.empty();
 	}
 
-	/**
-	 * Collects common constraint information for given parameters.
-	 *
-	 * @param type a type of an element under investigation
-	 * @param annotationInstances a collection of {@link AnnotationInstance}s on an element under investigation
-	 * @param typeArgumentAnnotated is type argument annotated
-	 * @param isCascading is an element marked with {@link Valid} ?
-	 *
-	 * @return a {@link CommonConstraintInformation} instance containing common constraint information
-	 */
 	protected CommonConstraintInformation findCommonConstraintInformation(Type type, Collection<AnnotationInstance> annotationInstances,
 			boolean typeArgumentAnnotated, boolean isCascading) {
 		return new CommonConstraintInformation(
@@ -302,66 +117,96 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 		);
 	}
 
-	/**
-	 * Creates {@link MetaConstraint} based on given {@link ConstraintDescriptorImpl}.
-	 *
-	 * @param declaringClass a class on which constraints are defined
-	 * @param descriptor a descriptor to convert
-	 *
-	 * @return {@link MetaConstraint} created based on given parameters
-	 */
-	protected <A extends Annotation> MetaConstraint<?> createMetaConstraint(Class<?> declaringClass, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forClass( declaringClass ) );
+	private UnwrapMode determineUnwrapMode(Type type, Collection<AnnotationInstance> annotationInstances, boolean typeArgumentAnnotated) {
+		boolean indexable = jandexHelper.isIndexable( type );
+		Optional<AnnotationInstance> unwrapValidatedValue = jandexHelper.findAnnotation( annotationInstances, UnwrapValidatedValue.class );
+
+		if ( !unwrapValidatedValue.isPresent() && typeArgumentAnnotated && !indexable ) {
+			return UnwrapMode.UNWRAP;
+		}
+		else if ( unwrapValidatedValue.isPresent() ) {
+			return unwrapValidatedValue.get().value().asBoolean() ? UnwrapMode.UNWRAP : UnwrapMode.SKIP_UNWRAP;
+		}
+		return UnwrapMode.AUTOMATIC;
 	}
 
-	/**
-	 * Creates {@link MetaConstraint} based on given {@link ConstraintDescriptorImpl}.
-	 *
-	 * @param member a field on which constraints are defined
-	 * @param descriptor a descriptor to convert
-	 *
-	 * @return {@link MetaConstraint} created based on given parameters
-	 */
-	protected <A extends Annotation> MetaConstraint<?> createMetaConstraint(Field member, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forProperty( member ) );
+	private Map<Class<?>, Class<?>> getGroupConversions(Optional<AnnotationInstance> convertGroup, Optional<AnnotationInstance> convertGroupList) {
+		Map<Class<?>, Class<?>> groupConversionMap = CollectionHelper.newHashMap();
+
+		convertGroup.ifPresent( annotation -> addToConversionGroup( groupConversionMap, annotation ) );
+
+		convertGroupList.ifPresent( nestedAnnotations -> {
+			for ( AnnotationValue annotationValue : (AnnotationValue[]) nestedAnnotations.value().value() ) {
+				addToConversionGroup( groupConversionMap, annotationValue.asNested() );
+			}
+		} );
+
+		return groupConversionMap;
 	}
 
-	/**
-	 * Creates {@link MetaConstraint} based on given {@link ConstraintDescriptorImpl}.
-	 *
-	 * @param member an executable on which constraints are defined (for return value)
-	 * @param descriptor a descriptor to convert
-	 *
-	 * @return {@link MetaConstraint} created based on given parameters
-	 */
-	protected <A extends Annotation> MetaConstraint<A> createMetaConstraint(Executable member, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<>(
-				descriptor,
-				ConstraintDescriptorImpl.ConstraintType.GENERIC.equals( descriptor.getConstraintType() ) ?
-						ConstraintLocation.forReturnValue( member ) : ConstraintLocation.forCrossParameter( member )
+	private void addToConversionGroup(Map<Class<?>, Class<?>> groupConversionMap, AnnotationInstance annotation) {
+		Class<?> from = jandexHelper.getClassForName( annotation.value( "from" ).asClass().name() );
+		groupConversionMap.merge(
+				from,
+				jandexHelper.getClassForName( annotation.value( "to" ).asClass().name() ),
+				( val1, val2 ) -> {
+					throw LOG.getMultipleGroupConversionsForSameSourceException(
+							from,
+							CollectionHelper.asSet( val1, val2 )
+					);
+				}
 		);
 	}
 
-	/**
-	 * Creates {@link MetaConstraint} based on given {@link ConstraintDescriptorImpl}.
-	 *
-	 * @param member an executable of iterest
-	 * @param parameterIndex index of executable parameter on which constraints are defined
-	 * @param descriptor a descriptor to convert
-	 *
-	 * @return {@link MetaConstraint} created based on given parameters
-	 */
-	protected <A extends Annotation> MetaConstraint<A> createMetaConstraint(Executable member, int parameterIndex, ConstraintDescriptorImpl<A> descriptor) {
-		return new MetaConstraint<>(
-				descriptor,
-				ConstraintLocation.forParameter( member, parameterIndex )
-		);
+	private Stream<ConstraintDescriptorImpl<?>> findConstraintAnnotations(Member member, AnnotationInstance annotationInstance) {
+		return instanceToAnnotations( annotationInstance ).map( constraint -> buildConstraintDescriptor( member, constraint, ElementType.FIELD ) );
 	}
 
-	/**
-	 * Creates a {@link MetaConstraint} for a type argument constraint.
-	 */
-	protected <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(
+	@SuppressWarnings("unchecked")
+	private <A extends Annotation> Stream<Annotation> instanceToAnnotations(AnnotationInstance annotationInstance) {
+		Class<A> annotationClass = (Class<A>) jandexHelper.getClassForName( annotationInstance.name() );
+		if ( constraintHelper.isMultiValueConstraint( annotationClass ) ) {
+			return Arrays.stream( (AnnotationValue[]) annotationInstance.value().value() )
+					.map( annotationValue -> instanceToAnnotation( annotationValue.asNested() ) );
+		}
+		else if ( constraintHelper.isConstraintAnnotation( annotationClass ) ) {
+			return Stream.of( instanceToAnnotation( annotationClass, annotationInstance ) );
+		}
+		else {
+			return Stream.empty();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private <A extends Annotation> A instanceToAnnotation(AnnotationInstance annotationInstance) {
+		return instanceToAnnotation( (Class<A>) jandexHelper.getClassForName( annotationInstance.name() ), annotationInstance );
+	}
+
+	private <A extends Annotation> A instanceToAnnotation(Class<A> annotationClass, AnnotationInstance annotationInstance) {
+		AnnotationDescriptor<A> annotationDescriptor = new AnnotationDescriptor<>( annotationClass );
+
+		annotationInstance.values().stream()
+				.forEach( annotationValue -> annotationDescriptor.setValue( annotationValue.name(), jandexHelper.convertAnnotationValue( annotationValue ) ) );
+
+		A annotation;
+		try {
+			annotation = AnnotationFactory.create( annotationDescriptor );
+		}
+		catch (RuntimeException e) {
+			throw LOG.getUnableToCreateAnnotationForConfiguredConstraintException( e );
+		}
+		return annotation;
+	}
+
+	private Stream<AnnotationInstance> findConstrainAnnotations(Collection<AnnotationInstance> allAnnotations) {
+		return allAnnotations.stream().filter( this::isConstraintAnnotation );
+	}
+
+	private boolean isConstraintAnnotation(AnnotationInstance annotationInstance) {
+		return constraintAnnotations.contains( annotationInstance.name() );
+	}
+
+	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(
 			ConstraintLocation location,
 			ConstraintDescriptorImpl<A> descriptor,
 			java.lang.reflect.Type type
@@ -370,7 +215,7 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( location, null, type ) );
 	}
 
-	protected <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(
+	private <A extends Annotation> ConstraintDescriptorImpl<A> buildConstraintDescriptor(
 			Member member,
 			A annotation,
 			ElementType type) {
