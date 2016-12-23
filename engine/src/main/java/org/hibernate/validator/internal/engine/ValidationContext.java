@@ -35,7 +35,6 @@ import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.IdentitySet;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -130,11 +129,6 @@ public class ValidationContext<T> {
 	private final ClockProvider clockProvider;
 
 	/**
-	 * Used for resolving generic type information.
-	 */
-	private final TypeResolutionHelper typeResolutionHelper;
-
-	/**
 	 * Whether or not validation should fail on the first constraint violation.
 	 */
 	private final boolean failFast;
@@ -150,7 +144,6 @@ public class ValidationContext<T> {
 			TraversableResolver traversableResolver,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
-			TypeResolutionHelper typeResolutionHelper,
 			boolean failFast,
 			T rootBean,
 			Class<T> rootBeanClass,
@@ -163,7 +156,6 @@ public class ValidationContext<T> {
 		this.traversableResolver = traversableResolver;
 		this.parameterNameProvider = parameterNameProvider;
 		this.clockProvider = clockProvider;
-		this.typeResolutionHelper = typeResolutionHelper;
 		this.failFast = failFast;
 
 		this.rootBean = rootBean;
@@ -184,7 +176,6 @@ public class ValidationContext<T> {
 			ConstraintValidatorFactory constraintValidatorFactory,
 			TraversableResolver traversableResolver,
 			ClockProvider clockProvider,
-			TypeResolutionHelper typeResolutionHelper,
 			boolean failFast) {
 
 		return new ValidationContextBuilder(
@@ -193,7 +184,6 @@ public class ValidationContext<T> {
 				constraintValidatorFactory,
 				traversableResolver,
 				clockProvider,
-				typeResolutionHelper,
 				failFast
 		);
 	}
@@ -479,7 +469,6 @@ public class ValidationContext<T> {
 		private final ConstraintValidatorFactory constraintValidatorFactory;
 		private final TraversableResolver traversableResolver;
 		private final ClockProvider clockProvider;
-		private final TypeResolutionHelper typeResolutionHelper;
 		private final boolean failFast;
 
 		private ValidationContextBuilder(
@@ -488,14 +477,12 @@ public class ValidationContext<T> {
 				ConstraintValidatorFactory constraintValidatorFactory,
 				TraversableResolver traversableResolver,
 				ClockProvider clockProvider,
-				TypeResolutionHelper typeResolutionHelper,
 				boolean failFast) {
 			this.constraintValidatorManager = constraintValidatorManager;
 			this.messageInterpolator = messageInterpolator;
 			this.constraintValidatorFactory = constraintValidatorFactory;
 			this.traversableResolver = traversableResolver;
 			this.clockProvider = clockProvider;
-			this.typeResolutionHelper = typeResolutionHelper;
 			this.failFast = failFast;
 		}
 
@@ -509,7 +496,6 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider,
 					clockProvider,
-					typeResolutionHelper,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -529,7 +515,6 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider,
 					clockProvider,
-					typeResolutionHelper,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -547,7 +532,6 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					clockProvider,
-					typeResolutionHelper,
 					failFast,
 					null, //root bean
 					rootBeanClass,
@@ -571,7 +555,6 @@ public class ValidationContext<T> {
 					traversableResolver,
 					parameterNameProvider,
 					clockProvider,
-					typeResolutionHelper,
 					failFast,
 					rootBean,
 					rootBeanClass,
@@ -594,7 +577,6 @@ public class ValidationContext<T> {
 					traversableResolver,
 					null, //parameter name provider
 					clockProvider,
-					typeResolutionHelper,
 					failFast,
 					rootBean,
 					rootBeanClass,

@@ -340,7 +340,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				constraintValidatorFactory,
 				getCachingTraversableResolver(),
 				clockProvider,
-				typeResolutionHelper,
 				failFast
 		);
 	}
