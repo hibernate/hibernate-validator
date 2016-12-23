@@ -57,12 +57,6 @@ public final class CollectionHelper {
 		return new HashSet<T>( c );
 	}
 
-	public static <T> HashSet<T> newHashSet(Collection<? extends T> s1, Collection<? extends T> s2) {
-		HashSet<T> set = CollectionHelper.<T>newHashSet( s1 );
-		set.addAll( s2 );
-		return set;
-	}
-
 	public static <T> HashSet<T> newHashSet(Iterable<? extends T> iterable) {
 		HashSet<T> set = newHashSet();
 		for ( T t : iterable ) {
@@ -76,7 +70,7 @@ public final class CollectionHelper {
 	}
 
 	public static <T> ArrayList<T> newArrayList(int size) {
-		return new ArrayList<T>( getInitialCapacityFromExpectedSize( size ) );
+		return new ArrayList<T>( size );
 	}
 
 	@SafeVarargs
