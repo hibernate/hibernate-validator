@@ -175,7 +175,7 @@ resolvers, constraint validator factories and parameter name providers.
 Furthermore, parameter and return value constraints on the methods and constructors of CDI managed
 beans will automatically be validated upon invocation.
 
-When your application runs on a Jave EE container, this integration is enabled by default. When
+When your application runs on a Java EE container, this integration is enabled by default. When
 working with CDI in a Servlet container or in a pure Java SE environment, you can use the CDI
 portable extension provided by Hibernate Validator. To do so, add the portable extension to your
 class path as described in <<section-getting-started-cdi>>.
@@ -300,7 +300,7 @@ see <<section-configuration-validation-xml>> for an example
 
 * Use the `@ValidateOnExecution` annotation on the executable or type level
 
-If several sources of configuration are specified for a given executable, `@ValidateOnExecutionn on
+If several sources of configuration are specified for a given executable, `@ValidateOnExecution` on
 the executable level takes precedence over `@ValidateOnExecution` on the type level and
 `@ValidateOnExecution` generally takes precedence over the globally configured types in __META-
 INF/validation.xml__.
