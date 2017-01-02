@@ -226,7 +226,7 @@ http://www.jetbrains.com/idea/[IntelliJ IDEA] (version 9 and above):
 to the "Annotation Processors" list
 * If applicable add you module to the "Processed Modules" list
 
-Rebuilding your project then should show any erronous constraint annotations:
+Rebuilding your project then should show any erroneous constraint annotations:
 
 image::annotation_processor_intellij.png[]
 
