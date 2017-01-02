@@ -2,7 +2,7 @@
 == Creating custom constraints
 
 The Bean Validation API defines a whole set of standard constraint annotations such as `@NotNull`,
-`@Size` etc. In cases where these buit-in constraints are not sufficient, you cean easily create
+`@Size` etc. In cases where these built-in constraints are not sufficient, you can easily create
 custom constraints tailored to your specific validation requirements.
 
 [[validator-customconstraints-simple]]
