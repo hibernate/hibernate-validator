@@ -59,7 +59,7 @@ extension by adding the following dependency:
 
 * _hibernate-validator-annotation-processor-&lt;version&gt;.jar_ is an optional jar which can be integrated with your build
 environment respectively IDE to verify that constraint annotations are correctly used. Refer to the [online
-documentation](http://docs.jboss.org/hibernate/stable/validator/reference/en-US/html/validator-annotation-processor.html) for more information.
+documentation](https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#validator-annotation-processor) for more information.
 
 ## Licensing
 
