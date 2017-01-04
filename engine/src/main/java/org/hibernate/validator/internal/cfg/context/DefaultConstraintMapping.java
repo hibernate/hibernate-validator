@@ -13,16 +13,19 @@ import java.lang.annotation.Annotation;
 import java.util.Set;
 
 import javax.validation.Constraint;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -78,15 +81,18 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 	 * Returns all bean configurations configured through this constraint mapping.
 	 *
 	 * @param constraintHelper constraint helper required for building constraint descriptors
+	 * @param typeResolutionHelper type resolution helper
 	 * @param parameterNameProvider parameter name provider required for building parameter elements
+	 * @param valueExtractors the {@link ValueExtractor} registry
 	 *
 	 * @return a set of {@link BeanConfiguration}s with an element for each type configured through this mapping
 	 */
-	public Set<BeanConfiguration<?>> getBeanConfigurations(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
+	public Set<BeanConfiguration<?>> getBeanConfigurations(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+			ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors) {
 		Set<BeanConfiguration<?>> configurations = newHashSet();
 
 		for ( TypeConstraintMappingContextImpl<?> typeContext : typeContexts ) {
-			configurations.add( typeContext.build( constraintHelper, parameterNameProvider ) );
+			configurations.add( typeContext.build( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractors ) );
 		}
 
 		return configurations;

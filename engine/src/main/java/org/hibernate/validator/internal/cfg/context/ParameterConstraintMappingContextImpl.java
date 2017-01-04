@@ -19,12 +19,14 @@ import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method parameter.
@@ -99,7 +101,8 @@ final class ParameterConstraintMappingContextImpl
 		return executableContext.getTypeContext().method( name, parameterTypes );
 	}
 
-	public ConstrainedParameter build(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
+	public ConstrainedParameter build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+			ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors) {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		Type parameterType = ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex );
 
@@ -109,7 +112,7 @@ final class ParameterConstraintMappingContextImpl
 				parameterType,
 				parameterIndex,
 				parameterNameProvider.getParameterNames( executableContext.getExecutable() ).get( parameterIndex ),
-				getConstraints( constraintHelper ),
+				getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ),
 				Collections.emptySet(),
 				groupConversions,
 				getCascadedTypeParameters( parameterType, isCascading ),

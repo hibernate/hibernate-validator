@@ -14,15 +14,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -38,6 +41,8 @@ public abstract class MetaDataBuilder {
 	private static final Log log = LoggerFactory.make();
 
 	protected final ConstraintHelper constraintHelper;
+	protected final TypeResolutionHelper typeResolutionHelper;
+	protected final ValueExtractors valueExtractors;
 
 	private final Class<?> beanClass;
 	private final Set<MetaConstraint<?>> constraints = newHashSet();
@@ -46,9 +51,11 @@ public abstract class MetaDataBuilder {
 	private UnwrapMode unwrapMode;
 	private ConfigurationSource unwrapModeSource;
 
-	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper) {
+	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractors valueExtractors) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
+		this.typeResolutionHelper = typeResolutionHelper;
+		this.valueExtractors = valueExtractors;
 	}
 
 	/**
@@ -171,10 +178,7 @@ public abstract class MetaDataBuilder {
 				constraint.getDescriptor().getConstraintType()
 		);
 
-		return new MetaConstraint<>(
-				descriptor,
-				constraint.getLocation()
-		);
+		return MetaConstraints.create( typeResolutionHelper, valueExtractors, descriptor, constraint.getLocation() );
 	}
 
 	/**

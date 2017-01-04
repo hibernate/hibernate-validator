@@ -11,12 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.MappingXmlParser;
 
 /**
@@ -30,29 +32,27 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
-	/**
-	 * Creates a new {@link XmlMetaDataProvider}.
-	 *
-	 * @param constraintHelper the constraint helper
-	 * @param parameterNameProvider the name provider
-	 * @param mappingStreams the input stream for the xml configuration
-	 * @param externalClassLoader user provided class loader for the loading of XML mapping files
-	 */
 	public XmlMetaDataProvider(ConstraintHelper constraintHelper,
-							   ExecutableParameterNameProvider parameterNameProvider,
-							   Set<InputStream> mappingStreams,
-							   ClassLoader externalClassLoader) {
-		this( constraintHelper, createMappingParser( constraintHelper, parameterNameProvider, mappingStreams, externalClassLoader ) );
+			TypeResolutionHelper typeResolutionHelper,
+			ExecutableParameterNameProvider parameterNameProvider,
+			ValueExtractors valueExtractors,
+			Set<InputStream> mappingStreams,
+			ClassLoader externalClassLoader) {
+		this( constraintHelper, typeResolutionHelper, valueExtractors, createMappingParser( constraintHelper, typeResolutionHelper, parameterNameProvider,
+				valueExtractors, mappingStreams, externalClassLoader ) );
 	}
 
-	private XmlMetaDataProvider(ConstraintHelper constraintHelper, MappingXmlParser mappingParser) {
+	private XmlMetaDataProvider(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractors valueExtractors,
+			MappingXmlParser mappingParser) {
 		super( constraintHelper, createBeanConfigurations( mappingParser ) );
 		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}
 
-	private static MappingXmlParser createMappingParser(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider, Set<InputStream> mappingStreams,
+	private static MappingXmlParser createMappingParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+			ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors, Set<InputStream> mappingStreams,
 			ClassLoader externalClassLoader) {
-		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, parameterNameProvider, externalClassLoader );
+		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, typeResolutionHelper, parameterNameProvider,
+				valueExtractors, externalClassLoader );
 		mappingParser.parse( mappingStreams );
 		return mappingParser;
 	}

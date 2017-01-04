@@ -18,14 +18,22 @@ import java.util.stream.Collectors;
 import javax.validation.ValidationException;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 
 /**
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ValueExtractors {
+
+	private static final Log log = LoggerFactory.make();
 
 	private final List<ValueExtractorDescriptor> valueExtractors;
 
@@ -65,6 +73,32 @@ public class ValueExtractors {
 		tmpValueExtractors.add( new ValueExtractorDescriptor( ObjectValueExtractor.INSTANCE ) );
 
 		valueExtractors = Collections.unmodifiableList( tmpValueExtractors );
+	}
+
+	public ValueExtractorDescriptor forLocation(ConstraintLocation constraintLocation) {
+		ValueExtractorDescriptor valueExtractorDescriptor = null;
+
+		if ( constraintLocation instanceof TypeArgumentConstraintLocation ) {
+			TypeArgumentConstraintLocation typeArgumentConstraintLocation = (TypeArgumentConstraintLocation) constraintLocation;
+
+			Class<?> declaredType = TypeHelper.getErasedReferenceType( typeArgumentConstraintLocation.getDelegate().getTypeForValidatorResolution() );
+			TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
+			valueExtractorDescriptor = getCascadedValueExtractor( declaredType, typeParameter );
+
+			if ( valueExtractorDescriptor == null ) {
+				throw log.getNoValueExtractorFoundForTypeException( declaredType, typeParameter );
+			}
+		}
+		else if ( constraintLocation.getUnwrapMode() == UnwrapMode.UNWRAP ) {
+			Class<?> declaredType = TypeHelper.getErasedReferenceType( constraintLocation.getTypeForValidatorResolution() );
+			valueExtractorDescriptor = getValueExtractor( declaredType );
+
+			if ( valueExtractorDescriptor == null ) {
+				throw log.getNoValueExtractorFoundForTypeException( declaredType, null );
+			}
+		}
+
+		return valueExtractorDescriptor;
 	}
 
 	/**

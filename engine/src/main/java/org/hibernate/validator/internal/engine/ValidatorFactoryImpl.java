@@ -149,32 +149,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.typeResolutionHelper = new TypeResolutionHelper();
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
 
-
-		// HV-302; don't load XmlMappingParser if not necessary
-		if ( configurationState.getMappingStreams().isEmpty() ) {
-			this.xmlMetaDataProvider = null;
-		}
-		else {
-			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, parameterNameProvider, configurationState.getMappingStreams(), externalClassLoader
-			);
-		}
-
-		this.constraintMappings = Collections.unmodifiableSet(
-				getConstraintMappings(
-						configurationState,
-						externalClassLoader
-				)
-		);
-
-		Map<String, String> properties = configurationState.getProperties();
-
 		boolean tmpFailFast = false;
 		boolean tmpAllowOverridingMethodAlterParameterConstraint = false;
 		boolean tmpAllowMultipleCascadedValidationOnReturnValues = false;
 		boolean tmpAllowParallelMethodsDefineParameterConstraints = false;
-
 		List<ValueExtractor<?>> tmpCascadedValueExtractors = new ArrayList<>( 5 );
+
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
 
@@ -194,9 +174,29 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			tmpCascadedValueExtractors = new ArrayList<>( hibernateSpecificConfig.getCascadedValueExtractors() );
 		}
 
+		this.valueExtractors = new ValueExtractors( tmpCascadedValueExtractors );
+
+		// HV-302; don't load XmlMappingParser if not necessary
+		if ( configurationState.getMappingStreams().isEmpty() ) {
+			this.xmlMetaDataProvider = null;
+		}
+		else {
+			this.xmlMetaDataProvider = new XmlMetaDataProvider(
+					constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractors, configurationState.getMappingStreams(), externalClassLoader
+			);
+		}
+
+		this.constraintMappings = Collections.unmodifiableSet(
+				getConstraintMappings(
+						configurationState,
+						externalClassLoader
+				)
+		);
+
 		registerCustomConstraintValidators( constraintMappings, constraintHelper );
 
-		this.valueExtractors = new ValueExtractors( tmpCascadedValueExtractors );
+		Map<String, String> properties = configurationState.getProperties();
+
 		tmpFailFast = checkPropertiesForBoolean( properties, HibernateValidatorConfiguration.FAIL_FAST, tmpFailFast );
 		this.failFast = tmpFailFast;
 
@@ -357,7 +357,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			beanMetaDataManager = new BeanMetaDataManager(
 					constraintHelper,
 					executableHelper,
+					typeResolutionHelper,
 					parameterNameProvider,
+					valueExtractors,
 					buildDataProviders( parameterNameProvider ),
 					methodValidationConfiguration
 			);
@@ -391,7 +393,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			metaDataProviders.add(
 					new ProgrammaticMetaDataProvider(
 							constraintHelper,
+							typeResolutionHelper,
 							parameterNameProvider,
+							valueExtractors,
 							constraintMappings
 					)
 			);

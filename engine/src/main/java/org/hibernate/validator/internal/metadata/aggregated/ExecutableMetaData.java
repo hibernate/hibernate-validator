@@ -28,6 +28,7 @@ import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -38,6 +39,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * An aggregated view of the constraint related meta data for a given method or
@@ -264,23 +266,15 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		private final ExecutableHelper executableHelper;
 
-		/**
-		 * Creates a new builder based on the given executable meta data.
-		 *
-		 * @param constrainedExecutable The base executable for this builder. This is the lowest
-		 * executable with a given signature within a type hierarchy.
-		 * @param constraintHelper the constraint helper
-		 * @param executableHelper the executable helper
-		 * @param beanClass the bean class
-		 * @param methodValidationConfiguration configuration instance for method validation behaviour
-		 */
 		public Builder(
 				Class<?> beanClass,
 				ConstrainedExecutable constrainedExecutable,
 				ConstraintHelper constraintHelper,
 				ExecutableHelper executableHelper,
+				TypeResolutionHelper typeResolutionHelper,
+				ValueExtractors valueExtractors,
 				MethodValidationConfiguration methodValidationConfiguration) {
-			super( beanClass, constraintHelper );
+			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractors );
 
 			this.executableHelper = executableHelper;
 			this.kind = constrainedExecutable.getKind();
@@ -398,7 +392,9 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 								new ParameterMetaData.Builder(
 										executable.getDeclaringClass(),
 										oneParameter,
-										constraintHelper
+										constraintHelper,
+										typeResolutionHelper,
+										valueExtractors
 								)
 						);
 					}

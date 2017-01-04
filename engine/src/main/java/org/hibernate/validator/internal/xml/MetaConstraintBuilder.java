@@ -22,10 +22,13 @@ import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.xml.bind.JAXBElement;
 
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -53,10 +56,15 @@ class MetaConstraintBuilder {
 
 	private final ClassLoadingHelper classLoadingHelper;
 	private final ConstraintHelper constraintHelper;
+	private final TypeResolutionHelper typeResolutionHelper;
+	private final ValueExtractors valueExtractors;
 
-	MetaConstraintBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper) {
+	MetaConstraintBuilder(ClassLoadingHelper classLoadingHelper, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+			ValueExtractors valueExtractors) {
 		this.classLoadingHelper = classLoadingHelper;
 		this.constraintHelper = constraintHelper;
+		this.typeResolutionHelper = typeResolutionHelper;
+		this.valueExtractors = valueExtractors;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -102,7 +110,7 @@ class MetaConstraintBuilder {
 				constraintHelper, constraintLocation.getMember(), annotation, type, constraintType
 		);
 
-		return new MetaConstraint<A>( constraintDescriptor, constraintLocation );
+		return MetaConstraints.create( typeResolutionHelper, valueExtractors, constraintDescriptor, constraintLocation );
 	}
 
 	private <A extends Annotation> Annotation buildAnnotation(AnnotationType annotationType, Class<A> returnType, String defaultPackage) {

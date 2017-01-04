@@ -45,11 +45,13 @@ import javax.validation.groups.ConvertGroup;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -65,6 +67,7 @@ import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -90,17 +93,23 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	static final int DEFAULT_INITIAL_CAPACITY = 16;
 
 	protected final ConstraintHelper constraintHelper;
+	protected final TypeResolutionHelper typeResolutionHelper;
 	protected final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
 	protected final AnnotationProcessingOptions annotationProcessingOptions;
 	protected final ExecutableParameterNameProvider parameterNameProvider;
+	protected final ValueExtractors valueExtractors;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
+			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
+			ValueExtractors valueExtractors,
 			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
+		this.typeResolutionHelper = typeResolutionHelper;
 		this.parameterNameProvider = parameterNameProvider;
+		this.valueExtractors = valueExtractors;
 		this.annotationProcessingOptions = annotationProcessingOptions;
-		configuredBeans = new ConcurrentReferenceHashMap<>(
+		this.configuredBeans = new ConcurrentReferenceHashMap<>(
 				DEFAULT_INITIAL_CAPACITY,
 				SOFT,
 				SOFT
@@ -220,7 +229,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		ConstraintLocation location = ConstraintLocation.forClass( clazz );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetaData ) {
-			classLevelConstraints.add( new MetaConstraint<>( constraintDescription, location ) );
+			classLevelConstraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractors, constraintDescription, location ) );
 		}
 
 		return classLevelConstraints;
@@ -293,7 +302,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		ConstraintLocation location = ConstraintLocation.forProperty( field );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
-			constraints.add( new MetaConstraint<>( constraintDescription, location ) );
+			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractors, constraintDescription, location ) );
 		}
 		return constraints;
 	}
@@ -427,12 +436,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		ConstraintLocation crossParameterLocation = ConstraintLocation.forCrossParameter( executable );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescriptor : constraintsDescriptors ) {
-			constraints.add(
-					new MetaConstraint<>(
-							constraintDescriptor,
-							constraintDescriptor.getConstraintType() == ConstraintType.GENERIC ? returnValueLocation : crossParameterLocation
-					)
-			);
+			ConstraintLocation location = constraintDescriptor.getConstraintType() == ConstraintType.GENERIC ? returnValueLocation : crossParameterLocation;
+			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractors, constraintDescriptor, location ) );
 		}
 
 		return constraints;
@@ -510,7 +515,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					parameterConstraints.add(
-							new MetaConstraint<>( constraintDescriptorImpl, location )
+							MetaConstraints.create( typeResolutionHelper, valueExtractors, constraintDescriptorImpl, location )
 					);
 				}
 			}
@@ -850,8 +855,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	/**
 	 * Creates a {@code MetaConstraint} for a type argument constraint.
 	 */
-	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(ConstraintDescriptorImpl<A> descriptor, TypeArgumentLocation location, TypeVariable<?> typeVariable, Type type) {
-		return new MetaConstraint<>( descriptor, ConstraintLocation.forTypeArgument( location.toConstraintLocation(), typeVariable, type ) );
+	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(ConstraintDescriptorImpl<A> descriptor, TypeArgumentLocation location,
+			TypeVariable<?> typeVariable, Type type) {
+		ConstraintLocation constraintLocation = ConstraintLocation.forTypeArgument( location.toConstraintLocation(), typeVariable, type );
+		return MetaConstraints.create( typeResolutionHelper, valueExtractors, descriptor, constraintLocation );
 	}
 
 	/**

@@ -13,6 +13,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -22,9 +23,11 @@ import javax.validation.ValidationException;
 import javax.validation.constraints.DecimalMin;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.xml.MappingXmlParser;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeMethod;
@@ -41,7 +44,8 @@ public class MappingXmlParserTest {
 	@BeforeMethod
 	public void setupParserHelper() {
 		constraintHelper = new ConstraintHelper();
-		xmlMappingParser = new MappingXmlParser( constraintHelper, new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ), null );
+		xmlMappingParser = new MappingXmlParser( constraintHelper, new TypeResolutionHelper(),
+				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ), new ValueExtractors( Collections.emptyList() ), null );
 	}
 
 	@Test

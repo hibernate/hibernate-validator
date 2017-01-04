@@ -17,6 +17,7 @@ import static org.testng.Assert.assertNotNull;
 import java.lang.annotation.ElementType;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +47,7 @@ import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -53,6 +55,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.BeforeMethod;
@@ -512,8 +515,9 @@ public class ConstraintMappingTest {
 	private <T> BeanConfiguration<T> getBeanConfiguration(Class<T> type) {
 		Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations(
 				new ConstraintHelper(),
-				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() )
-		);
+				new TypeResolutionHelper(),
+				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
+				new ValueExtractors( Collections.emptyList() ) );
 
 		for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
 			if ( beanConfiguration.getBeanClass() == type ) {

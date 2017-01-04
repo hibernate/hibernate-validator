@@ -13,7 +13,6 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +51,6 @@ import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.resolver.CachingTraversableResolverForSingleValidation;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
@@ -74,8 +72,6 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import com.fasterxml.classmate.ResolvedType;
 
 /**
  * The main Bean Validation class. This is the core processing class of Hibernate Validator.
@@ -554,17 +550,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				valueToValidate = valueContext.getCurrentValidatedValue();
 			}
 
-			// type parameter constraint, e.g. Property<@Email String> email;
-			if ( metaConstraint.getLocation() instanceof TypeArgumentConstraintLocation ) {
-				success = validateTypeParameterConstraint( validationContext, valueContext, metaConstraint, valueToValidate );
-			}
-			// type parameter constraint given on wrapper type, e.g. @ValidationAppliesTo(WRAPPED) @Email StringProperty email;
-			else if ( valueContext.getCurrentValidatable().getUnwrapMode( metaConstraint.getLocation() ) == UnwrapMode.UNWRAP ) {
-				success = validateConstraintRequiringUnwrapping( validationContext, valueContext, metaConstraint, valueToValidate );
+			valueContext.setDeclaredTypeOfValidatedElement( metaConstraint.getTypeOfValidatedElement() );
+
+			// constraint requiring a ValueExtractor
+			if ( metaConstraint.getValueExtractorDescriptor() != null ) {
+				TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext, metaConstraint );
+				( (ValueExtractor) metaConstraint.getValueExtractorDescriptor().getValueExtractor() ).extractValues( valueToValidate, receiver );
+
+				success = receiver.isSuccess();
 			}
 			// regular constraint
 			else {
-				valueContext.setDeclaredTypeOfValidatedElement( metaConstraint.getLocation().getTypeForValidatorResolution() );
 				success = metaConstraint.validateConstraint( validationContext, valueContext );
 			}
 
@@ -575,68 +571,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		valueContext.setPropertyPath( currentPath );
 
 		return success;
-	}
-
-	// TODO the value extractor should be retrieved at meta-data instantiation and be cached (unlike cascades, constraint
-	// validator resolution is based on the static type of an element)
-	private boolean validateTypeParameterConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, MetaConstraint<?> metaConstraint,
-			Object valueToValidate) {
-		TypeArgumentConstraintLocation typeArgumentConstraintLocation = (TypeArgumentConstraintLocation) metaConstraint.getLocation();
-
-		Class<?> declaredType = TypeHelper.getErasedReferenceType( typeArgumentConstraintLocation.getDelegate().getTypeForValidatorResolution() );
-		TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
-		valueContext.setDeclaredTypeOfValidatedElement( typeArgumentConstraintLocation.getTypeForValidatorResolution() );
-		ValueExtractorDescriptor extractor = valueExtractors.getCascadedValueExtractor( declaredType, typeParameter );
-
-		if ( extractor == null ) {
-			throw log.getNoValueExtractorFoundForTypeException( declaredType, typeParameter );
-		}
-
-		TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext, metaConstraint );
-		( (ValueExtractor) extractor.getValueExtractor() ).extractValues( valueToValidate, receiver );
-
-		return receiver.isSuccess();
-	}
-
-	// TODO the value extractor should be retrieved at meta-data instantiation and be cached (unlike cascades, constraint
-	// validator resolution is based on the static type of an element
-	private boolean validateConstraintRequiringUnwrapping(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, MetaConstraint<?> metaConstraint,
-			Object valueToValidate) {
-		Class<?> declaredType = TypeHelper.getErasedReferenceType( metaConstraint.getLocation().getTypeForValidatorResolution() );
-		ValueExtractorDescriptor extractor = valueExtractors.getValueExtractor( declaredType );
-
-		if ( extractor == null ) {
-			throw log.getNoValueExtractorFoundForTypeException( declaredType, null );
-		}
-
-		// when validating e.g. IntegerProperty, set declared type to Integer for validator resolution
-		valueContext.setDeclaredTypeOfValidatedElement(
-				getSingleTypeParameterBind( metaConstraint.getLocation().getTypeForValidatorResolution(), extractor.getExtractedType() )
-		);
-
-		TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext, metaConstraint );
-		( (ValueExtractor) extractor.getValueExtractor() ).extractValues( valueToValidate, receiver );
-
-		return receiver.isSuccess();
-	}
-
-	/**
-	 * Returns the sub-types binding for the single type parameter of the super-type. E.g. for {@code IntegerProperty}
-	 * and {@code Property<T>}, {@code Integer} would be returned.
-	 */
-	private Class<?> getSingleTypeParameterBind(Type subType, Type superType) {
-		ResolvedType resolvedType = typeResolutionHelper.getTypeResolver().resolve( subType );
-		List<ResolvedType> resolvedTypeParameters = resolvedType.typeParametersFor( TypeHelper.getErasedReferenceType( superType ) );
-
-		if ( resolvedTypeParameters.isEmpty() ) {
-			throw log.getNoValueExtractorFoundForUnwrapException( subType );
-		}
-		else if ( resolvedTypeParameters.size() > 1 ) {
-			throw log.getUnableToExtractValueForTypeWithMultipleTypeParametersException(  subType );
-		}
-		else {
-			return resolvedTypeParameters.iterator().next().getErasedType();
-		}
 	}
 
 	private final class TypeParameterValueReceiver implements ValueExtractor.ValueReceiver {

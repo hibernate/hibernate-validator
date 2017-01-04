@@ -21,9 +21,11 @@ import java.util.stream.Collectors;
 
 import javax.validation.ElementKind;
 
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.PropertyDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -34,6 +36,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -143,24 +146,27 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 		private boolean unwrapModeExplicitlyConfigured = false;
 
-		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper) {
-			super( beanClass, constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+				ValueExtractors valueExtractors) {
+			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractors );
 
 			this.propertyName = constrainedField.getField().getName();
 			this.propertyType = ReflectionHelper.typeOf( constrainedField.getField() );
 			add( constrainedField );
 		}
 
-		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintHelper constraintHelper) {
-			super( beanClass, constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+				ValueExtractors valueExtractors) {
+			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractors );
 
 			this.propertyName = null;
 			this.propertyType = null;
 			add( constrainedType );
 		}
 
-		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper) {
-			super( beanClass, constraintHelper );
+		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+				ValueExtractors valueExtractors) {
+			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractors );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getExecutable() );
 			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getExecutable() );
@@ -261,7 +267,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				adaptedLocation = ConstraintLocation.forProperty( constraint.getLocation().getMember() );
 			}
 
-			return new MetaConstraint<>( constraint.getDescriptor(), adaptedLocation );
+			return MetaConstraints.create( typeResolutionHelper, valueExtractors, constraint.getDescriptor(), adaptedLocation );
 		}
 
 		private String getPropertyName(ConstrainedElement constrainedElement) {

@@ -36,5 +36,3 @@ public class XmlBasedMethodValidationTest extends AbstractMethodValidationTest {
 		return "[XML] - ";
 	}
 }
-
-

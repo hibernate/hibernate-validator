@@ -17,6 +17,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -43,6 +45,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.joda.time.DateMidnight;
@@ -62,7 +65,9 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 	public void setUpProvider() {
 		provider = new AnnotationMetaDataProvider(
 				new ConstraintHelper(),
+				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
+				new ValueExtractors( Collections.emptyList() ),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}

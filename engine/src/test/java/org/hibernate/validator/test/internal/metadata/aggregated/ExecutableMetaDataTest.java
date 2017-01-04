@@ -22,6 +22,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -56,7 +57,9 @@ public class ExecutableMetaDataTest {
 		beanMetaDataManager = new BeanMetaDataManager(
 				new ConstraintHelper(),
 				new ExecutableHelper( new TypeResolutionHelper() ),
+				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
+				new ValueExtractors( Collections.emptyList() ),
 				Collections.<MetaDataProvider>emptyList()
 		);
 

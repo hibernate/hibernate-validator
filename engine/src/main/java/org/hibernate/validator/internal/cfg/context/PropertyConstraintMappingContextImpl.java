@@ -21,12 +21,14 @@ import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -93,13 +95,13 @@ final class PropertyConstraintMappingContextImpl
 		return typeContext.method( name, parameterTypes );
 	}
 
-	ConstrainedElement build(ConstraintHelper constraintHelper) {
+	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractors valueExtractors) {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		if ( member instanceof Field ) {
 			return new ConstrainedField(
 					ConfigurationSource.API,
 					(Field) member,
-					getConstraints( constraintHelper ),
+					getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ),
 					Collections.emptySet(),
 					groupConversions,
 					getCascadedTypeParameters( (Field) member, isCascading ),
@@ -110,7 +112,7 @@ final class PropertyConstraintMappingContextImpl
 			return new ConstrainedExecutable(
 					ConfigurationSource.API,
 					(Executable) member,
-					getConstraints( constraintHelper ),
+					getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ),
 					groupConversions,
 					getCascadedTypeParameters( (Executable) member, isCascading ),
 					unwrapMode()

@@ -19,6 +19,7 @@ import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -27,6 +28,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorI
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 
 /**
@@ -125,8 +127,12 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		private ConstrainedParameter constrainedParameter;
 		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 
-		public Builder(Class<?> beanClass, ConstrainedParameter constrainedParameter, ConstraintHelper constraintHelper) {
-			super( beanClass, constraintHelper );
+		public Builder(Class<?> beanClass,
+				ConstrainedParameter constrainedParameter,
+				ConstraintHelper constraintHelper,
+				TypeResolutionHelper typeResolutionHelper,
+				ValueExtractors valueExtractors) {
+			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractors );
 
 			this.parameterType = constrainedParameter.getType();
 			this.parameterIndex = constrainedParameter.getIndex();

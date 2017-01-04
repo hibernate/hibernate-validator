@@ -8,10 +8,14 @@ package org.hibernate.validator.internal.metadata.core;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Type;
 import java.util.Set;
+
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -22,6 +26,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class MetaConstraint<A extends Annotation> {
 
@@ -41,13 +46,28 @@ public class MetaConstraint<A extends Annotation> {
 	private final ConstraintLocation location;
 
 	/**
+	 * The {@link ValueExtractor} used to extract the value for validation.
+	 */
+	private final ValueExtractorDescriptor valueExtractorDescriptor;
+
+	/**
+	 * The type of the validated element.
+	 */
+	private final Type typeOfValidatedElement;
+
+	/**
 	 * @param constraintDescriptor The constraint descriptor for this constraint
 	 * @param location meta data about constraint placement
+	 * @param valueExtractorDescriptor the potential {@link ValueExtractor} used to extract the value to validate
+	 * @param typeOfValidatedElement the type of the validated element
 	 */
-	public MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location) {
+	MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location, ValueExtractorDescriptor valueExtractorDescriptor,
+			Type typeOfValidatedElement) {
 		this.constraintTree = new ConstraintTree<>( constraintDescriptor );
 		this.constraintDescriptor = constraintDescriptor;
 		this.location = location;
+		this.valueExtractorDescriptor = valueExtractorDescriptor;
+		this.typeOfValidatedElement = typeOfValidatedElement;
 	}
 
 	/**
@@ -77,6 +97,14 @@ public class MetaConstraint<A extends Annotation> {
 		return location;
 	}
 
+	public ValueExtractorDescriptor getValueExtractorDescriptor() {
+		return valueExtractorDescriptor;
+	}
+
+	public Type getTypeOfValidatedElement() {
+		return typeOfValidatedElement;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if ( this == o ) {
@@ -92,6 +120,12 @@ public class MetaConstraint<A extends Annotation> {
 			return false;
 		}
 		if ( location != null ? !location.equals( that.location ) : that.location != null ) {
+			return false;
+		}
+		if ( valueExtractorDescriptor != null ? !valueExtractorDescriptor.equals( that.valueExtractorDescriptor ) : that.valueExtractorDescriptor != null ) {
+			return false;
+		}
+		if ( typeOfValidatedElement != null ? !typeOfValidatedElement.equals( that.typeOfValidatedElement ) : that.typeOfValidatedElement != null ) {
 			return false;
 		}
 
@@ -111,6 +145,8 @@ public class MetaConstraint<A extends Annotation> {
 		sb.append( "MetaConstraint" );
 		sb.append( "{constraintType=" ).append( constraintDescriptor.getAnnotation().annotationType().getName() );
 		sb.append( ", location=" ).append( location );
+		sb.append( ", valueExtractorDescriptor=" ).append( valueExtractorDescriptor );
+		sb.append( ", typeOfValidatedElement=" ).append( typeOfValidatedElement );
 		sb.append( "}" );
 		return sb.toString();
 	}

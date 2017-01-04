@@ -19,6 +19,7 @@ import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -28,6 +29,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -106,14 +108,15 @@ abstract class ExecutableConstraintMappingContextImpl {
 		return typeContext;
 	}
 
-	public ConstrainedElement build(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
+	public ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+			ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors) {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedExecutable(
 				ConfigurationSource.API,
 				executable,
-				getParameters( constraintHelper, parameterNameProvider ),
-				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
-				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper ) : Collections.<MetaConstraint<?>>emptySet(),
+				getParameters( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractors ),
+				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ) : Collections.<MetaConstraint<?>>emptySet(),
+				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ) : Collections.<MetaConstraint<?>>emptySet(),
 				Collections.emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
 				getCascadedTypeParameters( executable, returnValueContext != null && returnValueContext.isCascading() ),
@@ -121,13 +124,14 @@ abstract class ExecutableConstraintMappingContextImpl {
 		);
 	}
 
-	private List<ConstrainedParameter> getParameters(ConstraintHelper constraintHelper, ExecutableParameterNameProvider parameterNameProvider) {
+	private List<ConstrainedParameter> getParameters(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
+			ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
 
 		for ( int i = 0; i < parameterContexts.length; i++ ) {
 			ParameterConstraintMappingContextImpl parameter = parameterContexts[i];
 			if ( parameter != null ) {
-				constrainedParameters.add( parameter.build( constraintHelper, parameterNameProvider ) );
+				constrainedParameters.add( parameter.build( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractors ) );
 			}
 			else {
 				constrainedParameters.add(
