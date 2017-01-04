@@ -8,8 +8,8 @@ package org.hibernate.validator.internal.engine.cascading;
 
 import java.util.List;
 
-import org.hibernate.validator.spi.cascading.ExtractedValue;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValueExtractor;
 
 class ListValueExtractor implements ValueExtractor<List<@ExtractedValue ?>> {
 
@@ -22,7 +22,7 @@ class ListValueExtractor implements ValueExtractor<List<@ExtractedValue ?>> {
 	public void extractValues(List<?> originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( Object object : originalValue ) {
-			receiver.indexedValue( object, "<collection element>", i );
+			receiver.indexedValue( "<collection element>", i, object );
 			i++;
 		}
 	}

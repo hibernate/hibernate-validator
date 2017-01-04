@@ -16,11 +16,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.validation.ValidationException;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
 
 /**
  * @author Gunnar Morling

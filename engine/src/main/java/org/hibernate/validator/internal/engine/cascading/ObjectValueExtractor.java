@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ValueExtractor;
 
 class ObjectValueExtractor implements ValueExtractor<Object> {
 
@@ -17,6 +17,6 @@ class ObjectValueExtractor implements ValueExtractor<Object> {
 
 	@Override
 	public void extractValues(Object originalValue, ValueReceiver receiver) {
-		receiver.value( originalValue, null );
+		receiver.value( null, originalValue );
 	}
 }

@@ -7,9 +7,10 @@
 //tag::include[]
 package org.hibernate.validator.referenceguide.chapter11.valuehandling;
 
-import org.hibernate.validator.spi.cascading.ExtractedValue;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
 //end::include[]
+
+import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValueExtractor;
 
 /**
  * @author Gunnar Morling
@@ -19,7 +20,7 @@ public class PropertyValueExtractor implements ValueExtractor<Property<@Extracte
 
 	@Override
 	public void extractValues(Property<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
-		receiver.value( originalValue.getValue(), null );
+		receiver.value( null, originalValue.getValue() );
 	}
 }
 //end::include[]

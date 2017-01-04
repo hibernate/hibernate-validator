@@ -9,15 +9,15 @@ package org.hibernate.validator.test.internal.engine.cascaded;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.hibernate.validator.spi.cascading.ExtractedValue;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValueExtractor;
 
 class MapKeyExtractor implements ValueExtractor<Map<@ExtractedValue ?, ?>> {
 
 	@Override
 	public void extractValues(Map<?, ?> originalValue, ValueExtractor.ValueReceiver receiver) {
 		for ( Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.keyedValue( entry.getKey(), "map_key", "key(" + entry.getKey() + ")" );
+			receiver.keyedValue( "map_key", "key(" + entry.getKey() + ")", entry.getKey() );
 		}
 	}
 }

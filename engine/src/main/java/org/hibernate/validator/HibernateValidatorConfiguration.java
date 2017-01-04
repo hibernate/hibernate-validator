@@ -7,9 +7,9 @@
 package org.hibernate.validator;
 
 import javax.validation.Configuration;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
 /**

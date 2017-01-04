@@ -12,10 +12,11 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
+import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValueExtractor;
+
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.spi.cascading.ExtractedValue;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
 
 /**
  * Describes a {@link ValueExtractor}.

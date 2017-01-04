@@ -26,6 +26,7 @@ import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.spi.ConfigurationState;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
@@ -48,7 +49,6 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
 /**

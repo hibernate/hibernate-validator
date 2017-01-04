@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ValueExtractor;
 
 class DoubleArrayValueExtractor implements ValueExtractor<double[]> {
 
@@ -19,7 +19,7 @@ class DoubleArrayValueExtractor implements ValueExtractor<double[]> {
 	public void extractValues(double[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( double object : originalValue ) {
-			receiver.indexedValue( object, "<collection element>", i );
+			receiver.indexedValue( "<collection element>", i, object );
 			i++;
 		}
 	}

@@ -32,10 +32,10 @@ import javax.validation.Validator;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Null;
+import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.spi.cascading.ExtractedValue;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
@@ -213,7 +213,7 @@ public class UnwrapModesTest {
 
 		@Override
 		public void extractValues(ValueHolder<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
-			receiver.value( originalValue.value, null );
+			receiver.value( null, originalValue.value );
 		}
 	}
 

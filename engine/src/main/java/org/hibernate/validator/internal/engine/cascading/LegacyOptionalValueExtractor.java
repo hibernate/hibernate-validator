@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.engine.cascading;
 
 import java.util.Optional;
 
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ValueExtractor;
 
 /**
  * Extractor for supporting the legacy construct {@code @Valid Optional<Foo>}.
@@ -25,6 +25,6 @@ public class LegacyOptionalValueExtractor implements ValueExtractor<Optional<?>>
 
 	@Override
 	public void extractValues(Optional<?> originalValue, ValueExtractor.ValueReceiver receiver) {
-		receiver.value( originalValue != null && originalValue.isPresent() ? originalValue.get() : null, null );
+		receiver.value( null, originalValue != null && originalValue.isPresent() ? originalValue.get() : null );
 	}
 }

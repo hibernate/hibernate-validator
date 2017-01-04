@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ValueExtractor;
 
 class LegacyIterableValueExtractor implements ValueExtractor<Iterable<?>> {
 
@@ -17,10 +17,10 @@ class LegacyIterableValueExtractor implements ValueExtractor<Iterable<?>> {
 
 	@Override
 	public void extractValues(Iterable<?> originalValue, ValueReceiver receiver) {
-		receiver.value( originalValue, null );
+		receiver.value( null, originalValue );
 
 		for ( Object object : originalValue ) {
-			receiver.iterableValue( object, "<collection element>" );
+			receiver.iterableValue( "<collection element>", object );
 		}
 	}
 }

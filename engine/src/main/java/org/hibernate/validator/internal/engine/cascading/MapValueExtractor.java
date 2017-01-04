@@ -8,8 +8,8 @@ package org.hibernate.validator.internal.engine.cascading;
 
 import java.util.Map;
 
-import org.hibernate.validator.spi.cascading.ExtractedValue;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValueExtractor;
 
 class MapValueExtractor implements ValueExtractor<Map<?, @ExtractedValue ?>> {
 
@@ -25,7 +25,7 @@ class MapValueExtractor implements ValueExtractor<Map<?, @ExtractedValue ?>> {
 		}
 
 		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.keyedValue( entry.getValue(), "<collection element>", entry.getKey() );
+			receiver.keyedValue( "<collection element>", entry.getKey(), entry.getValue() );
 		}
 	}
 }

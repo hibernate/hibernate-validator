@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
-import org.hibernate.validator.spi.cascading.ExtractedValue;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValueExtractor;
 
 /**
  * @author Gunnar Morling
@@ -17,6 +17,6 @@ public class ReferenceValueExtractor implements ValueExtractor<Reference<@Extrac
 
 	@Override
 	public void extractValues(Reference<?> originalValue, ValueExtractor.ValueReceiver receiver) {
-		receiver.value( originalValue.getValue(), null );
+		receiver.value( null, originalValue.getValue() );
 	}
 }

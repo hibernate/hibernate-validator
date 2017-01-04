@@ -8,8 +8,8 @@ package org.hibernate.validator.test.internal.engine.cascaded;
 
 import java.util.Map.Entry;
 
-import org.hibernate.validator.spi.cascading.ExtractedValue;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValueExtractor;
 
 import com.google.common.collect.Multimap;
 
@@ -18,7 +18,7 @@ class MultimapValueExtractor implements ValueExtractor<Multimap<?, @ExtractedVal
 	@Override
 	public void extractValues(Multimap<?, ?> originalValue, ValueExtractor.ValueReceiver receiver) {
 		for ( Entry<?, ?> entry : originalValue.entries() ) {
-			receiver.keyedValue( entry.getValue(), "multimap_value", entry.getKey() );
+			receiver.keyedValue( "multimap_value", entry.getKey(), entry.getValue() );
 		}
 	}
 }

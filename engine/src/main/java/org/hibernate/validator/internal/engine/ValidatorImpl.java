@@ -36,6 +36,7 @@ import javax.validation.Validator;
 import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
@@ -73,7 +74,6 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
 
 import com.fasterxml.classmate.ResolvedType;
 
@@ -653,25 +653,25 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		@Override
-		public void value(Object object, String nodeName) {
+		public void value(String nodeName, Object object) {
 			doValidate( object, nodeName );
 		}
 
 		@Override
-		public void iterableValue(Object value, String nodeName) {
+		public void iterableValue(String nodeName, Object value) {
 			valueContext.markCurrentPropertyAsIterable();
 			doValidate( value, nodeName );
 		}
 
 		@Override
-		public void indexedValue(Object value, String nodeName, int index) {
+		public void indexedValue(String nodeName, int index, Object value) {
 			valueContext.markCurrentPropertyAsIterable();
 			valueContext.setIndex( index );
 			doValidate( value, nodeName );
 		}
 
 		@Override
-		public void keyedValue(Object value, String nodeName, Object key) {
+		public void keyedValue(String nodeName, Object key, Object value) {
 			valueContext.markCurrentPropertyAsIterable();
 			valueContext.setKey( key );
 			doValidate( value, nodeName );
@@ -807,25 +807,25 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 
 		@Override
-		public void value(Object value, String nodeName) {
+		public void value(String nodeName, Object value) {
 			doValidate( value, nodeName );
 		}
 
 		@Override
-		public void iterableValue(Object value, String nodeName) {
+		public void iterableValue(String nodeName, Object value) {
 			valueContext.markCurrentPropertyAsIterable();
 			doValidate( value, nodeName );
 		}
 
 		@Override
-		public void indexedValue(Object value, String nodeName, int index) {
+		public void indexedValue(String nodeName, int index, Object value) {
 			valueContext.markCurrentPropertyAsIterable();
 			valueContext.setIndex( index );
 			doValidate( value, nodeName );
 		}
 
 		@Override
-		public void keyedValue(Object value, String nodeName, Object key) {
+		public void keyedValue(String nodeName, Object key, Object value) {
 			valueContext.markCurrentPropertyAsIterable();
 			valueContext.setKey( key );
 			doValidate( value, nodeName );

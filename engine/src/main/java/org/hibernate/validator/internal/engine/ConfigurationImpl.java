@@ -30,6 +30,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
@@ -47,7 +48,6 @@ import org.hibernate.validator.internal.xml.ValidationBootstrapParameters;
 import org.hibernate.validator.internal.xml.ValidationXmlParser;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.PlatformResourceBundleLocator;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 

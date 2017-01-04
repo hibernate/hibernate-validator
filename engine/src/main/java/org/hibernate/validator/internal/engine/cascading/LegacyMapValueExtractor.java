@@ -8,7 +8,7 @@ package org.hibernate.validator.internal.engine.cascading;
 
 import java.util.Map;
 
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ValueExtractor;
 
 class LegacyMapValueExtractor implements ValueExtractor<Map<?, ?>> {
 
@@ -19,10 +19,10 @@ class LegacyMapValueExtractor implements ValueExtractor<Map<?, ?>> {
 
 	@Override
 	public void extractValues(Map<?, ?> originalValue, ValueReceiver receiver) {
-		receiver.value( originalValue, null );
+		receiver.value( null, originalValue );
 
 		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.keyedValue( entry.getValue(), "<collection element>", entry.getKey() );
+			receiver.keyedValue( "<collection element>", entry.getKey(), entry.getValue() );
 		}
 	}
 }

@@ -6,8 +6,8 @@
  */
 package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
-import org.hibernate.validator.spi.cascading.ExtractedValue;
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValueExtractor;
 
 /**
  * @author Gunnar Morling
@@ -16,6 +16,6 @@ public class PropertyValueExtractor implements ValueExtractor<Property<@Extracte
 
 	@Override
 	public void extractValues(Property<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
-		receiver.value( originalValue.getValue(), null );
+		receiver.value( null, originalValue.getValue() );
 	}
 }

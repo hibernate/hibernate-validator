@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ValueExtractor;
 
 class FloatArrayValueExtractor implements ValueExtractor<float[]> {
 
@@ -19,7 +19,7 @@ class FloatArrayValueExtractor implements ValueExtractor<float[]> {
 	public void extractValues(float[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( float object : originalValue ) {
-			receiver.indexedValue( object, "<collection element>", i );
+			receiver.indexedValue( "<collection element>", i, object );
 			i++;
 		}
 	}

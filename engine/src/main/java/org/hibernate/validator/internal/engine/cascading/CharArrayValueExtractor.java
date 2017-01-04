@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
-import org.hibernate.validator.spi.cascading.ValueExtractor;
+import javax.validation.valueextraction.ValueExtractor;
 
 class CharArrayValueExtractor implements ValueExtractor<char[]> {
 
@@ -19,7 +19,7 @@ class CharArrayValueExtractor implements ValueExtractor<char[]> {
 	public void extractValues(char[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( char object : originalValue ) {
-			receiver.indexedValue( object, "<collection element>", i );
+			receiver.indexedValue( "<collection element>", i, object );
 			i++;
 		}
 	}
