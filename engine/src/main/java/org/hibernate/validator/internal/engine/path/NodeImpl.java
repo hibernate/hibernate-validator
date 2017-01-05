@@ -57,13 +57,13 @@ public class NodeImpl
 
 	private String asString;
 
-	private NodeImpl(String name, NodeImpl parent, boolean indexable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes, Integer parameterIndex, Object value) {
+	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes, Integer parameterIndex, Object value) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
 		this.key = key;
 		this.value = value;
-		this.isIterable = indexable;
+		this.isIterable = isIterable;
 		this.kind = kind;
 		this.parameterTypes = parameterTypes;
 		this.parameterIndex = parameterIndex;
