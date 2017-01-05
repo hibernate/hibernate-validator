@@ -54,7 +54,7 @@ public class CustomValueExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithMultimap>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[work].value", "addressByType[work].value" );
+		assertCorrectPropertyPaths( violations, "addressByType[work].email", "addressByType[work].email" );
 	}
 
 	private static class CustomerWithMultimap {

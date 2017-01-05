@@ -14,14 +14,14 @@ class EmailAddress {
 
 	@NotNull
 	@Email
-	private final String value;
+	private final String email;
 
 	public EmailAddress(String value) {
-		this.value = value;
+		this.email = value;
 	}
 
 	@Override
 	public String toString() {
-		return "EmailAddress [value=" + value + "]";
+		return "EmailAddress [email=" + email + "]";
 	}
 }

@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 /**
  * @author Gunnar Morling
  */
-public class MapKeyExtractorTest {
+public class MapExtractorTest {
 
 	@Test
 	public void canUseCustomKeyExtractorForMaps() throws Exception {
@@ -38,7 +38,7 @@ public class MapKeyExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithCascadingKeys>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[key(too short)].value", "addressByType[key(too small)].value" );
+		assertCorrectPropertyPaths( violations, "addressByType[key(too short)].type", "addressByType[key(too small)].type" );
 	}
 
 	@Test
@@ -66,11 +66,11 @@ public class MapKeyExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithCascadingKeyAndValueMap>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[too small].value", "addressByType[long enough].value", "addressByType[key(too small)].value", "addressByType[key(too short)].value" );
+		assertCorrectPropertyPaths( violations, "addressByType[too small].email", "addressByType[long enough].email", "addressByType[key(too small)].type", "addressByType[key(too short)].type" );
 	}
 
 	@Test
-	public void canUseKeyAndValueExtractorForTypeLevelConstraintsOfOfMap() throws Exception {
+	public void canUseKeyAndValueExtractorForTypeLevelConstraintsOfMap() throws Exception {
 		CustomerWithConstrainedKeysAndValues bob = new CustomerWithConstrainedKeysAndValues();
 
 		Validator validator = Validation.byProvider( HibernateValidator.class )

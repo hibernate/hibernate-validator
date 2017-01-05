@@ -13,14 +13,14 @@ class AddressType {
 
 	@NotNull
 	@Size(min = 10)
-	private final String value;
+	private final String type;
 
 	public AddressType(String value) {
-		this.value = value;
+		this.type = value;
 	}
 
 	@Override
 	public String toString() {
-		return value;
+		return type;
 	}
 }
