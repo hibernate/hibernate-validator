@@ -55,6 +55,7 @@ public class ValueExtractors {
 
 		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyMapValueExtractor.INSTANCE ) );
 		tmpValueExtractors.add( new ValueExtractorDescriptor( MapValueExtractor.INSTANCE ) );
+		tmpValueExtractors.add( new ValueExtractorDescriptor( MapKeyExtractor.INSTANCE ) );
 
 		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyIterableValueExtractor.INSTANCE ) );
 		tmpValueExtractors.add( new ValueExtractorDescriptor( IterableValueExtractor.INSTANCE ) );

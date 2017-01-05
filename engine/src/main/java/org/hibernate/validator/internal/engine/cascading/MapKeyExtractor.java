@@ -4,20 +4,28 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.test.internal.engine.cascaded;
+package org.hibernate.validator.internal.engine.cascading;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
 class MapKeyExtractor implements ValueExtractor<Map<@ExtractedValue ?, ?>> {
 
+	static final MapKeyExtractor INSTANCE = new MapKeyExtractor();
+
+	private MapKeyExtractor() {
+	}
+
 	@Override
-	public void extractValues(Map<?, ?> originalValue, ValueExtractor.ValueReceiver receiver) {
-		for ( Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.keyedValue( "map_key", "key(" + entry.getKey() + ")", entry.getKey() );
+	public void extractValues(Map<?, ?> originalValue, ValueReceiver receiver) {
+		if ( originalValue == null ) {
+			return;
+		}
+
+		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
+			receiver.keyedValue( "<map key>", "key(" + entry.getKey() + ")", entry.getKey() );
 		}
 	}
 }
