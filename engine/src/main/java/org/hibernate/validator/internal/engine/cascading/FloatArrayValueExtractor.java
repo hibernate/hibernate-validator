@@ -19,7 +19,7 @@ class FloatArrayValueExtractor implements ValueExtractor<float[]> {
 	public void extractValues(float[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( float object : originalValue ) {
-			receiver.indexedValue( "<collection element>", i, object );
+			receiver.indexedValue( "<iterable element>", i, object );
 			i++;
 		}
 	}

@@ -19,7 +19,7 @@ class ShortArrayValueExtractor implements ValueExtractor<short[]> {
 	public void extractValues(short[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( short object : originalValue ) {
-			receiver.indexedValue( "<collection element>", i, object );
+			receiver.indexedValue( "<iterable element>", i, object );
 			i++;
 		}
 	}

@@ -19,7 +19,7 @@ class ByteArrayValueExtractor implements ValueExtractor<byte[]> {
 	public void extractValues(byte[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( byte object : originalValue ) {
-			receiver.indexedValue( "<collection element>", i, object );
+			receiver.indexedValue( "<iterable element>", i, object );
 			i++;
 		}
 	}

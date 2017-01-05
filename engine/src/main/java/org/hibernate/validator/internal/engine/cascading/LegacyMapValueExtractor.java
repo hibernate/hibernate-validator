@@ -22,7 +22,7 @@ class LegacyMapValueExtractor implements ValueExtractor<Map<?, ?>> {
 		receiver.value( null, originalValue );
 
 		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.keyedValue( "<collection element>", entry.getKey(), entry.getValue() );
+			receiver.keyedValue( "<map value>", entry.getKey(), entry.getValue() );
 		}
 	}
 }

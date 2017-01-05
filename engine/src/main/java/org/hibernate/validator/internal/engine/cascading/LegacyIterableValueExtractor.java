@@ -20,7 +20,7 @@ class LegacyIterableValueExtractor implements ValueExtractor<Iterable<?>> {
 		receiver.value( null, originalValue );
 
 		for ( Object object : originalValue ) {
-			receiver.iterableValue( "<collection element>", object );
+			receiver.iterableValue( "<iterable element>", object );
 		}
 	}
 }

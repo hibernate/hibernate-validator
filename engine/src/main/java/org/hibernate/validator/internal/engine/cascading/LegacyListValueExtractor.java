@@ -23,7 +23,7 @@ class LegacyListValueExtractor implements ValueExtractor<List<?>> {
 
 		int i = 0;
 		for ( Object object : originalValue ) {
-			receiver.indexedValue( "<collection element>", i, object );
+			receiver.indexedValue( "<iterable element>", i, object );
 			i++;
 		}
 	}

@@ -19,7 +19,7 @@ class LongArrayValueExtractor implements ValueExtractor<long[]> {
 	public void extractValues(long[] originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( long object : originalValue ) {
-			receiver.indexedValue( "<collection element>", i, object );
+			receiver.indexedValue( "<iterable element>", i, object );
 			i++;
 		}
 	}

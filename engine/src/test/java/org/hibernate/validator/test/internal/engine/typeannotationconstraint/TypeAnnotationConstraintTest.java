@@ -67,7 +67,7 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithList1>> constraintViolations = validator.validate( l );
 
-		assertCorrectPropertyPaths( constraintViolations, "names[1].<collection element>", "names[2].<collection element>", "names[2].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "names[1].<iterable element>", "names[2].<iterable element>", "names[2].<iterable element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlank.class,
@@ -82,7 +82,7 @@ public class TypeAnnotationConstraintTest {
 		l.bars = Arrays.asList( new Bar( 2 ), null );
 		Set<ConstraintViolation<TypeWithList3>> constraintViolations = validator.validate( l );
 		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "bars[1].<collection element>", "bars[0].number" );
+		assertCorrectPropertyPaths( constraintViolations, "bars[1].<iterable element>", "bars[0].number" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
 	}
 
@@ -93,7 +93,7 @@ public class TypeAnnotationConstraintTest {
 		l.names = Arrays.asList( "First", "", null );
 		Set<ConstraintViolation<TypeWithList4>> constraintViolations = validator.validate( l );
 		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "names[1].<collection element>", "names[2].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "names[1].<iterable element>", "names[2].<iterable element>" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotBlank.class );
 
 		l = new TypeWithList4();
@@ -112,7 +112,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<TypeWithList5>> constraintViolations = validator.validate( l );
 
 		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "strings[0].<collection element>", "strings[2].<collection element>", "strings[2].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "strings[0].<iterable element>", "strings[2].<iterable element>", "strings[2].<iterable element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlank.class,
@@ -132,9 +132,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"returnStrings.<return value>[1].<collection element>",
-				"returnStrings.<return value>[2].<collection element>",
-				"returnStrings.<return value>[2].<collection element>"
+				"returnStrings.<return value>[1].<iterable element>",
+				"returnStrings.<return value>[2].<iterable element>",
+				"returnStrings.<return value>[2].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -163,7 +163,7 @@ public class TypeAnnotationConstraintTest {
 
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
-		assertThat( secondNode.getName() ).isEqualTo( "<collection element>" );
+		assertThat( secondNode.getName() ).isEqualTo( "<iterable element>" );
 		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
 	}
 
@@ -180,9 +180,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"setValues.listParameter[0].<collection element>",
-				"setValues.listParameter[2].<collection element>",
-				"setValues.listParameter[2].<collection element>"
+				"setValues.listParameter[0].<iterable element>",
+				"setValues.listParameter[2].<iterable element>",
+				"setValues.listParameter[2].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -204,9 +204,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"TypeWithList8.listParameter[0].<collection element>",
-				"TypeWithList8.listParameter[2].<collection element>",
-				"TypeWithList8.listParameter[2].<collection element>"
+				"TypeWithList8.listParameter[0].<iterable element>",
+				"TypeWithList8.listParameter[2].<iterable element>",
+				"TypeWithList8.listParameter[2].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -227,7 +227,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<TypeWithSet1>> constraintViolations = validator.validate( s );
 
 		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "names[].<collection element>", "names[].<collection element>", "names[].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "names[].<iterable element>", "names[].<iterable element>", "names[].<iterable element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlank.class,
@@ -242,7 +242,7 @@ public class TypeAnnotationConstraintTest {
 		TypeWithSet3 s = new TypeWithSet3();
 		s.bars = CollectionHelper.asSet( new Bar( 2 ), null );
 		Set<ConstraintViolation<TypeWithSet3>> constraintViolations = validator.validate( s );
-		assertCorrectPropertyPaths( constraintViolations, "bars[].<collection element>", "bars[].number" );
+		assertCorrectPropertyPaths( constraintViolations, "bars[].<iterable element>", "bars[].number" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
 	}
 
@@ -253,7 +253,7 @@ public class TypeAnnotationConstraintTest {
 		s.names = CollectionHelper.asSet( "First", "", null );
 		Set<ConstraintViolation<TypeWithSet4>> constraintViolations = validator.validate( s );
 		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "names[].<collection element>", "names[].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "names[].<iterable element>", "names[].<iterable element>" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotBlank.class );
 
 		s = new TypeWithSet4();
@@ -276,7 +276,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<TypeWithSet5>> constraintViolations = validator.validate( s );
 
 		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "strings[].<collection element>", "strings[].<collection element>", "strings[].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "strings[].<iterable element>", "strings[].<iterable element>", "strings[].<iterable element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlank.class,
@@ -297,9 +297,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"returnStrings.<return value>[].<collection element>",
-				"returnStrings.<return value>[].<collection element>",
-				"returnStrings.<return value>[].<collection element>"
+				"returnStrings.<return value>[].<iterable element>",
+				"returnStrings.<return value>[].<iterable element>",
+				"returnStrings.<return value>[].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -322,9 +322,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"setValues.setParameter[].<collection element>",
-				"setValues.setParameter[].<collection element>",
-				"setValues.setParameter[].<collection element>"
+				"setValues.setParameter[].<iterable element>",
+				"setValues.setParameter[].<iterable element>",
+				"setValues.setParameter[].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -346,9 +346,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"TypeWithSet8.setParameter[].<collection element>",
-				"TypeWithSet8.setParameter[].<collection element>",
-				"TypeWithSet8.setParameter[].<collection element>"
+				"TypeWithSet8.setParameter[].<iterable element>",
+				"TypeWithSet8.setParameter[].<iterable element>",
+				"TypeWithSet8.setParameter[].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -369,7 +369,7 @@ public class TypeAnnotationConstraintTest {
 		m.nameMap.put( "third", "Name 3" );
 		Set<ConstraintViolation<TypeWithMap1>> constraintViolations = validator.validate( m );
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "nameMap[second].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "nameMap[second].<map value>" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlank.class );
 	}
 
@@ -381,7 +381,7 @@ public class TypeAnnotationConstraintTest {
 		m.barMap.put( "foo", null );
 		Set<ConstraintViolation<TypeWithMap3>> constraintViolations = validator.validate( m );
 		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "barMap[foo].<collection element>", "barMap[bar].number" );
+		assertCorrectPropertyPaths( constraintViolations, "barMap[foo].<map value>", "barMap[bar].number" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
 	}
 
@@ -395,7 +395,7 @@ public class TypeAnnotationConstraintTest {
 		m.nameMap.put( "third", "Name 3" );
 		Set<ConstraintViolation<TypeWithMap4>> constraintViolations = validator.validate( m );
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "nameMap[second].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "nameMap[second].<map value>" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlank.class );
 
 		m = new TypeWithMap4();
@@ -416,8 +416,8 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<TypeWithMap5>> constraintViolations = validator.validate( m );
 
 		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "stringMap[first].<collection element>", "stringMap[third].<collection element>",
-				 "stringMap[third].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "stringMap[first].<map value>", "stringMap[third].<map value>",
+				 "stringMap[third].<map value>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlank.class,
@@ -443,9 +443,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"returnStringMap.<return value>[second].<collection element>",
-				"returnStringMap.<return value>[third].<collection element>",
-				"returnStringMap.<return value>[third].<collection element>"
+				"returnStringMap.<return value>[second].<map value>",
+				"returnStringMap.<return value>[third].<map value>",
+				"returnStringMap.<return value>[third].<map value>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -474,7 +474,7 @@ public class TypeAnnotationConstraintTest {
 
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getKey() ).isEqualTo( "first" );
-		assertThat( secondNode.getName() ).isEqualTo( "<collection element>" );
+		assertThat( secondNode.getName() ).isEqualTo( "<map value>" );
 		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
 	}
 
@@ -496,9 +496,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"setValues.mapParameter[second].<collection element>",
-				"setValues.mapParameter[third].<collection element>",
-				"setValues.mapParameter[third].<collection element>"
+				"setValues.mapParameter[second].<map value>",
+				"setValues.mapParameter[third].<map value>",
+				"setValues.mapParameter[third].<map value>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -525,9 +525,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"TypeWithMap8.mapParameter[second].<collection element>",
-				"TypeWithMap8.mapParameter[third].<collection element>",
-				"TypeWithMap8.mapParameter[third].<collection element>"
+				"TypeWithMap8.mapParameter[second].<map value>",
+				"TypeWithMap8.mapParameter[third].<map value>",
+				"TypeWithMap8.mapParameter[third].<map value>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -548,7 +548,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<TypeWithArray1>> constraintViolations = validator.validate( a );
 
 		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "names[1].<collection element>", "names[2].<collection element>", "names[2].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "names[1].<iterable element>", "names[2].<iterable element>", "names[2].<iterable element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlank.class,
@@ -563,7 +563,7 @@ public class TypeAnnotationConstraintTest {
 		TypeWithArray3 a = new TypeWithArray3();
 		a.bars = new Bar[]{ new Bar( 2 ), null };
 		Set<ConstraintViolation<TypeWithArray3>> constraintViolations = validator.validate( a );
-		assertCorrectPropertyPaths( constraintViolations, "bars[1].<collection element>", "bars[0].number" );
+		assertCorrectPropertyPaths( constraintViolations, "bars[1].<iterable element>", "bars[0].number" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class, NotNull.class );
 	}
 
@@ -574,7 +574,7 @@ public class TypeAnnotationConstraintTest {
 		a.names = new String[]{ "First", "", null };
 		Set<ConstraintViolation<TypeWithArray4>> constraintViolations = validator.validate( a );
 		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "names[1].<collection element>", "names[2].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "names[1].<iterable element>", "names[2].<iterable element>" );
 		assertCorrectConstraintTypes( constraintViolations, NotBlank.class, NotBlank.class );
 
 		a = new TypeWithArray4();
@@ -594,7 +594,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<TypeWithArray5>> constraintViolations = validator.validate( a );
 
 		assertNumberOfViolations( constraintViolations, 3 );
-		assertCorrectPropertyPaths( constraintViolations, "strings[0].<collection element>", "strings[2].<collection element>", "strings[2].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "strings[0].<iterable element>", "strings[2].<iterable element>", "strings[2].<iterable element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				NotBlank.class,
@@ -615,9 +615,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"returnStrings.<return value>[1].<collection element>",
-				"returnStrings.<return value>[2].<collection element>",
-				"returnStrings.<return value>[2].<collection element>"
+				"returnStrings.<return value>[1].<iterable element>",
+				"returnStrings.<return value>[2].<iterable element>",
+				"returnStrings.<return value>[2].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -646,7 +646,7 @@ public class TypeAnnotationConstraintTest {
 
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
-		assertThat( secondNode.getName() ).isEqualTo( "<collection element>" );
+		assertThat( secondNode.getName() ).isEqualTo( "<iterable element>" );
 		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
 	}
 
@@ -664,9 +664,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"setValues.arrayParameter[0].<collection element>",
-				"setValues.arrayParameter[2].<collection element>",
-				"setValues.arrayParameter[2].<collection element>"
+				"setValues.arrayParameter[0].<iterable element>",
+				"setValues.arrayParameter[2].<iterable element>",
+				"setValues.arrayParameter[2].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -689,9 +689,9 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"TypeWithArray8.arrayParameter[0].<collection element>",
-				"TypeWithArray8.arrayParameter[2].<collection element>",
-				"TypeWithArray8.arrayParameter[2].<collection element>"
+				"TypeWithArray8.arrayParameter[0].<iterable element>",
+				"TypeWithArray8.arrayParameter[2].<iterable element>",
+				"TypeWithArray8.arrayParameter[2].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -712,7 +712,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives1>> constraintViolations = validator.validate( a );
 
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ints[1].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "ints[1].<iterable element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				Min.class
@@ -728,7 +728,7 @@ public class TypeAnnotationConstraintTest {
 		a.ints = new int[]{ 6, 1 };
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives4>> constraintViolations = validator.validate( a );
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ints[1].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "ints[1].<iterable element>" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class );
 
 		a = new TypeWithArrayOfPrimitives4();
@@ -748,7 +748,7 @@ public class TypeAnnotationConstraintTest {
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives5>> constraintViolations = validator.validate( a );
 
 		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "ints[1].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "ints[1].<iterable element>" );
 		assertCorrectConstraintTypes(
 				constraintViolations,
 				Min.class
@@ -767,7 +767,7 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"returnInts.<return value>[1].<collection element>"
+				"returnInts.<return value>[1].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -794,7 +794,7 @@ public class TypeAnnotationConstraintTest {
 
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
-		assertThat( secondNode.getName() ).isEqualTo( "<collection element>" );
+		assertThat( secondNode.getName() ).isEqualTo( "<iterable element>" );
 		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
 	}
 
@@ -812,7 +812,7 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"setValues.arrayParameter[1].<collection element>"
+				"setValues.arrayParameter[1].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,
@@ -833,7 +833,7 @@ public class TypeAnnotationConstraintTest {
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"TypeWithArrayOfPrimitives8.arrayParameter[1].<collection element>"
+				"TypeWithArrayOfPrimitives8.arrayParameter[1].<iterable element>"
 		);
 		assertCorrectConstraintTypes(
 				constraintViolations,

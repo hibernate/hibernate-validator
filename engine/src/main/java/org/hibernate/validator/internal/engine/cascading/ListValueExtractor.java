@@ -22,7 +22,7 @@ class ListValueExtractor implements ValueExtractor<List<@ExtractedValue ?>> {
 	public void extractValues(List<?> originalValue, ValueReceiver receiver) {
 		int i = 0;
 		for ( Object object : originalValue ) {
-			receiver.indexedValue( "<collection element>", i, object );
+			receiver.indexedValue( "<iterable element>", i, object );
 			i++;
 		}
 	}

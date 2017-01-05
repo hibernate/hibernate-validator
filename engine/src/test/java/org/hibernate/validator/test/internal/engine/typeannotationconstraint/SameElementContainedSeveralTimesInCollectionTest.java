@@ -44,7 +44,7 @@ public class SameElementContainedSeveralTimesInCollectionTest {
 
 		Set<ConstraintViolation<ListContainer>> constraintViolations = validator.validate( listContainer );
 
-		assertCorrectPropertyPaths( constraintViolations, "values[0].<collection element>", "values[2].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "values[0].<iterable element>", "values[2].<iterable element>" );
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class SameElementContainedSeveralTimesInCollectionTest {
 
 		Set<ConstraintViolation<MapContainer>> constraintViolations = validator.validate( withMap );
 
-		assertCorrectPropertyPaths( constraintViolations, "values[EMPTY_1].<collection element>", "values[EMPTY_2].<collection element>" );
+		assertCorrectPropertyPaths( constraintViolations, "values[EMPTY_1].<map value>", "values[EMPTY_2].<map value>" );
 	}
 
 	private static class ListContainer {

@@ -19,7 +19,7 @@ class IterableValueExtractor implements ValueExtractor<Iterable<@ExtractedValue 
 	@Override
 	public void extractValues(Iterable<?> originalValue, ValueReceiver receiver) {
 		for ( Object object : originalValue ) {
-			receiver.iterableValue( "<collection element>", object );
+			receiver.iterableValue( "<iterable element>", object );
 		}
 	}
 }
