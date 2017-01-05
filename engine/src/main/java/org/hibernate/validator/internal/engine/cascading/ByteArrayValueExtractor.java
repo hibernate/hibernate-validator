@@ -17,10 +17,8 @@ class ByteArrayValueExtractor implements ValueExtractor<byte[]> {
 
 	@Override
 	public void extractValues(byte[] originalValue, ValueReceiver receiver) {
-		int i = 0;
-		for ( byte object : originalValue ) {
-			receiver.indexedValue( "<iterable element>", i, object );
-			i++;
+		for ( int i = 0; i < originalValue.length; i++ ) {
+			receiver.indexedValue( "<iterable element>", i, originalValue[i] );
 		}
 	}
 }

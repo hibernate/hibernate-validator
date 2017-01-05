@@ -17,10 +17,8 @@ class IntArrayValueExtractor implements ValueExtractor<int[]> {
 
 	@Override
 	public void extractValues(int[] originalValue, ValueReceiver receiver) {
-		int i = 0;
-		for ( int object : originalValue ) {
-			receiver.indexedValue( "<iterable element>", i, object );
-			i++;
+		for ( int i = 0; i < originalValue.length; i++ ) {
+			receiver.indexedValue( "<iterable element>", i, originalValue[i] );
 		}
 	}
 }

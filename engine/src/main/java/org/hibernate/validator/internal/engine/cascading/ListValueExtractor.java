@@ -20,10 +20,8 @@ class ListValueExtractor implements ValueExtractor<List<@ExtractedValue ?>> {
 
 	@Override
 	public void extractValues(List<?> originalValue, ValueReceiver receiver) {
-		int i = 0;
-		for ( Object object : originalValue ) {
-			receiver.indexedValue( "<iterable element>", i, object );
-			i++;
+		for ( int i = 0; i < originalValue.size(); i++ ) {
+			receiver.indexedValue( "<iterable element>", i, originalValue.get( i ) );
 		}
 	}
 }
