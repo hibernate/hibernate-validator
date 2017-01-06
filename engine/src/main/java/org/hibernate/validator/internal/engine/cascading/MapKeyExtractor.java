@@ -25,7 +25,7 @@ class MapKeyExtractor implements ValueExtractor<Map<@ExtractedValue ?, ?>> {
 		}
 
 		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.keyedValue( "<map key>", "key(" + entry.getKey() + ")", entry.getKey() );
+			receiver.keyedValue( "<map key>", entry.getKey(), entry.getKey() );
 		}
 	}
 }

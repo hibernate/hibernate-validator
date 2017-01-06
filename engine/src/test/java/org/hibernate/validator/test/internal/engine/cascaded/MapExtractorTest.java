@@ -38,7 +38,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithCascadingKeys>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[key(too short)].type", "addressByType[key(too small)].type" );
+		assertCorrectPropertyPaths( violations, "addressByType[too short].type", "addressByType[too small].type" );
 	}
 
 	@Test
@@ -52,7 +52,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithConstrainedKeys>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[key(too short)].<map key>", "addressByType[key(too small)].<map key>" );
+		assertCorrectPropertyPaths( violations, "addressByType[too short].<map key>", "addressByType[too small].<map key>" );
 	}
 
 	@Test
@@ -66,7 +66,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithCascadingKeyAndValueMap>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[too small].email", "addressByType[long enough].email", "addressByType[key(too small)].type", "addressByType[key(too short)].type" );
+		assertCorrectPropertyPaths( violations, "addressByType[too small].email", "addressByType[long enough].email", "addressByType[too small].type", "addressByType[too short].type" );
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class MapExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithConstrainedKeysAndValues>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[key(too short)].<map key>", "addressByType[key(too small)].<map key>", "addressByType[long enough].<map value>" );
+		assertCorrectPropertyPaths( violations, "addressByType[too short].<map key>", "addressByType[too small].<map key>", "addressByType[long enough].<map value>" );
 	}
 
 	private static class CustomerWithCascadingKeys {
