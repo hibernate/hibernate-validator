@@ -7,8 +7,12 @@
 package org.hibernate.validator.internal.metadata.jandex;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +21,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.validation.Valid;
+
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -125,8 +133,7 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 				returnValueConstraints,
 				typeArgumentsConstraints,
 				commonInformation.getGroupConversions(),
-				// TODO Jandex: we need to determine the TypeVariables
-				Collections.emptyList(),
+				findCascadingTypeParameters( executable ),
 				commonInformation.getUnwrapMode()
 		);
 	}
@@ -149,10 +156,10 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 	}
 
 	private ConstrainedParameter toConstrainedParameter(ParameterInformation parameterInformation, Executable executable) {
-		CommonConstraintInformation commonInformation;
-		Stream<MetaConstraint<?>> parameterConstraints;
-		Set<MetaConstraint<?>> typeArgumentsConstraints;
-		Class<?> parameterType = jandexHelper.getClassForName( parameterInformation.getType().name() );
+			CommonConstraintInformation commonInformation;
+			Stream<MetaConstraint<?>> parameterConstraints;
+			Set<MetaConstraint<?>> typeArgumentsConstraints;
+			Class<?> parameterType = jandexHelper.getClassForName( parameterInformation.getType().name() );
 
 		if ( annotationProcessingOptions.areParameterConstraintsIgnoredFor( executable, parameterInformation.getIndex() ) ) {
 			parameterConstraints = Stream.empty();
@@ -191,8 +198,7 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 				parameterConstraints.collect( Collectors.toSet() ),
 				typeArgumentsConstraints,
 				commonInformation.getGroupConversions(),
-				// TODO Jandex: we need to determine the TypeVariables
-				Collections.emptyList(),
+				findCascadingTypeParameters( executable ),
 				commonInformation.getUnwrapMode()
 		);
 	}
@@ -252,6 +258,33 @@ public class ConstrainedMethodJandexBuilder extends AbstractConstrainedElementJa
 	private boolean isSynthetic(MethodInfo methodInfo) {
 		// currently, Jandex does not expose this in a practical way
 		return ( methodInfo.flags() & ( SYNTHETIC | BRIDGE ) ) != 0;
+	}
+
+	/**
+	 * TODO: this method was directly copied from AnnotationMetaDataProvider, we will need to refactor this but it's
+	 * better to wait for the dust to settle a bit
+	 */
+	private List<TypeVariable<?>> findCascadingTypeParameters(Executable executable) {
+		boolean isArray;
+		TypeVariable<?>[] typeParameters;
+
+		if ( executable instanceof Method ) {
+			isArray =  ( (Method) executable ).getReturnType().isArray();
+			typeParameters = ( (Method) executable ).getReturnType().getTypeParameters();
+		}
+		else {
+			isArray = false;
+			typeParameters = ( (Constructor<?>) executable ).getDeclaringClass().getTypeParameters();
+		}
+		AnnotatedType annotatedType = executable.getAnnotatedReturnType();
+
+		List<TypeVariable<?>> cascadingTypeParameters = getCascadingTypeParameters( typeParameters, annotatedType );
+
+		if ( executable.isAnnotationPresent( Valid.class ) ) {
+			cascadingTypeParameters.add( isArray ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+		}
+
+		return cascadingTypeParameters;
 	}
 
 	/**

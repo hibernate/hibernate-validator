@@ -8,7 +8,11 @@ package org.hibernate.validator.internal.metadata.jandex;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
+import java.lang.reflect.AnnotatedParameterizedType;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Member;
+import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import javax.validation.Valid;
 import javax.validation.groups.ConvertGroup;
 
 import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
@@ -225,6 +230,30 @@ public abstract class AbstractConstrainedElementJandexBuilder {
 				annotation,
 				type
 		);
+	}
+
+	/**
+	 * TODO: this method was directly copied from AnnotationMetaDataProvider, we will need to refactor this but it's
+	 * better to wait for the dust to settle a bit
+	 */
+	protected List<TypeVariable<?>> getCascadingTypeParameters(TypeVariable<?>[] typeParameters, AnnotatedType annotatedType) {
+		List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
+
+		if ( annotatedType instanceof AnnotatedParameterizedType ) {
+			AnnotatedParameterizedType annotatedParameterizedType = (AnnotatedParameterizedType) annotatedType;
+			AnnotatedType[] annotatedTypeArguments = annotatedParameterizedType.getAnnotatedActualTypeArguments();
+
+			int i = 0;
+
+			for ( AnnotatedType annotatedTypeArgument : annotatedTypeArguments ) {
+				if ( annotatedTypeArgument.isAnnotationPresent( Valid.class ) ) {
+					cascadingTypeParameters.add( typeParameters[i] );
+				}
+				i++;
+			}
+		}
+
+		return cascadingTypeParameters;
 	}
 
 	/**

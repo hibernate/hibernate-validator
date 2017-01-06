@@ -7,14 +7,19 @@
 package org.hibernate.validator.internal.metadata.jandex;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
+import java.lang.reflect.TypeVariable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.validation.Valid;
+
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -69,14 +74,14 @@ public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJan
 				!typeArgumentsConstraints.isEmpty(),
 				isCascading
 		);
+
 		return new ConstrainedField(
 				ConfigurationSource.JANDEX,
-				findField( beanClass, fieldInfo ),
+				field,
 				constraints,
 				typeArgumentsConstraints,
 				commonInformation.getGroupConversions(),
-				// TODO Jandex: we need to determine the TypeVariables
-				Collections.emptyList(),
+				findCascadingTypeParameters( field ),
 				commonInformation.getUnwrapMode()
 		);
 	}
@@ -98,4 +103,22 @@ public class ConstrainedFieldJandexBuilder extends AbstractConstrainedElementJan
 	private <A extends Annotation> MetaConstraint<?> createMetaConstraint(Field member, ConstraintDescriptorImpl<A> descriptor) {
 		return new MetaConstraint<>( descriptor, ConstraintLocation.forProperty( member ) );
 	}
+
+	/**
+	 * TODO: this method was directly copied from AnnotationMetaDataProvider, we will need to refactor this but it's
+	 * better to wait for the dust to settle a bit
+	 */
+	private List<TypeVariable<?>> findCascadingTypeParameters(Field field) {
+		TypeVariable<?>[] typeParameters = field.getType().getTypeParameters();
+		AnnotatedType annotatedType = field.getAnnotatedType();
+
+		List<TypeVariable<?>> cascadingTypeParameters = getCascadingTypeParameters( typeParameters, annotatedType );
+
+		if ( field.isAnnotationPresent( Valid.class ) ) {
+			cascadingTypeParameters.add( field.getType().isArray() ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+		}
+
+		return cascadingTypeParameters;
+	}
+
 }

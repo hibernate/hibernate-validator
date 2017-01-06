@@ -239,7 +239,10 @@ public class JandexMetaDataProvider implements MetaDataProvider {
 		return null;
 	}
 
-	// TODO: this method is copied over from AnnotationMetaDataProvider. Is there anything to be done about it ?
+	/**
+	 * TODO: this method was directly copied from AnnotationMetaDataProvider, we will need to refactor this but it's
+	 * better to wait for the dust to settle a bit
+	 */
 	private static <T> DefaultGroupSequenceProvider<? super T> newGroupSequenceProviderClassInstance(Class<?> beanClass, Class<? extends DefaultGroupSequenceProvider<? super T>> providerClass) {
 		Method[] providerMethods = run( GetMethods.action( providerClass ) );
 		for ( Method method : providerMethods ) {

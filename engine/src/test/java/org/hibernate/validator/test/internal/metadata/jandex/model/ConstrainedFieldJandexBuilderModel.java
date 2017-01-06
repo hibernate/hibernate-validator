@@ -16,6 +16,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.groups.ConvertGroup;
 
+import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.test.internal.metadata.jandex.JandexMetaDataProviderTest;
 
 /**
@@ -30,13 +31,10 @@ public class ConstrainedFieldJandexBuilderModel {
 	private String var1;
 
 	@Min(value = 2, groups = Group3.class)
-	@ConvertGroup.List({
-			@ConvertGroup(from = Group1.class, to = Group2.class),
-			@ConvertGroup(from = Group3.class, to = Group2.class)
-	})
+	@ConvertGroup(from = Group1.class, to = Group2.class)
 	private String var2;
 
-	private Optional<String> optional;
+	private Optional<@NotBlank String> optional;
 
 	@Valid
 	private List<@NotNull String> list;
