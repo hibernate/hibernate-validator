@@ -35,7 +35,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.apache.log4j.Logger;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
 import org.hibernate.validator.testutil.TestForIssue;
