@@ -6,20 +6,22 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.future;
 
-import java.time.Instant;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForInstant;
-
 import static org.hibernate.validator.testutils.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+
+import java.time.Instant;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForInstant;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Tests for {@link org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForInstant}.
  *
  * @author Khalid Alqinyah
+ * @author Guillaume Smet
  */
 public class FutureValidatorForInstantTest {
 
@@ -38,5 +40,13 @@ public class FutureValidatorForInstantTest {
 		assertTrue( constraint.isValid( null, null ), "null fails validation." );
 		assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future Instant '" + future + "' fails validation." );
 		assertFalse( constraint.isValid( past, getConstraintValidatorContext() ), "Past Instant '" + past + "' validated as future." );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1198")
+	public void testEpochOverflow() {
+		Instant future = Instant.MAX;
+
+		assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future Instant '" + future + "' fails validation." );
 	}
 }

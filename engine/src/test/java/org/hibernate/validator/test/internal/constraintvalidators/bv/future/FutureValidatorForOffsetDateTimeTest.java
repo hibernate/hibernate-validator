@@ -6,21 +6,23 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.future;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForOffsetDateTime;
-
 import static org.hibernate.validator.testutils.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
+import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForOffsetDateTime;
+import org.hibernate.validator.testutil.TestForIssue;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Tests for {@link org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForOffsetDateTime}.
  *
  * @author Khalid Alqinyah
+ * @author Guillaume Smet
  */
 public class FutureValidatorForOffsetDateTimeTest {
 
@@ -43,5 +45,13 @@ public class FutureValidatorForOffsetDateTimeTest {
 			assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future OffsetDateTime '" + future + "' fails validation." );
 			assertFalse( constraint.isValid( past, getConstraintValidatorContext() ), "Past OffsetDateTime '" + past + "' validated as future." );
 		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1198")
+	public void testEpochOverflow() {
+		OffsetDateTime future = OffsetDateTime.MAX;
+
+		assertTrue( constraint.isValid( future, getConstraintValidatorContext() ), "Future OffsetDateTime '" + future + "' fails validation." );
 	}
 }

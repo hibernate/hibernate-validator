@@ -6,7 +6,10 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
@@ -19,6 +22,7 @@ import org.hibernate.validator.spi.time.TimeProvider;
  * Check that the {@code java.time.chrono.ChronoZonedDateTime} passed is in the future.
  *
  * @author Khalid Alqinyah
+ * @author Guillaume Smet
  */
 @IgnoreJava6Requirement
 public class FutureValidatorForChronoZonedDateTime implements ConstraintValidator<Future, ChronoZonedDateTime<?>> {
@@ -37,8 +41,8 @@ public class FutureValidatorForChronoZonedDateTime implements ConstraintValidato
 
 		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
 				.getTimeProvider();
-		long now = timeProvider.getCurrentTime();
+		ZonedDateTime reference = ZonedDateTime.ofInstant( Instant.ofEpochMilli( timeProvider.getCurrentTime() ), value.getZone() );
 
-		return value.toInstant().toEpochMilli() > now;
+		return value.compareTo( reference ) > 0;
 	}
 }

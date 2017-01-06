@@ -6,7 +6,9 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.future;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Future;
@@ -37,8 +39,8 @@ public class FutureValidatorForOffsetDateTime implements ConstraintValidator<Fut
 
 		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
 				.getTimeProvider();
-		long now = timeProvider.getCurrentTime();
+		OffsetDateTime reference = OffsetDateTime.ofInstant( Instant.ofEpochMilli( timeProvider.getCurrentTime() ), value.getOffset() );
 
-		return value.toInstant().toEpochMilli() > now;
+		return value.compareTo( reference ) > 0;
 	}
 }

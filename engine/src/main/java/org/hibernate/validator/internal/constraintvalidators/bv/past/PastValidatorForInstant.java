@@ -19,6 +19,7 @@ import org.hibernate.validator.spi.time.TimeProvider;
  * Check that the {@code java.time.Instant} passed is in the past.
  *
  * @author Khalid Alqinyah
+ * @author Guillaume Smet
  */
 @IgnoreJava6Requirement
 public class PastValidatorForInstant implements ConstraintValidator<Past, Instant> {
@@ -37,8 +38,8 @@ public class PastValidatorForInstant implements ConstraintValidator<Past, Instan
 
 		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
 				.getTimeProvider();
-		long now = timeProvider.getCurrentTime();
+		Instant reference = Instant.ofEpochMilli( timeProvider.getCurrentTime() );
 
-		return value.toEpochMilli() < now;
+		return value.compareTo( reference ) < 0;
 	}
 }

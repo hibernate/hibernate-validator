@@ -11,6 +11,7 @@ import java.time.Instant;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForInstant;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.testutils.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
@@ -20,6 +21,7 @@ import static org.testng.Assert.assertTrue;
  * Tests for {@link org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForInstant}.
  *
  * @author Khalid Alqinyah
+ * @author Guillaume Smet
  */
 public class PastValidatorForInstantTest {
 
@@ -38,5 +40,13 @@ public class PastValidatorForInstantTest {
 		assertTrue( constraint.isValid( null, null ), "null fails validation." );
 		assertTrue( constraint.isValid( past, getConstraintValidatorContext() ), "Past Instant '" + past + "' fails validation." );
 		assertFalse( constraint.isValid( future, getConstraintValidatorContext() ), "Future Instant '" + future + "' validated as past." );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1198")
+	public void testEpochOverflow() {
+		Instant past = Instant.MAX;
+
+		assertFalse( constraint.isValid( past, getConstraintValidatorContext() ), "Future Instant '" + past + "' fails validation." );
 	}
 }

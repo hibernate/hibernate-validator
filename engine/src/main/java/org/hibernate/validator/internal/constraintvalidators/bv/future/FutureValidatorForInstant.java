@@ -19,6 +19,7 @@ import org.hibernate.validator.spi.time.TimeProvider;
  * Check that the {@code java.time.Instant} passed is in the future.
  *
  * @author Khalid Alqinyah
+ * @author Guillaume Smet
  */
 @IgnoreJava6Requirement
 public class FutureValidatorForInstant implements ConstraintValidator<Future, Instant> {
@@ -37,8 +38,8 @@ public class FutureValidatorForInstant implements ConstraintValidator<Future, In
 
 		TimeProvider timeProvider = context.unwrap( HibernateConstraintValidatorContext.class )
 				.getTimeProvider();
-		long now = timeProvider.getCurrentTime();
+		Instant reference = Instant.ofEpochMilli( timeProvider.getCurrentTime() );
 
-		return value.toEpochMilli() > now;
+		return value.compareTo( reference ) > 0;
 	}
 }

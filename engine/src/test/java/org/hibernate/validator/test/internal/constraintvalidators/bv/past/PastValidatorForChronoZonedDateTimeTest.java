@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.bv.past;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -13,6 +15,7 @@ import java.time.ZonedDateTime;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoZonedDateTime;
+import org.hibernate.validator.testutil.TestForIssue;
 
 import static org.hibernate.validator.testutils.ValidatorUtil.getConstraintValidatorContext;
 import static org.testng.Assert.assertFalse;
@@ -22,6 +25,7 @@ import static org.testng.Assert.assertTrue;
  * Tests for {@link org.hibernate.validator.internal.constraintvalidators.bv.past.PastValidatorForChronoZonedDateTime}.
  *
  * @author Khalid Alqinyah
+ * @author Guillaume Smet
  */
 public class PastValidatorForChronoZonedDateTimeTest {
 
@@ -44,5 +48,13 @@ public class PastValidatorForChronoZonedDateTimeTest {
 			assertTrue( constraint.isValid( past, getConstraintValidatorContext() ), "Past ZonedDateTime '" + past + "' fails validation." );
 			assertFalse( constraint.isValid( future, getConstraintValidatorContext() ), "Future ZonedDateTime '" + future + "' validated as past." );
 		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1198")
+	public void testEpochOverflow() {
+		ZonedDateTime future = ZonedDateTime.of( LocalDate.MAX, LocalTime.MAX, ZoneId.of( "GMT" ) );
+
+		assertFalse( constraint.isValid( future, getConstraintValidatorContext() ), "Future ZonedDateTime '" + future + "' fails validation." );
 	}
 }
