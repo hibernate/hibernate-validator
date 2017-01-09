@@ -13,15 +13,15 @@ import java.util.ServiceLoader;
 import javax.money.spi.ServiceProvider;
 
 /**
- * A {@link ServiceProvider} using a given class loader.
+ * A javax.money {@link ServiceProvider} using a given class loader.
  *
  * @author Guillaume Smet
  */
-public class ClassLoaderAwareJavaxMoneyServiceProvider implements ServiceProvider {
+public class ExternalClassLoaderJavaxMoneyServiceProvider implements ServiceProvider {
 
 	private final ClassLoader classLoader;
 
-	public ClassLoaderAwareJavaxMoneyServiceProvider(ClassLoader externalClassLoader) {
+	public ExternalClassLoaderJavaxMoneyServiceProvider(ClassLoader externalClassLoader) {
 		this.classLoader = externalClassLoader;
 	}
 

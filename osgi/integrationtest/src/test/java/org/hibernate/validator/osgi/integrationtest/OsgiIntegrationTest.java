@@ -53,7 +53,7 @@ import com.example.CustomerDecimalMin;
 import com.example.ExampleConstraintValidatorFactory;
 import com.example.Order;
 import com.example.RetailOrder;
-import com.example.money.ClassLoaderAwareJavaxMoneyServiceProvider;
+import com.example.money.ExternalClassLoaderJavaxMoneyServiceProvider;
 import com.example.money.JavaxMoneyOrder;
 
 /**
@@ -238,7 +238,7 @@ public class OsgiIntegrationTest {
 
 	@Test
 	public void canUseJavaxMoneyConstraints() {
-		Bootstrap.init( new ClassLoaderAwareJavaxMoneyServiceProvider( MonetaryConfig.class.getClassLoader() ) );
+		Bootstrap.init( new ExternalClassLoaderJavaxMoneyServiceProvider( MonetaryConfig.class.getClassLoader() ) );
 
 		Set<ConstraintViolation<JavaxMoneyOrder>> constraintViolations = Validation.byProvider( HibernateValidator.class )
 				.providerResolver( new MyValidationProviderResolver() )
