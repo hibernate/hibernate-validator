@@ -12,6 +12,8 @@
     <deployment>
         <dependencies>
             <module name="org.joda.time" />
+            <module name="javax.money.api" />
+            <module name="org.javamoney.moneta" services="export" />
         </dependencies>
     </deployment>
 </jboss-deployment-structure>
