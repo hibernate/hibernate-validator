@@ -2,10 +2,16 @@ println "[INFO] ----------------------------------------------------------------
 println "[INFO] UPDATING BEAN VALIDATION RELATED WILDFLY MODULES                        ";
 println "[INFO] ------------------------------------------------------------------------";
 
-def processFileInplace(file, Closure processText) {
+def processFileInplace(File file, Closure processText) {
     def text = file.text
     file.write( processText( text ) )
 }
+
+def appendDependency(File file, String dependencyToAppend, boolean optional) {
+    file.write( file.text.replaceAll( /<\/dependencies>/, '  <module name="' + dependencyToAppend + '"' + ( optional ? ' optional="true"' : '' ) + '/>\n  </dependencies>' ) )
+}
+
+new File( project.properties['wildflyPatchedTargetDir'], 'modules/system/layers/base/javax/validation/api/main/validation-api-1.1.0.Final.jar' ).delete()
 
 // HV
 hvModuleXml = new File( project.properties['wildflyPatchedTargetDir'], 'modules/system/layers/base/org/hibernate/validator/main/module.xml' )
@@ -14,6 +20,7 @@ println "[INFO] Using HV version " + hvArtifactName;
 processFileInplace( hvModuleXml ) { text ->
     text.replaceAll( /hibernate-validator.*jar/, hvArtifactName )
 }
+appendDependency( hvModuleXml, "javax.money.api", true )
 
 new File( project.properties['wildflyPatchedTargetDir'], 'modules/system/layers/base/org/hibernate/validator/main/hibernate-validator-5.2.4.Final.jar' ).delete()
 

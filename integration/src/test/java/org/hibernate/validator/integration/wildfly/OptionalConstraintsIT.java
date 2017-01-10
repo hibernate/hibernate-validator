@@ -11,12 +11,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.money.MonetaryAmount;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Future;
 
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.integration.AbstractArquillianIT;
+import org.javamoney.moneta.Money;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
@@ -27,23 +30,12 @@ import org.testng.annotations.Test;
  * Asserts that the constraints based on the JodaTime and JSoup server modules can be used.
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class OptionalConstraintsIT extends AbstractArquillianIT {
 
 	private static final String WAR_FILE_NAME = OptionalConstraintsIT.class
 			.getSimpleName() + ".war";
-
-	public static class Shipment {
-
-		@Future
-		public DateTime deliveryDate = new DateTime( 2014, 10, 21, 0, 0, 0, 0 );
-	}
-
-	public static class Item {
-
-		@SafeHtml
-		public String descriptionHtml = "<script>Cross-site scripting https://en.wikipedia.org/wiki/42<script/>";
-	}
 
 	@Deployment
 	public static Archive<?> createTestArchive() {
@@ -71,4 +63,35 @@ public class OptionalConstraintsIT extends AbstractArquillianIT {
 		assertThat( violations.size() ).isEqualTo( 1 );
 		assertThat( violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo( SafeHtml.class );
 	}
+
+	@Test
+	public void canUseJavaMoneyBasedConstraint() {
+		Set<ConstraintViolation<Order>> violations = validator.validate( new Order( Money.of( 1200.0, "EUR" ) ) );
+
+		assertThat( violations.size() ).isEqualTo( 1 );
+		assertThat( violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo( DecimalMax.class );
+	}
+
+	private static class Shipment {
+
+		@Future
+		public DateTime deliveryDate = new DateTime( 2014, 10, 21, 0, 0, 0, 0 );
+	}
+
+	private static class Item {
+
+		@SafeHtml
+		public String descriptionHtml = "<script>Cross-site scripting https://en.wikipedia.org/wiki/42<script/>";
+	}
+
+	private static class Order {
+
+		@DecimalMax("1000")
+		private MonetaryAmount amount;
+
+		private Order(MonetaryAmount amount) {
+			this.amount = amount;
+		}
+	}
+
 }

@@ -22,6 +22,7 @@
 
     <properties>
         <wildflyTargetDir>${basedir}/target/wildfly-${wildfly.version}</wildflyTargetDir>
+        <wildflyModulesDir>${wildflyTargetDir}/modules/system/layers/base</wildflyModulesDir>
     </properties>
 
     <dependencies>
@@ -59,6 +60,16 @@
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.money</groupId>
+            <artifactId>money-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.javamoney</groupId>
+            <artifactId>moneta</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -165,6 +176,50 @@
                                     <outputDirectory>${project.build.directory}</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-javamoney</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>javax.money</groupId>
+                                    <artifactId>money-api</artifactId>
+                                    <version>${javax-money.version}</version>
+                                    <outputDirectory>${wildflyModulesDir}/javax/money/api/main/</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.javamoney</groupId>
+                                    <artifactId>moneta</artifactId>
+                                    <version>${moneta.version}</version>
+                                    <outputDirectory>${wildflyModulesDir}/org/javamoney/moneta/main/</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${wildflyModulesDir}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/test/modules</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
