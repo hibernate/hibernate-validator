@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.time.past;
 
-import java.time.Clock;
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -16,11 +16,11 @@ import java.util.Date;
  * @author Alaa Nassef
  * @author Guillaume Smet
  */
-public class PastValidatorForDate extends AbstractPastEpochBasedValidator<Date> {
+public class PastValidatorForDate extends AbstractPastInstantBasedValidator<Date> {
 
 	@Override
-	protected long getEpochMillis(Date value, Clock reference) {
-		return value.getTime();
+	protected Instant getInstant(Date value) {
+		return value.toInstant();
 	}
 
 }
