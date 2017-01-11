@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.time.future;
 
-import java.time.Clock;
+import java.time.Instant;
 import java.util.Calendar;
 
 /**
@@ -16,11 +16,11 @@ import java.util.Calendar;
  * @author Alaa Nassef
  * @author Guillaume Smet
  */
-public class FutureValidatorForCalendar extends AbstractFutureEpochBasedValidator<Calendar> {
+public class FutureValidatorForCalendar extends AbstractFutureInstantBasedValidator<Calendar> {
 
 	@Override
-	protected long getEpochMillis(Calendar value, Clock reference) {
-		return value.getTimeInMillis();
+	protected Instant getInstant(Calendar value) {
+		return value.toInstant();
 	}
 
 }
