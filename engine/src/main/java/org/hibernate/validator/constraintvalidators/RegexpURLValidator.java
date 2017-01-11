@@ -12,6 +12,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.URL;
+import org.hibernate.validator.internal.util.DomainNameUtil;
 
 /**
  * Validate that the character sequence (e.g. string) is a valid URL using a regular expression.
@@ -51,6 +52,10 @@ public class RegexpURLValidator implements ConstraintValidator<URL, CharSequence
 
 		ValueHolder values = parseUrl( value.toString() );
 		if ( values == null ) {
+			return false;
+		}
+
+		if ( !DomainNameUtil.isValidDomainAddress( values.getHost() ) ) {
 			return false;
 		}
 

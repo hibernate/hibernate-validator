@@ -339,23 +339,28 @@ public class URLValidatorTest {
 		assertFalse( validator.isValid( "///a", null ) );
 		assertFalse( validator.isValid( "foo.com", null ) );
 		assertFalse( validator.isValid( ":// should fail", null ) );
-//		assertFalse( validator.isValid( "rdar://1234", null ) );
-//		assertFalse( validator.isValid( "ftps://foo.bar/", null ) );
-//		assertFalse( validator.isValid( "h://test", null ) );
+
+		if ( validator instanceof URLValidator ) {
+			// 'exotic' protocols are considered valid using RegexpURLValidator but not URLValidator
+			// as the last one doesn't allow unknown protocols
+			assertFalse( validator.isValid( "rdar://1234", null ) );
+			assertFalse( validator.isValid( "ftps://foo.bar/", null ) );
+			assertFalse( validator.isValid( "h://test", null ) );
+		}
 
 		if ( validator instanceof RegexpURLValidator ) {
-//			assertFalse( validator.isValid( "http://", null ) );
-//			assertFalse( validator.isValid( "http://.", null ) );
-//			assertFalse( validator.isValid( "http://..", null ) );
-//			assertFalse( validator.isValid( "http://../", null ) );
-//			assertFalse( validator.isValid( "http://?", null ) );
-//			assertFalse( validator.isValid( "http://??", null ) );
-//			assertFalse( validator.isValid( "http://??/", null ) );
-//			assertFalse( validator.isValid( "http://#", null ) );
-//			assertFalse( validator.isValid( "http://##", null ) );
-//			assertFalse( validator.isValid( "http://##/", null ) );
+			assertFalse( validator.isValid( "http://", null ) );
+			assertFalse( validator.isValid( "http://.", null ) );
+			assertFalse( validator.isValid( "http://..", null ) );
+			assertFalse( validator.isValid( "http://../", null ) );
+			assertFalse( validator.isValid( "http://?", null ) );
+			assertFalse( validator.isValid( "http://??", null ) );
+			assertFalse( validator.isValid( "http://??/", null ) );
+			assertFalse( validator.isValid( "http://#", null ) );
+			assertFalse( validator.isValid( "http://##", null ) );
+			assertFalse( validator.isValid( "http://##/", null ) );
 			assertFalse( validator.isValid( "http://foo.bar?q=Spaces should be encoded", null ) );
-//			assertFalse( validator.isValid( "http:///a", null ) );
+			assertFalse( validator.isValid( "http:///a", null ) );
 			assertFalse( validator.isValid( "http:// shouldfail.com", null ) );
 			assertFalse( validator.isValid( "http://foo.bar/foo(bar)baz quux", null ) );
 //			assertFalse( validator.isValid( "http://-error-.invalid/", null ) );
@@ -369,9 +374,9 @@ public class URLValidatorTest {
 //			assertFalse( validator.isValid( "http://1.1.1.1.1", null ) );
 //			assertFalse( validator.isValid( "http://123.123.123", null ) );
 //			assertFalse( validator.isValid( "http://3628126748", null ) );
-//			assertFalse( validator.isValid( "http://.www.foo.bar/", null ) );
-//			assertFalse( validator.isValid( "http://www.foo.bar./", null ) );
-//			assertFalse( validator.isValid( "http://.www.foo.bar./", null ) );
+			assertFalse( validator.isValid( "http://.www.foo.bar/", null ) );
+			assertFalse( validator.isValid( "http://www.foo.bar./", null ) );
+			assertFalse( validator.isValid( "http://.www.foo.bar./", null ) );
 //			assertFalse( validator.isValid( "http://10.1.1.1", null ) );
 //			assertFalse( validator.isValid( "http://10.1.1.254", null ) );
 		}
