@@ -44,6 +44,7 @@ import javax.validation.constraints.Size;
 import javax.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.constraints.ConstraintComposition;
+import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
@@ -76,6 +77,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForN
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.CurrencyValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMaxValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMinValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MaxValidatorForMonetaryAmount;
@@ -184,6 +186,7 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, CPF.class, CPFValidator.class );
 
 		if ( isJavaMoneyInClasspath() ) {
+			putConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );
 			putConstraints( tmpConstraints, DecimalMax.class, Arrays.asList( DecimalMaxValidatorForNumber.class,
 					DecimalMaxValidatorForCharSequence.class, DecimalMaxValidatorForMonetaryAmount.class ) );
 			putConstraints( tmpConstraints, DecimalMin.class, Arrays.asList( DecimalMinValidatorForNumber.class,

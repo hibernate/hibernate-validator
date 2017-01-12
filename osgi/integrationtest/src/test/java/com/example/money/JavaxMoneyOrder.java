@@ -9,6 +9,7 @@ package com.example.money;
 import javax.money.MonetaryAmount;
 import javax.validation.constraints.DecimalMin;
 
+import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
@@ -20,6 +21,7 @@ public class JavaxMoneyOrder {
 	private String name;
 
 	@DecimalMin(value = "100")
+	@Currency("EUR")
 	private MonetaryAmount amount;
 
 	public JavaxMoneyOrder(String name, MonetaryAmount amount) {

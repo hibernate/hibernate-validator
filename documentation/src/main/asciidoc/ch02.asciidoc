@@ -625,6 +625,11 @@ level constraint.
  allows to ignore non digit characters. The default is `false`.
 |None
 
+|`@Currency(value=)`
+|any sub-type of `javax.money.MonetaryAmount` (if the https://jcp.org/en/jsr/detail?id=354[JSR 354 API] and an implementation is on the class path)
+|Checks that the annotated `javax.money.MonetaryAmount` currency unit is part of the specified currency units.
+|None
+
 |`@EAN`
 |`CharSequence`
 |Checks that the annotated character sequence is a valid

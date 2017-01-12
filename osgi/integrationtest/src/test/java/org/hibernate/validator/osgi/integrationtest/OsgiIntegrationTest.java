@@ -30,6 +30,7 @@ import javax.money.spi.Bootstrap;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidationProviderResolver;
+import javax.validation.Validator;
 import javax.validation.spi.ValidationProvider;
 
 import org.hibernate.validator.HibernateValidator;
@@ -235,15 +236,21 @@ public class OsgiIntegrationTest {
 	public void canUseJavaxMoneyConstraints() {
 		Bootstrap.init( new ExternalClassLoaderJavaxMoneyServiceProvider( MonetaryConfig.class.getClassLoader() ) );
 
-		Set<ConstraintViolation<JavaxMoneyOrder>> constraintViolations = Validation.byProvider( HibernateValidator.class )
+		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
 				.externalClassLoader( getClass().getClassLoader() )
 				.buildValidatorFactory()
-				.getValidator()
-				.validate( new JavaxMoneyOrder( "Order 1", Money.of( 0, "EUR" ) ) );
+				.getValidator();
+
+		Set<ConstraintViolation<JavaxMoneyOrder>> constraintViolations = validator.validate( new JavaxMoneyOrder( "Order 1", Money.of( 0, "EUR" ) ) );
 
 		assertEquals( 1, constraintViolations.size() );
 		assertEquals( "must be greater than or equal to 100", constraintViolations.iterator().next().getMessage() );
+
+		constraintViolations = validator.validate( new JavaxMoneyOrder( "Order 1", Money.of( 120, "USD" ) ) );
+
+		assertEquals( 1, constraintViolations.size() );
+		assertEquals( "invalid currency (must be one of [EUR])", constraintViolations.iterator().next().getMessage() );
 	}
 
 	private ExpressionFactory buildExpressionFactory() {

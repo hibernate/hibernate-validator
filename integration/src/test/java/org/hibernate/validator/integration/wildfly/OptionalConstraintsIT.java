@@ -17,6 +17,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.Future;
 
+import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.integration.AbstractArquillianIT;
 import org.javamoney.moneta.Money;
@@ -70,6 +71,11 @@ public class OptionalConstraintsIT extends AbstractArquillianIT {
 
 		assertThat( violations.size() ).isEqualTo( 1 );
 		assertThat( violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo( DecimalMax.class );
+
+		violations = validator.validate( new Order( Money.of( 900.0, "USD" ) ) );
+
+		assertThat( violations.size() ).isEqualTo( 1 );
+		assertThat( violations.iterator().next().getConstraintDescriptor().getAnnotation().annotationType() ).isEqualTo( Currency.class );
 	}
 
 	private static class Shipment {
@@ -87,6 +93,7 @@ public class OptionalConstraintsIT extends AbstractArquillianIT {
 	private static class Order {
 
 		@DecimalMax("1000")
+		@Currency("EUR")
 		private MonetaryAmount amount;
 
 		private Order(MonetaryAmount amount) {
