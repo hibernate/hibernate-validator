@@ -42,6 +42,7 @@ import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 
 import org.hibernate.validator.constraints.ConstraintComposition;
+import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.EAN;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
@@ -81,6 +82,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureVal
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForOffsetDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadableInstant;
 import org.hibernate.validator.internal.constraintvalidators.bv.future.FutureValidatorForReadablePartial;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.CurrencyValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMaxValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMinValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MaxValidatorForMonetaryAmount;
@@ -160,6 +162,7 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, CPF.class, CPFValidator.class );
 
 		if ( isJavaMoneyInClasspath() ) {
+			putConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );
 			putConstraints( tmpConstraints, DecimalMax.class, DecimalMaxValidatorForNumber.class,
 					DecimalMaxValidatorForCharSequence.class, DecimalMaxValidatorForMonetaryAmount.class );
 			putConstraints( tmpConstraints, DecimalMin.class, DecimalMinValidatorForNumber.class,
