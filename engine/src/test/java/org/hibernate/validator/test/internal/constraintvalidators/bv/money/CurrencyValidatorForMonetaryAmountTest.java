@@ -11,6 +11,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.lang.annotation.ElementType;
 import java.util.Set;
 
 import javax.money.MonetaryAmount;
@@ -19,6 +20,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.CurrencyDef;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.CurrencyValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
@@ -63,6 +68,24 @@ public class CurrencyValidatorForMonetaryAmountTest {
 		assertCorrectConstraintViolationMessages( violations, "invalid currency (must be one of [EUR, USD])" );
 	}
 
+	@Test
+	public void programmaticDefinition() {
+		HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class ).configure();
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( Order.class )
+			.ignoreAllAnnotations()
+			.property( "amount", ElementType.FIELD )
+				.constraint( new CurrencyDef().value( "EUR", "USD" ) );
+
+		Validator validator = config.addMapping( mapping )
+			.buildValidatorFactory()
+			.getValidator();
+
+		Set<ConstraintViolation<Order>> violations = validator.validate( new Order( Money.of( 100, "GBP" ) ) );
+		assertNumberOfViolations( violations, 1 );
+		assertCorrectConstraintViolationMessages( violations, "invalid currency (must be one of [EUR, USD])" );
+	}
+
 	private Currency currency(String... acceptedCurrencies) {
 		AnnotationDescriptor<Currency> descriptor = new AnnotationDescriptor<>( Currency.class );
 		descriptor.setValue( "value", acceptedCurrencies );
@@ -72,7 +95,7 @@ public class CurrencyValidatorForMonetaryAmountTest {
 	private static class Order {
 
 		@Currency({ "EUR", "USD" })
-		private MonetaryAmount amount;
+		private final MonetaryAmount amount;
 
 		private Order(MonetaryAmount amount) {
 			this.amount = amount;
