@@ -8,11 +8,13 @@ package org.hibernate.validator.internal.metadata.core;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.List;
+
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
@@ -37,16 +39,48 @@ public class MetaConstraints {
 
 	public static <A extends Annotation> MetaConstraint<A> create(TypeResolutionHelper typeResolutionHelper, ValueExtractors valueExtractors,
 			ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location) {
-		ValueExtractorDescriptor valueExtractorDescriptor = valueExtractors.forLocation( location );
-
+		ValueExtractorDescriptor valueExtractorDescriptor;
 		Type typeOfValidatedElement;
-		if ( !( location instanceof TypeArgumentConstraintLocation ) && location.getUnwrapMode() == UnwrapMode.UNWRAP ) {
-			typeOfValidatedElement = getSingleTypeParameterBind( typeResolutionHelper,
-					location.getTypeForValidatorResolution(),
-					valueExtractorDescriptor.getExtractedType() );
+
+		if ( location instanceof TypeArgumentConstraintLocation ) {
+			TypeArgumentConstraintLocation typeArgumentConstraintLocation = (TypeArgumentConstraintLocation) location;
+
+			Class<?> declaredType = TypeHelper.getErasedReferenceType( typeArgumentConstraintLocation.getDelegate().getTypeForValidatorResolution() );
+			TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
+
+			valueExtractorDescriptor = valueExtractors.getCascadedValueExtractor( declaredType, typeParameter );
+			typeOfValidatedElement = location.getTypeForValidatorResolution();
+
+			if ( valueExtractorDescriptor == null ) {
+				throw LOG.getNoValueExtractorFoundForTypeException( declaredType, typeParameter );
+			}
 		}
 		else {
-			typeOfValidatedElement = location.getTypeForValidatorResolution();
+			if ( ValidateUnwrappedValue.NO.equals( constraintDescriptor.validateUnwrappedValue() ) ) {
+				valueExtractorDescriptor = null;
+				typeOfValidatedElement = location.getTypeForValidatorResolution();
+			}
+			else {
+				Class<?> declaredType = TypeHelper.getErasedReferenceType( location.getTypeForValidatorResolution() );
+				ValueExtractorDescriptor valueExtractorDescriptorCandidate = valueExtractors.getValueExtractor( declaredType );
+
+				if ( ValidateUnwrappedValue.DEFAULT.equals( constraintDescriptor.validateUnwrappedValue() )
+						&& ( valueExtractorDescriptorCandidate == null
+								|| !valueExtractorDescriptorCandidate.constraintsApplyToWrappedValue() ) ) {
+					valueExtractorDescriptor = null;
+					typeOfValidatedElement = location.getTypeForValidatorResolution();
+				}
+				else {
+					if ( valueExtractorDescriptorCandidate == null ) {
+						throw LOG.getNoValueExtractorFoundForTypeException( declaredType, null );
+					}
+
+					valueExtractorDescriptor = valueExtractorDescriptorCandidate;
+					typeOfValidatedElement = getSingleTypeParameterBind( typeResolutionHelper,
+							location.getTypeForValidatorResolution(),
+							valueExtractorDescriptor.getExtractedType() );
+				}
+			}
 		}
 
 		return new MetaConstraint<A>( constraintDescriptor, location, valueExtractorDescriptor, typeOfValidatedElement );

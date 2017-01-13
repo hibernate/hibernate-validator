@@ -167,6 +167,9 @@ public class ConstraintHelper {
 	public static final String PAYLOAD = "payload";
 	public static final String MESSAGE = "message";
 	public static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
+	public static final String VALIDATE_UNWRAPPED_VALUE = "validateUnwrappedValue";
+
+	private static final List<String> SUPPORTED_VALID_METHODS = Arrays.asList( VALIDATION_APPLIES_TO, VALIDATE_UNWRAPPED_VALUE );
 
 	private static final Log log = LoggerFactory.make();
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";
@@ -498,7 +501,7 @@ public class ConstraintHelper {
 	private void assertNoParameterStartsWithValid(Class<? extends Annotation> annotationType) {
 		final Method[] methods = run( GetDeclaredMethods.action( annotationType ) );
 		for ( Method m : methods ) {
-			if ( m.getName().startsWith( "valid" ) && !m.getName().equals( VALIDATION_APPLIES_TO ) ) {
+			if ( m.getName().startsWith( "valid" ) && !SUPPORTED_VALID_METHODS.contains( m.getName() ) ) {
 				throw log.getConstraintParametersCannotStartWithValidException();
 			}
 		}

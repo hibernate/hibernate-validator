@@ -37,10 +37,12 @@ import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.ValidationException;
+import javax.validation.constraints.Min;
 import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
@@ -252,6 +254,15 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	@Override
 	public ConstraintTarget getValidationAppliesTo() {
 		return (ConstraintTarget) attributes.get( ConstraintHelper.VALIDATION_APPLIES_TO );
+	}
+
+	@Override
+	public ValidateUnwrappedValue validateUnwrappedValue() {
+		ValidateUnwrappedValue validateUnwrappedValue = (ValidateUnwrappedValue) attributes.get( ConstraintHelper.VALIDATE_UNWRAPPED_VALUE );
+		if ( validateUnwrappedValue == null ) {
+			validateUnwrappedValue = ValidateUnwrappedValue.DEFAULT;
+		}
+		return validateUnwrappedValue;
 	}
 
 	@Override

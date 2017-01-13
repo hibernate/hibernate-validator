@@ -12,7 +12,9 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
+import javax.validation.valueextraction.ConstraintsApplyTo;
 import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.ValidationTarget;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.util.StringHelper;
@@ -24,6 +26,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * Describes a {@link ValueExtractor}.
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ValueExtractorDescriptor {
 
@@ -32,11 +35,13 @@ public class ValueExtractorDescriptor {
 	private final ValueExtractor<?> valueExtractor;
 	private final Type extractedType;
 	private final TypeVariable<?> extractedTypeParameter;
+	private final boolean constraintsApplyToWrappedValue;
 
 	public ValueExtractorDescriptor(ValueExtractor<?> valueExtractor) {
 		this.valueExtractor = valueExtractor;
 		this.extractedTypeParameter = getExtractedTypeParameter( valueExtractor.getClass() );
 		this.extractedType = getExtractedType( valueExtractor.getClass() );
+		this.constraintsApplyToWrappedValue = constraintsApplyToWrappedValue( valueExtractor.getClass() );
 	}
 
 	private static TypeVariable<?> getExtractedTypeParameter(Class<?> extractorImplementationType) {
@@ -85,6 +90,16 @@ public class ValueExtractorDescriptor {
 		return extractedType.getType();
 	}
 
+	private static boolean constraintsApplyToWrappedValue(Class<?> extractorImplementationType) {
+		ConstraintsApplyTo constraintsApplyTo = extractorImplementationType.getAnnotation( ConstraintsApplyTo.class );
+
+		if ( constraintsApplyTo == null ) {
+			return false;
+		}
+
+		return ValidationTarget.WRAPPED_VALUE.equals( constraintsApplyTo.value() );
+	}
+
 	public Type getExtractedType() {
 		return extractedType;
 	}
@@ -97,9 +112,13 @@ public class ValueExtractorDescriptor {
 		return valueExtractor;
 	}
 
+	public boolean constraintsApplyToWrappedValue() {
+		return constraintsApplyToWrappedValue;
+	}
+
 	@Override
 	public String toString() {
 		return "ValueExtractorDescriptor [valueExtractor=" + StringHelper.toShortString( valueExtractor.getClass() ) + ", extractedType=" + StringHelper.toShortString( extractedType )
-				+ ", extractedTypeParameter=" + extractedTypeParameter + "]";
+				+ ", extractedTypeParameter=" + extractedTypeParameter + ", constraintsApplyToWrappedValue=" + constraintsApplyToWrappedValue + "]";
 	}
 }
