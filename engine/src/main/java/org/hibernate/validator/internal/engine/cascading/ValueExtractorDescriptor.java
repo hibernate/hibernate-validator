@@ -12,9 +12,8 @@ import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-import javax.validation.valueextraction.ConstraintsApplyTo;
 import javax.validation.valueextraction.ExtractedValue;
-import javax.validation.valueextraction.ValidationTarget;
+import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.util.StringHelper;
@@ -35,13 +34,13 @@ public class ValueExtractorDescriptor {
 	private final ValueExtractor<?> valueExtractor;
 	private final Type extractedType;
 	private final TypeVariable<?> extractedTypeParameter;
-	private final boolean constraintsApplyToWrappedValue;
+	private final boolean unwrapByDefault;
 
 	public ValueExtractorDescriptor(ValueExtractor<?> valueExtractor) {
 		this.valueExtractor = valueExtractor;
 		this.extractedTypeParameter = getExtractedTypeParameter( valueExtractor.getClass() );
 		this.extractedType = getExtractedType( valueExtractor.getClass() );
-		this.constraintsApplyToWrappedValue = constraintsApplyToWrappedValue( valueExtractor.getClass() );
+		this.unwrapByDefault = hasUnwrapByDefaultAnnotation( valueExtractor.getClass() );
 	}
 
 	private static TypeVariable<?> getExtractedTypeParameter(Class<?> extractorImplementationType) {
@@ -90,14 +89,8 @@ public class ValueExtractorDescriptor {
 		return extractedType.getType();
 	}
 
-	private static boolean constraintsApplyToWrappedValue(Class<?> extractorImplementationType) {
-		ConstraintsApplyTo constraintsApplyTo = extractorImplementationType.getAnnotation( ConstraintsApplyTo.class );
-
-		if ( constraintsApplyTo == null ) {
-			return false;
-		}
-
-		return ValidationTarget.WRAPPED_VALUE.equals( constraintsApplyTo.value() );
+	private static boolean hasUnwrapByDefaultAnnotation(Class<?> extractorImplementationType) {
+		return extractorImplementationType.isAnnotationPresent( UnwrapByDefault.class );
 	}
 
 	public Type getExtractedType() {
@@ -112,13 +105,13 @@ public class ValueExtractorDescriptor {
 		return valueExtractor;
 	}
 
-	public boolean constraintsApplyToWrappedValue() {
-		return constraintsApplyToWrappedValue;
+	public boolean unwrapByDefault() {
+		return unwrapByDefault;
 	}
 
 	@Override
 	public String toString() {
 		return "ValueExtractorDescriptor [valueExtractor=" + StringHelper.toShortString( valueExtractor.getClass() ) + ", extractedType=" + StringHelper.toShortString( extractedType )
-				+ ", extractedTypeParameter=" + extractedTypeParameter + ", constraintsApplyToWrappedValue=" + constraintsApplyToWrappedValue + "]";
+				+ ", extractedTypeParameter=" + extractedTypeParameter + ", unwrapByDefault=" + unwrapByDefault + "]";
 	}
 }
