@@ -1,6 +1,20 @@
 Hibernate Validator Changelog
 =============================
 
+5.4.0.CR1 (14-01-2017)
+-------------------------
+
+** Bug
+    * HV-1198 - engine               - @Past and @Future break with too far in past/future for Java8
+
+** Improvement
+    * HV-1203 - engine               - Add a @Currency annotation for javax.money
+    * HV-1195 - documentation        - Fix link to annotation processor documentation in README.md
+    * HV-1189 - engine               - Outdated javadoc comment for BeanMetaData#getDefaultValidationSequence
+    * HV-1187 - build, engine        - Support JDK9 ea+148
+    * HV-1180 - annotation-processor - Detect cyclic definition of group sequence due to group inheritance in the annotation processor
+    * HV-1124 - integration          - Add integration test for javax.money validation on WildFly
+
 5.4.0.Beta1 (08-12-2016)
 -------------------------
 
