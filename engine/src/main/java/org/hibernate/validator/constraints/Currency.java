@@ -15,7 +15,6 @@ import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -24,8 +23,6 @@ import javax.money.MonetaryAmount;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
-
-import org.hibernate.validator.constraints.Currency.List;
 
 /**
  * The {@link MonetaryAmount} has to be in the right {@link CurrencyUnit}.
@@ -37,7 +34,6 @@ import org.hibernate.validator.constraints.Currency.List;
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
-@Repeatable(List.class)
 @ReportAsSingleViolation
 public @interface Currency {
 	String message() default "{org.hibernate.validator.constraints.Currency.message}";
