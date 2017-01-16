@@ -692,4 +692,17 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 202, value = "Unable to get the current time from the clock provider")
 	ValidationException getUnableToGetCurrentTimeFromClockProvider(@Cause Exception e);
+
+	@Message(id = 203, value = "Error parsing Jandex index file.")
+	ValidationException getParsingJandexIndexException(@Cause Exception e);
+
+	@Message(id = 204, value = "Unable to find the class '%s' referenced in the Jandex index.")
+	ValidationException getUnableToFindClassReferencedInJandexIndex(String className, @Cause Exception e);
+
+	@Message(id = 205, value = "Unable to find the field '%2$s' referenced in the Jandex index for class '%1$s'.")
+	ValidationException getUnableToFindFieldReferencedInJandexIndex(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String string, @Cause Exception e);
+
+	@Message(id = 206, value = "Unable to find the method '%2$s' referenced in the Jandex index for class '%1$s'.")
+	ValidationException getUnableToFindMethodReferencedInJandexIndex(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String string, @Cause Exception e);
+
 }

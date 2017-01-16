@@ -70,7 +70,7 @@ public final class LoadClass implements PrivilegedAction<Class<?>> {
 		final ClassLoader loader = HibernateValidator.class.getClassLoader();
 		Exception exception;
 		try {
-			return Class.forName( className, true, HibernateValidator.class.getClassLoader() );
+			return Class.forName( className, true, loader );
 		}
 		catch (ClassNotFoundException e) {
 			exception = e;
