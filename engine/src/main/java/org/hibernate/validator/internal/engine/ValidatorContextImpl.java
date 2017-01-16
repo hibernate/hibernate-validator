@@ -14,7 +14,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 
 import org.hibernate.validator.HibernateValidatorContext;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 
 /**
@@ -34,7 +34,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ExecutableParameterNameProvider parameterNameProvider;
 	private ClockProvider clockProvider;
 	private boolean failFast;
-	private final ValueExtractors valueExtractors;
+	private final ValueExtractorManager valueExtractorManager;
 	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
 
 
@@ -47,7 +47,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.clockProvider = validatorFactory.getClockProvider();
 		this.failFast = validatorFactory.isFailFast();
 		// TODO make overwritable per this context
-		this.valueExtractors = validatorFactory.getValueExtractors();
+		this.valueExtractorManager = validatorFactory.getValueExtractorManager();
 	}
 
 	@Override
@@ -138,7 +138,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				parameterNameProvider,
 				clockProvider,
 				failFast,
-				valueExtractors,
+				valueExtractorManager,
 				methodValidationConfiguration
 		);
 	}

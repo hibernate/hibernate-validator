@@ -14,7 +14,7 @@ import java.util.List;
 import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
@@ -37,7 +37,7 @@ public class MetaConstraints {
 	private MetaConstraints() {
 	}
 
-	public static <A extends Annotation> MetaConstraint<A> create(TypeResolutionHelper typeResolutionHelper, ValueExtractors valueExtractors,
+	public static <A extends Annotation> MetaConstraint<A> create(TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
 			ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location) {
 		ValueExtractorDescriptor valueExtractorDescriptor;
 		Type typeOfValidatedElement;
@@ -48,7 +48,7 @@ public class MetaConstraints {
 			Class<?> declaredType = TypeHelper.getErasedReferenceType( typeArgumentConstraintLocation.getDelegate().getTypeForValidatorResolution() );
 			TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
 
-			valueExtractorDescriptor = valueExtractors.getCascadedValueExtractor( declaredType, typeParameter );
+			valueExtractorDescriptor = valueExtractorManager.getCascadedValueExtractor( declaredType, typeParameter );
 			typeOfValidatedElement = location.getTypeForValidatorResolution();
 
 			if ( valueExtractorDescriptor == null ) {
@@ -62,7 +62,7 @@ public class MetaConstraints {
 			}
 			else {
 				Class<?> declaredType = TypeHelper.getErasedReferenceType( location.getTypeForValidatorResolution() );
-				ValueExtractorDescriptor valueExtractorDescriptorCandidate = valueExtractors.getValueExtractor( declaredType );
+				ValueExtractorDescriptor valueExtractorDescriptorCandidate = valueExtractorManager.getValueExtractor( declaredType );
 
 				if ( ValidateUnwrappedValue.DEFAULT.equals( constraintDescriptor.validateUnwrappedValue() )
 						&& ( valueExtractorDescriptorCandidate == null

@@ -17,7 +17,7 @@ import java.util.List;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaDataImpl;
@@ -87,9 +87,9 @@ public class BeanMetaDataManager {
 	private final TypeResolutionHelper typeResolutionHelper;
 
 	/**
-	 * The {@link ValueExtractor} registry.
+	 * The {@link ValueExtractor} manager.
 	 */
-	private final ValueExtractors valueExtractors;
+	private final ValueExtractorManager valueExtractorManager;
 
 	/**
 	 * Used to cache the constraint meta data for validated entities
@@ -117,18 +117,18 @@ public class BeanMetaDataManager {
 	 * @param executableHelper the executable helper
 	 * @param typeResolutionHelper the type resolution helper
 	 * @param parameterNameProvider the parameter name provider
-	 * @param valueExtractors the {@link ValueExtractor} registry
+	 * @param valueExtractorManager the {@link ValueExtractor} manager
 	 * @param optionalMetaDataProviders optional meta data provider used on top of the annotation based provider
 	 */
 	public BeanMetaDataManager(ConstraintHelper constraintHelper,
 			ExecutableHelper executableHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
-			ValueExtractors valueExtractors,
+			ValueExtractorManager valueExtractorManager,
 			List<MetaDataProvider> optionalMetaDataProviders) {
 		this(
 				constraintHelper, executableHelper, typeResolutionHelper, parameterNameProvider,
-				valueExtractors, optionalMetaDataProviders,
+				valueExtractorManager, optionalMetaDataProviders,
 				new MethodValidationConfiguration()
 		);
 	}
@@ -137,13 +137,13 @@ public class BeanMetaDataManager {
 			ExecutableHelper executableHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
-			ValueExtractors valueExtractors,
+			ValueExtractorManager valueExtractorManager,
 			List<MetaDataProvider> optionalMetaDataProviders,
 			MethodValidationConfiguration methodValidationConfiguration) {
 		this.constraintHelper = constraintHelper;
 		this.executableHelper = executableHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractors = valueExtractors;
+		this.valueExtractorManager = valueExtractorManager;
 
 		this.metaDataProviders = newArrayList();
 		this.metaDataProviders.addAll( optionalMetaDataProviders );
@@ -164,7 +164,7 @@ public class BeanMetaDataManager {
 					constraintHelper,
 					typeResolutionHelper,
 					parameterNameProvider,
-					valueExtractors,
+					valueExtractorManager,
 					annotationProcessingOptions
 			);
 
@@ -198,7 +198,7 @@ public class BeanMetaDataManager {
 	 */
 	private <T> BeanMetaDataImpl<T> createBeanMetaData(Class<T> clazz) {
 		BeanMetaDataBuilder<T> builder = BeanMetaDataBuilder.getInstance(
-				constraintHelper, executableHelper, typeResolutionHelper, valueExtractors, validationOrderGenerator, clazz, methodValidationConfiguration );
+				constraintHelper, executableHelper, typeResolutionHelper, valueExtractorManager, validationOrderGenerator, clazz, methodValidationConfiguration );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
 			for ( BeanConfiguration<? super T> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {

@@ -21,7 +21,7 @@ import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -95,13 +95,13 @@ final class PropertyConstraintMappingContextImpl
 		return typeContext.method( name, parameterTypes );
 	}
 
-	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractors valueExtractors) {
+	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		if ( member instanceof Field ) {
 			return new ConstrainedField(
 					ConfigurationSource.API,
 					(Field) member,
-					getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ),
+					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					Collections.emptySet(),
 					groupConversions,
 					getCascadedTypeParameters( (Field) member, isCascading )
@@ -111,7 +111,7 @@ final class PropertyConstraintMappingContextImpl
 			return new ConstrainedExecutable(
 					ConfigurationSource.API,
 					(Executable) member,
-					getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ),
+					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					groupConversions,
 					getCascadedTypeParameters( (Executable) member, isCascading )
 			);

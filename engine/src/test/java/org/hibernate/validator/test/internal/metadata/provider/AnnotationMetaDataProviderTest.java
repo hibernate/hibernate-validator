@@ -31,7 +31,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -64,7 +64,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 				new ConstraintHelper(),
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new ValueExtractors( Collections.emptyList() ),
+				new ValueExtractorManager( Collections.emptyList() ),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}

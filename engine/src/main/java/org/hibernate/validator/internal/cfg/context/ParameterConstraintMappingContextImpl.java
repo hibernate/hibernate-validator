@@ -19,7 +19,7 @@ import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -102,7 +102,7 @@ final class ParameterConstraintMappingContextImpl
 	}
 
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors) {
+			ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager) {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		Type parameterType = ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex );
 
@@ -112,7 +112,7 @@ final class ParameterConstraintMappingContextImpl
 				parameterType,
 				parameterIndex,
 				parameterNameProvider.getParameterNames( executableContext.getExecutable() ).get( parameterIndex ),
-				getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ),
+				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				Collections.emptySet(),
 				groupConversions,
 				getCascadedTypeParameters( parameterType, isCascading )

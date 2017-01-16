@@ -28,7 +28,7 @@ import javax.validation.ElementKind;
 import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -268,9 +268,9 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				ConstraintHelper constraintHelper,
 				ExecutableHelper executableHelper,
 				TypeResolutionHelper typeResolutionHelper,
-				ValueExtractors valueExtractors,
+				ValueExtractorManager valueExtractorManager,
 				MethodValidationConfiguration methodValidationConfiguration) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractors );
+			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
 
 			this.executableHelper = executableHelper;
 			this.kind = constrainedExecutable.getKind();
@@ -389,7 +389,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 										oneParameter,
 										constraintHelper,
 										typeResolutionHelper,
-										valueExtractors
+										valueExtractorManager
 								)
 						);
 					}

@@ -45,7 +45,7 @@ import javax.validation.groups.ConvertGroup;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -95,17 +95,17 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	protected final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
 	protected final AnnotationProcessingOptions annotationProcessingOptions;
 	protected final ExecutableParameterNameProvider parameterNameProvider;
-	protected final ValueExtractors valueExtractors;
+	protected final ValueExtractorManager valueExtractorManager;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
-			ValueExtractors valueExtractors,
+			ValueExtractorManager valueExtractorManager,
 			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.parameterNameProvider = parameterNameProvider;
-		this.valueExtractors = valueExtractors;
+		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 		this.configuredBeans = new ConcurrentReferenceHashMap<>(
 				DEFAULT_INITIAL_CAPACITY,
@@ -227,7 +227,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		ConstraintLocation location = ConstraintLocation.forClass( clazz );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : classMetaData ) {
-			classLevelConstraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractors, constraintDescription, location ) );
+			classLevelConstraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescription, location ) );
 		}
 
 		return classLevelConstraints;
@@ -286,7 +286,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		ConstraintLocation location = ConstraintLocation.forProperty( field );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
-			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractors, constraintDescription, location ) );
+			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescription, location ) );
 		}
 		return constraints;
 	}
@@ -393,7 +393,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		for ( ConstraintDescriptorImpl<?> constraintDescriptor : constraintsDescriptors ) {
 			ConstraintLocation location = constraintDescriptor.getConstraintType() == ConstraintType.GENERIC ? returnValueLocation : crossParameterLocation;
-			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractors, constraintDescriptor, location ) );
+			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor, location ) );
 		}
 
 		return constraints;
@@ -463,7 +463,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				);
 				for ( ConstraintDescriptorImpl<?> constraintDescriptorImpl : constraints ) {
 					parameterConstraints.add(
-							MetaConstraints.create( typeResolutionHelper, valueExtractors, constraintDescriptorImpl, location )
+							MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptorImpl, location )
 					);
 				}
 			}
@@ -804,7 +804,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private <A extends Annotation> MetaConstraint<?> createTypeArgumentMetaConstraint(ConstraintDescriptorImpl<A> descriptor, TypeArgumentLocation location,
 			TypeVariable<?> typeVariable, Type type) {
 		ConstraintLocation constraintLocation = ConstraintLocation.forTypeArgument( location.toConstraintLocation(), typeVariable, type );
-		return MetaConstraints.create( typeResolutionHelper, valueExtractors, descriptor, constraintLocation );
+		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, descriptor, constraintLocation );
 	}
 
 	/**

@@ -33,7 +33,7 @@ import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -135,7 +135,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 */
 	private final Map<ExecutableParameterNameProvider, BeanMetaDataManager> beanMetaDataManagerMap;
 
-	private final ValueExtractors valueExtractors;
+	private final ValueExtractorManager valueExtractorManager;
 
 	public ValidatorFactoryImpl(ConfigurationState configurationState) {
 		ClassLoader externalClassLoader = getExternalClassLoader( configurationState );
@@ -174,7 +174,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			tmpCascadedValueExtractors = new ArrayList<>( hibernateSpecificConfig.getCascadedValueExtractors() );
 		}
 
-		this.valueExtractors = new ValueExtractors( tmpCascadedValueExtractors );
+		this.valueExtractorManager = new ValueExtractorManager( tmpCascadedValueExtractors );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -182,7 +182,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		else {
 			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractors, configurationState.getMappingStreams(), externalClassLoader
+					constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager, configurationState.getMappingStreams(), externalClassLoader
 			);
 		}
 
@@ -276,7 +276,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				parameterNameProvider,
 				clockProvider,
 				failFast,
-				valueExtractors,
+				valueExtractorManager,
 				methodValidationConfiguration
 		);
 	}
@@ -314,8 +314,8 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		return failFast;
 	}
 
-	ValueExtractors getValueExtractors() {
-		return valueExtractors;
+	ValueExtractorManager getValueExtractorManager() {
+		return valueExtractorManager;
 	}
 
 	@Override
@@ -349,7 +349,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
 			boolean failFast,
-			ValueExtractors valueExtractors,
+			ValueExtractorManager valueExtractorManager,
 			MethodValidationConfiguration methodValidationConfiguration) {
 
 		BeanMetaDataManager beanMetaDataManager;
@@ -359,7 +359,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 					executableHelper,
 					typeResolutionHelper,
 					parameterNameProvider,
-					valueExtractors,
+					valueExtractorManager,
 					buildDataProviders( parameterNameProvider ),
 					methodValidationConfiguration
 			);
@@ -377,7 +377,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				parameterNameProvider,
 				clockProvider,
 				typeResolutionHelper,
-				valueExtractors,
+				valueExtractorManager,
 				constraintValidatorManager,
 				failFast
 		);
@@ -395,7 +395,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 							constraintHelper,
 							typeResolutionHelper,
 							parameterNameProvider,
-							valueExtractors,
+							valueExtractorManager,
 							constraintMappings
 					)
 			);

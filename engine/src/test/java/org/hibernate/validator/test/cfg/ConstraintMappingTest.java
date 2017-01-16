@@ -47,7 +47,7 @@ import org.hibernate.validator.cfg.defs.SizeDef;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -517,7 +517,7 @@ public class ConstraintMappingTest {
 				new ConstraintHelper(),
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new ValueExtractors( Collections.emptyList() ) );
+				new ValueExtractorManager( Collections.emptyList() ) );
 
 		for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
 			if ( beanConfiguration.getBeanClass() == type ) {

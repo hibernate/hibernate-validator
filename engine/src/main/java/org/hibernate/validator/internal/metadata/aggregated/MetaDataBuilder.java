@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -40,18 +40,18 @@ public abstract class MetaDataBuilder {
 
 	protected final ConstraintHelper constraintHelper;
 	protected final TypeResolutionHelper typeResolutionHelper;
-	protected final ValueExtractors valueExtractors;
+	protected final ValueExtractorManager valueExtractorManager;
 
 	private final Class<?> beanClass;
 	private final Set<MetaConstraint<?>> constraints = newHashSet();
 	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
 
-	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractors valueExtractors) {
+	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
 		this.beanClass = beanClass;
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractors = valueExtractors;
+		this.valueExtractorManager = valueExtractorManager;
 	}
 
 	/**
@@ -165,7 +165,7 @@ public abstract class MetaDataBuilder {
 				constraint.getDescriptor().getConstraintType()
 		);
 
-		return MetaConstraints.create( typeResolutionHelper, valueExtractors, descriptor, constraint.getLocation() );
+		return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, descriptor, constraint.getLocation() );
 	}
 
 	/**

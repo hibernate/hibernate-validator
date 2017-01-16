@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -35,24 +35,24 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 	public XmlMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider,
-			ValueExtractors valueExtractors,
+			ValueExtractorManager valueExtractorManager,
 			Set<InputStream> mappingStreams,
 			ClassLoader externalClassLoader) {
-		this( constraintHelper, typeResolutionHelper, valueExtractors, createMappingParser( constraintHelper, typeResolutionHelper, parameterNameProvider,
-				valueExtractors, mappingStreams, externalClassLoader ) );
+		this( constraintHelper, typeResolutionHelper, valueExtractorManager, createMappingParser( constraintHelper, typeResolutionHelper, parameterNameProvider,
+				valueExtractorManager, mappingStreams, externalClassLoader ) );
 	}
 
-	private XmlMetaDataProvider(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractors valueExtractors,
+	private XmlMetaDataProvider(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
 			MappingXmlParser mappingParser) {
 		super( constraintHelper, createBeanConfigurations( mappingParser ) );
 		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}
 
 	private static MappingXmlParser createMappingParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors, Set<InputStream> mappingStreams,
+			ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, Set<InputStream> mappingStreams,
 			ClassLoader externalClassLoader) {
 		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, typeResolutionHelper, parameterNameProvider,
-				valueExtractors, externalClassLoader );
+				valueExtractorManager, externalClassLoader );
 		mappingParser.parse( mappingStreams );
 		return mappingParser;
 	}

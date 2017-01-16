@@ -32,7 +32,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
@@ -65,7 +65,7 @@ public class MappingXmlParser {
 	private final Set<Class<?>> processedClasses = newHashSet();
 	private final ConstraintHelper constraintHelper;
 	private final TypeResolutionHelper typeResolutionHelper;
-	private final ValueExtractors valueExtractors;
+	private final ValueExtractorManager valueExtractorManager;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 	private final Map<Class<?>, List<Class<?>>> defaultSequences;
 	private final Map<Class<?>, Set<ConstrainedElement>> constrainedElements;
@@ -88,10 +88,10 @@ public class MappingXmlParser {
 	}
 
 	public MappingXmlParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ExecutableParameterNameProvider parameterNameProvider,
-			ValueExtractors valueExtractors, ClassLoader externalClassLoader) {
+			ValueExtractorManager valueExtractorManager, ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractors = valueExtractors;
+		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = new AnnotationProcessingOptionsImpl();
 		this.defaultSequences = newHashMap();
 		this.constrainedElements = newHashMap();
@@ -116,7 +116,7 @@ public class MappingXmlParser {
 					classLoadingHelper,
 					constraintHelper,
 					typeResolutionHelper,
-					valueExtractors
+					valueExtractorManager
 			);
 			GroupConversionBuilder groupConversionBuilder = new GroupConversionBuilder( classLoadingHelper );
 

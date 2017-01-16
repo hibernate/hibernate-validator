@@ -18,7 +18,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.context.ConstraintDefinitionContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -83,16 +83,16 @@ public class DefaultConstraintMapping implements ConstraintMapping {
 	 * @param constraintHelper constraint helper required for building constraint descriptors
 	 * @param typeResolutionHelper type resolution helper
 	 * @param parameterNameProvider parameter name provider required for building parameter elements
-	 * @param valueExtractors the {@link ValueExtractor} registry
+	 * @param valueExtractorManager the {@link ValueExtractor} manager
 	 *
 	 * @return a set of {@link BeanConfiguration}s with an element for each type configured through this mapping
 	 */
 	public Set<BeanConfiguration<?>> getBeanConfigurations(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors) {
+			ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager) {
 		Set<BeanConfiguration<?>> configurations = newHashSet();
 
 		for ( TypeConstraintMappingContextImpl<?> typeContext : typeContexts ) {
-			configurations.add( typeContext.build( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractors ) );
+			configurations.add( typeContext.build( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager ) );
 		}
 
 		return configurations;

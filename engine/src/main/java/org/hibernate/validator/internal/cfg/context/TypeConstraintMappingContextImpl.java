@@ -24,7 +24,7 @@ import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.cfg.context.TypeConstraintMappingContext;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
@@ -185,18 +185,18 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	BeanConfiguration<C> build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors) {
+			ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager) {
 		return new BeanConfiguration<>(
 				ConfigurationSource.API,
 				beanClass,
-				buildConstraintElements( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractors ),
+				buildConstraintElements( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager ),
 				defaultGroupSequence,
 				getDefaultGroupSequenceProvider()
 		);
 	}
 
 	private Set<ConstrainedElement> buildConstraintElements(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors) {
+			ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager) {
 		Set<ConstrainedElement> elements = newHashSet();
 
 		//class-level configuration
@@ -204,18 +204,18 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 				new ConstrainedType(
 						ConfigurationSource.API,
 						beanClass,
-						getConstraints( constraintHelper, typeResolutionHelper, valueExtractors )
+						getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager )
 				)
 		);
 
 		//constructors/methods
 		for ( ExecutableConstraintMappingContextImpl executableContext : executableContexts ) {
-			elements.add( executableContext.build( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractors ) );
+			elements.add( executableContext.build( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager ) );
 		}
 
 		//properties
 		for ( PropertyConstraintMappingContextImpl propertyContext : propertyContexts ) {
-			elements.add( propertyContext.build( constraintHelper, typeResolutionHelper, valueExtractors ) );
+			elements.add( propertyContext.build( constraintHelper, typeResolutionHelper, valueExtractorManager ) );
 		}
 
 		return elements;

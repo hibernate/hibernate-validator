@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.ElementKind;
 
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
@@ -139,8 +139,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private final Type propertyType;
 
 		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractors valueExtractors) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractors );
+				ValueExtractorManager valueExtractorManager) {
+			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
 
 			this.propertyName = constrainedField.getField().getName();
 			this.propertyType = ReflectionHelper.typeOf( constrainedField.getField() );
@@ -148,8 +148,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		public Builder(Class<?> beanClass, ConstrainedType constrainedType, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractors valueExtractors) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractors );
+				ValueExtractorManager valueExtractorManager) {
+			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
 
 			this.propertyName = null;
 			this.propertyType = null;
@@ -157,8 +157,8 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		public Builder(Class<?> beanClass, ConstrainedExecutable constrainedMethod, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-				ValueExtractors valueExtractors) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractors );
+				ValueExtractorManager valueExtractorManager) {
+			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
 
 			this.propertyName = ReflectionHelper.getPropertyName( constrainedMethod.getExecutable() );
 			this.propertyType = ReflectionHelper.typeOf( constrainedMethod.getExecutable() );
@@ -237,7 +237,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				adaptedLocation = ConstraintLocation.forProperty( constraint.getLocation().getMember() );
 			}
 
-			return MetaConstraints.create( typeResolutionHelper, valueExtractors, constraint.getDescriptor(), adaptedLocation );
+			return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraint.getDescriptor(), adaptedLocation );
 		}
 
 		private String getPropertyName(ConstrainedElement constrainedElement) {

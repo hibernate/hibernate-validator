@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -38,9 +38,9 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper,
 										TypeResolutionHelper typeResolutionHelper,
 										ExecutableParameterNameProvider parameterNameProvider,
-										ValueExtractors valueExtractors,
+										ValueExtractorManager valueExtractorManager,
 										Set<DefaultConstraintMapping> constraintMappings) {
-		super( constraintHelper, createBeanConfigurations( constraintMappings, constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractors ) );
+		super( constraintHelper, createBeanConfigurations( constraintMappings, constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager ) );
 		Contracts.assertNotNull( constraintMappings );
 
 		assertUniquenessOfConfiguredTypes( constraintMappings );
@@ -62,11 +62,11 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	}
 
 	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(Set<DefaultConstraintMapping> mappings, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ExecutableParameterNameProvider parameterNameProvider, ValueExtractors valueExtractors) {
+			TypeResolutionHelper typeResolutionHelper, ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager) {
 		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<>();
 		for ( DefaultConstraintMapping mapping : mappings ) {
 			Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations( constraintHelper, typeResolutionHelper, parameterNameProvider,
-					valueExtractors );
+					valueExtractorManager );
 
 			for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
 				configuredBeans.put( beanConfiguration.getBeanClass().getName(), beanConfiguration );

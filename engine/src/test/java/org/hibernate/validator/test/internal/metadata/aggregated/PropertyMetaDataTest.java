@@ -17,7 +17,7 @@ import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -42,7 +42,7 @@ public class PropertyMetaDataTest {
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new ValueExtractors( Collections.emptyList() ),
+				new ValueExtractorManager( Collections.emptyList() ),
 				Collections.<MetaDataProvider>emptyList()
 		);
 	}

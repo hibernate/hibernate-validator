@@ -19,7 +19,7 @@ import javax.validation.ElementKind;
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -128,8 +128,8 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 				ConstrainedParameter constrainedParameter,
 				ConstraintHelper constraintHelper,
 				TypeResolutionHelper typeResolutionHelper,
-				ValueExtractors valueExtractors) {
-			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractors );
+				ValueExtractorManager valueExtractorManager) {
+			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
 
 			this.parameterType = constrainedParameter.getType();
 			this.parameterIndex = constrainedParameter.getIndex();

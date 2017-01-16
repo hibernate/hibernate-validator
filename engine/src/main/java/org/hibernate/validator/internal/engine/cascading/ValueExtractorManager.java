@@ -26,11 +26,11 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  * @author Gunnar Morling
  * @author Guillaume Smet
  */
-public class ValueExtractors {
+public class ValueExtractorManager {
 
 	private final List<ValueExtractorDescriptor> valueExtractors;
 
-	public ValueExtractors(Iterable<ValueExtractor<?>> externalExtractors) {
+	public ValueExtractorManager(Iterable<ValueExtractor<?>> externalExtractors) {
 		List<ValueExtractorDescriptor> tmpValueExtractors = new ArrayList<>();
 
 		for ( ValueExtractor<?> valueExtractor : externalExtractors ) {

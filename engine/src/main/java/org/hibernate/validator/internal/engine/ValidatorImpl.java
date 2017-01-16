@@ -41,7 +41,7 @@ import org.hibernate.validator.internal.engine.ValidationContext.ValidationConte
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
-import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.GroupWithInheritance;
@@ -143,7 +143,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final TypeResolutionHelper typeResolutionHelper;
 
-	private final ValueExtractors valueExtractors;
+	private final ValueExtractorManager valueExtractorManager;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
 			MessageInterpolator messageInterpolator,
@@ -152,7 +152,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
 			TypeResolutionHelper typeResolutionHelper,
-			ValueExtractors valueExtractors,
+			ValueExtractorManager valueExtractorManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			boolean failFast) {
 		this.constraintValidatorFactory = constraintValidatorFactory;
@@ -162,7 +162,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.parameterNameProvider = parameterNameProvider;
 		this.clockProvider = clockProvider;
 		this.typeResolutionHelper = typeResolutionHelper;
-		this.valueExtractors = valueExtractors;
+		this.valueExtractorManager = valueExtractorManager;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;
 
@@ -681,7 +681,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 
 			for ( TypeVariable<?> cascadingTypeParameterOfValueType : cascadingTypeParametersOfValueType ) {
-				ValueExtractorDescriptor extractor = valueExtractors.getCascadedValueExtractor(
+				ValueExtractorDescriptor extractor = valueExtractorManager.getCascadedValueExtractor(
 						value.getClass(),
 						cascadingTypeParameterOfValueType
 				);
