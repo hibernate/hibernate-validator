@@ -106,6 +106,15 @@ public @interface ScriptAssert {
 	String alias() default "_this";
 
 	/**
+	 * @return The name of the property for which you would like to report a validation error.
+	 * If given, the resulting constraint violation will be reported on the specified property.
+	 * If not given, the constraint violation will be reported on the annotated bean.
+	 *
+	 * @since 5.4
+	 */
+	String reportOn() default "";
+
+	/**
 	 * Defines several {@code @ScriptAssert} annotations on the same element.
 	 */
 	@Target({ TYPE })

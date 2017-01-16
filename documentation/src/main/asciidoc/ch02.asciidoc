@@ -727,16 +727,20 @@ optionally allowed attributes using the annotation `@SafeHtml.Tag`.
 
 |`@ScriptAssert(lang=, +
               script=, +
-              alias=)`
+              alias=, +
+              reportOn=)`
 |Any type
 |Checks whether the given script can successfully be
 evaluated against the annotated element. In order to use this
 constraint, an implementation of the Java Scripting API as
 defined by JSR 223 ("Scripting for the
-Java^TM^ Platform") must part of the
+Java^TM^ Platform") must be a part of the
 class path. The expressions to be evaluated can be written in
 any scripting or expression language, for which a JSR 223
-compatible engine can be found in the class path.
+compatible engine can be found in the class path. Even though
+this is a type level constraint, one can use `reportOn` attribute
+to be able to report a constraint violation on a specified property
+rather than the whole object.
 |None
 
 |`@URL(protocol=, +
