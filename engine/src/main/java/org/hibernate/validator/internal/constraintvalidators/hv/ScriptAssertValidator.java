@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.util.Contracts;
-
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * Validator for the {@link ScriptAssert} constraint annotation.
@@ -20,10 +20,13 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  * @author Kevin Pollet &lt;kevin.pollet@serli.com&gt; (C) 2011 SERLI
+ * @author Marko Bekhta
  */
 public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, Object> {
 
 	private String alias;
+	private String reportOn;
+	private String message;
 	private ScriptAssertContext scriptAssertContext;
 
 	@Override
@@ -31,12 +34,21 @@ public class ScriptAssertValidator implements ConstraintValidator<ScriptAssert, 
 		validateParameters( constraintAnnotation );
 
 		this.alias = constraintAnnotation.alias();
+		this.reportOn = constraintAnnotation.reportOn();
+		this.message = constraintAnnotation.message();
 		this.scriptAssertContext = new ScriptAssertContext( constraintAnnotation.lang(), constraintAnnotation.script() );
 	}
 
 	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
-		return scriptAssertContext.evaluateScriptAssertExpression( value, alias );
+		boolean validationResult = scriptAssertContext.evaluateScriptAssertExpression( value, alias );
+
+		if ( !validationResult && !reportOn.isEmpty() ) {
+			constraintValidatorContext.disableDefaultConstraintViolation();
+			constraintValidatorContext.buildConstraintViolationWithTemplate( message ).addPropertyNode( reportOn ).addConstraintViolation();
+		}
+
+		return validationResult;
 	}
 
 	private void validateParameters(ScriptAssert constraintAnnotation) {
