@@ -108,7 +108,7 @@ public class ValueExtractorManager {
 				cascadingParameterBoundToExtractorType = cascadingTypeParameter;
 			}
 
-			if ( cascadingParameterBoundToExtractorType.equals( extractorDescriptor.extractedTypeParameter() ) ) {
+			if ( cascadingParameterBoundToExtractorType.equals( extractorDescriptor.getExtractedTypeParameter() ) ) {
 				// TODO implement selection of most specific extractor per requested type parameter
 				return extractorDescriptor;
 			}

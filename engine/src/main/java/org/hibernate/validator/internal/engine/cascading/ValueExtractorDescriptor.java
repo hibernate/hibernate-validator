@@ -97,7 +97,7 @@ public class ValueExtractorDescriptor {
 		return extractedType;
 	}
 
-	public TypeVariable<?> extractedTypeParameter() {
+	public TypeVariable<?> getExtractedTypeParameter() {
 		return extractedTypeParameter;
 	}
 
@@ -105,7 +105,7 @@ public class ValueExtractorDescriptor {
 		return valueExtractor;
 	}
 
-	public boolean unwrapByDefault() {
+	public boolean isUnwrapByDefault() {
 		return unwrapByDefault;
 	}
 

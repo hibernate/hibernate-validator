@@ -66,7 +66,7 @@ public class MetaConstraints {
 
 				if ( ValidateUnwrappedValue.DEFAULT.equals( constraintDescriptor.validateUnwrappedValue() )
 						&& ( valueExtractorDescriptorCandidate == null
-								|| !valueExtractorDescriptorCandidate.unwrapByDefault() ) ) {
+								|| !valueExtractorDescriptorCandidate.isUnwrapByDefault() ) ) {
 					valueExtractorDescriptor = null;
 					typeOfValidatedElement = location.getTypeForValidatorResolution();
 				}
