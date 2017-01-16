@@ -32,4 +32,9 @@ public class ScriptAssertDef extends ConstraintDef<ScriptAssertDef, ScriptAssert
 		addParameter( "alias", alias );
 		return this;
 	}
+
+	public ScriptAssertDef reportOn(String reportOn) {
+		addParameter( "reportOn", reportOn );
+		return this;
+	}
 }
