@@ -6,9 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
+import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
-class ObjectValueExtractor implements ValueExtractor<Object> {
+class ObjectValueExtractor implements ValueExtractor<@ExtractedValue Object> {
 
 	static final ObjectValueExtractor INSTANCE = new ObjectValueExtractor();
 

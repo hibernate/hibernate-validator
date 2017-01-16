@@ -8,9 +8,10 @@ package org.hibernate.validator.internal.engine.cascading;
 
 import java.util.Map;
 
+import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
-class LegacyMapValueExtractor implements ValueExtractor<Map<?, ?>> {
+class LegacyMapValueExtractor implements ValueExtractor<@ExtractedValue Map<?, ?>> {
 
 	static final LegacyMapValueExtractor INSTANCE = new LegacyMapValueExtractor();
 

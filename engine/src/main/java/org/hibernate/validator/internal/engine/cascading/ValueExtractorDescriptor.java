@@ -17,6 +17,8 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Describes a {@link ValueExtractor}.
@@ -24,6 +26,8 @@ import org.hibernate.validator.internal.util.TypeHelper;
  * @author Gunnar Morling
  */
 public class ValueExtractorDescriptor {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	private final ValueExtractor<?> valueExtractor;
 	private final Type extractedType;
@@ -41,23 +45,37 @@ public class ValueExtractorDescriptor {
 		AnnotatedType extractedType = ( (AnnotatedParameterizedType) genericInterface ).getAnnotatedActualTypeArguments()[0];
 		Class<?> extractedTypeRaw = (Class<?>) TypeHelper.getErasedType( extractedType.getType() );
 
+		TypeVariable<?> extractedTypeParameter = null;
+
+		if ( extractedType.isAnnotationPresent( ExtractedValue.class ) ) {
+			if ( extractedType instanceof AnnotatedArrayType ) {
+				extractedTypeParameter = ArrayElement.INSTANCE;
+			}
+			else {
+				extractedTypeParameter = AnnotatedObject.INSTANCE;
+			}
+		}
+
 		if ( extractedType instanceof AnnotatedParameterizedType ) {
 			AnnotatedParameterizedType parameterizedExtractedType = (AnnotatedParameterizedType) extractedType;
-
 			int i = 0;
 			for ( AnnotatedType typeArgument : parameterizedExtractedType.getAnnotatedActualTypeArguments() ) {
-				// TODO raise error if given several times
 				if ( typeArgument.isAnnotationPresent( ExtractedValue.class ) ) {
-					return extractedTypeRaw.getTypeParameters()[i];
+					if ( extractedTypeParameter != null ) {
+						throw LOG.getValueExtractorDeclaresExtractedValueMultipleTimesException( extractorImplementationType );
+					}
+
+					extractedTypeParameter = extractedTypeRaw.getTypeParameters()[i];
 				}
 				i++;
 			}
 		}
-		else if ( extractedType instanceof AnnotatedArrayType ) {
-			return ArrayElement.INSTANCE;
+
+		if ( extractedTypeParameter == null ) {
+			throw LOG.getValueExtractorFailsToDeclareExtractedValueException( extractorImplementationType );
 		}
 
-		return AnnotatedObject.INSTANCE;
+		return extractedTypeParameter;
 	}
 
 	private static Type getExtractedType(Class<?> extractorImplementationType) {

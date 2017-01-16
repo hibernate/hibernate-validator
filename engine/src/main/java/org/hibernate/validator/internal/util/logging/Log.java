@@ -692,4 +692,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 202, value = "Unable to get the current time from the clock provider")
 	ValidationException getUnableToGetCurrentTimeFromClockProvider(@Cause Exception e);
+
+	@Message(id = 203, value = "Value extractor type %1s fails to declare the extracted type parameter using @ExtractedValue.")
+	ValidationException getValueExtractorFailsToDeclareExtractedValueException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorType);
+
+	@Message(id = 204, value = "Only one type parameter must be marked with @ExtractedValue for value extractor type %1s.")
+	ValidationException getValueExtractorDeclaresExtractedValueMultipleTimesException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorType);
 }

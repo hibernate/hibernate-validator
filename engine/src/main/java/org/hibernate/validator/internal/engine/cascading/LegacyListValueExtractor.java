@@ -8,9 +8,10 @@ package org.hibernate.validator.internal.engine.cascading;
 
 import java.util.List;
 
+import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
-class LegacyListValueExtractor implements ValueExtractor<List<?>> {
+class LegacyListValueExtractor implements ValueExtractor<@ExtractedValue List<?>> {
 
 	static final LegacyListValueExtractor INSTANCE = new LegacyListValueExtractor();
 

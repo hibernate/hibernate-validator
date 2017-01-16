@@ -6,9 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
+import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
-class ShortArrayValueExtractor implements ValueExtractor<short[]> {
+class ShortArrayValueExtractor implements ValueExtractor<short @ExtractedValue[]> {
 
 	static final ShortArrayValueExtractor INSTANCE = new ShortArrayValueExtractor();
 

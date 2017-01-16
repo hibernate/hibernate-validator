@@ -6,9 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
+import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
-class LongArrayValueExtractor implements ValueExtractor<long[]> {
+class LongArrayValueExtractor implements ValueExtractor<long @ExtractedValue[]> {
 
 	static final LongArrayValueExtractor INSTANCE = new LongArrayValueExtractor();
 

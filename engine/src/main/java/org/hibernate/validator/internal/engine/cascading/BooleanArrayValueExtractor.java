@@ -6,9 +6,10 @@
  */
 package org.hibernate.validator.internal.engine.cascading;
 
+import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
-class BooleanArrayValueExtractor implements ValueExtractor<boolean[]> {
+class BooleanArrayValueExtractor implements ValueExtractor<boolean @ExtractedValue[]> {
 
 	static final BooleanArrayValueExtractor INSTANCE = new BooleanArrayValueExtractor();
 
