@@ -112,6 +112,13 @@
             <artifactId>wildfly-arquillian-container-managed</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-validator-modules</artifactId>
+            <classifier>wildfly-${wildfly.version}-patch</classifier>
+            <type>zip</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
