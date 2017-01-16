@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.cascading;
 
 import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.util.IgnoreJava8Requirement;
@@ -19,6 +20,7 @@ import javafx.beans.value.ObservableValue;
  * @author Gunnar Morling
  */
 @IgnoreJava8Requirement
+@UnwrapByDefault
 public class ObservableValueExtractor implements ValueExtractor<ObservableValue<@ExtractedValue ?>> {
 
 	static final ObservableValueExtractor INSTANCE = new ObservableValueExtractor();

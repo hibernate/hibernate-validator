@@ -22,6 +22,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.valueextraction.ValidateUnwrappedValue;
 
+import org.hibernate.validator.internal.engine.cascading.ObservableValueExtractor;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -37,7 +38,7 @@ import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.FXCollections;
 
 /**
- * Tests for {@link org.hibernate.validator.internal.engine.valuehandling.JavaFXPropertyValueUnwrapper}.
+ * Tests for {@link ObservableValueExtractor}.
  *
  * @author Khalid Alqinyah
  * @author Hardy Ferentschik
@@ -144,7 +145,7 @@ public class JavaFXPropertyValueUnwrapperTest {
 
 	@SuppressWarnings("unused")
 	public class Bar3 {
-		@NotNull
+		@NotNull(validateUnwrappedValue = ValidateUnwrappedValue.NO)
 		MapProperty property = new SimpleMapProperty( null );
 	}
 
