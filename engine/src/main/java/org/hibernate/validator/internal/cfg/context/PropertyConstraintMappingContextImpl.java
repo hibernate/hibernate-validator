@@ -104,8 +104,7 @@ final class PropertyConstraintMappingContextImpl
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ),
 					Collections.emptySet(),
 					groupConversions,
-					getCascadedTypeParameters( (Field) member, isCascading ),
-					unwrapMode()
+					getCascadedTypeParameters( (Field) member, isCascading )
 			);
 		}
 		else {
@@ -114,8 +113,7 @@ final class PropertyConstraintMappingContextImpl
 					(Executable) member,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ),
 					groupConversions,
-					getCascadedTypeParameters( (Executable) member, isCascading ),
-					unwrapMode()
+					getCascadedTypeParameters( (Executable) member, isCascading )
 			);
 		}
 	}

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**
@@ -29,23 +28,19 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	protected final Map<Class<?>, Class<?>> groupConversions;
 	protected final List<TypeVariable<?>> cascadingTypeParameters;
 	protected final Set<MetaConstraint<?>> typeArgumentConstraints;
-	protected final UnwrapMode unwrapMode;
 
 	public AbstractConstrainedElement(ConfigurationSource source,
 									  ConstrainedElementKind kind,
 									  Set<MetaConstraint<?>> constraints,
 									  Set<MetaConstraint<?>> typeArgumentConstraints,
 									  Map<Class<?>, Class<?>> groupConversions,
-									  List<TypeVariable<?>> cascadingTypeParameters,
-									  UnwrapMode unwrapMode) {
+									  List<TypeVariable<?>> cascadingTypeParameters) {
 		this.kind = kind;
 		this.source = source;
 		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
 		this.typeArgumentConstraints = typeArgumentConstraints != null ? Collections.unmodifiableSet( typeArgumentConstraints ) : Collections.<MetaConstraint<?>>emptySet();
 		this.groupConversions = Collections.unmodifiableMap( groupConversions );
 		this.cascadingTypeParameters = cascadingTypeParameters;
-
-		this.unwrapMode = unwrapMode;
 	}
 
 	@Override
@@ -89,11 +84,6 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	}
 
 	@Override
-	public UnwrapMode unwrapMode() {
-		return unwrapMode;
-	}
-
-	@Override
 	public ConfigurationSource getSource() {
 		return source;
 	}
@@ -103,8 +93,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 		return "AbstractConstrainedElement [kind=" + kind + ", source="
 				+ source + ", constraints="
 				+ constraints + ", groupConversions=" + groupConversions
-				+ ", cascadingTypeParameters=" + cascadingTypeParameters + ", unwrapMode="
-				+ unwrapMode + "]";
+				+ ", cascadingTypeParameters=" + cascadingTypeParameters + "]";
 	}
 
 	@Override

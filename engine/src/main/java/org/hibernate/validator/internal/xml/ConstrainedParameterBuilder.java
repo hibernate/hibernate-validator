@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -96,8 +95,7 @@ class ConstrainedParameterBuilder {
 					metaConstraints,
 					Collections.emptySet(),
 					groupConversions,
-					getCascadedTypeParameters( type, parameterType.getValid() != null ),
-					UnwrapMode.AUTOMATIC
+					getCascadedTypeParameters( type, parameterType.getValid() != null )
 			);
 			constrainedParameters.add( constrainedParameter );
 			i++;

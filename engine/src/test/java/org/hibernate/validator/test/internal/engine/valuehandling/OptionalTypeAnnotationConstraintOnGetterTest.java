@@ -33,17 +33,17 @@ import javax.validation.ReportAsSingleViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Test combination of {@link Optional} and {@link UnwrapValidatedValue} on methods.
+ * Test combination of {@link Optional} and {@code validateUnwrappedValue()} on getters.
  *
  * @author Davide D'Alto
  */
@@ -199,8 +199,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithoutTypeAnnotation;
 
-		@UnwrapValidatedValue(false)
-		@NotNull(message = "container")
+		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
 		public Optional<String> getValueWithoutTypeAnnotation() {
 			return valueWithoutTypeAnnotation;
 		}
@@ -214,8 +213,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithNotNull;
 
-		@UnwrapValidatedValue(false)
-		@NotNull(message = "container")
+		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
 		public Optional<@NotNull(message = "type") String> getValueWithNotNull() {
 			return valueWithNotNull;
 		}
@@ -229,8 +227,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithNotNullUnwrapped;
 
-		@UnwrapValidatedValue(true)
-		@NotNull(message = "container")
+		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.YES)
 		public Optional<@NotBlank(message = "type") String> getValueWithNotNullUnwrapped() {
 			return valueWithNotNullUnwrapped;
 		}
@@ -244,8 +241,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithNullOrNotBlank;
 
-		@UnwrapValidatedValue(false)
-		@NotNull(message = "container")
+		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
 		public Optional<@NullOrNotBlank(message = "type") String> getValueWithNullOrNotBlank() {
 			return valueWithNullOrNotBlank;
 		}

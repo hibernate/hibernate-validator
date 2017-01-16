@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**
@@ -49,8 +48,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
-				Collections.<TypeVariable<?>>emptyList(),
-				UnwrapMode.AUTOMATIC
+				Collections.<TypeVariable<?>>emptyList()
 		);
 	}
 
@@ -67,8 +65,6 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 	 * @param typeArgumentConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented method parameter, if any.
 	 * @param cascadingTypeParameters The type parameters marked for cascaded validation, if any.
-	 * @param unwrapMode Determines how the value of the parameter must be handled in regards to
-	 * unwrapping prior to validation.
 	 */
 	public ConstrainedParameter(ConfigurationSource source,
 								Executable executable,
@@ -78,16 +74,14 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 								Set<MetaConstraint<?>> constraints,
 								Set<MetaConstraint<?>> typeArgumentConstraints,
 								Map<Class<?>, Class<?>> groupConversions,
-								List<TypeVariable<?>> cascadingTypeParameters,
-								UnwrapMode unwrapMode) {
+								List<TypeVariable<?>> cascadingTypeParameters) {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,
 				constraints,
 				typeArgumentConstraints,
 				groupConversions,
-				cascadingTypeParameters,
-				unwrapMode
+				cascadingTypeParameters
 		);
 
 		this.executable = executable;
@@ -131,15 +125,6 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 			mergedName = other.name;
 		}
 
-		// TODO - Is this the right way of handling the merge of unwrapMode? (HF)
-		UnwrapMode mergedUnwrapMode;
-		if ( source.getPriority() > other.source.getPriority() ) {
-			mergedUnwrapMode = unwrapMode;
-		}
-		else {
-			mergedUnwrapMode = other.unwrapMode;
-		}
-
 		Set<MetaConstraint<?>> mergedConstraints = newHashSet( constraints );
 		mergedConstraints.addAll( other.constraints );
 
@@ -161,8 +146,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				mergedConstraints,
 				mergedTypeArgumentConstraints,
 				mergedGroupConversions,
-				mergedCascadingTypeParameters,
-				mergedUnwrapMode
+				mergedCascadingTypeParameters
 		);
 	}
 

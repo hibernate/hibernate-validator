@@ -14,9 +14,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
-import org.joda.time.DateMidnight;
 import org.hibernate.validator.constraints.ScriptAssert;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling
@@ -85,11 +84,4 @@ public class CustomerRepository {
 		return null;
 	}
 
-	@UnwrapValidatedValue
-	public Set<String> methodRequiringUnwrapping() {
-		return null;
-	}
-
-	public void methodWithParameterRequiringUnwrapping(@UnwrapValidatedValue long l) {
-	}
 }

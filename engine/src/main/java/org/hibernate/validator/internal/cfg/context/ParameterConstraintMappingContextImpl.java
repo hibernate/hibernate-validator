@@ -115,8 +115,7 @@ final class ParameterConstraintMappingContextImpl
 				getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ),
 				Collections.emptySet(),
 				groupConversions,
-				getCascadedTypeParameters( parameterType, isCascading ),
-				unwrapMode()
+				getCascadedTypeParameters( parameterType, isCascading )
 		);
 	}
 

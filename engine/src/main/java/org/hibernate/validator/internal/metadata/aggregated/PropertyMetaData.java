@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import javax.validation.ElementKind;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
@@ -37,8 +36,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.logging.Log;
-import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Represents the constraint related meta data for a JavaBeans property.
@@ -57,22 +54,19 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class PropertyMetaData extends AbstractConstraintMetaData {
 
-	private static final Log log = LoggerFactory.make();
 	private final Set<Cascadable> cascadables;
 
 	private PropertyMetaData(String propertyName,
 							 Type type,
 							 Set<MetaConstraint<?>> constraints,
-							 Set<Cascadable> cascadables,
-							 UnwrapMode unwrapMode) {
+							 Set<Cascadable> cascadables) {
 		super(
 				propertyName,
 				type,
 				constraints,
 				ElementKind.PROPERTY,
 				!cascadables.isEmpty(),
-				!cascadables.isEmpty() || !constraints.isEmpty(),
-				unwrapMode
+				!cascadables.isEmpty() || !constraints.isEmpty()
 		);
 
 		this.cascadables = cascadables;
@@ -143,8 +137,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		private final String propertyName;
 		private final Map<Member, Cascadable.Builder> cascadableBuilders = new HashMap<>();
 		private final Type propertyType;
-		private UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
-		private boolean unwrapModeExplicitlyConfigured = false;
 
 		public Builder(Class<?> beanClass, ConstrainedField constrainedField, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 				ValueExtractors valueExtractors) {
@@ -191,26 +183,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		public final void add(ConstrainedElement constrainedElement) {
 			super.add( constrainedElement );
 
-			// HV-925
-			// Trying to detect inconsistent value unwrapping configuration between a property field and its getter.
-			// If a field or getter explicitly uses @UnwrapValidatedValue, the corresponding getter / field needs to either
-			// not use @UnwrapValidatedValue or use the same value for the annotation.
-			UnwrapMode newUnwrapMode = constrainedElement.unwrapMode();
-			if ( unwrapModeExplicitlyConfigured ) {
-				if ( !UnwrapMode.AUTOMATIC.equals( newUnwrapMode ) && !newUnwrapMode.equals( unwrapMode ) ) {
-					throw log.getInconsistentValueUnwrappingConfigurationBetweenFieldAndItsGetterException(
-							propertyName,
-							getBeanClass()
-					);
-				}
-			}
-			else {
-				if ( !UnwrapMode.AUTOMATIC.equals( newUnwrapMode ) ) {
-					unwrapMode = constrainedElement.unwrapMode();
-					unwrapModeExplicitlyConfigured = true;
-				}
-			}
-
 			if ( constrainedElement.isCascading() || !constrainedElement.getGroupConversions().isEmpty() ) {
 				if ( constrainedElement.getKind() == ConstrainedElementKind.FIELD ) {
 					Field field = ( (ConstrainedField) constrainedElement ).getField();
@@ -221,7 +193,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 						cascadableBuilders.put( field, builder );
 					}
 
-					builder.unwrapMode( unwrapMode );
 					builder.addGroupConversions( constrainedElement.getGroupConversions() );
 					builder.addCascadingTypeParameters( constrainedElement.getCascadingTypeParameters() );
 				}
@@ -234,7 +205,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 						cascadableBuilders.put( method, builder );
 					}
 
-					builder.unwrapMode( unwrapMode );
 					builder.addGroupConversions( constrainedElement.getGroupConversions() );
 					builder.addCascadingTypeParameters( constrainedElement.getCascadingTypeParameters() );
 				}
@@ -282,11 +252,6 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		@Override
-		public UnwrapMode unwrapMode() {
-			return unwrapMode;
-		}
-
-		@Override
 		public PropertyMetaData build() {
 			Set<Cascadable> cascadables = cascadableBuilders.values()
 					.stream()
@@ -297,8 +262,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 					propertyName,
 					propertyType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
-					cascadables,
-					unwrapMode()
+					cascadables
 			);
 		}
 	}

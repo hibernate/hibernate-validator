@@ -7,11 +7,13 @@
 package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
 import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.ValueExtractor;
 
 /**
  * @author Gunnar Morling
  */
+@UnwrapByDefault
 public class PropertyValueExtractor implements ValueExtractor<Property<@ExtractedValue ?>> {
 
 	@Override

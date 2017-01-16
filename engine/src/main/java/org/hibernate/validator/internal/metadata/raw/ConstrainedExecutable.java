@@ -22,7 +22,6 @@ import java.util.Set;
 
 import javax.validation.metadata.ConstraintDescriptor;
 
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -62,16 +61,13 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param returnValueConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param cascadingTypeParameters The type parameters marked for cascaded validation, if any.
-	 * @param unwrapMode Whether the value of the executable's return value must be unwrapped prior to
-	 * validation or not.
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
 			Executable executable,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
-			List<TypeVariable<?>> cascadingTypeParameters,
-			UnwrapMode unwrapMode) {
+			List<TypeVariable<?>> cascadingTypeParameters) {
 		this(
 				source,
 				executable,
@@ -80,8 +76,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				returnValueConstraints,
 				Collections.emptySet(),
 				groupConversions,
-				cascadingTypeParameters,
-				unwrapMode
+				cascadingTypeParameters
 		);
 	}
 
@@ -99,8 +94,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * if any.
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param cascadingTypeParameters The type parameters marked for cascaded validation, if any.
-	 * @param unwrapMode Determines how the value of the executable's return value must be handled in regards to
-	 * unwrapping prior to validation.
 	 */
 	public ConstrainedExecutable(
 			ConfigurationSource source,
@@ -110,16 +103,14 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> typeArgumentConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
-			List<TypeVariable<?>> cascadingTypeParameters,
-			UnwrapMode unwrapMode) {
+			List<TypeVariable<?>> cascadingTypeParameters) {
 		super(
 				source,
 				( executable instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
 				returnValueConstraints,
 				typeArgumentConstraints,
 				groupConversions,
-				cascadingTypeParameters,
-				unwrapMode
+				cascadingTypeParameters
 		);
 
 		this.executable = executable;
@@ -295,15 +286,6 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		List<TypeVariable<?>> mergedCascadingTypeParameters = new ArrayList<>( cascadingTypeParameters );
 		mergedCascadingTypeParameters.addAll( other.cascadingTypeParameters );
 
-		// TODO - Is this the right way of handling the merge of unwrapMode? (HF)
-		UnwrapMode mergedUnwrapMode;
-		if ( source.getPriority() > other.source.getPriority() ) {
-			mergedUnwrapMode = unwrapMode;
-		}
-		else {
-			mergedUnwrapMode = other.unwrapMode;
-		}
-
 		return new ConstrainedExecutable(
 				mergedSource,
 				executable,
@@ -312,8 +294,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				mergedReturnValueConstraints,
 				mergedTypeArgumentConstraints,
 				mergedGroupConversions,
-				mergedCascadingTypeParameters,
-				mergedUnwrapMode
+				mergedCascadingTypeParameters
 		);
 	}
 

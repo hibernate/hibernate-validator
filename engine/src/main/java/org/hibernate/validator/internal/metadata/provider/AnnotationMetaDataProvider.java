@@ -46,7 +46,6 @@ import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -77,7 +76,6 @@ import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod
 import org.hibernate.validator.internal.util.privilegedactions.GetMethods;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 /**
  * {@code MetaDataProvider} which reads the metadata from annotations which is the default configuration source.
@@ -267,7 +265,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		Set<MetaConstraint<?>> typeArgumentsConstraints = findTypeAnnotationConstraints( field );
 
 		boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
-		UnwrapMode unwrapMode = unwrapMode( field, typeArgumentAnnotated );
 
 		return new ConstrainedField(
 				ConfigurationSource.ANNOTATION,
@@ -275,21 +272,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				constraints,
 				typeArgumentsConstraints,
 				groupConversions,
-				cascadingTypeVariables,
-				unwrapMode
+				cascadingTypeVariables
 		);
-	}
-
-	private UnwrapMode unwrapMode(Field field, boolean typeArgumentAnnotated) {
-		boolean isCollection = ReflectionHelper.isCollection( ReflectionHelper.typeOf( field ) );
-		UnwrapValidatedValue unwrapValidatedValue = field.getAnnotation( UnwrapValidatedValue.class );
-		return unwrapMode( typeArgumentAnnotated, isCollection, unwrapValidatedValue );
-	}
-
-	private UnwrapMode unwrapMode(Executable executable, boolean typeArgumentAnnotated) {
-		boolean isCollection = ReflectionHelper.isCollection( ReflectionHelper.typeOf( executable ) );
-		UnwrapValidatedValue unwrapValidatedValue = executable.getAnnotation( UnwrapValidatedValue.class );
-		return unwrapMode( typeArgumentAnnotated, isCollection, unwrapValidatedValue );
 	}
 
 	private Set<MetaConstraint<?>> convertToMetaConstraints(List<ConstraintDescriptorImpl<?>> constraintDescriptors, Field field) {
@@ -305,30 +289,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractors, constraintDescription, location ) );
 		}
 		return constraints;
-	}
-
-	private UnwrapMode unwrapMode(boolean typeArgumentAnnotated, boolean isCollection, UnwrapValidatedValue unwrapValidatedValue) {
-		if ( unwrapValidatedValue == null && typeArgumentAnnotated && !isCollection ) {
-			/*
-			 * Optional<@NotNull String> exampleValue
-			 */
-			return UnwrapMode.UNWRAP;
-		}
-		else if ( unwrapValidatedValue != null ) {
-			/*
-			 * @UnwrapValidatedValue(false) Optional<@NotNull String> exampleValue
-			 */
-			return unwrapValidatedValue.value() ? UnwrapMode.UNWRAP : UnwrapMode.SKIP_UNWRAP;
-		}
-		/*
-		 * @NotNull Optional<String> exampleValue
-		 *
-		 * @NotNull String otherExampleValue
-		 *
-		 * @NotNull
-		 * List<@NotBlankTypeUse String> thirdExampleValue
-		 */
-		return UnwrapMode.AUTOMATIC;
 	}
 
 	private Set<ConstrainedExecutable> getConstructorMetaData(Class<?> clazz) {
@@ -390,7 +350,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		Map<Class<?>, Class<?>> groupConversions;
 		List<TypeVariable<?>> cascadingTypeVariables;
 
-		UnwrapMode unwrapMode = UnwrapMode.AUTOMATIC;
 		if ( annotationProcessingOptions.areReturnValueConstraintsIgnoredFor( executable ) ) {
 			returnValueConstraints = Collections.emptySet();
 			typeArgumentsConstraints = Collections.emptySet();
@@ -399,8 +358,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 		else {
 			typeArgumentsConstraints = findTypeAnnotationConstraints( executable );
-			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
-			unwrapMode = unwrapMode( executable, typeArgumentAnnotated );
 			returnValueConstraints = convertToMetaConstraints(
 					executableConstraints.get( ConstraintType.GENERIC ),
 					executable
@@ -420,8 +377,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				returnValueConstraints,
 				typeArgumentsConstraints,
 				groupConversions,
-				cascadingTypeVariables,
-				unwrapMode
+				cascadingTypeVariables
 		);
 	}
 
@@ -483,15 +439,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 								parameterConstraints,
 								Collections.emptySet(),
 								getGroupConversions( groupConversion, groupConversionList ),
-								Collections.emptyList(),
-								UnwrapMode.AUTOMATIC
+								Collections.emptyList()
 						)
 				);
 				i++;
 				continue;
 			}
-
-			UnwrapValidatedValue unwrapValidatedValue = null;
 
 			ConstraintLocation location = ConstraintLocation.forParameter( executable, i );
 
@@ -502,11 +455,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				}
 				else if ( parameterAnnotation.annotationType().equals( ConvertGroup.List.class ) ) {
 					groupConversionList = (ConvertGroup.List) parameterAnnotation;
-				}
-
-				// unwrapping required?
-				else if ( parameterAnnotation.annotationType().equals( UnwrapValidatedValue.class ) ) {
-					unwrapValidatedValue = (UnwrapValidatedValue) parameterAnnotation;
 				}
 
 				// collect constraints if this annotation is a constraint annotation
@@ -524,7 +472,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			List<TypeVariable<?>> cascadingTypeParameters = findCascadingTypeParameters( parameter );
 			boolean typeArgumentAnnotated = !typeArgumentsConstraints.isEmpty();
 			boolean isCollection = ReflectionHelper.isCollection( ReflectionHelper.typeOf( executable, i ) );
-			UnwrapMode unwrapMode = unwrapMode( typeArgumentAnnotated, isCollection, unwrapValidatedValue );
 
 			metaData.add(
 					new ConstrainedParameter(
@@ -536,8 +483,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 							parameterConstraints,
 							typeArgumentsConstraints,
 							getGroupConversions( groupConversion, groupConversionList ),
-							cascadingTypeParameters,
-							unwrapMode
+							cascadingTypeParameters
 					)
 			);
 			i++;

@@ -6,6 +6,10 @@
  */
 package org.hibernate.validator.test.internal.metadata;
 
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -19,14 +23,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
-import org.joda.time.DateMidnight;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerBasic;
 import org.hibernate.validator.test.internal.metadata.Customer.CustomerComplex;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import org.joda.time.DateMidnight;
 
 /**
  * @author Gunnar Morling
@@ -61,7 +60,6 @@ public class CustomerRepositoryExt extends CustomerRepository {
 	public CustomerRepositoryExt(DateMidnight start, DateMidnight end) {
 	}
 
-	@UnwrapValidatedValue
 	public CustomerRepositoryExt(long l) {
 	}
 

@@ -34,7 +34,6 @@ import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.hibernate.validator.internal.engine.groups.ValidationOrder;
 import org.hibernate.validator.internal.engine.groups.ValidationOrderGenerator;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
@@ -308,18 +307,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	@Override
 	public List<Class<? super T>> getClassHierarchy() {
 		return classHierarchyWithoutInterfaces;
-	}
-
-	@Override
-	public UnwrapMode getUnwrapMode(ConstraintLocation location) {
-		PropertyConstraintLocation propertyLocation = getPropertyConstraintLocation( location );
-
-		if ( propertyLocation != null ) {
-			return propertyMetaDataMap.get( propertyLocation.getPropertyName() ).unwrapMode();
-		}
-		else {
-			return UnwrapMode.AUTOMATIC;
-		}
 	}
 
 	private static Set<ConstraintDescriptorImpl<?>> getClassLevelConstraintsAsDescriptors(Set<MetaConstraint<?>> constraints) {

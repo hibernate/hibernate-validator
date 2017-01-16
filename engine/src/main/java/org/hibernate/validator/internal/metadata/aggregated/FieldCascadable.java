@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -45,16 +44,14 @@ public class FieldCascadable implements Cascadable {
 	private final Type cascadableType;
 	private final List<TypeVariable<?>> cascadingTypeParameters;
 	private final GroupConversionHelper groupConversionHelper;
-	private final UnwrapMode unwrapMode;
 
-	FieldCascadable(Field field, List<TypeVariable<?>> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions, UnwrapMode unwrapMode) {
+	FieldCascadable(Field field, List<TypeVariable<?>> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions) {
 		this.field = field;
 		this.propertyName = field.getName();
 		this.cascadableType = ReflectionHelper.typeOf( field );
 		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( !cascadingTypeParameters.isEmpty(), field.toString() );
-		this.unwrapMode = unwrapMode;
 	}
 
 	@Override
@@ -70,11 +67,6 @@ public class FieldCascadable implements Cascadable {
 	@Override
 	public ElementType getElementType() {
 		return ElementType.FIELD;
-	}
-
-	@Override
-	public UnwrapMode unwrapMode() {
-		return unwrapMode;
 	}
 
 	@Override
@@ -105,8 +97,6 @@ public class FieldCascadable implements Cascadable {
 		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 		private final Map<Class<?>, Class<?>> groupConversions = new HashMap<>();
 
-		private UnwrapMode unwrapMode;
-
 		public Builder(Field field) {
 			this.field = field;
 		}
@@ -135,13 +125,8 @@ public class FieldCascadable implements Cascadable {
 		}
 
 		@Override
-		public void unwrapMode(UnwrapMode unwrapMode) {
-			this.unwrapMode = unwrapMode;
-		}
-
-		@Override
 		public FieldCascadable build() {
-			return new FieldCascadable( getAccessible( field ), cascadingTypeParameters, groupConversions, unwrapMode );
+			return new FieldCascadable( getAccessible( field ), cascadingTypeParameters, groupConversions );
 		}
 
 		/**

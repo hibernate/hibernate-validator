@@ -33,12 +33,13 @@ import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Null;
 import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.UnwrapByDefault;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -46,72 +47,65 @@ import org.testng.annotations.Test;
  * Test the various scenarios for explicit and implicit unwrapping of values.
  *
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 @TestForIssue(jiraKey = "HV-925")
 @SuppressWarnings("unused")
-public class UnwrapModesTest {
-	private Validator validatorWithUnwrapper;
-	private Validator validatorWithoutUnwrapper;
+public class UnwrappingTest {
+	private Validator validatorWithValueExtractor;
+	private Validator validatorWithoutValueExtractor;
 
 	@BeforeClass
 	public void setupValidator() {
-		validatorWithoutUnwrapper = ValidatorUtil.getValidator();
+		validatorWithoutValueExtractor = ValidatorUtil.getValidator();
 
-		validatorWithUnwrapper = ValidatorUtil.getConfiguration()
+		validatorWithValueExtractor = ValidatorUtil.getConfiguration()
 				.addCascadedValueExtractor( new ValueHolderExtractor() )
+				.addCascadedValueExtractor( new UnwrapByDefaultWrapperExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 	}
 
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
-	public void no_constraint_validator_for_wrapped_and_unwrapped_value_throws_exception() {
-		validatorWithoutUnwrapper.validate( new Foo() );
+	public void no_constraint_validator_for_wrapped_value_throws_exception() {
+		validatorWithoutValueExtractor.validate( new Foo() );
 	}
 
 	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
 	public void no_constraint_validator_for_unwrapped_value_throws_exception() {
-		validatorWithUnwrapper.validate( new Fubar() );
+		validatorWithValueExtractor.validate( new Fubar() );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000198.*")
-	public void missing_value_unwrapper_throws_exception() {
-		validatorWithoutUnwrapper.validate( new Foobar() );
-	}
-
-	@Test(enabled = false)
-	// TODO implicit unwrapping not supported
-	public void unwrapped_values_get_validated() {
-		Set<ConstraintViolation<Bar>> constraintViolations = validatorWithUnwrapper.validate( new Bar() );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "integerHolder", "stringHolder" );
-		assertCorrectConstraintTypes( constraintViolations, Min.class, NotBlank.class );
+	public void missing_value_extractor_throws_exception() {
+		validatorWithoutValueExtractor.validate( new Foobar() );
 	}
 
 	@Test
-	public void validate_wrapper_itself_if_there_is_no_unwrapper_and_no_validator_for_wrapped_value() {
-		Set<ConstraintViolation<Qux>> constraintViolations = validatorWithoutUnwrapper.validate( new Qux() );
+	public void validate_wrapper_itself_if_there_is_no_value_extractor() {
+		Set<ConstraintViolation<Qux>> constraintViolations = validatorWithoutValueExtractor.validate( new Qux() );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "integerHolder" );
 		assertCorrectConstraintTypes( constraintViolations, ValueHolderConstraint.class );
 	}
 
 	@Test
-	public void validate_wrapper_itself_if_there_is_unwrapper_but_only_constraint_validator_for_wrapper() {
-		Set<ConstraintViolation<Qux>> constraintViolations = validatorWithUnwrapper.validate( new Qux() );
+	public void validate_wrapper_itself_even_if_there_is_a_value_extractor() {
+		Set<ConstraintViolation<Qux>> constraintViolations = validatorWithValueExtractor.validate( new Qux() );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "integerHolder" );
 		assertCorrectConstraintTypes( constraintViolations, ValueHolderConstraint.class );
 
 		// execute validation twice to ensure that the handling for this case is not subjective to caching (see HV-976)
-		constraintViolations = validatorWithUnwrapper.validate( new Qux() );
+		constraintViolations = validatorWithValueExtractor.validate( new Qux() );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "integerHolder" );
 		assertCorrectConstraintTypes( constraintViolations, ValueHolderConstraint.class );
 	}
 
 	@Test
-	public void validate_wrapper_itself_if_there_is_no_unwrapper() {
-		Set<ConstraintViolation<Baz>> constraintViolations = validatorWithoutUnwrapper.validate( new Baz() );
+	public void validate_wrapper_itself_if_there_is_no_value_extractor_even_if_constraint_could_be_applied_to_unwrapped_value() {
+		Set<ConstraintViolation<Baz>> constraintViolations = validatorWithoutValueExtractor.validate( new Baz() );
 		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths( constraintViolations, "integerHolder" );
 		assertCorrectConstraintTypes( constraintViolations, Null.class );
@@ -120,24 +114,44 @@ public class UnwrapModesTest {
 	@Test(enabled = false, expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000186.*")
 	// TODO implicit unwrapping not supported for now
 	public void constraint_declaration_exception_if_there_are_validators_for_wrapper_and_wrapped_value() {
-		validatorWithUnwrapper.validate( new Baz() );
+		validatorWithValueExtractor.validate( new Baz() );
+	}
+
+	@Test
+	public void validate_wrapped_value_if_value_extractor_unwraps_by_default() {
+		Set<ConstraintViolation<WrapperWithImplicitUnwrapping>> constraintViolations = validatorWithValueExtractor.validate( new WrapperWithImplicitUnwrapping() );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "integerWrapper" );
+		assertCorrectConstraintTypes( constraintViolations, Min.class );
+	}
+
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030.*")
+	public void validation_exception_if_unwrapping_disabled_per_constraint() {
+		validatorWithValueExtractor.validate( new WrapperWithDisabledUnwrapping() );
+	}
+
+	@Test
+	public void validate_wrapped_value_if_value_extractor_unwraps_by_default_and_unwrapping_enabled_per_constraint() {
+		Set<ConstraintViolation<WrapperWithForcedUnwrapping>> constraintViolations = validatorWithValueExtractor.validate( new WrapperWithForcedUnwrapping() );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "integerWrapper" );
+		assertCorrectConstraintTypes( constraintViolations, Min.class );
 	}
 
 	public class Foo {
-		// no constraint validator defined for @DummyConstraint and no unwrapper for ValueHolder
+		// no constraint validator defined for @DummyConstraint
 		@DummyConstraint
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
 	public class Fubar {
-		// @UnwrapValidatedValue annotation optional
-		@Future // there is no future validator for integers!
+		// no constraint validator for the wrapped value
+		@Future(validateUnwrappedValue = ValidateUnwrappedValue.YES)
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
 	public class Foobar {
-		@UnwrapValidatedValue
-		@Min(10)
+		@Min(value = 10, validateUnwrappedValue = ValidateUnwrappedValue.YES)
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
@@ -158,9 +172,40 @@ public class UnwrapModesTest {
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
+	public class WrapperWithImplicitUnwrapping {
+
+		@Min(10)
+		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
+	}
+
+	public class WrapperWithDisabledUnwrapping {
+
+		@Min(value = 10, validateUnwrappedValue = ValidateUnwrappedValue.NO)
+		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
+	}
+
+	public class WrapperWithForcedUnwrapping {
+
+		@Min(value = 10, validateUnwrappedValue = ValidateUnwrappedValue.YES)
+		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
+	}
+
 	class ValueHolder<T> {
 
 		ValueHolder(T value) {
+			this.value = value;
+		}
+
+		private final T value;
+
+		public T getValue() {
+			return value;
+		}
+	}
+
+	class Wrapper<T> {
+
+		Wrapper(T value) {
 			this.value = value;
 		}
 
@@ -208,6 +253,15 @@ public class UnwrapModesTest {
 
 		@Override
 		public void extractValues(ValueHolder<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
+			receiver.value( null, originalValue.value );
+		}
+	}
+
+	@UnwrapByDefault
+	class UnwrapByDefaultWrapperExtractor implements ValueExtractor<Wrapper<@ExtractedValue ?>> {
+
+		@Override
+		public void extractValues(Wrapper<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
 			receiver.value( null, originalValue.value );
 		}
 	}

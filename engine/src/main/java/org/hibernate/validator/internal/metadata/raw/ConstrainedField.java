@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.StringHelper;
 
@@ -36,18 +35,15 @@ public class ConstrainedField extends AbstractConstrainedElement {
 	 * @param typeArgumentConstraints Type arguments constraints, if any.
 	 * @param groupConversions The group conversions of the represented field, if any.
 	 * @param cascadingTypeParameters The type parameters marked for cascaded validation, if any.
-	 * @param unwrapMode Determines how the value of the field must be handled in regards to
-	 * unwrapping prior to validation.
 	 */
 	public ConstrainedField(ConfigurationSource source,
 							Field field,
 							Set<MetaConstraint<?>> constraints,
 							Set<MetaConstraint<?>> typeArgumentConstraints,
 							Map<Class<?>, Class<?>> groupConversions,
-							List<TypeVariable<?>> cascadingTypeParameters,
-							UnwrapMode unwrapMode) {
+							List<TypeVariable<?>> cascadingTypeParameters) {
 
-		super( source, ConstrainedElementKind.FIELD, constraints, typeArgumentConstraints, groupConversions, cascadingTypeParameters, unwrapMode );
+		super( source, ConstrainedElementKind.FIELD, constraints, typeArgumentConstraints, groupConversions, cascadingTypeParameters );
 
 		this.field = field;
 	}

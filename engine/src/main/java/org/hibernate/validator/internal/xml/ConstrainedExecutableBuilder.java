@@ -25,7 +25,6 @@ import javax.validation.ValidationException;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
@@ -229,8 +228,7 @@ class ConstrainedExecutableBuilder {
 				returnValueConstraints,
 				Collections.emptySet(),
 				groupConversions,
-				getCascadedTypeParameters( executable, isCascaded ),
-				UnwrapMode.AUTOMATIC
+				getCascadedTypeParameters( executable, isCascaded )
 		);
 	}
 

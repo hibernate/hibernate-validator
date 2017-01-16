@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.metadata.raw;
 import java.util.Collections;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**
@@ -38,8 +37,7 @@ public class ConstrainedType extends AbstractConstrainedElement {
 				constraints,
 				Collections.emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
-				Collections.emptyList(),
-				UnwrapMode.AUTOMATIC
+				Collections.emptyList()
 		);
 
 		this.beanClass = beanClass;

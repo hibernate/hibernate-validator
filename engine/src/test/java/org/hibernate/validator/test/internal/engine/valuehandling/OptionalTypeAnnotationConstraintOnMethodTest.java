@@ -34,17 +34,17 @@ import javax.validation.ReportAsSingleViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Test combination of {@link Optional} and {@link UnwrapValidatedValue} on methods.
+ * Test combination of {@link Optional} and {@code validateUnwrappedValue()} on methods.
  *
  * @author Davide D'Alto
  */
@@ -244,25 +244,25 @@ public class OptionalTypeAnnotationConstraintOnMethodTest {
 
 	static class ModelA {
 
-		public void method(@UnwrapValidatedValue(false) @NotNull(message = "container") Optional<String> valueWithoutTypeAnnotation) {
+		public void method(@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO) Optional<String> valueWithoutTypeAnnotation) {
 		}
 	}
 
 	static class ModelB {
 
-		public void method(@UnwrapValidatedValue(false) @NotNull(message = "container") Optional<@NotNull(message = "type") String> valueWithNotNull) {
+		public void method(@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO) Optional<@NotNull(message = "type") String> valueWithNotNull) {
 		}
 	}
 
 	static class ModelC {
 
-		public void method(@UnwrapValidatedValue(true) @NotNull(message = "container") Optional<@NotBlank(message = "type") String> valueWithNotNullUnwrapped) {
+		public void method(@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.YES) Optional<@NotBlank(message = "type") String> valueWithNotNullUnwrapped) {
 		}
 	}
 
 	static class ModelD {
 
-		public void method(@UnwrapValidatedValue(false) @NotNull(message = "container") Optional<@NullOrNotBlank(message = "type") String> valueWithNullOrNotBlank) {
+		public void method(@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO) Optional<@NullOrNotBlank(message = "type") String> valueWithNullOrNotBlank) {
 		}
 	}
 

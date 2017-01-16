@@ -20,12 +20,10 @@ import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 /**
  * Represents the constraint related meta data of the return value of a method
@@ -46,16 +44,14 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	public ReturnValueMetaData(Type type,
 							   Set<MetaConstraint<?>> constraints,
 							   List<TypeVariable<?>> cascadingTypeParameters,
-							   Map<Class<?>, Class<?>> groupConversions,
-							   UnwrapMode unwrapMode) {
+							   Map<Class<?>, Class<?>> groupConversions) {
 		super(
 				RETURN_VALUE_NODE_NAME,
 				type,
 				constraints,
 				ElementKind.RETURN_VALUE,
 				!cascadingTypeParameters.isEmpty(),
-				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty(),
-				unwrapMode
+				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty()
 		);
 
 		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
@@ -109,11 +105,6 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	@Override
 	public void appendTo(PathImpl path) {
 		path.addReturnValueNode();
-	}
-
-	@Override
-	public UnwrapMode getUnwrapMode(ConstraintLocation location) {
-		return unwrapMode();
 	}
 
 	@Override

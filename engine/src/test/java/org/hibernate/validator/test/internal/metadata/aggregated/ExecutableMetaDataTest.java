@@ -23,7 +23,6 @@ import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
@@ -206,22 +205,6 @@ public class ExecutableMetaDataTest {
 	}
 
 	@Test
-	public void requiresUnwrappingForMethod() throws Exception {
-		Method method = CustomerRepositoryExt.class.getMethod( "methodRequiringUnwrapping" );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
-
-		assertEquals( methodMetaData.unwrapMode(), UnwrapMode.UNWRAP );
-	}
-
-	@Test
-	public void requiresUnwrappingForConstructor() throws Exception {
-		Constructor<CustomerRepositoryExt> constructor = CustomerRepositoryExt.class.getConstructor( long.class );
-		ExecutableMetaData constructorMetaData = beanMetaData.getMetaDataFor( constructor );
-
-		assertEquals( constructorMetaData.unwrapMode(), UnwrapMode.UNWRAP );
-	}
-
-	@Test
 	public void methodWithConstrainedParameter() throws Exception {
 		Method method = CustomerRepositoryExt.class.getMethod( "createCustomer", CharSequence.class, String.class );
 		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
@@ -364,7 +347,6 @@ public class ExecutableMetaDataTest {
 		assertFalse( methodMetaData.isConstrained() );
 		assertThat( methodMetaData ).isEmpty();
 		assertThat( methodMetaData.getCrossParameterConstraints() ).isEmpty();
-		assertEquals( methodMetaData.unwrapMode(), UnwrapMode.AUTOMATIC );
 
 		assertThat( methodMetaData.getParameterMetaData( 0 ).isConstrained() ).isFalse();
 		assertThat( methodMetaData.getParameterMetaData( 0 ).isCascading() ).isFalse();

@@ -13,7 +13,6 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**
@@ -107,14 +106,6 @@ public interface ConstrainedElement extends Iterable<MetaConstraint<?>> {
 	 *         <code>false</code> otherwise.
 	 */
 	boolean isConstrained();
-
-	/**
-	 * Determines how to handle unwrapping of validated values as configured via {@code UnwrapValidatedValue}.
-	 *
-	 * @return Returns the unwrapping mode for this constrained element.
-	 * @see org.hibernate.validator.valuehandling.UnwrapValidatedValue
-	 */
-	UnwrapMode unwrapMode();
 
 	/**
 	 * Returns the configuration source contributing this constrained element.

@@ -23,7 +23,6 @@ import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -44,16 +43,14 @@ public class GetterCascadable implements Cascadable {
 	private final Type cascadableType;
 	private final List<TypeVariable<?>> cascadingTypeParameters;
 	private final GroupConversionHelper groupConversionHelper;
-	private final UnwrapMode unwrapMode;
 
-	GetterCascadable(Method method, List<TypeVariable<?>> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions, UnwrapMode unwrapMode) {
+	GetterCascadable(Method method, List<TypeVariable<?>> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions) {
 		this.method = method;
 		this.propertyName = ReflectionHelper.getPropertyName( method );
 		this.cascadableType = ReflectionHelper.typeOf( method );
 		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( !cascadingTypeParameters.isEmpty(), method.toString() );
-		this.unwrapMode = unwrapMode;
 	}
 
 	@Override
@@ -69,11 +66,6 @@ public class GetterCascadable implements Cascadable {
 	@Override
 	public ElementType getElementType() {
 		return ElementType.METHOD;
-	}
-
-	@Override
-	public UnwrapMode unwrapMode() {
-		return unwrapMode;
 	}
 
 	@Override
@@ -104,8 +96,6 @@ public class GetterCascadable implements Cascadable {
 		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
 		private final Map<Class<?>, Class<?>> groupConversions = new HashMap<>();
 
-		private UnwrapMode unwrapMode;
-
 		public Builder(Method method) {
 			this.method = method;
 		}
@@ -134,13 +124,8 @@ public class GetterCascadable implements Cascadable {
 		}
 
 		@Override
-		public void unwrapMode(UnwrapMode unwrapMode) {
-			this.unwrapMode = unwrapMode;
-		}
-
-		@Override
 		public GetterCascadable build() {
-			return new GetterCascadable( getAccessible( method ), cascadingTypeParameters, groupConversions, unwrapMode );
+			return new GetterCascadable( getAccessible( method ), cascadingTypeParameters, groupConversions );
 		}
 
 		/**

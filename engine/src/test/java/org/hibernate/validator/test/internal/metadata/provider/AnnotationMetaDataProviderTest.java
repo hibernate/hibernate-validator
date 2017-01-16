@@ -10,7 +10,6 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.testng.Assert.assertEquals;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -33,7 +32,6 @@ import javax.validation.metadata.ConstraintDescriptor;
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
@@ -47,7 +45,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.joda.time.DateMidnight;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -328,112 +325,6 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		provider.getBeanConfigurationForHierarchy( User3.class );
 	}
 
-	@Test
-	@TestForIssue(jiraKey = "HV-819")
-	public void unwrapValidatedValueOnField() throws Exception {
-		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				GolfPlayer.class
-		);
-
-		ConstrainedField constrainedField = findConstrainedField( beanConfigurations, GolfPlayer.class, "name" );
-
-		assertEquals( constrainedField.unwrapMode(), UnwrapMode.UNWRAP );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-925")
-	public void testAutomaticUnwrapValidatedValueOnField() throws Exception {
-		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				GolfPlayer.class
-		);
-
-		ConstrainedField constrainedField = findConstrainedField( beanConfigurations, GolfPlayer.class, "nickname" );
-
-		assertEquals( constrainedField.unwrapMode(), UnwrapMode.AUTOMATIC );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-819")
-	public void unwrapValidatedValueOnProperty() throws Exception {
-		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				GolfPlayer.class
-		);
-
-		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
-				beanConfigurations,
-				GolfPlayer.class,
-				"getHandicap"
-		);
-
-		assertEquals( constrainedMethod.unwrapMode(), UnwrapMode.UNWRAP );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-925")
-	public void testSkipUnwrapValidatedValueOnProperty() throws Exception {
-		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				GolfPlayer.class
-		);
-
-		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
-				beanConfigurations,
-				GolfPlayer.class,
-				"getScore"
-		);
-
-		assertEquals( constrainedMethod.unwrapMode(), UnwrapMode.SKIP_UNWRAP );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-819")
-	public void unwrapValidatedValueOnMethod() throws Exception {
-		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				GolfPlayer.class
-		);
-
-		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
-				beanConfigurations,
-				GolfPlayer.class,
-				"enterTournament"
-		);
-
-		assertEquals( constrainedMethod.unwrapMode(), UnwrapMode.UNWRAP );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-819")
-	public void unwrapValidatedValueOnConstructor() throws Exception {
-		@SuppressWarnings("rawtypes")
-		List<BeanConfiguration<? super Wrapper>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				Wrapper.class
-		);
-
-		ConstrainedExecutable constrainedConstructor = findConstrainedConstructor(
-				beanConfigurations,
-				Wrapper.class,
-				Object.class
-		);
-
-		assertEquals( constrainedConstructor.unwrapMode(), UnwrapMode.UNWRAP );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HV-819")
-	public void unwrapValidatedValueOnParameter() throws Exception {
-		List<BeanConfiguration<? super GolfPlayer>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				GolfPlayer.class
-		);
-
-		ConstrainedExecutable constrainedMethod = findConstrainedMethod(
-				beanConfigurations,
-				GolfPlayer.class,
-				"practice",
-				Wrapper.class
-		);
-
-		assertEquals( constrainedMethod.getParameterMetaData( 0 ).unwrapMode(), UnwrapMode.UNWRAP );
-	}
-
 	private static class Foo {
 		@NotNull
 		public Foo(@NotNull String foo) {
@@ -585,39 +476,4 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		String value();
 	}
 
-	private static class GolfPlayer {
-		private Wrapper<String> nickname;
-
-		@UnwrapValidatedValue
-		private Wrapper<String> name;
-
-		@UnwrapValidatedValue
-		public Wrapper<Double> getHandicap() {
-			return null;
-		}
-
-		@UnwrapValidatedValue(false)
-		public Wrapper<Double> getScore() {
-			return null;
-		}
-
-		@UnwrapValidatedValue
-		public Wrapper<Boolean> enterTournament() {
-			return null;
-		}
-
-		@SuppressWarnings("unused")
-		public void practice(@UnwrapValidatedValue Wrapper<Integer> numberOfBalls) {
-		}
-	}
-
-	private static class Wrapper<T> {
-		@SuppressWarnings("unused")
-		public T value;
-
-		@UnwrapValidatedValue
-		public Wrapper(T value) {
-			this.value = value;
-		}
-	}
 }

@@ -10,21 +10,18 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertC
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.UnexpectedTypeException;
 import javax.validation.Validator;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -44,6 +41,7 @@ import javafx.collections.FXCollections;
  *
  * @author Khalid Alqinyah
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 public class JavaFXPropertyValueUnwrapperTest {
 
@@ -86,16 +84,10 @@ public class JavaFXPropertyValueUnwrapperTest {
 		);
 	}
 
-	@Test( enabled = false )
-	// TODO: applying to the wrapper by default seems legit
-	public void testValidatorForWrapperAndWrappedValueThrowsException() {
-		try {
-			validator.validate( new Bar1() );
-			fail( "Should have thrown an exception" );
-		}
-		catch (UnexpectedTypeException e) {
-			assertTrue( e.getMessage().startsWith( "HV000186" ) );
-		}
+	@Test
+	public void testValidateUnwrappedValueNo() {
+		Set<ConstraintViolation<Bar1>> constraintViolations = validator.validate( new Bar1() );
+		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
 	@Test
@@ -119,15 +111,14 @@ public class JavaFXPropertyValueUnwrapperTest {
 
 	@SuppressWarnings("unused")
 	public class Foo {
-		@UnwrapValidatedValue
-		@Max(value = 3)
+		// Need to explicitly unwrap, since ReadOnlyListProperty in itself implements List
+		@Max(value = 3, validateUnwrappedValue = ValidateUnwrappedValue.YES)
 		ReadOnlyDoubleWrapper doubleProperty = new ReadOnlyDoubleWrapper( 4.5 );
 
-		@UnwrapValidatedValue
+		// The value extractor of Property enables unwrapping by default
 		@Min(value = 3)
 		IntegerProperty integerProperty = new SimpleIntegerProperty( 2 );
 
-		@UnwrapValidatedValue
 		@AssertTrue
 		ReadOnlyBooleanProperty booleanProperty = new SimpleBooleanProperty( false );
 	}
@@ -135,27 +126,24 @@ public class JavaFXPropertyValueUnwrapperTest {
 	@SuppressWarnings("unused")
 	public class Fubar {
 		// Need to explicitly unwrap, since ReadOnlyListProperty in itself implements List
-		@UnwrapValidatedValue
-		@Size(min = 5)
+		@Size(min = 5, validateUnwrappedValue = ValidateUnwrappedValue.YES)
 		ReadOnlyListProperty listProperty = new ReadOnlyListWrapper( FXCollections.observableArrayList( 1, 2, 3 ) );
 	}
 
 	@SuppressWarnings("unused")
 	public class Bar1 {
-		@NotNull
+		@NotNull(validateUnwrappedValue = ValidateUnwrappedValue.NO)
 		MapProperty property = new SimpleMapProperty( null );
 	}
 
 	@SuppressWarnings("unused")
 	public class Bar2 {
-		@UnwrapValidatedValue(true)
 		@NotNull
 		MapProperty property = new SimpleMapProperty( null );
 	}
 
 	@SuppressWarnings("unused")
 	public class Bar3 {
-		@UnwrapValidatedValue(false)
 		@NotNull
 		MapProperty property = new SimpleMapProperty( null );
 	}

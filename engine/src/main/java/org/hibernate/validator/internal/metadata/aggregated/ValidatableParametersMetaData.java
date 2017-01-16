@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -25,6 +24,7 @@ import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraint
  */
 public class ValidatableParametersMetaData implements Validatable {
 
+	@SuppressWarnings("unused")
 	private final List<ParameterMetaData> parameterMetaData;
 	private final Iterable<Cascadable> cascadables;
 
@@ -40,18 +40,7 @@ public class ValidatableParametersMetaData implements Validatable {
 		return cascadables;
 	}
 
-	@Override
-	public UnwrapMode getUnwrapMode(ConstraintLocation location) {
-		ParameterConstraintLocation parameterConstraintLocation = getParameterConstraintLocation( location );
-
-		if ( parameterConstraintLocation != null ) {
-			return parameterMetaData.get( parameterConstraintLocation.getIndex() ).unwrapMode();
-		}
-
-		// cross-parameter
-		return UnwrapMode.AUTOMATIC;
-	}
-
+	@SuppressWarnings("unused")
 	private ParameterConstraintLocation getParameterConstraintLocation(ConstraintLocation location) {
 		if ( location instanceof ParameterConstraintLocation ) {
 			return (ParameterConstraintLocation) location;

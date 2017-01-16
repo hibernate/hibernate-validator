@@ -20,7 +20,6 @@ import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -119,8 +118,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractors ) : Collections.<MetaConstraint<?>>emptySet(),
 				Collections.emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
-				getCascadedTypeParameters( executable, returnValueContext != null && returnValueContext.isCascading() ),
-				returnValueContext != null ? returnValueContext.unwrapMode() : UnwrapMode.AUTOMATIC
+				getCascadedTypeParameters( executable, returnValueContext != null && returnValueContext.isCascading() )
 		);
 	}
 

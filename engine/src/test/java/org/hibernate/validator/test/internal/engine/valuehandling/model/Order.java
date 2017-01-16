@@ -7,15 +7,13 @@
 package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
 import javax.validation.constraints.Size;
-
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 /**
  * @author Gunnar Morling
  */
 public class Order {
 
-	@Size(min = 4)
-	@UnwrapValidatedValue
+	@Size(min = 4, validateUnwrappedValue = ValidateUnwrappedValue.YES)
 	private final Wrapper<Long> id = new Wrapper<Long>( 42L );
 }

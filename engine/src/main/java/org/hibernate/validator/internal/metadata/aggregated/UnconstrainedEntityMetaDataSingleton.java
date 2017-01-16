@@ -15,10 +15,8 @@ import javax.validation.ConstraintDeclarationException;
 import javax.validation.metadata.BeanDescriptor;
 
 import org.hibernate.validator.internal.engine.groups.Sequence;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 
 /**
  * A dummy implementation of {@code BeanMetaData} used as a placeholder for unconstrained types.
@@ -96,8 +94,4 @@ public final class UnconstrainedEntityMetaDataSingleton<T> implements BeanMetaDa
 		throw new UnsupportedOperationException();
 	}
 
-	@Override
-	public UnwrapMode getUnwrapMode(ConstraintLocation location) {
-		throw new UnsupportedOperationException();
-	}
 }

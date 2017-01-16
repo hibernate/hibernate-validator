@@ -25,7 +25,6 @@ import javax.validation.constraints.Min;
 import javax.validation.executable.ExecutableValidator;
 
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -141,7 +140,6 @@ public class OptionalValueUnwrapperTest {
 		assertCorrectConstraintTypes( constraintViolations, Min.class, Min.class );
 	}
 
-	@SuppressWarnings("unused")
 	private class Foo {
 		@Min(value = 5)
 		Optional<Integer> integerOptional = Optional.of( 3 );
@@ -152,7 +150,6 @@ public class OptionalValueUnwrapperTest {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private class Snafu {
 		@Valid
 		Optional<Bar> barOptional = Optional.of( new Bar() );
@@ -160,11 +157,10 @@ public class OptionalValueUnwrapperTest {
 
 	@SuppressWarnings("unused")
 	private class Fubar {
-		public void setBar(@UnwrapValidatedValue @Valid Optional<Bar> optionalBarPara) {
+		public void setBar(@Valid Optional<Bar> optionalBarPara) {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private class Qux {
 		@Valid
 		public Optional<Bar> getBar() {
@@ -174,17 +170,15 @@ public class OptionalValueUnwrapperTest {
 
 	@SuppressWarnings("unused")
 	private class Baz {
-		public void setOptionalLong(@UnwrapValidatedValue @Min(5) Optional<Long> optionalLongPara) {
+		public void setOptionalLong(@Min(5) Optional<Long> optionalLongPara) {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private class Bar {
 		@Min(value = 5)
 		int number = 3;
 	}
 
-	@SuppressWarnings("unused")
 	private class Quux {
 		@Valid
 		public Optional<List<Bar>> getBar() {

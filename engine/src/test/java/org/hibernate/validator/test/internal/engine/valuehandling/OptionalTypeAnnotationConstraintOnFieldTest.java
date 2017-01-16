@@ -33,17 +33,17 @@ import javax.validation.ReportAsSingleViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.testutil.TestForIssue;
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Test combination of {@link Optional} and {@link UnwrapValidatedValue} on fields.
+ * Test combination of {@link Optional} and {@code validateUnwrappedValue()} on fields.
  *
  * @author Davide D'Alto
  */
@@ -197,31 +197,27 @@ public class OptionalTypeAnnotationConstraintOnFieldTest {
 
 	private static class ModelA {
 
-		@UnwrapValidatedValue(false)
-		@NotNull(message = "container")
+		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
 		Optional<String> valueWithoutTypeAnnotation;
 
 	}
 
 	private static class ModelB {
 
-		@UnwrapValidatedValue(false)
-		@NotNull(message = "container")
+		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
 		Optional<@NotNull(message = "type") String> valueWithNotNull;
 
 	}
 
 	private static class ModelC {
 
-		@UnwrapValidatedValue(true)
-		@NotNull(message = "container")
+		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.YES)
 		Optional<@NotBlank(message = "type") String> valueWithNotNullUnwrapped;
 	}
 
 	private static class ModelD {
 
-		@UnwrapValidatedValue(false)
-		@NotNull(message = "container")
+		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
 		Optional<@NullOrNotBlank(message = "type") String> valueWithNullOrNotBlank;
 	}
 

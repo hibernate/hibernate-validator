@@ -25,7 +25,6 @@ import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
@@ -107,7 +106,6 @@ public class ParameterMetaDataTest {
 		assertFalse( parameterMetaData.isCascading() );
 		assertFalse( parameterMetaData.isConstrained() );
 		assertThat( parameterMetaData ).isEmpty();
-		assertEquals( parameterMetaData.unwrapMode(), UnwrapMode.AUTOMATIC );
 	}
 
 	@Test
@@ -119,16 +117,6 @@ public class ParameterMetaDataTest {
 				methodMetaData.getParameterMetaData( 0 )
 						.convertGroup( Default.class )
 		).isEqualTo( ValidationGroup.class );
-	}
-
-	@Test
-	public void parameterRequiringUnwrapping() throws Exception {
-		Method method = CustomerRepository.class.getMethod( "methodWithParameterRequiringUnwrapping", long.class );
-		ExecutableMetaData methodMetaData = beanMetaData.getMetaDataFor( method );
-
-		ParameterMetaData parameterMetaData = methodMetaData.getParameterMetaData( 0 );
-
-		assertEquals( parameterMetaData.unwrapMode(), UnwrapMode.UNWRAP );
 	}
 
 	@Test @TestForIssue( jiraKey = "HV-887" )

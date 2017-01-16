@@ -17,7 +17,6 @@ import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
@@ -58,13 +57,6 @@ public interface Cascadable {
 	ElementType getElementType();
 
 	/**
-	 * Defines how the validated values needs to be treated in case there is a potential unwrapper specified for its type
-	 *
-	 * @return the {@code ValidatedValueUnwrapMode} to be used for this constraint.
-	 */
-	UnwrapMode unwrapMode();
-
-	/**
 	 * Returns the data type of this cascadable, e.g. the type of a bean property or the
 	 * return type of a method.
 	 *
@@ -93,7 +85,6 @@ public interface Cascadable {
 
 		void addGroupConversions(Map<Class<?>, Class<?>> groupConversions);
 		void addCascadingTypeParameters(List<TypeVariable<?>> cascadingTypeParameters);
-		void unwrapMode(UnwrapMode unwrapMode);
 		Cascadable build();
 	}
 }

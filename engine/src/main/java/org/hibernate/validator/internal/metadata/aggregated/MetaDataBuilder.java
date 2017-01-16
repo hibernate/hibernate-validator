@@ -15,13 +15,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.core.MetaConstraints;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -48,8 +46,6 @@ public abstract class MetaDataBuilder {
 	private final Set<MetaConstraint<?>> constraints = newHashSet();
 	private final Map<Class<?>, Class<?>> groupConversions = newHashMap();
 	private boolean isCascading = false;
-	private UnwrapMode unwrapMode;
-	private ConfigurationSource unwrapModeSource;
 
 	protected MetaDataBuilder(Class<?> beanClass, ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractors valueExtractors) {
 		this.beanClass = beanClass;
@@ -81,11 +77,6 @@ public abstract class MetaDataBuilder {
 		constraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getConstraints() ) );
 		constraints.addAll( adaptConstraints( constrainedElement.getKind(), constrainedElement.getTypeArgumentConstraints() ) );
 		isCascading = isCascading || constrainedElement.isCascading();
-
-		if ( unwrapMode == null || constrainedElement.getSource().getPriority() > unwrapModeSource.getPriority() ) {
-			unwrapMode = constrainedElement.unwrapMode();
-			unwrapModeSource = constrainedElement.getSource();
-		}
 
 		addGroupConversions( constrainedElement.getGroupConversions() );
 	}
@@ -130,10 +121,6 @@ public abstract class MetaDataBuilder {
 
 	protected Class<?> getBeanClass() {
 		return beanClass;
-	}
-
-	public UnwrapMode unwrapMode() {
-		return unwrapMode;
 	}
 
 	/**

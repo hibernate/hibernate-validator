@@ -6,17 +6,17 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+
 import javax.validation.ElementKind;
 
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Base implementation for {@link ConstraintMetaData} with attributes common
@@ -32,22 +32,19 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	private final Set<MetaConstraint<?>> constraints;
 	private final boolean isCascading;
 	private final boolean isConstrained;
-	private final UnwrapMode unwrapMode;
 
 	public AbstractConstraintMetaData(String name,
 									  Type type,
 									  Set<MetaConstraint<?>> constraints,
 									  ElementKind constrainedMetaDataKind,
 									  boolean isCascading,
-									  boolean isConstrained,
-									  UnwrapMode unwrapMode) {
+									  boolean isConstrained) {
 		this.name = name;
 		this.type = type;
 		this.constraints = Collections.unmodifiableSet( constraints );
 		this.constrainedMetaDataKind = constrainedMetaDataKind;
 		this.isCascading = isCascading;
 		this.isConstrained = isConstrained;
-		this.unwrapMode = unwrapMode;
 	}
 
 	@Override
@@ -85,17 +82,11 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	}
 
 	@Override
-	public UnwrapMode unwrapMode() {
-		return unwrapMode;
-	}
-
-	@Override
 	public String toString() {
 		return "AbstractConstraintMetaData [name=" + name + ", type=" + type
 				+ ", constrainedMetaDataKind=" + constrainedMetaDataKind
 				+ ", constraints=" + constraints + ", isCascading="
-				+ isCascading + ", isConstrained=" + isConstrained
-				+ ", unwrapMode=" + unwrapMode + "]";
+				+ isCascading + ", isConstrained=" + isConstrained + "]";
 	}
 
 	@Override

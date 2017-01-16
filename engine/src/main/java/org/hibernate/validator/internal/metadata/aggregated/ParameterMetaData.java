@@ -21,15 +21,14 @@ import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractors;
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.engine.valuehandling.UnwrapMode;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
  * An aggregated view of the constraint related meta data for a single method
@@ -49,16 +48,14 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 							  Type type,
 							  Set<MetaConstraint<?>> constraints,
 							  List<TypeVariable<?>> cascadingTypeParameters,
-							  Map<Class<?>, Class<?>> groupConversions,
-							  UnwrapMode unwrapMode) {
+							  Map<Class<?>, Class<?>> groupConversions) {
 		super(
 				name,
 				type,
 				constraints,
 				ElementKind.PARAMETER,
 				!cascadingTypeParameters.isEmpty(),
-				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty(),
-				unwrapMode
+				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty()
 		);
 
 		this.index = index;
@@ -179,8 +176,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 					parameterType,
 					adaptOriginsAndImplicitGroups( getConstraints() ),
 					cascadingTypeParameters,
-					getGroupConversions(),
-					unwrapMode()
+					getGroupConversions()
 			);
 		}
 	}
