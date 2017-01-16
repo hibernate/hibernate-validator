@@ -43,8 +43,7 @@ public class OptionalValueUnwrapperTest {
 		validator = getValidator();
 	}
 
-	@Test(enabled = false)
-	// TODO implicit unwrap not supported for the time being
+	@Test
 	public void testOptionalUnwrappedValueViolations() {
 		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
 		assertNumberOfViolations( constraintViolations, 2 );
@@ -67,8 +66,7 @@ public class OptionalValueUnwrapperTest {
 		assertCorrectConstraintTypes( constraintViolations, Min.class );
 	}
 
-	@Test(enabled = false)
-	// TODO implicit unwrap not supported for now
+	@Test
 	public void testOptionalUnwrappedExecutableReturnValue() throws Exception {
 		ExecutableValidator executableValidator = validator.forExecutables();
 		Method method = Foo.class.getMethod( "getOptionalLong" );

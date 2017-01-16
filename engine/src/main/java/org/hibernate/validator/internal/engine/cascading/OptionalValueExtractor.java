@@ -9,12 +9,13 @@ package org.hibernate.validator.internal.engine.cascading;
 import java.util.Optional;
 
 import javax.validation.valueextraction.ExtractedValue;
+import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.ValueExtractor;
 
 /**
  * @author Gunnar Morling
- *
  */
+@UnwrapByDefault
 public class OptionalValueExtractor implements ValueExtractor<Optional<@ExtractedValue ?>> {
 
 	static final OptionalValueExtractor INSTANCE = new OptionalValueExtractor();
