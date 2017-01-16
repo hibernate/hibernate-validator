@@ -9,7 +9,9 @@ package org.hibernate.validator.cfg;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.validation.Payload;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 /**
  * Base class for all constraint definition types. Each sub type represents a
@@ -75,6 +77,11 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 
 	public C payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
+		return getThis();
+	}
+
+	public C validateUnwrappedValue(ValidateUnwrappedValue validateUnwrappedValue) {
+		addParameter( "validateUnwrappedValue", validateUnwrappedValue );
 		return getThis();
 	}
 

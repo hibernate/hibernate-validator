@@ -16,6 +16,7 @@ import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.ScriptAssert.List;
 
@@ -118,6 +119,12 @@ public @interface ScriptAssert {
 	 * @since 5.4
 	 */
 	String reportOn() default "";
+
+	/**
+	 * @return if the validated value should be unwrapped before validation
+	 * @since 6.0
+	 */
+	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Defines several {@code @ScriptAssert} annotations on the same element.

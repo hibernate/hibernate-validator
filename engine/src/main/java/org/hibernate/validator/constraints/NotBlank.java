@@ -23,6 +23,7 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.NotNull;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.NotBlank.List;
 
@@ -45,6 +46,12 @@ public @interface NotBlank {
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
+
+	/**
+	 * @return if the validated value should be unwrapped before validation
+	 * @since 6.0
+	 */
+	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Defines several {@code @NotBlank} annotations on the same element.

@@ -24,6 +24,7 @@ import javax.money.MonetaryAmount;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
+import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.Currency.List;
 
@@ -50,6 +51,12 @@ public @interface Currency {
 	 * The {@link CurrencyUnit} codes (e.g. USD, EUR...) being accepted.
 	 */
 	String[] value();
+
+	/**
+	 * @return if the validated value should be unwrapped before validation
+	 * @since 6.0
+	 */
+	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Defines several {@code @Email} annotations on the same element.
