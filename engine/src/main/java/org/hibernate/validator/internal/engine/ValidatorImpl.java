@@ -542,8 +542,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				valueToValidate = valueContext.getCurrentValidatedValue();
 			}
 
-			valueContext.setDeclaredTypeOfValidatedElement( metaConstraint.getTypeOfValidatedElement() );
-
 			// constraint requiring a ValueExtractor
 			if ( metaConstraint.getValueExtractorDescriptor() != null ) {
 				TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext, metaConstraint );

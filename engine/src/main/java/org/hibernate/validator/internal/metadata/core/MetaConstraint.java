@@ -51,23 +51,17 @@ public class MetaConstraint<A extends Annotation> {
 	private final ValueExtractorDescriptor valueExtractorDescriptor;
 
 	/**
-	 * The type of the validated element.
-	 */
-	private final Type typeOfValidatedElement;
-
-	/**
 	 * @param constraintDescriptor The constraint descriptor for this constraint
 	 * @param location meta data about constraint placement
 	 * @param valueExtractorDescriptor the potential {@link ValueExtractor} used to extract the value to validate
-	 * @param typeOfValidatedElement the type of the validated element
+	 * @param validatedValueType the type of the validated element
 	 */
 	MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location, ValueExtractorDescriptor valueExtractorDescriptor,
-			Type typeOfValidatedElement) {
-		this.constraintTree = new ConstraintTree<>( constraintDescriptor );
+			Type validatedValueType) {
+		this.constraintTree = new ConstraintTree<>( constraintDescriptor, validatedValueType );
 		this.constraintDescriptor = constraintDescriptor;
 		this.location = location;
 		this.valueExtractorDescriptor = valueExtractorDescriptor;
-		this.typeOfValidatedElement = typeOfValidatedElement;
 	}
 
 	/**
@@ -101,10 +95,6 @@ public class MetaConstraint<A extends Annotation> {
 		return valueExtractorDescriptor;
 	}
 
-	public Type getTypeOfValidatedElement() {
-		return typeOfValidatedElement;
-	}
-
 	@Override
 	public boolean equals(Object o) {
 		if ( this == o ) {
@@ -125,9 +115,6 @@ public class MetaConstraint<A extends Annotation> {
 		if ( valueExtractorDescriptor != null ? !valueExtractorDescriptor.equals( that.valueExtractorDescriptor ) : that.valueExtractorDescriptor != null ) {
 			return false;
 		}
-		if ( typeOfValidatedElement != null ? !typeOfValidatedElement.equals( that.typeOfValidatedElement ) : that.typeOfValidatedElement != null ) {
-			return false;
-		}
 
 		return true;
 	}
@@ -146,7 +133,6 @@ public class MetaConstraint<A extends Annotation> {
 		sb.append( "{constraintType=" ).append( constraintDescriptor.getAnnotation().annotationType().getName() );
 		sb.append( ", location=" ).append( location );
 		sb.append( ", valueExtractorDescriptor=" ).append( valueExtractorDescriptor );
-		sb.append( ", typeOfValidatedElement=" ).append( typeOfValidatedElement );
 		sb.append( "}" );
 		return sb.toString();
 	}

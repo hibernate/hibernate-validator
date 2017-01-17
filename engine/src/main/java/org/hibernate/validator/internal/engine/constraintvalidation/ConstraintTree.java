@@ -49,13 +49,16 @@ public class ConstraintTree<A extends Annotation> {
 	 */
 	private final ConstraintDescriptorImpl<A> descriptor;
 
-	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor) {
-		this( descriptor, null );
+	private final Type validatedValueType;
+
+	public ConstraintTree(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType) {
+		this( descriptor, validatedValueType, null );
 	}
 
-	private ConstraintTree(ConstraintDescriptorImpl<A> descriptor, ConstraintTree<?> parent) {
+	private ConstraintTree(ConstraintDescriptorImpl<A> descriptor, Type validatedValueType, ConstraintTree<?> parent) {
 		this.parent = parent;
 		this.descriptor = descriptor;
+		this.validatedValueType = validatedValueType;
 
 		final Set<ConstraintDescriptorImpl<?>> composingConstraints = descriptor.getComposingConstraintImpls();
 		children = newArrayList( composingConstraints.size() );
@@ -67,7 +70,7 @@ public class ConstraintTree<A extends Annotation> {
 	}
 
 	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
-		return new ConstraintTree<>( composingDescriptor, this );
+		return new ConstraintTree<>( composingDescriptor, this.validatedValueType, this );
 	}
 
 	public final List<ConstraintTree<?>> getChildren() {
@@ -172,7 +175,6 @@ public class ConstraintTree<A extends Annotation> {
 
 	private <T> ConstraintValidator<A, ?> getInitializedConstraintValidator(ValidationContext<T> validationContext,
 			ValueContext<?, ?> valueContext) {
-		Type validatedValueType = valueContext.getDeclaredTypeOfValidatedElement();
 		ConstraintValidator<A, ?> validator = validationContext.getConstraintValidatorManager()
 				.getInitializedValidator(
 						validatedValueType,

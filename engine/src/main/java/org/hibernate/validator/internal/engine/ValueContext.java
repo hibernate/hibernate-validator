@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.engine;
 
 import java.lang.annotation.ElementType;
-import java.lang.reflect.Type;
 
 import javax.validation.groups.Default;
 
@@ -59,11 +58,6 @@ public class ValueContext<T, V> {
 	 * The {@code ElementType} the constraint was defined on
 	 */
 	private ElementType elementType;
-
-	/**
-	 * The declared type of validated value.
-	 */
-	private Type declaredTypeOfValidatedElement;
 
 	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
@@ -165,17 +159,6 @@ public class ValueContext<T, V> {
 		this.elementType = elementType;
 	}
 
-	/**
-	 * Returns the declared (static) type of the currently validated element.
-	 */
-	public final Type getDeclaredTypeOfValidatedElement() {
-		return declaredTypeOfValidatedElement;
-	}
-
-	public final void setDeclaredTypeOfValidatedElement(Type declaredTypeOfValidatedElement) {
-		this.declaredTypeOfValidatedElement = declaredTypeOfValidatedElement;
-	}
-
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
@@ -186,7 +169,6 @@ public class ValueContext<T, V> {
 		sb.append( ", currentGroup=" ).append( currentGroup );
 		sb.append( ", currentValue=" ).append( currentValue );
 		sb.append( ", elementType=" ).append( elementType );
-		sb.append( ", typeOfValidatedValue=" ).append( declaredTypeOfValidatedElement );
 		sb.append( '}' );
 		return sb.toString();
 	}
