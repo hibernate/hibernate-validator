@@ -44,7 +44,7 @@ import javafx.collections.FXCollections;
  * @author Hardy Ferentschik
  * @author Guillaume Smet
  */
-public class JavaFXPropertyValueUnwrapperTest {
+public class JavaFXObservableValueExtractorTest {
 
 	private Validator validator;
 

@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
  * @author Khalid Alqinyah
  * @author Hardy Ferentschik
  */
-public class OptionalValueUnwrapperTest {
+public class OptionalValueExtractorTest {
 
 	private Validator validator;
 
