@@ -1,0 +1,6 @@
+body:before {
+	content: url(../images/hibernate_logo_smaller.png);
+	box-shadow: 0 2px 2px #ddd;
+	display: block;
+	padding: 20px 20px 10px 15px;
+}
