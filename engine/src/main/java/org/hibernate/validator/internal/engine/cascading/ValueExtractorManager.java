@@ -38,7 +38,7 @@ public class ValueExtractorManager {
 		}
 
 		if ( isJavaFxInClasspath() ) {
-			tmpValueExtractors.add( new ValueExtractorDescriptor( ObservableValueExtractor.INSTANCE ) );
+			tmpValueExtractors.add( new ValueExtractorDescriptor( ObservableValueValueExtractor.INSTANCE ) );
 		}
 
 		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyListValueExtractor.INSTANCE ) );

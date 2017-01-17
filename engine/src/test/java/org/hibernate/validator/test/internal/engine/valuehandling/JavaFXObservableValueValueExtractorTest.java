@@ -22,7 +22,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.valueextraction.ValidateUnwrappedValue;
 
-import org.hibernate.validator.internal.engine.cascading.ObservableValueExtractor;
+import org.hibernate.validator.internal.engine.cascading.ObservableValueValueExtractor;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -38,13 +38,13 @@ import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.FXCollections;
 
 /**
- * Tests for {@link ObservableValueExtractor}.
+ * Tests for {@link ObservableValueValueExtractor}.
  *
  * @author Khalid Alqinyah
  * @author Hardy Ferentschik
  * @author Guillaume Smet
  */
-public class JavaFXObservableValueExtractorTest {
+public class JavaFXObservableValueValueExtractorTest {
 
 	private Validator validator;
 
