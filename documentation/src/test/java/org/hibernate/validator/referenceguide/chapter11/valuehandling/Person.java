@@ -6,8 +6,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -21,7 +19,6 @@ public class Person {
 	private Optional<String> firstName = Optional.of( "John" );
 
 	@NotNull
-	@UnwrapValidatedValue // UnwrapValidatedValue required since otherwise unclear which value to validate
 	private Optional<String> lastName = Optional.of( "Doe" );
 	//end::optional[]
 

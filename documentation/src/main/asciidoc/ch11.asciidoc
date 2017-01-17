@@ -71,8 +71,6 @@ part of the public this is not necessarily true for its sub-packages.
             see <<section-extensions-path-api>>.
 |`org.hibernate.validator.spi.constraintdefinition`|An SPI for registering additional constraint validators programmatically,
             see <<section-constraint-definition-contribution>>.
-|`org.hibernate.validator.valuehandling`, `org.hibernate.validator.spi.valuehandling`|Classes related to the processing
-            of values prior to thei validation, see <<section-value-handling>>.
 |===============
 
 [NOTE]
