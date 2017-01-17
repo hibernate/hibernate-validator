@@ -22,7 +22,11 @@
     <description>The Hibernate Validator reference manual</description>
 
     <properties>
-        <jdocbook.ignoreTranslations>false</jdocbook.ignoreTranslations>
+        <asciidoctor.base-outputdir>${basedir}/target/asciidoctor</asciidoctor.base-outputdir>
+        <asciidoctor.images-dir>${basedir}/src/main/resources/images</asciidoctor.images-dir>
+        <asciidoctor.examples-sourcedir>${basedir}/src/test/java</asciidoctor.examples-sourcedir>
+        <asciidoctor.engine-source-dir>${basedir}/../engine/src/main/java</asciidoctor.engine-source-dir>
+
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven-surefire-plugin.argLine>-Duser.language=en</maven-surefire-plugin.argLine>
@@ -84,50 +88,79 @@
                             <goal>process-asciidoc</goal>
                         </goals>
                         <configuration>
-                            <backend>html</backend>
-                            <outputDirectory>${basedir}/target/asciidoc-html</outputDirectory>
-                            <sourceHighlighter>highlightjs</sourceHighlighter>
+                            <backend>html5</backend>
+                            <sourceDocumentName>index.asciidoc</sourceDocumentName>
+                            <outputDirectory>${asciidoctor.base-outputdir}/html_single</outputDirectory>
+                            <!--
+                            Asciidoctor Maven plugin 1.6 introduces a resources management which will allow to copy
+                            only the necessary resources. For now, we put the resources in an external directory and use
+                            the maven-resources-plugin to copy them.
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>css/**</include>
+                                        <include>images/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            -->
+                            <sourceHighlighter>prettify</sourceHighlighter>
                             <attributes>
-                                <sourcedir>${basedir}/src/test/java</sourcedir>
-                                <engine-sourcedir>${basedir}/../engine/src/main/java</engine-sourcedir>
+                                <sourcedir>${asciidoctor.examples-sourcedir}</sourcedir>
+                                <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
+                                <icons>font</icons>
+                                <html.google-analytics-id>UA-45270411-3</html.google-analytics-id>
+                                <html.google-tag-manager-id>GTM-NJWS5L</html.google-tag-manager-id>
+                                <html.google-tag-manager-channel>Hibernate</html.google-tag-manager-channel>
                             </attributes>
                         </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jruby</groupId>
-                        <artifactId>jruby-complete</artifactId>
-                        <version>1.7.26</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-resources-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>copy-asciidoc-images</id>
-                  <phase>generate-resources</phase>
-                  <goals>
-                    <goal>copy-resources</goal>
-                  </goals>
-                  <configuration>
-                    <outputDirectory>${basedir}/target/asciidoc-html/images</outputDirectory>
-                    <resources>
-                      <resource>
-                        <directory>${basedir}/src/main/asciidoc/images</directory>
-                      </resource>
-                    </resources>
-                  </configuration>
-                </execution>
-              </executions>
+                <!-- This won't be necessary with version 1.6 of the asciidoctor Maven plugin as it's possible to define the resources copied.
+                It will also be possible to put back the images, css and docinfo files into the asciidoc directory. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-asciidoc-images</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${asciidoctor.base-outputdir}/html_single/images/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources/images/</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-asciidoc-css</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${asciidoctor.base-outputdir}/html_single/css/</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources/css/</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
     <profiles>
         <profile>
-            <id>docbook</id>
+            <id>documentation-pdf</id>
             <build>
                 <plugins>
                     <plugin>
@@ -135,93 +168,97 @@
                         <artifactId>asciidoctor-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>output-docbook</id>
+                                <id>output-pdf</id>
                                 <phase>generate-resources</phase>
                                 <goals>
                                     <goal>process-asciidoc</goal>
                                 </goals>
                                 <configuration>
-                                    <backend>docbook</backend>
-                                    <outputDirectory>target/asciidoc-docbook/en-US</outputDirectory>
+                                    <backend>pdf</backend>
+                                    <sourceDocumentName>index.asciidoc</sourceDocumentName>
+                                    <imagesDir>${asciidoctor.images-dir}</imagesDir>
+                                    <outputDirectory>${asciidoctor.base-outputdir}/pdf</outputDirectory>
+                                    <sourceHighlighter>coderay</sourceHighlighter>
                                     <attributes>
-                                        <sourcedir>${basedir}/src/test/java</sourcedir>
-                                        <engine-sourcedir>${basedir}/../engine/src/main/java</engine-sourcedir>
+                                        <sourcedir>${asciidoctor.examples-sourcedir}</sourcedir>
+                                        <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
+                                        <icons>font</icons>
+                                        <pagenums/>
+                                        <toc/>
+                                        <idprefix/>
+                                        <idseparator>-</idseparator>
                                     </attributes>
                                 </configuration>
                             </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
+                            <!-- The epub output is very alpha. Let's forget about it for now.
                             <execution>
-                                <id>copy-docbook-images-to-staging</id>
+                                <id>output-epub</id>
                                 <phase>generate-resources</phase>
                                 <goals>
-                                    <goal>copy-resources</goal>
+                                    <goal>process-asciidoc</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${basedir}/target/docbook/staging/images/images</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${basedir}/src/main/asciidoc/images</directory>
-                                        </resource>
-                                    </resources>
+                                    <backend>epub3</backend>
+                                    <sourceDocumentName>index.asciidoc</sourceDocumentName>
+                                    <imagesDir>${asciidoctor.images-dir}</imagesDir>
+                                    <outputDirectory>${asciidoctor.base-outputdir}/epub</outputDirectory>
+                                    <sourceHighlighter>coderay</sourceHighlighter>
+                                    <attributes>
+                                        <sourcedir>${asciidoctor.examples-sourcedir}</sourcedir>
+                                        <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
+                                        <icons>font</icons>
+                                        <pagenums/>
+                                        <toc/>
+                                        <idprefix/>
+                                        <idseparator>-</idseparator>
+                                    </attributes>
                                 </configuration>
                             </execution>
+                            -->
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.jboss.maven.plugins</groupId>
-                        <artifactId>maven-jdocbook-plugin</artifactId>
-                        <configuration>
-                            <sourceDirectory>${basedir}/target/asciidoc-docbook</sourceDirectory>
-                            <sourceDocumentName>index.xml</sourceDocumentName>
-                            <masterTranslation>en-US</masterTranslation>
-                            <formats>
-                                <format>
-                                    <formatName>html_single</formatName>
-                                    <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml-single.xsl
-                                    </stylesheetResource>
-                                    <finalName>index.html</finalName>
-                                </format>
-                                <format>
-                                    <formatName>html</formatName>
-                                    <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/xhtml.xsl
-                                    </stylesheetResource>
-                                    <finalName>index.html</finalName>
-                                </format>
-                                <format>
-                                    <formatName>pdf</formatName>
-                                    <stylesheetResource>classpath:/xslt/org/hibernate/jdocbook/xslt/pdf.xsl
-                                    </stylesheetResource>
-                                    <finalName>hibernate_validator_reference.pdf</finalName>
-                                </format>
-                            </formats>
-                            <options>
-                                <xincludeSupported>true</xincludeSupported>
-                                <xmlTransformerType>saxon</xmlTransformerType>
-                                <!-- needed for uri-resolvers; can be ommitted if using 'current' uri scheme -->
-                                <!-- could also locate the docbook dependency and inspect its version... -->
-                                <!-- docbookVersion>1.72.0</docbookVersion -->
-                                <localeSeparator>-</localeSeparator>
-                                <injectionDateFormat>yyyy-MM-dd</injectionDateFormat>
-                                <transformerParameters>
-                                    <html.googleAnalyticsId>UA-45270411-3</html.googleAnalyticsId>
-                                    <html.googleTagManagerId>GTM-NJWS5L</html.googleTagManagerId>
-                                    <html.googleTagManagerChannel>Hibernate</html.googleTagManagerChannel>
-                                </transformerParameters>
-                            </options>
-                        </configuration>
+                        <groupId>ch.mfrey.maven.plugin</groupId>
+                        <artifactId>copy-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>docbook-processing</id>
-                                <phase>generate-resources</phase>
+                                <id>copy</id>
+                                <phase>install</phase>
                                 <goals>
-                                    <goal>resources</goal>
-                                    <goal>generate</goal>
+                                    <goal>copy</goal>
                                 </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <directory>${asciidoctor.base-outputdir}/pdf</directory>
+                                            <move>true</move>
+                                            <includes>
+                                                <include>index.pdf</include>
+                                            </includes>
+                                            <paths>
+                                                <path>
+                                                    <from>index.pdf</from>
+                                                    <to>hibernate-validator-${project.version}-reference-guide.pdf</to>
+                                                </path>
+                                            </paths>
+                                        </resource>
+                                        <!-- The epub output is very alpha. Let's forget about it for now.
+                                        <resource>
+                                            <directory>${asciidoctor.base-outputdir}/epub</directory>
+                                            <move>true</move>
+                                            <includes>
+                                                <include>index.epub</include>
+                                            </includes>
+                                            <paths>
+                                                <path>
+                                                    <from>index.epub</from>
+                                                    <to>hibernate-validator-${project.version}-reference-guide.epub</to>
+                                                </path>
+                                            </paths>
+                                        </resource>
+                                        -->
+                                    </resources>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
