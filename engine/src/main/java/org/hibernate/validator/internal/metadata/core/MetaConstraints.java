@@ -48,7 +48,7 @@ public class MetaConstraints {
 			Class<?> declaredType = TypeHelper.getErasedReferenceType( typeArgumentConstraintLocation.getDelegate().getTypeForValidatorResolution() );
 			TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
 
-			valueExtractorDescriptor = valueExtractorManager.getCascadedValueExtractor( declaredType, typeParameter );
+			valueExtractorDescriptor = valueExtractorManager.getValueExtractor( declaredType, typeParameter );
 			typeOfValidatedElement = location.getTypeForValidatorResolution();
 
 			if ( valueExtractorDescriptor == null ) {

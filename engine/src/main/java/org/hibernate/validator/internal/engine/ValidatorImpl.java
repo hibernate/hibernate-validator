@@ -671,7 +671,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			);
 
 			for ( TypeVariable<?> cascadingTypeParameterOfValueType : cascadingTypeParametersOfValueType ) {
-				ValueExtractorDescriptor extractor = valueExtractorManager.getCascadedValueExtractor(
+				ValueExtractorDescriptor extractor = valueExtractorManager.getValueExtractor(
 						value.getClass(),
 						cascadingTypeParameterOfValueType
 				);
