@@ -1,8 +1,13 @@
-= Hibernate Validator {hvVersion}
+= Hibernate Validator {hvVersion} - JSR 380 Reference Implementation: Reference Guide
 Hardy Ferentschik; Gunnar Morling
+:doctype: book
 :revdate: {docdate}
-:toc:
+:sectanchors:
+:anchor:
+:toc: left
+:docinfodir: ../resources/docinfo/
 :docinfo:
+:title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
 include::pr01.asciidoc[]
 

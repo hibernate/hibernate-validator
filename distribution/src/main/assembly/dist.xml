@@ -116,7 +116,7 @@
             <outputDirectory>docs/api</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>../documentation/target/docbook/publish</directory>
+            <directory>../documentation/target/asciidoctor</directory>
             <outputDirectory>docs/reference</outputDirectory>
         </fileSet>
 
