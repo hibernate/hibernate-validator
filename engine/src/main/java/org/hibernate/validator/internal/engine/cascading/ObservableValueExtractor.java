@@ -19,7 +19,7 @@ import javafx.beans.value.ObservableValue;
  *
  * @author Gunnar Morling
  */
-@IgnoreJava8Requirement
+@IgnoreJava8Requirement // JavaFX is not part of the AnimalSniffer Java 8 signatures
 @UnwrapByDefault
 public class ObservableValueExtractor implements ValueExtractor<ObservableValue<@ExtractedValue ?>> {
 
