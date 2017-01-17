@@ -68,7 +68,6 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
-import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -138,11 +137,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 */
 	private final boolean failFast;
 
-	/**
-	 * Used for resolving generic type information.
-	 */
-	private final TypeResolutionHelper typeResolutionHelper;
-
 	private final ValueExtractorManager valueExtractorManager;
 
 	public ValidatorImpl(ConstraintValidatorFactory constraintValidatorFactory,
@@ -151,7 +145,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			BeanMetaDataManager beanMetaDataManager,
 			ExecutableParameterNameProvider parameterNameProvider,
 			ClockProvider clockProvider,
-			TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			boolean failFast) {
@@ -161,7 +154,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		this.beanMetaDataManager = beanMetaDataManager;
 		this.parameterNameProvider = parameterNameProvider;
 		this.clockProvider = clockProvider;
-		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
 		this.constraintValidatorManager = constraintValidatorManager;
 		this.failFast = failFast;

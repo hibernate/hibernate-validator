@@ -376,7 +376,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				beanMetaDataManager,
 				parameterNameProvider,
 				clockProvider,
-				typeResolutionHelper,
 				valueExtractorManager,
 				constraintValidatorManager,
 				failFast
