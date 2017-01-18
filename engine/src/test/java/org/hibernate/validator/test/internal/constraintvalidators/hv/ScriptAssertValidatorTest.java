@@ -6,7 +6,8 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
-import static org.testng.Assert.assertEquals;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -14,9 +15,11 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
+
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 import org.hibernate.validator.constraints.ScriptAssert;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
@@ -24,7 +27,6 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescrip
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.Test;
 
 /**
@@ -122,31 +124,33 @@ public class ScriptAssertValidatorTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-1201")
 	public void reportOnField() {
-		assertTrue( ValidatorUtil.getValidator().validate( new AnnotatedCalendarEvent(
+		Validator validator = ValidatorUtil.getValidator();
+
+		assertTrue( validator.validate( new AnnotatedCalendarEvent(
 						Date.from( Instant.now() ),
 						Date.from( Instant.now().plusMillis( 1000L ) )
 				)
 		).isEmpty(), "Should pass validation" );
 
-		assertCalendarEventViolations( ValidatorUtil.getValidator().validate( new AnnotatedCalendarEvent(
+		Set<ConstraintViolation<AnnotatedCalendarEvent>> fieldViolations = validator.validate(
+				new AnnotatedCalendarEvent(
+					Date.from( Instant.now().plusMillis( 1000L ) ),
+					Date.from( Instant.now().minusMillis( 1000L ) )
+				)
+		);
+
+		assertCorrectPropertyPaths( fieldViolations, "startDate" );
+		assertCorrectConstraintViolationMessages( fieldViolations, "script expression \"_this.startDate.before(_this.endDate)\" didn't evaluate to true" );
+
+		Set<ConstraintViolation<AnnotatedWithoutReportCalendarEvent>> beanViolations = validator.validate(
+				new AnnotatedWithoutReportCalendarEvent(
 						Date.from( Instant.now().plusMillis( 1000L ) ),
 						Date.from( Instant.now().minusMillis( 1000L ) )
 				)
-		), "startDate" );
+		);
 
-		assertCalendarEventViolations( ValidatorUtil.getValidator().validate( new AnnotatedWithoutReportCalendarEvent(
-						Date.from( Instant.now().plusMillis( 1000L ) ),
-						Date.from( Instant.now().minusMillis( 1000L ) )
-				)
-		), "" );
-	}
-
-	private <T> void assertCalendarEventViolations(Set<ConstraintViolation<T>> violations, String propertyPath) {
-		assertFalse( violations.isEmpty(), "Should have violations" );
-		assertEquals( violations.size(), 1, "Should have only one violation" );
-		ConstraintViolation violation = violations.iterator().next();
-		assertEquals( violation.getMessage(), "script expression \"_this.startDate.before(_this.endDate)\" didn't evaluate to true", "Message should match" );
-		assertEquals( violation.getPropertyPath().toString(), propertyPath, "Property path should match" );
+		assertCorrectPropertyPaths( beanViolations, "" );
+		assertCorrectConstraintViolationMessages( fieldViolations, "script expression \"_this.startDate.before(_this.endDate)\" didn't evaluate to true" );
 	}
 
 	/**
@@ -216,9 +220,9 @@ public class ScriptAssertValidatorTest {
 	 */
 	private static class CalendarEvent {
 
-		private Date startDate;
+		private final Date startDate;
 
-		private Date endDate;
+		private final Date endDate;
 
 		public CalendarEvent(Date startDate, Date endDate) {
 			this.startDate = startDate;
@@ -237,10 +241,11 @@ public class ScriptAssertValidatorTest {
 	}
 
 	@ScriptAssert(lang = "groovy", script = "_this.startDate.before(_this.endDate)", reportOn = "startDate")
+	@SuppressWarnings("unused")
 	private static class AnnotatedCalendarEvent {
 
-		private Date startDate;
-		private Date endDate;
+		private final Date startDate;
+		private final Date endDate;
 
 		public AnnotatedCalendarEvent(Date startDate, Date endDate) {
 			this.startDate = startDate;
@@ -249,10 +254,11 @@ public class ScriptAssertValidatorTest {
 	}
 
 	@ScriptAssert(lang = "groovy", script = "_this.startDate.before(_this.endDate)")
+	@SuppressWarnings("unused")
 	private static class AnnotatedWithoutReportCalendarEvent {
 
-		private Date startDate;
-		private Date endDate;
+		private final Date startDate;
+		private final Date endDate;
 
 		public AnnotatedWithoutReportCalendarEvent(Date startDate, Date endDate) {
 			this.startDate = startDate;

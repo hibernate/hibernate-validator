@@ -761,8 +761,8 @@ Java^TM^ Platform") must be a part of the
 class path. The expressions to be evaluated can be written in
 any scripting or expression language, for which a JSR 223
 compatible engine can be found in the class path. Even though
-this is a type level constraint, one can use `reportOn` attribute
-to be able to report a constraint violation on a specified property
+this is a class-level constraint, one can use the `reportOn` attribute
+to report a constraint violation on a specific property
 rather than the whole object.
 |None
 
@@ -834,5 +834,3 @@ In some cases neither the Bean Validation constraints nor the custom constraints
 Hibernate Validator will fulfill your requirements. In this case you can easily write your own
 constraint. You can find more information in <<validator-customconstraints>>.
 ====
-
-
