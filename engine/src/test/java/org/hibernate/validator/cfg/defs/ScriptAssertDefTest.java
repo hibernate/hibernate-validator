@@ -6,12 +6,12 @@
  */
 package org.hibernate.validator.cfg.defs;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.testng.Assert.assertTrue;
 
 import java.time.Instant;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
@@ -21,7 +21,6 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutils.ValidatorUtil;
-
 import org.testng.annotations.Test;
 
 /**
@@ -87,17 +86,18 @@ public class ScriptAssertDefTest {
 						Instant.now().minusMillis( 1000L )
 				)
 		);
-		assertFalse( violations.isEmpty(), "Should fail validation" );
-		assertEquals( violations.iterator().next().getPropertyPath().toString(), propertyPath, "Property path should match" );
+
+		assertCorrectPropertyPaths( violations, propertyPath );
 	}
 
 	/**
 	 * Test model class.
 	 */
+	@SuppressWarnings("unused")
 	private static class CalendarEvent {
 
-		private Instant startDate;
-		private Instant endDate;
+		private final Instant startDate;
+		private final Instant endDate;
 
 		public CalendarEvent(Instant startDate, Instant endDate) {
 			this.startDate = startDate;
