@@ -18,10 +18,6 @@ import javax.validation.constraintvalidation.ValidationTarget;
 public class CrossParameterValidator2 implements ConstraintValidator<InvalidCrossParameterConstraint, Object[]> {
 
 	@Override
-	public void initialize(InvalidCrossParameterConstraint constraintAnnotation) {
-	}
-
-	@Override
 	public boolean isValid(Object[] value, ConstraintValidatorContext context) {
 		return false;
 	}

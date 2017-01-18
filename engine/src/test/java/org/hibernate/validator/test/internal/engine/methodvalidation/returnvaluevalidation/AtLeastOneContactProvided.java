@@ -32,10 +32,6 @@ public @interface AtLeastOneContactProvided {
 			implements ConstraintValidator<AtLeastOneContactProvided, ContactBean> {
 
 		@Override
-		public void initialize(final AtLeastOneContactProvided nonRecursive) {
-		}
-
-		@Override
 		public boolean isValid(final ContactBean bean, final ConstraintValidatorContext constraintValidatorContext) {
 			if ( bean.getEmail() == null && bean.getPhone() == null ) {
 				return false;

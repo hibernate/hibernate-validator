@@ -30,11 +30,6 @@ public @interface AuthorBusinessRules {
 	class AuthorBusinessRulesValidator implements ConstraintValidator<AuthorBusinessRules, Object> {
 
 		@Override
-		public void initialize(AuthorBusinessRules constraintAnnotation) {
-
-		}
-
-		@Override
 		public boolean isValid(Object value, ConstraintValidatorContext context) {
 			return true;
 		}

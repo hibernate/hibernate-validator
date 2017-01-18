@@ -352,20 +352,12 @@ public class FailFastTest {
 	public static class BarConstraintValidator implements ConstraintValidator<BarConstraint, FooBar> {
 
 		@Override
-		public void initialize(BarConstraint constraintAnnotation) {
-		}
-
-		@Override
 		public boolean isValid(FooBar value, ConstraintValidatorContext context) {
 			return false;
 		}
 	}
 
 	public static class FooConstraintValidator implements ConstraintValidator<FooConstraint, FooBar> {
-
-		@Override
-		public void initialize(FooConstraint constraintAnnotation) {
-		}
 
 		@Override
 		public boolean isValid(FooBar value, ConstraintValidatorContext context) {

@@ -64,9 +64,6 @@ public class LazyEvaluationOfComposingConstraintsTest {
 
 	public static class MyComposedConstraintValidator extends InvocationCounter
 			implements ConstraintValidator<MyComposedConstraint, Object> {
-		@Override
-		public void initialize(MyComposedConstraint constraintAnnotation) {
-		}
 
 		@Override
 		public boolean isValid(Object value, ConstraintValidatorContext context) {

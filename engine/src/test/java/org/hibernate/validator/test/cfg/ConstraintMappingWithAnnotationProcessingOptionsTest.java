@@ -467,9 +467,6 @@ public class ConstraintMappingWithAnnotationProcessingOptionsTest {
 	}
 
 	public class FightersValidator implements ConstraintValidator<Fighters, Object> {
-		@Override
-		public void initialize(Fighters annotation) {
-		}
 
 		@Override
 		public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {

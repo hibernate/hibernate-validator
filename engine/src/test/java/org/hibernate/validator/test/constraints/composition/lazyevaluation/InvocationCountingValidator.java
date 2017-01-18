@@ -16,10 +16,6 @@ public class InvocationCountingValidator extends InvocationCounter
 		implements ConstraintValidator<InvocationCounting, Object> {
 
 	@Override
-	public void initialize(InvocationCounting parameters) {
-	}
-
-	@Override
 	public boolean isValid(Object o, ConstraintValidatorContext constraintValidatorContext) {
 		incrementCount( o );
 		return false;

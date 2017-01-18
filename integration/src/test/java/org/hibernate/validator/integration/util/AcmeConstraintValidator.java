@@ -15,10 +15,6 @@ import javax.validation.ConstraintValidatorContext;
 public class AcmeConstraintValidator implements ConstraintValidator<AcmeConstraint, Object> {
 
 	@Override
-	public void initialize(AcmeConstraint constraintAnnotation) {
-	}
-
-	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
 		return false;
 	}

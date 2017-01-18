@@ -166,10 +166,6 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 			implements ConstraintValidator<ValidB2BRepository, CustomerRepositoryImpl> {
 
 		@Override
-		public void initialize(ValidB2BRepository annotation) {
-		}
-
-		@Override
 		public boolean isValid(CustomerRepositoryImpl repository, ConstraintValidatorContext context) {
 			return false;
 		}

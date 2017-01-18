@@ -16,11 +16,6 @@ public class IsValidValidator implements ConstraintValidator<IsValid, DummyTestC
 
 	public static final String message = "Custom error message";
 
-
-	@Override
-	public void initialize(IsValid isValid) {
-	}
-
 	@Override
 	public boolean isValid(DummyTestClass dummyTestClass, ConstraintValidatorContext constraintValidatorContext) {
 		constraintValidatorContext.disableDefaultConstraintViolation();

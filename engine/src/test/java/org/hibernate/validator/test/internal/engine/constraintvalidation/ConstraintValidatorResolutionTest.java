@@ -144,11 +144,6 @@ public class ConstraintValidatorResolutionTest {
 			implements ConstraintValidator<ConstraintWithParametrizedValidator, Value<?>> {
 
 		@Override
-		public void initialize(ConstraintWithParametrizedValidator constraint) {
-			// nothing to initialize
-		}
-
-		@Override
 		public boolean isValid(Value<?> settingValue, ConstraintValidatorContext context) {
 			return false;
 		}
@@ -168,11 +163,6 @@ public class ConstraintValidatorResolutionTest {
 
 	@SuppressWarnings("rawtypes")
 	public static class RawValidator implements ConstraintValidator<ConstraintWithRawValidator, Value> {
-
-		@Override
-		public void initialize(ConstraintWithRawValidator constraint) {
-			// nothing to initialize
-		}
 
 		@Override
 		public boolean isValid(Value value, ConstraintValidatorContext context) {
@@ -199,11 +189,6 @@ public class ConstraintValidatorResolutionTest {
 			implements ConstraintValidator<ConstraintWithRawAndParametrizedValidator, Value<?>> {
 
 		@Override
-		public void initialize(ConstraintWithRawAndParametrizedValidator constraint) {
-			// nothing to initialize
-		}
-
-		@Override
 		public boolean isValid(Value<?> value, ConstraintValidatorContext context) {
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate(
@@ -216,11 +201,6 @@ public class ConstraintValidatorResolutionTest {
 	@SuppressWarnings("rawtypes")
 	public static class RawValidatorForConstraintWithRawAndParametrizedValidator
 			implements ConstraintValidator<ConstraintWithRawAndParametrizedValidator, Value> {
-
-		@Override
-		public void initialize(ConstraintWithRawAndParametrizedValidator constraint) {
-			// nothing to initialize
-		}
 
 		@Override
 		public boolean isValid(Value value, ConstraintValidatorContext context) {

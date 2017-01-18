@@ -39,9 +39,6 @@ public @interface PostCodeList {
 
 	class PostCodeListValidatorForNumber
 			implements ConstraintValidator<PostCodeList, Collection<? extends Number>> {
-		@Override
-		public void initialize(PostCodeList constraintAnnotation) {
-		}
 
 		@Override
 		public boolean isValid(Collection<? extends Number> value, ConstraintValidatorContext constraintValidatorContext) {
@@ -50,9 +47,6 @@ public @interface PostCodeList {
 	}
 
 	class PostCodeListValidatorForString implements ConstraintValidator<PostCodeList, Collection<String>> {
-		@Override
-		public void initialize(PostCodeList constraintAnnotation) {
-		}
 
 		@Override
 		public boolean isValid(Collection<String> value, ConstraintValidatorContext constraintValidatorContext) {

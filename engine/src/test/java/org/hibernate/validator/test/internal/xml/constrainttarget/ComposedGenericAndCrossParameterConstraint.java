@@ -45,10 +45,6 @@ public @interface ComposedGenericAndCrossParameterConstraint {
 			implements ConstraintValidator<ComposedGenericAndCrossParameterConstraint, Object> {
 
 		@Override
-		public void initialize(ComposedGenericAndCrossParameterConstraint parameters) {
-		}
-
-		@Override
 		public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
 			return false;
 		}

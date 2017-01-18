@@ -63,10 +63,6 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 	);
 
 	@Override
-	public void initialize(Email annotation) {
-	}
-
-	@Override
 	public boolean isValid(CharSequence value, ConstraintValidatorContext context) {
 		if ( value == null || value.length() == 0 ) {
 			return true;

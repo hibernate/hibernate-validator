@@ -20,10 +20,6 @@ import javax.validation.ConstraintValidatorContext;
 public class LongStringValidator implements ConstraintValidator<PatternOrLong, String> {
 
 	@Override
-	public void initialize(PatternOrLong constraintAnnotation) {
-	}
-
-	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
 		boolean pass;
 		if ( value == null ) {

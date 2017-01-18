@@ -80,10 +80,6 @@ public class GroupValidationTest {
 			private final AtomicInteger invocationCount = new AtomicInteger( 0 );
 
 			@Override
-			public void initialize(FailOnSecondValidationCall parameters) {
-			}
-
-			@Override
 			public boolean isValid(Object o, ConstraintValidatorContext constraintValidatorContext) {
 				int invocationCount = this.invocationCount.incrementAndGet();
 				if ( invocationCount > 1 ) {

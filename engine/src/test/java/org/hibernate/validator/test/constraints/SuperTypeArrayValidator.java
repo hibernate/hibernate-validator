@@ -15,10 +15,6 @@ import javax.validation.ConstraintValidatorContext;
 public class SuperTypeArrayValidator implements ConstraintValidator<SuperTypeArray, SuperType[]> {
 
 	@Override
-	public void initialize(SuperTypeArray annotation) {
-	}
-
-	@Override
 	public boolean isValid(SuperType[] value, ConstraintValidatorContext constraintValidatorContext) {
 		return true;
 	}

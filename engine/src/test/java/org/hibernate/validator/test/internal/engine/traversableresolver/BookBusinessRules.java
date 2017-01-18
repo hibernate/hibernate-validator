@@ -30,11 +30,6 @@ import javax.validation.Payload;
 	class BookBusinessRulesValidator implements ConstraintValidator<BookBusinessRules, Object> {
 
 		@Override
-		public void initialize(BookBusinessRules constraintAnnotation) {
-
-		}
-
-		@Override
 		public boolean isValid(Object value, ConstraintValidatorContext context) {
 			return true;
 		}

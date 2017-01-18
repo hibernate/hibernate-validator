@@ -93,10 +93,6 @@ public class CascadedClassConstraintTest {
 	public static class ValidFooValidator implements ConstraintValidator<ValidFoo, Foo> {
 
 		@Override
-		public void initialize(ValidFoo annotation) {
-		}
-
-		@Override
 		public boolean isValid(Foo foo, ConstraintValidatorContext context) {
 			return false;
 		}

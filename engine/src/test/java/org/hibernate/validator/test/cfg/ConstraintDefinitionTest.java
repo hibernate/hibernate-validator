@@ -352,11 +352,6 @@ public class ConstraintDefinitionTest {
 		}
 
 		@Override
-		public void initialize(ConstraintAnnotation constraintAnnotation) {
-			// Nothing to do here
-		}
-
-		@Override
 		public boolean isValid(T value, ConstraintValidatorContext context) {
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate( getIdentifyingMessage( getClass() ) )

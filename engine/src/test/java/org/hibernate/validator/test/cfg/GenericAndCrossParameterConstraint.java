@@ -43,10 +43,6 @@ public @interface GenericAndCrossParameterConstraint {
 	class GenericValidator implements ConstraintValidator<GenericAndCrossParameterConstraint, Object> {
 
 		@Override
-		public void initialize(GenericAndCrossParameterConstraint parameters) {
-		}
-
-		@Override
 		public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
 			return false;
 		}

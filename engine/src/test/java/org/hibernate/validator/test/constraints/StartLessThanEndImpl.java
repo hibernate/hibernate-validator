@@ -15,10 +15,6 @@ import javax.validation.ConstraintValidatorContext;
 public class StartLessThanEndImpl implements ConstraintValidator<StartLessThanEnd, Interval> {
 
 	@Override
-	public void initialize(StartLessThanEnd constraintAnnotation) {
-	}
-
-	@Override
 	public boolean isValid(Interval value, ConstraintValidatorContext c) {
 		if ( value.start > value.end ) {
 			c.disableDefaultConstraintViolation();

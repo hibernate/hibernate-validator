@@ -15,10 +15,6 @@ import javax.validation.ConstraintValidatorContext;
 public class CloneableConstraintValidator implements ConstraintValidator<org.hibernate.validator.test.constraints.Cloneable, java.lang.Cloneable> {
 
 	@Override
-	public void initialize(org.hibernate.validator.test.constraints.Cloneable annotation) {
-	}
-
-	@Override
 	public boolean isValid(java.lang.Cloneable value, ConstraintValidatorContext constraintValidatorContext) {
 		return true;
 	}
