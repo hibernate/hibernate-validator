@@ -65,10 +65,6 @@ class LambdaBasedValidatorDescriptor<A extends Annotation> implements Constraint
 		}
 
 		@Override
-		public void initialize(A constraintAnnotation) {
-		}
-
-		@Override
 		public boolean isValid(T value, ConstraintValidatorContext context) {
 			return lambda.isValid( value );
 		}

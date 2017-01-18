@@ -20,11 +20,6 @@ import org.joda.time.DateMidnight;
 public class ConsistentDateParametersValidator implements ConstraintValidator<ConsistentDateParameters, Object[]> {
 
 	@Override
-	public void initialize(ConsistentDateParameters constraintAnnotation) {
-		//nothing to do
-	}
-
-	@Override
 	public boolean isValid(Object[] value, ConstraintValidatorContext context) {
 		if ( value.length != 2 ) {
 			throw new IllegalArgumentException( "Unexpected method signature" );

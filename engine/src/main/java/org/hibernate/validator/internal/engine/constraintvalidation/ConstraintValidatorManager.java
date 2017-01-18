@@ -40,9 +40,6 @@ public class ConstraintValidatorManager {
 	 * no matching constraint validator instance
 	 */
 	private static ConstraintValidator<?, ?> DUMMY_CONSTRAINT_VALIDATOR = new ConstraintValidator<Null, Object>() {
-		@Override
-		public void initialize(Null constraintAnnotation) {
-		}
 
 		@Override
 		public boolean isValid(Object value, ConstraintValidatorContext context) {

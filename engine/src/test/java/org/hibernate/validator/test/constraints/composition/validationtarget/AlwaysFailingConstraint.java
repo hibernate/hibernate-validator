@@ -50,10 +50,6 @@ public @interface AlwaysFailingConstraint {
 	class AlwaysFailingConstraintValidator implements ConstraintValidator<AlwaysFailingConstraint, Object> {
 
 		@Override
-		public void initialize(AlwaysFailingConstraint constraintAnnotation) {
-		}
-
-		@Override
 		public boolean isValid(Object value, ConstraintValidatorContext context) {
 			return false;
 		}

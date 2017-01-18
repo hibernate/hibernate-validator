@@ -18,10 +18,6 @@ import org.hibernate.validator.constraints.NotBlank;
  */
 public class NotBlankValidator implements ConstraintValidator<NotBlank, CharSequence> {
 
-	@Override
-	public void initialize(NotBlank annotation) {
-	}
-
 	/**
 	 * Checks that the trimmed string is not empty.
 	 *

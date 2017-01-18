@@ -169,10 +169,6 @@ public class HibernateConstraintValidatorContextTest {
 			implements ConstraintValidator<OracleConstraint, String> {
 
 		@Override
-		public void initialize(OracleConstraint constraintAnnotation) {
-		}
-
-		@Override
 		public boolean isValid(String question, ConstraintValidatorContext context) {
 			HibernateConstraintValidatorContext hibernateContext = context.unwrap( HibernateConstraintValidatorContext.class );
 

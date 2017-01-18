@@ -143,10 +143,6 @@ public class CustomerRepositoryExt extends CustomerRepository {
 			implements ConstraintValidator<ValidB2BRepository, CustomerRepositoryExt> {
 
 		@Override
-		public void initialize(ValidB2BRepository annotation) {
-		}
-
-		@Override
 		public boolean isValid(CustomerRepositoryExt repository, ConstraintValidatorContext context) {
 			return false;
 		}

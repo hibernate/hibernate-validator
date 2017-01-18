@@ -480,11 +480,6 @@ public class ConstructorConstraintMappingTest {
 		class Validator implements ConstraintValidator<ValidGreetingService, GreetingService> {
 
 			@Override
-			public void initialize(ValidGreetingService constraintAnnotation) {
-				//nothing to do
-			}
-
-			@Override
 			public boolean isValid(GreetingService value, ConstraintValidatorContext context) {
 				return false;
 			}

@@ -199,11 +199,6 @@ public class UnwrapModesTest {
 			implements ConstraintValidator<ValueHolderConstraint, ValueHolder> {
 
 		@Override
-		public void initialize(ValueHolderConstraint constraintAnnotation) {
-
-		}
-
-		@Override
 		public boolean isValid(ValueHolder value, ConstraintValidatorContext context) {
 			return false;
 		}

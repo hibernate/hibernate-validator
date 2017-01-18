@@ -18,10 +18,6 @@ import javax.validation.constraints.Null;
 public class NullValidator implements ConstraintValidator<Null, Object> {
 
 	@Override
-	public void initialize(Null constraintAnnotation) {
-	}
-
-	@Override
 	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
 		return object == null;
 	}

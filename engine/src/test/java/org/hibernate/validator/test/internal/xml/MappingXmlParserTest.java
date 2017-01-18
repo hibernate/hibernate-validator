@@ -98,20 +98,12 @@ public class MappingXmlParserTest {
 	public static class DecimalMinValidatorForFoo implements ConstraintValidator<DecimalMin, Foo> {
 
 		@Override
-		public void initialize(DecimalMin constraintAnnotation) {
-		}
-
-		@Override
 		public boolean isValid(Foo value, ConstraintValidatorContext context) {
 			return false;
 		}
 	}
 
 	public static class DecimalMinValidatorForBar implements ConstraintValidator<DecimalMin, Bar> {
-
-		@Override
-		public void initialize(DecimalMin constraintAnnotation) {
-		}
 
 		@Override
 		public boolean isValid(Bar value, ConstraintValidatorContext context) {

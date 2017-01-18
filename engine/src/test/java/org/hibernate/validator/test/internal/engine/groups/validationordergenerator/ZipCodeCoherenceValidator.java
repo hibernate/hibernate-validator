@@ -15,10 +15,6 @@ import javax.validation.ConstraintValidatorContext;
 public class ZipCodeCoherenceValidator implements ConstraintValidator<ZipCodeCoherenceChecker, Address> {
 
 	@Override
-	public void initialize(ZipCodeCoherenceChecker parameters) {
-	}
-
-	@Override
 	public boolean isValid(Address value, ConstraintValidatorContext constraintValidatorContext) {
 		return false;
 	}

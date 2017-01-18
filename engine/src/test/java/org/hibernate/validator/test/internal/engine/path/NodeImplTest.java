@@ -481,9 +481,6 @@ public class NodeImplTest {
 	}
 
 	public static class CustomConstraintValidator implements ConstraintValidator<CustomConstraint, Object> {
-		@Override
-		public void initialize(CustomConstraint constraintAnnotation) {
-		}
 
 		@Override
 		public boolean isValid(Object o, ConstraintValidatorContext context) {

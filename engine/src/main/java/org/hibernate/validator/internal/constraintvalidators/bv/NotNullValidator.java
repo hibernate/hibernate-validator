@@ -18,10 +18,6 @@ import javax.validation.constraints.NotNull;
 public class NotNullValidator implements ConstraintValidator<NotNull, Object> {
 
 	@Override
-	public void initialize(NotNull parameters) {
-	}
-
-	@Override
 	public boolean isValid(Object object, ConstraintValidatorContext constraintValidatorContext) {
 		return object != null;
 	}
