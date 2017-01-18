@@ -126,8 +126,7 @@
 
         <puppycrawl.checkstyle.version>7.1</puppycrawl.checkstyle.version>
 
-        <!-- Note: we use 2.4.8-SNAPSHOT for JDK 9. Remove the related lines from the jdk9 profile when upgrading to 2.4.8. -->
-        <groovy.version>2.4.7</groovy.version>
+        <groovy.version>2.4.8</groovy.version>
 
         <!--
         Do not upgrade Surefire and Failsafe to 2.19+.
@@ -921,8 +920,6 @@
                     --add-opens=java.management/javax.management.openmbean=ALL-UNNAMED
                     --add-opens=java.naming/javax.naming=ALL-UNNAMED
                 </arquillian.javaVmArguments.add-opens>
-                <!-- Use Groovy 2.4.8-SNAPSHOT for JDK 9. To be removed once 2.4.8 is officially released. -->
-                <groovy.version>2.4.8-SNAPSHOT</groovy.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -937,86 +934,6 @@
                     </plugins>
                 </pluginManagement>
             </build>
-            <!--
-            Add JFrog snapshots repository for Groovy 2.4.8-SNAPSHOT.
-            To be removed once 2.4.8 is officially released.
-            -->
-            <repositories>
-                <!-- Use Central first -->
-                <repository>
-                    <id>central</id>
-                    <name>Maven Central</name>
-                    <url>http://repo.maven.apache.org/maven2/</url>
-                    <snapshots>
-                        <enabled>false</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </snapshots>
-                </repository>
-                <repository>
-                    <id>jboss-public-repository-group</id>
-                    <name>JBoss Public Maven Repository Group</name>
-                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                    <layout>default</layout>
-                    <releases>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </snapshots>
-                </repository>
-                <repository>
-                    <id>jfrog-snapshots</id>
-                    <name>JFrog snapshots repository for Groovy</name>
-                    <url>https://oss.jfrog.org/oss-snapshot-local/</url>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </snapshots>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <!-- Use Central first -->
-                <pluginRepository>
-                    <id>central</id>
-                    <name>Maven Central</name>
-                    <url>http://repo.maven.apache.org/maven2/</url>
-                    <snapshots>
-                        <enabled>false</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>jboss-public-repository-group</id>
-                    <name>JBoss Public Maven Repository Group</name>
-                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-                    <layout>default</layout>
-                    <releases>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </snapshots>
-                </pluginRepository>
-                <pluginRepository>
-                    <id>jfrog-snapshots</id>
-                    <name>JFrog snapshots repository for Groovy</name>
-                    <url>https://oss.jfrog.org/oss-snapshot-local/</url>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                        <updatePolicy>never</updatePolicy>
-                    </snapshots>
-                </pluginRepository>
-            </pluginRepositories>
         </profile>
     </profiles>
 </project>
