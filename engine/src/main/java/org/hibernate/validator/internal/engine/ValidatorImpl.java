@@ -61,7 +61,8 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.PropertyConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.FieldConstraintLocation;
+import org.hibernate.validator.internal.metadata.location.GetterConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
@@ -1415,14 +1416,15 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private String getPropertyName(ConstraintLocation location) {
-		if ( location instanceof PropertyConstraintLocation ) {
-			return ( (PropertyConstraintLocation) location ).getPropertyName();
+		if ( location instanceof TypeArgumentConstraintLocation ) {
+			location = ( (TypeArgumentConstraintLocation) location ).getDelegate();
 		}
-		else if ( location instanceof TypeArgumentConstraintLocation ) {
-			ConstraintLocation delegate = ( (TypeArgumentConstraintLocation) location ).getDelegate();
-			if ( delegate instanceof PropertyConstraintLocation ) {
-				return ( (PropertyConstraintLocation) delegate ).getPropertyName();
-			}
+
+		if ( location instanceof FieldConstraintLocation ) {
+			return ( (FieldConstraintLocation) location ).getPropertyName();
+		}
+		else if ( location instanceof GetterConstraintLocation ) {
+			return ( (GetterConstraintLocation) location ).getPropertyName();
 		}
 
 		return null;

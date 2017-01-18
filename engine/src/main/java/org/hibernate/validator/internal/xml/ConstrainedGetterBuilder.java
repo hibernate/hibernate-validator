@@ -59,7 +59,7 @@ class ConstrainedGetterBuilder {
 		for ( GetterType getterType : getterList ) {
 			String getterName = getterType.getName();
 			Method getter = findGetter( beanClass, getterName, alreadyProcessedGetterNames );
-			ConstraintLocation constraintLocation = ConstraintLocation.forProperty( getter );
+			ConstraintLocation constraintLocation = ConstraintLocation.forGetter( getter );
 
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : getterType.getConstraint() ) {

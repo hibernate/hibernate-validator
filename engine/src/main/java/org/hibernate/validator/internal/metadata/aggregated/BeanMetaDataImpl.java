@@ -40,9 +40,6 @@ import org.hibernate.validator.internal.metadata.descriptor.BeanDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.PropertyConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
@@ -468,20 +465,6 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	private boolean hasDefaultGroupSequenceProvider() {
 		return defaultGroupSequenceProvider != null;
-	}
-
-	private PropertyConstraintLocation getPropertyConstraintLocation(ConstraintLocation location) {
-		if ( location instanceof PropertyConstraintLocation ) {
-			return (PropertyConstraintLocation) location;
-		}
-		else if ( location instanceof TypeArgumentConstraintLocation ) {
-			ConstraintLocation delegate = ( (TypeArgumentConstraintLocation) location ).getDelegate();
-			if ( delegate instanceof PropertyConstraintLocation ) {
-				return (PropertyConstraintLocation) delegate;
-			}
-		}
-
-		return null;
 	}
 
 	@Override

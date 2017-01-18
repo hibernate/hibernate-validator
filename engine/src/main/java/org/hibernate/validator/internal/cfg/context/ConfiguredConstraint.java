@@ -11,6 +11,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -46,11 +47,20 @@ class ConfiguredConstraint<A extends Annotation> {
 	}
 
 	static <A extends Annotation> ConfiguredConstraint<A> forProperty(ConstraintDef<?, A> constraint, Member member) {
-		return new ConfiguredConstraint<>(
+		if ( member instanceof Field ) {
+			return new ConfiguredConstraint<>(
 				constraint,
-				ConstraintLocation.forProperty( member ),
-				( member instanceof Field ) ? ElementType.FIELD : ElementType.METHOD
-		);
+				ConstraintLocation.forField( (Field) member ),
+				ElementType.FIELD
+			);
+		}
+		else {
+			return new ConfiguredConstraint<>(
+				constraint,
+				ConstraintLocation.forGetter( (Method) member ),
+				ElementType.METHOD
+			);
+		}
 	}
 
 	public static <A extends Annotation> ConfiguredConstraint<A> forParameter(ConstraintDef<?, A> constraint, Executable executable, int parameterIndex) {
