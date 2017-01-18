@@ -23,7 +23,6 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.br.TituloEleitoral.List;
@@ -55,12 +54,6 @@ public @interface TituloEleitoral {
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
-
-	/**
-	 * @return if the validated value should be unwrapped before validation
-	 * @since 6.0
-	 */
-	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Defines several {@code @TituloEleitoral} annotations on the same element.

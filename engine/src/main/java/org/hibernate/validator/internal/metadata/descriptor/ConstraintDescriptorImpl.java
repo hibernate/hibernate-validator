@@ -41,6 +41,7 @@ import javax.validation.constraintvalidation.SupportedValidationTarget;
 import javax.validation.constraintvalidation.ValidationTarget;
 import javax.validation.groups.Default;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.valueextraction.Unwrapping;
 import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.CompositionType;
@@ -143,6 +144,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private final ConstraintType constraintType;
 
 	/**
+	 * The unwrapping behavior defined on the constraint.
+	 */
+	private final ValidateUnwrappedValue validateUnwrappedValue;
+
+	/**
 	 * Type indicating how composing constraints should be combined. By default this is set to
 	 * {@code ConstraintComposition.CompositionType.AND}.
 	 */
@@ -171,6 +177,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.attributes = buildAnnotationParameterMap( annotation );
 		this.groups = buildGroupSet( implicitGroup );
 		this.payloads = buildPayloadSet( annotation );
+
+		this.validateUnwrappedValue = determineValidateUnwrappedValue( this.payloads, member, annotationType );
 
 		this.constraintValidatorDescriptors = constraintHelper.getAllValidatorDescriptors( annotationType )
 				.stream()
@@ -257,10 +265,6 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public ValidateUnwrappedValue validateUnwrappedValue() {
-		ValidateUnwrappedValue validateUnwrappedValue = (ValidateUnwrappedValue) attributes.get( ConstraintHelper.VALIDATE_UNWRAPPED_VALUE );
-		if ( validateUnwrappedValue == null ) {
-			validateUnwrappedValue = ValidateUnwrappedValue.DEFAULT;
-		}
 		return validateUnwrappedValue;
 	}
 
@@ -346,6 +350,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		sb.append( ", groups=" ).append( groups );
 		sb.append( ", attributes=" ).append( attributes );
 		sb.append( ", constraintType=" ).append( constraintType );
+		sb.append( ", validateUnwrappedValue=" ).append( validateUnwrappedValue );
 		sb.append( '}' );
 		return sb.toString();
 	}
@@ -454,6 +459,22 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		}
 
 		return constraintType;
+	}
+
+	private static ValidateUnwrappedValue determineValidateUnwrappedValue(Set<Class<? extends Payload>> payloads, Member member, Class<? extends Annotation> annotationType) {
+		if ( payloads.contains( Unwrapping.Unwrap.class ) ) {
+			if ( payloads.contains( Unwrapping.Skip.class ) ) {
+				throw log.getInvalidUnwrappingConfigurationForConstraintException( member, annotationType );
+			}
+
+			return ValidateUnwrappedValue.YES;
+		}
+
+		if ( payloads.contains( Unwrapping.Skip.class ) ) {
+			return ValidateUnwrappedValue.NO;
+		}
+
+		return ValidateUnwrappedValue.DEFAULT;
 	}
 
 	private void validateCrossParameterConstraintType(Member member, boolean hasCrossParameterValidator) {

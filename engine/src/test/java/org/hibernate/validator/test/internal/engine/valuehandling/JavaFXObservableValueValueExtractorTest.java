@@ -20,7 +20,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
+import javax.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.internal.engine.cascading.ObservableValueValueExtractor;
 import org.testng.annotations.BeforeClass;
@@ -113,7 +113,7 @@ public class JavaFXObservableValueValueExtractorTest {
 	@SuppressWarnings("unused")
 	public class Foo {
 		// Need to explicitly unwrap, since ReadOnlyListProperty in itself implements List
-		@Max(value = 3, validateUnwrappedValue = ValidateUnwrappedValue.YES)
+		@Max(value = 3, payload = { Unwrapping.Unwrap.class })
 		ReadOnlyDoubleWrapper doubleProperty = new ReadOnlyDoubleWrapper( 4.5 );
 
 		// The value extractor of Property enables unwrapping by default
@@ -127,13 +127,13 @@ public class JavaFXObservableValueValueExtractorTest {
 	@SuppressWarnings("unused")
 	public class Fubar {
 		// Need to explicitly unwrap, since ReadOnlyListProperty in itself implements List
-		@Size(min = 5, validateUnwrappedValue = ValidateUnwrappedValue.YES)
+		@Size(min = 5, payload = { Unwrapping.Unwrap.class })
 		ReadOnlyListProperty listProperty = new ReadOnlyListWrapper( FXCollections.observableArrayList( 1, 2, 3 ) );
 	}
 
 	@SuppressWarnings("unused")
 	public class Bar1 {
-		@NotNull(validateUnwrappedValue = ValidateUnwrappedValue.NO)
+		@NotNull(payload = { Unwrapping.Skip.class })
 		MapProperty property = new SimpleMapProperty( null );
 	}
 
@@ -145,7 +145,7 @@ public class JavaFXObservableValueValueExtractorTest {
 
 	@SuppressWarnings("unused")
 	public class Bar3 {
-		@NotNull(validateUnwrappedValue = ValidateUnwrappedValue.NO)
+		@NotNull(payload = { Unwrapping.Skip.class })
 		MapProperty property = new SimpleMapProperty( null );
 	}
 

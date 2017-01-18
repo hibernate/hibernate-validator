@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.validation.Payload;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 /**
  * Base class for all constraint definition types. Each sub type represents a
@@ -75,13 +74,9 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 		return getThis();
 	}
 
+	@SuppressWarnings("unchecked")
 	public C payload(Class<? extends Payload>... payload) {
 		addParameter( "payload", payload );
-		return getThis();
-	}
-
-	public C validateUnwrappedValue(ValidateUnwrappedValue validateUnwrappedValue) {
-		addParameter( "validateUnwrappedValue", validateUnwrappedValue );
 		return getThis();
 	}
 

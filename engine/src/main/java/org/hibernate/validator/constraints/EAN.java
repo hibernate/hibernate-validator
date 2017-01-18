@@ -22,7 +22,6 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.EAN.List;
 
@@ -52,12 +51,6 @@ public @interface EAN {
 	Class<? extends Payload>[] payload() default { };
 
 	Type type() default Type.EAN13;
-
-	/**
-	 * @return if the validated value should be unwrapped before validation
-	 * @since 6.0
-	 */
-	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Defines several {@code @NotBlank} annotations on the same element.

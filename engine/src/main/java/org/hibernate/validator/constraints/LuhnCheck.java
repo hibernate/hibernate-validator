@@ -21,7 +21,6 @@ import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.LuhnCheck.List;
 
@@ -76,12 +75,6 @@ public @interface LuhnCheck {
 	 * validation error ({@code false}).
 	 */
 	boolean ignoreNonDigitCharacters() default true;
-
-	/**
-	 * @return if the validated value should be unwrapped before validation
-	 * @since 6.0
-	 */
-	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Defines several {@code @LuhnCheck} annotations on the same element.

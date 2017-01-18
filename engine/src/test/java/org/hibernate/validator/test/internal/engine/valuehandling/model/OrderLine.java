@@ -15,6 +15,13 @@ public class OrderLine {
 
 	private Property<Long> id = new Property<Long>( 0L );
 
+	public OrderLine() {
+	}
+
+	public OrderLine(long id) {
+		this.id = new Property<Long>( id );
+	}
+
 	@Min(1)
 	public Property<Long> getId() {
 		return id;

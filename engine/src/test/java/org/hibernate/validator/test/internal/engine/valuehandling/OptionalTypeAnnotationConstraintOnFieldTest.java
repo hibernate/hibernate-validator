@@ -33,7 +33,7 @@ import javax.validation.ReportAsSingleViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
+import javax.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
@@ -197,27 +197,27 @@ public class OptionalTypeAnnotationConstraintOnFieldTest {
 
 	private static class ModelA {
 
-		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
+		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
 		Optional<String> valueWithoutTypeAnnotation;
 
 	}
 
 	private static class ModelB {
 
-		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
+		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
 		Optional<@NotNull(message = "type") String> valueWithNotNull;
 
 	}
 
 	private static class ModelC {
 
-		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.YES)
+		@NotNull(message = "container", payload = { Unwrapping.Unwrap.class })
 		Optional<@NotBlank(message = "type") String> valueWithNotNullUnwrapped;
 	}
 
 	private static class ModelD {
 
-		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
+		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
 		Optional<@NullOrNotBlank(message = "type") String> valueWithNullOrNotBlank;
 	}
 

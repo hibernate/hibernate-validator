@@ -94,7 +94,6 @@ import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidat
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForCalendar;
-import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForHijrahDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForInstant;
@@ -111,8 +110,8 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.future.Futu
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForThaiBuddhistDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForYear;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForYearMonth;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.future.FutureValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForCalendar;
-import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForHijrahDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForInstant;
@@ -129,6 +128,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastVa
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForThaiBuddhistDate;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForYear;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForYearMonth;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
@@ -167,9 +167,8 @@ public class ConstraintHelper {
 	public static final String PAYLOAD = "payload";
 	public static final String MESSAGE = "message";
 	public static final String VALIDATION_APPLIES_TO = "validationAppliesTo";
-	public static final String VALIDATE_UNWRAPPED_VALUE = "validateUnwrappedValue";
 
-	private static final List<String> SUPPORTED_VALID_METHODS = Arrays.asList( VALIDATION_APPLIES_TO, VALIDATE_UNWRAPPED_VALUE );
+	private static final List<String> SUPPORTED_VALID_METHODS = Arrays.asList( VALIDATION_APPLIES_TO );
 
 	private static final Log log = LoggerFactory.make();
 	private static final String JODA_TIME_CLASS_NAME = "org.joda.time.ReadableInstant";

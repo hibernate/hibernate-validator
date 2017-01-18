@@ -21,7 +21,6 @@ import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.Mod11Check.List;
 
@@ -121,12 +120,6 @@ public @interface Mod11Check {
 	 * If not specified {@code RIGHT_TO_LEFT} is assumed, it is the default Mod11 behavior.
 	 */
 	ProcessingDirection processingDirection() default ProcessingDirection.RIGHT_TO_LEFT;
-
-	/**
-	 * @return if the validated value should be unwrapped before validation
-	 * @since 6.0
-	 */
-	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Defines several {@code @Mod11Check} annotations on the same element.

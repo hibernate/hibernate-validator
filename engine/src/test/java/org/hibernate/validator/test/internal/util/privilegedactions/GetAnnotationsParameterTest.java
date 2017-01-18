@@ -16,7 +16,6 @@ import javax.validation.Payload;
 import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import javax.validation.groups.Default;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
 import org.testng.annotations.Test;
@@ -52,11 +51,6 @@ public class GetAnnotationsParameterTest {
 			@Override
 			public Class<? extends Annotation> annotationType() {
 				return this.getClass();
-			}
-
-			@Override
-			public ValidateUnwrappedValue validateUnwrappedValue() {
-				return ValidateUnwrappedValue.DEFAULT;
 			}
 		};
 		String message = GetAnnotationParameter.action( testAnnotation, "message", String.class ).run();

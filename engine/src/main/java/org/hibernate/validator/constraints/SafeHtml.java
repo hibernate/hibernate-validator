@@ -22,7 +22,6 @@ import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.SafeHtml.List;
 
@@ -64,12 +63,6 @@ public @interface SafeHtml {
 	 * @return Allows to specify additional whitelist tags with optional attributes.
 	 */
 	Tag[] additionalTagsWithAttributes() default { };
-
-	/**
-	 * @return if the validated value should be unwrapped before validation
-	 * @since 6.0
-	 */
-	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Allows to specify whitelist tags with specified optional attributes. Adding a tag with a given attribute also

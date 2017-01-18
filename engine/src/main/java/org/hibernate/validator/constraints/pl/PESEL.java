@@ -22,7 +22,6 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 /**
  * Validates that a {@code CharSequence} is a PESEL (Polish national identification number).
@@ -44,12 +43,6 @@ public @interface PESEL {
 	Class<?>[] groups() default { };
 
 	Class<? extends Payload>[] payload() default { };
-
-	/**
-	 * @return if the validated value should be unwrapped before validation
-	 * @since 6.0
-	 */
-	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Defines several {@code @NIP} annotations on the same element.

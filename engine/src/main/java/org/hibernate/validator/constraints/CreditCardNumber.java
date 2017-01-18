@@ -23,7 +23,6 @@ import javax.validation.Constraint;
 import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.CreditCardNumber.List;
 
@@ -55,12 +54,6 @@ public @interface CreditCardNumber {
 	 */
 	@OverridesAttribute(constraint = LuhnCheck.class, name = "ignoreNonDigitCharacters")
 	boolean ignoreNonDigitCharacters() default false;
-
-	/**
-	 * @return if the validated value should be unwrapped before validation
-	 * @since 6.0
-	 */
-	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Defines several {@code @CreditCardNumber} annotations on the same element.

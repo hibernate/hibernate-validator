@@ -7,7 +7,7 @@
 package org.hibernate.validator.test.internal.engine.valuehandling.model;
 
 import javax.validation.constraints.Size;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
+import javax.validation.valueextraction.Unwrapping;
 
 /**
  * @author Gunnar Morling
@@ -23,7 +23,7 @@ public class Customer {
 	@Size(min = 4, groups = CustomValidationGroup.class)
 	private final StringProperty middleName = new StringProperty( "Foo" );
 
-	@Size(min = 4, validateUnwrappedValue = ValidateUnwrappedValue.YES)
+	@Size(min = 4, payload = { Unwrapping.Unwrap.class })
 	private final UiInput<String> nameInput = new UiInput<String>( "Bob" );
 
 	public void setName(@Size(min = 4) Property<String> name) {

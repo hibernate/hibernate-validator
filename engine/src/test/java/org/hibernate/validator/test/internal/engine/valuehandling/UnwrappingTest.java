@@ -34,7 +34,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Null;
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.UnwrapByDefault;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
+import javax.validation.valueextraction.Unwrapping;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.constraints.NotBlank;
@@ -146,12 +146,12 @@ public class UnwrappingTest {
 
 	public class Fubar {
 		// no constraint validator for the wrapped value
-		@Future(validateUnwrappedValue = ValidateUnwrappedValue.YES)
+		@Future(payload = { Unwrapping.Unwrap.class })
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
 	public class Foobar {
-		@Min(value = 10, validateUnwrappedValue = ValidateUnwrappedValue.YES)
+		@Min(value = 10, payload = { Unwrapping.Unwrap.class })
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
@@ -180,13 +180,13 @@ public class UnwrappingTest {
 
 	public class WrapperWithDisabledUnwrapping {
 
-		@Min(value = 10, validateUnwrappedValue = ValidateUnwrappedValue.NO)
+		@Min(value = 10, payload = { Unwrapping.Skip.class })
 		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
 	}
 
 	public class WrapperWithForcedUnwrapping {
 
-		@Min(value = 10, validateUnwrappedValue = ValidateUnwrappedValue.YES)
+		@Min(value = 10, payload = { Unwrapping.Unwrap.class })
 		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
 	}
 

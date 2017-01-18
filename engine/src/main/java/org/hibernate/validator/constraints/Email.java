@@ -24,7 +24,6 @@ import javax.validation.OverridesAttribute;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 import javax.validation.constraints.Pattern;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.constraints.Email.List;
 
@@ -57,12 +56,6 @@ public @interface Email {
 	 * @return used in combination with {@link #regexp()} in order to specify a regular expression option
 	 */
 	@OverridesAttribute(constraint = Pattern.class, name = "flags") Pattern.Flag[] flags() default { };
-
-	/**
-	 * @return if the validated value should be unwrapped before validation
-	 * @since 6.0
-	 */
-	ValidateUnwrappedValue validateUnwrappedValue() default ValidateUnwrappedValue.DEFAULT;
 
 	/**
 	 * Defines several {@code @Email} annotations on the same element.

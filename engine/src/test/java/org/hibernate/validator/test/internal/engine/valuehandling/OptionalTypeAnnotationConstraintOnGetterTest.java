@@ -33,7 +33,7 @@ import javax.validation.ReportAsSingleViolation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import javax.validation.valueextraction.ValidateUnwrappedValue;
+import javax.validation.valueextraction.Unwrapping;
 
 import org.hibernate.validator.constraints.CompositionType;
 import org.hibernate.validator.constraints.ConstraintComposition;
@@ -199,7 +199,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithoutTypeAnnotation;
 
-		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
+		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
 		public Optional<String> getValueWithoutTypeAnnotation() {
 			return valueWithoutTypeAnnotation;
 		}
@@ -213,7 +213,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithNotNull;
 
-		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
+		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
 		public Optional<@NotNull(message = "type") String> getValueWithNotNull() {
 			return valueWithNotNull;
 		}
@@ -227,7 +227,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithNotNullUnwrapped;
 
-		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.YES)
+		@NotNull(message = "container", payload = { Unwrapping.Unwrap.class })
 		public Optional<@NotBlank(message = "type") String> getValueWithNotNullUnwrapped() {
 			return valueWithNotNullUnwrapped;
 		}
@@ -241,7 +241,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithNullOrNotBlank;
 
-		@NotNull(message = "container", validateUnwrappedValue = ValidateUnwrappedValue.NO)
+		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
 		public Optional<@NullOrNotBlank(message = "type") String> getValueWithNullOrNotBlank() {
 			return valueWithNullOrNotBlank;
 		}
