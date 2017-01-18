@@ -217,24 +217,21 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				return constraints;
 			}
 
-			// convert (getter) return value locations into property locations for usage within this meta-data
+			// convert return value locations into getter locations for usage within this meta-data
 			return constraints.stream()
-				.map( this::withAdaptedLocation )
+				.map( this::withGetterLocation )
 				.collect( Collectors.toSet() );
 		}
 
-		private MetaConstraint<?> withAdaptedLocation(MetaConstraint<?> constraint) {
-			ConstraintLocation adaptedLocation;
+		private MetaConstraint<?> withGetterLocation(MetaConstraint<?> constraint) {
+			ConstraintLocation adaptedLocation = ConstraintLocation.forGetter( (Method) constraint.getLocation().getMember() );
 
 			if ( constraint.getLocation() instanceof TypeArgumentConstraintLocation ) {
-				ConstraintLocation adaptedDelegate = ConstraintLocation.forProperty( constraint.getLocation().getMember() );
-				adaptedLocation = ConstraintLocation.forTypeArgument( adaptedDelegate,
+				adaptedLocation = ConstraintLocation.forTypeArgument(
+						adaptedLocation,
 						( (TypeArgumentConstraintLocation) constraint.getLocation() ).getTypeParameter(),
 						constraint.getLocation().getTypeForValidatorResolution()
 				);
-			}
-			else {
-				adaptedLocation = ConstraintLocation.forProperty( constraint.getLocation().getMember() );
 			}
 
 			return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraint.getDescriptor(), adaptedLocation );

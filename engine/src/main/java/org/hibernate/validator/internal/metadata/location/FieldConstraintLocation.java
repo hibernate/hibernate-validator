@@ -6,10 +6,8 @@
  */
 package org.hibernate.validator.internal.metadata.location;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -19,23 +17,22 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
-import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
 
 /**
- * Property constraint location (field or getter).
+ * Field constraint location.
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
  */
-public class PropertyConstraintLocation implements ConstraintLocation {
+public class FieldConstraintLocation implements ConstraintLocation {
 
 	/**
 	 * The member the constraint was defined on.
 	 */
-	private final Member member;
+	private final Field field;
 
-	private final Member accessibleMember;
+	private final Field accessibleField;
 
 	/**
 	 * The property name associated with the member.
@@ -48,21 +45,21 @@ public class PropertyConstraintLocation implements ConstraintLocation {
 	private final Type typeForValidatorResolution;
 
 
-	PropertyConstraintLocation(Member member) {
-		this.member = member;
-		this.accessibleMember = getAccessible( member );
-		this.propertyName = ReflectionHelper.getPropertyName( member );
-		this.typeForValidatorResolution = ReflectionHelper.boxedType( ReflectionHelper.typeOf( member ) );
+	FieldConstraintLocation(Field field) {
+		this.field = field;
+		this.accessibleField = getAccessible( field );
+		this.propertyName = ReflectionHelper.getPropertyName( field );
+		this.typeForValidatorResolution = ReflectionHelper.boxedType( ReflectionHelper.typeOf( field ) );
 	}
 
 	@Override
 	public Class<?> getDeclaringClass() {
-		return member.getDeclaringClass();
+		return field.getDeclaringClass();
 	}
 
 	@Override
 	public Member getMember() {
-		return member;
+		return field;
 	}
 
 	public String getPropertyName() {
@@ -82,20 +79,12 @@ public class PropertyConstraintLocation implements ConstraintLocation {
 	@Override
 	// TODO Probably this should be done with a security check to prevent direct usage by external clients
 	public Object getValue(Object parent) {
-		if ( accessibleMember instanceof Method ) {
-			return ReflectionHelper.getValue( (Method) accessibleMember, parent );
-		}
-		else if ( accessibleMember instanceof Field ) {
-			return ReflectionHelper.getValue( (Field) accessibleMember, parent );
-		}
-		else {
-			throw new IllegalArgumentException( "Unexpected member type: " + accessibleMember );
-		}
+		return ReflectionHelper.getValue( accessibleField, parent );
 	}
 
 	@Override
 	public String toString() {
-		return "PropertyConstraintLocation [member=" + StringHelper.toShortString( member ) + ", typeForValidatorResolution="
+		return "FieldConstraintLocation [member=" + StringHelper.toShortString( field ) + ", typeForValidatorResolution="
 				+ StringHelper.toShortString( typeForValidatorResolution ) + "]";
 	}
 
@@ -108,9 +97,9 @@ public class PropertyConstraintLocation implements ConstraintLocation {
 			return false;
 		}
 
-		PropertyConstraintLocation that = (PropertyConstraintLocation) o;
+		FieldConstraintLocation that = (FieldConstraintLocation) o;
 
-		if ( member != null ? !member.equals( that.member ) : that.member != null ) {
+		if ( field != null ? !field.equals( that.field ) : that.field != null ) {
 			return false;
 		}
 		if ( !typeForValidatorResolution.equals( that.typeForValidatorResolution ) ) {
@@ -122,7 +111,7 @@ public class PropertyConstraintLocation implements ConstraintLocation {
 
 	@Override
 	public int hashCode() {
-		int result = member != null ? member.hashCode() : 0;
+		int result = field != null ? field.hashCode() : 0;
 		result = 31 * result + typeForValidatorResolution.hashCode();
 		return result;
 	}
@@ -131,24 +120,19 @@ public class PropertyConstraintLocation implements ConstraintLocation {
 	 * Returns an accessible version of the given member. Will be the given member itself in case it is accessible,
 	 * otherwise a copy which is set accessible.
 	 */
-	private static Member getAccessible(Member original) {
-		if ( ( (AccessibleObject) original ).isAccessible() ) {
+	private static Field getAccessible(Field original) {
+		if ( original.isAccessible() ) {
 			return original;
 		}
 
 		Class<?> clazz = original.getDeclaringClass();
-		Member accessibleMember;
+		Field accessibleField;
 
-		if ( original instanceof Field ) {
-			accessibleMember = run( GetDeclaredField.action( clazz, original.getName() ) );
-		}
-		else {
-			accessibleMember = run( GetDeclaredMethod.action( clazz, original.getName() ) );
-		}
+		accessibleField = run( GetDeclaredField.action( clazz, original.getName() ) );
 
-		run( SetAccessibility.action( accessibleMember ) );
+		run( SetAccessibility.action( accessibleField ) );
 
-		return accessibleMember;
+		return accessibleField;
 	}
 
 	/**

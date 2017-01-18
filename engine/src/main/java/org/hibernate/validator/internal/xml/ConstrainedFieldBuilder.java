@@ -57,7 +57,7 @@ class ConstrainedFieldBuilder {
 		List<String> alreadyProcessedFieldNames = newArrayList();
 		for ( FieldType fieldType : fields ) {
 			Field field = findField( beanClass, fieldType.getName(), alreadyProcessedFieldNames );
-			ConstraintLocation constraintLocation = ConstraintLocation.forProperty( field );
+			ConstraintLocation constraintLocation = ConstraintLocation.forField( field );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
 			for ( ConstraintType constraint : fieldType.getConstraint() ) {
 				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(

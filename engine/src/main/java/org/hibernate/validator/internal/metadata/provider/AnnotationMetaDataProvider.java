@@ -283,7 +283,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		Set<MetaConstraint<?>> constraints = newHashSet();
 
-		ConstraintLocation location = ConstraintLocation.forProperty( field );
+		ConstraintLocation location = ConstraintLocation.forField( field );
 
 		for ( ConstraintDescriptorImpl<?> constraintDescription : constraintDescriptors ) {
 			constraints.add( MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescription, location ) );
@@ -625,7 +625,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Field field) {
 		return findTypeArgumentsConstraints(
 			field,
-			new TypeArgumentPropertyLocation( field ),
+			new TypeArgumentFieldLocation( field ),
 			field.getAnnotatedType(),
 			field.getType().getTypeParameters()
 		);
@@ -834,16 +834,16 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 	}
 
-	private static class TypeArgumentPropertyLocation implements TypeArgumentLocation {
-		private final Member member;
+	private static class TypeArgumentFieldLocation implements TypeArgumentLocation {
+		private final Field field;
 
-		private TypeArgumentPropertyLocation(Member member) {
-			this.member = member;
+		private TypeArgumentFieldLocation(Field field) {
+			this.field = field;
 		}
 
 		@Override
 		public ConstraintLocation toConstraintLocation() {
-			return ConstraintLocation.forProperty( member );
+			return ConstraintLocation.forField( field );
 		}
 	}
 

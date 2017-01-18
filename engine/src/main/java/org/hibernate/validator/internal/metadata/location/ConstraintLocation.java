@@ -7,7 +7,9 @@
 package org.hibernate.validator.internal.metadata.location;
 
 import java.lang.reflect.Executable;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
@@ -37,8 +39,12 @@ public interface ConstraintLocation {
 		return new BeanConstraintLocation( declaringClass );
 	}
 
-	static PropertyConstraintLocation forProperty(Member member) {
-		return new PropertyConstraintLocation( member );
+	static ConstraintLocation forField(Field field) {
+		return new FieldConstraintLocation( field );
+	}
+
+	static ConstraintLocation forGetter(Method getter) {
+		return new GetterConstraintLocation( getter );
 	}
 
 	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type type) {
@@ -85,8 +91,8 @@ public interface ConstraintLocation {
 
 	/**
 	 * Obtains the value of this location from the parent. The type of the passed parent depends on the location type,
-	 * e.g. a bean would be passed for a {@link PropertyConstraintLocation} but an object array for a
-	 * {@link ParameterConstraintLocation}.
+	 * e.g. a bean would be passed for a {@link FieldConstraintLocation} or {@link GetterConstraintLocation} but an
+	 * object array for a {@link ParameterConstraintLocation}.
 	 */
 	Object getValue(Object parent);
 }
