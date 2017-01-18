@@ -44,18 +44,6 @@ public class OptionalValueExtractorTest {
 	}
 
 	@Test
-	public void testOptionalUnwrappedValueViolations() {
-		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( new Foo() );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths(
-				constraintViolations,
-				"integerOptional",
-				"optionalLong"
-		);
-		assertCorrectConstraintTypes( constraintViolations, Min.class, Max.class );
-	}
-
-	@Test
 	public void testOptionalCascadedValidation() {
 		Set<ConstraintViolation<Snafu>> constraintViolations = validator.validate( new Snafu() );
 		assertNumberOfViolations( constraintViolations, 1 );
@@ -63,35 +51,6 @@ public class OptionalValueExtractorTest {
 				constraintViolations,
 				"barOptional.number"
 		);
-		assertCorrectConstraintTypes( constraintViolations, Min.class );
-	}
-
-	@Test
-	public void testOptionalUnwrappedExecutableReturnValue() throws Exception {
-		ExecutableValidator executableValidator = validator.forExecutables();
-		Method method = Foo.class.getMethod( "getOptionalLong" );
-		Set<ConstraintViolation<Foo>> constraintViolations = executableValidator.validateReturnValue(
-				new Foo(),
-				method,
-				Optional.of( 9L )
-		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "getOptionalLong.<return value>" );
-		assertCorrectConstraintTypes( constraintViolations, Max.class );
-	}
-
-	@Test
-	public void testOptionalUnwrappedExecutableParameter() throws Exception {
-		ExecutableValidator executableValidator = validator.forExecutables();
-		Method method = Baz.class.getMethod( "setOptionalLong", Optional.class );
-		Object[] values = { Optional.of( 2L ) };
-		Set<ConstraintViolation<Baz>> constraintViolations = executableValidator.validateParameters(
-				new Baz(),
-				method,
-				values
-		);
-		assertNumberOfViolations( constraintViolations, 1 );
-		assertCorrectPropertyPaths( constraintViolations, "setOptionalLong.optionalLongPara" );
 		assertCorrectConstraintTypes( constraintViolations, Min.class );
 	}
 

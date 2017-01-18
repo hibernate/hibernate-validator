@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.engine.cascading;
 import java.util.Optional;
 
 import javax.validation.valueextraction.ExtractedValue;
-import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.ValueExtractor;
 
 /**
@@ -18,7 +17,6 @@ import javax.validation.valueextraction.ValueExtractor;
  * @author Gunnar Morling
  */
 // TODO should we keep that, or only support {@code Optional<@Valid Foo>}.
-@UnwrapByDefault
 public class LegacyOptionalValueExtractor implements ValueExtractor<@ExtractedValue Optional<?>> {
 
 	static final LegacyOptionalValueExtractor INSTANCE = new LegacyOptionalValueExtractor();
