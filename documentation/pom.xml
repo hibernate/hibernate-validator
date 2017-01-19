@@ -254,7 +254,7 @@
                                             <paths>
                                                 <path>
                                                     <from>index.pdf</from>
-                                                    <to>hibernate-validator-${project.version}-reference-guide.pdf</to>
+                                                    <to>hibernate_validator_reference.pdf</to>
                                                 </path>
                                             </paths>
                                         </resource>
@@ -268,7 +268,7 @@
                                             <paths>
                                                 <path>
                                                     <from>index.epub</from>
-                                                    <to>hibernate-validator-${project.version}-reference-guide.epub</to>
+                                                    <to>hibernate_validator_reference.epub</to>
                                                 </path>
                                             </paths>
                                         </resource>
