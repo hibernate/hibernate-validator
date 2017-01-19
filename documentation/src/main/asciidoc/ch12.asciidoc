@@ -38,7 +38,7 @@ As of Hibernate Validator {hvVersion} the Hibernate Validator Annotation Process
 getter methods (optionally, see below)
 * only such annotation types are annotated with constraint annotations which are constraint
 annotations themselves
-* definition of dynamic default group sequence with @GroupSequenceProvider is valid
+* definition of dynamic default group sequence with `@GroupSequenceProvider` is valid
 * annotation parameter values are meaningful and valid
 * method parameter constraints in inheritance hierarchies respect the inheritance rules
 * method return value constraints in inheritance hierarchies respect the inheritance rules
@@ -124,71 +124,41 @@ for http://ant.apache.org/[Apache Ant]:
 
 ===== Maven
 
-There are several options for integrating the annotation processor with
-http://maven.apache.org/[Apache Maven]. Generally it is sufficient to add the Hibernate
-Validator Annotation Processor as dependency to your project:
+For using the Hibernate Validator annotation processor with Maven, set it up via the `annotationProcessorPaths` option like this:
 
-.Adding the HV Annotation Processor as dependency
+.Using the HV Annotation Processor with Maven
 ====
 [source, XML]
 [subs="verbatim,attributes"]
 ----
-...
-<dependency>
-    <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-validator-annotation-processor</artifactId>
-    <version>{hvVersion}</version>
-</dependency>
-...
-----
-====
-
-The processor will then be executed automatically by the compiler. This basically works, but comes
-with the disadavantage that in some cases messages from the annotation processor are not displayed
-(see http://jira.codehaus.org/browse/MCOMPILER-66[MCOMPILER-66]).
-
-Another option is using the http://code.google.com/p/maven-annotation-plugin[Maven Annotation Plugin].
-To work with this plugin, disable the standard annotation processing performed
-by the compiler plugin and configure the annotation plugin by specifying an execution and adding the
-Hibernate Validator Annotation Processor as plugin dependency (that way the processor is not visible
-on the project's actual classpath):
-
-.Configuring the Maven Annotation Plugin
-====
-[source, XML]
-[subs="verbatim,attributes"]
-----
-...
-<plugin>
-    <artifactId>maven-compiler-plugin</artifactId>
-    <configuration>
-        <source>1.6</source>
-        <target>1.6</target>
-        <compilerArgument>-proc:none</compilerArgument>
-    </configuration>
-</plugin>
-<plugin>
-    <groupId>org.bsc.maven</groupId>
-    <artifactId>maven-processor-plugin</artifactId>
-    <version>2.2.1</version>
-    <executions>
-        <execution>
-            <id>process</id>
-            <goals>
-                <goal>process</goal>
-            </goals>
-            <phase>process-sources</phase>
-        </execution>
-    </executions>
-    <dependencies>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator-annotation-processor</artifactId>
-            <version>{hvVersion}</version>
-        </dependency>
-    </dependencies>
-</plugin>
-...
+<project>
+    [...]
+    <build>
+        [...]
+        <plugins>
+            [...]
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-validator-annotation-processor</artifactId>
+                            <version>{hvVersion}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            [...]
+        </plugins>
+        [...]
+    </build>
+    [...]
+</project>
 ----
 ====
 
@@ -197,7 +167,10 @@ on the project's actual classpath):
 
 ===== Eclipse
 
-Do the following to use the annotation processor within the http://www.eclipse.org/[Eclipse] IDE:
+The annotation processor will automatically be set up for Maven projects configured as described above,
+provided you have the https://www.eclipse.org/m2e/[M2E Eclipse plug-in] installed.
+
+For plain Eclipse projects follow these steps to set up the annotation processor:
 
 * Right-click your project, choose "Properties"
 * Go to "Java Compiler" and make sure, that "Compiler compliance level" is set to "1.6".
@@ -264,4 +237,3 @@ be an issue with the Eclipse JSR 269 API implementation, but further investigati
 * When using the processor within Eclipse, the check of dynamic default group sequence definitions
 doesn't work. After further investigation, it seems to be an issue with the Eclipse JSR 269 API
 implementation.
-
