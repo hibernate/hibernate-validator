@@ -195,6 +195,9 @@
                                     <attributes>
                                         <sourcedir>${asciidoctor.examples-sourcedir}</sourcedir>
                                         <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
+                                        <pdf-stylesdir>${project.basedir}/src/main/resources/theme</pdf-stylesdir>
+                                        <pdf-style>hibernate</pdf-style>
+                                        <pdf-fontsdir>${project.basedir}/src/main/resources/theme/fonts</pdf-fontsdir>
                                         <icons>font</icons>
                                         <pagenums/>
                                         <toc/>
