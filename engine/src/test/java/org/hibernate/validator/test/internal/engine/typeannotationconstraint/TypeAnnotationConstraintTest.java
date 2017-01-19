@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -963,7 +963,7 @@ public class TypeAnnotationConstraintTest {
 
 	// No unwrapper available
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000197.*")
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000197.*")
 	public void custom_generic_type_with_type_annotation_constraint_but_no_unwrapper_throws_exception() {
 		// No unwrapper is registered for Baz
 		BazHolder bazHolder = new BazHolder();
