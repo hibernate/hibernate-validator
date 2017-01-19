@@ -110,9 +110,6 @@
                                 <sourcedir>${asciidoctor.examples-sourcedir}</sourcedir>
                                 <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
                                 <icons>font</icons>
-                                <html.google-analytics-id>UA-45270411-3</html.google-analytics-id>
-                                <html.google-tag-manager-id>GTM-NJWS5L</html.google-tag-manager-id>
-                                <html.google-tag-manager-channel>Hibernate</html.google-tag-manager-channel>
                             </attributes>
                         </configuration>
                     </execution>
