@@ -21,7 +21,7 @@ install:
   - mvn -N io.takari:maven:wrapper
   - ./mvnw -v
   # first run to download all the Maven dependencies without logging
-  - travis_wait ./mvnw -s settings-example.xml -B -q -DskipTests=true install
+  - travis_wait ./mvnw -s settings-example.xml -U -B -q -DskipTests=true install
 before_script:
 script:
   - ./mvnw -s settings-example.xml clean verify
