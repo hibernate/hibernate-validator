@@ -170,7 +170,7 @@
         -->
         <maven-surefire-plugin.jigsaw.modules>java.xml.bind</maven-surefire-plugin.jigsaw.modules>
         <maven-javadoc-plugin.jigsaw.modules>java.xml.bind</maven-javadoc-plugin.jigsaw.modules>
-        
+
         <!-- add-opens options required for Arquillian and WildFly -->
         <arquillian.javaVmArguments.add-opens></arquillian.javaVmArguments.add-opens>
     </properties>
@@ -492,40 +492,6 @@
                     <executions>
                         <execution>
                             <id>check-style</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <!-- Run mvn animal-sniffer:check to check that only Java 1.6 APIs are used -->
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>animal-sniffer-maven-plugin</artifactId>
-                    <version>1.15</version>
-                    <dependencies>
-                        <!-- Enforcing the newest version of ASM in order to make sure AnimalSniffer can be used on JDK 8 -->
-                        <!-- Also see http://jira.codehaus.org/browse/MANIMALSNIFFER-45 -->
-                        <dependency>
-                            <groupId>org.ow2.asm</groupId>
-                            <artifactId>asm-all</artifactId>
-                            <version>5.0.4</version>
-                        </dependency>
-                    </dependencies>
-                    <configuration>
-                        <signature>
-                            <groupId>org.codehaus.mojo.signature</groupId>
-                            <artifactId>java18</artifactId>
-                            <version>1.0</version>
-                        </signature>
-                        <annotations>
-                            <annotation>org.hibernate.validator.internal.util.IgnoreJava8Requirement</annotation>
-                        </annotations>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>check-java-api-signature</id>
                             <phase>verify</phase>
                             <goals>
                                 <goal>check</goal>

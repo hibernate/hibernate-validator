@@ -10,8 +10,6 @@ import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.ValueExtractor;
 
-import org.hibernate.validator.internal.util.IgnoreJava8Requirement;
-
 import javafx.beans.value.ObservableValue;
 
 /**
@@ -19,7 +17,6 @@ import javafx.beans.value.ObservableValue;
  *
  * @author Gunnar Morling
  */
-@IgnoreJava8Requirement // JavaFX is not part of the AnimalSniffer Java 8 signatures
 @UnwrapByDefault
 public class ObservableValueValueExtractor implements ValueExtractor<ObservableValue<@ExtractedValue ?>> {
 
