@@ -36,6 +36,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
+import javax.validation.valueextraction.ValueExtractorDefinitionException;
 import javax.xml.stream.XMLStreamException;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
@@ -675,13 +676,13 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToConvertTypeToClassException(Type type);
 
 	@Message(id = 197, value = "No value extractor found for type parameter '%2$s' of type %1$s.")
-	ValidationException getNoValueExtractorFoundForTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> type, TypeVariable<?> typeParameter);
+	ConstraintDeclarationException getNoValueExtractorFoundForTypeException(@FormatWith(ClassObjectFormatter.class) Class<?> type, TypeVariable<?> typeParameter);
 
 	@Message(id = 198, value = "No suitable value extractor found for type %1$s.")
-	ValidationException getNoValueExtractorFoundForUnwrapException(Type type);
+	ConstraintDeclarationException getNoValueExtractorFoundForUnwrapException(Type type);
 
 	@Message(id = 199, value = "Cannot extract value for type %1$s with more than one type parameters.")
-	ValidationException getUnableToExtractValueForTypeWithMultipleTypeParametersException(Type type);
+	ConstraintDeclarationException getUnableToExtractValueForTypeWithMultipleTypeParametersException(Type type);
 
 	@LogMessage(level = INFO)
 	@Message(id = 200, value = "Using %s as clock provider.")
@@ -694,10 +695,10 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToGetCurrentTimeFromClockProvider(@Cause Exception e);
 
 	@Message(id = 203, value = "Value extractor type %1s fails to declare the extracted type parameter using @ExtractedValue.")
-	ValidationException getValueExtractorFailsToDeclareExtractedValueException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorType);
+	ValueExtractorDefinitionException getValueExtractorFailsToDeclareExtractedValueException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorType);
 
 	@Message(id = 204, value = "Only one type parameter must be marked with @ExtractedValue for value extractor type %1s.")
-	ValidationException getValueExtractorDeclaresExtractedValueMultipleTimesException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorType);
+	ValueExtractorDefinitionException getValueExtractorDeclaresExtractedValueMultipleTimesException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorType);
 
 	@Message(id = 205, value = "Invalid unwrapping configuration for constraint %2$s on %1$s. You can only define one of 'Unwrapping.Skip' or 'Unwrapping.Unwrap'.")
 	ConstraintDefinitionException getInvalidUnwrappingConfigurationForConstraintException(Member member, @FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint);

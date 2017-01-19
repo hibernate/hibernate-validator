@@ -13,6 +13,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintDefinitionException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
@@ -116,7 +117,7 @@ public class UnwrapValidatedValueTest {
 		assertEquals( violations.size(), 1 );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000198.*")
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000198.*")
 	public void shouldRaiseExceptionIfNoMatchingUnwrapperIsFound() {
 		validator.validate( new Order() );
 	}

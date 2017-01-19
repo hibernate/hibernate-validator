@@ -22,12 +22,12 @@ import java.lang.annotation.Target;
 import java.util.Set;
 
 import javax.validation.Constraint;
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.Payload;
 import javax.validation.UnexpectedTypeException;
-import javax.validation.ValidationException;
 import javax.validation.Validator;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
@@ -61,7 +61,8 @@ public class UnwrappingTest {
 
 		validatorWithValueExtractor = ValidatorUtil.getConfiguration()
 				.addCascadedValueExtractor( new ValueHolderExtractor() )
-				.addCascadedValueExtractor( new UnwrapByDefaultWrapperExtractor() )
+				.addCascadedValueExtractor( new UnwrapByDefaultWrapperValueExtractor() )
+				.addCascadedValueExtractor( new WrapperWithTwoTypeArgumentsValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 	}
@@ -76,7 +77,7 @@ public class UnwrappingTest {
 		validatorWithValueExtractor.validate( new Fubar() );
 	}
 
-	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000198.*")
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000198.*")
 	public void missing_value_extractor_throws_exception() {
 		validatorWithoutValueExtractor.validate( new Foobar() );
 	}
@@ -138,82 +139,105 @@ public class UnwrappingTest {
 		assertCorrectConstraintTypes( constraintViolations, Min.class );
 	}
 
-	public class Foo {
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000199.*")
+	public void validate_wrapped_value_while_wrapper_has_two_type_parameters_raises_exception() {
+		validatorWithValueExtractor.validate( new BeanWithWrapperWithTwoTypeArguments() );
+	}
+
+	private class Foo {
 		// no constraint validator defined for @DummyConstraint
 		@DummyConstraint
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
-	public class Fubar {
+	private class Fubar {
 		// no constraint validator for the wrapped value
 		@Future(payload = { Unwrapping.Unwrap.class })
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
-	public class Foobar {
+	private class Foobar {
 		@Min(value = 10, payload = { Unwrapping.Unwrap.class })
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
-	public class Bar {
+	private class Bar {
 		@Min(10)
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 
 		private final ValueHolder<@NotBlank String> stringHolder = new ValueHolder<>( "" );
 	}
 
-	public class Baz {
+	private class Baz {
 		@Null
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
-	public class Qux {
+	private class Qux {
 		@ValueHolderConstraint
 		private final ValueHolder<Integer> integerHolder = new ValueHolder<>( 5 );
 	}
 
-	public class WrapperWithImplicitUnwrapping {
+	private class WrapperWithImplicitUnwrapping {
 
 		@Min(10)
 		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
 	}
 
-	public class WrapperWithDisabledUnwrapping {
+	private class WrapperWithDisabledUnwrapping {
 
 		@Min(value = 10, payload = { Unwrapping.Skip.class })
 		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
 	}
 
-	public class WrapperWithForcedUnwrapping {
+	private class WrapperWithForcedUnwrapping {
 
 		@Min(value = 10, payload = { Unwrapping.Unwrap.class })
 		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
 	}
 
-	class ValueHolder<T> {
+	private class BeanWithWrapperWithTwoTypeArguments {
 
-		ValueHolder(T value) {
-			this.value = value;
-		}
+		@Min(value = 10, payload = { Unwrapping.Unwrap.class })
+		private final WrapperWithTwoTypeArguments<Long, String> wrapper = new WrapperWithTwoTypeArguments<Long, String>( 5L, "value" );
+	}
+
+	private class ValueHolder<T> {
 
 		private final T value;
+
+		private ValueHolder(T value) {
+			this.value = value;
+		}
 
 		public T getValue() {
 			return value;
 		}
 	}
 
-	class Wrapper<T> {
-
-		Wrapper(T value) {
-			this.value = value;
-		}
+	private class Wrapper<T> {
 
 		private final T value;
+
+		private Wrapper(T value) {
+			this.value = value;
+		}
 
 		public T getValue() {
 			return value;
 		}
+	}
+
+	private class WrapperWithTwoTypeArguments<T, U> {
+
+		private final T value1;
+		private final U value2;
+
+		private WrapperWithTwoTypeArguments(T value1, U value2) {
+			this.value1 = value1;
+			this.value2 = value2;
+		}
+
 	}
 
 	@Documented
@@ -249,7 +273,7 @@ public class UnwrappingTest {
 		}
 	}
 
-	class ValueHolderExtractor implements ValueExtractor<ValueHolder<@ExtractedValue ?>> {
+	private class ValueHolderExtractor implements ValueExtractor<ValueHolder<@ExtractedValue ?>> {
 
 		@Override
 		public void extractValues(ValueHolder<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
@@ -258,11 +282,19 @@ public class UnwrappingTest {
 	}
 
 	@UnwrapByDefault
-	class UnwrapByDefaultWrapperExtractor implements ValueExtractor<Wrapper<@ExtractedValue ?>> {
+	private class UnwrapByDefaultWrapperValueExtractor implements ValueExtractor<Wrapper<@ExtractedValue ?>> {
 
 		@Override
 		public void extractValues(Wrapper<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
 			receiver.value( null, originalValue.value );
+		}
+	}
+
+	private class WrapperWithTwoTypeArgumentsValueExtractor implements ValueExtractor<WrapperWithTwoTypeArguments<@ExtractedValue ?, ?>> {
+
+		@Override
+		public void extractValues(WrapperWithTwoTypeArguments<?, ?> originalValue, ValueExtractor.ValueReceiver receiver) {
+			receiver.value( null, originalValue.value1 );
 		}
 	}
 
