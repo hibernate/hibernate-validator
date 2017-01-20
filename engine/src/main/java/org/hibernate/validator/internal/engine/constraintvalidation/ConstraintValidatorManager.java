@@ -80,7 +80,7 @@ public class ConstraintValidatorManager {
 
 	/**
 	 * @param validatedValueType the type of the value to be validated. Cannot be {@code null}.
-	 * @param descriptor the constraint descriptor for which to get an initalized constraint validator. Cannot be {@code null}
+	 * @param descriptor the constraint descriptor for which to get an initialized constraint validator. Cannot be {@code null}
 	 * @param constraintFactory constraint factory used to instantiate the constraint validator. Cannot be {@code null}.
 	 * @param <V> the type of the value to be validated
 	 * @param <A> the annotation type
