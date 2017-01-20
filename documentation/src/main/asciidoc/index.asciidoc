@@ -1,7 +1,9 @@
 = Hibernate Validator {hvVersion}
 Hardy Ferentschik; Gunnar Morling
 :revdate: {docdate}
-:toc:
+:sectanchors:
+:anchor:
+:toc: left
 :docinfo:
 
 include::pr01.asciidoc[]
