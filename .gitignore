@@ -29,6 +29,7 @@ atlassian-ide-plugin.xml
 .project
 .settings
 .factorypath
+.checkstyle
 .externalToolBuilders
 maven-eclipse.xml
 
