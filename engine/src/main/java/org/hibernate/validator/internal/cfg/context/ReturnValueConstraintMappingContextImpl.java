@@ -39,7 +39,7 @@ final class ReturnValueConstraintMappingContextImpl
 
 	@Override
 	public ReturnValueConstraintMappingContext constraint(ConstraintDef<?, ?> definition) {
-		super.addConstraint( ConfiguredConstraint.forExecutable( definition, executableContext.getExecutable() ) );
+		super.addConstraint( ConfiguredConstraint.forReturnValue( definition, executableContext.getExecutable() ) );
 		return this;
 	}
 
