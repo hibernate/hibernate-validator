@@ -22,7 +22,7 @@
     <description>The Hibernate Validator reference manual</description>
 
     <properties>
-        <asciidoctor.base-outputdir>${basedir}/target/asciidoctor</asciidoctor.base-outputdir>
+        <asciidoctor.base-outputdir>${basedir}/target/asciidoctor/en-US</asciidoctor.base-outputdir>
         <asciidoctor.images-dir>${basedir}/src/main/resources/images</asciidoctor.images-dir>
         <asciidoctor.examples-sourcedir>${basedir}/src/test/java</asciidoctor.examples-sourcedir>
         <asciidoctor.engine-source-dir>${basedir}/../engine/src/main/java</asciidoctor.engine-source-dir>
