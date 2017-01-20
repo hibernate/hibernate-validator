@@ -666,6 +666,38 @@ public class MethodConstraintMappingTest {
 		}
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1220")
+	public void crossParameterConstraintOnMethodReturningVoid() {
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( GreetingService.class )
+				.method( "sayNothing", String.class )
+				.crossParameter()
+				.constraint(
+						new GenericConstraintDef<GenericAndCrossParameterConstraint>(
+								GenericAndCrossParameterConstraint.class
+						)
+				);
+		config.addMapping( mapping );
+
+		try {
+			GreetingService service = getValidatingProxy(
+					wrappedObject,
+					config.buildValidatorFactory().getValidator()
+			);
+			service.sayNothing( "" );
+
+			fail( "Expected exception wasn't thrown." );
+		}
+		catch (ConstraintViolationException e) {
+
+			assertCorrectConstraintViolationMessages(
+					e, "default message"
+			);
+			assertCorrectPropertyPaths( e, "sayNothing.<cross-parameter>" );
+		}
+	}
+
 	private interface TestGroup {
 	}
 
@@ -708,6 +740,8 @@ public class MethodConstraintMappingTest {
 
 		User getUser();
 
+		void sayNothing(String string1);
+
 	}
 
 	public class GreetingServiceImpl implements GreetingService {
@@ -746,6 +780,11 @@ public class MethodConstraintMappingTest {
 		@Override
 		public User getUser() {
 			return new User( null );
+		}
+
+		@Override
+		public void sayNothing(String string1) {
+			// Nothing to do
 		}
 	}
 }

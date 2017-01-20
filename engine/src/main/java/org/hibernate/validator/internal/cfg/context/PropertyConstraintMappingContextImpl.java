@@ -62,7 +62,7 @@ final class PropertyConstraintMappingContextImpl
 		}
 		else {
 			super.addConstraint(
-					ConfiguredConstraint.forExecutable(
+					ConfiguredConstraint.forReturnValue(
 							definition, ExecutableElement.forMethod( (Method) member )
 					)
 			);
