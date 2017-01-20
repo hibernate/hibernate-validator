@@ -1,3 +1,7 @@
+# Hibernate theme based on the default theme
+# Based on revision: https://github.com/asciidoctor/asciidoctor-pdf/blob/fa5c3e383aaaa0e6634a7ac9380401cc796893f1/data/themes/default-theme.yml
+# The default-theme.yml used as a base is also present in this directory.
+
 font:
   catalog:
     Overpass:
