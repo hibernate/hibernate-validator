@@ -59,9 +59,15 @@ class ConfiguredConstraint<A extends Annotation> {
 		);
 	}
 
-	public static <A extends Annotation> ConfiguredConstraint<A> forExecutable(ConstraintDef<?, A> constraint, ExecutableElement executable) {
+	public static <A extends Annotation> ConfiguredConstraint<A> forReturnValue(ConstraintDef<?, A> constraint, ExecutableElement executable) {
 		return new ConfiguredConstraint<A>(
 				constraint, ConstraintLocation.forReturnValue( executable ), executable.getElementType()
+		);
+	}
+
+	public static <A extends Annotation> ConfiguredConstraint<A> forCrossParameter(ConstraintDef<?, A> constraint, ExecutableElement executable) {
+		return new ConfiguredConstraint<A>(
+				constraint, ConstraintLocation.forCrossParameter( executable ), executable.getElementType()
 		);
 	}
 
