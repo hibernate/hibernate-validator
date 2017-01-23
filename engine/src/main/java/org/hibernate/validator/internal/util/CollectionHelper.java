@@ -90,47 +90,6 @@ public final class CollectionHelper {
 	}
 
 	/**
-	 * Builds an {@link Iterator} for a given array. It is (un)necessarily ugly because we have to deal with array of primitives.
-	 *
-	 * @param object a given array
-	 * @return an {@code Iterator} iterating over the array
-	 */
-	public static Iterator<?> iteratorFromArray(Object object) {
-		Iterator<?> iterator;
-		if ( Object.class.isAssignableFrom( object.getClass().getComponentType() ) ) {
-			iterator = new ObjectArrayIterator( (Object[]) object );
-		}
-		else if ( object.getClass() == boolean[].class ) {
-			iterator = new BooleanArrayIterator( (boolean[]) object );
-		}
-		else if ( object.getClass() == int[].class ) {
-			iterator = new IntArrayIterator( (int[]) object );
-		}
-		else if ( object.getClass() == long[].class ) {
-			iterator = new LongArrayIterator( (long[]) object );
-		}
-		else if ( object.getClass() == double[].class ) {
-			iterator = new DoubleArrayIterator( (double[]) object );
-		}
-		else if ( object.getClass() == float[].class ) {
-			iterator = new FloatArrayIterator( (float[]) object );
-		}
-		else if ( object.getClass() == byte[].class ) {
-			iterator = new ByteArrayIterator( (byte[]) object );
-		}
-		else if ( object.getClass() == short[].class ) {
-			iterator = new ShortArrayIterator( (short[]) object );
-		}
-		else if ( object.getClass() == char[].class ) {
-			iterator = new CharArrayIterator( (char[]) object );
-		}
-		else {
-			throw new IllegalArgumentException( "Provided object " + object + " is not a supported array type" );
-		}
-		return iterator;
-	}
-
-	/**
 	 * As the default loadFactor is of 0.75, we need to calculate the initial capacity from the expected size to avoid
 	 * resizing the collection when we populate the collection with all the initial elements. We use a calculation
 	 * similar to what is done in {@link HashMap#putAll(Map)}.
@@ -145,201 +104,213 @@ public final class CollectionHelper {
 		return (int) ( (float) expectedSize / 0.75f + 1.0f );
 	}
 
-	private static class ObjectArrayIterator implements Iterator<Object> {
+	/**
+	 * Builds an {@link Iterator} for a given array. It is (un)necessarily ugly because we have to deal with array of primitives.
+	 *
+	 * @param object a given array
+	 * @return an {@code Iterator} iterating over the array
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" }) // Reflection is used to ensure the correct types are used
+	public static Iterator<?> iteratorFromArray(Object object) {
+		return new ArrayIterator( accessorFromArray( object ), object );
+	}
 
-		private Object[] values;
+	/**
+	 * Builds an {@link Iterable} for a given array. It is (un)necessarily ugly because we have to deal with array of primitives.
+	 *
+	 * @param object a given array
+	 * @return an {@code Iterable} providing iterators over the array
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" }) // Reflection is used to ensure the correct types are used
+	public static Iterable<?> iterableFromArray(Object object) {
+		return new ArrayIterable( accessorFromArray( object ), object );
+	}
+
+	private static ArrayAccessor<?, ?> accessorFromArray(Object object) {
+		ArrayAccessor<?, ?> accessor;
+		if ( Object.class.isAssignableFrom( object.getClass().getComponentType() ) ) {
+			accessor = ArrayAccessor.OBJECT;
+		}
+		else if ( object.getClass() == boolean[].class ) {
+			accessor = ArrayAccessor.BOOLEAN;
+		}
+		else if ( object.getClass() == int[].class ) {
+			accessor = ArrayAccessor.INT;
+		}
+		else if ( object.getClass() == long[].class ) {
+			accessor = ArrayAccessor.LONG;
+		}
+		else if ( object.getClass() == double[].class ) {
+			accessor = ArrayAccessor.DOUBLE;
+		}
+		else if ( object.getClass() == float[].class ) {
+			accessor = ArrayAccessor.FLOAT;
+		}
+		else if ( object.getClass() == byte[].class ) {
+			accessor = ArrayAccessor.BYTE;
+		}
+		else if ( object.getClass() == short[].class ) {
+			accessor = ArrayAccessor.SHORT;
+		}
+		else if ( object.getClass() == char[].class ) {
+			accessor = ArrayAccessor.CHAR;
+		}
+		else {
+			throw new IllegalArgumentException( "Provided object " + object + " is not a supported array type" );
+		}
+		return accessor;
+	}
+
+	private static class ArrayIterable<A, T> implements Iterable<T> {
+		private final ArrayAccessor<A, T> accessor;
+		private final A values;
+
+		public ArrayIterable(ArrayAccessor<A, T> accessor, A values) {
+			this.accessor = accessor;
+			this.values = values;
+		}
+
+		@Override
+		public final Iterator<T> iterator() {
+			return new ArrayIterator<>( accessor, values );
+		}
+	}
+
+	private static class ArrayIterator<A, T> implements Iterator<T> {
+		private final ArrayAccessor<A, T> accessor;
+		private final A values;
 		private int current = 0;
 
-		private ObjectArrayIterator(Object[] values) {
+		public ArrayIterator(ArrayAccessor<A, T> accessor, A values) {
+			this.accessor = accessor;
 			this.values = values;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return current < values.length;
+			return current < accessor.size( values );
 		}
 
 		@Override
-		public Object next() {
-			Object result = values[current];
+		public T next() {
+			T result = accessor.get( values, current );
 			current++;
 			return result;
 		}
 	}
 
-	private static class BooleanArrayIterator implements Iterator<Boolean> {
+	private interface ArrayAccessor<A, T> {
 
-		private boolean[] values;
-		private int current = 0;
+		int size(A array);
 
-		private BooleanArrayIterator(boolean[] values) {
-			this.values = values;
-		}
+		T get(A array, int index);
 
-		@Override
-		public boolean hasNext() {
-			return current < values.length;
-		}
+		ArrayAccessor<Object[], Object> OBJECT = new ArrayAccessor<Object[], Object>() {
+			@Override
+			public int size(Object[] array) {
+				return array.length;
+			}
 
-		@Override
-		public Boolean next() {
-			boolean result = values[current];
-			current++;
-			return result;
-		}
-	}
+			@Override
+			public Object get(Object[] array, int index) {
+				return array[index];
+			}
+		};
 
-	private static class IntArrayIterator implements Iterator<Integer> {
+		ArrayAccessor<boolean[], Boolean> BOOLEAN = new ArrayAccessor<boolean[], Boolean>() {
+			@Override
+			public int size(boolean[] array) {
+				return array.length;
+			}
 
-		private int[] values;
-		private int current = 0;
+			@Override
+			public Boolean get(boolean[] array, int index) {
+				return array[index];
+			}
+		};
 
-		private IntArrayIterator(int[] values) {
-			this.values = values;
-		}
+		ArrayAccessor<int[], Integer> INT = new ArrayAccessor<int[], Integer>() {
+			@Override
+			public int size(int[] array) {
+				return array.length;
+			}
 
-		@Override
-		public boolean hasNext() {
-			return current < values.length;
-		}
+			@Override
+			public Integer get(int[] array, int index) {
+				return array[index];
+			}
+		};
 
-		@Override
-		public Integer next() {
-			int result = values[current];
-			current++;
-			return result;
-		}
-	}
+		ArrayAccessor<long[], Long> LONG = new ArrayAccessor<long[], Long>() {
+			@Override
+			public int size(long[] array) {
+				return array.length;
+			}
 
-	private static class LongArrayIterator implements Iterator<Long> {
+			@Override
+			public Long get(long[] array, int index) {
+				return array[index];
+			}
+		};
 
-		private long[] values;
-		private int current = 0;
+		ArrayAccessor<double[], Double> DOUBLE = new ArrayAccessor<double[], Double>() {
+			@Override
+			public int size(double[] array) {
+				return array.length;
+			}
 
-		private LongArrayIterator(long[] values) {
-			this.values = values;
-		}
+			@Override
+			public Double get(double[] array, int index) {
+				return array[index];
+			}
+		};
 
-		@Override
-		public boolean hasNext() {
-			return current < values.length;
-		}
+		ArrayAccessor<float[], Float> FLOAT = new ArrayAccessor<float[], Float>() {
+			@Override
+			public int size(float[] array) {
+				return array.length;
+			}
 
-		@Override
-		public Long next() {
-			long result = values[current];
-			current++;
-			return result;
-		}
-	}
+			@Override
+			public Float get(float[] array, int index) {
+				return array[index];
+			}
+		};
 
-	private static class DoubleArrayIterator implements Iterator<Double> {
+		ArrayAccessor<byte[], Byte> BYTE = new ArrayAccessor<byte[], Byte>() {
+			@Override
+			public int size(byte[] array) {
+				return array.length;
+			}
 
-		private double[] values;
-		private int current = 0;
+			@Override
+			public Byte get(byte[] array, int index) {
+				return array[index];
+			}
+		};
 
-		private DoubleArrayIterator(double[] values) {
-			this.values = values;
-		}
+		ArrayAccessor<short[], Short> SHORT = new ArrayAccessor<short[], Short>() {
+			@Override
+			public int size(short[] array) {
+				return array.length;
+			}
 
-		@Override
-		public boolean hasNext() {
-			return current < values.length;
-		}
+			@Override
+			public Short get(short[] array, int index) {
+				return array[index];
+			}
+		};
 
-		@Override
-		public Double next() {
-			double result = values[current];
-			current++;
-			return result;
-		}
-	}
+		ArrayAccessor<char[], Character> CHAR = new ArrayAccessor<char[], Character>() {
+			@Override
+			public int size(char[] array) {
+				return array.length;
+			}
 
-	private static class FloatArrayIterator implements Iterator<Float> {
-
-		private float[] values;
-		private int current = 0;
-
-		private FloatArrayIterator(float[] values) {
-			this.values = values;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return current < values.length;
-		}
-
-		@Override
-		public Float next() {
-			float result = values[current];
-			current++;
-			return result;
-		}
-	}
-
-	private static class ByteArrayIterator implements Iterator<Byte> {
-
-		private byte[] values;
-		private int current = 0;
-
-		private ByteArrayIterator(byte[] values) {
-			this.values = values;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return current < values.length;
-		}
-
-		@Override
-		public Byte next() {
-			byte result = values[current];
-			current++;
-			return result;
-		}
-	}
-
-	private static class ShortArrayIterator implements Iterator<Short> {
-
-		private short[] values;
-		private int current = 0;
-
-		private ShortArrayIterator(short[] values) {
-			this.values = values;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return current < values.length;
-		}
-
-		@Override
-		public Short next() {
-			short result = values[current];
-			current++;
-			return result;
-		}
-	}
-
-	private static class CharArrayIterator implements Iterator<Character> {
-
-		private char[] values;
-		private int current = 0;
-
-		private CharArrayIterator(char[] values) {
-			this.values = values;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return current < values.length;
-		}
-
-		@Override
-		public Character next() {
-			char result = values[current];
-			current++;
-			return result;
-		}
+			@Override
+			public Character get(char[] array, int index) {
+				return array[index];
+			}
+		};
 	}
 }
