@@ -19,7 +19,6 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -391,22 +390,20 @@ public final class ReflectionHelper {
 			return null;
 		}
 
-		Iterator<?> iter;
+		Iterable<?> iterable;
 		Type type = value.getClass();
 		if ( isIterable( type ) ) {
-			iter = ( (Iterable<?>) value ).iterator();
+			iterable = ( (Iterable<?>) value );
 		}
 		else if ( TypeHelper.isArray( type ) ) {
-			iter = CollectionHelper.iteratorFromArray( value );
+			iterable = CollectionHelper.iterableFromArray( value );
 		}
 		else {
 			return null;
 		}
 
 		int i = 0;
-		Object o;
-		while ( iter.hasNext() ) {
-			o = iter.next();
+		for ( Object o : iterable ) {
 			if ( i == index ) {
 				return o;
 			}
