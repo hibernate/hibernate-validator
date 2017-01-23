@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jqa:jqassistant-rules xmlns:jqa="http://www.buschmais.com/jqassistant/core/analysis/rules/schema/v1.0">
+
+    <constraint id="my-rules:PublicTypesMayNotExtendInternalTypes">
+        <description>API/SPI types must not extend/implement internal types.</description>
+        <cypher><![CDATA[
+            MATCH
+                (class)-[:`EXTENDS`]->(supertype)
+            WHERE
+                NOT class.fqn =~ ".*\\.internal\\..*"
+                AND supertype.fqn =~ ".*\\.internal\\..*"
+            RETURN
+                class
+            UNION ALL
+            MATCH
+                (class)-[:`IMPLEMENTS`]->(supertype)
+            WHERE
+                NOT class.fqn =~ ".*\\.internal\\..*"
+                AND supertype.fqn =~ ".*\\.internal\\..*"
+            RETURN
+                class
+        ]]></cypher>
+    </constraint>
+
+    <constraint id="my-rules:PublicMethodsMayNotExposeInternalTypes">
+        <description>API/SPI methods must not expose internal types.</description>
+        <cypher><![CDATA[
+            // return values
+            MATCH
+                (class)-[:`DECLARES`]->(method)-[:`RETURNS`]->(returntype)
+            WHERE
+                NOT class.fqn =~ ".*\\.internal\\..*"
+                AND (method.visibility="public" OR method.visibility="protected")
+                AND returntype.fqn =~ ".*\\.internal\\..*"
+            RETURN
+                method
+
+            // parameters
+            UNION ALL
+            MATCH
+                (class)-[:`DECLARES`]->(method)-[:`HAS`]->(parameter)-[:`OF_TYPE`]->(parametertype)
+            WHERE
+                NOT class.fqn =~ ".*\\.internal\\..*"
+                AND (method.visibility="public" OR method.visibility="protected")
+                AND parametertype.fqn =~ ".*\\.internal\\..*"
+            RETURN
+                method
+        ]]></cypher>
+    </constraint>
+
+    <constraint id="my-rules:PublicFieldsMayNotExposeInternalTypes">
+        <description>API/SPI fields must not expose internal types.</description>
+        <cypher><![CDATA[
+            MATCH
+                (class)-[:`DECLARES`]->(field)-[:`OF_TYPE`]->(fieldtype)
+            WHERE
+                NOT class.fqn =~ ".*\\.internal\\..*"
+                AND (field.visibility="public" OR field.visibility="protected")
+                AND fieldtype.fqn =~ ".*\\.internal\\..*"
+            RETURN
+                field
+        ]]></cypher>
+    </constraint>
+
+    <group id="default">
+        <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
+        <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
+        <includeConstraint refId="my-rules:PublicFieldsMayNotExposeInternalTypes" />
+    </group>
+
+</jqa:jqassistant-rules>
