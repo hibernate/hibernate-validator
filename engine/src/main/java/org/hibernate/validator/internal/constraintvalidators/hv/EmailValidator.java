@@ -72,7 +72,7 @@ public class EmailValidator implements ConstraintValidator<Email, CharSequence> 
 			return false;
 		}
 
-		return DomainNameUtil.isValidDomainAddress( domainPart );
+		return DomainNameUtil.isValidEmailDomainAddress( domainPart );
 	}
 
 	/**

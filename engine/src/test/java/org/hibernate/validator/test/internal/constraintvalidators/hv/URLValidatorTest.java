@@ -329,6 +329,7 @@ public class URLValidatorTest {
 		assertTrue( validator.isValid( "http://1337.net", null ) );
 		assertTrue( validator.isValid( "http://a.b-c.de", null ) );
 		assertTrue( validator.isValid( "http://223.255.255.254", null ) );
+		assertTrue( validator.isValid( "http://[2001:0db8:0a0b:12f0:0000:0000:0000:0001]", null ) );
 
 		// invalid urls:
 		assertFalse( validator.isValid( "http", null ) );
@@ -363,22 +364,16 @@ public class URLValidatorTest {
 			assertFalse( validator.isValid( "http:///a", null ) );
 			assertFalse( validator.isValid( "http:// shouldfail.com", null ) );
 			assertFalse( validator.isValid( "http://foo.bar/foo(bar)baz quux", null ) );
-//			assertFalse( validator.isValid( "http://-error-.invalid/", null ) );
-//			assertFalse( validator.isValid( "http://a.b--c.de/", null ) );
-//			assertFalse( validator.isValid( "http://-a.b.co", null ) );
-//			assertFalse( validator.isValid( "http://a.b-.co", null ) );
-//			assertFalse( validator.isValid( "http://0.0.0.0", null ) );
-//			assertFalse( validator.isValid( "http://10.1.1.0", null ) );
-//			assertFalse( validator.isValid( "http://10.1.1.255", null ) );
-//			assertFalse( validator.isValid( "http://224.1.1.1", null ) );
-//			assertFalse( validator.isValid( "http://1.1.1.1.1", null ) );
+			assertFalse( validator.isValid( "http://-error-.invalid/", null ) );
+			assertFalse( validator.isValid( "http://a.b--c.de/", null ) );
+			assertFalse( validator.isValid( "http://-a.b.co", null ) );
+			assertFalse( validator.isValid( "http://a.b-.co", null ) );
 //			assertFalse( validator.isValid( "http://123.123.123", null ) );
 //			assertFalse( validator.isValid( "http://3628126748", null ) );
 			assertFalse( validator.isValid( "http://.www.foo.bar/", null ) );
 			assertFalse( validator.isValid( "http://www.foo.bar./", null ) );
 			assertFalse( validator.isValid( "http://.www.foo.bar./", null ) );
-//			assertFalse( validator.isValid( "http://10.1.1.1", null ) );
-//			assertFalse( validator.isValid( "http://10.1.1.254", null ) );
+			assertFalse( validator.isValid( "http://2001:0db8:0a0b:12f0:0000:0000:0000:0001", null ) );
 		}
 	}
 
