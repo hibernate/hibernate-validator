@@ -19,7 +19,7 @@ your __pom.xml__:
 [subs="verbatim,attributes"]
 ----
 <dependency>
-    <groupId>org.hibernate</groupId>
+    <groupId>org.hibernate.validator</groupId>
     <artifactId>hibernate-validator</artifactId>
     <version>{hvVersion}</version>
 </dependency>
@@ -73,7 +73,7 @@ Validator CDI portable extension by adding the following Maven dependency to you
 [subs="verbatim,attributes"]
 ----
 <dependency>
-    <groupId>org.hibernate</groupId>
+    <groupId>org.hibernate.validator</groupId>
     <artifactId>hibernate-validator-cdi</artifactId>
     <version>{hvVersion}</version>
 </dependency>
@@ -117,7 +117,7 @@ You don't need to assign any permissions to other code bases calling Hibernate V
 ==== Updating Hibernate Validator in WildFly
 
 The http://wildfly.org/[WildFly application server] contains Hibernate Validator out of the box.
-In order to update the server modules for Bean Validation API and Hibernate Validator to the latest and greatest, the patch mechanism of WildFly can be used. 
+In order to update the server modules for Bean Validation API and Hibernate Validator to the latest and greatest, the patch mechanism of WildFly can be used.
 
 You can download the patch file from http://sourceforge.net/projects/hibernate/files/hibernate-validator[SourceForge] or from Maven Central using the following dependency:
 
@@ -127,7 +127,7 @@ You can download the patch file from http://sourceforge.net/projects/hibernate/f
 [subs="verbatim,attributes"]
 ----
 <dependency>
-    <groupId>org.hibernate</groupId>
+    <groupId>org.hibernate.validator</groupId>
     <artifactId>hibernate-validator-modules</artifactId>
     <version>{hvVersion}</version>
     <classifier>wildfly-{wildflyVersion}-patch</classifier>
@@ -266,4 +266,3 @@ To learn more about the validation of beans and properties, just continue readin
 <<chapter-bean-constraints>>. If you are interested in using Bean Validation for the validation of
 method pre- and postcondition refer to <<chapter-method-constraints>>. In case your application has
 specific validation requirements have a look at <<validator-customconstraints>>.
-

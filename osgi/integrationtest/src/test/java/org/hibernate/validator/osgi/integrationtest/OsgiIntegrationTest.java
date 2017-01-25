@@ -75,7 +75,7 @@ public class OsgiIntegrationTest {
 	@Configuration
 	public Option[] config() {
 		MavenUrlReference hibernateValidatorFeature = maven()
-				.groupId( "org.hibernate" )
+				.groupId( "org.hibernate.validator" )
 				.artifactId( "hibernate-validator-osgi-karaf-features" )
 				.classifier( "features" )
 				.type( "xml" )

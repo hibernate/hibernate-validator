@@ -8,8 +8,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator-parent</artifactId>
-        <groupId>org.hibernate</groupId>
         <version>6.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -30,15 +30,15 @@
         <!-- The modules to include in the distribution. Any non-optional/provided dependencies will
                      automatically be included as well -->
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-validator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-validator-cdi</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-validator-annotation-processor</artifactId>
         </dependency>
 

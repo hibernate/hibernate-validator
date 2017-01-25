@@ -37,7 +37,7 @@ public class VersionIT extends AbstractArquillianIT {
 	public static Archive<?> createTestArchive() {
 		String expectedVersion = Maven.resolver()
 				.loadPomFromFile( "pom.xml" )
-				.resolve( "org.hibernate:hibernate-validator" )
+				.resolve( "org.hibernate.validator:hibernate-validator" )
 				.withoutTransitivity()
 				.asResolvedArtifact()[0]
 				.getResolvedVersion();
