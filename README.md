@@ -33,7 +33,7 @@ Logging will delegate any log requests to that provider.
 * Add the following to your Maven or Ivy dependency list
 
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>5.3.4.Final</version>
         </dependency>
@@ -52,7 +52,7 @@ in an environment which does not provide this integration out of the box, you ma
 extension by adding the following dependency:
 
         <dependency>
-           <groupId>org.hibernate</groupId>
+           <groupId>org.hibernate.validator</groupId>
            <artifactId>hibernate-validator-cdi</artifactId>
            <version>5.3.4.Final</version>
         </dependency>
@@ -106,4 +106,3 @@ We provide a `.travis.yml` file so that you can enable CI for your GitHub fork b
 * [Mailing Lists](http://hibernate.org/community/)
 * [Issue Tracking](https://hibernate.atlassian.net/browse/HV)
 * [Continuous Integration](http://ci.hibernate.org/view/Validator/) | [![Build Status](http://ci.hibernate.org/view/Validator/job/hibernate-validator-master/badge/icon)](http://ci.hibernate.org/view/Validator/job/hibernate-validator-master/)
-

@@ -16,7 +16,7 @@ annotations are incorrectly used.
 You can find the Hibernate Validator Annotation Processor as part of the distribution bundle on
 http://sourceforge.net/projects/hibernate/files/hibernate-validator[Sourceforge] or in the
 usual Maven repositories such as Maven Central under the GAV
-`org.hibernate:hibernate-validator-annotation-processor:{hvVersion}`.
+`org.hibernate.validator:hibernate-validator-annotation-processor:{hvVersion}`.
 ====
 
 [[validator-annotationprocessor-prerequisites]]
@@ -146,7 +146,7 @@ For using the Hibernate Validator annotation processor with Maven, set it up via
                     <target>1.8</target>
                     <annotationProcessorPaths>
                         <path>
-                            <groupId>org.hibernate</groupId>
+                            <groupId>org.hibernate.validator</groupId>
                             <artifactId>hibernate-validator-annotation-processor</artifactId>
                             <version>{hvVersion}</version>
                         </path>

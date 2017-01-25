@@ -8,7 +8,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.hibernate</groupId>
+    <groupId>org.hibernate.validator</groupId>
     <artifactId>hibernate-validator-parent</artifactId>
     <version>6.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -188,22 +188,22 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-validator</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-validator-test-utils</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-validator-cdi</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>hibernate-validator-annotation-processor</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -449,7 +449,7 @@
                     <version>2.17</version>
                     <dependencies>
                         <dependency>
-                            <groupId>org.hibernate</groupId>
+                            <groupId>${project.groupId}</groupId>
                             <artifactId>hibernate-validator-build-config</artifactId>
                             <version>${project.version}</version>
                         </dependency>
