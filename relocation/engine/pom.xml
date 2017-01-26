@@ -8,7 +8,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator</artifactId>
-    <name>Hibernate validator Relocation artifacts - engine</name>
+    <name>Hibernate Validator Engine - Relocation Artifact</name>
 
     <distributionManagement>
         <relocation>

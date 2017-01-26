@@ -9,7 +9,7 @@
     <artifactId>hibernate-validator-relocation</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate validator Relocation artifacts</name>
+    <name>Hibernate Validator Relocation Artifacts</name>
 
     <modules>
         <module>annotation-processor</module>

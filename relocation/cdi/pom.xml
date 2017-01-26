@@ -8,7 +8,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-cdi</artifactId>
-    <name>Hibernate validator Relocation artifacts - cdi</name>
+    <name>Hibernate Validator CDI Portable Extension - Relocation Artifact</name>
 
     <distributionManagement>
         <relocation>

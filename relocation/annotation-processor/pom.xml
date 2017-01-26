@@ -8,7 +8,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-annotation-processor</artifactId>
-    <name>Hibernate validator Relocation artifacts - annotation-processor</name>
+    <name>Hibernate Validator Annotation Processor - Relocation Artifact</name>
 
     <distributionManagement>
         <relocation>

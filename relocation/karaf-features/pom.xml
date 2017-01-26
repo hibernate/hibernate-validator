@@ -8,7 +8,7 @@
 
     <groupId>org.hibernate</groupId>
     <artifactId>hibernate-validator-osgi-karaf-features</artifactId>
-    <name>Hibernate validator Relocation artifacts - osgi-karaf-features</name>
+    <name>Hibernate Validator Karaf Features - Relocation Artifacts</name>
 
     <distributionManagement>
         <relocation>
