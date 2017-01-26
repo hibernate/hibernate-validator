@@ -22,10 +22,19 @@
     <description>The Hibernate Validator reference manual</description>
 
     <properties>
-        <asciidoctor.base-outputdir>${basedir}/target/asciidoctor/en-US</asciidoctor.base-outputdir>
-        <asciidoctor.images-dir>${basedir}/src/main/resources/images</asciidoctor.images-dir>
-        <asciidoctor.examples-sourcedir>${basedir}/src/test/java</asciidoctor.examples-sourcedir>
+        <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/en-US</asciidoctor.base-output-dir>
+        <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
+        <asciidoctor.aggregated-resources-dir>${project.build.directory}/aggregated-resources</asciidoctor.aggregated-resources-dir>
+        <asciidoctor.examples-source-dir>${basedir}/src/test/java</asciidoctor.examples-source-dir>
         <asciidoctor.engine-source-dir>${basedir}/../engine/src/main/java</asciidoctor.engine-source-dir>
+
+        <html.meta.description>Hibernate Validator, Annotation based constraints for your domain model - Reference Documentation</html.meta.description>
+        <html.meta.keywords>hibernate, validator, hibernate validator, validation, bean validation</html.meta.keywords>
+        <html.meta.project-key>validator</html.meta.project-key>
+        <html.google-analytics.id>UA-45270411-3</html.google-analytics.id>
+        <html.google-analytics.tag-manager.id>GTM-NJWS5L</html.google-analytics.tag-manager.id>
+        <html.google-analytics.tag-manager.channel>Hibernate</html.google-analytics.tag-manager.channel>
+        <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>
 
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
@@ -58,7 +67,7 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Only use assertj when stricly necessary in the documentation tests -->
+        <!-- Only use assertj when strictly necessary in the documentation tests -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -91,80 +100,135 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.asciidoctor</groupId>
-                <artifactId>asciidoctor-maven-plugin</artifactId>
+                <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>output-html</id>
+                        <id>unpack-asciidoctor-theme</id>
                         <phase>generate-resources</phase>
                         <goals>
-                            <goal>process-asciidoc</goal>
+                            <goal>unpack</goal>
                         </goals>
                         <configuration>
-                            <backend>html5</backend>
-                            <sourceDocumentName>index.asciidoc</sourceDocumentName>
-                            <outputDirectory>${asciidoctor.base-outputdir}/html_single</outputDirectory>
-                            <!--
-                            Asciidoctor Maven plugin 1.6 introduces a resources management which will allow to copy
-                            only the necessary resources. For now, we put the resources in an external directory and use
-                            the maven-resources-plugin to copy them.
-                            <resources>
-                                <resource>
-                                    <directory>src/main/resources</directory>
-                                    <includes>
-                                        <include>css/**</include>
-                                        <include>images/**</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                            -->
-                            <sourceHighlighter>prettify</sourceHighlighter>
-                            <attributes>
-                                <sourcedir>${asciidoctor.examples-sourcedir}</sourcedir>
-                                <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
-                                <icons>font</icons>
-                            </attributes>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.hibernate.infra</groupId>
+                                    <artifactId>hibernate-asciidoctor-theme</artifactId>
+                                    <version>${hibernate-asciidoctor-theme.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
-                <!-- This won't be necessary with version 1.6 of the asciidoctor Maven plugin as it's possible to define the resources copied.
-                It will also be possible to put back the images, css and docinfo files into the asciidoc directory. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy-asciidoc-images</id>
+                        <id>copy-asciidoc-theme-to-aggregated-resources</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${asciidoctor.base-outputdir}/html_single/images/</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/src/main/resources/images/</directory>
+                                    <directory>${asciidoctor.theme-dir}</directory>
+                                    <filtering>true</filtering>
                                 </resource>
                             </resources>
+                            <outputDirectory>${asciidoctor.aggregated-resources-dir}</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-asciidoc-css</id>
+                        <id>copy-local-resources-to-aggregated-resources</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${asciidoctor.base-outputdir}/html_single/css/</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/src/main/resources/css/</directory>
+                                    <directory>${basedir}/src/main/resources</directory>
+                                    <filtering>true</filtering>
                                 </resource>
                             </resources>
+                            <outputDirectory>${asciidoctor.aggregated-resources-dir}</outputDirectory>
+                            <overwrite>true</overwrite>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-css-to-html-output</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${asciidoctor.aggregated-resources-dir}/css/</directory>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${asciidoctor.base-output-dir}/html_single/css/</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-images-to-html-output</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${asciidoctor.aggregated-resources-dir}/images/</directory>
+                                </resource>
+                            </resources>
+                            <outputDirectory>${asciidoctor.base-output-dir}/html_single/images/</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.asciidoctor</groupId>
+                <artifactId>asciidoctor-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>output-html</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>process-asciidoc</goal>
+                        </goals>
+                        <configuration>
+                            <backend>html5</backend>
+                            <outputDirectory>${asciidoctor.base-output-dir}/html_single</outputDirectory>
+                            <sourceHighlighter>prettify</sourceHighlighter>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sourceDocumentName>index.asciidoc</sourceDocumentName>
+                    <attributes>
+                        <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/noorm-documentation</docinfodir>
+                        <icons>font</icons>
+                        <tabsize>4</tabsize>
+
+                        <sourcedir>${asciidoctor.examples-source-dir}</sourcedir>
+                        <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
+
+                        <hvVersion>${project.version}</hvVersion>
+                        <bvVersion>${bv.api.version}</bvVersion>
+                        <wildflyVersion>${wildfly.version}</wildflyVersion>
+                    </attributes>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -179,55 +243,25 @@
                         <executions>
                             <execution>
                                 <id>output-pdf</id>
-                                <phase>generate-resources</phase>
+                                <phase>process-resources</phase>
                                 <goals>
                                     <goal>process-asciidoc</goal>
                                 </goals>
                                 <configuration>
                                     <backend>pdf</backend>
-                                    <sourceDocumentName>index.asciidoc</sourceDocumentName>
-                                    <imagesDir>${asciidoctor.images-dir}</imagesDir>
-                                    <outputDirectory>${asciidoctor.base-outputdir}/pdf</outputDirectory>
+                                    <outputDirectory>${asciidoctor.base-output-dir}/pdf</outputDirectory>
                                     <sourceHighlighter>coderay</sourceHighlighter>
                                     <attributes>
-                                        <sourcedir>${asciidoctor.examples-sourcedir}</sourcedir>
-                                        <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
-                                        <pdf-stylesdir>${project.basedir}/src/main/resources/theme</pdf-stylesdir>
+                                        <imagesDir>${asciidoctor.aggregated-resources-dir}/images/</imagesDir>
+                                        <pdf-stylesdir>${asciidoctor.aggregated-resources-dir}/theme</pdf-stylesdir>
                                         <pdf-style>hibernate</pdf-style>
-                                        <pdf-fontsdir>${project.basedir}/src/main/resources/theme/fonts</pdf-fontsdir>
-                                        <icons>font</icons>
+                                        <pdf-fontsdir>${asciidoctor.aggregated-resources-dir}/theme/fonts</pdf-fontsdir>
                                         <pagenums/>
-                                        <toc/>
                                         <idprefix/>
                                         <idseparator>-</idseparator>
                                     </attributes>
                                 </configuration>
                             </execution>
-                            <!-- The epub output is very alpha. Let's forget about it for now.
-                            <execution>
-                                <id>output-epub</id>
-                                <phase>generate-resources</phase>
-                                <goals>
-                                    <goal>process-asciidoc</goal>
-                                </goals>
-                                <configuration>
-                                    <backend>epub3</backend>
-                                    <sourceDocumentName>index.asciidoc</sourceDocumentName>
-                                    <imagesDir>${asciidoctor.images-dir}</imagesDir>
-                                    <outputDirectory>${asciidoctor.base-outputdir}/epub</outputDirectory>
-                                    <sourceHighlighter>coderay</sourceHighlighter>
-                                    <attributes>
-                                        <sourcedir>${asciidoctor.examples-sourcedir}</sourcedir>
-                                        <engine-sourcedir>${asciidoctor.engine-source-dir}</engine-sourcedir>
-                                        <icons>font</icons>
-                                        <pagenums/>
-                                        <toc/>
-                                        <idprefix/>
-                                        <idseparator>-</idseparator>
-                                    </attributes>
-                                </configuration>
-                            </execution>
-                            -->
                         </executions>
                     </plugin>
                     <plugin>
@@ -243,7 +277,7 @@
                                 <configuration>
                                     <resources>
                                         <resource>
-                                            <directory>${asciidoctor.base-outputdir}/pdf</directory>
+                                            <directory>${asciidoctor.base-output-dir}/pdf</directory>
                                             <move>true</move>
                                             <includes>
                                                 <include>index.pdf</include>
@@ -255,21 +289,6 @@
                                                 </path>
                                             </paths>
                                         </resource>
-                                        <!-- The epub output is very alpha. Let's forget about it for now.
-                                        <resource>
-                                            <directory>${asciidoctor.base-outputdir}/epub</directory>
-                                            <move>true</move>
-                                            <includes>
-                                                <include>index.epub</include>
-                                            </includes>
-                                            <paths>
-                                                <path>
-                                                    <from>index.epub</from>
-                                                    <to>hibernate_validator_reference.epub</to>
-                                                </path>
-                                            </paths>
-                                        </resource>
-                                        -->
                                     </resources>
                                 </configuration>
                             </execution>

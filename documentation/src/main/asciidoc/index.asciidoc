@@ -5,7 +5,7 @@ Hardy Ferentschik; Gunnar Morling
 :sectanchors:
 :anchor:
 :toc: left
-:docinfodir: ../resources/docinfo/
+:docinfodir: {docinfodir}
 :docinfo:
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
