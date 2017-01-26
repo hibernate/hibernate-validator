@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator-parent</artifactId>
+        <version>6.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hibernate-validator-relocation</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate validator Relocation artifacts</name>
+
+    <modules>
+        <module>annotation-processor</module>
+        <module>cdi</module>
+        <module>engine</module>
+        <module>karaf-features</module>
+    </modules>
+</project>
