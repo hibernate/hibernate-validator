@@ -153,11 +153,12 @@
 
         <groovy.version>2.4.8</groovy.version>
 
+        <!-- Asciidoctor -->
+        <hibernate-asciidoctor-theme.version>1.0.0.Final</hibernate-asciidoctor-theme.version>
         <asciidoctor-maven-plugin.version>1.5.3</asciidoctor-maven-plugin.version>
         <jruby.version>1.7.26</jruby.version>
         <asciidoctorj.version>1.5.4.1</asciidoctorj.version>
         <asciidoctorj-pdf.version>1.5.0-alpha.11</asciidoctorj-pdf.version>
-        <asciidoctorj-epub3.version>1.5.0-alpha.6</asciidoctorj-epub3.version>
 
         <!--
         Do not upgrade Surefire and Failsafe to 2.19+.
@@ -588,7 +589,7 @@
                         <pushChanges>false</pushChanges>
                         <localCheckout>true</localCheckout>
                         <tagNameFormat>@{project.version}</tagNameFormat>
-                        <releaseProfiles>docbook</releaseProfiles>
+                        <releaseProfiles>documentation-pdf</releaseProfiles>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -602,38 +603,9 @@
                     <version>2.2</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.jboss.maven.plugins</groupId>
-                    <artifactId>maven-jdocbook-plugin</artifactId>
-                    <version>2.3.10</version>
-                    <extensions>true</extensions>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.jboss.pressgang</groupId>
-                            <artifactId>pressgang-xslt-ns</artifactId>
-                            <version>3.1.4</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.hibernate</groupId>
-                            <artifactId>hibernate-jdocbook-style</artifactId>
-                            <version>3.0.2</version>
-                            <type>jdocbook-style</type>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
                     <groupId>org.asciidoctor</groupId>
                     <artifactId>asciidoctor-maven-plugin</artifactId>
                     <version>${asciidoctor-maven-plugin.version}</version>
-                    <configuration>
-                        <sourceDocumentName>index.asciidoc</sourceDocumentName>
-                        <doctype>book</doctype>
-                        <attributes>
-                            <tabsize>4</tabsize>
-                            <hvVersion>${project.version}</hvVersion>
-                            <bvVersion>${bv.api.version}</bvVersion>
-                            <wildflyVersion>${wildfly.version}</wildflyVersion>
-                        </attributes>
-                    </configuration>
                     <dependencies>
                         <dependency>
                             <groupId>org.jruby</groupId>
@@ -649,11 +621,6 @@
                             <groupId>org.asciidoctor</groupId>
                             <artifactId>asciidoctorj-pdf</artifactId>
                             <version>${asciidoctorj-pdf.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.asciidoctor</groupId>
-                            <artifactId>asciidoctorj-epub3</artifactId>
-                            <version>${asciidoctorj-epub3.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -892,6 +859,7 @@
                                         <goals>
                                             <goal>copy-dependencies</goal>
                                             <goal>copy</goal>
+                                            <goal>unpack</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
