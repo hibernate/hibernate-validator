@@ -366,13 +366,12 @@ public final class ReflectionHelper {
 	 *
 	 * @param value The object from which to retrieve the indexed value. The object has to be non <code>null</code> and
 	 * either a collection or array.
-	 * @param index The index. The index does not have to be numerical. <code>value</code> could also be a map in which
-	 * case the index could also be a string key.
+	 * @param index The index.
 	 *
 	 * @return The indexed value or <code>null</code> if <code>value</code> is <code>null</code> or not a collection or array.
 	 *         <code>null</code> is also returned in case the index does not exist.
 	 */
-	public static Object getIndexedValue(Object value, Integer index) {
+	public static Object getIndexedValue(Object value, int index) {
 		if ( value == null ) {
 			return null;
 		}
