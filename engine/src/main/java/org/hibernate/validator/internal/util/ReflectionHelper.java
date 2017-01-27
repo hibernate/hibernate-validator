@@ -226,16 +226,6 @@ public final class ReflectionHelper {
 		return type;
 	}
 
-	public static Object getValue(Member member, Object object) {
-		if ( member instanceof Method ) {
-			return getValue( (Method) member, object );
-		}
-		else if ( member instanceof Field ) {
-			return getValue( (Field) member, object );
-		}
-		return null;
-	}
-
 	public static Object getValue(Field field, Object object) {
 		try {
 			return field.get( object );
@@ -249,10 +239,7 @@ public final class ReflectionHelper {
 		try {
 			return method.invoke( object );
 		}
-		catch (IllegalAccessException e) {
-			throw log.getUnableToAccessMemberException( method.getName(), e );
-		}
-		catch (InvocationTargetException e) {
+		catch (IllegalAccessException | InvocationTargetException e) {
 			throw log.getUnableToAccessMemberException( method.getName(), e );
 		}
 	}
