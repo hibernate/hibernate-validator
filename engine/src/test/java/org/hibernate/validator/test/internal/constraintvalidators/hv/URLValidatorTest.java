@@ -290,10 +290,91 @@ public class URLValidatorTest {
 	}
 
 	private void assertValidUrls(ConstraintValidator<URL, CharSequence> validator) {
+		//valid urls
 		assertTrue( validator.isValid( null, null ) );
+		assertTrue( validator.isValid( "ftp://abc.de", null ) );
+		assertTrue( validator.isValid( "http://foo.com/blah_blah", null ) );
+		assertTrue( validator.isValid( "http://foo.com/blah_blah/", null ) );
+		assertTrue( validator.isValid( "http://foo.com/blah_blah_(wikipedia)", null ) );
+		assertTrue( validator.isValid( "http://foo.com/blah_blah_(wikipedia)_(again)", null ) );
+		assertTrue( validator.isValid( "http://www.example.com/wpstyle/?p=364", null ) );
+		assertTrue( validator.isValid( "https://www.example.com/foo/?bar=baz&inga=42&quux", null ) );
+		assertTrue( validator.isValid( "http://✪df.ws/123", null ) );
+		assertTrue( validator.isValid( "http://userid:password@example.com:8080", null ) );
+		assertTrue( validator.isValid( "http://userid:password@example.com:8080/", null ) );
+		assertTrue( validator.isValid( "http://userid@example.com", null ) );
+		assertTrue( validator.isValid( "http://userid@example.com/", null ) );
+		assertTrue( validator.isValid( "http://userid@example.com:8080", null ) );
+		assertTrue( validator.isValid( "http://userid@example.com:8080/", null ) );
+		assertTrue( validator.isValid( "http://userid:password@example.com", null ) );
+		assertTrue( validator.isValid( "http://userid:password@example.com/", null ) );
+		assertTrue( validator.isValid( "http://142.42.1.1/", null ) );
+		assertTrue( validator.isValid( "http://142.42.1.1:8080/", null ) );
+		assertTrue( validator.isValid( "http://➡.ws/䨹", null ) );
+		assertTrue( validator.isValid( "http://⌘.ws", null ) );
+		assertTrue( validator.isValid( "http://⌘.ws/", null ) );
+		assertTrue( validator.isValid( "http://foo.com/blah_(wikipedia)#cite-1", null ) );
+		assertTrue( validator.isValid( "http://foo.com/blah_(wikipedia)_blah#cite-1", null ) );
+		assertTrue( validator.isValid( "http://foo.com/unicode_(✪)_in_parens", null ) );
+		assertTrue( validator.isValid( "http://foo.com/(something)?after=parens", null ) );
+		assertTrue( validator.isValid( "http://☺.damowmow.com/", null ) );
+		assertTrue( validator.isValid( "http://code.google.com/events/#&product=browser", null ) );
+		assertTrue( validator.isValid( "http://j.mp", null ) );
+		assertTrue( validator.isValid( "ftp://foo.bar/baz", null ) );
+		assertTrue( validator.isValid( "http://foo.bar/?q=Test%20URL-encoded%20stuff", null ) );
+		assertTrue( validator.isValid( "http://مثال.إختبار", null ) );
+		assertTrue( validator.isValid( "http://例子.测试", null ) );
+		assertTrue( validator.isValid( "http://उदाहरण.परीक्षा", null ) );
+		assertTrue( validator.isValid( "http://-.~_!$&'()*+,;=:%40:80%2f::::::@example.com", null ) );
+		assertTrue( validator.isValid( "http://1337.net", null ) );
+		assertTrue( validator.isValid( "http://a.b-c.de", null ) );
+		assertTrue( validator.isValid( "http://223.255.255.254", null ) );
+		assertTrue( validator.isValid( "http://[2001:0db8:0a0b:12f0:0000:0000:0000:0001]", null ) );
+
+		// invalid urls:
 		assertFalse( validator.isValid( "http", null ) );
 		assertFalse( validator.isValid( "ftp//abc.de", null ) );
-		assertTrue( validator.isValid( "ftp://abc.de", null ) );
+		assertFalse( validator.isValid( "//", null ) );
+		assertFalse( validator.isValid( "//a", null ) );
+		assertFalse( validator.isValid( "///", null ) );
+		assertFalse( validator.isValid( "///a", null ) );
+		assertFalse( validator.isValid( "foo.com", null ) );
+		assertFalse( validator.isValid( ":// should fail", null ) );
+
+		if ( validator instanceof URLValidator ) {
+			// 'exotic' protocols are considered valid using RegexpURLValidator but not URLValidator
+			// as the last one doesn't allow unknown protocols
+			assertFalse( validator.isValid( "rdar://1234", null ) );
+			assertFalse( validator.isValid( "ftps://foo.bar/", null ) );
+			assertFalse( validator.isValid( "h://test", null ) );
+		}
+
+		if ( validator instanceof RegexpURLValidator ) {
+			assertFalse( validator.isValid( "http://", null ) );
+			assertFalse( validator.isValid( "http://.", null ) );
+			assertFalse( validator.isValid( "http://..", null ) );
+			assertFalse( validator.isValid( "http://../", null ) );
+			assertFalse( validator.isValid( "http://?", null ) );
+			assertFalse( validator.isValid( "http://??", null ) );
+			assertFalse( validator.isValid( "http://??/", null ) );
+			assertFalse( validator.isValid( "http://#", null ) );
+			assertFalse( validator.isValid( "http://##", null ) );
+			assertFalse( validator.isValid( "http://##/", null ) );
+			assertFalse( validator.isValid( "http://foo.bar?q=Spaces should be encoded", null ) );
+			assertFalse( validator.isValid( "http:///a", null ) );
+			assertFalse( validator.isValid( "http:// shouldfail.com", null ) );
+			assertFalse( validator.isValid( "http://foo.bar/foo(bar)baz quux", null ) );
+			assertFalse( validator.isValid( "http://-error-.invalid/", null ) );
+			assertFalse( validator.isValid( "http://a.b--c.de/", null ) );
+			assertFalse( validator.isValid( "http://-a.b.co", null ) );
+			assertFalse( validator.isValid( "http://a.b-.co", null ) );
+//			assertFalse( validator.isValid( "http://123.123.123", null ) );
+//			assertFalse( validator.isValid( "http://3628126748", null ) );
+			assertFalse( validator.isValid( "http://.www.foo.bar/", null ) );
+			assertFalse( validator.isValid( "http://www.foo.bar./", null ) );
+			assertFalse( validator.isValid( "http://.www.foo.bar./", null ) );
+			assertFalse( validator.isValid( "http://2001:0db8:0a0b:12f0:0000:0000:0000:0001", null ) );
+		}
 	}
 
 	private void assertValidCharSequenceUrls(ConstraintValidator<URL, CharSequence> validator) {
