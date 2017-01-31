@@ -21,25 +21,20 @@ portable between Bean Validation providers.
 
 === Public API
 
-Let's start, however, with a look at the public API of Hibernate Validator. <<validator-public-api>>
-lists all packages belonging to this API and describes their purpose. Note that when a package is
-part of the public this is not necessarily true for its sub-packages.
+Let's start, however, with a look at the public API of Hibernate Validator. Below you can find a list of all packages belonging to this API and their purpose.
+Note that when a package is part of the public API this is not necessarily true for its sub-packages.
 
-[[validator-public-api]]
-.Hibernate Validator public API
-//|Packages|Description
-//[horizontal]
 `org.hibernate.validator`::
 			Classes used by the Bean Validation bootstrap mechanism (eg. validation provider, configuration class); For more details see <<chapter-bootstrapping>>.
 `org.hibernate.validator.cfg`, `org.hibernate.validator.cfg.context`, `org.hibernate.validator.cfg.defs`, `org.hibernate.validator.spi.cfg`::
 			Hibernate Validator's fluent API for constraint declaration; In `org.hibernate.validator.cfg` you will find the `ConstraintMapping` interface, in `org.hibernate.validator.cfg.defs` all constraint definitions and in `org.hibernate.validator.spi.cfg` a callback for using the API for configuring the default validator factory. Refer to <<section-programmatic-api>> for the details.
 `org.hibernate.validator.constraints`, `org.hibernate.validator.constraints.br`::
-			Some useful custom constraints provided by Hibernate Validator in addition to the built-in constraints defined by the Bean Validation specification; The constraints are described in detail in <<validator-defineconstraints-hv-constraints>>.
+			Some useful custom constraints provided by Hibernate Validator in addition to the built-in constraints defined by the Bean Validation specification; the constraints are described in detail in <<validator-defineconstraints-hv-constraints>>.
 `org.hibernate.validator.constraintvalidation`::
 			Extended constraint validator context which allows to set custom attributes for message interpolation. <<section-hibernateconstraintvalidatorcontext>> describes how to make use of that feature.
-`org.hibernate.validator.group`, `org.hibernate.validator.spi.group`:: The group sequence provider feature which allows you to define dynamic default group sequences in function of the validated object state; The specifics can be found in <<section-default-group-class>>.
+`org.hibernate.validator.group`, `org.hibernate.validator.spi.group`:: The group sequence provider feature which allows you to define dynamic default group sequences in function of the validated object state; the specifics can be found in <<section-default-group-class>>.
 `org.hibernate.validator.messageinterpolation`, `org.hibernate.validator.resourceloading`, `org.hibernate.validator.spi.resourceloading`::
-			Classes related to constraint message interpolation; The first package contains Hibernate Validator's default message interpolator, `ResourceBundleMessageInterpolator`. The latter two packages provide the `ResourceBundleLocator` SPI for the loading of resource bundles (see <<section-resource-bundle-locator>>) and its default implementation.
+			Classes related to constraint message interpolation; the first package contains Hibernate Validator's default message interpolator, `ResourceBundleMessageInterpolator`. The latter two packages provide the `ResourceBundleLocator` SPI for the loading of resource bundles (see <<section-resource-bundle-locator>>) and its default implementation.
 `org.hibernate.validator.parameternameprovider`::
 			A `ParameterNameProvider` based on the ParaNamer library, see <<section-paranamer-parameternameprovider>>.
 `org.hibernate.validator.propertypath`::
