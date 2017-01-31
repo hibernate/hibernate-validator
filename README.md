@@ -33,7 +33,7 @@ Logging will delegate any log requests to that provider.
 * Add the following to your Maven or Ivy dependency list
 
         <dependency>
-            <groupId>org.hibernate.validator</groupId>
+            <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>5.3.4.Final</version>
         </dependency>
@@ -52,7 +52,7 @@ in an environment which does not provide this integration out of the box, you ma
 extension by adding the following dependency:
 
         <dependency>
-           <groupId>org.hibernate.validator</groupId>
+           <groupId>org.hibernate</groupId>
            <artifactId>hibernate-validator-cdi</artifactId>
            <version>5.3.4.Final</version>
         </dependency>
