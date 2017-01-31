@@ -53,10 +53,12 @@ http://java.sun.com/javase/6/docs/technotes/tools/windows/javac.html#options[pro
             string representation of one of the values from the enum `javax.tools.Diagnostic.Kind`,
             e.g. `WARNING`. A value of `ERROR` will cause compilation to halt whenever the AP detects
             a constraint problem. Defaults to `ERROR`.
+
 `methodConstraintsSupported`:: Controls whether constraints are allowed at methods of any
             kind. Must be set to `true` when working with method level constraints as supported by
             Hibernate Validator. Can be set to `false` to allow constraints only at
             JavaBeans getter methods as defined by the Bean Validation API. Defaults to `true`.
+
 `verbose`:: Controls whether detailed processing information shall be
             displayed or not, useful for debugging purposes. Must be either
             `true` or `false`. Defaults to `false`.
