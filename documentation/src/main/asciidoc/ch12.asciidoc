@@ -46,28 +46,21 @@ annotations themselves
 [[validator-annotationprocessor-options]]
 === Options
 
-The behavior of the Hibernate Validator Annotation Processor can be controlled using the
-http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javac.html#BHCHACIB[processor options]
-listed in table <<table_processor_options>>:
+The behavior of the Hibernate Validator Annotation Processor can be controlled using the following
+http://docs.oracle.com/javase/8/docs/technotes/tools/windows/javac.html#BHCHACIB[processor options]:
 
-[[table_processor_options]]
-.Hibernate Validator Annotation Processor options
-[options="header"]
-|===============
-|Option|Explanation
-|`diagnosticKind`|Controls how constraint problems are reported. Must be the
+`diagnosticKind`:: Controls how constraint problems are reported. Must be the
             string representation of one of the values from the enum `javax.tools.Diagnostic.Kind`,
             e.g. `WARNING`. A value of `ERROR` will cause compilation to halt whenever the AP detects
             a constraint problem. Defaults to `ERROR`.
-|`methodConstraintsSupported`|Controls whether constraints are allowed at methods of any
+`methodConstraintsSupported`:: Controls whether constraints are allowed at methods of any
             kind. Must be set to `true` when working with method level constraints as supported by
             Hibernate Validator. Can be set to `false` to allow constraints only at
             JavaBeans getter methods as defined by the Bean Validation API. Defaults to `true`.
-|`verbose`|Controls whether detailed processing information shall be
+`verbose`:: Controls whether detailed processing information shall be
             displayed or not, useful for debugging purposes. Must be either
             `true` or `false`. Defaults to `false`.
 
-|===============
 
 
 [[validator-annotationprocessor-usage]]
