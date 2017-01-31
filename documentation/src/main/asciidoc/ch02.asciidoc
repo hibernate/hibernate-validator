@@ -412,59 +412,44 @@ before they are propagated to the model.
 
 ==== `ConstraintViolation` methods
 
-Now it is time to have a closer look at what a `ConstraintViolation` is. Using the different methods
-of `ConstraintViolation` a lot of useful information about the cause of the validation failure can be
-determined. <<table-constraint-violation>> gives an overview of these methods. The values in the
-"Example" column refer to <<example-validator-validate>>.
+Now it is time to have a closer look at what a `ConstraintViolation` is.
+Using the different methods of `ConstraintViolation` a lot of useful information about the cause of the validation failure can be determined.
+The following gives an overview of these methods.
+The values under "Example" column refer to <<example-validator-validate>>.
 
-[[table-constraint-violation]]
-.The various `ConstraintViolation` methods
-//[horizontal]
-`getMessage()`::
-	Usage::: The interpolated error message
+`getMessage()`:: The interpolated error message
 	Example::: "may not be null"
-`getMessageTemplate()`::
-	Usage::: The non-interpolated error message
+`getMessageTemplate()`:: The non-interpolated error message
 	Example::: "{... NotNull.message}"
-`getRootBean()`::
-	Usage::: The root bean being validated
+`getRootBean()`:: The root bean being validated
 	Example::: car
-`getRootBeanClass()`::
-	Usage::: The class of the root bean being validated
+`getRootBeanClass()`:: The class of the root bean being validated
 	Example::: `Car.class`
-`getLeafBean()`::
-	Usage::: If a bean constraint, the bean instance the constraint is
-             applied on; If a property constraint, the bean instance hosting
+`getLeafBean()`:: If a bean constraint, the bean instance the constraint is
+             applied on; if a property constraint, the bean instance hosting
              the property the constraint is applied on
 	Example::: `car`
-`getPropertyPath()`::
-	Usage::: The property path to the validated value from root bean
+`getPropertyPath()`:: The property path to the validated value from root bean
 	Example::: contains one node with kind `PROPERTY` and name "manufacturer"
-`getInvalidValue()`::
-	Usage::: The value failing to pass the constraint
+`getInvalidValue()`:: The value failing to pass the constraint
 	Example::: `null`
-`getConstraintDescriptor()`::
-	Usage::: Constraint metadata reported to fail
+`getConstraintDescriptor()`:: Constraint metadata reported to fail
 	Example::: descriptor for `@NotNull`
-
 
 [[section-builtin-constraints]]
 === Built-in constraints
 
 Hibernate Validator comprises a basic set of commonly used constraints. These are foremost the
-constraints defined by the Bean Validation specification (see <<table-spec-constraints>>).
+constraints defined by the Bean Validation specification (see <<validator-defineconstraints-spec>>).
 Additionally, Hibernate Validator provides useful custom constraints (see
-<<table-custom-constraints>> and <<table-custom-country-constraints>>).
+<<validator-defineconstraints-hv-constraints>>).
 
 [[validator-defineconstraints-spec]]
 ==== Bean Validation constraints
 
-<<table-spec-constraints>> shows purpose and supported data types of all constraints specified in
-the Bean Validation API. All these constraints apply to the field/property level, there are no
-class-level constraints defined in the Bean Validation specification. If you are using the Hibernate
-object-relational mapper, some of the constraints are taken into account when creating the DDL for
-your model (see column "Hibernate metadata impact").
-
+Below you can find a list of all constraints specified in the Bean Validation API.
+All these constraints apply to the field/property level, there are no class-level constraints defined in the Bean Validation specification.
+If you are using the Hibernate object-relational mapper, some of the constraints are taken into account when creating the DDL for your model (see "Hibernate metadata impact").
 
 [NOTE]
 ====
@@ -473,146 +458,129 @@ Bean Validation specification (e.g. `@Max` can be applied to strings). Relying o
 impact portability of your application between Bean Validation providers.
 ====
 
+`@AssertFalse`:: Checks that the annotated element is false
+	Supported data types::: `Boolean`, `boolean`
+	Hibernate metadata impact::: None
 
-[[table-spec-constraints]]
-.Bean Validation constraints
+`@AssertTrue`:: Checks that the annotated element is true
+	Supported data types::: `Boolean`, `boolean`
+	Hibernate metadata impact::: None
 
-//[horizontal]
-`@AssertFalse`::
-	*Supported data types*::: `Boolean`, `boolean`
-	*Use*::: Checks that the annotated element is false
-	*Hibernate metadata impact*::: None
-`@AssertTrue`::
-	*Supported data types*::: `Boolean`, `boolean`
-	*Use*::: Checks that the annotated element is true
-	*Hibernate metadata impact*::: None
-`@DecimalMax(value=,inclusive=)`::
-	*Supported data types*::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; Additionally supported by HV: any sub-type of `Number` and `javax.money.MonetaryAmount` (if the https://jcp.org/en/jsr/detail?id=354[JSR 354 API] and an implementation is on the class path)
-	*Use*::: Checks whether the annotated value is less than the specified maximum, when `inclusive`=false. Otherwise whether the value is less than or equal to the specified maximum. The parameter value is the string representation of the max value according to the `BigDecimal` string representation.
-	*Hibernate metadata impact*::: None
-`@DecimalMin(value=,inclusive=)`::
-	*Supported data types*::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; Additionally supported by HV: any sub-type of `Number` and `javax.money.MonetaryAmount`
-	*Use*::: Checks whether the annotated value is larger than the specified minimum, when `inclusive`=false. Otherwise whether the value is larger than or equal to the specified minimum. The parameter value is the string representation of the min value according to the `BigDecimal` string representation.
-	*Hibernate metadata impact*::: None
-`@Digits(integer=,fraction=)`::
-	*Supported data types*::: BigDecimal, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; Additionally supported by HV: any sub-type of `Number`
-	*Use*::: Checks whether the annotated value is a number having up to `integer` digits and `fraction` fractional digits
-	*Hibernate metadata impact*::: Defines column precision and scale
-`@Future`::
-	*Supported data types*::: `java.util.Date`, `java.util.Calendar`, `java.time.chrono.ChronoZonedDateTime`, `java.time.Instant`, `java.time.OffsetDateTime`; Additionally supported by HV, if the http://www.joda.org/joda-time/[Joda Time] date/time API is on the classpath: any implementations of `ReadablePartial` and `ReadableInstant`
-	*Use*::: Checks whether the annotated date is in the future
-	*Hibernate metadata impact*::: None
-`@Max(value=)`::
-	*Supported data types*::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; Additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
-	*Use*::: Checks whether the annotated value is less than or equal to the specified maximum
-	*Hibernate metadata impact*::: Adds a check constraint on the column
-`@Min(value=)`::
-	*Supported data types*::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; Additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
-	*Use*::: Checks whether the annotated value is higher than or equal to the specified minimum
-	*Hibernate metadata impact*::: Adds a check constraint on the column
-`@NotNull`::
-	*Supported data types*::: Any type
-	*Use*::: hecks that the annotated value is not `null`
-	*Hibernate metadata impact*::: Column(s) are not nullable
-`@Null`::
-	*Supported data types*::: Any type
-	*Use*::: hecks that the annotated value is `null`
-	*Hibernate metadata impact*::: None
-`@Past`::
-	*Supported data types*::: `java.util.Date`, `java.util.Calendar`, `java.time.chrono.ChronoZonedDateTime`, `java.time.Instant`, `java.time.OffsetDateTime`; Additionally supported by HV, if the http://www.joda.org/joda-time/[Joda Time] date/time API is on the classpath: any implementations of `ReadablePartial` and `ReadableInstant`
-	*Use*::: Checks whether the annotated date is in the past
-	*Hibernate metadata impact*::: None
-`@Pattern(regex=,flags=)`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks if the annotated string matches the regular expression `regex` considering the given flag `match`
-	*Hibernate metadata impact*::: None
-`@Size(min=, max=)`::
-	*Supported data types*::: `CharSequence`, `Collection`, `Map` and arrays
-	*Use*::: Checks if the annotated element's size is between `min` and `max` (inclusive)
-	*Hibernate metadata impact*::: Column length will be set to `max`
-`@Valid`::
-	*Supported data types*::: Any non-primitive type
-	*Use*::: Performs validation recursively on the associated object. If the object is a collection or an array, the elements are validated recursively. If the object is a map, the value elements are validated recursively.
-	*Hibernate metadata impact*::: None
+`@DecimalMax(value=,inclusive=)`:: Checks whether the annotated value is less than the specified maximum, when `inclusive`=false. Otherwise whether the value is less than or equal to the specified maximum. The parameter value is the string representation of the max value according to the `BigDecimal` string representation.
+	Supported data types::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `Number` and `javax.money.MonetaryAmount` (if the https://jcp.org/en/jsr/detail?id=354[JSR 354 API] and an implementation is on the class path)
+	Hibernate metadata impact::: None
+
+`@DecimalMin(value=,inclusive=)`:: Checks whether the annotated value is larger than the specified minimum, when `inclusive`=false. Otherwise whether the value is larger than or equal to the specified minimum. The parameter value is the string representation of the min value according to the `BigDecimal` string representation.
+	Supported data types::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `Number` and `javax.money.MonetaryAmount`
+	Hibernate metadata impact::: None
+
+`@Digits(integer=,fraction=)`:: Checks whether the annotated value is a number having up to `integer` digits and `fraction` fractional digits
+	Supported data types::: BigDecimal, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `Number`
+	Hibernate metadata impact::: Defines column precision and scale
+
+`@Future`:: Checks whether the annotated date is in the future
+	Supported data types::: `java.util.Date`, `java.util.Calendar`, `java.time.chrono.ChronoZonedDateTime`, `java.time.Instant`, `java.time.OffsetDateTime`; additionally supported by HV, if the http://www.joda.org/joda-time/[Joda Time] date/time API is on the classpath: any implementations of `ReadablePartial` and `ReadableInstant`
+	Hibernate metadata impact::: None
+
+`@Max(value=)`:: Checks whether the annotated value is less than or equal to the specified maximum
+	Supported data types::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
+	Hibernate metadata impact::: Adds a check constraint on the column
+
+`@Min(value=)`:: Checks whether the annotated value is higher than or equal to the specified minimum
+	Supported data types::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
+	Hibernate metadata impact::: Adds a check constraint on the column
+
+`@NotNull`:: Checks that the annotated value is not `null`
+	Supported data types::: Any type
+	Hibernate metadata impact::: Column(s) are not nullable
+
+`@Null`:: Checks that the annotated value is `null`
+	Supported data types::: Any type
+	Hibernate metadata impact::: None
+
+`@Past`:: Checks whether the annotated date is in the past
+	Supported data types::: `java.util.Date`, `java.util.Calendar`, `java.time.chrono.ChronoZonedDateTime`, `java.time.Instant`, `java.time.OffsetDateTime`; Additionally supported by HV, if the http://www.joda.org/joda-time/[Joda Time] date/time API is on the classpath: any implementations of `ReadablePartial` and `ReadableInstant`
+	Hibernate metadata impact::: None
+
+`@Pattern(regex=,flags=)`:: Checks if the annotated string matches the regular expression `regex` considering the given flag `match`
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
+`@Size(min=, max=)`:: Checks if the annotated element's size is between `min` and `max` (inclusive)
+	Supported data types::: `CharSequence`, `Collection`, `Map` and arrays
+	Hibernate metadata impact::: Column length will be set to `max`
+
+`@Valid`:: Performs validation recursively on the associated object. If the object is a collection or an array, the elements are validated recursively. If the object is a map, the value elements are validated recursively.
+	Supported data types::: Any non-primitive type
+	Hibernate metadata impact::: None
 
 [NOTE]
 ====
-On top of the parameters indicated in <<table-spec-constraints>> each constraint has the parameters
+On top of the parameters listed above each constraint has the parameters
 message, groups and payload. This is a requirement of the Bean Validation specification.
 ====
-
 
 [[validator-defineconstraints-hv-constraints]]
 ==== Additional constraints
 
-In addition to the constraints defined by the Bean Validation API Hibernate Validator provides
-several useful custom constraints which are listed in <<table-custom-constraints>>. With one
-exception also these constraints apply to the field/property level, only `@ScriptAssert` is a class-
-level constraint.
+In addition to the constraints defined by the Bean Validation API Hibernate Validator provides several useful custom constraints which are listed below.
+With one exception also these constraints apply to the field/property level, only `@ScriptAssert` is a class-level constraint.
 
-[[table-custom-constraints]]
-.Custom constraints
+`@CreditCardNumber(ignoreNonDigitCharacters=)`:: Checks that the annotated character sequence passes the Luhn checksum test. Note, this validation aims to check for user mistakes, not credit card validity! See also http://www.merriampark.com/anatomycc.htm[Anatomy of Credit Card Numbers]. `ignoreNonDigitCharacters` allows to ignore non digit characters. The default is `false`.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
 
-//[horizontal]
-`@CreditCardNumber(ignoreNonDigitCharacters=)`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the annotated character sequence passes the Luhn checksum test. Note, this validation aims to check for user mistakes, not credit card validity! See also http://www.merriampark.com/anatomycc.htm[Anatomy of Credit Card Numbers]. `ignoreNonDigitCharacters` allows to ignore non digit characters. The default is `false`.
-	*Hibernate metadata impact*::: None
-`@Currency(value=)`::
-	*Supported data types*::: any sub-type of `javax.money.MonetaryAmount` (if the https://jcp.org/en/jsr/detail?id=354[JSR 354 API] and an implementation is on the class path)
-	*Use*::: Checks that the annotated `javax.money.MonetaryAmount` currency unit is part of the specified currency units.
-	*Hibernate metadata impact*::: None
-`@EAN`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the annotated character sequence is a valid link:$$http://en.wikipedia.org/wiki/International_Article_Number_%28EAN%29$$[EAN] barcode. type determines the type of barcode. The default is EAN-13.
-	*Hibernate metadata impact*::: None
-`@Email`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks whether the specified character sequence is a valid email address. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the email must match.
-	*Hibernate metadata impact*::: None
-`@Length(min=, max=)`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Validates that the annotated character sequence is between `min` and `max` included
-	*Hibernate metadata impact*::: Column length will be set to max
-`@LuhnCheck(startIndex= , endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=)`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the digits within the annotated character sequence pass the Luhn checksum algorithm (see also link:$$http://en.wikipedia.org/wiki/Luhn_algorithm$$[Luhn algorithm]). `startIndex` and `endIndex` allow to only run the algorithm on the specified sub-string. `checkDigitIndex` allows to use an arbitrary digit within the character sequence as the check digit. If not specified it is assumed that the check digit is part of the specified range. Last but not least, `ignoreNonDigitCharacters` allows to ignore non digit characters.
-	*Hibernate metadata impact*::: None
-`@Mod10Check(multiplier=, weight=, startIndex=, endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=)`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the digits within the annotated character sequence pass the generic mod 10 checksum algorithm. `multiplier` determines the multiplier for odd numbers (defaults to 3), `weight` the weight for even numbers (defaults to 1). `startIndex` and `endIndex` allow to only run the algorithm on the specified sub-string. `checkDigitIndex` allows to use an arbitrary digit within the character sequence as the check digit. If not specified it is assumed that the check digit is part of the specified range. Last but not least, `ignoreNonDigitCharacters` allows to ignore non digit characters.
-	*Hibernate metadata impact*::: None
-`@Mod11Check(threshold=, startIndex=, endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=, treatCheck10As=, treatCheck11As=)`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the digits within the annotated character sequence pass the mod 11 checksum algorithm. `threshold` specifies the threshold for the mod11 multiplier growth; if no value is specified the multiplier will grow indefinitely. `treatCheck10As` and `treatCheck11As` specify the check digits to be used when the mod 11 checksum equals 10 or 11, respectively. Default to X and 0, respectively. `startIndex`, `endIndex` `checkDigitIndex` and `ignoreNonDigitCharacters` carry the same semantics as in `@Mod10Check`.
-	*Hibernate metadata impact*::: None
-`@NotBlank`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the annotated character sequence is not null and the trimmed length is greater than 0. The difference to `@NotEmpty` is that this constraint can only be applied on strings and that trailing white-spaces are ignored.
-	*Hibernate metadata impact*::: None
-`@NotEmpty`::
-	*Supported data types*::: `CharSequence`, `Collection`, `Map` and arrays
-	*Use*::: Checks whether the annotated element is not null nor empty
-	*Hibernate metadata impact*::: None
-`@Range(min=, max=)`::
-	*Supported data types*::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
-	*Use*::: Checks whether the annotated value lies between (inclusive) the specified minimum and maximum
-	*Hibernate metadata impact*::: None
-`@SafeHtml(whitelistType= , additionalTags=, additionalTagsWithAttributes=)`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks whether the annotated value contains potentially malicious fragments such as `<script/>`. In order to use this constraint, the link:$$http://jsoup.org/$$[jsoup] library must be part of the class path. With the `whitelistType` attribute a predefined whitelist type can be chosen which can be refined via `additionalTags` or `additionalTagsWithAttributes`. The former allows to add tags without any attributes, whereas the latter allows to specify tags and optionally allowed attributes using the annotation `@SafeHtml.Tag`.
-	*Hibernate metadata impact*::: None
-`@ScriptAssert(lang=, script=, alias=, reportOn=)`::
-	*Supported data types*::: Any type
-	*Use*::: Checks whether the given script can successfully be evaluated against the annotated element. In order to use this constraint, an implementation of the Java Scripting API as defined by JSR 223 ("Scripting for the Java^TM^ Platform") must be a part of the class path. The expressions to be evaluated can be written in any scripting or expression language, for which a JSR 223 compatible engine can be found in the class path. Even though this is a class-level constraint, one can use the `reportOn` attribute to report a constraint violation on a specific property rather than the whole object.
-	*Hibernate metadata impact*::: None
-`@URL(protocol=, host=, port=, regexp=, flags=)`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks if the annotated character sequence is a valid URL according to RFC2396. If any of the optional parameters `protocol`, `host` or `port` are specified, the corresponding URL fragments must match the specified values. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the URL must match. Per default this constraint used the `java.net.URL` constructor to verify whether a given string represents a valid URL. A regular expression based version is also available - `RegexpURLValidator` - which can be configured via XML (see <<section-mapping-xml-constraints>>) or the programmatic API (see <<section-programmatic-constraint-definition>>).
-	*Hibernate metadata impact*::: None
+`@Currency(value=)`::	Checks that the currency unit of the annotated `javax.money.MonetaryAmount` is part of the specified currency units.
+	Supported data types::: any sub-type of `javax.money.MonetaryAmount` (if the https://jcp.org/en/jsr/detail?id=354[JSR 354 API] and an implementation is on the class path)
+	Hibernate metadata impact::: None
 
+`@EAN`::Checks that the annotated character sequence is a valid link:$$http://en.wikipedia.org/wiki/International_Article_Number_%28EAN%29$$[EAN] barcode. type determines the type of barcode. The default is EAN-13.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
 
+`@Email`:: Checks whether the specified character sequence is a valid email address. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the email must match.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
 
+`@Length(min=, max=)`::	Validates that the annotated character sequence is between `min` and `max` included
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: Column length will be set to max
+
+`@LuhnCheck(startIndex= , endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=)`::	Checks that the digits within the annotated character sequence pass the Luhn checksum algorithm (see also link:$$http://en.wikipedia.org/wiki/Luhn_algorithm$$[Luhn algorithm]). `startIndex` and `endIndex` allow to only run the algorithm on the specified sub-string. `checkDigitIndex` allows to use an arbitrary digit within the character sequence as the check digit. If not specified it is assumed that the check digit is part of the specified range. Last but not least, `ignoreNonDigitCharacters` allows to ignore non digit characters.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
+`@Mod10Check(multiplier=, weight=, startIndex=, endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=)`::	Checks that the digits within the annotated character sequence pass the generic mod 10 checksum algorithm. `multiplier` determines the multiplier for odd numbers (defaults to 3), `weight` the weight for even numbers (defaults to 1). `startIndex` and `endIndex` allow to only run the algorithm on the specified sub-string. `checkDigitIndex` allows to use an arbitrary digit within the character sequence as the check digit. If not specified it is assumed that the check digit is part of the specified range. Last but not least, `ignoreNonDigitCharacters` allows to ignore non digit characters.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
+`@Mod11Check(threshold=, startIndex=, endIndex=, checkDigitIndex=, ignoreNonDigitCharacters=, treatCheck10As=, treatCheck11As=)`:: Checks that the digits within the annotated character sequence pass the mod 11 checksum algorithm. `threshold` specifies the threshold for the mod11 multiplier growth; if no value is specified the multiplier will grow indefinitely. `treatCheck10As` and `treatCheck11As` specify the check digits to be used when the mod 11 checksum equals 10 or 11, respectively. Default to X and 0, respectively. `startIndex`, `endIndex` `checkDigitIndex` and `ignoreNonDigitCharacters` carry the same semantics as in `@Mod10Check`.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
+`@NotBlank`::	Checks that the annotated character sequence is not null and the trimmed length is greater than 0. The difference to `@NotEmpty` is that this constraint can only be applied on strings and that trailing white-spaces are ignored.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
+`@NotEmpty`::	Checks whether the annotated element is not null nor empty
+	Supported data types::: `CharSequence`, `Collection`, `Map` and arrays
+	Hibernate metadata impact::: None
+
+`@Range(min=, max=)`::Checks whether the annotated value lies between (inclusive) the specified minimum and maximum
+	Supported data types::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
+	Hibernate metadata impact::: None
+
+`@SafeHtml(whitelistType= , additionalTags=, additionalTagsWithAttributes=)`::	Checks whether the annotated value contains potentially malicious fragments such as `<script/>`. In order to use this constraint, the link:$$http://jsoup.org/$$[jsoup] library must be part of the class path. With the `whitelistType` attribute a predefined whitelist type can be chosen which can be refined via `additionalTags` or `additionalTagsWithAttributes`. The former allows to add tags without any attributes, whereas the latter allows to specify tags and optionally allowed attributes using the annotation `@SafeHtml.Tag`.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
+`@ScriptAssert(lang=, script=, alias=, reportOn=)`::Checks whether the given script can successfully be evaluated against the annotated element. In order to use this constraint, an implementation of the Java Scripting API as defined by JSR 223 ("Scripting for the Java^TM^ Platform") must be a part of the class path. The expressions to be evaluated can be written in any scripting or expression language, for which a JSR 223 compatible engine can be found in the class path. Even though this is a class-level constraint, one can use the `reportOn` attribute to report a constraint violation on a specific property rather than the whole object.
+	Supported data types::: Any type
+	Hibernate metadata impact::: None
+
+`@URL(protocol=, host=, port=, regexp=, flags=)`:: Checks if the annotated character sequence is a valid URL according to RFC2396. If any of the optional parameters `protocol`, `host` or `port` are specified, the corresponding URL fragments must match the specified values. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the URL must match. Per default this constraint used the `java.net.URL` constructor to verify whether a given string represents a valid URL. A regular expression based version is also available - `RegexpURLValidator` - which can be configured via XML (see <<section-mapping-xml-constraints>>) or the programmatic API (see <<section-programmatic-constraint-definition>>).
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
 
 ===== Country specific constraints
 
@@ -625,45 +593,35 @@ If you have to implement a country specific constraint, consider making it a con
 Hibernate Validator!
 ====
 
+`@CNPJ`:: Checks that the annotated character sequence represents a Brazilian corporate tax payer registry number (Cadastro de Pessoa Juríeddica)
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: Brazil
 
-[[table-custom-country-constraints]]
-.Custom country specific constraints
+`@CPF`:: Checks that the annotated character sequence represents a Brazilian individual taxpayer registry number (Cadastro de Pessoa Fídsica)
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: Brazil
 
-//[horizontal]
-`@CNPJ`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the annotated character sequence represents a Brazilian corporate tax payer registry number (Cadastro de Pessoa Juríeddica)
-	*Hibernate metadata impact*::: None
-	*Country*::: Brazil
+`@TituloEleitoral`:: 	Checks that the annotated character sequence represents a Brazilian voter ID card number (http://www.exceldoseujeito.com.br/2008/12/19/validar-cpf-cnpj-e-titulo-de-eleitor-parte-ii/[Título Eleitoral])
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: Brazil
 
-`@CPF`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the annotated character sequence represents a Brazilian individual taxpayer registry number (Cadastro de Pessoa Fídsica)
-	*Hibernate metadata impact*::: None
-	*Country*::: Brazil
+`@NIP`:: Checks that the annotated character sequence represents a Polish VAT identification number (https://pl.wikipedia.org/wiki/NIP[NIP])
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: Poland
 
-`@TituloEleitoral`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the annotated character sequence represents a Brazilian voter ID card number (http://www.exceldoseujeito.com.br/2008/12/19/validar-cpf-cnpj-e-titulo-de-eleitor-parte-ii/[Título Eleitoral])
-	*Hibernate metadata impact*::: None
-	*Country*::: Brazil
-`@NIP`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: hecks that the annotated character sequence represents a Polish VAT identification number (https://pl.wikipedia.org/wiki/NIP[NIP])
-	*Hibernate metadata impact*::: None
-	*Country*::: Poland
+`@PESEL`:: Checks that the annotated character sequence represents a Polish national identification number (https://pl.wikipedia.org/wiki/PESEL[PESEL])
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: Poland
 
-`@PESEL`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the annotated character sequence represents a Polish national identification number (https://pl.wikipedia.org/wiki/PESEL[PESEL])
-	*Hibernate metadata impact*::: None
-	*Country*::: Poland
-
-`@REGON`::
-	*Supported data types*::: `CharSequence`
-	*Use*::: Checks that the annotated character sequence represents a Polish taxpayer identification number (https://pl.wikipedia.org/wiki/REGON[REGON]). Can be applied to both 9 and 14 digits versions of REGON
-	*Hibernate metadata impact*::: None
-	*Country*::: Poland
+`@REGON`:: Checks that the annotated character sequence represents a Polish taxpayer identification number (https://pl.wikipedia.org/wiki/REGON[REGON]). Can be applied to both 9 and 14 digits versions of REGON
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+	Country::: Poland
 
 [TIP]
 ====

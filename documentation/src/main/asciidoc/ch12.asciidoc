@@ -46,14 +46,9 @@ annotations themselves
 [[validator-annotationprocessor-options]]
 === Options
 
-The behavior of the Hibernate Validator Annotation Processor can be controlled using the
-http://java.sun.com/javase/6/docs/technotes/tools/windows/javac.html#options[processor options]
-listed in table <<table_processor_options>>:
+The behavior of the Hibernate Validator Annotation Processor can be controlled using the following
+http://java.sun.com/javase/6/docs/technotes/tools/windows/javac.html#options[processor options]:
 
-[[table_processor_options]]
-.Hibernate Validator Annotation Processor options
-//|Option|Explanation
-//[horizontal]
 `diagnosticKind`:: Controls how constraint problems are reported. Must be the
             string representation of one of the values from the enum `javax.tools.Diagnostic.Kind`,
             e.g. `WARNING`. A value of `ERROR` will cause compilation to halt whenever the AP detects

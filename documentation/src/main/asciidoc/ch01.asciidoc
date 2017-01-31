@@ -245,9 +245,8 @@ based parameter name provider.
 ==== New date/time API
 
 Java 8 introduces a new date/time API. Hibernate Validator provides full support for the new API
-where `@Future` and `@Past` constraints can be applied on the new types. The table
-<<table-spec-constraints>> shows the types supported for `@Future` and `@Past`, including the types
-from the new API.
+where `@Future` and `@Past` constraints can be applied on the new types.
+The complete list of types supported for `@Future` and `@Past` can be found in <<validator-defineconstraints-spec>>.
 
 ==== Optional type
 
