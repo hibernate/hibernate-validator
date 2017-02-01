@@ -1,6 +1,24 @@
 Hibernate Validator Changelog
 =============================
 
+5.4.0.Final (01-02-2017)
+-------------------------
+
+** Bug
+    * HV-1220 - engine        - Programmatically defined cross parameter method constraints don't work on method returning void
+    * HV-1205 - engine        - Don't use @Repeatable on some constraints
+
+** Improvement
+    * HV-1218 - engine        - Add missing programmatic constraint definitions 
+    * HV-1217 - documentation - Simplify description of annotation processor set-up in docs
+    * HV-1204 - engine        - Add CurrencyDef for programmatic usage of @Currency constraint
+
+** Task
+    * HV-1216 - documentation - Avoid usage of tables in reference docs where feasible
+    * HV-1214 - documentation - Switch to Asciidoctor output for the documentation
+    * HV-1210 - build         - Upgrade to Groovy 2.4.8
+    * HV-1201 - engine        - Allow to specify a field for reporting constraint violations from @ScriptAssert
+
 5.4.0.CR1 (14-01-2017)
 -------------------------
 
