@@ -259,11 +259,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	private <T> Set<ConstraintViolation<T>> validateParameters(T object, Executable executable, Object[] parameterValues, Class<?>... groups) {
-		//this might be the case for parameterless methods
-		if ( parameterValues == null ) {
-			return Collections.emptySet();
-		}
-
 		ValidationOrder validationOrder = determineGroupValidationOrder( groups );
 
 		ValidationContext<T> context = getValidationContext().forValidateParameters(

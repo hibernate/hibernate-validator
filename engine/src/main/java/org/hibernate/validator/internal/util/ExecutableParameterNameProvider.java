@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 
 import javax.validation.ParameterNameProvider;
@@ -28,6 +29,10 @@ public class ExecutableParameterNameProvider {
 	}
 
 	public List<String> getParameterNames(Executable executable) {
+		//skip parameterless methods
+		if ( executable.getParameterCount() == 0 ) {
+			return Collections.emptyList();
+		}
 		if ( executable instanceof Method ) {
 			return delegate.getParameterNames( (Method) executable );
 		}
