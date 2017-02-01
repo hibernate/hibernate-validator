@@ -125,6 +125,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 	private List<ConstrainedParameter> getParameters(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 			ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
+		List<String> parameterNames = parameterNameProvider.getParameterNames( executable );
 
 		for ( int i = 0; i < parameterContexts.length; i++ ) {
 			ParameterConstraintMappingContextImpl parameter = parameterContexts[i];
@@ -138,7 +139,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 								executable,
 								ReflectionHelper.typeOf( executable, i ),
 								i,
-								parameterNameProvider.getParameterNames( executable ).get( i )
+								parameterNames.get( i )
 						)
 				);
 			}
