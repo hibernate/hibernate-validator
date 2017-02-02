@@ -43,7 +43,7 @@ public @interface PESEL {
 	Class<? extends Payload>[] payload() default { };
 
 	/**
-	 * Defines several {@code @NIP} annotations on the same element.
+	 * Defines several {@code @PESEL} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 	@Retention(RUNTIME)
