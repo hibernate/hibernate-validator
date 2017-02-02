@@ -628,6 +628,7 @@
                         <sourceDocumentName>index.asciidoc</sourceDocumentName>
                         <doctype>book</doctype>
                         <attributes>
+                            <tabsize>4</tabsize>
                             <hvVersion>${project.version}</hvVersion>
                             <bvVersion>${bv.api.version}</bvVersion>
                             <wildflyVersion>${wildfly.version}</wildflyVersion>
