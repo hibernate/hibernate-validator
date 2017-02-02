@@ -7,12 +7,12 @@
 package org.hibernate.validator.test.internal.engine.methodvalidation;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.testng.Assert.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.validation.ParameterNameProvider;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -20,7 +20,6 @@ import javax.validation.Validator;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.testng.annotations.Test;
 
 /**
@@ -43,8 +42,8 @@ public class ParameterlessMethodValidationTest {
 
 			@Override
 			public List<String> getParameterNames(Method method) {
-				if ( method.getName().equals( "getString" ) ) {
-					throw new IllegalStateException( "this method shouldn't be invoked" + method.getName() );
+				if ( method.getParameters().length == 0 ) {
+					throw new IllegalStateException( "getParameterNames() shouldn't be invoked for parameterless method" + method.getName() );
 				}
 				return Arrays.asList( new String[method.getParameterCount()] );
 			}
@@ -57,22 +56,17 @@ public class ParameterlessMethodValidationTest {
 
 		Bar bar = new Bar();
 
-		try {
-			assertNumberOfViolations( validator.forExecutables().validateParameters( bar, bar.getClass().getMethod( "getString" ), new Object[]{} ), 0 );
-		}
-		catch (IllegalStateException e) {
-			fail( "ParameterNameProvider#getParameterNames() shouldn't be invoked for getString" );
-		}
+		assertNumberOfViolations( validator.forExecutables().validateParameters( bar, bar.getClass().getMethod( "getString" ), new Object[]{} ), 0 );
 	}
 
 	private static class Bar {
 
 		private String string;
 
+		@SuppressWarnings("unused")
 		public String getString() {
 			return string;
 		}
-
 	}
 
 }
