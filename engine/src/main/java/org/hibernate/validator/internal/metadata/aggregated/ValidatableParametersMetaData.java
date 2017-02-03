@@ -46,7 +46,7 @@ public class ValidatableParametersMetaData implements Validatable {
 			return (ParameterConstraintLocation) location;
 		}
 		else if ( location instanceof TypeArgumentConstraintLocation ) {
-			return (ParameterConstraintLocation) ( (TypeArgumentConstraintLocation) location ).getDelegate();
+			return (ParameterConstraintLocation) ( (TypeArgumentConstraintLocation) location ).getOuterDelegate();
 		}
 
 		return null;

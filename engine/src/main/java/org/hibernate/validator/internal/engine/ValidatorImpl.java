@@ -522,6 +522,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
 		PathImpl currentPath = valueContext.getPropertyPath();
 		valueContext.appendNode( metaConstraint.getLocation() );
@@ -539,11 +540,11 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			}
 
 			// constraint requiring a ValueExtractor
-			if ( metaConstraint.getValueExtractorDescriptor() != null ) {
+			if ( !metaConstraint.getValueExtractorDescriptors().isEmpty() ) {
 				if ( valueToValidate != null ) {
-					TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext, metaConstraint );
-					( (ValueExtractor) metaConstraint.getValueExtractorDescriptor().getValueExtractor() ).extractValues( valueToValidate, receiver );
-
+					TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext,
+							metaConstraint, metaConstraint.getValueExtractorDescriptors() );
+					( (ValueExtractor) metaConstraint.getValueExtractorDescriptors().get( 0 ).getValueExtractor() ).extractValues( valueToValidate, receiver );
 					success = receiver.isSuccess();
 				}
 			}
@@ -567,11 +568,16 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		private final ValueContext<?, Object> valueContext;
 		private final MetaConstraint<?> metaConstraint;
 		private boolean success = true;
+		private final List<ValueExtractorDescriptor> valueExtractorDescriptors;
 
-		public TypeParameterValueReceiver(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, MetaConstraint<?> metaConstraint) {
+		private int extractorIndex = 1;
+
+		public TypeParameterValueReceiver(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, MetaConstraint<?> metaConstraint,
+				List<ValueExtractorDescriptor> valueExtractorDescriptors) {
 			this.validationContext = validationContext;
 			this.valueContext = valueContext;
 			this.metaConstraint = metaConstraint;
+			this.valueExtractorDescriptors = valueExtractorDescriptors;
 		}
 
 		@Override
@@ -599,6 +605,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			doValidate( value, nodeName );
 		}
 
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		private void doValidate(Object value, String nodeName) {
 			PathImpl before = valueContext.getPropertyPath();
 
@@ -606,8 +613,20 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				valueContext.appendTypeParameterNode( nodeName );
 			}
 
-			valueContext.setCurrentValidatedValue( value );
-			success &= metaConstraint.validateConstraint( validationContext, valueContext );
+			if ( extractorIndex < valueExtractorDescriptors.size() ) {
+				if ( value != null ) {
+					ValueExtractorDescriptor valueExtractorDescriptor = valueExtractorDescriptors.get( extractorIndex );
+					extractorIndex++;
+
+					( (ValueExtractor) valueExtractorDescriptor.getValueExtractor() ).extractValues( value, this );
+
+					extractorIndex--;
+				}
+			}
+			else {
+				valueContext.setCurrentValidatedValue( value );
+				success &= metaConstraint.validateConstraint( validationContext, valueContext );
+			}
 
 			// reset the path to the state before this call
 			valueContext.setPropertyPath( before );
@@ -1413,7 +1432,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 	private String getPropertyName(ConstraintLocation location) {
 		if ( location instanceof TypeArgumentConstraintLocation ) {
-			location = ( (TypeArgumentConstraintLocation) location ).getDelegate();
+			location = ( (TypeArgumentConstraintLocation) location ).getOuterDelegate();
 		}
 
 		if ( location instanceof FieldConstraintLocation ) {

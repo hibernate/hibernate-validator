@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.core;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.valueextraction.ValueExtractor;
@@ -46,22 +47,23 @@ public class MetaConstraint<A extends Annotation> {
 	private final ConstraintLocation location;
 
 	/**
-	 * The {@link ValueExtractor} used to extract the value for validation.
+	 * The sequence of {@link ValueExtractor}s used to navigate from the outermost container to the innermost container
+	 * and extract the value for validation.
 	 */
-	private final ValueExtractorDescriptor valueExtractorDescriptor;
+	private final List<ValueExtractorDescriptor> valueExtractorDescriptors;
 
 	/**
 	 * @param constraintDescriptor The constraint descriptor for this constraint
 	 * @param location meta data about constraint placement
-	 * @param valueExtractorDescriptor the potential {@link ValueExtractor} used to extract the value to validate
+	 * @param valueExtractorDescriptors the potential {@link ValueExtractor}s used to extract the value to validate
 	 * @param validatedValueType the type of the validated element
 	 */
-	MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location, ValueExtractorDescriptor valueExtractorDescriptor,
+	MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location, List<ValueExtractorDescriptor> valueExtractorDescriptors,
 			Type validatedValueType) {
 		this.constraintTree = new ConstraintTree<>( constraintDescriptor, validatedValueType );
 		this.constraintDescriptor = constraintDescriptor;
 		this.location = location;
-		this.valueExtractorDescriptor = valueExtractorDescriptor;
+		this.valueExtractorDescriptors = valueExtractorDescriptors;
 	}
 
 	/**
@@ -91,8 +93,8 @@ public class MetaConstraint<A extends Annotation> {
 		return location;
 	}
 
-	public ValueExtractorDescriptor getValueExtractorDescriptor() {
-		return valueExtractorDescriptor;
+	public List<ValueExtractorDescriptor> getValueExtractorDescriptors() {
+		return valueExtractorDescriptors;
 	}
 
 	@Override
@@ -112,7 +114,7 @@ public class MetaConstraint<A extends Annotation> {
 		if ( location != null ? !location.equals( that.location ) : that.location != null ) {
 			return false;
 		}
-		if ( valueExtractorDescriptor != null ? !valueExtractorDescriptor.equals( that.valueExtractorDescriptor ) : that.valueExtractorDescriptor != null ) {
+		if ( valueExtractorDescriptors != null ? !valueExtractorDescriptors.equals( that.valueExtractorDescriptors ) : that.valueExtractorDescriptors != null ) {
 			return false;
 		}
 
@@ -132,7 +134,7 @@ public class MetaConstraint<A extends Annotation> {
 		sb.append( "MetaConstraint" );
 		sb.append( "{constraintType=" ).append( constraintDescriptor.getAnnotation().annotationType().getName() );
 		sb.append( ", location=" ).append( location );
-		sb.append( ", valueExtractorDescriptor=" ).append( valueExtractorDescriptor );
+		sb.append( ", valueExtractorDescriptors=" ).append( valueExtractorDescriptors );
 		sb.append( "}" );
 		return sb.toString();
 	}
