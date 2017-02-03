@@ -47,8 +47,8 @@ public interface ConstraintLocation {
 		return new GetterConstraintLocation( getter );
 	}
 
-	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type type) {
-		return new TypeArgumentConstraintLocation( delegate, typeParameter, type );
+	static ConstraintLocation forTypeArgument(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
+		return new TypeArgumentConstraintLocation( delegate, typeParameter, typeOfAnnotatedElement );
 	}
 
 	static ConstraintLocation forReturnValue(Executable executable) {

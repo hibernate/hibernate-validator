@@ -25,6 +25,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
@@ -768,6 +769,13 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 				typeArgumentConstraints.addAll( findTypeUseConstraints( member, annotatedTypeParameter, typeVariable, location, validatedType ) );
 
+				if ( validatedType instanceof ParameterizedType ) {
+					typeArgumentConstraints.addAll( findTypeArgumentsConstraints( member,
+							new NestedTypeArgumentLocation( location, typeVariable, validatedType ),
+							annotatedTypeParameter,
+							ReflectionHelper.getClassFromType( validatedType ).getTypeParameters() ) );
+				}
+
 				i++;
 			}
 
@@ -779,6 +787,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			Type validatedType = annotatedArrayType.getAnnotatedGenericComponentType().getType();
 
 			typeArgumentConstraints.addAll( findTypeUseConstraints( member, annotatedArrayType, ArrayElement.INSTANCE, location, validatedType ) );
+
+			// FIXME not sure dealing with array of generics is worth it?
+
 			return typeArgumentConstraints;
 		}
 		else {
@@ -791,9 +802,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 */
 	private Set<MetaConstraint<?>> findTypeUseConstraints(Member member, AnnotatedType typeArgument, TypeVariable<?> typeVariable, TypeArgumentLocation location, Type type) {
 		Set<MetaConstraint<?>> constraints = Arrays.stream( typeArgument.getAnnotations() )
-			.flatMap( a -> findConstraintAnnotations( member, a, ElementType.TYPE_USE ).stream() )
-			.map( d -> createTypeArgumentMetaConstraint( d, location, typeVariable, type ) )
-			.collect( Collectors.toSet() );
+				.flatMap( a -> findConstraintAnnotations( member, a, ElementType.TYPE_USE ).stream() )
+				.map( d -> createTypeArgumentMetaConstraint( d, location, typeVariable, type ) )
+				.collect( Collectors.toSet() );
 
 		return constraints;
 	}
@@ -858,5 +869,23 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		public ConstraintLocation toConstraintLocation() {
 			return ConstraintLocation.forReturnValue( executable );
 		}
+	}
+
+	private static class NestedTypeArgumentLocation implements TypeArgumentLocation {
+		private final TypeArgumentLocation parentLocation;
+		private final TypeVariable<?> typeParameter;
+		private final Type typeOfAnnotatedElement;
+
+		private NestedTypeArgumentLocation(TypeArgumentLocation parentLocation, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
+			this.parentLocation = parentLocation;
+			this.typeParameter = typeParameter;
+			this.typeOfAnnotatedElement = typeOfAnnotatedElement;
+		}
+
+		@Override
+		public ConstraintLocation toConstraintLocation() {
+			return ConstraintLocation.forTypeArgument( parentLocation.toConstraintLocation(), typeParameter, typeOfAnnotatedElement );
+		}
+
 	}
 }

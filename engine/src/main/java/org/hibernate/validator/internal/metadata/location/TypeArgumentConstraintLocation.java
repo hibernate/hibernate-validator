@@ -20,17 +20,27 @@ import org.hibernate.validator.internal.util.StringHelper;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class TypeArgumentConstraintLocation implements ConstraintLocation {
 
 	private final ConstraintLocation delegate;
 	private final TypeVariable<?> typeParameter;
 	private final Type typeForValidatorResolution;
+	private final Type containerType;
+	private final ConstraintLocation outerDelegate;
 
 	TypeArgumentConstraintLocation(ConstraintLocation delegate, TypeVariable<?> typeParameter, Type typeOfAnnotatedElement) {
 		this.delegate = delegate;
 		this.typeParameter = typeParameter;
 		this.typeForValidatorResolution = ReflectionHelper.boxedType( typeOfAnnotatedElement );
+		this.containerType = delegate.getTypeForValidatorResolution();
+
+		ConstraintLocation outerDelegate = delegate;
+		while ( outerDelegate instanceof TypeArgumentConstraintLocation ) {
+			outerDelegate = ( (TypeArgumentConstraintLocation) outerDelegate ).delegate;
+		}
+		this.outerDelegate = outerDelegate;
 	}
 
 	@Override
@@ -52,6 +62,10 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 		return typeForValidatorResolution;
 	}
 
+	public Type getContainerType() {
+		return containerType;
+	}
+
 	@Override
 	public void appendTo(ExecutableParameterNameProvider parameterNameProvider, PathImpl path) {
 		delegate.appendTo( parameterNameProvider, path );
@@ -66,10 +80,14 @@ public class TypeArgumentConstraintLocation implements ConstraintLocation {
 		return delegate;
 	}
 
+	public ConstraintLocation getOuterDelegate() {
+		return outerDelegate;
+	}
+
 	@Override
 	public String toString() {
-		return "TypeArgumentValueConstraintLocation [delegate=" + delegate + ", typeForValidatorResolution="
-				+ StringHelper.toShortString( typeForValidatorResolution ) + "]";
+		return "TypeArgumentValueConstraintLocation [typeForValidatorResolution=" + StringHelper.toShortString( typeForValidatorResolution )
+				+ ", delegate=" + delegate + "]";
 	}
 
 	@Override
