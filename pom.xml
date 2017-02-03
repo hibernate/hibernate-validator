@@ -99,7 +99,7 @@
 
         <bv.api.version>2.0.0-SNAPSHOT</bv.api.version>
         <!-- Version to be used as baseline for API/SPI change reports -->
-        <previous.stable>5.3.4.Final</previous.stable>
+        <previous.stable>5.4.0.Final</previous.stable>
 
         <paranamer.version>2.8</paranamer.version>
         <javax.el.version>3.0.1-b08</javax.el.version>
