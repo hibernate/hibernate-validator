@@ -312,11 +312,7 @@ public class NodeImpl
 	private String buildToString() {
 		StringBuilder builder = new StringBuilder();
 
-		if ( ElementKind.BEAN.equals( getKind() ) ) {
-			// class level constraints don't contribute to path
-			builder.append( "" );
-		}
-		else {
+		if ( getName() != null ) {
 			builder.append( getName() );
 		}
 

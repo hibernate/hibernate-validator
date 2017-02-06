@@ -10,16 +10,14 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
-import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
-import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -148,10 +146,12 @@ abstract class ExecutableConstraintMappingContextImpl {
 		return constrainedParameters;
 	}
 
-	private List<TypeVariable<?>> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
+	private List<CascadingTypeParameter> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
 		if ( isCascaded ) {
 			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
-			return Collections.singletonList( isArray ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+			return Collections.singletonList( isArray
+					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( executable ) )
+					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( executable ) ) );
 		}
 		else {
 			return Collections.emptyList();

@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.metadata.facets;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +16,7 @@ import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 
 /**
  * Provides a unified view on cascadable elements of all kinds, be it properties
@@ -79,12 +79,12 @@ public interface Cascadable {
 	 * returned list will contain the special {@link AnnotatedElement} marker in case the element itself has been
 	 * marked.
 	 */
-	List<TypeVariable<?>> getCascadingTypeParameters();
+	List<CascadingTypeParameter> getCascadingTypeParameters();
 
 	public interface Builder {
 
 		void addGroupConversions(Map<Class<?>, Class<?>> groupConversions);
-		void addCascadingTypeParameters(List<TypeVariable<?>> cascadingTypeParameters);
+		void addCascadingTypeParameters(List<CascadingTypeParameter> cascadingTypeParameters);
 		Cascadable build();
 	}
 }

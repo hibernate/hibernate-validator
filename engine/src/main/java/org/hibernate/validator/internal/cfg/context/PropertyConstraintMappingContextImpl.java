@@ -11,7 +11,6 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,15 +18,15 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
-import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
-import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
 /**
@@ -118,19 +117,23 @@ final class PropertyConstraintMappingContextImpl
 		}
 	}
 
-	private List<TypeVariable<?>> getCascadedTypeParameters(Field field, boolean isCascaded) {
+	private List<CascadingTypeParameter> getCascadedTypeParameters(Field field, boolean isCascaded) {
 		if ( isCascaded ) {
-			return Collections.singletonList( field.getType().isArray() ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+			return Collections.singletonList( field.getType().isArray()
+					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( field ) )
+					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( field ) ) );
 		}
 		else {
 			return Collections.emptyList();
 		}
 	}
 
-	private List<TypeVariable<?>> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
+	private List<CascadingTypeParameter> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
 		if ( isCascaded ) {
 			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
-			return Collections.singletonList( isArray ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+			return Collections.singletonList( isArray
+					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( executable ) )
+					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( executable ) ) );
 		}
 		else {
 			return Collections.emptyList();

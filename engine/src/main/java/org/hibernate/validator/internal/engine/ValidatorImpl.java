@@ -57,6 +57,7 @@ import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ParameterMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.PropertyMetaData;
 import org.hibernate.validator.internal.metadata.aggregated.ReturnValueMetaData;
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
@@ -668,7 +669,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 							group != originalGroup
 							);
 
-					validateCascadedValues( value, validationContext, valueContext, cascadable, validationOrder );
+					validateCascadedValues( value, validationContext, valueContext, cascadable.getCascadingTypeParameters(), validationOrder );
 				}
 			}
 
@@ -679,12 +680,13 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void validateCascadedValues(Object value, ValidationContext<?> context, ValueContext<?, ?> valueContext, Cascadable cascadable, ValidationOrder validationOrder) {
-		for ( TypeVariable<?> cascadingTypeParameter : cascadable.getCascadingTypeParameters() ) {
+	private void validateCascadedValues(Object value, ValidationContext<?> context, ValueContext<?, ?> valueContext,
+			List<CascadingTypeParameter> cascadingTypeParameters, ValidationOrder validationOrder) {
+		for ( CascadingTypeParameter cascadingTypeParameter : cascadingTypeParameters ) {
 			List<TypeVariable<?>> cascadingTypeParametersOfValueType = getCorrespondingTypeParametersInSubType(
 					value.getClass(),
-					TypeHelper.getErasedReferenceType( cascadable.getCascadableType() ),
-					cascadingTypeParameter
+					TypeHelper.getErasedReferenceType( cascadingTypeParameter.getEnclosingType() ),
+					cascadingTypeParameter.getTypeParameter()
 			);
 
 			for ( TypeVariable<?> cascadingTypeParameterOfValueType : cascadingTypeParametersOfValueType ) {
@@ -698,7 +700,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 					continue;
 				}
 
-				CascadingValueReceiver receiver = new CascadingValueReceiver( context, valueContext, validationOrder );
+				CascadingValueReceiver receiver = new CascadingValueReceiver( context, valueContext, validationOrder, cascadingTypeParameter );
 
 				( (ValueExtractor) extractor.getValueExtractor() ).extractValues( value, receiver );
 			}
@@ -740,11 +742,14 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		private final ValidationContext<?> context;
 		private final ValueContext<?, ?> valueContext;
 		private final ValidationOrder validationOrder;
+		private final CascadingTypeParameter cascadingTypeParameter;
 
-		public CascadingValueReceiver(ValidationContext<?> context, ValueContext<?, ?> valueContext, ValidationOrder validationOrder) {
+		public CascadingValueReceiver(ValidationContext<?> context, ValueContext<?, ?> valueContext, ValidationOrder validationOrder,
+				CascadingTypeParameter cascadingTypeParameter) {
 			this.context = context;
 			this.valueContext = valueContext;
 			this.validationOrder = validationOrder;
+			this.cascadingTypeParameter = cascadingTypeParameter;
 		}
 
 		@Override
@@ -781,6 +786,17 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			// Cascade validation
 			validateInContext( context, cascadedValueContext, validationOrder );
+
+			// Cascade validation to next types arguments
+			if ( !cascadingTypeParameter.getCascadingTypeParameters().isEmpty() ) {
+				ValueContext<?, Object> cascadedTypeArgumentValueContext = buildNewLocalExecutionContext( valueContext, value );
+				if ( nodeName != null ) {
+					cascadedTypeArgumentValueContext.appendTypeParameterNode( nodeName );
+				}
+
+				validateCascadedValues( value, context, cascadedTypeArgumentValueContext, cascadingTypeParameter.getCascadingTypeParameters(),
+						validationOrder );
+			}
 		}
 	}
 

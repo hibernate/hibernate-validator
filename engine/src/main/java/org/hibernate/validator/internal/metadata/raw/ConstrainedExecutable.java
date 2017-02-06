@@ -12,7 +12,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -22,6 +21,7 @@ import java.util.Set;
 
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
@@ -67,7 +67,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			Executable executable,
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
-			List<TypeVariable<?>> cascadingTypeParameters) {
+			List<CascadingTypeParameter> cascadingTypeParameters) {
 		this(
 				source,
 				executable,
@@ -103,7 +103,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			Set<MetaConstraint<?>> returnValueConstraints,
 			Set<MetaConstraint<?>> typeArgumentConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
-			List<TypeVariable<?>> cascadingTypeParameters) {
+			List<CascadingTypeParameter> cascadingTypeParameters) {
 		super(
 				source,
 				( executable instanceof Constructor ) ? ConstrainedElementKind.CONSTRUCTOR : ConstrainedElementKind.METHOD,
@@ -283,7 +283,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );
 
-		List<TypeVariable<?>> mergedCascadingTypeParameters = new ArrayList<>( cascadingTypeParameters );
+		List<CascadingTypeParameter> mergedCascadingTypeParameters = new ArrayList<>( cascadingTypeParameters );
 		mergedCascadingTypeParameters.addAll( other.cascadingTypeParameters );
 
 		return new ConstrainedExecutable(
