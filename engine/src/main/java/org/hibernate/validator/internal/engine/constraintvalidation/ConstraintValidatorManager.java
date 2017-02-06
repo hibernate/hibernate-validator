@@ -11,8 +11,10 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.validation.ConstraintValidator;
@@ -187,14 +189,14 @@ public class ConstraintValidatorManager {
 	}
 
 	private void clearEntriesForFactory(ConstraintValidatorFactory constraintFactory) {
-		List<CacheKey> entriesToRemove = new ArrayList<CacheKey>();
-		for ( Map.Entry<CacheKey, ConstraintValidator<?, ?>> entry : constraintValidatorCache.entrySet() ) {
-			if ( entry.getKey().getConstraintFactory() == constraintFactory ) {
-				entriesToRemove.add( entry.getKey() );
+		Iterator<Entry<CacheKey, ConstraintValidator<?, ?>>> cacheEntries = constraintValidatorCache.entrySet().iterator();
+
+		while ( cacheEntries.hasNext() ) {
+			Entry<CacheKey, ConstraintValidator<?, ?>> cacheEntry = cacheEntries.next();
+			if ( cacheEntry.getKey().getConstraintFactory() == constraintFactory ) {
+				constraintFactory.releaseInstance( cacheEntry.getValue() );
+				cacheEntries.remove();
 			}
-		}
-		for ( CacheKey key : entriesToRemove ) {
-			constraintValidatorCache.remove( key );
 		}
 	}
 
