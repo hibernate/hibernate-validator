@@ -49,6 +49,8 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
+import org.hibernate.validator.internal.util.stereotypes.ThreadSafe;
 import org.hibernate.validator.spi.cfg.ConstraintMappingContributor;
 
 /**
@@ -94,6 +96,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * Programmatic constraints passed via the Hibernate Validator specific API. Empty if there are
 	 * no programmatic constraints
 	 */
+	@Immutable
 	private final Set<DefaultConstraintMapping> constraintMappings;
 
 	/**
@@ -133,6 +136,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * could be used. To still have the metadata static we create a {@code BeanMetaDataManager} per parameter name
 	 * provider. See also HV-659.
 	 */
+	@ThreadSafe
 	private final Map<ExecutableParameterNameProvider, BeanMetaDataManager> beanMetaDataManagerMap;
 
 	private final ValueExtractorManager valueExtractorManager;
