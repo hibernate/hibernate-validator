@@ -60,7 +60,13 @@ public class ConstraintValidatorManager {
 	/**
 	 * The most recently used non default constraint validator factory.
 	 */
-	private ConstraintValidatorFactory mostRecentlyUsedNonDefaultConstraintValidatorFactory;
+	private volatile ConstraintValidatorFactory mostRecentlyUsedNonDefaultConstraintValidatorFactory;
+
+	/**
+	 * Used for synchronizing access to {@link #mostRecentlyUsedNonDefaultConstraintValidatorFactory} (which can be
+	 * null itself).
+	 */
+	private final Object mostRecentlyUsedNonDefaultConstraintValidatorFactoryMutex = new Object();
 
 	/**
 	 * Cache of initialized {@code ConstraintValidator} instances keyed against validates type, annotation and
@@ -114,8 +120,13 @@ public class ConstraintValidatorManager {
 			ConstraintValidator<A, ?> constraintValidator) {
 		// we only cache constraint validator instances for the default and most recently used factory
 		if ( key.constraintFactory != defaultConstraintValidatorFactory && key.constraintFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
-			clearEntriesForFactory( mostRecentlyUsedNonDefaultConstraintValidatorFactory );
-			mostRecentlyUsedNonDefaultConstraintValidatorFactory = key.constraintFactory;
+
+			synchronized ( mostRecentlyUsedNonDefaultConstraintValidatorFactoryMutex ) {
+				if ( key.constraintFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
+					clearEntriesForFactory( mostRecentlyUsedNonDefaultConstraintValidatorFactory );
+					mostRecentlyUsedNonDefaultConstraintValidatorFactory = key.constraintFactory;
+				}
+			}
 		}
 
 		@SuppressWarnings("unchecked")
