@@ -656,7 +656,7 @@ useful and whether they meet your needs.
 ==== Constraint definitions via `ServiceLoader`
 
 Hibernate Validator allows to utilize Java's
-link:http://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html/[ServiceLoader]
+http://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html[ServiceLoader]
 mechanism to register additional constraint definitions. All you have to do is to add the file
 _javax.validation.ConstraintValidator_ to _META-INF/services_. In this service file you list the
 fully qualified classnames of your constraint validator classes (one per line). Hibernate Validator
