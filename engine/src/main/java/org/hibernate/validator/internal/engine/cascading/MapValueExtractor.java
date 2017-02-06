@@ -20,10 +20,6 @@ class MapValueExtractor implements ValueExtractor<Map<?, @ExtractedValue ?>> {
 
 	@Override
 	public void extractValues(Map<?, ?> originalValue, ValueReceiver receiver) {
-		if ( originalValue == null ) {
-			return;
-		}
-
 		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
 			receiver.keyedValue( "<map value>", entry.getKey(), entry.getValue() );
 		}

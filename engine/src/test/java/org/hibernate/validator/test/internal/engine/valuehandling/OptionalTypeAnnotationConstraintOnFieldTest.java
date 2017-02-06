@@ -84,11 +84,10 @@ public class OptionalTypeAnnotationConstraintOnFieldTest {
 		model.valueWithNotNull = null;
 
 		Set<ConstraintViolation<ModelB>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNull", "valueWithNotNull" );
-		// TODO: We don't need to validate the type since the container already failed
-		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNull.class );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNull" );
+		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container" );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
 
 	@Test
@@ -197,14 +196,14 @@ public class OptionalTypeAnnotationConstraintOnFieldTest {
 
 	private static class ModelA {
 
-		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
+		@NotNull(message = "container")
 		Optional<String> valueWithoutTypeAnnotation;
 
 	}
 
 	private static class ModelB {
 
-		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
+		@NotNull(message = "container")
 		Optional<@NotNull(message = "type") String> valueWithNotNull;
 
 	}
@@ -217,7 +216,7 @@ public class OptionalTypeAnnotationConstraintOnFieldTest {
 
 	private static class ModelD {
 
-		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
+		@NotNull(message = "container")
 		Optional<@NullOrNotBlank(message = "type") String> valueWithNullOrNotBlank;
 	}
 

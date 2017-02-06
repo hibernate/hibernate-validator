@@ -540,10 +540,12 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			// constraint requiring a ValueExtractor
 			if ( metaConstraint.getValueExtractorDescriptor() != null ) {
-				TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext, metaConstraint );
-				( (ValueExtractor) metaConstraint.getValueExtractorDescriptor().getValueExtractor() ).extractValues( valueToValidate, receiver );
+				if ( valueToValidate != null ) {
+					TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext, metaConstraint );
+					( (ValueExtractor) metaConstraint.getValueExtractorDescriptor().getValueExtractor() ).extractValues( valueToValidate, receiver );
 
-				success = receiver.isSuccess();
+					success = receiver.isSuccess();
+				}
 			}
 			// regular constraint
 			else {

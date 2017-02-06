@@ -23,6 +23,6 @@ public class OptionalValueExtractor implements ValueExtractor<Optional<@Extracte
 
 	@Override
 	public void extractValues(Optional<?> originalValue, ValueExtractor.ValueReceiver receiver) {
-		receiver.value( null, originalValue != null && originalValue.isPresent() ? originalValue.get() : null );
+		receiver.value( null, originalValue.isPresent() ? originalValue.get() : null );
 	}
 }
