@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.internal.metadata.core;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newConcurrentHashMap;
 import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 import java.lang.annotation.Annotation;
@@ -20,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -201,7 +200,7 @@ public class ConstraintHelper {
 
 		putConstraints( tmpConstraints, Digits.class, DigitsValidatorForCharSequence.class, DigitsValidatorForNumber.class );
 
-		List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = newArrayList( 18 );
+		List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = new ArrayList<>( 18 );
 		futureValidators.add( FutureValidatorForCalendar.class );
 		futureValidators.add( FutureValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
@@ -240,7 +239,7 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
 		putConstraint( tmpConstraints, Null.class, NullValidator.class );
 
-		List<Class<? extends ConstraintValidator<Past, ?>>> pastValidators = newArrayList( 18 );
+		List<Class<? extends ConstraintValidator<Past, ?>>> pastValidators = new ArrayList<>( 18 );
 		pastValidators.add( PastValidatorForCalendar.class );
 		pastValidators.add( PastValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
@@ -267,7 +266,7 @@ public class ConstraintHelper {
 
 		putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
 
-		List<Class<? extends ConstraintValidator<Size, ?>>> sizeValidators = newArrayList( 11 );
+		List<Class<? extends ConstraintValidator<Size, ?>>> sizeValidators = new ArrayList<>( 11 );
 		sizeValidators.add( SizeValidatorForCharSequence.class );
 		sizeValidators.add( SizeValidatorForCollection.class );
 		sizeValidators.add( SizeValidatorForArray.class );
@@ -308,7 +307,7 @@ public class ConstraintHelper {
 
 	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators, Class<A> constraintType, Class<? extends ConstraintValidator<A, ?>> validatorType1, Class<? extends ConstraintValidator<A, ?>> validatorType2) {
 		List<ConstraintValidatorDescriptor<?>> descriptors = Stream.of( validatorType1, validatorType2 )
-				.map( c -> ConstraintValidatorDescriptor.forClass( c ) )
+				.map( ConstraintValidatorDescriptor::forClass )
 				.collect( Collectors.toList() );
 
 		validators.put( constraintType, Collections.unmodifiableList( descriptors ) );
@@ -316,7 +315,7 @@ public class ConstraintHelper {
 
 	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators, Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorDescriptors) {
 		List<ConstraintValidatorDescriptor<?>> descriptors = validatorDescriptors.stream()
-				.map( c -> ConstraintValidatorDescriptor.forClass( c ) )
+				.map( ConstraintValidatorDescriptor::forClass )
 				.collect( Collectors.toList() );
 
 		validators.put( constraintType, Collections.unmodifiableList( descriptors ) );
@@ -378,7 +377,7 @@ public class ConstraintHelper {
 	 */
 	public <A extends Annotation> List<ConstraintValidatorDescriptor<A>> findValidatorDescriptors(Class<A> annotationType, ValidationTarget validationTarget) {
 		List<ConstraintValidatorDescriptor<A>> validatorDescriptors = getAllValidatorDescriptors( annotationType );
-		List<ConstraintValidatorDescriptor<A>> matchingValidatorDescriptors = newArrayList();
+		List<ConstraintValidatorDescriptor<A>> matchingValidatorDescriptors = new ArrayList<>();
 
 		for ( ConstraintValidatorDescriptor<A> descriptor : validatorDescriptors ) {
 			if ( supportsValidationTarget( descriptor, validationTarget ) ) {
@@ -650,7 +649,7 @@ public class ConstraintHelper {
 	@SuppressWarnings("unchecked")
 	private static class ValidatorDescriptorMap {
 
-		private final ConcurrentMap<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> constraintValidatorDescriptors = newConcurrentHashMap();
+		private final ConcurrentMap<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> constraintValidatorDescriptors = new ConcurrentHashMap<>();
 
 		private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> get(Class<A> annotationType) {
 			return (List<ConstraintValidatorDescriptor<A>>) constraintValidatorDescriptors.get( annotationType );
