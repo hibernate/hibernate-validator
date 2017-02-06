@@ -1,15 +1,16 @@
 //tag::include[]
 package org.hibernate.validator.referenceguide.chapter11.dynamicpayload;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+
 //end::include[]
 
 import java.util.Map;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 //tag::include[]
 public class ValidPassengerCountValidator implements ConstraintValidator<ValidPassengerCount, Car> {
@@ -33,22 +34,20 @@ public class ValidPassengerCountValidator implements ConstraintValidator<ValidPa
 			return true;
 		}
 
-		int passangerCount = car.getPassengers().size();
-		if ( car.getSeatCount() >= passangerCount ) {
+		int passengerCount = car.getPassengers().size();
+		if ( car.getSeatCount() >= passengerCount ) {
 			return true;
 		}
 		else {
 
-			if ( suggestedCars.containsKey( passangerCount ) ) {
+			if ( suggestedCars.containsKey( passengerCount ) ) {
 				HibernateConstraintValidatorContext hibernateContext = context.unwrap(
 						HibernateConstraintValidatorContext.class
 				);
-				hibernateContext.withDynamicPayload( suggestedCars.get( passangerCount ) );
+				hibernateContext.withDynamicPayload( suggestedCars.get( passengerCount ) );
 			}
 			return false;
 		}
 	}
 }
 //end::include[]
-
-
