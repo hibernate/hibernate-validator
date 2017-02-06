@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.internal.metadata.raw;
 
-import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**
@@ -26,7 +26,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	protected final ConfigurationSource source;
 	protected final Set<MetaConstraint<?>> constraints;
 	protected final Map<Class<?>, Class<?>> groupConversions;
-	protected final List<TypeVariable<?>> cascadingTypeParameters;
+	protected final List<CascadingTypeParameter> cascadingTypeParameters;
 	protected final Set<MetaConstraint<?>> typeArgumentConstraints;
 
 	public AbstractConstrainedElement(ConfigurationSource source,
@@ -34,7 +34,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 									  Set<MetaConstraint<?>> constraints,
 									  Set<MetaConstraint<?>> typeArgumentConstraints,
 									  Map<Class<?>, Class<?>> groupConversions,
-									  List<TypeVariable<?>> cascadingTypeParameters) {
+									  List<CascadingTypeParameter> cascadingTypeParameters) {
 		this.kind = kind;
 		this.source = source;
 		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
@@ -74,7 +74,7 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	}
 
 	@Override
-	public List<TypeVariable<?>> getCascadingTypeParameters() {
+	public List<CascadingTypeParameter> getCascadingTypeParameters() {
 		return cascadingTypeParameters;
 	}
 
