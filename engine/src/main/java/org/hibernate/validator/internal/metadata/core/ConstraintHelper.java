@@ -201,7 +201,7 @@ public class ConstraintHelper {
 
 		putConstraints( tmpConstraints, Digits.class, DigitsValidatorForCharSequence.class, DigitsValidatorForNumber.class );
 
-		List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = newArrayList( 11 );
+		List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = newArrayList( 18 );
 		futureValidators.add( FutureValidatorForCalendar.class );
 		futureValidators.add( FutureValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
@@ -240,7 +240,7 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
 		putConstraint( tmpConstraints, Null.class, NullValidator.class );
 
-		List<Class<? extends ConstraintValidator<Past, ?>>> pastValidators = newArrayList( 11 );
+		List<Class<? extends ConstraintValidator<Past, ?>>> pastValidators = newArrayList( 18 );
 		pastValidators.add( PastValidatorForCalendar.class );
 		pastValidators.add( PastValidatorForDate.class );
 		if ( isJodaTimeInClasspath() ) {
