@@ -98,11 +98,11 @@ public class ConstraintValidatorManager {
 				constraintFactory
 		);
 
-		if ( constraintValidatorCache.containsKey( key ) ) {
-			@SuppressWarnings("unchecked")
-			ConstraintValidator<A, ?> constraintValidator = (ConstraintValidator<A, ?>) constraintValidatorCache.get(
-					key
-			);
+		@SuppressWarnings("unchecked")
+		ConstraintValidator<A, ?> constraintValidator = (ConstraintValidator<A, ?>) constraintValidatorCache.get(
+				key
+		);
+		if ( constraintValidator != null ) {
 			if ( DUMMY_CONSTRAINT_VALIDATOR.equals( constraintValidator ) ) {
 				return null;
 			}
@@ -116,7 +116,7 @@ public class ConstraintValidatorManager {
 				descriptor,
 				validatedValueType
 		);
-		ConstraintValidator<A, ?> constraintValidator = createAndInitializeValidator(
+		constraintValidator = createAndInitializeValidator(
 				constraintFactory,
 				validatorDescriptor,
 				descriptor
