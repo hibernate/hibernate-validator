@@ -84,11 +84,10 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 		model.setValueWithNotNull( null );
 
 		Set<ConstraintViolation<ModelB>> constraintViolations = validator.validate( model );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNull", "valueWithNotNull" );
-		// TODO: We don't need to validate the type since the container already failed
-		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNull.class );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "valueWithNotNull" );
+		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container" );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
 
 	@Test
@@ -199,7 +198,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithoutTypeAnnotation;
 
-		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
+		@NotNull(message = "container")
 		public Optional<String> getValueWithoutTypeAnnotation() {
 			return valueWithoutTypeAnnotation;
 		}
@@ -213,7 +212,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithNotNull;
 
-		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
+		@NotNull(message = "container")
 		public Optional<@NotNull(message = "type") String> getValueWithNotNull() {
 			return valueWithNotNull;
 		}
@@ -241,7 +240,7 @@ public class OptionalTypeAnnotationConstraintOnGetterTest {
 
 		private Optional<String> valueWithNullOrNotBlank;
 
-		@NotNull(message = "container", payload = { Unwrapping.Skip.class })
+		@NotNull(message = "container")
 		public Optional<@NullOrNotBlank(message = "type") String> getValueWithNullOrNotBlank() {
 			return valueWithNullOrNotBlank;
 		}

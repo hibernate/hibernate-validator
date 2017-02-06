@@ -91,11 +91,11 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 				.forExecutables()
 				.validateConstructorParameters( constructor, values );
 
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "ModelB.valueWithNotNull", "ModelB.valueWithNotNull" );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "ModelB.valueWithNotNull" );
 
-		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container", "type" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNull.class );
+		assertThat( constraintViolations ).extracting( "message" ).containsOnly( "container" );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
 
 	@Test
@@ -221,13 +221,13 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 
 	static class ModelA {
 
-		public ModelA(@NotNull(message = "container", payload = { Unwrapping.Skip.class }) Optional<String> valueWithoutTypeAnnotation) {
+		public ModelA(@NotNull(message = "container") Optional<String> valueWithoutTypeAnnotation) {
 		}
 	}
 
 	static class ModelB {
 
-		public ModelB(@NotNull(message = "container", payload = { Unwrapping.Skip.class }) Optional<@NotNull(message = "type") String> valueWithNotNull) {
+		public ModelB(@NotNull(message = "container") Optional<@NotNull(message = "type") String> valueWithNotNull) {
 		}
 	}
 
@@ -239,7 +239,7 @@ public class OptionalTypeAnnotationConstraintOnConstructorTest {
 
 	static class ModelD {
 
-		public ModelD(@NotNull(message = "container", payload = { Unwrapping.Skip.class }) Optional<@NullOrNotBlank(message = "type") String> valueWithNullOrNotBlank) {
+		public ModelD(@NotNull(message = "container") Optional<@NullOrNotBlank(message = "type") String> valueWithNullOrNotBlank) {
 		}
 	}
 

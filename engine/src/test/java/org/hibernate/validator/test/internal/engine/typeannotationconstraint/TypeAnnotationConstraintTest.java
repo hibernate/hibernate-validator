@@ -9,6 +9,7 @@ package org.hibernate.validator.test.internal.engine.typeannotationconstraint;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
@@ -56,6 +57,17 @@ public class TypeAnnotationConstraintTest {
 	@BeforeClass
 	public void setup() {
 		validator = getValidator();
+	}
+
+	// Validate value extractors are not called on null values
+
+	@Test
+	public void value_extractor_not_called_on_null_values() {
+		Set<ConstraintViolation<ModelWithNullValue>> constraintViolations = validator.validate( new ModelWithNullValue() );
+
+		assertCorrectPropertyPaths( constraintViolations, "nullValue" );
+		assertCorrectConstraintViolationMessages( constraintViolations, "container" );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
 
 	// List
@@ -879,9 +891,9 @@ public class TypeAnnotationConstraintTest {
 		o = new TypeWithOptional4();
 		o.stringOptional = null;
 		constraintViolations = validator.validate( o );
-		assertNumberOfViolations( constraintViolations, 2 );
-		assertCorrectPropertyPaths( constraintViolations, "stringOptional", "stringOptional" );
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotBlank.class );
+		assertNumberOfViolations( constraintViolations, 1 );
+		assertCorrectPropertyPaths( constraintViolations, "stringOptional" );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
 
 	@Test
@@ -985,6 +997,13 @@ public class TypeAnnotationConstraintTest {
 
 		assertingLogger.assertMessageLogged();
 		log4jRootLogger.removeAppender( assertingLogger );
+	}
+
+	// Validate value extractors are not called on null values
+
+	static class ModelWithNullValue {
+
+		private @NotNull(message = "container") Optional<@NotNull(message = "type") String> nullValue;
 	}
 
 	// List
