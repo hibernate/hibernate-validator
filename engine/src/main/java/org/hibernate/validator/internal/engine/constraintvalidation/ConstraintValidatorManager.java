@@ -35,7 +35,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  */
 public class ConstraintValidatorManager {
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make();
 
 	/**
 	 * Dummy {@code ConstraintValidator} used as placeholder for the case that for a given context there exists
@@ -58,9 +58,9 @@ public class ConstraintValidatorManager {
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 
 	/**
-	 * The least recently used non default constraint validator factory.
+	 * The most recently used non default constraint validator factory.
 	 */
-	private ConstraintValidatorFactory leastRecentlyUsedNonDefaultConstraintValidatorFactory;
+	private ConstraintValidatorFactory mostRecentlyUsedNonDefaultConstraintValidatorFactory;
 
 	/**
 	 * Cache of initialized {@code ConstraintValidator} instances keyed against validates type, annotation and
@@ -109,7 +109,7 @@ public class ConstraintValidatorManager {
 				return null;
 			}
 			else {
-				log.tracef( "Constraint validator %s found in cache.", constraintValidator );
+				LOG.tracef( "Constraint validator %s found in cache.", constraintValidator );
 				return constraintValidator;
 			}
 		}
@@ -149,9 +149,9 @@ public class ConstraintValidatorManager {
 			ConstraintValidatorFactory constraintFactory,
 			ConstraintValidator<?, ?> constraintValidator) {
 		// we only cache constraint validator instance for the default and least recently used factory
-		if ( constraintFactory != defaultConstraintValidatorFactory && constraintFactory != leastRecentlyUsedNonDefaultConstraintValidatorFactory ) {
-			clearEntriesForFactory( leastRecentlyUsedNonDefaultConstraintValidatorFactory );
-			leastRecentlyUsedNonDefaultConstraintValidatorFactory = constraintFactory;
+		if ( constraintFactory != defaultConstraintValidatorFactory && constraintFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
+			clearEntriesForFactory( mostRecentlyUsedNonDefaultConstraintValidatorFactory );
+			mostRecentlyUsedNonDefaultConstraintValidatorFactory = constraintFactory;
 		}
 
 		final CacheKey key = new CacheKey(
@@ -226,7 +226,7 @@ public class ConstraintValidatorManager {
 		}
 
 		if ( discoveredSuitableTypes.size() > 1 ) {
-			throw log.getMoreThanOneValidatorFoundForTypeException( validatedValueType, discoveredSuitableTypes );
+			throw LOG.getMoreThanOneValidatorFoundForTypeException( validatedValueType, discoveredSuitableTypes );
 		}
 
 		Type suitableType = discoveredSuitableTypes.get( 0 );
@@ -249,7 +249,7 @@ public class ConstraintValidatorManager {
 			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
 		catch (RuntimeException e) {
-			throw log.getUnableToInitializeConstraintValidatorException( constraintValidator.getClass(), e );
+			throw LOG.getUnableToInitializeConstraintValidatorException( constraintValidator.getClass(), e );
 		}
 	}
 
