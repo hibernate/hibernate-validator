@@ -47,7 +47,7 @@ public @interface EAN {
 	Type type() default Type.EAN13;
 
 	/**
-	 * Defines several {@code @NotBlank} annotations on the same element.
+	 * Defines several {@code @EAN} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 	@Retention(RUNTIME)
