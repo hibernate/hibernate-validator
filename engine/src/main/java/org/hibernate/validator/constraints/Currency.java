@@ -52,7 +52,7 @@ public @interface Currency {
 	String[] value();
 
 	/**
-	 * Defines several {@code @Email} annotations on the same element.
+	 * Defines several {@code @Currency} annotations on the same element.
 	 */
 	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 	@Retention(RUNTIME)
