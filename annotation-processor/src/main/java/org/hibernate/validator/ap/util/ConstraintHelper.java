@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.ap.util;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
+import java.time.Period;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
@@ -247,8 +249,8 @@ public class ConstraintHelper {
 				BeanValidationTypes.FUTURE,
 				JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS
 		);
-		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, Number.class, String.class );
-		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, Number.class, String.class, Duration.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class, Duration.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_NULL, Object.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NULL, Object.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, Calendar.class, Date.class );
@@ -292,6 +294,14 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SAFE_HTML, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SCRIPT_ASSERT, Object.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.URL, CharSequence.class );
+
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.DURATION_MAX, Duration.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.DURATION_MIN, Duration.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.DURATION_RANGE, Duration.class );
+
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.PERIOD_MAX, Period.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.PERIOD_MIN, Period.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.PERIOD_RANGE, Period.class );
 	}
 
 	/**
