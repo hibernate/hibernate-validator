@@ -1,4 +1,4 @@
-= Hibernate Validator {hvVersion} - JSR 380 Reference Implementation: Reference Guide
+= Hibernate Validator {hvVersion} - JSR 349 Reference Implementation: Reference Guide
 Hardy Ferentschik; Gunnar Morling
 :doctype: book
 :revdate: {docdate}
