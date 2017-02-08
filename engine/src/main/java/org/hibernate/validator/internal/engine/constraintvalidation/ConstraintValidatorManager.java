@@ -98,93 +98,59 @@ public class ConstraintValidatorManager {
 		Contracts.assertNotNull( descriptor );
 		Contracts.assertNotNull( constraintFactory );
 
-		final CacheKey key = new CacheKey(
-				descriptor.getAnnotation(),
-				validatedValueType,
-				constraintFactory
-		);
+		CacheKey key = new CacheKey( descriptor.getAnnotation(), validatedValueType, constraintFactory );
 
 		@SuppressWarnings("unchecked")
 		ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintValidatorCache.get(
 				key
 		);
-		if ( constraintValidator != null ) {
-			if ( DUMMY_CONSTRAINT_VALIDATOR.equals( constraintValidator ) ) {
-				return null;
-			}
-			else {
-				LOG.tracef( "Constraint validator %s found in cache.", constraintValidator );
-				return constraintValidator;
-			}
-		}
 
-		Class<? extends ConstraintValidator<?, ?>> validatorClass = findMatchingValidatorClass(
-				descriptor,
-				validatedValueType
-		);
-
-		constraintValidator = createAndInitializeValidator(
-				constraintFactory,
-				validatorClass,
-				descriptor
-		);
 		if ( constraintValidator == null ) {
-			putInitializedValidator(
-					validatedValueType,
-					descriptor.getAnnotation(),
-					constraintFactory,
-					DUMMY_CONSTRAINT_VALIDATOR
-			);
-			return null;
+			constraintValidator = createAndInitializeValidator( constraintFactory, validatedValueType, descriptor );
+			constraintValidator = cacheValidator( key, constraintValidator );
 		}
 		else {
-			putInitializedValidator(
-					validatedValueType,
-					descriptor.getAnnotation(),
-					constraintFactory,
-					constraintValidator
-			);
-			return constraintValidator;
-
+			LOG.tracef( "Constraint validator %s found in cache.", constraintValidator );
 		}
+
+		return DUMMY_CONSTRAINT_VALIDATOR == constraintValidator ? null : constraintValidator;
 	}
 
-	private void putInitializedValidator(Type validatedValueType,
-			Annotation annotation,
-			ConstraintValidatorFactory constraintFactory,
-			ConstraintValidator<?, ?> constraintValidator) {
-		// we only cache constraint validator instance for the default and least recently used factory
-		if ( constraintFactory != defaultConstraintValidatorFactory && constraintFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
+	private <V, A extends Annotation> ConstraintValidator<A, V> cacheValidator(CacheKey key, ConstraintValidator<A, V> constraintValidator) {
+		// we only cache constraint validator instances for the default and most recently used factory
+		if ( key.constraintFactory != defaultConstraintValidatorFactory && key.constraintFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
 			clearEntriesForFactory( mostRecentlyUsedNonDefaultConstraintValidatorFactory );
-			mostRecentlyUsedNonDefaultConstraintValidatorFactory = constraintFactory;
-		}
-
-		final CacheKey key = new CacheKey(
-				annotation,
-				validatedValueType,
-				constraintFactory
-		);
-
-		constraintValidatorCache.putIfAbsent( key, constraintValidator );
-	}
-
-	private <V, A extends Annotation> ConstraintValidator<A, V> createAndInitializeValidator(
-			ConstraintValidatorFactory constraintFactory,
-			Class<? extends ConstraintValidator<?, ?>> validatorClass,
-			ConstraintDescriptor<A> descriptor) {
-
-		if ( validatorClass == null ) {
-			return null;
+			mostRecentlyUsedNonDefaultConstraintValidatorFactory = key.constraintFactory;
 		}
 
 		@SuppressWarnings("unchecked")
-		ConstraintValidator<A, V> constraintValidator = (ConstraintValidator<A, V>) constraintFactory.getInstance(
-				validatorClass
-		);
-		if ( constraintValidator == null ) {
-			throw log.getConstraintFactoryMustNotReturnNullException( validatorClass );
+		ConstraintValidator<A, V> cached = (ConstraintValidator<A, V>) constraintValidatorCache.putIfAbsent( key, constraintValidator );
+
+		return cached != null ? cached : constraintValidator;
+	}
+
+	@SuppressWarnings("unchecked")
+	private <V, A extends Annotation> ConstraintValidator<A, V> createAndInitializeValidator(
+			ConstraintValidatorFactory constraintFactory,
+			Type validatedValueType,
+			ConstraintDescriptorImpl<A> descriptor) {
+
+		Class<? extends ConstraintValidator<A, V>> validatorClass = (Class<? extends ConstraintValidator<A, V>>) findMatchingValidatorClass( descriptor, validatedValueType );
+		ConstraintValidator<A, V> constraintValidator;
+
+		if ( validatorClass == null ) {
+			constraintValidator = (ConstraintValidator<A, V>) DUMMY_CONSTRAINT_VALIDATOR;
 		}
-		initializeConstraint( descriptor, constraintValidator );
+		else {
+			constraintValidator = constraintFactory.getInstance( validatorClass );
+
+			if ( constraintValidator == null ) {
+				throw LOG.getConstraintFactoryMustNotReturnNullException( validatorClass );
+			}
+
+			initializeValidator( descriptor, constraintValidator );
+		}
+
 		return constraintValidator;
 	}
 
@@ -254,7 +220,7 @@ public class ConstraintValidatorManager {
 		return determinedSuitableTypes;
 	}
 
-	private <A extends Annotation> void initializeConstraint(ConstraintDescriptor<A> descriptor, ConstraintValidator<A, ?> constraintValidator) {
+	private <A extends Annotation> void initializeValidator(ConstraintDescriptor<A> descriptor, ConstraintValidator<A, ?> constraintValidator) {
 		try {
 			constraintValidator.initialize( descriptor.getAnnotation() );
 		}
