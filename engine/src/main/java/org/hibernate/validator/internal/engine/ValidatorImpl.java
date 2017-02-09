@@ -785,16 +785,18 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
 
 			// Cascade validation
-			validateInContext( context, cascadedValueContext, validationOrder );
+			if ( cascadingTypeParameter.isCascading() ) {
+				validateInContext( context, cascadedValueContext, validationOrder );
+			}
 
-			// Cascade validation to next types arguments
-			if ( !cascadingTypeParameter.getCascadingTypeParameters().isEmpty() ) {
+			// Cascade validation to nested types arguments
+			if ( !cascadingTypeParameter.getNestedCascadingTypeParameters().isEmpty() ) {
 				ValueContext<?, Object> cascadedTypeArgumentValueContext = buildNewLocalExecutionContext( valueContext, value );
 				if ( nodeName != null ) {
 					cascadedTypeArgumentValueContext.appendTypeParameterNode( nodeName );
 				}
 
-				validateCascadedValues( value, context, cascadedTypeArgumentValueContext, cascadingTypeParameter.getCascadingTypeParameters(),
+				validateCascadedValues( value, context, cascadedTypeArgumentValueContext, cascadingTypeParameter.getNestedCascadingTypeParameters(),
 						validationOrder );
 			}
 		}

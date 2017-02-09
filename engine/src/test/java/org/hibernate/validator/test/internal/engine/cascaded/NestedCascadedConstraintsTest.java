@@ -66,22 +66,24 @@ public class NestedCascadedConstraintsTest {
 
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[Optional[Cinema[cinema2]]].<map value>[1].email",
-				"map[Optional[Cinema[cinema2]]].<map value>[2].email"
+				"map[Optional[Cinema<cinema2>]].<map value>[1].email",
+				"map[Optional[Cinema<cinema2>]].<map value>[2].email",
+				"map[Optional[Cinema<cinema3>]].<map value>[0].<iterable element>"
 		);
+		assertCorrectConstraintTypes( constraintViolations, Email.class, Email.class, NotNull.class );
 
 		constraintViolations = validator.validate( CinemaEmailAddresses.invalidKey() );
 
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[Optional[Cinema[cinema3]]].<map key>.visitor.name",
-				"map[Optional.empty].<map key>"
+				"map[Optional[Cinema<cinema4>]].<map key>.visitor.name"
 		);
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 	}
 
 	private static class EmailAddressMap {
 
-		private final Map<String, @Valid List<@Valid EmailAddress>> map = new HashMap<>();
+		private final Map<String, List<@Valid EmailAddress>> map = new HashMap<>();
 
 		private static EmailAddressMap validEmailAddressMap() {
 			List<EmailAddress> validEmailAddresses = Arrays.asList( new EmailAddress( "valid-email-1@example.com" ), new EmailAddress( "valid-email-2@example.com" ) );
@@ -107,7 +109,7 @@ public class NestedCascadedConstraintsTest {
 
 	private static class CinemaEmailAddresses {
 
-		private final Map<@NotNull @Valid Optional<@NotNull @Valid Cinema>, @Valid List<@Valid EmailAddress>> map = new HashMap<>();
+		private final Map<@NotNull Optional<@Valid Cinema>, List<@NotNull @Valid EmailAddress>> map = new HashMap<>();
 
 		private static CinemaEmailAddresses validCinemaEmailAddresses() {
 			CinemaEmailAddresses cinemaEmailAddresses = new CinemaEmailAddresses();
@@ -125,6 +127,10 @@ public class NestedCascadedConstraintsTest {
 					Optional.of( new Cinema( "cinema2", new SomeReference<>( new Visitor( "Name 2" ) ) ) ),
 					Arrays.asList( new EmailAddress( "valid-email-3@example.com" ), new EmailAddress( "invalid-1" ), new EmailAddress( "invalid-2" ) )
 			);
+			cinemaEmailAddresses.map.put(
+					Optional.of( new Cinema( "cinema3", new SomeReference<>( new Visitor( "Name 3" ) ) ) ),
+					Arrays.asList( (EmailAddress) null )
+			);
 
 			return cinemaEmailAddresses;
 		}
@@ -132,12 +138,8 @@ public class NestedCascadedConstraintsTest {
 		private static CinemaEmailAddresses invalidKey() {
 			CinemaEmailAddresses cinemaEmailAddresses = validCinemaEmailAddresses();
 			cinemaEmailAddresses.map.put(
-					Optional.of( new Cinema( "cinema3", new SomeReference<>( new Visitor() ) ) ),
+					Optional.of( new Cinema( "cinema4", new SomeReference<>( new Visitor() ) ) ),
 					Arrays.asList( new EmailAddress( "valid-email-4@example.com" ) )
-			);
-			cinemaEmailAddresses.map.put(
-					Optional.empty(),
-					Arrays.asList( new EmailAddress( "valid-email-5@example.com" ) )
 			);
 
 			return cinemaEmailAddresses;

@@ -30,7 +30,7 @@ class Cinema {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append( getClass().getSimpleName() )
-				.append( "[" ).append( name ).append( "]" );
+				.append( "<" ).append( name ).append( ">" );
 		return sb.toString();
 	}
 }
