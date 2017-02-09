@@ -42,7 +42,6 @@ public class NestedCascadedConstraintsTest {
 
 		constraintViolations = validator.validate( EmailAddressMap.invalidEmailAddressMap() );
 
-		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[invalid].<map value>[1].email",
@@ -65,7 +64,6 @@ public class NestedCascadedConstraintsTest {
 
 		constraintViolations = validator.validate( CinemaEmailAddresses.invalidCinemaEmailAddresses() );
 
-		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[Optional[Cinema[cinema2]]].<map value>[1].email",
@@ -74,7 +72,6 @@ public class NestedCascadedConstraintsTest {
 
 		constraintViolations = validator.validate( CinemaEmailAddresses.invalidKey() );
 
-		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[Optional[Cinema[cinema3]]].<map key>.visitor.name",

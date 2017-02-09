@@ -32,6 +32,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 @TestForIssue(jiraKey = "HV-1237")
+@SuppressWarnings("restriction")
 public class NestedTypeArgumentsValueExtractorTest {
 
 	private Validator validator;
@@ -47,21 +48,18 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 
 		constraintViolations = validator.validate( Foo.invalidKeyFoo() );
-		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[k].<map key>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 
 		constraintViolations = validator.validate( Foo.invalidListFoo() );
-		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key1].<map value>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 
 		constraintViolations = validator.validate( Foo.invalidStringFoo() );
-		assertNumberOfViolations( constraintViolations, 2 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key1].<map value>[0].<iterable element>",
@@ -69,7 +67,6 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class );
 
 		constraintViolations = validator.validate( Foo.reallyInvalidFoo() );
-		assertNumberOfViolations( constraintViolations, 3 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[k].<map key>",
@@ -84,13 +81,11 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 
 		constraintViolations = validator.validate( Bar.invalidStringPropertyBar() );
-		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key].<map value>[1].<iterable element>" );
 
 		constraintViolations = validator.validate( Bar.invalidListElementBar() );
-		assertNumberOfViolations( constraintViolations, 1 );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key].<map value>[0].<iterable element>" );
