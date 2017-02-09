@@ -705,17 +705,23 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			int i = 0;
 
 			for ( AnnotatedType annotatedTypeArgument : annotatedTypeArguments ) {
-				if ( annotatedTypeArgument.isAnnotationPresent( Valid.class ) ) {
-					Type validatedType = annotatedTypeArgument.getType();
-					List<CascadingTypeParameter> nestedCascadingTypeParameters;
-					if ( validatedType instanceof ParameterizedType ) {
-						nestedCascadingTypeParameters = getCascadingTypeParameters(
-								ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(), annotatedTypeArgument );
-					}
-					else {
-						nestedCascadingTypeParameters = Collections.emptyList();
-					}
-					cascadingTypeParameters.add( new CascadingTypeParameter( typeParameters[i], annotatedType.getType(), nestedCascadingTypeParameters ) );
+				Type validatedType = annotatedTypeArgument.getType();
+				List<CascadingTypeParameter> nestedCascadingTypeParameters;
+				if ( validatedType instanceof ParameterizedType ) {
+					nestedCascadingTypeParameters = getCascadingTypeParameters(
+							ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(), annotatedTypeArgument );
+				}
+				else {
+					nestedCascadingTypeParameters = Collections.emptyList();
+				}
+
+				boolean isCascading = annotatedTypeArgument.isAnnotationPresent( Valid.class );
+
+				if ( isCascading || !nestedCascadingTypeParameters.isEmpty() ) {
+					CascadingTypeParameter cascadingTypeParameter = new CascadingTypeParameter( annotatedType.getType(), typeParameters[i],
+							isCascading, nestedCascadingTypeParameters );
+
+					cascadingTypeParameters.add( cascadingTypeParameter );
 				}
 				i++;
 			}

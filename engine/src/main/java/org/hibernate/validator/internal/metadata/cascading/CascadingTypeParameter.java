@@ -22,32 +22,39 @@ import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 public class CascadingTypeParameter {
 
 	/**
+	 * The enclosing type that defines this type parameter.
+	 */
+	private final Type enclosingType;
+
+	/**
 	 * The type parameter.
 	 */
 	private final TypeVariable<?> typeParameter;
 
 	/**
-	 * The enclosing type that defines this type parameter.
-	 */
-	private final Type cascadableType;
-
-	/**
 	 * Possibly the cascading type parameters corresponding to this type parameter if it is a parameterized type.
 	 */
-	private final List<CascadingTypeParameter> cascadingTypeParameters;
+	private final List<CascadingTypeParameter> nestedCascadingTypeParameters;
 
-	public CascadingTypeParameter(TypeVariable<?> typeParameter, Type cascadableType, List<CascadingTypeParameter> cascadingTypeParameters) {
+	/**
+	 * If this type parameter is marked for cascading.
+	 */
+	private final boolean cascading;
+
+	public CascadingTypeParameter(Type enclosingType, TypeVariable<?> typeParameter, boolean cascading,
+			List<CascadingTypeParameter> nestedCascadingTypeParameters) {
+		this.enclosingType = enclosingType;
 		this.typeParameter = typeParameter;
-		this.cascadableType = cascadableType;
-		this.cascadingTypeParameters = cascadingTypeParameters;
+		this.cascading = cascading;
+		this.nestedCascadingTypeParameters = Collections.unmodifiableList( nestedCascadingTypeParameters );
 	}
 
 	public static CascadingTypeParameter annotatedObject(Type cascadableType) {
-		return new CascadingTypeParameter( AnnotatedObject.INSTANCE, cascadableType, Collections.emptyList() );
+		return new CascadingTypeParameter( cascadableType, AnnotatedObject.INSTANCE, true, Collections.emptyList() );
 	}
 
 	public static CascadingTypeParameter arrayElement(Type cascadableType) {
-		return new CascadingTypeParameter( ArrayElement.INSTANCE, cascadableType, Collections.emptyList() );
+		return new CascadingTypeParameter( cascadableType, ArrayElement.INSTANCE, true, Collections.emptyList() );
 	}
 
 	public TypeVariable<?> getTypeParameter() {
@@ -55,11 +62,28 @@ public class CascadingTypeParameter {
 	}
 
 	public Type getEnclosingType() {
-		return cascadableType;
+		return enclosingType;
 	}
 
-	public List<CascadingTypeParameter> getCascadingTypeParameters() {
-		return cascadingTypeParameters;
+	public boolean isCascading() {
+		return cascading;
+	}
+
+	public List<CascadingTypeParameter> getNestedCascadingTypeParameters() {
+		return nestedCascadingTypeParameters;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() );
+		sb.append( " [" );
+		sb.append( "enclosingType=" ).append( enclosingType.getTypeName() ).append( ", " );
+		sb.append( "typeParameter=" ).append( typeParameter ).append( ", " );
+		sb.append( "cascading=" ).append( cascading ).append( ", " );
+		sb.append( "nestedCascadingTypeParameters=" ).append( nestedCascadingTypeParameters );
+		sb.append( "]" );
+		return sb.toString();
 	}
 
 }
