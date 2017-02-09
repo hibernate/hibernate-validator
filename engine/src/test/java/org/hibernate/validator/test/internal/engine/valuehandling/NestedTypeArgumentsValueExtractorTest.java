@@ -9,6 +9,8 @@ package org.hibernate.validator.test.internal.engine.valuehandling;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Arrays;
@@ -52,12 +54,22 @@ public class NestedTypeArgumentsValueExtractorTest {
 				constraintViolations,
 				"map[k].<map key>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map key>", true, "k", null )
+		);
 
 		constraintViolations = validator.validate( Foo.invalidListFoo() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key1].<map value>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, "key1", null )
+		);
 
 		constraintViolations = validator.validate( Foo.invalidStringFoo() );
 		assertCorrectPropertyPaths(
@@ -65,6 +77,16 @@ public class NestedTypeArgumentsValueExtractorTest {
 				"map[key1].<map value>[0].<iterable element>",
 				"map[key1].<map value>[1].<iterable element>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, "key1", null )
+						.typeArgument( "<iterable element>", true, null, 0 ),
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, "key1", null )
+						.typeArgument( "<iterable element>", true, null, 1 )
+		);
 
 		constraintViolations = validator.validate( Foo.reallyInvalidFoo() );
 		assertCorrectPropertyPaths(
@@ -73,6 +95,18 @@ public class NestedTypeArgumentsValueExtractorTest {
 				"map[k].<map value>",
 				"map[k].<map value>[0].<iterable element>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class, Size.class );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map key>", true, "k", null ),
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, "k", null ),
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, "k", null )
+						.typeArgument( "<iterable element>", true, null, 0 )
+		);
 	}
 
 	@Test
@@ -84,11 +118,23 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key].<map value>[1].<iterable element>" );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, "key", null )
+						.typeArgument( "<iterable element>", true, null, 1 )
+		);
 
 		constraintViolations = validator.validate( Bar.invalidListElementBar() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key].<map value>[0].<iterable element>" );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, "key", null )
+						.typeArgument( "<iterable element>", true, null, 0 )
+		);
 	}
 
 	private static class Foo {
