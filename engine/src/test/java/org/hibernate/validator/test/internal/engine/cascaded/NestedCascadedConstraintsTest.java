@@ -9,10 +9,12 @@ package org.hibernate.validator.test.internal.engine.cascaded;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,6 +50,16 @@ public class NestedCascadedConstraintsTest {
 				"map[invalid].<map value>[2].email"
 		);
 		assertCorrectConstraintTypes( constraintViolations, Email.class, Email.class );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, "invalid", null )
+						.property( "email", true, null, 1 ),
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, "invalid", null )
+						.property( "email", true, null, 2 )
+		);
 	}
 
 	@Test
@@ -62,7 +74,8 @@ public class NestedCascadedConstraintsTest {
 
 		assertNumberOfViolations( constraintViolations, 0 );
 
-		constraintViolations = validator.validate( CinemaEmailAddresses.invalidCinemaEmailAddresses() );
+		CinemaEmailAddresses invalidCinemaEmailAddresses = CinemaEmailAddresses.invalidCinemaEmailAddresses();
+		constraintViolations = validator.validate( invalidCinemaEmailAddresses );
 
 		assertCorrectPropertyPaths(
 				constraintViolations,
@@ -71,19 +84,41 @@ public class NestedCascadedConstraintsTest {
 				"map[Optional[Cinema<cinema3>]].<map value>[0].<iterable element>"
 		);
 		assertCorrectConstraintTypes( constraintViolations, Email.class, Email.class, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, invalidCinemaEmailAddresses.map.keySet().toArray()[1], null )
+						.property( "email", true, null, 1 ),
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, invalidCinemaEmailAddresses.map.keySet().toArray()[1], null )
+						.property( "email", true, null, 2 ),
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map value>", true, invalidCinemaEmailAddresses.map.keySet().toArray()[2], null )
+						.typeArgument( "<iterable element>", true, null, 0 )
+		);
 
-		constraintViolations = validator.validate( CinemaEmailAddresses.invalidKey() );
+		CinemaEmailAddresses invalidKeyCinemaEmailAddresses = CinemaEmailAddresses.invalidKey();
+		constraintViolations = validator.validate( invalidKeyCinemaEmailAddresses );
 
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[Optional[Cinema<cinema4>]].<map key>.visitor.name"
 		);
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "map" )
+						.typeArgument( "<map key>", true, invalidKeyCinemaEmailAddresses.map.keySet().toArray()[1], null )
+						.property( "visitor" )
+						.property( "name" )
+		);
 	}
 
 	private static class EmailAddressMap {
 
-		private final Map<String, List<@Valid EmailAddress>> map = new HashMap<>();
+		private final Map<String, List<@Valid EmailAddress>> map = new LinkedHashMap<>();
 
 		private static EmailAddressMap validEmailAddressMap() {
 			List<EmailAddress> validEmailAddresses = Arrays.asList( new EmailAddress( "valid-email-1@example.com" ), new EmailAddress( "valid-email-2@example.com" ) );
@@ -109,7 +144,7 @@ public class NestedCascadedConstraintsTest {
 
 	private static class CinemaEmailAddresses {
 
-		private final Map<@NotNull Optional<@Valid Cinema>, List<@NotNull @Valid EmailAddress>> map = new HashMap<>();
+		private final Map<@NotNull Optional<@Valid Cinema>, List<@NotNull @Valid EmailAddress>> map = new LinkedHashMap<>();
 
 		private static CinemaEmailAddresses validCinemaEmailAddresses() {
 			CinemaEmailAddresses cinemaEmailAddresses = new CinemaEmailAddresses();
