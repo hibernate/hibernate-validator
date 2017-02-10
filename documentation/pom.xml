@@ -211,6 +211,11 @@
                             <backend>html5</backend>
                             <outputDirectory>${asciidoctor.base-output-dir}/html_single</outputDirectory>
                             <sourceHighlighter>prettify</sourceHighlighter>
+                            <attributes>
+                                <stylesdir>css</stylesdir>
+                                <iconfont-remote>false</iconfont-remote>
+                                <iconfont-name>font-awesome/css/font-awesome.min</iconfont-name>
+                            </attributes>
                         </configuration>
                     </execution>
                 </executions>
