@@ -674,9 +674,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 						cascadingTypeParameterOfValueType
 				);
 
-				// TODO should only happen during transition off of value unwrappers
 				if ( extractor == null ) {
-					continue;
+					throw log.getNoValueExtractorFoundForTypeException( value.getClass(), cascadingTypeParameterOfValueType );
 				}
 
 				CascadingValueReceiver receiver = new CascadingValueReceiver( context, valueContext, validationOrder );
