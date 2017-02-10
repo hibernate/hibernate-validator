@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.internal.metadata.provider;
 
-import java.util.List;
-
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptions;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 
@@ -33,16 +31,10 @@ public interface MetaDataProvider {
 	 */
 	AnnotationProcessingOptions getAnnotationProcessingOptions();
 
+
 	/**
-	 * Returns a list with the configurations for all types contained in the
-	 * given type's hierarchy (including implemented interfaces) starting at the
-	 * specified type.
-	 *
-	 * @param beanClass The type of interest.
-	 * @param <T> The type of the class to get the configurations for.
-	 *
-	 * @return A set with the configurations for the complete hierarchy of the
-	 *         given type. May be empty, but never {@code null}.
+	 * Returns a bean configuration for the given type or {@code null} if this provider has no meta-data on the given
+	 * type.
 	 */
-	<T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass);
+	<T> BeanConfiguration<? super T> getBeanConfiguration(Class<T> beanClass);
 }

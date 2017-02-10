@@ -14,10 +14,11 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
@@ -127,7 +128,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	/**
 	 * Metadata provider for XML configuration.
 	 */
-	private XmlMetaDataProvider xmlMetaDataProvider;
+	private final XmlMetaDataProvider xmlMetaDataProvider;
 
 	/**
 	 * Prior to the introduction of {@code ParameterNameProvider} all the bean meta data was static and could be
@@ -137,7 +138,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * provider. See also HV-659.
 	 */
 	@ThreadSafe
-	private final Map<ExecutableParameterNameProvider, BeanMetaDataManager> beanMetaDataManagerMap;
+	private final ConcurrentMap<ExecutableParameterNameProvider, BeanMetaDataManager> beanMetaDataManagers;
 
 	private final ValueExtractorManager valueExtractorManager;
 
@@ -148,7 +149,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
 		this.clockProvider = configurationState.getClockProvider();
-		this.beanMetaDataManagerMap = Collections.synchronizedMap( new IdentityHashMap<ExecutableParameterNameProvider, BeanMetaDataManager>() );
+		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
 		this.executableHelper = new ExecutableHelper( typeResolutionHelper );
@@ -339,12 +340,9 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	@Override
 	public void close() {
 		constraintValidatorManager.clear();
-		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagerMap.values() ) {
+		for ( BeanMetaDataManager beanMetaDataManager : beanMetaDataManagers.values() ) {
 			beanMetaDataManager.clear();
 		}
-
-		// this holds a reference to the provided external class-loader, thus freeing it to be on the safe side
-		xmlMetaDataProvider = null;
 	}
 
 	Validator createValidator(ConstraintValidatorFactory constraintValidatorFactory,
@@ -356,22 +354,18 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			ValueExtractorManager valueExtractorManager,
 			MethodValidationConfiguration methodValidationConfiguration) {
 
-		BeanMetaDataManager beanMetaDataManager;
-		if ( !beanMetaDataManagerMap.containsKey( parameterNameProvider ) ) {
-			beanMetaDataManager = new BeanMetaDataManager(
-					constraintHelper,
-					executableHelper,
-					typeResolutionHelper,
-					parameterNameProvider,
-					valueExtractorManager,
-					buildDataProviders( parameterNameProvider ),
-					methodValidationConfiguration
-			);
-			beanMetaDataManagerMap.put( parameterNameProvider, beanMetaDataManager );
-		}
-		else {
-			beanMetaDataManager = beanMetaDataManagerMap.get( parameterNameProvider );
-		}
+		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
+				parameterNameProvider,
+				p -> new BeanMetaDataManager(
+						constraintHelper,
+						executableHelper,
+						typeResolutionHelper,
+						parameterNameProvider,
+						valueExtractorManager,
+						buildDataProviders( parameterNameProvider ),
+						methodValidationConfiguration
+				)
+		 );
 
 		return new ValidatorImpl(
 				constraintValidatorFactory,

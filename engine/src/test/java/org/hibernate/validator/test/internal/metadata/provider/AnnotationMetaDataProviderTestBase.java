@@ -22,38 +22,33 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
  */
 public abstract class AnnotationMetaDataProviderTestBase {
 
-	protected <T> ConstrainedField findConstrainedField(Iterable<BeanConfiguration<? super T>> beanConfigurations,
+	protected <T> ConstrainedField findConstrainedField(BeanConfiguration<T> beanConfiguration,
 														Class<? super T> clazz, String fieldName) throws Exception {
-		return (ConstrainedField) findConstrainedElement( beanConfigurations, clazz.getDeclaredField( fieldName ) );
+
+		return (ConstrainedField) findConstrainedElement( beanConfiguration, clazz.getDeclaredField( fieldName ) );
 	}
 
-	protected <T> ConstrainedExecutable findConstrainedMethod(Iterable<BeanConfiguration<? super T>> beanConfigurations,
-															  Class<? super T> clazz, String methodName, Class<?>... parameterTypes)
-			throws Exception {
-		return (ConstrainedExecutable) findConstrainedElement(
-				beanConfigurations,
-				clazz.getMethod( methodName, parameterTypes )
-		);
-	}
-
-	protected <T> ConstrainedExecutable findConstrainedConstructor(
-			Iterable<BeanConfiguration<? super T>> beanConfigurations, Class<? super T> clazz,
+	protected <T> ConstrainedExecutable findConstrainedMethod(BeanConfiguration<T> beanConfiguration,
+															  Class<? super T> clazz, String methodName,
 			Class<?>... parameterTypes) throws Exception {
-		return (ConstrainedExecutable) findConstrainedElement(
-				beanConfigurations,
-				clazz.getConstructor( parameterTypes )
-		);
+
+		return (ConstrainedExecutable) findConstrainedElement( beanConfiguration, clazz.getMethod( methodName, parameterTypes ) );
 	}
 
-	protected <T> ConstrainedType findConstrainedType(Iterable<BeanConfiguration<? super T>> beanConfigurations,
+	protected <T> ConstrainedExecutable findConstrainedConstructor(BeanConfiguration<T> beanConfigurations, Class<T> clazz, Class<?>... parameterTypes)
+			throws Exception {
+
+		return (ConstrainedExecutable) findConstrainedElement( beanConfigurations, clazz.getConstructor( parameterTypes ) );
+	}
+
+	protected <T> ConstrainedType findConstrainedType(BeanConfiguration<T> beanConfiguration,
 													  Class<? super T> type) {
-		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
-			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
-				if ( constrainedElement.getKind() == ConstrainedElementKind.TYPE ) {
-					ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
-					if ( constrainedType.getBeanClass().equals( type ) ) {
-						return constrainedType;
-					}
+
+		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
+			if ( constrainedElement.getKind() == ConstrainedElementKind.TYPE ) {
+				ConstrainedType constrainedType = (ConstrainedType) constrainedElement;
+				if ( constrainedType.getBeanClass().equals( type ) ) {
+					return constrainedType;
 				}
 			}
 		}
@@ -61,19 +56,18 @@ public abstract class AnnotationMetaDataProviderTestBase {
 		throw new RuntimeException( "Found no constrained element for type " + type );
 	}
 
-	protected ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations,
+	protected ConstrainedElement findConstrainedElement(BeanConfiguration<?> beanConfiguration,
 														Member member) {
-		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
-			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
-				if ( member instanceof Executable && constrainedElement instanceof ConstrainedExecutable ) {
-					if ( member.equals( ( (ConstrainedExecutable) constrainedElement ).getExecutable() ) ) {
-						return constrainedElement;
-					}
+
+		for ( ConstrainedElement constrainedElement : beanConfiguration.getConstrainedElements() ) {
+			if ( member instanceof Executable && constrainedElement instanceof ConstrainedExecutable ) {
+				if ( member.equals( ( (ConstrainedExecutable) constrainedElement ).getExecutable() ) ) {
+					return constrainedElement;
 				}
-				else if ( member instanceof Field && constrainedElement instanceof ConstrainedField ) {
-					if ( member.equals( ( (ConstrainedField) constrainedElement ).getField() ) ) {
-						return constrainedElement;
-					}
+			}
+			else if ( member instanceof Field && constrainedElement instanceof ConstrainedField ) {
+				if ( member.equals( ( (ConstrainedField) constrainedElement ).getField() ) ) {
+					return constrainedElement;
 				}
 			}
 		}

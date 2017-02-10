@@ -67,7 +67,6 @@ import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
-import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructors;
@@ -120,20 +119,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	}
 
 	@Override
-	public <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(Class<T> beanClass) {
-		List<BeanConfiguration<? super T>> configurations = newArrayList();
-
-		for ( Class<? super T> hierarchyClass : ClassHierarchyHelper.getHierarchy( beanClass ) ) {
-			BeanConfiguration<? super T> configuration = getBeanConfiguration( hierarchyClass );
-			if ( configuration != null ) {
-				configurations.add( configuration );
-			}
-		}
-
-		return configurations;
-	}
-
-	private <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
+	public <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
 		@SuppressWarnings("unchecked")
 		BeanConfiguration<T> configuration = (BeanConfiguration<T>) configuredBeans.get( beanClass );
 
