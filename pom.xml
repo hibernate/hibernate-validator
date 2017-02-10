@@ -154,7 +154,7 @@
         <groovy.version>2.4.8</groovy.version>
 
         <!-- Asciidoctor -->
-        <hibernate-asciidoctor-theme.version>1.0.0.Final</hibernate-asciidoctor-theme.version>
+        <hibernate-asciidoctor-theme.version>1.0.1.Final</hibernate-asciidoctor-theme.version>
         <asciidoctor-maven-plugin.version>1.5.3</asciidoctor-maven-plugin.version>
         <jruby.version>1.7.26</jruby.version>
         <asciidoctorj.version>1.5.4.1</asciidoctorj.version>
