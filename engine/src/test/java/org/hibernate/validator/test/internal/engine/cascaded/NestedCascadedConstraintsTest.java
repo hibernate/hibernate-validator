@@ -116,6 +116,34 @@ public class NestedCascadedConstraintsTest {
 		);
 	}
 
+	@Test
+	public void testNestedOnArray() {
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.addCascadedValueExtractor( new ReferenceValueExtractor() )
+				.buildValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<CinemaArray>> constraintViolations = validator.validate( CinemaArray.validCinemaArray() );
+
+		assertNumberOfViolations( constraintViolations, 0 );
+
+		constraintViolations = validator.validate( CinemaArray.invalidCinemaArray() );
+
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"array[0].<iterable element>.visitor.name"
+		);
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "array" )
+						.typeArgument( "<iterable element>", true, null, 0 )
+						.property( "visitor" )
+						.property( "name" )
+		);
+	}
+
 	private static class EmailAddressMap {
 
 		private final Map<String, List<@Valid EmailAddress>> map = new LinkedHashMap<>();
@@ -178,6 +206,28 @@ public class NestedCascadedConstraintsTest {
 			);
 
 			return cinemaEmailAddresses;
+		}
+	}
+
+	@SuppressWarnings({ "unused", "unchecked" })
+	private static class CinemaArray {
+
+		private Optional<@NotNull @Valid Cinema>[] array;
+
+		private static CinemaArray validCinemaArray() {
+			CinemaArray cinemaArray = new CinemaArray();
+
+			cinemaArray.array = new Optional[] { Optional.of( new Cinema( "cinema1", new SomeReference<>( new Visitor( "Name 1" ) ) ) ) };
+
+			return cinemaArray;
+		}
+
+		private static CinemaArray invalidCinemaArray() {
+			CinemaArray cinemaArray = new CinemaArray();
+
+			cinemaArray.array = new Optional[] { Optional.of( new Cinema( "cinema2", new SomeReference<>( new Visitor() ) ) ) };
+
+			return cinemaArray;
 		}
 	}
 

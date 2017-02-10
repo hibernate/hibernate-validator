@@ -46,10 +46,10 @@ public class NestedTypeArgumentsValueExtractorTest {
 
 	@Test
 	public void validation_of_nested_type_arguments_works_with_map_of_list_of_optional() {
-		Set<ConstraintViolation<Foo>> constraintViolations = validator.validate( Foo.validFoo() );
+		Set<ConstraintViolation<MapOfLists>> constraintViolations = validator.validate( MapOfLists.validFoo() );
 		assertNumberOfViolations( constraintViolations, 0 );
 
-		constraintViolations = validator.validate( Foo.invalidKeyFoo() );
+		constraintViolations = validator.validate( MapOfLists.invalidKeyFoo() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[k].<map key>" );
@@ -60,7 +60,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 						.typeArgument( "<map key>", true, "k", null )
 		);
 
-		constraintViolations = validator.validate( Foo.invalidListFoo() );
+		constraintViolations = validator.validate( MapOfLists.invalidListFoo() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key1].<map value>" );
@@ -71,7 +71,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 						.typeArgument( "<map value>", true, "key1", null )
 		);
 
-		constraintViolations = validator.validate( Foo.invalidStringFoo() );
+		constraintViolations = validator.validate( MapOfLists.invalidStringFoo() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key1].<map value>[0].<iterable element>",
@@ -88,7 +88,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 						.typeArgument( "<iterable element>", true, null, 1 )
 		);
 
-		constraintViolations = validator.validate( Foo.reallyInvalidFoo() );
+		constraintViolations = validator.validate( MapOfLists.reallyInvalidFoo() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[k].<map key>",
@@ -111,10 +111,10 @@ public class NestedTypeArgumentsValueExtractorTest {
 
 	@Test
 	public void validation_of_nested_type_arguments_works_with_map_of_list_of_stringproperty() {
-		Set<ConstraintViolation<Bar>> constraintViolations = validator.validate( Bar.validBar() );
+		Set<ConstraintViolation<MapOfListsWithAutomaticUnwrapping>> constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.validBar() );
 		assertNumberOfViolations( constraintViolations, 0 );
 
-		constraintViolations = validator.validate( Bar.invalidStringPropertyBar() );
+		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidStringPropertyBar() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key].<map value>[1].<iterable element>" );
@@ -125,7 +125,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 						.typeArgument( "<iterable element>", true, null, 1 )
 		);
 
-		constraintViolations = validator.validate( Bar.invalidListElementBar() );
+		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidListElementBar() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
 				"map[key].<map value>[0].<iterable element>" );
@@ -137,12 +137,32 @@ public class NestedTypeArgumentsValueExtractorTest {
 		);
 	}
 
-	private static class Foo {
+	@Test
+	public void validation_of_nested_type_arguments_works_with_array_of_optional_of_stringproperty() {
+		Set<ConstraintViolation<ArrayOfOptionalsWithAutomaticUnwrapping>> constraintViolations = validator.validate( ArrayOfOptionalsWithAutomaticUnwrapping.validBaz() );
+		assertNumberOfViolations( constraintViolations, 0 );
+
+		constraintViolations = validator.validate( ArrayOfOptionalsWithAutomaticUnwrapping.invalidArray() );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"array[0].<iterable element>",
+				"array[1].<iterable element>" );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "array" )
+						.typeArgument( "<iterable element>", true, null, 0 ),
+				pathWith()
+						.property( "array" )
+						.typeArgument( "<iterable element>", true, null, 1 )
+		);
+	}
+
+	private static class MapOfLists {
 
 		private Map<@Size(min = 2) String, @NotNull @Size(min = 2) List<Optional<@Size(min = 3) String>>> map;
 
-		private static Foo validFoo() {
-			Foo foo = new Foo();
+		private static MapOfLists validFoo() {
+			MapOfLists foo = new MapOfLists();
 
 			List<Optional<String>> list = Arrays.asList( Optional.of( "one" ), Optional.of( "two" ) );
 			foo.map = new HashMap<>();
@@ -151,8 +171,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 			return foo;
 		}
 
-		private static Foo invalidKeyFoo() {
-			Foo foo = new Foo();
+		private static MapOfLists invalidKeyFoo() {
+			MapOfLists foo = new MapOfLists();
 
 			List<Optional<String>> list = Arrays.asList( Optional.of( "one" ), Optional.of( "two" ) );
 			foo.map = new HashMap<>();
@@ -161,8 +181,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 			return foo;
 		}
 
-		private static Foo invalidListFoo() {
-			Foo foo = new Foo();
+		private static MapOfLists invalidListFoo() {
+			MapOfLists foo = new MapOfLists();
 
 			List<Optional<String>> list = Arrays.asList( Optional.of( "only one value" ) );
 			foo.map = new HashMap<>();
@@ -171,8 +191,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 			return foo;
 		}
 
-		private static Foo invalidStringFoo() {
-			Foo foo = new Foo();
+		private static MapOfLists invalidStringFoo() {
+			MapOfLists foo = new MapOfLists();
 
 			List<Optional<String>> list = Arrays.asList( Optional.of( "1" ), Optional.of( "2" ) );
 			foo.map = new HashMap<>();
@@ -181,8 +201,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 			return foo;
 		}
 
-		private static Foo reallyInvalidFoo() {
-			Foo foo = new Foo();
+		private static MapOfLists reallyInvalidFoo() {
+			MapOfLists foo = new MapOfLists();
 
 			List<Optional<String>> list = Arrays.asList( Optional.of( "1" ) );
 			foo.map = new HashMap<>();
@@ -192,12 +212,12 @@ public class NestedTypeArgumentsValueExtractorTest {
 		}
 	}
 
-	private static class Bar {
+	private static class MapOfListsWithAutomaticUnwrapping {
 
 		private Map<@Size(min = 2) String, List<@NotNull(payload = { Unwrapping.Skip.class }) @Size(min = 2) StringProperty>> map;
 
-		private static Bar validBar() {
-			Bar bar = new Bar();
+		private static MapOfListsWithAutomaticUnwrapping validBar() {
+			MapOfListsWithAutomaticUnwrapping bar = new MapOfListsWithAutomaticUnwrapping();
 
 			List<StringProperty> list = Arrays.asList( new SimpleStringProperty( "one" ), new SimpleStringProperty( "tw" ),
 					new SimpleStringProperty( "three" ) );
@@ -207,8 +227,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 			return bar;
 		}
 
-		private static Bar invalidStringPropertyBar() {
-			Bar bar = new Bar();
+		private static MapOfListsWithAutomaticUnwrapping invalidStringPropertyBar() {
+			MapOfListsWithAutomaticUnwrapping bar = new MapOfListsWithAutomaticUnwrapping();
 
 			List<StringProperty> list = Arrays.asList( new SimpleStringProperty( "one" ), new SimpleStringProperty( "t" ),
 					new SimpleStringProperty( "three" ) );
@@ -218,8 +238,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 			return bar;
 		}
 
-		private static Bar invalidListElementBar() {
-			Bar bar = new Bar();
+		private static MapOfListsWithAutomaticUnwrapping invalidListElementBar() {
+			MapOfListsWithAutomaticUnwrapping bar = new MapOfListsWithAutomaticUnwrapping();
 
 			List<StringProperty> list = Arrays.asList( null, new SimpleStringProperty( "two" ) );
 			bar.map = new HashMap<>();
@@ -227,6 +247,29 @@ public class NestedTypeArgumentsValueExtractorTest {
 
 			return bar;
 		}
+	}
+
+	@SuppressWarnings({ "unchecked", "unused" })
+	private static class ArrayOfOptionalsWithAutomaticUnwrapping {
+
+		private Optional<@Size(min = 3) StringProperty> @NotNull [] array;
+
+		private static ArrayOfOptionalsWithAutomaticUnwrapping validBaz() {
+			ArrayOfOptionalsWithAutomaticUnwrapping baz = new ArrayOfOptionalsWithAutomaticUnwrapping();
+
+			baz.array = new Optional[] { Optional.of( new SimpleStringProperty( "string1" ) ), Optional.of( new SimpleStringProperty( "string2" ) ) };
+
+			return baz;
+		}
+
+		private static ArrayOfOptionalsWithAutomaticUnwrapping invalidArray() {
+			ArrayOfOptionalsWithAutomaticUnwrapping baz = new ArrayOfOptionalsWithAutomaticUnwrapping();
+
+			baz.array = new Optional[] { null, Optional.of( new SimpleStringProperty( "st" ) ) };
+
+			return baz;
+		}
+
 	}
 
 }
