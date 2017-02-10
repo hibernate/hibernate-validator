@@ -10,6 +10,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertC
 
 import java.util.Set;
 
+import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
 import javax.validation.Valid;
 import javax.validation.Validation;
@@ -55,6 +56,19 @@ public class CustomValueExtractorTest {
 		Set<ConstraintViolation<CustomerWithMultimap>> violations = validator.validate( bob );
 
 		assertCorrectPropertyPaths( violations, "addressByType[work].email", "addressByType[work].email" );
+	}
+
+	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000197.*")
+	public void missingCustomExtractorThrowsException() throws Exception {
+		Cinema cinema = new Cinema();
+		cinema.visitor = new SomeReference<>( new Visitor() );
+
+		Validator validator = Validation.byProvider( HibernateValidator.class )
+				.configure()
+				.buildValidatorFactory()
+				.getValidator();
+
+		validator.validate( cinema );
 	}
 
 	private static class CustomerWithMultimap {
