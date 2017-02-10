@@ -34,6 +34,7 @@ import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 
 /**
  * This manager is in charge of providing all constraint related meta data
@@ -201,7 +202,7 @@ public class BeanMetaDataManager {
 				constraintHelper, executableHelper, typeResolutionHelper, valueExtractorManager, validationOrderGenerator, clazz, methodValidationConfiguration );
 
 		for ( MetaDataProvider provider : metaDataProviders ) {
-			for ( BeanConfiguration<? super T> beanConfiguration : provider.getBeanConfigurationForHierarchy( clazz ) ) {
+			for ( BeanConfiguration<? super T> beanConfiguration : getBeanConfigurationForHierarchy( provider, clazz ) ) {
 				builder.add( beanConfiguration );
 			}
 		}
@@ -252,5 +253,27 @@ public class BeanMetaDataManager {
 		}
 
 		return beanMetaData;
+	}
+
+	/**
+	 * Returns a list with the configurations for all types contained in the given type's hierarchy (including
+	 * implemented interfaces) starting at the specified type.
+	 *
+	 * @param beanClass The type of interest.
+	 * @param <T> The type of the class to get the configurations for.
+	 * @return A set with the configurations for the complete hierarchy of the given type. May be empty, but never
+	 * {@code null}.
+	 */
+	private <T> List<BeanConfiguration<? super T>> getBeanConfigurationForHierarchy(MetaDataProvider provider, Class<T> beanClass) {
+		List<BeanConfiguration<? super T>> configurations = newArrayList();
+
+		for ( Class<? super T> clazz : ClassHierarchyHelper.getHierarchy( beanClass ) ) {
+			BeanConfiguration<? super T> configuration = provider.getBeanConfiguration( clazz );
+			if ( configuration != null ) {
+				configurations.add( configuration );
+			}
+		}
+
+		return configurations;
 	}
 }

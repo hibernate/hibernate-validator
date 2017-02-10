@@ -9,9 +9,6 @@ package org.hibernate.validator.test.internal.metadata.provider;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Executable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +25,6 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.provider.AnnotationMetaDataProvider;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
-import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
@@ -42,7 +38,7 @@ import org.testng.annotations.Test;
  *
  * @author Khalid Alqinyah
  */
-public class TypeAnnotationMetaDataRetrievalTest {
+public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProviderTestBase {
 
 	private AnnotationMetaDataProvider provider;
 
@@ -59,11 +55,9 @@ public class TypeAnnotationMetaDataRetrievalTest {
 
 	@Test
 	public void testFieldTypeArgument() throws Exception {
-		List<BeanConfiguration<? super A>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				A.class
-		);
+		BeanConfiguration<A> beanConfiguration = provider.getBeanConfiguration( A.class );
 
-		ConstrainedField field = findConstrainedField( beanConfigurations, A.class, "names" );
+		ConstrainedField field = findConstrainedField( beanConfiguration, A.class, "names" );
 		assertThat( field.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
 		assertThat( getAnnotationsTypes( field.getTypeArgumentConstraints() ) ).contains(
 				NotNull.class, NotBlank.class
@@ -72,11 +66,9 @@ public class TypeAnnotationMetaDataRetrievalTest {
 
 	@Test
 	public void testGetterTypeArgument() throws Exception {
-		List<BeanConfiguration<? super B>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				B.class
-		);
+		BeanConfiguration<B> beanConfiguration = provider.getBeanConfiguration( B.class );
 
-		ConstrainedExecutable executable = findConstrainedMethod( beanConfigurations, B.class, "getNames" );
+		ConstrainedExecutable executable = findConstrainedMethod( beanConfiguration, B.class, "getNames" );
 		assertThat( executable.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
 		assertThat( getAnnotationsTypes( executable.getTypeArgumentConstraints() ) ).contains(
 				NotNull.class, NotBlank.class
@@ -85,11 +77,9 @@ public class TypeAnnotationMetaDataRetrievalTest {
 
 	@Test
 	public void testReturnValueTypeArgument() throws Exception {
-		List<BeanConfiguration<? super C>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				C.class
-		);
+		BeanConfiguration<C> beanConfiguration = provider.getBeanConfiguration( C.class );
 
-		ConstrainedExecutable executable = findConstrainedMethod( beanConfigurations, C.class, "returnNames" );
+		ConstrainedExecutable executable = findConstrainedMethod( beanConfiguration, C.class, "returnNames" );
 		assertThat( executable.getTypeArgumentConstraints().size() ).isEqualTo( 2 );
 		assertThat( getAnnotationsTypes( executable.getTypeArgumentConstraints() ) ).contains(
 				NotNull.class, NotBlank.class
@@ -98,12 +88,10 @@ public class TypeAnnotationMetaDataRetrievalTest {
 
 	@Test
 	public void testExecutableParameterTypeArgument() throws Exception {
-		List<BeanConfiguration<? super D>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				D.class
-		);
+		BeanConfiguration<D> beanConfiguration = provider.getBeanConfiguration( D.class );
 
 		ConstrainedExecutable executable = findConstrainedMethod(
-				beanConfigurations,
+				beanConfiguration,
 				D.class,
 				"setValues",
 				String.class,
@@ -119,12 +107,10 @@ public class TypeAnnotationMetaDataRetrievalTest {
 
 	@Test
 	public void testConstructorParameterTypeArgument() throws Exception {
-		List<BeanConfiguration<? super E>> beanConfigurations = provider.getBeanConfigurationForHierarchy(
-				E.class
-		);
+		BeanConfiguration<E> beanConfiguration = provider.getBeanConfiguration( E.class );
 
 		ConstrainedExecutable executable = findConstrainedConstructor(
-				beanConfigurations,
+				beanConfiguration,
 				E.class,
 				String.class,
 				Integer.class,
@@ -142,48 +128,6 @@ public class TypeAnnotationMetaDataRetrievalTest {
 		return metaConstraints.stream()
 			.map( m -> m.getDescriptor().getAnnotationType() )
 			.collect( Collectors.toList() );
-	}
-
-	private <T> ConstrainedField findConstrainedField(Iterable<BeanConfiguration<? super T>> beanConfigurations,
-			Class<? super T> clazz, String fieldName) throws Exception {
-		return (ConstrainedField) findConstrainedElement( beanConfigurations, clazz.getDeclaredField( fieldName ) );
-	}
-
-	private <T> ConstrainedExecutable findConstrainedMethod(Iterable<BeanConfiguration<? super T>> beanConfigurations,
-			Class<? super T> clazz, String methodName, Class<?>... parameterTypes)
-			throws Exception {
-		return (ConstrainedExecutable) findConstrainedElement(
-				beanConfigurations,
-				clazz.getMethod( methodName, parameterTypes )
-		);
-	}
-
-	private <T> ConstrainedExecutable findConstrainedConstructor(
-			Iterable<BeanConfiguration<? super T>> beanConfigurations, Class<? super T> clazz,
-			Class<?>... parameterTypes) throws Exception {
-		return (ConstrainedExecutable) findConstrainedElement(
-				beanConfigurations,
-				clazz.getConstructor( parameterTypes )
-		);
-	}
-
-	protected ConstrainedElement findConstrainedElement(Iterable<? extends BeanConfiguration<?>> beanConfigurations, Member member) {
-		for ( BeanConfiguration<?> oneConfiguration : beanConfigurations ) {
-			for ( ConstrainedElement constrainedElement : oneConfiguration.getConstrainedElements() ) {
-				if ( member instanceof Executable && constrainedElement instanceof ConstrainedExecutable ) {
-					if ( member.equals( ( (ConstrainedExecutable) constrainedElement ).getExecutable() ) ) {
-						return constrainedElement;
-					}
-				}
-				else if ( member instanceof Field && constrainedElement instanceof ConstrainedField ) {
-					if ( member.equals( ( (ConstrainedField) constrainedElement ).getField() ) ) {
-						return constrainedElement;
-					}
-				}
-			}
-		}
-
-		throw new RuntimeException( "Found no constrained element for " + member );
 	}
 
 	static class A {

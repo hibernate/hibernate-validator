@@ -8,6 +8,7 @@ package org.hibernate.validator.internal.metadata.provider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -23,16 +24,20 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * A {@link MetaDataProvider} based on the programmatic constraint API.
  *
  * @author Gunnar Morling
  */
-public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassName {
+public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make();
 
+	// cached against the fqcn of a class. not a class instance itself (HV-479)
+	@Immutable
+	private final Map<String, BeanConfiguration<?>> configuredBeans;
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
 	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper,
@@ -40,20 +45,23 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 										ExecutableParameterNameProvider parameterNameProvider,
 										ValueExtractorManager valueExtractorManager,
 										Set<DefaultConstraintMapping> constraintMappings) {
-		super( constraintHelper, createBeanConfigurations( constraintMappings, constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager ) );
 		Contracts.assertNotNull( constraintMappings );
+
+		configuredBeans = Collections.unmodifiableMap(
+				createBeanConfigurations( constraintMappings, constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager )
+		);
 
 		assertUniquenessOfConfiguredTypes( constraintMappings );
 		annotationProcessingOptions = mergeAnnotationProcessingOptions( constraintMappings );
 	}
 
-	private void assertUniquenessOfConfiguredTypes(Set<DefaultConstraintMapping> mappings) {
+	private static void assertUniquenessOfConfiguredTypes(Set<DefaultConstraintMapping> mappings) {
 		Set<Class<?>> allConfiguredTypes = newHashSet();
 
 		for ( DefaultConstraintMapping constraintMapping : mappings ) {
 			for ( Class<?> configuredType : constraintMapping.getConfiguredTypes() ) {
 				if ( allConfiguredTypes.contains( configuredType ) ) {
-					throw log.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( configuredType );
+					throw LOG.getBeanClassHasAlreadyBeConfiguredViaProgrammaticApiException( configuredType );
 				}
 			}
 
@@ -86,7 +94,7 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 	 *
 	 * @return a single annotation processing options object
 	 */
-	private AnnotationProcessingOptions mergeAnnotationProcessingOptions(Set<DefaultConstraintMapping> mappings) {
+	private static AnnotationProcessingOptions mergeAnnotationProcessingOptions(Set<DefaultConstraintMapping> mappings) {
 		// if we only have one mapping we can return the context of just this mapping
 		if ( mappings.size() == 1 ) {
 			return mappings.iterator().next().getAnnotationProcessingOptions();
@@ -99,6 +107,12 @@ public class ProgrammaticMetaDataProvider extends MetaDataProviderKeyedByClassNa
 		}
 
 		return options;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
+		return (BeanConfiguration<T>) configuredBeans.get( beanClass.getName() );
 	}
 
 	@Override

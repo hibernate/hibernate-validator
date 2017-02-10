@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.metadata.provider;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +20,7 @@ import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.xml.MappingXmlParser;
 
 /**
@@ -28,7 +30,11 @@ import org.hibernate.validator.internal.xml.MappingXmlParser;
  * @author Gunnar Morling
  * @author Hardy Ferentschik
  */
-public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
+public class XmlMetaDataProvider implements MetaDataProvider {
+
+	// cached against the fqcn of a class. not a class instance itself (HV-479)
+	@Immutable
+	private final Map<String, BeanConfiguration<?>> configuredBeans;
 
 	private final AnnotationProcessingOptions annotationProcessingOptions;
 
@@ -38,23 +44,13 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 			ValueExtractorManager valueExtractorManager,
 			Set<InputStream> mappingStreams,
 			ClassLoader externalClassLoader) {
-		this( constraintHelper, typeResolutionHelper, valueExtractorManager, createMappingParser( constraintHelper, typeResolutionHelper, parameterNameProvider,
-				valueExtractorManager, mappingStreams, externalClassLoader ) );
-	}
 
-	private XmlMetaDataProvider(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
-			MappingXmlParser mappingParser) {
-		super( constraintHelper, createBeanConfigurations( mappingParser ) );
-		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
-	}
-
-	private static MappingXmlParser createMappingParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, Set<InputStream> mappingStreams,
-			ClassLoader externalClassLoader) {
-		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, typeResolutionHelper, parameterNameProvider,
-				valueExtractorManager, externalClassLoader );
+		MappingXmlParser mappingParser = new MappingXmlParser( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager,
+				externalClassLoader );
 		mappingParser.parse( mappingStreams );
-		return mappingParser;
+
+		configuredBeans = Collections.unmodifiableMap( createBeanConfigurations( mappingParser ) );
+		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}
 
 	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(MappingXmlParser mappingParser) {
@@ -62,16 +58,23 @@ public class XmlMetaDataProvider extends MetaDataProviderKeyedByClassName {
 		for ( Class<?> clazz : mappingParser.getXmlConfiguredClasses() ) {
 			Set<ConstrainedElement> constrainedElements = mappingParser.getConstrainedElementsForClass( clazz );
 
-			BeanConfiguration<?> beanConfiguration = createBeanConfiguration(
+			BeanConfiguration<?> beanConfiguration = new BeanConfiguration<>(
 					ConfigurationSource.XML,
 					clazz,
 					constrainedElements,
 					mappingParser.getDefaultSequenceForClass( clazz ),
 					null
 			);
+
 			configuredBeans.put( clazz.getName(), beanConfiguration );
 		}
 		return configuredBeans;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> BeanConfiguration<T> getBeanConfiguration(Class<T> beanClass) {
+		return (BeanConfiguration<T>) configuredBeans.get( beanClass.getName() );
 	}
 
 	@Override

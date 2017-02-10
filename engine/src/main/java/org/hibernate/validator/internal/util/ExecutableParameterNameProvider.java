@@ -49,4 +49,31 @@ public class ExecutableParameterNameProvider {
 	public String toString() {
 		return "ExecutableParameterNameProvider [delegate=" + delegate + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ( ( delegate == null ) ? 0 : delegate.hashCode() );
+		return result;
+	}
+
+	/**
+	 * Equality is based on identity of the delegate.
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ExecutableParameterNameProvider other = (ExecutableParameterNameProvider) obj;
+
+		return delegate == other;
+	}
 }
