@@ -19,26 +19,27 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.constraints.time.DurationMax.List;
 
 /**
  * Annotated {@link Duration} element's length must be less than or equal to
- * the one constructed from {@link DurationMax#value()} in {@link DurationMax#units()}.
+ * the one constructed as a sum of {@link DurationMax#nanos()}, {@link DurationMax#millis()},
+ * {@link DurationMax#seconds()}, {@link DurationMax#minutes()}, {@link DurationMax#hours()},
+ * {@link DurationMax#days()}.
  *
  * @author Marko Bekhta
- * @hv.experimental
  */
 @Documented
 @Constraint(validatedBy = { })
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
-@ReportAsSingleViolation
+@ReportAsSingleViolation @Incubating
 public @interface DurationMax {
 
 	String message() default "{org.hibernate.validator.constraints.time.DurationMax.message}";
@@ -47,9 +48,26 @@ public @interface DurationMax {
 
 	Class<? extends Payload>[] payload() default { };
 
-	long value() default 0;
+	long days() default 0;
 
-	ChronoUnit units() default ChronoUnit.NANOS;
+	long hours() default 0;
+
+	long minutes() default 0;
+
+	long seconds() default 0;
+
+	long millis() default 0;
+
+	long nanos() default 0;
+
+	/**
+	 * Specifies whether the specified maximum is inclusive or exclusive. By default, it is inclusive.
+	 *
+	 * @return {@code true} if the value must be smaller or equal to the specified maximum,
+	 *         {@code false} if the value must be smaller
+	 *
+	 */
+	boolean inclusive() default true;
 
 	/**
 	 * Defines several {@code @DurationMax} annotations on the same element.

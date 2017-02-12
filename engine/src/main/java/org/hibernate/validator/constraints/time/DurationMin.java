@@ -19,19 +19,20 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
 
+import org.hibernate.validator.Incubating;
 import org.hibernate.validator.constraints.time.DurationMin.List;
 
 /**
  * Annotated {@link Duration} element's length must be greater than or equal to
- * the one constructed from {@link DurationMin#value()} in {@link DurationMin#units()}.
+ * the one constructed as a sum of {@link DurationMin#nanos()}, {@link DurationMin#millis()},
+ * {@link DurationMin#seconds()}, {@link DurationMin#minutes()}, {@link DurationMin#hours()},
+ * {@link DurationMin#days()}.
  *
  * @author Marko Bekhta
- * @hv.experimental
  */
 @Documented
 @Constraint(validatedBy = { })
@@ -39,6 +40,7 @@ import org.hibernate.validator.constraints.time.DurationMin.List;
 @Retention(RUNTIME)
 @Repeatable(List.class)
 @ReportAsSingleViolation
+@Incubating
 public @interface DurationMin {
 
 	String message() default "{org.hibernate.validator.constraints.time.DurationMin.message}";
@@ -47,9 +49,26 @@ public @interface DurationMin {
 
 	Class<? extends Payload>[] payload() default { };
 
-	long value() default 0;
+	long days() default 0;
 
-	ChronoUnit units() default ChronoUnit.NANOS;
+	long hours() default 0;
+
+	long minutes() default 0;
+
+	long seconds() default 0;
+
+	long millis() default 0;
+
+	long nanos() default 0;
+
+	/**
+	 * Specifies whether the specified minimum is inclusive or exclusive. By default, it is inclusive.
+	 *
+	 * @return {@code true} if the value must be higher or equal to the specified minimum,
+	 *         {@code false} if the value must be higher
+	 *
+	 */
+	boolean inclusive() default true;
 
 	/**
 	 * Defines several {@code @DurationMin} annotations on the same element.

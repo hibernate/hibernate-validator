@@ -534,6 +534,14 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: any sub-type of `javax.money.MonetaryAmount` (if the https://jcp.org/en/jsr/detail?id=354[JSR 354 API] and an implementation is on the class path)
 	Hibernate metadata impact::: None
 
+`@DurationMax(days=, hours=, minutes=, seconds=, millis=, nanos=, inclusive=)`:: Checks that annotated `java.time.Duration` element is not greater than the one constructed from annotation parameters. Equality is allowed if `inclusive` flag is set to `true`.
+	Supported data types::: `java.time.Duration`
+	Hibernate metadata impact::: None
+
+`@DurationMin(days=, hours=, minutes=, seconds=, millis=, nanos=, inclusive=)`:: Checks that annotated `java.time.Duration` element is not less than the one constructed from annotation parameters. Equality is allowed if `inclusive` flag is set to `true`.
+	Supported data types::: `java.time.Duration`
+	Hibernate metadata impact::: None
+
 `@EAN`:: Checks that the annotated character sequence is a valid link:$$http://en.wikipedia.org/wiki/International_Article_Number_%28EAN%29$$[EAN] barcode. type determines the type of barcode. The default is EAN-13.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None

@@ -62,8 +62,6 @@ import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
 import org.hibernate.validator.constraints.time.DurationMax;
 import org.hibernate.validator.constraints.time.DurationMin;
-import org.hibernate.validator.constraints.time.PeriodMax;
-import org.hibernate.validator.constraints.time.PeriodMin;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertFalseValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.AssertTrueValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMaxValidatorForCharSequence;
@@ -73,10 +71,8 @@ import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValida
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForDuration;
 import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
-import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForDuration;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
@@ -152,8 +148,6 @@ import org.hibernate.validator.internal.constraintvalidators.hv.pl.PESELValidato
 import org.hibernate.validator.internal.constraintvalidators.hv.pl.REGONValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMinValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.time.PeriodMaxValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.time.PeriodMinValidator;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -234,18 +228,16 @@ public class ConstraintHelper {
 
 		putConstraints( tmpConstraints, Future.class, futureValidators );
 
-		List<Class<? extends ConstraintValidator<Max, ?>>> maxValidators = Arrays.asList(
-				MaxValidatorForNumber.class, MaxValidatorForCharSequence.class, MaxValidatorForDuration.class
-		);
-		List<Class<? extends ConstraintValidator<Min, ?>>> minValidators = Arrays.asList(
-				MinValidatorForNumber.class, MinValidatorForCharSequence.class, MinValidatorForDuration.class
-		);
 		if ( isJavaMoneyInClasspath() ) {
-			maxValidators.add( MaxValidatorForMonetaryAmount.class );
-			minValidators.add( MinValidatorForMonetaryAmount.class );
+			putConstraints( tmpConstraints, Max.class, Arrays.asList( MaxValidatorForNumber.class,
+					MaxValidatorForCharSequence.class, MaxValidatorForMonetaryAmount.class ) );
+			putConstraints( tmpConstraints, Min.class, Arrays.asList( MinValidatorForNumber.class,
+					MinValidatorForCharSequence.class, MinValidatorForMonetaryAmount.class ) );
 		}
-		putConstraints( tmpConstraints, Max.class, maxValidators );
-		putConstraints( tmpConstraints, Min.class, minValidators );
+		else {
+			putConstraints( tmpConstraints, Max.class, MaxValidatorForNumber.class, MaxValidatorForCharSequence.class );
+			putConstraints( tmpConstraints, Min.class, MinValidatorForNumber.class, MinValidatorForCharSequence.class );
+		}
 
 		putConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
 		putConstraint( tmpConstraints, Null.class, NullValidator.class );
@@ -308,11 +300,8 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
 		putConstraint( tmpConstraints, URL.class, URLValidator.class );
 
-		putConstraint( tmpConstraints, DurationMin.class, DurationMinValidator.class );
 		putConstraint( tmpConstraints, DurationMax.class, DurationMaxValidator.class );
-		putConstraint( tmpConstraints, PeriodMin.class, PeriodMinValidator.class );
-		putConstraint( tmpConstraints, PeriodMax.class, PeriodMaxValidator.class );
-
+		putConstraint( tmpConstraints, DurationMin.class, DurationMinValidator.class );
 
 		this.builtinConstraints = Collections.unmodifiableMap( tmpConstraints );
 	}
