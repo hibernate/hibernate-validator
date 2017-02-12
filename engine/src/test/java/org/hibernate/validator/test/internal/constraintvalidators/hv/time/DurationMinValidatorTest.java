@@ -6,12 +6,21 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv.time;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.time.Duration;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
+import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.cfg.ConstraintMapping;
+import org.hibernate.validator.cfg.defs.DurationMinDef;
 import org.hibernate.validator.constraints.time.DurationMin;
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMinValidator;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
@@ -27,14 +36,14 @@ import org.testng.annotations.Test;
 public class DurationMinValidatorTest {
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1232" )
+	@TestForIssue(jiraKey = "HV-1232")
 	public void testIsValid() {
 		doTesting( true );
 		doTesting( false );
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HV-1232" )
+	@TestForIssue(jiraKey = "HV-1232")
 	public void testWithValidator() {
 		Validator validator = getValidator();
 
@@ -42,6 +51,31 @@ public class DurationMinValidatorTest {
 		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 9 ) ) ), 1 );
 		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 11 ) ) ), 0 );
 		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 11 ) ) ), 0 );
+
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1232")
+	public void testProgrammaticConstraint() {
+		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( AnotherTask.class )
+				.property( "timeToComplete", FIELD )
+				.constraint( new DurationMinDef()
+						.days( 1 ).hours( 1 )
+						.minutes( 1 ).seconds( 1 )
+						.millis( 1 ).nanos( 1 ).inclusive( false )
+				);
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		AnotherTask task = new AnotherTask( Duration.ofDays( 1 ) );
+		Set<ConstraintViolation<AnotherTask>> constraintViolations = validator.validate( task );
+		assertCorrectConstraintTypes( constraintViolations, DurationMin.class );
+
+		task = new AnotherTask( Duration.ofDays( 2 ) );
+		constraintViolations = validator.validate( task );
+		assertNumberOfViolations( constraintViolations, 0 );
 
 	}
 
@@ -72,4 +106,12 @@ public class DurationMinValidatorTest {
 		}
 	}
 
+	private static class AnotherTask {
+
+		private Duration timeToComplete;
+
+		public AnotherTask(Duration timeToComplete) {
+			this.timeToComplete = timeToComplete;
+		}
+	}
 }
