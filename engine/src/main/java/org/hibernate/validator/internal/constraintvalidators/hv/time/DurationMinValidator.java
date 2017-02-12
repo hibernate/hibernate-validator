@@ -20,11 +20,18 @@ import org.hibernate.validator.constraints.time.DurationMin;
  */
 public class DurationMinValidator implements ConstraintValidator<DurationMin, Duration> {
 
-	private Duration duration;
+	private Duration minDuration;
+	private boolean inclusive;
 
 	@Override
 	public void initialize(DurationMin constraintAnnotation) {
-		this.duration = Duration.of( constraintAnnotation.value(), constraintAnnotation.units() );
+		this.minDuration = Duration.ofNanos( constraintAnnotation.nanos() )
+				.plusMillis( constraintAnnotation.millis() )
+				.plusSeconds( constraintAnnotation.seconds() )
+				.plusMinutes( constraintAnnotation.minutes() )
+				.plusHours( constraintAnnotation.hours() )
+				.plusDays( constraintAnnotation.days() );
+		this.inclusive = constraintAnnotation.inclusive();
 	}
 
 	@Override
@@ -33,6 +40,7 @@ public class DurationMinValidator implements ConstraintValidator<DurationMin, Du
 		if ( value == null ) {
 			return true;
 		}
-		return duration.compareTo( value ) < 1;
+		int comparisonResult = minDuration.compareTo( value );
+		return inclusive ? comparisonResult <= 0 : comparisonResult < 0;
 	}
 }

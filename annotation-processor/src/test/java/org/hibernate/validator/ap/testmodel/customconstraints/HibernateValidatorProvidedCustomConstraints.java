@@ -6,6 +6,7 @@
  */
 package org.hibernate.validator.ap.testmodel.customconstraints;
 
+import java.time.Duration;
 import java.util.Date;
 
 import org.hibernate.validator.constraints.CreditCardNumber;
@@ -27,6 +28,8 @@ import org.hibernate.validator.constraints.br.TituloEleitoral;
 import org.hibernate.validator.constraints.pl.NIP;
 import org.hibernate.validator.constraints.pl.PESEL;
 import org.hibernate.validator.constraints.pl.REGON;
+import org.hibernate.validator.constraints.time.DurationMax;
+import org.hibernate.validator.constraints.time.DurationMin;
 
 @ScriptAssert(script = "some script", lang = "javascript")
 @SuppressWarnings("deprecation")
@@ -55,6 +58,10 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@PESEL
 	public String string;
 
+	@DurationMax
+	@DurationMin
+	public Duration duration;
+
 	/**
 	 * Not allowed.
 	 */
@@ -76,5 +83,7 @@ public class HibernateValidatorProvidedCustomConstraints {
 	@REGON
 	@NIP
 	@PESEL
+	@DurationMax
+	@DurationMin
 	public Date date;
 }

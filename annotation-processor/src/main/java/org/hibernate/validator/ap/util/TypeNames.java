@@ -72,10 +72,6 @@ public class TypeNames {
 		public static final String URL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".URL";
 		public static final String DURATION_MIN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.DurationMin";
 		public static final String DURATION_MAX = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.DurationMax";
-		public static final String DURATION_RANGE = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.DurationRange";
-		public static final String PERIOD_MIN = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.PeriodMin";
-		public static final String PERIOD_MAX = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.PeriodMax";
-		public static final String PERIOD_RANGE = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".time.PeriodRange";
 	}
 
 	public static class JodaTypes {
