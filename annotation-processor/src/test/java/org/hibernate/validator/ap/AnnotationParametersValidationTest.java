@@ -20,6 +20,7 @@ import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidLengthPa
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidPatternParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidScriptAssertParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.InvalidSizeParameters;
+import org.hibernate.validator.ap.testmodel.annotationparameters.CurrencyParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidDecimalMinMaxParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidDigitsParameters;
 import org.hibernate.validator.ap.testmodel.annotationparameters.ValidGroupsParameters;
@@ -292,6 +293,19 @@ public class AnnotationParametersValidationTest extends ConstraintValidationProc
 				new DiagnosticExpectation( Kind.WARNING, 110 ),
 				new DiagnosticExpectation( Kind.WARNING, 122 )
 
+		);
+	}
+
+	@Test
+	public void testValidCurrencyParameter() {
+		File sourceFile = compilerHelper.getSourceFile( CurrencyParameters.class );
+
+		boolean compilationResult = compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertTrue( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.WARNING, 21 )
 		);
 	}
 
