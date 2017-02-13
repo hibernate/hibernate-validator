@@ -14,6 +14,7 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.time.Duration;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
@@ -26,7 +27,6 @@ import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMax
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -50,7 +50,6 @@ public class DurationMaxValidatorTest {
 		assertNumberOfViolations( validator.validate( new Task( null ) ), 0 );
 		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 1 ) ) ), 0 );
 		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 11 ) ) ), 1 );
-
 	}
 
 	@Test
@@ -75,7 +74,6 @@ public class DurationMaxValidatorTest {
 		task = new AnotherTask( Duration.ofDays( 1 ) );
 		constraintViolations = validator.validate( task );
 		assertNumberOfViolations( constraintViolations, 0 );
-
 	}
 
 	private void doTesting(boolean inclusive) {

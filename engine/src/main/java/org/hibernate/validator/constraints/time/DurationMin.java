@@ -19,6 +19,7 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.time.Duration;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
@@ -27,10 +28,9 @@ import org.hibernate.validator.Incubating;
 import org.hibernate.validator.constraints.time.DurationMin.List;
 
 /**
- * Annotated {@link Duration} element's length must be greater than or equal to
- * the one constructed as a sum of {@link DurationMin#nanos()}, {@link DurationMin#millis()},
- * {@link DurationMin#seconds()}, {@link DurationMin#minutes()}, {@link DurationMin#hours()},
- * {@link DurationMin#days()}.
+ * The annotated {@link Duration} element must be longer than or equal to the one constructed as a sum of
+ * {@link DurationMin#nanos()}, {@link DurationMin#millis()}, {@link DurationMin#seconds()},
+ * {@link DurationMin#minutes()}, {@link DurationMin#hours()}, {@link DurationMin#days()}.
  *
  * @author Marko Bekhta
  */

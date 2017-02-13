@@ -7,13 +7,14 @@
 package org.hibernate.validator.internal.constraintvalidators.hv.time;
 
 import java.time.Duration;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.time.DurationMin;
 
 /**
- * Checks that a validated {@link Duration} length is greater than or equals to the
+ * Checks that a validated {@link Duration} length is longer than or equal to the
  * one specified with the annotation.
  *
  * @author Marko Bekhta

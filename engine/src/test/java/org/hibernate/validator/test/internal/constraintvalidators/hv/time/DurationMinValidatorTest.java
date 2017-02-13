@@ -14,6 +14,7 @@ import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.time.Duration;
 import java.util.Set;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
@@ -26,7 +27,6 @@ import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMin
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -51,7 +51,6 @@ public class DurationMinValidatorTest {
 		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 9 ) ) ), 1 );
 		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 11 ) ) ), 0 );
 		assertNumberOfViolations( validator.validate( new Task( Duration.ofSeconds( 11 ) ) ), 0 );
-
 	}
 
 	@Test
@@ -76,7 +75,6 @@ public class DurationMinValidatorTest {
 		task = new AnotherTask( Duration.ofDays( 2 ) );
 		constraintViolations = validator.validate( task );
 		assertNumberOfViolations( constraintViolations, 0 );
-
 	}
 
 	private void doTesting(boolean inclusive) {
@@ -93,7 +91,6 @@ public class DurationMinValidatorTest {
 		Assert.assertEquals( validator.isValid( Duration.ofNanos( 100L ), null ), inclusive );
 		Assert.assertTrue( validator.isValid( Duration.ofSeconds( 100L ), null ) );
 		Assert.assertFalse( validator.isValid( Duration.ofNanos( 10L ), null ) );
-
 	}
 
 	private static class Task {

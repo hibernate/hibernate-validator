@@ -19,6 +19,7 @@ import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.time.Duration;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import javax.validation.ReportAsSingleViolation;
@@ -27,10 +28,9 @@ import org.hibernate.validator.Incubating;
 import org.hibernate.validator.constraints.time.DurationMax.List;
 
 /**
- * Annotated {@link Duration} element's length must be less than or equal to
- * the one constructed as a sum of {@link DurationMax#nanos()}, {@link DurationMax#millis()},
- * {@link DurationMax#seconds()}, {@link DurationMax#minutes()}, {@link DurationMax#hours()},
- * {@link DurationMax#days()}.
+ * The annotated {@link Duration} element must be shorter than or equal to the one constructed as a sum of
+ * {@link DurationMax#nanos()}, {@link DurationMax#millis()}, {@link DurationMax#seconds()},
+ * {@link DurationMax#minutes()}, {@link DurationMax#hours()}, {@link DurationMax#days()}.
  *
  * @author Marko Bekhta
  */
@@ -39,7 +39,8 @@ import org.hibernate.validator.constraints.time.DurationMax.List;
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE })
 @Retention(RUNTIME)
 @Repeatable(List.class)
-@ReportAsSingleViolation @Incubating
+@ReportAsSingleViolation
+@Incubating
 public @interface DurationMax {
 
 	String message() default "{org.hibernate.validator.constraints.time.DurationMax.message}";
