@@ -702,4 +702,5 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 205, value = "Invalid unwrapping configuration for constraint %2$s on %1$s. You can only define one of 'Unwrapping.Skip' or 'Unwrapping.Unwrap'.")
 	ConstraintDefinitionException getInvalidUnwrappingConfigurationForConstraintException(Member member, @FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint);
+
 }
