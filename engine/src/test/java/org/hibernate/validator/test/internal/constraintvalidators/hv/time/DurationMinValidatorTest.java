@@ -8,11 +8,13 @@ package org.hibernate.validator.test.internal.constraintvalidators.hv.time;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -28,12 +30,26 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescrip
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
  * @author Marko Bekhta
  */
 public class DurationMinValidatorTest {
+
+	private static Locale PREVIOUS_LOCALE;
+
+	@BeforeClass
+	public static void saveLocale() {
+		PREVIOUS_LOCALE = Locale.getDefault();
+	}
+
+	@AfterClass
+	public static void restoreLocale() {
+		Locale.setDefault( PREVIOUS_LOCALE );
+	}
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1232")
@@ -77,6 +93,27 @@ public class DurationMinValidatorTest {
 		assertNumberOfViolations( constraintViolations, 0 );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1232")
+	public void testMessage() {
+		final HibernateValidatorConfiguration config = getConfiguration( HibernateValidator.class, Locale.ENGLISH );
+		ConstraintMapping mapping = config.createConstraintMapping();
+		mapping.type( AnotherTask.class )
+				.property( "timeToComplete", FIELD )
+				.constraint( new DurationMinDef()
+						.days( 30 )
+						.hours( 12 )
+						.minutes( 50 )
+						.inclusive( false )
+				);
+		config.addMapping( mapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		AnotherTask task = new AnotherTask( Duration.ofDays( 2 ) );
+		Set<ConstraintViolation<AnotherTask>> constraintViolations = validator.validate( task );
+		assertCorrectConstraintViolationMessages( constraintViolations, "must be longer than 30 days 12 hours 50 minutes" );
+	}
+
 	private void doTesting(boolean inclusive) {
 		AnnotationDescriptor<DurationMin> descriptor = new AnnotationDescriptor<>( DurationMin.class );
 		descriptor.setValue( "nanos", 100L );
@@ -96,7 +133,7 @@ public class DurationMinValidatorTest {
 	private static class Task {
 
 		@DurationMin(seconds = 10)
-		private Duration timeToComplete;
+		private final Duration timeToComplete;
 
 		public Task(Duration timeToComplete) {
 			this.timeToComplete = timeToComplete;
@@ -105,7 +142,7 @@ public class DurationMinValidatorTest {
 
 	private static class AnotherTask {
 
-		private Duration timeToComplete;
+		private final Duration timeToComplete;
 
 		public AnotherTask(Duration timeToComplete) {
 			this.timeToComplete = timeToComplete;
