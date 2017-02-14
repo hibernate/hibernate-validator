@@ -132,14 +132,19 @@ public class NestedCascadedConstraintsTest {
 
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"array[0].<iterable element>.visitor.name"
+				"array[0].<iterable element>[0].<iterable element>",
+				"array[0].<iterable element>[1].visitor.name"
 		);
-		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
+		assertCorrectConstraintTypes( constraintViolations, NotNull.class, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "array" )
 						.typeArgument( "<iterable element>", true, null, 0 )
-						.property( "visitor" )
+						.typeArgument( "<iterable element>", true, null, 0 ),
+				pathWith()
+						.property( "array" )
+						.typeArgument( "<iterable element>", true, null, 0 )
+						.property( "visitor", true, null, 1 )
 						.property( "name" )
 		);
 	}
@@ -212,12 +217,12 @@ public class NestedCascadedConstraintsTest {
 	@SuppressWarnings({ "unused", "unchecked" })
 	private static class CinemaArray {
 
-		private Optional<@NotNull @Valid Cinema>[] array;
+		private List<@NotNull @Valid Cinema>[] array;
 
 		private static CinemaArray validCinemaArray() {
 			CinemaArray cinemaArray = new CinemaArray();
 
-			cinemaArray.array = new Optional[] { Optional.of( new Cinema( "cinema1", new SomeReference<>( new Visitor( "Name 1" ) ) ) ) };
+			cinemaArray.array = new List[] { Arrays.asList( new Cinema( "cinema1", new SomeReference<>( new Visitor( "Name 1" ) ) ) ) };
 
 			return cinemaArray;
 		}
@@ -225,7 +230,7 @@ public class NestedCascadedConstraintsTest {
 		private static CinemaArray invalidCinemaArray() {
 			CinemaArray cinemaArray = new CinemaArray();
 
-			cinemaArray.array = new Optional[] { Optional.of( new Cinema( "cinema2", new SomeReference<>( new Visitor() ) ) ) };
+			cinemaArray.array = new List[] { Arrays.asList( null, new Cinema( "cinema2", new SomeReference<>( new Visitor() ) ) ) };
 
 			return cinemaArray;
 		}

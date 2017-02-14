@@ -12,9 +12,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
-import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.ParameterConstraintLocation;
-import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
 
 /**
  * Represents the constraint related meta data of the arguments of a method or
@@ -31,8 +28,8 @@ public class ValidatableParametersMetaData implements Validatable {
 	public ValidatableParametersMetaData(List<ParameterMetaData> parameterMetaData) {
 		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
 		this.cascadables = Collections.unmodifiableList( parameterMetaData.stream()
-			.filter( p -> p.isCascading() )
-			.collect( Collectors.toList() ) );
+				.filter( p -> p.isCascading() )
+				.collect( Collectors.toList() ) );
 	}
 
 	@Override
@@ -40,15 +37,4 @@ public class ValidatableParametersMetaData implements Validatable {
 		return cascadables;
 	}
 
-	@SuppressWarnings("unused")
-	private ParameterConstraintLocation getParameterConstraintLocation(ConstraintLocation location) {
-		if ( location instanceof ParameterConstraintLocation ) {
-			return (ParameterConstraintLocation) location;
-		}
-		else if ( location instanceof TypeArgumentConstraintLocation ) {
-			return (ParameterConstraintLocation) ( (TypeArgumentConstraintLocation) location ).getOuterDelegate();
-		}
-
-		return null;
-	}
 }
