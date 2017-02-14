@@ -17,6 +17,7 @@ import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.executable.ExecutableValidator;
 
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.CustomerRepositoryImpl.ValidB2BRepository;
@@ -99,7 +100,7 @@ public abstract class AbstractConstructorValidationTest {
 				ElementKind.CONSTRUCTOR,
 				ElementKind.RETURN_VALUE
 		);
-		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", "<return value>" );
+		assertNodeNames( constraintViolation.getPropertyPath(), "CustomerRepositoryImpl", NodeImpl.RETURN_VALUE_NODE_NAME );
 	}
 
 	@Test
@@ -119,7 +120,7 @@ public abstract class AbstractConstructorValidationTest {
 
 		Path path = constraintViolation.getPropertyPath();
 		assertNodeKinds( path, ElementKind.CONSTRUCTOR, ElementKind.RETURN_VALUE, ElementKind.PROPERTY );
-		assertNodeNames( path, "CustomerRepositoryImpl", "<return value>", "customer" );
+		assertNodeNames( path, "CustomerRepositoryImpl", NodeImpl.RETURN_VALUE_NODE_NAME, "customer" );
 	}
 
 	@Test(expectedExceptions = IllegalArgumentException.class)

@@ -9,6 +9,8 @@ package org.hibernate.validator.internal.engine.cascading;
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.path.NodeImpl;
+
 class LegacyIterableValueExtractor implements ValueExtractor<@ExtractedValue Iterable<?>> {
 
 	static final LegacyIterableValueExtractor INSTANCE = new LegacyIterableValueExtractor();
@@ -21,7 +23,7 @@ class LegacyIterableValueExtractor implements ValueExtractor<@ExtractedValue Ite
 		receiver.value( null, originalValue );
 
 		for ( Object object : originalValue ) {
-			receiver.iterableValue( "<iterable element>", object );
+			receiver.iterableValue( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, object );
 		}
 	}
 }
