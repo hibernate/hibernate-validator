@@ -14,7 +14,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,6 +29,7 @@ import javax.validation.metadata.ParameterDescriptor;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.aggregated.rule.MethodConfigurationRule;
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptorImpl;
@@ -83,7 +83,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 			List<ParameterMetaData> parameterMetaData,
 			Set<MetaConstraint<?>> crossParameterConstraints,
 			Map<Class<?>, Class<?>> returnValueGroupConversions,
-			List<TypeVariable<?>> cascadingTypeParameters,
+			List<CascadingTypeParameter> cascadingTypeParameters,
 			boolean isConstrained,
 			boolean isGetter) {
 		super(
@@ -248,7 +248,7 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		private Executable executable;
 		private final boolean isGetterMethod;
 		private final Set<MetaConstraint<?>> crossParameterConstraints = newHashSet();
-		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
+		private final List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
 		private final Set<MethodConfigurationRule> rules;
 		private boolean isConstrained = false;
 

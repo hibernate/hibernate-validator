@@ -92,7 +92,7 @@ public class NodeImpl
 				false,
 				null,
 				null,
-				ElementKind.PROPERTY,
+				ElementKind.PROPERTY, // TODO HV-1245 this should be TYPE_USE once it's included in BV
 				EMPTY_CLASS_ARRAY,
 				null,
 				null
@@ -312,11 +312,7 @@ public class NodeImpl
 	private String buildToString() {
 		StringBuilder builder = new StringBuilder();
 
-		if ( ElementKind.BEAN.equals( getKind() ) ) {
-			// class level constraints don't contribute to path
-			builder.append( "" );
-		}
-		else {
+		if ( getName() != null ) {
 			builder.append( getName() );
 		}
 

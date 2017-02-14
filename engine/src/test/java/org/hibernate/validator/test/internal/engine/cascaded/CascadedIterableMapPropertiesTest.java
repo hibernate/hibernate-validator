@@ -69,13 +69,13 @@ public class CascadedIterableMapPropertiesTest {
 		);
 	}
 
-	class IterableExtHolder {
+	private class IterableExtHolder {
 
 		@Valid
 		IterableExt iterableExt = new IterableExt();
 	}
 
-	class IterableExt implements Iterable<IntWrapper> {
+	private class IterableExt implements Iterable<IntWrapper> {
 
 		@NotNull
 		Integer value = null;
@@ -86,14 +86,14 @@ public class CascadedIterableMapPropertiesTest {
 		}
 	}
 
-	class ListExtHolder {
+	private class ListExtHolder {
 
 		@Valid
 		ListExt listExt = new ListExt();
 	}
 
 	@SuppressWarnings("serial")
-	class ListExt extends ArrayList<IntWrapper> {
+	private class ListExt extends ArrayList<IntWrapper> {
 
 		@NotNull
 		Integer value = null;
@@ -103,14 +103,14 @@ public class CascadedIterableMapPropertiesTest {
 		}
 	}
 
-	class MapExtHolder {
+	private class MapExtHolder {
 
 		@Valid
 		MapExt mapExt = new MapExt();
 	}
 
 	@SuppressWarnings("serial")
-	class MapExt extends HashMap<String, IntWrapper> {
+	private class MapExt extends HashMap<String, IntWrapper> {
 
 		@NotNull
 		Integer value = null;
@@ -122,7 +122,7 @@ public class CascadedIterableMapPropertiesTest {
 		}
 	}
 
-	class IntWrapper {
+	private class IntWrapper {
 
 		@Min(value = 2)
 		Integer number;

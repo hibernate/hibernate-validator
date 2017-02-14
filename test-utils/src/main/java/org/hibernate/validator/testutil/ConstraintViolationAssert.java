@@ -462,6 +462,12 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
+		public PathExpectation typeArgument(String name, boolean inIterable, Object key, Integer index) {
+			// TODO HV-1245 this should be TYPE_USE once it's included in BV
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null ) );
+			return this;
+		}
+
 		@Override
 		public String toString() {
 			String lineBreak = System.getProperty( "line.separator" );

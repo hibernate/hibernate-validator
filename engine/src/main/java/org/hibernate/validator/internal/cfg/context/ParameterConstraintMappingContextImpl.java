@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,9 +16,8 @@ import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContex
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
-import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
-import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -119,9 +117,10 @@ final class ParameterConstraintMappingContextImpl
 		);
 	}
 
-	private List<TypeVariable<?>> getCascadedTypeParameters(Type parameterType, boolean isCascaded) {
+	private List<CascadingTypeParameter> getCascadedTypeParameters(Type parameterType, boolean isCascaded) {
 		if ( isCascaded ) {
-			return Collections.singletonList( ReflectionHelper.getClassFromType( parameterType ).isArray() ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+			return Collections.singletonList( ReflectionHelper.getClassFromType( parameterType ).isArray() ?
+					CascadingTypeParameter.arrayElement( parameterType ) : CascadingTypeParameter.annotatedObject( parameterType ) );
 		}
 		else {
 			return Collections.emptyList();

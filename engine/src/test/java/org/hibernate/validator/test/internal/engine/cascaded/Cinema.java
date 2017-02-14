@@ -12,7 +12,25 @@ import javax.validation.Valid;
  * @author Gunnar Morling
  *
  */
-public class Cinema {
+class Cinema {
 
-	public Reference<@Valid Visitor> visitor;
+	String name;
+
+	Reference<@Valid Visitor> visitor;
+
+	Cinema() {
+	}
+
+	Cinema(String name, Reference<Visitor> visitor) {
+		this.name = name;
+		this.visitor = visitor;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() )
+				.append( "<" ).append( name ).append( ">" );
+		return sb.toString();
+	}
 }

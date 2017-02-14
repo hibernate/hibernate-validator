@@ -12,14 +12,12 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
-import org.hibernate.validator.internal.engine.cascading.ArrayElement;
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -104,9 +102,11 @@ class ConstrainedParameterBuilder {
 		return constrainedParameters;
 	}
 
-	private List<TypeVariable<?>> getCascadedTypeParameters(Type parameterType, boolean isCascaded) {
+	private List<CascadingTypeParameter> getCascadedTypeParameters(Type parameterType, boolean isCascaded) {
 		if ( isCascaded ) {
-			return Collections.singletonList( ReflectionHelper.getClassFromType( parameterType ).isArray() ? ArrayElement.INSTANCE : AnnotatedObject.INSTANCE );
+			return Collections.singletonList( ReflectionHelper.getClassFromType( parameterType ).isArray()
+					? CascadingTypeParameter.arrayElement( parameterType )
+					: CascadingTypeParameter.annotatedObject( parameterType ) );
 		}
 		else {
 			return Collections.emptyList();

@@ -7,11 +7,11 @@
 package org.hibernate.validator.internal.metadata.raw;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.TypeVariable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.StringHelper;
 
@@ -41,7 +41,7 @@ public class ConstrainedField extends AbstractConstrainedElement {
 							Set<MetaConstraint<?>> constraints,
 							Set<MetaConstraint<?>> typeArgumentConstraints,
 							Map<Class<?>, Class<?>> groupConversions,
-							List<TypeVariable<?>> cascadingTypeParameters) {
+							List<CascadingTypeParameter> cascadingTypeParameters) {
 
 		super( source, ConstrainedElementKind.FIELD, constraints, typeArgumentConstraints, groupConversions, cascadingTypeParameters );
 

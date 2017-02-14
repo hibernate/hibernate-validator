@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +20,7 @@ import javax.validation.metadata.ParameterDescriptor;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ParameterDescriptorImpl;
@@ -41,13 +41,13 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 	private final GroupConversionHelper groupConversionHelper;
 	private final int index;
-	private final List<TypeVariable<?>> cascadingTypeParameters;
+	private final List<CascadingTypeParameter> cascadingTypeParameters;
 
 	private ParameterMetaData(int index,
 							  String name,
 							  Type type,
 							  Set<MetaConstraint<?>> constraints,
-							  List<TypeVariable<?>> cascadingTypeParameters,
+							  List<CascadingTypeParameter> cascadingTypeParameters,
 							  Map<Class<?>, Class<?>> groupConversions) {
 		super(
 				name,
@@ -114,7 +114,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 	}
 
 	@Override
-	public List<TypeVariable<?>> getCascadingTypeParameters() {
+	public List<CascadingTypeParameter> getCascadingTypeParameters() {
 		return cascadingTypeParameters;
 	}
 
@@ -122,7 +122,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 		private final Type parameterType;
 		private final int parameterIndex;
 		private ConstrainedParameter constrainedParameter;
-		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
+		private final List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
 
 		public Builder(Class<?> beanClass,
 				ConstrainedParameter constrainedParameter,
