@@ -15,4 +15,11 @@ public class Visitor {
 
 	@NotNull
 	String name;
+
+	Visitor() {
+	}
+
+	Visitor(String name) {
+		this.name = name;
+	}
 }

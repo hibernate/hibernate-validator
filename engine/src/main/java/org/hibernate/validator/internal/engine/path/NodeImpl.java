@@ -39,8 +39,12 @@ public class NodeImpl
 
 	private static final String INDEX_OPEN = "[";
 	private static final String INDEX_CLOSE = "]";
-	private static final String RETURN_VALUE_NODE_NAME = "<return value>";
-	private static final String CROSS_PARAMETER_NODE_NAME = "<cross-parameter>";
+
+	public static final String RETURN_VALUE_NODE_NAME = "<return value>";
+	public static final String CROSS_PARAMETER_NODE_NAME = "<cross-parameter>";
+	public static final String ITERABLE_ELEMENT_NODE_NAME = "<iterable element>";
+	public static final String MAP_KEY_NODE_NAME = "<map key>";
+	public static final String MAP_VALUE_NODE_NAME = "<map value>";
 
 	private final String name;
 	private final NodeImpl parent;
@@ -92,7 +96,7 @@ public class NodeImpl
 				false,
 				null,
 				null,
-				ElementKind.PROPERTY,
+				ElementKind.PROPERTY, // TODO HV-1245 this should be TYPE_USE once it's included in BV
 				EMPTY_CLASS_ARRAY,
 				null,
 				null
@@ -312,11 +316,7 @@ public class NodeImpl
 	private String buildToString() {
 		StringBuilder builder = new StringBuilder();
 
-		if ( ElementKind.BEAN.equals( getKind() ) ) {
-			// class level constraints don't contribute to path
-			builder.append( "" );
-		}
-		else {
+		if ( getName() != null ) {
 			builder.append( getName() );
 		}
 

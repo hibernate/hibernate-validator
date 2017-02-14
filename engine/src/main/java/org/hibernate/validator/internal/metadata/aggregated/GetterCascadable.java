@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -23,6 +22,7 @@ import java.util.Set;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -41,10 +41,10 @@ public class GetterCascadable implements Cascadable {
 	private final Method method;
 	private final String propertyName;
 	private final Type cascadableType;
-	private final List<TypeVariable<?>> cascadingTypeParameters;
+	private final List<CascadingTypeParameter> cascadingTypeParameters;
 	private final GroupConversionHelper groupConversionHelper;
 
-	GetterCascadable(Method method, List<TypeVariable<?>> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions) {
+	GetterCascadable(Method method, List<CascadingTypeParameter> cascadingTypeParameters, Map<Class<?>, Class<?>> groupConversions) {
 		this.method = method;
 		this.propertyName = ReflectionHelper.getPropertyName( method );
 		this.cascadableType = ReflectionHelper.typeOf( method );
@@ -84,7 +84,7 @@ public class GetterCascadable implements Cascadable {
 	}
 
 	@Override
-	public List<TypeVariable<?>> getCascadingTypeParameters() {
+	public List<CascadingTypeParameter> getCascadingTypeParameters() {
 		return cascadingTypeParameters;
 	}
 
@@ -93,7 +93,7 @@ public class GetterCascadable implements Cascadable {
 		private static final Log LOG = LoggerFactory.make();
 
 		private final Method method;
-		private final List<TypeVariable<?>> cascadingTypeParameters = new ArrayList<>();
+		private final List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
 		private final Map<Class<?>, Class<?>> groupConversions = new HashMap<>();
 
 		public Builder(Method method) {
@@ -101,7 +101,7 @@ public class GetterCascadable implements Cascadable {
 		}
 
 		@Override
-		public void addCascadingTypeParameters(List<TypeVariable<?>> cascadingTypeParameters) {
+		public void addCascadingTypeParameters(List<CascadingTypeParameter> cascadingTypeParameters) {
 			this.cascadingTypeParameters.addAll( cascadingTypeParameters );
 		}
 

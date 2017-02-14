@@ -11,7 +11,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 
 /**
@@ -48,7 +48,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				Collections.<Class<?>, Class<?>>emptyMap(),
-				Collections.<TypeVariable<?>>emptyList()
+				Collections.<CascadingTypeParameter>emptyList()
 		);
 	}
 
@@ -74,7 +74,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 								Set<MetaConstraint<?>> constraints,
 								Set<MetaConstraint<?>> typeArgumentConstraints,
 								Map<Class<?>, Class<?>> groupConversions,
-								List<TypeVariable<?>> cascadingTypeParameters) {
+								List<CascadingTypeParameter> cascadingTypeParameters) {
 		super(
 				source,
 				ConstrainedElementKind.PARAMETER,
@@ -134,7 +134,7 @@ public class ConstrainedParameter extends AbstractConstrainedElement {
 		Map<Class<?>, Class<?>> mergedGroupConversions = newHashMap( groupConversions );
 		mergedGroupConversions.putAll( other.groupConversions );
 
-		List<TypeVariable<?>> mergedCascadingTypeParameters = new ArrayList<>( cascadingTypeParameters );
+		List<CascadingTypeParameter> mergedCascadingTypeParameters = new ArrayList<>( cascadingTypeParameters );
 		mergedCascadingTypeParameters.addAll( other.cascadingTypeParameters );
 
 		return new ConstrainedParameter(

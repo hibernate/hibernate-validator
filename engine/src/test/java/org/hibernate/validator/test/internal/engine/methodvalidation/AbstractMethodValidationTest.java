@@ -33,6 +33,7 @@ import javax.validation.Path.ParameterNode;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Address;
 import org.hibernate.validator.test.internal.engine.methodvalidation.model.Customer;
 import org.hibernate.validator.test.internal.engine.methodvalidation.service.ConsistentDateParameters;
@@ -609,7 +610,7 @@ public abstract class AbstractMethodValidationTest {
 			assertNodeNames(
 					constraintViolation.getPropertyPath(),
 					"methodWithCrossParameterConstraint",
-					"<cross-parameter>"
+					NodeImpl.CROSS_PARAMETER_NODE_NAME
 			);
 			assertNodeKinds( constraintViolation.getPropertyPath(), ElementKind.METHOD, ElementKind.CROSS_PARAMETER );
 		}

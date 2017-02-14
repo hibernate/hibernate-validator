@@ -9,6 +9,8 @@ package org.hibernate.validator.internal.engine.cascading;
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.path.NodeImpl;
+
 class ShortArrayValueExtractor implements ValueExtractor<short @ExtractedValue[]> {
 
 	static final ShortArrayValueExtractor INSTANCE = new ShortArrayValueExtractor();
@@ -19,7 +21,7 @@ class ShortArrayValueExtractor implements ValueExtractor<short @ExtractedValue[]
 	@Override
 	public void extractValues(short[] originalValue, ValueReceiver receiver) {
 		for ( int i = 0; i < originalValue.length; i++ ) {
-			receiver.indexedValue( "<iterable element>", i, originalValue[i] );
+			receiver.indexedValue( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, i, originalValue[i] );
 		}
 	}
 }

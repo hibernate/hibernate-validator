@@ -22,6 +22,6 @@ class EmailAddress {
 
 	@Override
 	public String toString() {
-		return "EmailAddress [email=" + email + "]";
+		return "EmailAddress<email=" + email + ">";
 	}
 }

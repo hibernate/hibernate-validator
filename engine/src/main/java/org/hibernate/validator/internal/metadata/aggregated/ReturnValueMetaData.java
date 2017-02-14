@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.metadata.aggregated;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +19,7 @@ import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -39,11 +39,11 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	private final List<Cascadable> cascadables;
 	private final GroupConversionHelper groupConversionHelper;
 
-	private final List<TypeVariable<?>> cascadingTypeParameters;
+	private final List<CascadingTypeParameter> cascadingTypeParameters;
 
 	public ReturnValueMetaData(Type type,
 							   Set<MetaConstraint<?>> constraints,
-							   List<TypeVariable<?>> cascadingTypeParameters,
+							   List<CascadingTypeParameter> cascadingTypeParameters,
 							   Map<Class<?>, Class<?>> groupConversions) {
 		super(
 				RETURN_VALUE_NODE_NAME,
@@ -108,7 +108,7 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 	}
 
 	@Override
-	public List<TypeVariable<?>> getCascadingTypeParameters() {
+	public List<CascadingTypeParameter> getCascadingTypeParameters() {
 		return cascadingTypeParameters;
 	}
 }

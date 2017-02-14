@@ -11,6 +11,8 @@ import java.util.List;
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.path.NodeImpl;
+
 class LegacyListValueExtractor implements ValueExtractor<@ExtractedValue List<?>> {
 
 	static final LegacyListValueExtractor INSTANCE = new LegacyListValueExtractor();
@@ -23,7 +25,7 @@ class LegacyListValueExtractor implements ValueExtractor<@ExtractedValue List<?>
 		receiver.value( null, originalValue );
 
 		for ( int i = 0; i < originalValue.size(); i++ ) {
-			receiver.indexedValue( "<iterable element>", i, originalValue.get( i ) );
+			receiver.indexedValue( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, i, originalValue.get( i ) );
 		}
 	}
 }
