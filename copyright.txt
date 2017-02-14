@@ -6,11 +6,12 @@ Andrey Rodionov
 Benson Margulies
 Brent Douglas
 Carlos Vara
-Dag Hovland
-Davide Marchignoli
 Carlo de Wolf
 Chris Beckey
 Christian Ivan
+Dag Hovland
+Davide D'Alto
+Davide Marchignoli
 Denis Tiago
 Doug Lea
 Emmanuel Bernard
@@ -26,6 +27,7 @@ Hardy Ferentschik
 Henno Vermeulen
 Jan-Willem Willebrands
 Jason T. Greene
+Jiri Bilek
 Julien Furgerot
 Julien May
 Juraci Krohling
@@ -40,6 +42,9 @@ Lukas Niemeier
 Mark Hobson
 Marko Bekhta
 Mert Çalişkan
+Michal Fotyga
+Nicola Ferraro
+Nicolas François
 Paolo Perrotta
 Pete Muir
 Sanne Grinovero
@@ -48,6 +53,9 @@ Shane Bryzak
 Shelly McGowan
 Steve Ebersole
 Strong Liu
+Tomaz Cerar
+Tommy Johansen
 Victor Rezende dos Santos
 Willi Schönborn
+Xavier Sosnovsky
 Yoann Rodière
