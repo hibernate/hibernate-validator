@@ -37,6 +37,7 @@ import javax.validation.constraints.Size;
 
 import org.apache.log4j.Logger;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.testutil.MessageLoggedAssertionLogger;
 import org.hibernate.validator.testutil.TestForIssue;
@@ -175,7 +176,7 @@ public class TypeAnnotationConstraintTest {
 
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
-		assertThat( secondNode.getName() ).isEqualTo( "<iterable element>" );
+		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
 		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
 	}
 
@@ -486,7 +487,7 @@ public class TypeAnnotationConstraintTest {
 
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getKey() ).isEqualTo( "first" );
-		assertThat( secondNode.getName() ).isEqualTo( "<map value>" );
+		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.MAP_VALUE_NODE_NAME );
 		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
 	}
 
@@ -658,7 +659,7 @@ public class TypeAnnotationConstraintTest {
 
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
-		assertThat( secondNode.getName() ).isEqualTo( "<iterable element>" );
+		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
 		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
 	}
 
@@ -806,7 +807,7 @@ public class TypeAnnotationConstraintTest {
 
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
-		assertThat( secondNode.getName() ).isEqualTo( "<iterable element>" );
+		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
 		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
 	}
 

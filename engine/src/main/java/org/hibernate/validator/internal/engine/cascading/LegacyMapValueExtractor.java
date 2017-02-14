@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.path.NodeImpl;
+
 class LegacyMapValueExtractor implements ValueExtractor<@ExtractedValue Map<?, ?>> {
 
 	static final LegacyMapValueExtractor INSTANCE = new LegacyMapValueExtractor();
@@ -23,7 +25,7 @@ class LegacyMapValueExtractor implements ValueExtractor<@ExtractedValue Map<?, ?
 		receiver.value( null, originalValue );
 
 		for ( Map.Entry<?, ?> entry : originalValue.entrySet() ) {
-			receiver.keyedValue( "<map value>", entry.getKey(), entry.getValue() );
+			receiver.keyedValue( NodeImpl.MAP_VALUE_NODE_NAME, entry.getKey(), entry.getValue() );
 		}
 	}
 }

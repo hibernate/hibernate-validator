@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.valueextraction.Unwrapping;
 
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -57,7 +58,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map key>", true, "k", null )
+						.typeArgument( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null )
 		);
 
 		constraintViolations = validator.validate( MapOfLists.invalidListFoo() );
@@ -68,7 +69,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, "key1", null )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null )
 		);
 
 		constraintViolations = validator.validate( MapOfLists.invalidStringFoo() );
@@ -80,12 +81,12 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, "key1", null )
-						.typeArgument( "<iterable element>", true, null, 0 ),
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0 ),
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, "key1", null )
-						.typeArgument( "<iterable element>", true, null, 1 )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1 )
 		);
 
 		constraintViolations = validator.validate( MapOfLists.reallyInvalidFoo() );
@@ -98,14 +99,14 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map key>", true, "k", null ),
+						.typeArgument( NodeImpl.MAP_KEY_NODE_NAME, true, "k", null ),
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, "k", null ),
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null ),
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, "k", null )
-						.typeArgument( "<iterable element>", true, null, 0 )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "k", null )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0 )
 		);
 	}
 
@@ -121,8 +122,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, "key", null )
-						.typeArgument( "<iterable element>", true, null, 1 )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1 )
 		);
 
 		constraintViolations = validator.validate( MapOfListsWithAutomaticUnwrapping.invalidListElementBar() );
@@ -132,8 +133,8 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, "key", null )
-						.typeArgument( "<iterable element>", true, null, 0 )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "key", null )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0 )
 		);
 	}
 
@@ -150,10 +151,10 @@ public class NestedTypeArgumentsValueExtractorTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "array" )
-						.typeArgument( "<iterable element>", true, null, 0 ),
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0 ),
 				pathWith()
 						.property( "array" )
-						.typeArgument( "<iterable element>", true, null, 1 )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1 )
 		);
 	}
 

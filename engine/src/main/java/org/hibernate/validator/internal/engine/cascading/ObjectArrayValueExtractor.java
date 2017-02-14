@@ -9,6 +9,8 @@ package org.hibernate.validator.internal.engine.cascading;
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.path.NodeImpl;
+
 class ObjectArrayValueExtractor implements ValueExtractor<Object @ExtractedValue[]> {
 
 	static final ObjectArrayValueExtractor INSTANCE = new ObjectArrayValueExtractor();
@@ -19,7 +21,7 @@ class ObjectArrayValueExtractor implements ValueExtractor<Object @ExtractedValue
 	@Override
 	public void extractValues(Object[] originalValue, ValueReceiver receiver) {
 		for ( int i = 0; i < originalValue.length; i++ ) {
-			receiver.indexedValue( "<iterable element>", i, originalValue[i] );
+			receiver.indexedValue( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, i, originalValue[i] );
 		}
 	}
 }

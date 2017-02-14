@@ -28,6 +28,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.Test;
 
@@ -53,11 +54,11 @@ public class NestedCascadedConstraintsTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, "invalid", null )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "invalid", null )
 						.property( "email", true, null, 1 ),
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, "invalid", null )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "invalid", null )
 						.property( "email", true, null, 2 )
 		);
 	}
@@ -87,16 +88,16 @@ public class NestedCascadedConstraintsTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, invalidCinemaEmailAddresses.map.keySet().toArray()[1], null )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, invalidCinemaEmailAddresses.map.keySet().toArray()[1], null )
 						.property( "email", true, null, 1 ),
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, invalidCinemaEmailAddresses.map.keySet().toArray()[1], null )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, invalidCinemaEmailAddresses.map.keySet().toArray()[1], null )
 						.property( "email", true, null, 2 ),
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map value>", true, invalidCinemaEmailAddresses.map.keySet().toArray()[2], null )
-						.typeArgument( "<iterable element>", true, null, 0 )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, invalidCinemaEmailAddresses.map.keySet().toArray()[2], null )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0 )
 		);
 
 		CinemaEmailAddresses invalidKeyCinemaEmailAddresses = CinemaEmailAddresses.invalidKey();
@@ -110,7 +111,7 @@ public class NestedCascadedConstraintsTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "map" )
-						.typeArgument( "<map key>", true, invalidKeyCinemaEmailAddresses.map.keySet().toArray()[1], null )
+						.typeArgument( NodeImpl.MAP_KEY_NODE_NAME, true, invalidKeyCinemaEmailAddresses.map.keySet().toArray()[1], null )
 						.property( "visitor" )
 						.property( "name" )
 		);
@@ -139,11 +140,11 @@ public class NestedCascadedConstraintsTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "array" )
-						.typeArgument( "<iterable element>", true, null, 0 )
-						.typeArgument( "<iterable element>", true, null, 0 ),
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0 )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0 ),
 				pathWith()
 						.property( "array" )
-						.typeArgument( "<iterable element>", true, null, 0 )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0 )
 						.property( "visitor", true, null, 1 )
 						.property( "name" )
 		);
