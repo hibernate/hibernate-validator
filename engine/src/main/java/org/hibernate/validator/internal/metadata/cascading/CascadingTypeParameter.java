@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
+import org.hibernate.validator.internal.util.StringHelper;
 
 /**
  * A type parameter that is marked for cascaded validation.
@@ -78,7 +79,7 @@ public class CascadingTypeParameter {
 		StringBuilder sb = new StringBuilder();
 		sb.append( getClass().getSimpleName() );
 		sb.append( " [" );
-		sb.append( "enclosingType=" ).append( enclosingType.getTypeName() ).append( ", " );
+		sb.append( "enclosingType=" ).append( StringHelper.toShortString( enclosingType ) ).append( ", " );
 		sb.append( "typeParameter=" ).append( typeParameter ).append( ", " );
 		sb.append( "cascading=" ).append( cascading ).append( ", " );
 		sb.append( "nestedCascadingTypeParameters=" ).append( nestedCascadingTypeParameters );

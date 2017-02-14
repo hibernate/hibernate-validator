@@ -20,6 +20,7 @@ import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescripto
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.StringHelper;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to
@@ -132,7 +133,7 @@ public class MetaConstraint<A extends Annotation> {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "MetaConstraint" );
-		sb.append( "{constraintType=" ).append( constraintDescriptor.getAnnotation().annotationType().getName() );
+		sb.append( "{constraintType=" ).append( StringHelper.toShortString( constraintDescriptor.getAnnotation().annotationType() ) );
 		sb.append( ", location=" ).append( location );
 		sb.append( ", valueExtractorDescriptors=" ).append( valueExtractorDescriptors );
 		sb.append( "}" );

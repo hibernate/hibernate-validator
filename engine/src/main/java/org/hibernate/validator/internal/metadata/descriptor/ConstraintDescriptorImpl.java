@@ -49,6 +49,7 @@ import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -341,7 +342,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "ConstraintDescriptorImpl" );
-		sb.append( "{annotation=" ).append( annotationType.getName() );
+		sb.append( "{annotation=" ).append( StringHelper.toShortString( annotationType ) );
 		sb.append( ", payloads=" ).append( payloads );
 		sb.append( ", hasComposingConstraints=" ).append( composingConstraints.isEmpty() );
 		sb.append( ", isReportAsSingleInvalidConstraint=" ).append( isReportAsSingleInvalidConstraint );
