@@ -92,7 +92,7 @@ public class NodeImpl
 				false,
 				null,
 				null,
-				ElementKind.PROPERTY,
+				ElementKind.PROPERTY, // TODO HV-1245 this should be TYPE_USE once it's included in BV
 				EMPTY_CLASS_ARRAY,
 				null,
 				null

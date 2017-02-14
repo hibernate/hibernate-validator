@@ -16,7 +16,8 @@ import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.util.StringHelper;
 
 /**
- * A type parameter that is marked for cascaded validation.
+ * A type parameter that is marked for cascaded validation and/or has one or more nested type parameters marked for
+ * cascaded validation.
  *
  * @author Guillaume Smet
  */

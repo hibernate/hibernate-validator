@@ -699,57 +699,64 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
 
 		if ( annotatedType instanceof AnnotatedArrayType ) {
-			AnnotatedArrayType annotatedArrayType = (AnnotatedArrayType) annotatedType;
-			Type validatedType = annotatedArrayType.getAnnotatedGenericComponentType().getType();
+			addCascadingTypeParametersForArrayType( cascadingTypeParameters, (AnnotatedArrayType) annotatedType );
+		}
+		else if ( annotatedType instanceof AnnotatedParameterizedType ) {
+			addCascadingTypeParametersForParameterizedType( cascadingTypeParameters, (AnnotatedParameterizedType) annotatedType, typeParameters );
+		}
 
+		return cascadingTypeParameters;
+	}
+
+	private void addCascadingTypeParametersForParameterizedType(List<CascadingTypeParameter> cascadingTypeParameters,
+			AnnotatedParameterizedType annotatedParameterizedType, TypeVariable<?>[] typeParameters) {
+		AnnotatedType[] annotatedTypeArguments = annotatedParameterizedType.getAnnotatedActualTypeArguments();
+
+		int i = 0;
+
+		for ( AnnotatedType annotatedTypeArgument : annotatedTypeArguments ) {
+			Type validatedType = annotatedTypeArgument.getType();
 			List<CascadingTypeParameter> nestedCascadingTypeParameters;
 			if ( validatedType instanceof ParameterizedType ) {
-				nestedCascadingTypeParameters = getCascadingTypeParameters( ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(),
-						annotatedArrayType.getAnnotatedGenericComponentType() );
+				nestedCascadingTypeParameters = getCascadingTypeParameters(
+						ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(), annotatedTypeArgument );
 			}
 			else {
 				nestedCascadingTypeParameters = Collections.emptyList();
 			}
 
-			boolean isCascading = annotatedArrayType.isAnnotationPresent( Valid.class );
-
-			CascadingTypeParameter cascadingTypeParameter = new CascadingTypeParameter( validatedType, ArrayElement.INSTANCE,
-					isCascading, nestedCascadingTypeParameters );
+			boolean isCascading = annotatedTypeArgument.isAnnotationPresent( Valid.class );
 
 			if ( isCascading || !nestedCascadingTypeParameters.isEmpty() ) {
+				CascadingTypeParameter cascadingTypeParameter = new CascadingTypeParameter( annotatedParameterizedType.getType(), typeParameters[i],
+						isCascading, nestedCascadingTypeParameters );
+
 				cascadingTypeParameters.add( cascadingTypeParameter );
 			}
+			i++;
 		}
-		else if ( annotatedType instanceof AnnotatedParameterizedType ) {
-			AnnotatedParameterizedType annotatedParameterizedType = (AnnotatedParameterizedType) annotatedType;
-			AnnotatedType[] annotatedTypeArguments = annotatedParameterizedType.getAnnotatedActualTypeArguments();
+	}
 
-			int i = 0;
+	private void addCascadingTypeParametersForArrayType(List<CascadingTypeParameter> cascadingTypeParameters, AnnotatedArrayType annotatedArrayType) {
+		Type validatedType = annotatedArrayType.getAnnotatedGenericComponentType().getType();
 
-			for ( AnnotatedType annotatedTypeArgument : annotatedTypeArguments ) {
-				Type validatedType = annotatedTypeArgument.getType();
-				List<CascadingTypeParameter> nestedCascadingTypeParameters;
-				if ( validatedType instanceof ParameterizedType ) {
-					nestedCascadingTypeParameters = getCascadingTypeParameters(
-							ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(), annotatedTypeArgument );
-				}
-				else {
-					nestedCascadingTypeParameters = Collections.emptyList();
-				}
-
-				boolean isCascading = annotatedTypeArgument.isAnnotationPresent( Valid.class );
-
-				if ( isCascading || !nestedCascadingTypeParameters.isEmpty() ) {
-					CascadingTypeParameter cascadingTypeParameter = new CascadingTypeParameter( annotatedType.getType(), typeParameters[i],
-							isCascading, nestedCascadingTypeParameters );
-
-					cascadingTypeParameters.add( cascadingTypeParameter );
-				}
-				i++;
-			}
+		List<CascadingTypeParameter> nestedCascadingTypeParameters;
+		if ( validatedType instanceof ParameterizedType ) {
+			nestedCascadingTypeParameters = getCascadingTypeParameters( ReflectionHelper.getClassFromType( validatedType ).getTypeParameters(),
+					annotatedArrayType.getAnnotatedGenericComponentType() );
+		}
+		else {
+			nestedCascadingTypeParameters = Collections.emptyList();
 		}
 
-		return cascadingTypeParameters;
+		boolean isCascading = annotatedArrayType.isAnnotationPresent( Valid.class );
+
+		CascadingTypeParameter cascadingTypeParameter = new CascadingTypeParameter( validatedType, ArrayElement.INSTANCE,
+				isCascading, nestedCascadingTypeParameters );
+
+		if ( isCascading || !nestedCascadingTypeParameters.isEmpty() ) {
+			cascadingTypeParameters.add( cascadingTypeParameter );
+		}
 	}
 
 	/**
