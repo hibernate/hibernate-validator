@@ -15,7 +15,6 @@ import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 import java.util.Set;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.Validator;
@@ -30,6 +29,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -147,7 +147,7 @@ public class ConstraintValidatorManagerTest {
 	}
 
 	@Test
-	public void testOnlyTheInstancesForTheLeastRecentlyUsedCustomFactoryAreCached() {
+	public void testAllInstancesForDifferentCustomFactoriesAreCached() {
 		ConstraintDescriptorImpl<?> constraintDescriptor = getConstraintDescriptorForProperty( "s1" );
 
 		for ( int i = 0; i < 10; i++ ) {
@@ -158,7 +158,7 @@ public class ConstraintValidatorManagerTest {
 			);
 
 			assertEquals(
-					constraintValidatorManager.numberOfCachedConstraintValidatorInstances(), 1,
+					constraintValidatorManager.numberOfCachedConstraintValidatorInstances(), i + 1,
 					"There should be only one instance cached"
 			);
 		}

@@ -11,11 +11,8 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -25,6 +22,7 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.LRUCache;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -36,6 +34,11 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  */
 public class ConstraintValidatorManager {
 	private static final Log LOG = LoggerFactory.make();
+
+	/**
+	 * A maximum possible number of cached constraint validators.
+	 */
+	private static final int MAX_CACHE_CAPACITY = 128;
 
 	/**
 	 * Dummy {@code ConstraintValidator} used as placeholder for the case that for a given context there exists
@@ -58,21 +61,10 @@ public class ConstraintValidatorManager {
 	private final ConstraintValidatorFactory defaultConstraintValidatorFactory;
 
 	/**
-	 * The most recently used non default constraint validator factory.
-	 */
-	private volatile ConstraintValidatorFactory mostRecentlyUsedNonDefaultConstraintValidatorFactory;
-
-	/**
-	 * Used for synchronizing access to {@link #mostRecentlyUsedNonDefaultConstraintValidatorFactory} (which can be
-	 * null itself).
-	 */
-	private final Object mostRecentlyUsedNonDefaultConstraintValidatorFactoryMutex = new Object();
-
-	/**
 	 * Cache of initialized {@code ConstraintValidator} instances keyed against validates type, annotation and
 	 * constraint validator factory ({@code CacheKey}).
 	 */
-	private final ConcurrentHashMap<CacheKey, ConstraintValidator<?, ?>> constraintValidatorCache;
+	private final Map<CacheKey, ConstraintValidator<?, ?>> constraintValidatorCache;
 
 	/**
 	 * Creates a new {@code ConstraintValidatorManager}.
@@ -81,7 +73,7 @@ public class ConstraintValidatorManager {
 	 */
 	public ConstraintValidatorManager(ConstraintValidatorFactory constraintValidatorFactory) {
 		this.defaultConstraintValidatorFactory = constraintValidatorFactory;
-		this.constraintValidatorCache = new ConcurrentHashMap<>();
+		this.constraintValidatorCache = LRUCache.getInstance( MAX_CACHE_CAPACITY );
 	}
 
 	/**
@@ -116,19 +108,7 @@ public class ConstraintValidatorManager {
 		return DUMMY_CONSTRAINT_VALIDATOR == constraintValidator ? null : constraintValidator;
 	}
 
-	private <A extends Annotation> ConstraintValidator<A, ?> cacheValidator(CacheKey key,
-			ConstraintValidator<A, ?> constraintValidator) {
-		// we only cache constraint validator instances for the default and most recently used factory
-		if ( key.constraintFactory != defaultConstraintValidatorFactory && key.constraintFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
-
-			synchronized ( mostRecentlyUsedNonDefaultConstraintValidatorFactoryMutex ) {
-				if ( key.constraintFactory != mostRecentlyUsedNonDefaultConstraintValidatorFactory ) {
-					clearEntriesForFactory( mostRecentlyUsedNonDefaultConstraintValidatorFactory );
-					mostRecentlyUsedNonDefaultConstraintValidatorFactory = key.constraintFactory;
-				}
-			}
-		}
-
+	private <A extends Annotation> ConstraintValidator<A, ?> cacheValidator(CacheKey key, ConstraintValidator<A, ?> constraintValidator) {
 		@SuppressWarnings("unchecked")
 		ConstraintValidator<A, ?> cached = (ConstraintValidator<A, ?>) constraintValidatorCache.putIfAbsent( key, constraintValidator );
 
@@ -152,18 +132,6 @@ public class ConstraintValidatorManager {
 		}
 
 		return constraintValidator;
-	}
-
-	private void clearEntriesForFactory(ConstraintValidatorFactory constraintFactory) {
-		Iterator<Entry<CacheKey, ConstraintValidator<?, ?>>> cacheEntries = constraintValidatorCache.entrySet().iterator();
-
-		while ( cacheEntries.hasNext() ) {
-			Entry<CacheKey, ConstraintValidator<?, ?>> cacheEntry = cacheEntries.next();
-			if ( cacheEntry.getKey().getConstraintFactory() == constraintFactory ) {
-				constraintFactory.releaseInstance( cacheEntry.getValue() );
-				cacheEntries.remove();
-			}
-		}
 	}
 
 	public void clear() {
