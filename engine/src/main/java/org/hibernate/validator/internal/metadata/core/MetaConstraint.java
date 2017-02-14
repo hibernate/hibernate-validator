@@ -20,6 +20,7 @@ import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescripto
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 
 /**
@@ -64,7 +65,7 @@ public class MetaConstraint<A extends Annotation> {
 		this.constraintTree = new ConstraintTree<>( constraintDescriptor, validatedValueType );
 		this.constraintDescriptor = constraintDescriptor;
 		this.location = location;
-		this.valueExtractorDescriptors = valueExtractorDescriptors;
+		this.valueExtractorDescriptors = CollectionHelper.toImmutableList( valueExtractorDescriptors );
 	}
 
 	/**

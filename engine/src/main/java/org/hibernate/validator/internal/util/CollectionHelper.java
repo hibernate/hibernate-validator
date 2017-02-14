@@ -9,9 +9,11 @@ package org.hibernate.validator.internal.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,6 +89,28 @@ public final class CollectionHelper {
 	@SafeVarargs
 	public static <T> Set<T> asSet(T... ts) {
 		return new HashSet<>( Arrays.asList( ts ) );
+	}
+
+	public static <T> List<T> toImmutableList(List<T> list) {
+		switch ( list.size() ) {
+			case 0:
+				return Collections.emptyList();
+			case 1:
+				return Collections.singletonList( list.get( 0 ) );
+			default:
+				return Collections.unmodifiableList( list );
+		}
+	}
+
+	public static <T> Set<T> toImmutableSet(Set<T> set) {
+		switch ( set.size() ) {
+			case 0:
+				return Collections.emptySet();
+			case 1:
+				return Collections.singleton( set.iterator().next() );
+			default:
+				return Collections.unmodifiableSet( set );
+		}
 	}
 
 	/**
