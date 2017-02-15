@@ -22,6 +22,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Instances of this class abstract the constraint type  (class, method or field constraint) and give access to
@@ -52,6 +53,7 @@ public class MetaConstraint<A extends Annotation> {
 	 * The sequence of {@link ValueExtractor}s used to navigate from the outermost container to the innermost container
 	 * and extract the value for validation.
 	 */
+	@Immutable
 	private final List<ValueExtractorDescriptor> valueExtractorDescriptors;
 
 	/**
