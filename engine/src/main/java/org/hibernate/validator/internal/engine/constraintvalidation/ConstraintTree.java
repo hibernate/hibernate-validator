@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.engine.constraintvalidation;
 import static org.hibernate.validator.constraints.CompositionType.ALL_FALSE;
 import static org.hibernate.validator.constraints.CompositionType.AND;
 import static org.hibernate.validator.constraints.CompositionType.OR;
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.Annotation;
@@ -17,6 +16,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintViolation;
@@ -27,6 +27,7 @@ import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Due to constraint composition a single constraint annotation can lead to a whole constraint tree being validated.
@@ -42,6 +43,8 @@ public class ConstraintTree<A extends Annotation> {
 	private static final Log log = LoggerFactory.make();
 
 	private final ConstraintTree<?> parent;
+
+	@Immutable
 	private final List<ConstraintTree<?>> children;
 
 	/**
@@ -59,22 +62,13 @@ public class ConstraintTree<A extends Annotation> {
 		this.parent = parent;
 		this.descriptor = descriptor;
 		this.validatedValueType = validatedValueType;
-
-		final Set<ConstraintDescriptorImpl<?>> composingConstraints = descriptor.getComposingConstraintImpls();
-		children = newArrayList( composingConstraints.size() );
-
-		for ( ConstraintDescriptorImpl<?> composingDescriptor : composingConstraints ) {
-			ConstraintTree<?> treeNode = createConstraintTree( composingDescriptor );
-			children.add( treeNode );
-		}
+		this.children = descriptor.getComposingConstraintImpls().stream()
+				.map( desc -> createConstraintTree( desc ) )
+				.collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
 	}
 
 	private <U extends Annotation> ConstraintTree<U> createConstraintTree(ConstraintDescriptorImpl<U> composingDescriptor) {
 		return new ConstraintTree<>( composingDescriptor, this.validatedValueType, this );
-	}
-
-	public final List<ConstraintTree<?>> getChildren() {
-		return children;
 	}
 
 	public final ConstraintDescriptorImpl<A> getDescriptor() {
@@ -83,7 +77,7 @@ public class ConstraintTree<A extends Annotation> {
 
 	public final <T> boolean validateConstraints(ValidationContext<T> executionContext,
 			ValueContext<?, ?> valueContext) {
-		Set<ConstraintViolation<T>> constraintViolations = newHashSet();
+		Set<ConstraintViolation<T>> constraintViolations = newHashSet( 5 );
 		validateConstraints( executionContext, valueContext, constraintViolations );
 		if ( !constraintViolations.isEmpty() ) {
 			executionContext.addConstraintFailures( constraintViolations );
@@ -268,9 +262,8 @@ public class ConstraintTree<A extends Annotation> {
 			ValueContext<?, ?> valueContext,
 			Set<ConstraintViolation<T>> constraintViolations) {
 		CompositionResult compositionResult = new CompositionResult( true, false );
-		List<ConstraintTree<?>> children = getChildren();
 		for ( ConstraintTree<?> tree : children ) {
-			Set<ConstraintViolation<T>> tmpViolations = newHashSet();
+			Set<ConstraintViolation<T>> tmpViolations = newHashSet( 5 );
 			tree.validateConstraints( executionContext, valueContext, tmpViolations );
 			constraintViolations.addAll( tmpViolations );
 

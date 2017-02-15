@@ -111,11 +111,11 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 			throw log.getAtLeastOneCustomMessageMustBeCreatedException();
 		}
 
-		List<ConstraintViolationCreationContext> returnedConstraintViolationCreationContexts = new ArrayList<ConstraintViolationCreationContext>(
+		List<ConstraintViolationCreationContext> returnedConstraintViolationCreationContexts = new ArrayList<>(
 				constraintViolationCreationContexts
 		);
 		if ( !defaultDisabled ) {
-			Map<String, Object> parameterMapCopy = newHashMap();
+			Map<String, Object> parameterMapCopy = newHashMap( expressionVariables.size() );
 			parameterMapCopy.putAll( expressionVariables );
 			returnedConstraintViolationCreationContexts.add(
 					new ConstraintViolationCreationContext(
