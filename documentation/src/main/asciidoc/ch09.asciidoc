@@ -32,7 +32,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/Car.java[t
 === `BeanDescriptor`
 
 The entry point into the metadata API is the method `Validator#getConstraintsForClass()`, which
-returns an instance of the `link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.
+returns an instance of the `link:$$https://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/index.
 html?javax/validation/metadata/BeanDescriptor.html$$[BeanDescriptor]` interface. Using this
 descriptor, you can obtain metadata for constraints declared directly on the bean itself (class- or
 property-level), but also retrieve metadata descriptors representing single properties, methods and
@@ -85,7 +85,7 @@ methods to be returned (getters, non-getters or both).
 === `PropertyDescriptor`
 
 The interface
-`link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/PropertyDescriptor.html$$[PropertyDescriptor]` represents one given property of a
+`link:$$https://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/index.html?javax/validation/metadata/PropertyDescriptor.html$$[PropertyDescriptor]` represents one given property of a
 class. It is transparent whether constraints are declared on a field or a property getter, provided
 the JavaBeans naming conventions are respected. <<metadata-example-using-propertydescriptor>> shows
 how to use the `PropertyDescriptor` interface.
@@ -108,8 +108,8 @@ XML), `false` otherwise. Any configured group conversions are returned by `getGr
 === `MethodDescriptor` and `ConstructorDescriptor`
 
 Constrained methods and constructors are represented by the interfaces
-`link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/MethodDescriptor.html$$[MethodDescriptor]`
-and `link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ConstructorDescriptor.html$$[ConstructorDescriptor]`, respectively.
+`link:$$https://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/index.html?javax/validation/metadata/MethodDescriptor.html$$[MethodDescriptor]`
+and `link:$$https://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/index.html?javax/validation/metadata/ConstructorDescriptor.html$$[ConstructorDescriptor]`, respectively.
 <<metadata-example-using-methodandconstructordescriptor>> demonstrates how to work with these
 descriptors.
 
@@ -154,7 +154,7 @@ getter's `MethodDescriptor` (e.g.
 [[validator-metadata-api-elementdescriptor]]
 === `ElementDescriptor`
 
-The `link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ElementDescriptor.html$$[ElementDiscriptor]`
+The `link:$$https://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/index.html?javax/validation/metadata/ElementDescriptor.html$$[ElementDiscriptor]`
 interface is the common base class for the
 individual descriptor types such as `BeanDescriptor`, `PropertyDescriptor` etc. Besides
 `getConstraintDescriptors()` it provides some more methods common to all descriptors.
@@ -218,7 +218,7 @@ sequence are.
 All those descriptor types that represent elements which can be subject of cascaded validation
 (i.e., `PropertyDescriptor`, `ParameterDescriptor` and `ReturnValueDescriptor`) provide access to the
 element's group conversions via `getGroupConversions()`. The returned set contains a
-`link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/GroupConversionDescriptor.html$$[GroupConversionDescriptor]`
+`link:$$https://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/index.html?javax/validation/metadata/GroupConversionDescriptor.html$$[GroupConversionDescriptor]`
 for each configured conversion, allowing to retrieve
 source and target groups of the conversion. <<metadata-example-using-groupconversiondescriptor>>
 shows an example.
@@ -236,7 +236,7 @@ include::{sourcedir}/org/hibernate/validator/referenceguide/chapter09/CarTest.ja
 === `ConstraintDescriptor`
 
 Last but not least, the
-`link:$$http://docs.jboss.org/hibernate/beanvalidation/spec/1.1/api/index.html?javax/validation/metadata/ConstraintDescriptor.html$$[ConstraintDescriptor]`
+`link:$$https://docs.jboss.org/hibernate/beanvalidation/spec/2.0/api/index.html?javax/validation/metadata/ConstraintDescriptor.html$$[ConstraintDescriptor]`
 interface describes a
 single constraint together with its composing constraints. Via an instance of this interface you get
 access to the constraint annotation and its parameters.

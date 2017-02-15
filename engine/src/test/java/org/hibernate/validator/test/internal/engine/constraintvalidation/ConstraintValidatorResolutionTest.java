@@ -96,8 +96,8 @@ public class ConstraintValidatorResolutionTest {
 	 * is more specific than
 	 * {@link RawValidatorForConstraintWithRawAndParametrizedValidator}.
 	 *
-	 * @see <a href="http://docs.oracle.com/javase/specs/jls/se7/html/jls-4.html#jls-4.10.2">JLS</a> (subtyping)
-	 * @see <a href="http://beanvalidation.org/1.1/spec/#typevalidatorresolution">BV spec</a> (constraint validator resolution)
+	 * @see <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-4.html#jls-4.10.2">JLS</a> (subtyping)
+	 * @see <a href="http://beanvalidation.org/2.0/spec/#typevalidatorresolution">BV spec</a> (constraint validator resolution)
 	 */
 	@Test
 	@TestForIssue(jiraKey = "HV-623")
