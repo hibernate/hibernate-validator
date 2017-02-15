@@ -29,6 +29,6 @@ in a remote WildFly instance (the HV dependencies are updated to the latest SNAP
 
 You can enforce the TCK via:
 
-    $ mvn test -Dincontainer -Dtck.version=1.1.2.Final
+    $ mvn test -Dincontainer -Dtck.version=2.0.0.Alpha1
 
-You can find more information about the Bean Validation TCK [here](http://beanvalidation.org/1.1/tck/).
+You can find more information about the Bean Validation TCK [here](http://beanvalidation.org/tck/).

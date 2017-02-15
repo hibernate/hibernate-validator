@@ -60,7 +60,7 @@ Unified EL in error messages.
 [TIP]
 ====
 You can find the formal definition of the interpolation algorithm in section
-link:http://beanvalidation.org/1.1/spec/#default-resolution-algorithm[5.3.1.1] of the Bean
+link:http://beanvalidation.org/2.0/spec/#default-resolution-algorithm[5.3.1.1] of the Bean
 Validation specification.
 ====
 
