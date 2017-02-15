@@ -1,6 +1,69 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.0.Alpha1 (15-02-2017)
+-------------------------
+
+** Bug
+    * HV-1088 - engine             - Unexpected behavior multi threads accessing ConstraintValidatorManager
+
+** Improvement
+    * HV-1249 - engine             - Improve collection allocations in hot code path
+    * HV-1246 - engine, tests      - Make node names constants
+    * HV-1244 - translations       - Add translation for Persian language
+    * HV-1238 - engine             - Expand the initial capacity of future/past validators list for added validators
+    * HV-1235 - validators         - Javadoc for PESEL mentions NIP
+    * HV-1202 - engine             - Use toInstant() instead of timeInMillis() for @Past/@Future validators on Date/Calendar
+    * HV-1194 - documentation      - BootstrappingTest of the documentation is not tested at all
+    * HV-1193 - engine             - Avoid systematic resizing of collections when using CollectionHelper with a size
+    * HV-1186 - build              - Move javax.money version properties outside of the WF dependencies block
+    * HV-1178 - integration        - Custom ValidationProviderResolver no longer needed for OSGi with explicitely given provider
+    * HV-1175 - engine             - Support type annotations on arrays and arrays of primitives
+    * HV-1174 - tests              - Typos in test methods name of Executable*Test
+    * HV-1172 - engine             - Remove unused methods from Cascadable
+    * HV-1171 - engine             - Include the simple name of the class when logging a method name
+    * HV-1145 - build              - Update checkstyle ParenPad rule to include RESOURCE_SPECIFICATION
+    * HV-1120 - engine             - Remove deprecated ignoreAnnotations() method
+    * HV-1111 - build              - Allow reference to types in JavaDoc without FQN 
+    * HV-1110 - engine             - Additional TYPE_USE related cleanup
+    * HV-1108 - engine             - Add Repeatable to NON_COMPOSING_CONSTRAINT_ANNOTATIONS
+    * HV-1105 - engine             - Revisit shared state managed by ValidatorFactoryImpl
+    * HV-1103 - engine             - Remove remaining pre-Java-8 code
+    * HV-1085 - build              - Raise BV to 2.0.0-SNAPSHOT and Java baseline to version 8
+    * HV-1084 - engine             - Move XML namespace to jcp.org from jboss.org
+    * HV-966 - engine             - ParameterNameProvider is called on methods with no parameter as well as Object methods
+
+** New Feature
+    * HV-1236 - build              - Upgrade to BV API 2.0.0.Alpha1
+    * HV-1232 - validators         - Implement constraint and validator for java.time.Duration
+    * HV-1166 - engine             - Implement proposal for value extractors
+    * HV-1135 - validators         - Implement initial BV 2.0 proposal for @Past/@Future support for JSR 310
+    * HV-1122 - engine             - Explore constraints based on Lambda expressions
+    * HV-1118 - engine             - Adapt default ParameterNameProvider to adhere to BV 2.0 rules
+    * HV-1094 - engine             - Mark constraints to support TYPE_USE
+    * HV-875 - engine, validators - Mark built-in constraints with @Repeatable
+
+** Sub-task
+    * HV-1243 - engine             - Throw an exception if extractor not found during cascaded validation
+    * HV-1237 - engine             - Support nested extraction
+    * HV-1219 - engine             - Implement latest changes to the exception model of value extraction
+    * HV-1213 - engine             - Remove the implicit unwrapping of Optional
+    * HV-1208 - engine             - Implicit unwrapping, e.g. @Min(1) IntegerProperty myInt; currently an explicit @UnwrapValidatedValue is required
+    * HV-1207 - engine             - Move retrieval of extractors for constraints (not cascaded validation) to metadata retrieval time and implement per constraint unwrapping
+    * HV-1206 - engine             - Require @ExtractedValue in extractor implementation when dealing with the annotated object itself
+
+** Task
+    * HV-1240 - engine             - Don't call ValueExtractors on null values
+    * HV-1233 - documentation      - Convert tabs to space in rendered doc to have a consistent behavior across browsers
+    * HV-1231 - engine             - Set "ignore-annotations" to true in the mapping XSD by default for beans
+    * HV-1229 - tests              - Upgrade OSGi test dependencies
+    * HV-1228 - documentation      - Switch to the common AsciiDoctor theme for the documentation
+    * HV-1225 - engine             - Remove unused method in ReflectionHelper
+    * HV-1224 - build              - Change group id to "org.hibernate.validator"
+    * HV-1223 - build              - Set up jQAssistant to create "Leaky API" report
+    * HV-1222 - engine             - Update CollectionHelper.iteratorFromArray and add CollectionHelper.iterableFromArray
+    * HV-1215 - build              - Rework the common release scripts to support Asciidoctor output
+
 5.4.0.Final (01-02-2017)
 -------------------------
 
