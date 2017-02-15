@@ -821,6 +821,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			result = 31 * result + index;
 			return result;
 		}
+
+		@Override
+		public String toString() {
+			return "ClassIndexWrapper [clazz=" + StringHelper.toShortString( clazz ) + ", index=" + index + "]";
+		}
 	}
 
 	/**
