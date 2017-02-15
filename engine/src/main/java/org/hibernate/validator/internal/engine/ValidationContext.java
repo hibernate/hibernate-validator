@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
@@ -233,15 +234,10 @@ public class ValidationContext<T> {
 
 	public Set<ConstraintViolation<T>> createConstraintViolations(ValueContext<?, ?> localContext,
 			ConstraintValidatorContextImpl constraintValidatorContext) {
-		Set<ConstraintViolation<T>> constraintViolations = newHashSet();
-		for ( ConstraintViolationCreationContext constraintViolationCreationContext : constraintValidatorContext.getConstraintViolationCreationContexts() ) {
-			ConstraintViolation<T> violation = createConstraintViolation(
-					localContext,
-					constraintViolationCreationContext, constraintValidatorContext.getConstraintDescriptor()
-			);
-			constraintViolations.add( violation );
-		}
-		return constraintViolations;
+
+		return constraintValidatorContext.getConstraintViolationCreationContexts().stream()
+			.map( c -> createConstraintViolation( localContext, c, constraintValidatorContext.getConstraintDescriptor() ) )
+			.collect( Collectors.toSet() );
 	}
 
 	public ConstraintValidatorFactory getConstraintValidatorFactory() {
