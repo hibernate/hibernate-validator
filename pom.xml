@@ -399,18 +399,18 @@
                         <goals>
                             <goal>enforce</goal>
                         </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[1.8.0-20,)</version>
+                                </requireJavaVersion>
+                                <requireMavenVersion>
+                                    <version>3.0.3</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <rules>
-                        <requireJavaVersion>
-                            <version>[1.8.0-20,)</version>
-                        </requireJavaVersion>
-                        <requireMavenVersion>
-                            <version>3.0.3</version>
-                        </requireMavenVersion>
-                    </rules>
-                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -952,6 +952,30 @@
             <modules>
                 <module>relocation</module>
             </modules>
+        </profile>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-release-rules</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps />
+                                    </rules>
+                                    <fail>true</fail>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>jdk9</id>
