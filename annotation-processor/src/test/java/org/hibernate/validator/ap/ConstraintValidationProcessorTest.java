@@ -22,6 +22,7 @@ import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInCon
 import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
 import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
+import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
 import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
 import org.hibernate.validator.ap.testmodel.ValidationUsingAtValidAnnotation;
@@ -590,6 +591,20 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertTrue( compilationResult, "Java 8 date/time API types fails at @Future/@Past." );
 	}
 
+    @Test
+    @TestForIssue(jiraKey = "HV-1252")
+    public void constraintsAllowedAtJavaMoneyTypes()
+    {
+        File sourceFile = compilerHelper.getSourceFile(ModelWithJavaMoneyTypes.class);
+
+        EnumSet<Library> libraries = EnumSet.of(Library.VALIDATION_API, Library.HIBERNATE_VALIDATOR, Library.JAVA_MONEY_API);
+        boolean compilationResult = compilerHelper.compile(
+                new ConstraintValidationProcessor(), diagnostics, libraries, sourceFile
+        );
+
+        assertTrue(compilationResult, "Java Money API types (MonetaryAmount) fails with constraints annotations.");
+    }
+	
 	@Test
 	public void crossParameterConstraintsAllowed() {
 
