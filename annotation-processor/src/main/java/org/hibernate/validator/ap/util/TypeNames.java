@@ -57,6 +57,7 @@ public class TypeNames {
 
 		private static final String ORG_HIBERNATE_VALIDATOR_CONSTRAINTS = "org.hibernate.validator.constraints";
 
+		public static final String CURRENCY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Currency";
 		public static final String EMAIL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Email";
 		public static final String LENGTH = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".Length";
 		public static final String MOD_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ModCheck";
@@ -88,4 +89,13 @@ public class TypeNames {
 		public static final String OFFSET_DATE_TIME = JAVA_TIME + ".OffsetDateTime";
 		public static final String INSTANT = JAVA_TIME + ".Instant";
 	}
+
+	public static class JavaMoneyTypes {
+
+		private static final String JAVAX_MONEY = "javax.money";
+
+		public static final String MONETARY_AMOUNT = JAVAX_MONEY + ".MonetaryAmount";
+
+	}
+
 }

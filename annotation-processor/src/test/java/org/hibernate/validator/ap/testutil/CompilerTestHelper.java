@@ -52,8 +52,8 @@ public class CompilerTestHelper {
 		VALIDATION_API( "validation-api.jar" ),
 
 		JODA_TIME( "joda-time.jar" ),
-		
-		JAVA_MONEY_API ( "money-api.jar" );
+
+		JAVA_MONEY_API( "money-api.jar" );
 
 		private final String name;
 

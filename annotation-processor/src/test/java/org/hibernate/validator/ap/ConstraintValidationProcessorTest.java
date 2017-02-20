@@ -6,11 +6,6 @@
  */
 package org.hibernate.validator.ap;
 
-import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
 import java.io.File;
 import java.util.EnumSet;
 import java.util.Locale;
@@ -21,8 +16,8 @@ import org.hibernate.validator.ap.testmodel.FieldLevelValidationUsingBuiltInCons
 import org.hibernate.validator.ap.testmodel.MethodLevelValidationUsingBuiltInConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithDateConstraints;
 import org.hibernate.validator.ap.testmodel.ModelWithJava8DateTime;
-import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithJavaMoneyTypes;
+import org.hibernate.validator.ap.testmodel.ModelWithJodaTypes;
 import org.hibernate.validator.ap.testmodel.ModelWithoutConstraints;
 import org.hibernate.validator.ap.testmodel.MultipleConstraintsOfSameType;
 import org.hibernate.validator.ap.testmodel.ValidationUsingAtValidAnnotation;
@@ -78,6 +73,11 @@ import org.hibernate.validator.ap.util.DiagnosticExpectation;
 import org.hibernate.validator.testutil.TestForIssue;
 
 import org.testng.annotations.Test;
+
+import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Miscellaneous tests for {@link ConstraintValidationProcessor}.
@@ -591,20 +591,23 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 		assertTrue( compilationResult, "Java 8 date/time API types fails at @Future/@Past." );
 	}
 
-    @Test
-    @TestForIssue(jiraKey = "HV-1252")
-    public void constraintsAllowedAtJavaMoneyTypes()
-    {
-        File sourceFile = compilerHelper.getSourceFile(ModelWithJavaMoneyTypes.class);
+	@Test
+	@TestForIssue(jiraKey = "HV-1252")
+	public void constraintsAllowedAtJavaMoneyTypes() {
+		File sourceFile = compilerHelper.getSourceFile( ModelWithJavaMoneyTypes.class );
 
-        EnumSet<Library> libraries = EnumSet.of(Library.VALIDATION_API, Library.HIBERNATE_VALIDATOR, Library.JAVA_MONEY_API);
-        boolean compilationResult = compilerHelper.compile(
-                new ConstraintValidationProcessor(), diagnostics, libraries, sourceFile
-        );
+		EnumSet<Library> libraries = EnumSet.of(
+				Library.VALIDATION_API,
+				Library.HIBERNATE_VALIDATOR,
+				Library.JAVA_MONEY_API
+		);
+		boolean compilationResult = compilerHelper.compile(
+				new ConstraintValidationProcessor(), diagnostics, libraries, sourceFile
+		);
 
-        assertTrue(compilationResult, "Java Money API types (MonetaryAmount) fails with constraints annotations.");
-    }
-	
+		assertTrue( compilationResult, "Java Money API types (MonetaryAmount) fails with constraints annotations." );
+	}
+
 	@Test
 	public void crossParameterConstraintsAllowed() {
 
