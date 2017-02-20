@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -197,9 +196,17 @@ public class ConstraintHelper {
 				String.class
 		);
 		registerAllowedTypesForBuiltInConstraint(
+				BeanValidationTypes.DECIMAL_MAX,
+				TypeNames.JavaMoneyTypes.MONETARY_AMOUNT
+		);
+		registerAllowedTypesForBuiltInConstraint(
 				BeanValidationTypes.DECIMAL_MIN,
 				Number.class,
 				String.class
+		);
+		registerAllowedTypesForBuiltInConstraint(
+				BeanValidationTypes.DECIMAL_MIN,
+				TypeNames.JavaMoneyTypes.MONETARY_AMOUNT
 		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DIGITS, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, Calendar.class, Date.class );
@@ -215,7 +222,9 @@ public class ConstraintHelper {
 				Java8DateTime.INSTANT
 		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, TypeNames.JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, TypeNames.JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_NULL, Object.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NULL, Object.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, Calendar.class, Date.class );
@@ -248,6 +257,10 @@ public class ConstraintHelper {
 		);
 
 		//register HV-specific constraints
+		registerAllowedTypesForBuiltInConstraint(
+				HibernateValidatorTypes.CURRENCY,
+				TypeNames.JavaMoneyTypes.MONETARY_AMOUNT
+		);
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.EMAIL, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.LENGTH, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_CHECK, CharSequence.class );
