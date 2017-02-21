@@ -98,6 +98,40 @@ public class MethodValidationConfiguration {
 		return Collections.unmodifiableSet( result );
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ( allowMultipleCascadedValidationOnReturnValues ? 1231 : 1237 );
+		result = prime * result + ( allowOverridingMethodAlterParameterConstraint ? 1231 : 1237 );
+		result = prime * result + ( allowParallelMethodsDefineParameterConstraints ? 1231 : 1237 );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		MethodValidationConfiguration other = (MethodValidationConfiguration) obj;
+		if ( allowMultipleCascadedValidationOnReturnValues != other.allowMultipleCascadedValidationOnReturnValues ) {
+			return false;
+		}
+		if ( allowOverridingMethodAlterParameterConstraint != other.allowOverridingMethodAlterParameterConstraint ) {
+			return false;
+		}
+		if ( allowParallelMethodsDefineParameterConstraints != other.allowParallelMethodsDefineParameterConstraints ) {
+			return false;
+		}
+		return true;
+	}
+
 	public static class Builder {
 
 		private boolean allowOverridingMethodAlterParameterConstraint = false;

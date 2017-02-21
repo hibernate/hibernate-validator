@@ -139,7 +139,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 	 * provider. See also HV-659.
 	 */
 	@ThreadSafe
-	private final ConcurrentMap<ExecutableParameterNameProvider, BeanMetaDataManager> beanMetaDataManagers;
+	private final ConcurrentMap<BeanMetaDataManagerKey, BeanMetaDataManager> beanMetaDataManagers;
 
 	private final ValueExtractorManager valueExtractorManager;
 
@@ -361,12 +361,13 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			MethodValidationConfiguration methodValidationConfiguration) {
 
 		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
-				parameterNameProvider,
-				p -> new BeanMetaDataManager(
+				new BeanMetaDataManagerKey( parameterNameProvider, methodValidationConfiguration ),
+				key -> new BeanMetaDataManager(
 						constraintHelper,
 						executableHelper,
 						typeResolutionHelper,
 						parameterNameProvider,
+						// TODO make part of the cache key, too
 						valueExtractorManager,
 						buildDataProviders(),
 						methodValidationConfiguration
@@ -500,6 +501,62 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			DefaultConstraintMapping mapping = new DefaultConstraintMapping();
 			mappings.add( mapping );
 			return mapping;
+		}
+	}
+
+	private static class BeanMetaDataManagerKey {
+		private final ExecutableParameterNameProvider parameterNameProvider;
+		private final MethodValidationConfiguration methodValidationConfiguration;
+
+		public BeanMetaDataManagerKey(ExecutableParameterNameProvider parameterNameProvider, MethodValidationConfiguration methodValidationConfiguration) {
+			this.parameterNameProvider = parameterNameProvider;
+			this.methodValidationConfiguration = methodValidationConfiguration;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ( ( methodValidationConfiguration == null ) ? 0 : methodValidationConfiguration.hashCode() );
+			result = prime * result + ( ( parameterNameProvider == null ) ? 0 : parameterNameProvider.hashCode() );
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			BeanMetaDataManagerKey other = (BeanMetaDataManagerKey) obj;
+			if ( methodValidationConfiguration == null ) {
+				if ( other.methodValidationConfiguration != null ) {
+					return false;
+				}
+			}
+			else if ( !methodValidationConfiguration.equals( other.methodValidationConfiguration ) ) {
+				return false;
+			}
+			if ( parameterNameProvider == null ) {
+				if ( other.parameterNameProvider != null ) {
+					return false;
+				}
+			}
+			else if ( !parameterNameProvider.equals( other.parameterNameProvider ) ) {
+				return false;
+			}
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return "BeanMetaDataManagerKey [parameterNameProvider=" + parameterNameProvider + ", methodValidationConfiguration=" + methodValidationConfiguration
+					+ "]";
 		}
 	}
 }
