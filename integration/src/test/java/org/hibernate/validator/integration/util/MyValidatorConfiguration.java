@@ -7,6 +7,7 @@
 package org.hibernate.validator.integration.util;
 
 import java.io.InputStream;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
 import javax.validation.Configuration;
@@ -16,6 +17,7 @@ import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidatorFactory;
 import javax.validation.spi.ValidationProvider;
+import javax.validation.valueextraction.ValueExtractor;
 
 /**
  * @author Hardy Ferentschik
@@ -53,6 +55,21 @@ public class MyValidatorConfiguration implements Configuration<MyValidatorConfig
 	}
 
 	@Override
+	public MyValidatorConfiguration parameterNameProvider(ParameterNameProvider parameterNameProvider) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MyValidatorConfiguration clockProvider(ClockProvider clockProvider) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public MyValidatorConfiguration addValueExtractor(ValueExtractor<?> extractor) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public MyValidatorConfiguration addMapping(InputStream stream) {
 		throw new UnsupportedOperationException();
 	}
@@ -78,28 +95,18 @@ public class MyValidatorConfiguration implements Configuration<MyValidatorConfig
 	}
 
 	@Override
-	public ValidatorFactory buildValidatorFactory() {
-		return provider.buildValidatorFactory( null );
-	}
-
-	@Override
-	public MyValidatorConfiguration parameterNameProvider(ParameterNameProvider parameterNameProvider) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public ParameterNameProvider getDefaultParameterNameProvider() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public MyValidatorConfiguration clockProvider(ClockProvider clockProvider) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public ClockProvider getDefaultClockProvider() {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public ValidatorFactory buildValidatorFactory() {
+		return provider.buildValidatorFactory( null );
 	}
 
 	@Override

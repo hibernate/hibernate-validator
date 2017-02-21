@@ -110,6 +110,31 @@ public class ValueExtractorDescriptor {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + extractedType.hashCode();
+		result = prime * result + extractedTypeParameter.hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ValueExtractorDescriptor other = (ValueExtractorDescriptor) obj;
+
+		return extractedTypeParameter.equals( other.extractedTypeParameter );
+	}
+
+	@Override
 	public String toString() {
 		return "ValueExtractorDescriptor [valueExtractor=" + StringHelper.toShortString( valueExtractor.getClass() ) + ", extractedType=" + StringHelper.toShortString( extractedType )
 				+ ", extractedTypeParameter=" + extractedTypeParameter + ", unwrapByDefault=" + unwrapByDefault + "]";

@@ -36,6 +36,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
+import javax.validation.valueextraction.ValueExtractor;
 import javax.validation.valueextraction.ValueExtractorDefinitionException;
 import javax.xml.stream.XMLStreamException;
 
@@ -703,4 +704,10 @@ public interface Log extends BasicLogger {
 	@Message(id = 205, value = "Invalid unwrapping configuration for constraint %2$s on %1$s. You can only define one of 'Unwrapping.Skip' or 'Unwrapping.Unwrap'.")
 	ConstraintDefinitionException getInvalidUnwrappingConfigurationForConstraintException(Member member, @FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint);
 
+	@Message(id = 206, value = "Unable to instantiate value extractor class %s.")
+	ValidationException getUnableToInstantiateValueExtractorClassException(String valueExtractorClassName, @Cause ValidationException e);
+
+	@LogMessage(level = INFO)
+	@Message(id = 207, value = "Adding value extractor %s.")
+	void addingValueExtractor(@FormatWith(ClassObjectFormatter.class) Class<? extends ValueExtractor<?>> valueExtractorClass);
 }

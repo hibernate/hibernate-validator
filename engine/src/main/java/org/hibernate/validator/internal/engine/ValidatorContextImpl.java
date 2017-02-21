@@ -12,6 +12,8 @@ import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
+import javax.validation.ValidatorContext;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
@@ -104,6 +106,11 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 			this.clockProvider = clockProvider;
 		}
 		return this;
+	}
+
+	@Override
+	public ValidatorContext addValueExtractor(ValueExtractor<?> extractor) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

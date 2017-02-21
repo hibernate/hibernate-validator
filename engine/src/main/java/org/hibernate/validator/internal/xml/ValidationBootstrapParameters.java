@@ -13,8 +13,10 @@ import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
@@ -24,7 +26,9 @@ import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
+import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
@@ -45,6 +49,7 @@ public class ValidationBootstrapParameters {
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = newHashMap();
 	private final Set<InputStream> mappings = newHashSet();
+	private final Set<ValueExtractorDescriptor> valueExtractors = new HashSet<>();
 
 	public ValidationBootstrapParameters() {
 	}
@@ -134,6 +139,16 @@ public class ValidationBootstrapParameters {
 
 	public void setClockProvider(ClockProvider clockProvider) {
 		this.clockProvider = clockProvider;
+	}
+
+	public Set<ValueExtractor<?>> getValueExtractors() {
+		return valueExtractors.stream()
+				.map( ValueExtractorDescriptor::getValueExtractor )
+				.collect( Collectors.toSet() );
+	}
+
+	public void addValueExtractor(ValueExtractor<?> valueExtractor) {
+		valueExtractors.add( new ValueExtractorDescriptor( valueExtractor ) );
 	}
 
 	@SuppressWarnings("unchecked")

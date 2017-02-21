@@ -34,7 +34,7 @@ public class CustomValueExtractorTest {
 
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addCascadedValueExtractor( new ReferenceValueExtractor() )
+				.addValueExtractor( new ReferenceValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -49,7 +49,7 @@ public class CustomValueExtractorTest {
 
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addCascadedValueExtractor( new MultimapValueExtractor() )
+				.addValueExtractor( new MultimapValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 

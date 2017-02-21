@@ -60,9 +60,9 @@ public class UnwrappingTest {
 		validatorWithoutValueExtractor = ValidatorUtil.getValidator();
 
 		validatorWithValueExtractor = ValidatorUtil.getConfiguration()
-				.addCascadedValueExtractor( new ValueHolderExtractor() )
-				.addCascadedValueExtractor( new UnwrapByDefaultWrapperValueExtractor() )
-				.addCascadedValueExtractor( new WrapperWithTwoTypeArgumentsValueExtractor() )
+				.addValueExtractor( new ValueHolderExtractor() )
+				.addValueExtractor( new UnwrapByDefaultWrapperValueExtractor() )
+				.addValueExtractor( new WrapperWithTwoTypeArgumentsValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 	}
@@ -181,25 +181,25 @@ public class UnwrappingTest {
 	private class WrapperWithImplicitUnwrapping {
 
 		@Min(10)
-		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
+		private final Wrapper<Integer> integerWrapper = new Wrapper<>( 5 );
 	}
 
 	private class WrapperWithDisabledUnwrapping {
 
 		@Min(value = 10, payload = { Unwrapping.Skip.class })
-		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
+		private final Wrapper<Integer> integerWrapper = new Wrapper<>( 5 );
 	}
 
 	private class WrapperWithForcedUnwrapping {
 
 		@Min(value = 10, payload = { Unwrapping.Unwrap.class })
-		private final Wrapper<Integer> integerWrapper = new Wrapper<Integer>( 5 );
+		private final Wrapper<Integer> integerWrapper = new Wrapper<>( 5 );
 	}
 
 	private class BeanWithWrapperWithTwoTypeArguments {
 
 		@Min(value = 10, payload = { Unwrapping.Unwrap.class })
-		private final WrapperWithTwoTypeArguments<Long, String> wrapper = new WrapperWithTwoTypeArguments<Long, String>( 5L, "value" );
+		private final WrapperWithTwoTypeArguments<Long, String> wrapper = new WrapperWithTwoTypeArguments<>( 5L, "value" );
 	}
 
 	private class ValueHolder<T> {

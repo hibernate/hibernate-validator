@@ -7,7 +7,6 @@
 package org.hibernate.validator;
 
 import javax.validation.Configuration;
-import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
@@ -119,8 +118,6 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @return {@code this} following the chaining method pattern
 	 */
 	HibernateValidatorConfiguration failFast(boolean failFast);
-
-	HibernateValidatorConfiguration addCascadedValueExtractor(ValueExtractor<?> extractor);
 
 	/**
 	 * Sets the class loader to be used for loading user-provided resources:
