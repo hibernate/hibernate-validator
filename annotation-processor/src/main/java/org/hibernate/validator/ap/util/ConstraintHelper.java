@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -35,6 +36,7 @@ import javax.lang.model.util.Types;
 import org.hibernate.validator.ap.util.TypeNames.BeanValidationTypes;
 import org.hibernate.validator.ap.util.TypeNames.HibernateValidatorTypes;
 import org.hibernate.validator.ap.util.TypeNames.Java8DateTime;
+import org.hibernate.validator.ap.util.TypeNames.JavaMoneyTypes;
 import org.hibernate.validator.ap.util.TypeNames.JodaTypes;
 
 /**
@@ -190,31 +192,13 @@ public class ConstraintHelper {
 		//register BV-defined constraints
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.ASSERT_FALSE, Boolean.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.ASSERT_TRUE, Boolean.class );
-		registerAllowedTypesForBuiltInConstraint(
-				BeanValidationTypes.DECIMAL_MAX,
-				Number.class,
-				String.class
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				BeanValidationTypes.DECIMAL_MAX,
-				TypeNames.JavaMoneyTypes.MONETARY_AMOUNT
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				BeanValidationTypes.DECIMAL_MIN,
-				Number.class,
-				String.class
-		);
-		registerAllowedTypesForBuiltInConstraint(
-				BeanValidationTypes.DECIMAL_MIN,
-				TypeNames.JavaMoneyTypes.MONETARY_AMOUNT
-		);
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DECIMAL_MAX, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DECIMAL_MAX, JavaMoneyTypes.MONETARY_AMOUNT );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DECIMAL_MIN, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DECIMAL_MIN, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DIGITS, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, Calendar.class, Date.class );
-		registerAllowedTypesForBuiltInConstraint(
-				BeanValidationTypes.FUTURE,
-				JodaTypes.READABLE_PARTIAL,
-				JodaTypes.READABLE_INSTANT
-		);
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, JodaTypes.READABLE_PARTIAL, JodaTypes.READABLE_INSTANT );
 		registerAllowedTypesForBuiltInConstraint(
 				BeanValidationTypes.FUTURE,
 				Java8DateTime.CHRONO_ZONED_DATE_TIME,
@@ -222,17 +206,13 @@ public class ConstraintHelper {
 				Java8DateTime.INSTANT
 		);
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, Number.class, String.class );
-		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, TypeNames.JavaMoneyTypes.MONETARY_AMOUNT );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class );
-		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, TypeNames.JavaMoneyTypes.MONETARY_AMOUNT );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_NULL, Object.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NULL, Object.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, Calendar.class, Date.class );
-		registerAllowedTypesForBuiltInConstraint(
-				BeanValidationTypes.PAST,
-				JodaTypes.READABLE_PARTIAL,
-				JodaTypes.READABLE_INSTANT
-		);
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, JodaTypes.READABLE_PARTIAL, JodaTypes.READABLE_INSTANT );
 		registerAllowedTypesForBuiltInConstraint(
 				BeanValidationTypes.PAST,
 				Java8DateTime.CHRONO_ZONED_DATE_TIME,
@@ -257,10 +237,7 @@ public class ConstraintHelper {
 		);
 
 		//register HV-specific constraints
-		registerAllowedTypesForBuiltInConstraint(
-				HibernateValidatorTypes.CURRENCY,
-				TypeNames.JavaMoneyTypes.MONETARY_AMOUNT
-		);
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CURRENCY, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.EMAIL, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.LENGTH, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.MOD_CHECK, CharSequence.class );
