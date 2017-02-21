@@ -33,7 +33,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -185,18 +184,18 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 	}
 
 	BeanConfiguration<C> build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager) {
+			ValueExtractorManager valueExtractorManager) {
 		return new BeanConfiguration<>(
 				ConfigurationSource.API,
 				beanClass,
-				buildConstraintElements( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager ),
+				buildConstraintElements( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				defaultGroupSequence,
 				getDefaultGroupSequenceProvider()
 		);
 	}
 
 	private Set<ConstrainedElement> buildConstraintElements(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager) {
+			ValueExtractorManager valueExtractorManager) {
 		Set<ConstrainedElement> elements = newHashSet();
 
 		//class-level configuration
@@ -210,7 +209,7 @@ public final class TypeConstraintMappingContextImpl<C> extends ConstraintMapping
 
 		//constructors/methods
 		for ( ExecutableConstraintMappingContextImpl executableContext : executableContexts ) {
-			elements.add( executableContext.build( constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager ) );
+			elements.add( executableContext.build( constraintHelper, typeResolutionHelper, valueExtractorManager ) );
 		}
 
 		//properties

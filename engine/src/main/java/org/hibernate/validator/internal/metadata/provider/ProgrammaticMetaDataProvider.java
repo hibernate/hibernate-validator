@@ -20,7 +20,6 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.util.Contracts;
-import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -42,13 +41,12 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 
 	public ProgrammaticMetaDataProvider(ConstraintHelper constraintHelper,
 										TypeResolutionHelper typeResolutionHelper,
-										ExecutableParameterNameProvider parameterNameProvider,
 										ValueExtractorManager valueExtractorManager,
 										Set<DefaultConstraintMapping> constraintMappings) {
 		Contracts.assertNotNull( constraintMappings );
 
 		configuredBeans = Collections.unmodifiableMap(
-				createBeanConfigurations( constraintMappings, constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager )
+				createBeanConfigurations( constraintMappings, constraintHelper, typeResolutionHelper, valueExtractorManager )
 		);
 
 		assertUniquenessOfConfiguredTypes( constraintMappings );
@@ -70,10 +68,10 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 	}
 
 	private static Map<String, BeanConfiguration<?>> createBeanConfigurations(Set<DefaultConstraintMapping> mappings, ConstraintHelper constraintHelper,
-			TypeResolutionHelper typeResolutionHelper, ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager) {
+			TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
 		final Map<String, BeanConfiguration<?>> configuredBeans = new HashMap<>();
 		for ( DefaultConstraintMapping mapping : mappings ) {
-			Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations( constraintHelper, typeResolutionHelper, parameterNameProvider,
+			Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations( constraintHelper, typeResolutionHelper,
 					valueExtractorManager );
 
 			for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {

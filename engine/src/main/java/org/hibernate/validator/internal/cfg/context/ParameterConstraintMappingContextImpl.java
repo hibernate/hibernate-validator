@@ -22,7 +22,6 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
@@ -100,7 +99,7 @@ final class ParameterConstraintMappingContextImpl
 	}
 
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
-			ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager) {
+			ValueExtractorManager valueExtractorManager) {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		Type parameterType = ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex );
 
@@ -109,7 +108,6 @@ final class ParameterConstraintMappingContextImpl
 				executableContext.getExecutable(),
 				parameterType,
 				parameterIndex,
-				parameterNameProvider.getParameterNames( executableContext.getExecutable() ).get( parameterIndex ),
 				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				Collections.emptySet(),
 				groupConversions,

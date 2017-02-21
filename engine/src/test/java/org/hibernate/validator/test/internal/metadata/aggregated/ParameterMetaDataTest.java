@@ -24,6 +24,7 @@ import javax.validation.executable.ValidateOnExecution;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -59,7 +60,8 @@ public class ParameterMetaDataTest {
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptyList() ),
-				Collections.<MetaDataProvider>emptyList()
+				Collections.<MetaDataProvider>emptyList(),
+				new MethodValidationConfiguration()
 		);
 
 		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepository.class );
@@ -133,7 +135,8 @@ public class ParameterMetaDataTest {
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new SkewedParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptyList() ),
-				Collections.<MetaDataProvider>emptyList()
+				Collections.<MetaDataProvider>emptyList(),
+				new MethodValidationConfiguration()
 		);
 		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );
 

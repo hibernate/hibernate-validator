@@ -41,7 +41,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
-import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -71,7 +70,6 @@ public class MappingXmlParser {
 	private final Map<Class<?>, Set<ConstrainedElement>> constrainedElements;
 
 	private final XmlParserHelper xmlParserHelper;
-	private final ExecutableParameterNameProvider parameterNameProvider;
 
 	private final ClassLoadingHelper classLoadingHelper;
 
@@ -87,8 +85,8 @@ public class MappingXmlParser {
 		return schemasByVersion;
 	}
 
-	public MappingXmlParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ExecutableParameterNameProvider parameterNameProvider,
-			ValueExtractorManager valueExtractorManager, ClassLoader externalClassLoader) {
+	public MappingXmlParser(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
+			ClassLoader externalClassLoader) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
 		this.valueExtractorManager = valueExtractorManager;
@@ -96,7 +94,6 @@ public class MappingXmlParser {
 		this.defaultSequences = newHashMap();
 		this.constrainedElements = newHashMap();
 		this.xmlParserHelper = new XmlParserHelper();
-		this.parameterNameProvider = parameterNameProvider;
 		this.classLoadingHelper = new ClassLoadingHelper( externalClassLoader );
 	}
 
@@ -133,7 +130,6 @@ public class MappingXmlParser {
 			);
 			ConstrainedExecutableBuilder constrainedExecutableBuilder = new ConstrainedExecutableBuilder(
 					classLoadingHelper,
-					parameterNameProvider,
 					metaConstraintBuilder,
 					groupConversionBuilder,
 					annotationProcessingOptions

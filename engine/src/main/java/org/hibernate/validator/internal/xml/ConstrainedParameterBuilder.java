@@ -23,7 +23,6 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
-import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.ParameterType;
@@ -36,15 +35,13 @@ import org.hibernate.validator.internal.xml.binding.ParameterType;
 class ConstrainedParameterBuilder {
 
 	private final GroupConversionBuilder groupConversionBuilder;
-	private final ExecutableParameterNameProvider parameterNameProvider;
 	private final MetaConstraintBuilder metaConstraintBuilder;
 	private final AnnotationProcessingOptionsImpl annotationProcessingOptions;
 
 	ConstrainedParameterBuilder(MetaConstraintBuilder metaConstraintBuilder,
-			ExecutableParameterNameProvider parameterNameProvider, GroupConversionBuilder groupConversionBuilder,
+			GroupConversionBuilder groupConversionBuilder,
 			AnnotationProcessingOptionsImpl annotationProcessingOptions) {
 		this.metaConstraintBuilder = metaConstraintBuilder;
-		this.parameterNameProvider = parameterNameProvider;
 		this.groupConversionBuilder = groupConversionBuilder;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 	}
@@ -54,7 +51,6 @@ class ConstrainedParameterBuilder {
 																		String defaultPackage) {
 		List<ConstrainedParameter> constrainedParameters = newArrayList();
 		int i = 0;
-		List<String> parameterNames = parameterNameProvider.getParameterNames( executable );
 		for ( ParameterType parameterType : parameterList ) {
 			ConstraintLocation constraintLocation = ConstraintLocation.forParameter( executable, i );
 			Set<MetaConstraint<?>> metaConstraints = newHashSet();
@@ -89,7 +85,6 @@ class ConstrainedParameterBuilder {
 					executable,
 					type,
 					i,
-					parameterNames.get( i ),
 					metaConstraints,
 					Collections.emptySet(),
 					groupConversions,
