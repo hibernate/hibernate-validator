@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
@@ -52,7 +53,8 @@ public class BeanMetaDataManagerTest {
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptyList() ),
-				Collections.<MetaDataProvider>emptyList()
+				Collections.<MetaDataProvider>emptyList(),
+				new MethodValidationConfiguration()
 		);
 	}
 

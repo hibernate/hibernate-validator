@@ -26,6 +26,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.internal.engine.DefaultParameterNameProvider;
+import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -186,7 +187,8 @@ public class PathImplTest {
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptyList() ),
-				Collections.<MetaDataProvider>emptyList()
+				Collections.<MetaDataProvider>emptyList(),
+				new MethodValidationConfiguration()
 		);
 
 		ExecutableMetaData executableMetaData = beanMetaDataManager.getBeanMetaData( Container.class )

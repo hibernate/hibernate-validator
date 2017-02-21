@@ -65,7 +65,6 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ConcurrentReferenceHashMap;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -94,17 +93,14 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	protected final TypeResolutionHelper typeResolutionHelper;
 	protected final ConcurrentReferenceHashMap<Class<?>, BeanConfiguration<?>> configuredBeans;
 	protected final AnnotationProcessingOptions annotationProcessingOptions;
-	protected final ExecutableParameterNameProvider parameterNameProvider;
 	protected final ValueExtractorManager valueExtractorManager;
 
 	public AnnotationMetaDataProvider(ConstraintHelper constraintHelper,
 			TypeResolutionHelper typeResolutionHelper,
-			ExecutableParameterNameProvider parameterNameProvider,
 			ValueExtractorManager valueExtractorManager,
 			AnnotationProcessingOptions annotationProcessingOptions) {
 		this.constraintHelper = constraintHelper;
 		this.typeResolutionHelper = typeResolutionHelper;
-		this.parameterNameProvider = parameterNameProvider;
 		this.valueExtractorManager = valueExtractorManager;
 		this.annotationProcessingOptions = annotationProcessingOptions;
 		this.configuredBeans = new ConcurrentReferenceHashMap<>(
@@ -395,8 +391,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	private List<ConstrainedParameter> getParameterMetaData(Executable executable) {
 		List<ConstrainedParameter> metaData = newArrayList();
 
-		List<String> parameterNames = parameterNameProvider.getParameterNames( executable );
-
 		int i = 0;
 		for ( Parameter parameter : executable.getParameters() ) {
 			Annotation[] parameterAnnotations;
@@ -408,7 +402,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				parameterAnnotations = new Annotation[0];
 			}
 
-			String parameterName = parameterNames.get( i );
 			Set<MetaConstraint<?>> parameterConstraints = newHashSet();
 			ConvertGroup groupConversion = null;
 			ConvertGroup.List groupConversionList = null;
@@ -420,7 +413,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 								executable,
 								ReflectionHelper.typeOf( executable, i ),
 								i,
-								parameterName,
 								parameterConstraints,
 								Collections.emptySet(),
 								getGroupConversions( groupConversion, groupConversionList ),
@@ -462,7 +454,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 							executable,
 							ReflectionHelper.typeOf( executable, i ),
 							i,
-							parameterName,
 							parameterConstraints,
 							typeArgumentsConstraints,
 							getGroupConversions( groupConversion, groupConversionList ),

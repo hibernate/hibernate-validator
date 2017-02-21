@@ -187,7 +187,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		}
 		else {
 			this.xmlMetaDataProvider = new XmlMetaDataProvider(
-					constraintHelper, typeResolutionHelper, parameterNameProvider, valueExtractorManager, configurationState.getMappingStreams(), externalClassLoader
+					constraintHelper, typeResolutionHelper, valueExtractorManager, configurationState.getMappingStreams(), externalClassLoader
 			);
 		}
 
@@ -362,7 +362,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 						typeResolutionHelper,
 						parameterNameProvider,
 						valueExtractorManager,
-						buildDataProviders( parameterNameProvider ),
+						buildDataProviders(),
 						methodValidationConfiguration
 				)
 		 );
@@ -380,7 +380,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		);
 	}
 
-	private List<MetaDataProvider> buildDataProviders(ExecutableParameterNameProvider parameterNameProvider) {
+	private List<MetaDataProvider> buildDataProviders() {
 		List<MetaDataProvider> metaDataProviders = newArrayList();
 		if ( xmlMetaDataProvider != null ) {
 			metaDataProviders.add( xmlMetaDataProvider );
@@ -391,7 +391,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 					new ProgrammaticMetaDataProvider(
 							constraintHelper,
 							typeResolutionHelper,
-							parameterNameProvider,
 							valueExtractorManager,
 							constraintMappings
 					)

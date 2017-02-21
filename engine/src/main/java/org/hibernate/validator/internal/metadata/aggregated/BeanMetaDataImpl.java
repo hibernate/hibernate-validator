@@ -26,7 +26,6 @@ import javax.validation.ElementKind;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstructorDescriptor;
-import javax.validation.metadata.MethodType;
 import javax.validation.metadata.PropertyDescriptor;
 
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
@@ -48,6 +47,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper;
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
@@ -479,34 +479,27 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	public static class BeanMetaDataBuilder<T> {
 
 		private final ConstraintHelper constraintHelper;
-
 		private final ValidationOrderGenerator validationOrderGenerator;
-
 		private final Class<T> beanClass;
-
 		private final Set<BuilderDelegate> builders = newHashSet();
-
 		private final ExecutableHelper executableHelper;
-
 		private final TypeResolutionHelper typeResolutionHelper;
-
 		private final ValueExtractorManager valueExtractorManager;
+		private final ExecutableParameterNameProvider parameterNameProvider;
+		private final MethodValidationConfiguration methodValidationConfiguration;
 
 		private ConfigurationSource sequenceSource;
-
 		private ConfigurationSource providerSource;
-
 		private List<Class<?>> defaultGroupSequence;
-
 		private DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
 
-		private final MethodValidationConfiguration methodValidationConfiguration;
 
 		private BeanMetaDataBuilder(
 				ConstraintHelper constraintHelper,
 				ExecutableHelper executableHelper,
 				TypeResolutionHelper typeResolutionHelper,
 				ValueExtractorManager valueExtractorManager,
+				ExecutableParameterNameProvider parameterNameProvider,
 				ValidationOrderGenerator validationOrderGenerator,
 				Class<T> beanClass,
 				MethodValidationConfiguration methodValidationConfiguration) {
@@ -516,6 +509,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			this.executableHelper = executableHelper;
 			this.typeResolutionHelper = typeResolutionHelper;
 			this.valueExtractorManager = valueExtractorManager;
+			this.parameterNameProvider = parameterNameProvider;
 			this.methodValidationConfiguration = methodValidationConfiguration;
 		}
 
@@ -524,6 +518,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				ExecutableHelper executableHelper,
 				TypeResolutionHelper typeResolutionHelper,
 				ValueExtractorManager valueExtractorManager,
+				ExecutableParameterNameProvider parameterNameProvider,
 				ValidationOrderGenerator validationOrderGenerator,
 				Class<T> beanClass,
 				MethodValidationConfiguration methodValidationConfiguration) {
@@ -532,6 +527,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 					executableHelper,
 					typeResolutionHelper,
 					valueExtractorManager,
+					parameterNameProvider,
 					validationOrderGenerator,
 					beanClass,
 					methodValidationConfiguration );
@@ -578,6 +574,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							executableHelper,
 							typeResolutionHelper,
 							valueExtractorManager,
+							parameterNameProvider,
 							methodValidationConfiguration
 					)
 			);
@@ -606,6 +603,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		private final ExecutableHelper executableHelper;
 		private final TypeResolutionHelper typeResolutionHelper;
 		private final ValueExtractorManager valueExtractorManager;
+		private final ExecutableParameterNameProvider parameterNameProvider;
 		private MetaDataBuilder propertyBuilder;
 		private ExecutableMetaData.Builder methodBuilder;
 		private final MethodValidationConfiguration methodValidationConfiguration;
@@ -618,6 +616,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 				ExecutableHelper executableHelper,
 				TypeResolutionHelper typeResolutionHelper,
 				ValueExtractorManager valueExtractorManager,
+				ExecutableParameterNameProvider parameterNameProvider,
 				MethodValidationConfiguration methodValidationConfiguration
 		) {
 			this.beanClass = beanClass;
@@ -625,6 +624,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			this.executableHelper = executableHelper;
 			this.typeResolutionHelper = typeResolutionHelper;
 			this.valueExtractorManager = valueExtractorManager;
+			this.parameterNameProvider = parameterNameProvider;
 			this.methodValidationConfiguration = methodValidationConfiguration;
 
 			switch ( constrainedElement.getKind() ) {
@@ -653,6 +653,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 								executableHelper,
 								typeResolutionHelper,
 								valueExtractorManager,
+								parameterNameProvider,
 								methodValidationConfiguration
 						);
 					}
@@ -700,6 +701,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 							executableHelper,
 							typeResolutionHelper,
 							valueExtractorManager,
+							parameterNameProvider,
 							methodValidationConfiguration
 					);
 				}

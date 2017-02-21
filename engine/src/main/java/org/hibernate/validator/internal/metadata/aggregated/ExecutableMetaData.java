@@ -37,6 +37,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ExecutableHelper;
+import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 
@@ -262,6 +263,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 		private final ExecutableHelper executableHelper;
 
+		private final ExecutableParameterNameProvider parameterNameProvider;
+
 		public Builder(
 				Class<?> beanClass,
 				ConstrainedExecutable constrainedExecutable,
@@ -269,10 +272,12 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 				ExecutableHelper executableHelper,
 				TypeResolutionHelper typeResolutionHelper,
 				ValueExtractorManager valueExtractorManager,
+				ExecutableParameterNameProvider parameterNameProvider,
 				MethodValidationConfiguration methodValidationConfiguration) {
 			super( beanClass, constraintHelper, typeResolutionHelper, valueExtractorManager );
 
 			this.executableHelper = executableHelper;
+			this.parameterNameProvider = parameterNameProvider;
 			this.kind = constrainedExecutable.getKind();
 			this.executable = constrainedExecutable.getExecutable();
 			this.rules = new HashSet<>( methodValidationConfiguration.getConfiguredRuleSet() );
@@ -389,7 +394,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 										oneParameter,
 										constraintHelper,
 										typeResolutionHelper,
-										valueExtractorManager
+										valueExtractorManager,
+										parameterNameProvider
 								)
 						);
 					}
