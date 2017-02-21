@@ -35,7 +35,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private ClockProvider clockProvider;
 	private boolean failFast;
 	private final ValueExtractorManager valueExtractorManager;
-	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
+	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder;
 
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
@@ -46,6 +46,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.parameterNameProvider = validatorFactory.getExecutableParameterNameProvider();
 		this.clockProvider = validatorFactory.getClockProvider();
 		this.failFast = validatorFactory.isFailFast();
+		this.methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder( validatorFactory.getMethodValidationConfiguration() );
 		// TODO make overwritable per this context
 		this.valueExtractorManager = validatorFactory.getValueExtractorManager();
 	}
@@ -113,19 +114,19 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 
 	@Override
 	public HibernateValidatorContext allowOverridingMethodAlterParameterConstraint(boolean allow) {
-		this.methodValidationConfiguration.allowOverridingMethodAlterParameterConstraint( allow );
+		methodValidationConfigurationBuilder.allowOverridingMethodAlterParameterConstraint( allow );
 		return this;
 	}
 
 	@Override
 	public HibernateValidatorContext allowMultipleCascadedValidationOnReturnValues(boolean allow) {
-		this.methodValidationConfiguration.allowMultipleCascadedValidationOnReturnValues( allow );
+		methodValidationConfigurationBuilder.allowMultipleCascadedValidationOnReturnValues( allow );
 		return this;
 	}
 
 	@Override
 	public HibernateValidatorContext allowParallelMethodsDefineParameterConstraints(boolean allow) {
-		this.methodValidationConfiguration.allowParallelMethodsDefineParameterConstraints( allow );
+		methodValidationConfigurationBuilder.allowParallelMethodsDefineParameterConstraints( allow );
 		return this;
 	}
 
@@ -139,7 +140,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				clockProvider,
 				failFast,
 				valueExtractorManager,
-				methodValidationConfiguration
+				methodValidationConfigurationBuilder.build()
 		);
 	}
 }

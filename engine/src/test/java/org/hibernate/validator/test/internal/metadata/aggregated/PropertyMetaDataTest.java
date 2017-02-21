@@ -45,7 +45,7 @@ public class PropertyMetaDataTest {
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptyList() ),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration()
+				new MethodValidationConfiguration.Builder().build()
 		);
 	}
 

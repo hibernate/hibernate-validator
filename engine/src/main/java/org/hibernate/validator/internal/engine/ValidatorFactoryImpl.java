@@ -34,6 +34,7 @@ import org.hibernate.validator.HibernateValidatorContext;
 import org.hibernate.validator.HibernateValidatorFactory;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.engine.MethodValidationConfiguration.Builder;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.constraintdefinition.ConstraintDefinitionContribution;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
@@ -205,14 +206,14 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		tmpFailFast = checkPropertiesForBoolean( properties, HibernateValidatorConfiguration.FAIL_FAST, tmpFailFast );
 		this.failFast = tmpFailFast;
 
-		this.methodValidationConfiguration = new MethodValidationConfiguration();
+		Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 
 		tmpAllowOverridingMethodAlterParameterConstraint = checkPropertiesForBoolean(
 				properties,
 				HibernateValidatorConfiguration.ALLOW_PARAMETER_CONSTRAINT_OVERRIDE,
 				tmpAllowOverridingMethodAlterParameterConstraint
 		);
-		this.methodValidationConfiguration.allowOverridingMethodAlterParameterConstraint(
+		methodValidationConfigurationBuilder.allowOverridingMethodAlterParameterConstraint(
 				tmpAllowOverridingMethodAlterParameterConstraint
 		);
 
@@ -221,7 +222,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				HibernateValidatorConfiguration.ALLOW_MULTIPLE_CASCADED_VALIDATION_ON_RESULT,
 				tmpAllowMultipleCascadedValidationOnReturnValues
 		);
-		this.methodValidationConfiguration.allowMultipleCascadedValidationOnReturnValues(
+		methodValidationConfigurationBuilder.allowMultipleCascadedValidationOnReturnValues(
 				tmpAllowMultipleCascadedValidationOnReturnValues
 		);
 
@@ -230,9 +231,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				HibernateValidatorConfiguration.ALLOW_PARALLEL_METHODS_DEFINE_PARAMETER_CONSTRAINTS,
 				tmpAllowParallelMethodsDefineParameterConstraints
 		);
-		this.methodValidationConfiguration.allowParallelMethodsDefineParameterConstraints(
+		methodValidationConfigurationBuilder.allowParallelMethodsDefineParameterConstraints(
 				tmpAllowParallelMethodsDefineParameterConstraints
 		);
+		this.methodValidationConfiguration = methodValidationConfigurationBuilder.build();
 
 		this.constraintValidatorManager = new ConstraintValidatorManager( configurationState.getConstraintValidatorFactory() );
 	}
@@ -317,6 +319,10 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	public boolean isFailFast() {
 		return failFast;
+	}
+
+	MethodValidationConfiguration getMethodValidationConfiguration() {
+		return methodValidationConfiguration;
 	}
 
 	ValueExtractorManager getValueExtractorManager() {
