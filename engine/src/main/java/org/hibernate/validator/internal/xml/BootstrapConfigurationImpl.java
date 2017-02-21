@@ -6,15 +6,16 @@
  */
 package org.hibernate.validator.internal.xml;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 /**
  * Wrapper class for the bootstrap parameters defined in <i>validation.xml</i>
@@ -140,6 +141,12 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	@Override
 	public String getClockProviderClassName() {
 		return clockProviderClassName;
+	}
+
+	@Override
+	public Set<String> getValueExtractorClassNames() {
+		// TODO implement
+		return Collections.emptySet();
 	}
 
 	@Override

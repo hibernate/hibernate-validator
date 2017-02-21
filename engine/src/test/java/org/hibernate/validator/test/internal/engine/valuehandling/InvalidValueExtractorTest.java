@@ -26,7 +26,7 @@ public class InvalidValueExtractorTest {
 	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000204.*")
 	public void severalExtractedValuesThrowException() {
 		ValidatorUtil.getConfiguration()
-				.addCascadedValueExtractor( new SeveralExtractedValuesValueExtractor() )
+				.addValueExtractor( new SeveralExtractedValuesValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 	}
@@ -34,7 +34,7 @@ public class InvalidValueExtractorTest {
 	@Test(expectedExceptions = ValueExtractorDefinitionException.class, expectedExceptionsMessageRegExp = "HV000203.*")
 	public void noExtractedValueThrowsException() {
 		ValidatorUtil.getConfiguration()
-				.addCascadedValueExtractor( new NoExtractedValueValueExtractor() )
+				.addValueExtractor( new NoExtractedValueValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 	}

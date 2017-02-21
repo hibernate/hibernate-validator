@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,7 +90,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private boolean failFast;
-	private final List<ValueExtractor<?>> cascadedValueExtractors = new ArrayList<>();
 	private ClassLoader externalClassLoader;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 
@@ -198,6 +196,19 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
+	public HibernateValidatorConfiguration addValueExtractor(ValueExtractor<?> extractor) {
+		Contracts.assertNotNull( extractor, MESSAGES.parameterMustNotBeNull( "extractor" ) );
+
+		if ( log.isDebugEnabled() ) {
+			log.debug( "Adding value extractor " + extractor );
+		}
+
+		validationBootstrapParameters.addValueExtractor( extractor );
+
+		return this;
+	}
+
+	@Override
 	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
 		Contracts.assertNotNull( stream, MESSAGES.inputStreamCannotBeNull() );
 
@@ -263,14 +274,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		if ( value != null ) {
 			validationBootstrapParameters.addConfigProperty( name, value );
 		}
-		return this;
-	}
-
-	@Override
-	public HibernateValidatorConfiguration addCascadedValueExtractor(ValueExtractor<?> extractor) {
-		Contracts.assertNotNull( extractor, MESSAGES.parameterMustNotBeNull( "extractor" ) );
-		cascadedValueExtractors.add( extractor );
-
 		return this;
 	}
 
@@ -387,8 +390,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return validationBootstrapParameters.getClockProvider();
 	}
 
-	public List<ValueExtractor<?>> getCascadedValueExtractors() {
-		return cascadedValueExtractors;
+	@Override
+	public Set<ValueExtractor<?>> getValueExtractors() {
+		return validationBootstrapParameters.getValueExtractors();
 	}
 
 	@Override

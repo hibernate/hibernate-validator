@@ -49,8 +49,8 @@ public class UnwrapValidatedValueTest {
 	@BeforeMethod
 	public void setupValidator() {
 		validator = ValidatorUtil.getConfiguration()
-				.addCascadedValueExtractor( new PropertyValueExtractor() )
-				.addCascadedValueExtractor( new UiInputValueExtractor() )
+				.addValueExtractor( new PropertyValueExtractor() )
+				.addValueExtractor( new UiInputValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 	}
@@ -71,7 +71,7 @@ public class UnwrapValidatedValueTest {
 	public void shouldUnwrapPropertyValuesDuringParameterValidation() throws Exception {
 		Customer customer = new Customer();
 		Method method = Customer.class.getMethod( "setName", Property.class );
-		Object[] parameterValues = new Object[] { new Property<String>( "Bob" ) };
+		Object[] parameterValues = new Object[] { new Property<>( "Bob" ) };
 
 		Set<ConstraintViolation<Customer>> violations = validator.forExecutables()
 				.validateParameters( customer, method, parameterValues );
@@ -83,7 +83,7 @@ public class UnwrapValidatedValueTest {
 	public void shouldUnwrapPropertyValuesDuringReturnValueValidation() throws Exception {
 		Customer customer = new Customer();
 		Method method = Customer.class.getMethod( "retrieveName" );
-		Property<String> returnValue = new Property<String>( "Bob" );
+		Property<String> returnValue = new Property<>( "Bob" );
 
 		Set<ConstraintViolation<Customer>> violations = validator.forExecutables()
 				.validateReturnValue( customer, method, returnValue );
@@ -131,7 +131,7 @@ public class UnwrapValidatedValueTest {
 				.constraint( new MaxDef().value( 5 ) );
 
 		Validator validator = configuration.addMapping( mapping )
-				.addCascadedValueExtractor( new PropertyValueExtractor() )
+				.addValueExtractor( new PropertyValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -149,7 +149,7 @@ public class UnwrapValidatedValueTest {
 				.constraint( new MaxDef().value( 5 ).payload( Unwrapping.Skip.class ) );
 
 		Validator validator = configuration.addMapping( mapping )
-				.addCascadedValueExtractor( new PropertyValueExtractor() )
+				.addValueExtractor( new PropertyValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -166,7 +166,7 @@ public class UnwrapValidatedValueTest {
 				.constraint( new MaxDef().value( 5 ).payload( Unwrapping.Skip.class, Unwrapping.Unwrap.class ) );
 
 		validator = configuration.addMapping( mapping )
-				.addCascadedValueExtractor( new PropertyValueExtractor() )
+				.addValueExtractor( new PropertyValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 	}

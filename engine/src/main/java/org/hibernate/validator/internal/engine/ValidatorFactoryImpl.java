@@ -12,7 +12,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.spi.ConfigurationState;
-import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
@@ -150,6 +148,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
 		this.clockProvider = configurationState.getClockProvider();
+		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
@@ -159,7 +158,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		boolean tmpAllowOverridingMethodAlterParameterConstraint = false;
 		boolean tmpAllowMultipleCascadedValidationOnReturnValues = false;
 		boolean tmpAllowParallelMethodsDefineParameterConstraints = false;
-		List<ValueExtractor<?>> tmpCascadedValueExtractors = new ArrayList<>( 5 );
 
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
@@ -176,11 +174,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			tmpAllowParallelMethodsDefineParameterConstraints =
 					hibernateSpecificConfig.getMethodValidationConfiguration()
 							.isAllowParallelMethodsDefineParameterConstraints();
-
-			tmpCascadedValueExtractors = new ArrayList<>( hibernateSpecificConfig.getCascadedValueExtractors() );
 		}
-
-		this.valueExtractorManager = new ValueExtractorManager( tmpCascadedValueExtractors );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {

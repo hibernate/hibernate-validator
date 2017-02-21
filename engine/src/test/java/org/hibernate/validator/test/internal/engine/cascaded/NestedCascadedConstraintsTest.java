@@ -67,7 +67,7 @@ public class NestedCascadedConstraintsTest {
 	public void testMultipleNestedValidWithCustomExtractor() {
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addCascadedValueExtractor( new ReferenceValueExtractor() )
+				.addValueExtractor( new ReferenceValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 
@@ -121,7 +121,7 @@ public class NestedCascadedConstraintsTest {
 	public void testNestedOnArray() {
 		Validator validator = Validation.byProvider( HibernateValidator.class )
 				.configure()
-				.addCascadedValueExtractor( new ReferenceValueExtractor() )
+				.addValueExtractor( new ReferenceValueExtractor() )
 				.buildValidatorFactory()
 				.getValidator();
 
