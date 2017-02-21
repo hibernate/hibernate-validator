@@ -21,6 +21,7 @@ Federico Mancini
 Gavin King
 George Gastaldi
 Gerhard Petracek
+Guillaume Husta
 Guillaume Smet
 Gunnar Morling
 Hardy Ferentschik
