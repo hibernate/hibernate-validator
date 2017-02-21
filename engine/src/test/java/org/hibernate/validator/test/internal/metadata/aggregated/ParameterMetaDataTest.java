@@ -61,7 +61,7 @@ public class ParameterMetaDataTest {
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptyList() ),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration()
+				new MethodValidationConfiguration.Builder().build()
 		);
 
 		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepository.class );
@@ -136,7 +136,7 @@ public class ParameterMetaDataTest {
 				new ExecutableParameterNameProvider( new SkewedParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptyList() ),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration()
+				new MethodValidationConfiguration.Builder().build()
 		);
 		BeanMetaData<ServiceImpl> localBeanMetaData = beanMetaDataManager.getBeanMetaData( ServiceImpl.class );
 

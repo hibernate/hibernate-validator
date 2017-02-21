@@ -93,7 +93,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean failFast;
 	private final List<ValueExtractor<?>> cascadedValueExtractors = new ArrayList<>();
 	private ClassLoader externalClassLoader;
-	private final MethodValidationConfiguration methodValidationConfiguration = new MethodValidationConfiguration();
+	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -213,36 +213,36 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public HibernateValidatorConfiguration allowOverridingMethodAlterParameterConstraint(boolean allow) {
-		this.methodValidationConfiguration.allowOverridingMethodAlterParameterConstraint( allow );
+		this.methodValidationConfigurationBuilder.allowOverridingMethodAlterParameterConstraint( allow );
 		return this;
 	}
 
 	public boolean isAllowOverridingMethodAlterParameterConstraint() {
-		return this.methodValidationConfiguration.isAllowOverridingMethodAlterParameterConstraint();
+		return this.methodValidationConfigurationBuilder.isAllowOverridingMethodAlterParameterConstraint();
 	}
 
 	@Override
 	public HibernateValidatorConfiguration allowMultipleCascadedValidationOnReturnValues(boolean allow) {
-		this.methodValidationConfiguration.allowMultipleCascadedValidationOnReturnValues( allow );
+		this.methodValidationConfigurationBuilder.allowMultipleCascadedValidationOnReturnValues( allow );
 		return this;
 	}
 
 	public boolean isAllowMultipleCascadedValidationOnReturnValues() {
-		return this.methodValidationConfiguration.isAllowMultipleCascadedValidationOnReturnValues();
+		return this.methodValidationConfigurationBuilder.isAllowMultipleCascadedValidationOnReturnValues();
 	}
 
 	@Override
 	public HibernateValidatorConfiguration allowParallelMethodsDefineParameterConstraints(boolean allow) {
-		this.methodValidationConfiguration.allowParallelMethodsDefineParameterConstraints( allow );
+		this.methodValidationConfigurationBuilder.allowParallelMethodsDefineParameterConstraints( allow );
 		return this;
 	}
 
 	public boolean isAllowParallelMethodsDefineParameterConstraints() {
-		return this.methodValidationConfiguration.isAllowParallelMethodsDefineParameterConstraints();
+		return this.methodValidationConfigurationBuilder.isAllowParallelMethodsDefineParameterConstraints();
 	}
 
 	public MethodValidationConfiguration getMethodValidationConfiguration() {
-		return this.methodValidationConfiguration;
+		return this.methodValidationConfigurationBuilder.build();
 	}
 
 	@Override

@@ -61,7 +61,7 @@ public class ExecutableMetaDataTest {
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
 				new ValueExtractorManager( Collections.emptyList() ),
 				Collections.<MetaDataProvider>emptyList(),
-				new MethodValidationConfiguration()
+				new MethodValidationConfiguration.Builder().build()
 		);
 
 		beanMetaData = beanMetaDataManager.getBeanMetaData( CustomerRepositoryExt.class );
