@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class LongArrayValueExtractor implements ValueExtractor<long @ExtractedValue[]> {
 
-	static final LongArrayValueExtractor INSTANCE = new LongArrayValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new LongArrayValueExtractor() );
 
 	private LongArrayValueExtractor() {
 	}

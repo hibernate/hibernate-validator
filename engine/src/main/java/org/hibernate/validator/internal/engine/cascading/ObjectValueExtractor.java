@@ -11,7 +11,7 @@ import javax.validation.valueextraction.ValueExtractor;
 
 class ObjectValueExtractor implements ValueExtractor<@ExtractedValue Object> {
 
-	static final ObjectValueExtractor INSTANCE = new ObjectValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ObjectValueExtractor() );
 
 	private ObjectValueExtractor() {
 	}

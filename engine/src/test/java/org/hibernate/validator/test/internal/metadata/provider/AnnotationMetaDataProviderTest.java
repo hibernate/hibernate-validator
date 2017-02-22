@@ -60,7 +60,7 @@ public class AnnotationMetaDataProviderTest extends AnnotationMetaDataProviderTe
 		provider = new AnnotationMetaDataProvider(
 				new ConstraintHelper(),
 				new TypeResolutionHelper(),
-				new ValueExtractorManager( Collections.emptyList() ),
+				new ValueExtractorManager( Collections.emptySet() ),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}

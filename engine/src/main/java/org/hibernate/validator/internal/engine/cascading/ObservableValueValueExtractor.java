@@ -20,7 +20,7 @@ import javafx.beans.value.ObservableValue;
 @UnwrapByDefault
 public class ObservableValueValueExtractor implements ValueExtractor<ObservableValue<@ExtractedValue ?>> {
 
-	static final ObservableValueValueExtractor INSTANCE = new ObservableValueValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ObservableValueValueExtractor() );
 
 	private ObservableValueValueExtractor() {
 	}

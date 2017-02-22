@@ -355,13 +355,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			MethodValidationConfiguration methodValidationConfiguration) {
 
 		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
-				new BeanMetaDataManagerKey( parameterNameProvider, methodValidationConfiguration ),
+				new BeanMetaDataManagerKey( parameterNameProvider, valueExtractorManager, methodValidationConfiguration ),
 				key -> new BeanMetaDataManager(
 						constraintHelper,
 						executableHelper,
 						typeResolutionHelper,
 						parameterNameProvider,
-						// TODO make part of the cache key, too
 						valueExtractorManager,
 						buildDataProviders(),
 						methodValidationConfiguration
@@ -500,10 +499,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static class BeanMetaDataManagerKey {
 		private final ExecutableParameterNameProvider parameterNameProvider;
+		private final ValueExtractorManager valueExtractorManager;
 		private final MethodValidationConfiguration methodValidationConfiguration;
 
-		public BeanMetaDataManagerKey(ExecutableParameterNameProvider parameterNameProvider, MethodValidationConfiguration methodValidationConfiguration) {
+		public BeanMetaDataManagerKey(ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, MethodValidationConfiguration methodValidationConfiguration) {
 			this.parameterNameProvider = parameterNameProvider;
+			this.valueExtractorManager = valueExtractorManager;
 			this.methodValidationConfiguration = methodValidationConfiguration;
 		}
 
@@ -513,6 +514,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			int result = 1;
 			result = prime * result + ( ( methodValidationConfiguration == null ) ? 0 : methodValidationConfiguration.hashCode() );
 			result = prime * result + ( ( parameterNameProvider == null ) ? 0 : parameterNameProvider.hashCode() );
+			result = prime * result + ( ( valueExtractorManager == null ) ? 0 : valueExtractorManager.hashCode() );
 			return result;
 		}
 
@@ -528,29 +530,16 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				return false;
 			}
 			BeanMetaDataManagerKey other = (BeanMetaDataManagerKey) obj;
-			if ( methodValidationConfiguration == null ) {
-				if ( other.methodValidationConfiguration != null ) {
-					return false;
-				}
-			}
-			else if ( !methodValidationConfiguration.equals( other.methodValidationConfiguration ) ) {
-				return false;
-			}
-			if ( parameterNameProvider == null ) {
-				if ( other.parameterNameProvider != null ) {
-					return false;
-				}
-			}
-			else if ( !parameterNameProvider.equals( other.parameterNameProvider ) ) {
-				return false;
-			}
-			return true;
+
+			return methodValidationConfiguration.equals( other.methodValidationConfiguration ) &&
+					parameterNameProvider.equals( other.parameterNameProvider ) &&
+					valueExtractorManager.equals( other.valueExtractorManager );
 		}
 
 		@Override
 		public String toString() {
-			return "BeanMetaDataManagerKey [parameterNameProvider=" + parameterNameProvider + ", methodValidationConfiguration=" + methodValidationConfiguration
-					+ "]";
+			return "BeanMetaDataManagerKey [parameterNameProvider=" + parameterNameProvider + ", valueExtractorManager=" + valueExtractorManager
+					+ ", methodValidationConfiguration=" + methodValidationConfiguration + "]";
 		}
 	}
 }

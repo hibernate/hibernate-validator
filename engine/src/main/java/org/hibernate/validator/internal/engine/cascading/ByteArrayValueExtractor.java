@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class ByteArrayValueExtractor implements ValueExtractor<byte @ExtractedValue[]> {
 
-	static final ByteArrayValueExtractor INSTANCE = new ByteArrayValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ByteArrayValueExtractor() );
 
 	private ByteArrayValueExtractor() {
 	}

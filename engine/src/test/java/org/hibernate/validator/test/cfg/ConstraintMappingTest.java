@@ -514,7 +514,8 @@ public class ConstraintMappingTest {
 		Set<BeanConfiguration<?>> beanConfigurations = mapping.getBeanConfigurations(
 				new ConstraintHelper(),
 				new TypeResolutionHelper(),
-				new ValueExtractorManager( Collections.emptyList() ) );
+				new ValueExtractorManager( Collections.emptySet() )
+		);
 
 		for ( BeanConfiguration<?> beanConfiguration : beanConfigurations ) {
 			if ( beanConfiguration.getBeanClass() == type ) {

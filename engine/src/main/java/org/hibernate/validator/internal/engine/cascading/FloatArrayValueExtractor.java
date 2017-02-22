@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class FloatArrayValueExtractor implements ValueExtractor<float @ExtractedValue[]> {
 
-	static final FloatArrayValueExtractor INSTANCE = new FloatArrayValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new FloatArrayValueExtractor() );
 
 	private FloatArrayValueExtractor() {
 	}

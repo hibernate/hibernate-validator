@@ -15,7 +15,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class MapValueExtractor implements ValueExtractor<Map<?, @ExtractedValue ?>> {
 
-	static final MapValueExtractor INSTANCE = new MapValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new MapValueExtractor() );
 
 	private MapValueExtractor() {
 	}

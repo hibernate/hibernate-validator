@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class CharArrayValueExtractor implements ValueExtractor<char @ExtractedValue[]> {
 
-	static final CharArrayValueExtractor INSTANCE = new CharArrayValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new CharArrayValueExtractor() );
 
 	private CharArrayValueExtractor() {
 	}

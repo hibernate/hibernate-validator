@@ -15,7 +15,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class ListValueExtractor implements ValueExtractor<List<@ExtractedValue ?>> {
 
-	static final ListValueExtractor INSTANCE = new ListValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ListValueExtractor() );
 
 	private ListValueExtractor() {
 	}

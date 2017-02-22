@@ -15,7 +15,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class LegacyMapValueExtractor implements ValueExtractor<@ExtractedValue Map<?, ?>> {
 
-	static final LegacyMapValueExtractor INSTANCE = new LegacyMapValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new LegacyMapValueExtractor() );
 
 	private LegacyMapValueExtractor() {
 	}
