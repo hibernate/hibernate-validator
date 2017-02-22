@@ -43,7 +43,7 @@ public class MappingXmlParserTest {
 	public void setupParserHelper() {
 		constraintHelper = new ConstraintHelper();
 		xmlMappingParser = new MappingXmlParser(
-				constraintHelper, new TypeResolutionHelper(), new ValueExtractorManager( Collections.emptyList() ), null
+				constraintHelper, new TypeResolutionHelper(), new ValueExtractorManager( Collections.emptySet() ), null
 		);
 	}
 

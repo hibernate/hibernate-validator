@@ -52,7 +52,7 @@ public class BeanMetaDataManagerTest {
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new ValueExtractorManager( Collections.emptyList() ),
+				new ValueExtractorManager( Collections.emptySet() ),
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build()
 		);

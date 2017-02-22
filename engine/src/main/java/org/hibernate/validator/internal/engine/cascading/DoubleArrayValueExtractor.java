@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class DoubleArrayValueExtractor implements ValueExtractor<double @ExtractedValue[]> {
 
-	static final DoubleArrayValueExtractor INSTANCE = new DoubleArrayValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new DoubleArrayValueExtractor() );
 
 	private DoubleArrayValueExtractor() {
 	}

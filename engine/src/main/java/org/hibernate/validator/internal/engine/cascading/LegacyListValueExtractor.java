@@ -15,7 +15,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class LegacyListValueExtractor implements ValueExtractor<@ExtractedValue List<?>> {
 
-	static final LegacyListValueExtractor INSTANCE = new LegacyListValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new LegacyListValueExtractor() );
 
 	private LegacyListValueExtractor() {
 	}

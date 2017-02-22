@@ -93,6 +93,19 @@ public class CustomValueExtractorTest {
 		} );
 	}
 
+	public void canUseCustomValueExtractorPerValidatorForMultimaps() throws Exception {
+		CustomerWithStringStringMultimap bob = new CustomerWithStringStringMultimap();
+
+		Validator validator = Validation.buildDefaultValidatorFactory()
+				.usingContext()
+				.addValueExtractor( new MultimapValueExtractor() )
+				.getValidator();
+
+		Set<ConstraintViolation<CustomerWithStringStringMultimap>> violations = validator.validate( bob );
+
+		assertCorrectPropertyPaths( violations, "addressByType[work].multimap_value", "addressByType[work].multimap_value" );
+	}
+
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000197.*")
 	public void missingCustomExtractorThrowsException() throws Exception {
 		Cinema cinema = new Cinema();
@@ -124,6 +137,15 @@ public class CustomValueExtractorTest {
 
 				// VF overrides validation.xml
 				assertCorrectPropertyPaths( violations, "address.2" );
+
+				validator = validatorFactory.usingContext()
+						.addValueExtractor( new GuavaOptionalValueExtractor3() )
+						.getValidator();
+
+				violations = validator.validate( bob );
+
+				// V overrides VF
+				assertCorrectPropertyPaths( violations, "address.3" );
 			}
 		);
 	}
@@ -182,6 +204,14 @@ public class CustomValueExtractorTest {
 		@Override
 		public void extractValues(Optional<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
 			receiver.value( "2", originalValue.isPresent() ? originalValue.get() : null );
+		}
+	}
+
+	public static class GuavaOptionalValueExtractor3 implements ValueExtractor<Optional<@ExtractedValue ?>> {
+
+		@Override
+		public void extractValues(Optional<@ExtractedValue ?> originalValue, ValueExtractor.ValueReceiver receiver) {
+			receiver.value( "3", originalValue.isPresent() ? originalValue.get() : null );
 		}
 	}
 }

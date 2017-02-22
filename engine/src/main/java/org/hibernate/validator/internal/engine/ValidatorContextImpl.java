@@ -6,13 +6,15 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
-import javax.validation.ValidatorContext;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorContext;
@@ -38,7 +40,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private boolean failFast;
 	private final ValueExtractorManager valueExtractorManager;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder;
-
+	private final Set<ValueExtractor<?>> valueExtractors;
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
 		this.validatorFactory = validatorFactory;
@@ -49,8 +51,8 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.clockProvider = validatorFactory.getClockProvider();
 		this.failFast = validatorFactory.isFailFast();
 		this.methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder( validatorFactory.getMethodValidationConfiguration() );
-		// TODO make overwritable per this context
 		this.valueExtractorManager = validatorFactory.getValueExtractorManager();
+		this.valueExtractors = new HashSet<>();
 	}
 
 	@Override
@@ -109,8 +111,9 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
-	public ValidatorContext addValueExtractor(ValueExtractor<?> extractor) {
-		throw new UnsupportedOperationException();
+	public HibernateValidatorContext addValueExtractor(ValueExtractor<?> extractor) {
+		valueExtractors.add( extractor );
+		return this;
 	}
 
 	@Override
@@ -146,7 +149,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				parameterNameProvider,
 				clockProvider,
 				failFast,
-				valueExtractorManager,
+				valueExtractors.isEmpty() ? valueExtractorManager : new ValueExtractorManager( valueExtractorManager, valueExtractors ),
 				methodValidationConfigurationBuilder.build()
 		);
 	}

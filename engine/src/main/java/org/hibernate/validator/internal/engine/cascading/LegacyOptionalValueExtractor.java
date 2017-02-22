@@ -19,7 +19,7 @@ import javax.validation.valueextraction.ValueExtractor;
 // TODO should we keep that, or only support {@code Optional<@Valid Foo>}.
 public class LegacyOptionalValueExtractor implements ValueExtractor<@ExtractedValue Optional<?>> {
 
-	static final LegacyOptionalValueExtractor INSTANCE = new LegacyOptionalValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new LegacyOptionalValueExtractor() );
 
 	private LegacyOptionalValueExtractor() {
 	}

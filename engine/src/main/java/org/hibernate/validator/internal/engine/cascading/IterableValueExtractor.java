@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class IterableValueExtractor implements ValueExtractor<Iterable<@ExtractedValue ?>> {
 
-	static final IterableValueExtractor INSTANCE = new IterableValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new IterableValueExtractor() );
 
 	private IterableValueExtractor() {
 	}

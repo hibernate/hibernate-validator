@@ -39,7 +39,7 @@ public class MetaConstraintTest {
 	public void setUp() throws Exception {
 		constraintHelper = new ConstraintHelper();
 		typeResolutionHelper = new TypeResolutionHelper();
-		valueExtractorManager = new ValueExtractorManager( Collections.emptyList() );
+		valueExtractorManager = new ValueExtractorManager( Collections.emptySet() );
 		barMethod = Foo.class.getMethod( "getBar" );
 		constraintAnnotation = barMethod.getAnnotation( NotNull.class );
 	}
@@ -47,14 +47,14 @@ public class MetaConstraintTest {
 	@Test
 	@TestForIssue(jiraKey = "HV-930")
 	public void two_meta_constraints_for_the_same_constraint_should_be_equal() throws Exception {
-		ConstraintDescriptorImpl<NotNull> constraintDescriptor1 = new ConstraintDescriptorImpl<NotNull>(
+		ConstraintDescriptorImpl<NotNull> constraintDescriptor1 = new ConstraintDescriptorImpl<>(
 				constraintHelper, barMethod, constraintAnnotation, METHOD
 		);
 		ConstraintLocation location1 = ConstraintLocation.forClass( Foo.class );
 		MetaConstraint<NotNull> metaConstraint1 = MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraintDescriptor1, location1 );
 
 
-		ConstraintDescriptorImpl<NotNull> constraintDescriptor2 = new ConstraintDescriptorImpl<NotNull>(
+		ConstraintDescriptorImpl<NotNull> constraintDescriptor2 = new ConstraintDescriptorImpl<>(
 				constraintHelper, barMethod, constraintAnnotation, METHOD
 		);
 		ConstraintLocation location2 = ConstraintLocation.forClass( Foo.class );

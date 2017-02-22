@@ -45,7 +45,7 @@ public class TypeAnnotationMetaDataRetrievalTest extends AnnotationMetaDataProvi
 		provider = new AnnotationMetaDataProvider(
 				new ConstraintHelper(),
 				new TypeResolutionHelper(),
-				new ValueExtractorManager( Collections.emptyList() ),
+				new ValueExtractorManager( Collections.emptySet() ),
 				new AnnotationProcessingOptionsImpl()
 		);
 	}

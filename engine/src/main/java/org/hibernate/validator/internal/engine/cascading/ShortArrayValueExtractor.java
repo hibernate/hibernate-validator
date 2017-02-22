@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class ShortArrayValueExtractor implements ValueExtractor<short @ExtractedValue[]> {
 
-	static final ShortArrayValueExtractor INSTANCE = new ShortArrayValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new ShortArrayValueExtractor() );
 
 	private ShortArrayValueExtractor() {
 	}
