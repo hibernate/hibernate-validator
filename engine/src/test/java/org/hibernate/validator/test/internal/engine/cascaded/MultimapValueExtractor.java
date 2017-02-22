@@ -13,7 +13,7 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import com.google.common.collect.Multimap;
 
-class MultimapValueExtractor implements ValueExtractor<Multimap<?, @ExtractedValue ?>> {
+public class MultimapValueExtractor implements ValueExtractor<Multimap<?, @ExtractedValue ?>> {
 
 	@Override
 	public void extractValues(Multimap<?, ?> originalValue, ValueExtractor.ValueReceiver receiver) {

@@ -47,6 +47,7 @@
             <xs:element type="xs:string" name="constraint-validator-factory" minOccurs="0"/>
             <xs:element type="xs:string" name="parameter-name-provider" minOccurs="0"/>
             <xs:element type="xs:string" name="clock-provider" minOccurs="0"/>
+            <xs:element type="xs:string" name="value-extractor" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="config:executable-validationType" name="executable-validation" minOccurs="0"/>
             <xs:element type="xs:string" name="constraint-mapping" maxOccurs="unbounded" minOccurs="0"/>
             <xs:element type="config:propertyType" name="property" maxOccurs="unbounded" minOccurs="0"/>

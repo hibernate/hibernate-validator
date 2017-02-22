@@ -521,6 +521,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 		}
 
+		validationBootstrapParameters.addAllNonExistingValueExtractors( xmlParameters.getValueExtractors() );
+
 		validationBootstrapParameters.addAllMappings( xmlParameters.getMappings() );
 		configurationStreams.addAll( xmlParameters.getMappings() );
 

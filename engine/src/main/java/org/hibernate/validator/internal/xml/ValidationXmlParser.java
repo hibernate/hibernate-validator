@@ -27,6 +27,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
@@ -53,7 +54,7 @@ public class ValidationXmlParser {
 	private final ClassLoader externalClassLoader;
 
 	private static Map<String, String> getSchemasByVersion() {
-		Map<String, String> schemasByVersion = new HashMap<String, String>();
+		Map<String, String> schemasByVersion = CollectionHelper.newHashMap( 3 );
 
 		schemasByVersion.put( "1.0", "META-INF/validation-configuration-1.0.xsd" );
 		schemasByVersion.put( "1.1", "META-INF/validation-configuration-1.1.xsd" );
@@ -167,7 +168,7 @@ public class ValidationXmlParser {
 	}
 
 	private BootstrapConfiguration createBootstrapConfiguration(ValidationConfigType config) {
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		for ( PropertyType property : config.getProperty() ) {
 			if ( log.isDebugEnabled() ) {
 				log.debugf(
@@ -192,9 +193,10 @@ public class ValidationXmlParser {
 				config.getTraversableResolver(),
 				config.getParameterNameProvider(),
 				config.getClockProvider(),
+				new HashSet<>( config.getValueExtractor() ),
 				defaultValidatedExecutableTypes,
 				executableValidationEnabled,
-				new HashSet<String>( config.getConstraintMapping() ),
+				new HashSet<>( config.getConstraintMapping() ),
 				properties
 		);
 	}
