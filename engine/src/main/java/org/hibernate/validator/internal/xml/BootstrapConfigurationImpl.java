@@ -11,6 +11,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,10 +55,12 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	private final String traversableResolverClassName;
 	private final String parameterNameProviderClassName;
 	private final String clockProviderClassName;
+	private final Set<String> valueExtractorClassNames;
 	private final Set<String> constraintMappingResourcePaths;
 	private final Map<String, String> properties;
 	private final Set<ExecutableType> validatedExecutableTypes;
 	private final boolean isExecutableValidationEnabled;
+
 
 	private BootstrapConfigurationImpl() {
 		this.defaultProviderClassName = null;
@@ -66,6 +69,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.traversableResolverClassName = null;
 		this.parameterNameProviderClassName = null;
 		this.clockProviderClassName = null;
+		this.valueExtractorClassNames = new HashSet<>( 0 );
 		this.validatedExecutableTypes = DEFAULT_VALIDATED_EXECUTABLE_TYPES;
 		this.isExecutableValidationEnabled = true;
 		this.constraintMappingResourcePaths = newHashSet();
@@ -78,6 +82,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 									  String traversableResolverClassName,
 									  String parameterNameProviderClassName,
 									  String clockProviderClassName,
+									  Set<String> valueExtractorClassNames,
 									  EnumSet<ExecutableType> validatedExecutableTypes,
 									  boolean isExecutableValidationEnabled,
 									  Set<String> constraintMappingResourcePaths,
@@ -88,6 +93,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.traversableResolverClassName = traversableResolverClassName;
 		this.parameterNameProviderClassName = parameterNameProviderClassName;
 		this.clockProviderClassName = clockProviderClassName;
+		this.valueExtractorClassNames = valueExtractorClassNames;
 		this.validatedExecutableTypes = prepareValidatedExecutableTypes( validatedExecutableTypes );
 		this.isExecutableValidationEnabled = isExecutableValidationEnabled;
 		this.constraintMappingResourcePaths = constraintMappingResourcePaths;
@@ -145,8 +151,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 
 	@Override
 	public Set<String> getValueExtractorClassNames() {
-		// TODO implement
-		return Collections.emptySet();
+		return valueExtractorClassNames;
 	}
 
 	@Override

@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,7 +49,7 @@ public class ValidationBootstrapParameters {
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = newHashMap();
 	private final Set<InputStream> mappings = newHashSet();
-	private final Set<ValueExtractorDescriptor> valueExtractors = new HashSet<>();
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractors = new HashMap<>();
 
 	public ValidationBootstrapParameters() {
 	}
@@ -61,6 +61,7 @@ public class ValidationBootstrapParameters {
 		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
 		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName(), externalClassLoader );
 		setClockProvider( bootstrapConfiguration.getClockProviderClassName(), externalClassLoader );
+		setValueExtractors( bootstrapConfiguration.getValueExtractorClassNames(), externalClassLoader );
 		setMappingStreams( bootstrapConfiguration.getConstraintMappingResourcePaths(), externalClassLoader );
 		setConfigProperties( bootstrapConfiguration.getProperties() );
 	}
@@ -142,13 +143,29 @@ public class ValidationBootstrapParameters {
 	}
 
 	public Set<ValueExtractor<?>> getValueExtractors() {
-		return valueExtractors.stream()
+		return valueExtractors.values()
+				.stream()
 				.map( ValueExtractorDescriptor::getValueExtractor )
 				.collect( Collectors.toSet() );
 	}
 
 	public void addValueExtractor(ValueExtractor<?> valueExtractor) {
-		valueExtractors.add( new ValueExtractorDescriptor( valueExtractor ) );
+		// TODO raise error if already there
+		ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
+		valueExtractors.put( descriptor.getKey(), descriptor );
+	}
+
+	/**
+	 * Adds all those extractors from the given input which are not for a type and type parameter handled by any of the
+	 * already added extractors.
+	 */
+	public void addAllNonExistingValueExtractors(Iterable<ValueExtractor<?>> valueExtractors) {
+		for ( ValueExtractor<?> valueExtractor : valueExtractors ) {
+			ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
+			if ( !this.valueExtractors.containsKey( descriptor.getKey() ) ) {
+				this.valueExtractors.put( descriptor.getKey(), descriptor );
+			}
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -242,6 +259,24 @@ public class ValidationBootstrapParameters {
 			}
 			catch (ValidationException e) {
 				throw log.getUnableToInstantiateClockProviderClassException( clockProviderFqcn, e );
+			}
+		}
+	}
+
+	private void setValueExtractors(Set<String> valueExtractorFqcns, ClassLoader externalClassLoader) {
+		for ( String valueExtractorFqcn : valueExtractorFqcns ) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends ValueExtractor<?>> clazz = (Class<? extends ValueExtractor<?>>) run(
+						LoadClass.action( valueExtractorFqcn, externalClassLoader )
+						);
+				ValueExtractor<?> valueExtractor = run( NewInstance.action( clazz, "value extractor class" ) );
+				log.addingValueExtractor( clazz );
+				ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
+				valueExtractors.put( descriptor.getKey(), descriptor );
+			}
+			catch (ValidationException e) {
+				throw log.getUnableToInstantiateValueExtractorClassException( valueExtractorFqcn, e );
 			}
 		}
 	}
