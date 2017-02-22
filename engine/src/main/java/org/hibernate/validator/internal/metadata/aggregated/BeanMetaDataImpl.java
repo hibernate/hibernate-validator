@@ -73,6 +73,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 */
 	private static final List<Class<?>> DEFAULT_GROUP_SEQUENCE = Collections.<Class<?>>singletonList( Default.class );
 
+	/**
+	 * Whether there are any constraints or cascades at all.
+	 */
+	private final boolean hasConstraints;
+
 	private final ValidationOrderGenerator validationOrderGenerator;
 
 	/**
@@ -157,8 +162,11 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 		Set<PropertyMetaData> propertyMetaDataSet = newHashSet();
 		Set<ExecutableMetaData> executableMetaDataSet = newHashSet();
+		boolean hasConstraints = false;
 
 		for ( ConstraintMetaData constraintMetaData : constraintMetaDataSet ) {
+			hasConstraints |= constraintMetaData.isCascading() || constraintMetaData.isConstrained();
+
 			if ( constraintMetaData.getKind() == ElementKind.PROPERTY ) {
 				propertyMetaDataSet.add( (PropertyMetaData) constraintMetaData );
 			}
@@ -176,6 +184,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			allMetaConstraints.addAll( propertyMetaData.getConstraints() );
 		}
 
+		this.hasConstraints = hasConstraints;
 		this.cascadedProperties = Collections.unmodifiableSet( cascadedProperties );
 		this.allMetaConstraints = Collections.unmodifiableSet( allMetaConstraints );
 
@@ -232,13 +241,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 
 	@Override
 	public boolean hasConstraints() {
-		if ( beanDescriptor.isBeanConstrained()
-				|| !beanDescriptor.getConstrainedConstructors().isEmpty()
-				|| !beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER, MethodType.GETTER ).isEmpty() ) {
-			return true;
-		}
-
-		return false;
+		return hasConstraints;
 	}
 
 	@Override
