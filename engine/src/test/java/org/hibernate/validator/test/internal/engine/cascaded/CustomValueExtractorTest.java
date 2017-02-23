@@ -106,6 +106,19 @@ public class CustomValueExtractorTest {
 		assertCorrectPropertyPaths( violations, "addressByType[work].multimap_value", "addressByType[work].multimap_value" );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1261")
+	public void canUseValueExtractorGivenViaServiceLoader() {
+		CustomerWithOptionalAddress bob = new CustomerWithOptionalAddress();
+
+		Validator validator = Validation.buildDefaultValidatorFactory()
+				.getValidator();
+
+		Set<ConstraintViolation<CustomerWithOptionalAddress>> violations = validator.validate( bob );
+
+		assertCorrectPropertyPaths( violations, "address" );
+	}
+
 	@Test(expectedExceptions = ConstraintDeclarationException.class, expectedExceptionsMessageRegExp = "HV000197.*")
 	public void missingCustomExtractorThrowsException() throws Exception {
 		Cinema cinema = new Cinema();
@@ -126,14 +139,22 @@ public class CustomValueExtractorTest {
 			() -> {
 				CustomerWithOptionalAddress bob = new CustomerWithOptionalAddress();
 
+				Validator validator = Validation.buildDefaultValidatorFactory()
+						.getValidator();
+
+				Set<ConstraintViolation<CustomerWithOptionalAddress>> violations = validator.validate( bob );
+
+				// validation.xml overrides service loader
+				assertCorrectPropertyPaths( violations, "address.1" );
+
 				ValidatorFactory validatorFactory = Validation.byDefaultProvider()
 						.configure()
 						.addValueExtractor( new GuavaOptionalValueExtractor2() )
 						.buildValidatorFactory();
 
-				Validator validator = validatorFactory.getValidator();
+				validator = validatorFactory.getValidator();
 
-				Set<ConstraintViolation<CustomerWithOptionalAddress>> violations = validator.validate( bob );
+				violations = validator.validate( bob );
 
 				// VF overrides validation.xml
 				assertCorrectPropertyPaths( violations, "address.2" );

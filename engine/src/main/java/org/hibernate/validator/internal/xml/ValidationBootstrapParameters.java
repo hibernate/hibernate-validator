@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
@@ -29,6 +28,7 @@ import javax.validation.spi.ValidationProvider;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor.Key;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
@@ -142,30 +142,13 @@ public class ValidationBootstrapParameters {
 		this.clockProvider = clockProvider;
 	}
 
-	public Set<ValueExtractor<?>> getValueExtractors() {
-		return valueExtractors.values()
-				.stream()
-				.map( ValueExtractorDescriptor::getValueExtractor )
-				.collect( Collectors.toSet() );
+	public Map<Key, ValueExtractorDescriptor> getValueExtractors() {
+		return valueExtractors;
 	}
 
 	public void addValueExtractor(ValueExtractor<?> valueExtractor) {
-		// TODO raise error if already there
 		ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
 		valueExtractors.put( descriptor.getKey(), descriptor );
-	}
-
-	/**
-	 * Adds all those extractors from the given input which are not for a type and type parameter handled by any of the
-	 * already added extractors.
-	 */
-	public void addAllNonExistingValueExtractors(Iterable<ValueExtractor<?>> valueExtractors) {
-		for ( ValueExtractor<?> valueExtractor : valueExtractors ) {
-			ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
-			if ( !this.valueExtractors.containsKey( descriptor.getKey() ) ) {
-				this.valueExtractors.put( descriptor.getKey(), descriptor );
-			}
-		}
 	}
 
 	@SuppressWarnings("unchecked")

@@ -14,9 +14,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
@@ -34,6 +38,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validator.internal.util.Contracts;
@@ -92,6 +97,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean failFast;
 	private ClassLoader externalClassLoader;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractors = new HashMap<>();
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -199,11 +205,14 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public HibernateValidatorConfiguration addValueExtractor(ValueExtractor<?> extractor) {
 		Contracts.assertNotNull( extractor, MESSAGES.parameterMustNotBeNull( "extractor" ) );
 
+		// TODO prevent duplicates
+
 		if ( log.isDebugEnabled() ) {
 			log.debug( "Adding value extractor " + extractor );
 		}
 
-		validationBootstrapParameters.addValueExtractor( extractor );
+		ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( extractor );
+		valueExtractors.put( descriptor.getKey(), descriptor );
 
 		return this;
 	}
@@ -291,6 +300,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final ValidatorFactory buildValidatorFactory() {
+		loadValueExtractorsFromServiceLoader();
 		parseValidationXml();
 		ValidatorFactory factory = null;
 		try {
@@ -392,7 +402,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public Set<ValueExtractor<?>> getValueExtractors() {
-		return validationBootstrapParameters.getValueExtractors();
+		return validationBootstrapParameters.getValueExtractors()
+				.values()
+				.stream()
+				.map( ValueExtractorDescriptor::getValueExtractor )
+				.collect( Collectors.toSet() );
 	}
 
 	@Override
@@ -472,6 +486,24 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			);
 			applyXmlSettings( xmlParameters );
 		}
+
+		for ( ValueExtractorDescriptor valueExtractorDescriptor : valueExtractors.values() ) {
+			validationBootstrapParameters.addValueExtractor( valueExtractorDescriptor.getValueExtractor() );
+		}
+	}
+
+	private void loadValueExtractorsFromServiceLoader() {
+		@SuppressWarnings("rawtypes")
+		ServiceLoader<ValueExtractor> loader = ServiceLoader.load(
+				ValueExtractor.class,
+				externalClassLoader != null ? externalClassLoader : getClass().getClassLoader()
+		);
+
+		@SuppressWarnings("rawtypes")
+		Iterator<ValueExtractor> extractors = loader.iterator();
+		while ( extractors.hasNext() ) {
+			validationBootstrapParameters.addValueExtractor( extractors.next() );
+		}
 	}
 
 	private void applyXmlSettings(ValidationBootstrapParameters xmlParameters) {
@@ -521,7 +553,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 		}
 
-		validationBootstrapParameters.addAllNonExistingValueExtractors( xmlParameters.getValueExtractors() );
+		for ( ValueExtractorDescriptor extractor : xmlParameters.getValueExtractors().values() ) {
+			validationBootstrapParameters.addValueExtractor( extractor.getValueExtractor() );
+		}
 
 		validationBootstrapParameters.addAllMappings( xmlParameters.getMappings() );
 		configurationStreams.addAll( xmlParameters.getMappings() );
