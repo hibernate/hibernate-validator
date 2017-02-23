@@ -6,7 +6,10 @@
  */
 package org.hibernate.validator;
 
+import java.util.Set;
+
 import javax.validation.Configuration;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
@@ -96,6 +99,18 @@ public interface HibernateValidatorConfiguration extends Configuration<Hibernate
 	 * @return A new constraint mapping.
 	 */
 	ConstraintMapping createConstraintMapping();
+
+	/**
+	 * Returns the default {@link ValueExtractor} implementations as per the
+	 * specification.
+	 *
+	 * @return the default {@code ValueExtractor} implementations compliant
+	 * with the specification
+	 *
+	 * @since 6.0
+	 */
+	@Incubating
+	Set<ValueExtractor<?>> getDefaultValueExtractors();
 
 	/**
 	 * Adds the specified {@link ConstraintMapping} instance to the configuration. Constraints configured in {@code mapping}
