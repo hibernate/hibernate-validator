@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.validation.ValidationException;
 import javax.validation.valueextraction.ValueExtractor;
@@ -29,6 +30,34 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Guillaume Smet
  */
 public class ValueExtractorManager {
+
+	@Immutable
+	public static final Set<ValueExtractor<?>> SPEC_DEFINED_EXTRACTORS = Stream.of(
+			ByteArrayValueExtractor.DESCRIPTOR,
+			ShortArrayValueExtractor.DESCRIPTOR,
+			IntArrayValueExtractor.DESCRIPTOR,
+			LongArrayValueExtractor.DESCRIPTOR,
+			FloatArrayValueExtractor.DESCRIPTOR,
+			DoubleArrayValueExtractor.DESCRIPTOR,
+			CharArrayValueExtractor.DESCRIPTOR,
+			BooleanArrayValueExtractor.DESCRIPTOR,
+			ObjectArrayValueExtractor.DESCRIPTOR,
+
+			LegacyListValueExtractor.DESCRIPTOR,
+			ListValueExtractor.DESCRIPTOR,
+
+			LegacyMapValueExtractor.DESCRIPTOR,
+			MapValueExtractor.DESCRIPTOR,
+			MapKeyExtractor.DESCRIPTOR,
+
+			LegacyIterableValueExtractor.DESCRIPTOR,
+			IterableValueExtractor.DESCRIPTOR,
+
+			OptionalValueExtractor.DESCRIPTOR,
+			ObjectValueExtractor.DESCRIPTOR
+		)
+		.map( ValueExtractorDescriptor::getValueExtractor )
+		.collect( Collectors.collectingAndThen( Collectors.toSet(), Collections::unmodifiableSet ) );
 
 	@Immutable
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractors;
@@ -81,6 +110,10 @@ public class ValueExtractorManager {
 		}
 
 		valueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
+	}
+
+	public static Set<ValueExtractor<?>> getDefaultValueExtractors() {
+		return SPEC_DEFINED_EXTRACTORS;
 	}
 
 	/**

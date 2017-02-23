@@ -6,10 +6,14 @@
  */
 package org.hibernate.validator.test.internal.engine.cascaded;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 
+import java.lang.reflect.TypeVariable;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
@@ -22,7 +26,11 @@ import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidator;
+import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.testutil.TestForIssue;
 import org.hibernate.validator.testutil.ValidationXmlTestHelper;
 import org.testng.annotations.BeforeMethod;
@@ -169,6 +177,46 @@ public class CustomValueExtractorTest {
 				assertCorrectPropertyPaths( violations, "address.3" );
 			}
 		);
+	}
+
+	@Test
+	public void canObtainDefaultExtractors() {
+		HibernateValidatorConfiguration config = Validation.byProvider( HibernateValidator.class )
+			.configure();
+
+		Set<ValueExtractor<?>> defaultExtractors = config.getDefaultValueExtractors();
+		assertThat( defaultExtractors ).isNotEmpty();
+
+		Set<TypeVariable<?>> mapExtractors = defaultExtractors.stream()
+			.filter( e -> {
+				return TypeHelper.getErasedReferenceType( new ValueExtractorDescriptor( e ).getExtractedType() ) == Map.class;
+			} )
+			.map( e ->  new ValueExtractorDescriptor( e ).getExtractedTypeParameter() )
+			.collect( Collectors.toSet() );
+
+		assertThat( mapExtractors ).containsOnly(
+				Map.class.getTypeParameters()[0], Map.class.getTypeParameters()[1], AnnotatedObject.INSTANCE  );
+
+		Set<TypeVariable<?>> optionalExtractors = defaultExtractors.stream()
+			.filter( e -> {
+				return TypeHelper.getErasedReferenceType( new ValueExtractorDescriptor( e ).getExtractedType() ) == java.util.Optional.class;
+			} )
+			.map( e ->  new ValueExtractorDescriptor( e ).getExtractedTypeParameter() )
+			.collect( Collectors.toSet() );
+
+		assertThat( optionalExtractors ).describedAs( "Expecting extractor for <T>, but not the legacy extractor for java.util.Optional" )
+			. containsOnly( java.util.Optional.class.getTypeParameters()
+		);
+
+		Set<TypeVariable<?>> guavaOptionalExtractors = defaultExtractors.stream()
+			.filter( e -> {
+				return TypeHelper.getErasedReferenceType( new ValueExtractorDescriptor( e ).getExtractedType() ) == Optional.class;
+			} )
+			.map( e ->  new ValueExtractorDescriptor( e ).getExtractedTypeParameter() )
+			.collect( Collectors.toSet() );
+
+		assertThat( guavaOptionalExtractors ).describedAs( "Extractor for Guava's Optional shouldn't be part of default extractors" )
+			.isEmpty();
 	}
 
 	private static class CustomerWithMultimap {

@@ -39,6 +39,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validator.internal.util.Contracts;
@@ -450,6 +451,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	@Override
 	public ClockProvider getDefaultClockProvider() {
 		return defaultClockProvider;
+	}
+
+	@Override
+	public Set<ValueExtractor<?>> getDefaultValueExtractors() {
+		return ValueExtractorManager.getDefaultValueExtractors();
 	}
 
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {

@@ -16,6 +16,7 @@ import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -156,7 +157,7 @@ public class ValueExtractorDescriptor {
 
 		@Override
 		public String toString() {
-			return "Key [extractedType=" + extractedType + ", extractedTypeParameter=" + extractedTypeParameter + "]";
+			return "Key [extractedType=" + StringHelper.toShortString( extractedType ) + ", extractedTypeParameter=" + extractedTypeParameter + "]";
 		}
 	}
 }
