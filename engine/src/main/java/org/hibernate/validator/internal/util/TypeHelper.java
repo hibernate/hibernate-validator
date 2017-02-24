@@ -305,11 +305,11 @@ public final class TypeHelper {
 		for ( ConstraintValidatorDescriptor<A> validator : validators ) {
 			Type type = validator.getValidatedType();
 
-			if ( validatorsTypes.containsKey( type ) ) {
-				throw log.getMultipleValidatorsForSameTypeException( annotationType, type );
-			}
+			ConstraintValidatorDescriptor<A> previous = validatorsTypes.put( type, validator );
 
-			validatorsTypes.put( type, validator );
+			if ( previous != null ) {
+				throw log.getMultipleValidatorsForSameTypeException( annotationType, type, previous.getValidatorClass(), validator.getValidatorClass() );
+			}
 		}
 
 		return validatorsTypes;
