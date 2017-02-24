@@ -508,8 +508,11 @@ public interface Log extends BasicLogger {
 	ValidationException getExceptionOccurredDuringMessageInterpolationException(@Cause Exception e);
 
 	@Message(id = 150,
-			value = "The constraint '%s' defines multiple validators for the type '%s'. Only one is allowed.")
-	UnexpectedTypeException getMultipleValidatorsForSameTypeException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint, Type type);
+			value = "The constraint %1$s defines multiple validators for the type %2$s: %3$s, %4$s. Only one is allowed.")
+	UnexpectedTypeException getMultipleValidatorsForSameTypeException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> constraint,
+			Type type,
+			@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> validatorClass1,
+			@FormatWith(ClassObjectFormatter.class) Class<? extends ConstraintValidator<?, ?>> validatorClass2);
 
 	@Message(id = 151,
 			value = "A method overriding another method must not alter the parameter constraint configuration, but method %2$s changes the configuration of %1$s.")
