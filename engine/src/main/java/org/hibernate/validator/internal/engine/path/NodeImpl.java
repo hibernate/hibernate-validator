@@ -19,6 +19,8 @@ import javax.validation.Path.MethodNode;
 import javax.validation.Path.ParameterNode;
 import javax.validation.Path.PropertyNode;
 import javax.validation.Path.ReturnValueNode;
+import javax.validation.Path.TypeArgumentNode;
+import javax.validation.TypeParameter;
 
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -29,9 +31,11 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class NodeImpl
-		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, org.hibernate.validator.path.PropertyNode, Serializable {
+		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.TypeArgumentNode,
+		org.hibernate.validator.path.PropertyNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
 
@@ -58,10 +62,12 @@ public class NodeImpl
 	private final Class<?>[] parameterTypes;
 	private final Integer parameterIndex;
 	private final Object value;
+	private final TypeParameter typeParameter;
 
 	private String asString;
 
-	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes, Integer parameterIndex, Object value) {
+	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
+			Integer parameterIndex, Object value, TypeParameter typeParameter) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
@@ -71,6 +77,7 @@ public class NodeImpl
 		this.kind = kind;
 		this.parameterTypes = parameterTypes;
 		this.parameterIndex = parameterIndex;
+		this.typeParameter = typeParameter;
 		this.hashCode = buildHashCode();
 	}
 
@@ -85,19 +92,21 @@ public class NodeImpl
 				ElementKind.PROPERTY,
 				EMPTY_CLASS_ARRAY,
 				null,
+				null,
 				null
 		);
 	}
 
-	public static NodeImpl createTypeParameterNode(String name, NodeImpl parent) {
+	public static NodeImpl createTypeArgumentNode(String name, NodeImpl parent) {
 		return new NodeImpl(
 				name,
 				parent,
 				false,
 				null,
 				null,
-				ElementKind.PROPERTY, // TODO HV-1245 this should be TYPE_USE once it's included in BV
+				ElementKind.TYPE_ARGUMENT,
 				EMPTY_CLASS_ARRAY,
+				null,
 				null,
 				null
 		);
@@ -113,6 +122,7 @@ public class NodeImpl
 				ElementKind.PARAMETER,
 				EMPTY_CLASS_ARRAY,
 				parameterIndex,
+				null,
 				null
 		);
 	}
@@ -127,16 +137,17 @@ public class NodeImpl
 				ElementKind.CROSS_PARAMETER,
 				EMPTY_CLASS_ARRAY,
 				null,
+				null,
 				null
 		);
 	}
 
 	public static NodeImpl createMethodNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, null );
 	}
 
 	public static NodeImpl createConstructorNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, null );
 	}
 
 	public static NodeImpl createBeanNode(NodeImpl parent) {
@@ -148,6 +159,7 @@ public class NodeImpl
 				null,
 				ElementKind.BEAN,
 				EMPTY_CLASS_ARRAY,
+				null,
 				null,
 				null
 		);
@@ -163,6 +175,7 @@ public class NodeImpl
 				ElementKind.RETURN_VALUE,
 				EMPTY_CLASS_ARRAY,
 				null,
+				null,
 				null
 		);
 	}
@@ -177,8 +190,8 @@ public class NodeImpl
 				node.kind,
 				node.parameterTypes,
 				node.parameterIndex,
-				node.value
-
+				node.value,
+				null
 		);
 	}
 
@@ -192,7 +205,8 @@ public class NodeImpl
 				node.kind,
 				node.parameterTypes,
 				node.parameterIndex,
-				node.value
+				node.value,
+				null
 		);
 	}
 
@@ -206,7 +220,8 @@ public class NodeImpl
 				node.kind,
 				node.parameterTypes,
 				node.parameterIndex,
-				node.value
+				node.value,
+				null
 		);
 	}
 
@@ -220,7 +235,23 @@ public class NodeImpl
 				node.kind,
 				node.parameterTypes,
 				node.parameterIndex,
-				value
+				value,
+				null
+		);
+	}
+
+	public static NodeImpl setTypeParameter(NodeImpl node, TypeParameter typeParameter) {
+		return new NodeImpl(
+				node.name,
+				node.parent,
+				node.isIterable,
+				node.index,
+				node.key,
+				node.kind,
+				node.parameterTypes,
+				node.parameterIndex,
+				node.value,
+				typeParameter
 		);
 	}
 
@@ -258,6 +289,14 @@ public class NodeImpl
 		}
 	}
 
+	@Override
+	public TypeParameter getTypeParameter() {
+		if ( parent == null ) {
+			return null;
+		}
+		return parent.typeParameter;
+	}
+
 	public final NodeImpl getParent() {
 		return parent;
 	}
@@ -275,7 +314,8 @@ public class NodeImpl
 				( kind == ElementKind.METHOD && nodeType == MethodNode.class ) ||
 				( kind == ElementKind.PARAMETER && nodeType == ParameterNode.class ) ||
 				( kind == ElementKind.PROPERTY && ( nodeType == PropertyNode.class || nodeType == org.hibernate.validator.path.PropertyNode.class ) ) ||
-				( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class ) ) {
+				( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class ) ||
+				( kind == ElementKind.TYPE_ARGUMENT && nodeType == TypeArgumentNode.class ) ) {
 			return nodeType.cast( this );
 		}
 
@@ -344,6 +384,7 @@ public class NodeImpl
 		result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
 		result = prime * result + ( ( parameterTypes == null ) ? 0 : parameterTypes.hashCode() );
 		result = prime * result + ( ( parent == null ) ? 0 : parent.hashCode() );
+		result = prime * result + ( ( typeParameter == null ) ? 0 : typeParameter.hashCode() );
 		return result;
 	}
 
@@ -381,6 +422,14 @@ public class NodeImpl
 			}
 		}
 		else if ( !key.equals( other.key ) ) {
+			return false;
+		}
+		if ( typeParameter == null ) {
+			if ( other.typeParameter != null ) {
+				return false;
+			}
+		}
+		else if ( !typeParameter.equals( other.typeParameter ) ) {
 			return false;
 		}
 		if ( kind != other.kind ) {

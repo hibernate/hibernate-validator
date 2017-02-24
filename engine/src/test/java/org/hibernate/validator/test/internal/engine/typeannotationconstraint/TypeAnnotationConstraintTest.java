@@ -177,7 +177,7 @@ public class TypeAnnotationConstraintTest {
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
 		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
-		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
+		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.TYPE_ARGUMENT );
 	}
 
 	@Test
@@ -488,7 +488,7 @@ public class TypeAnnotationConstraintTest {
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getKey() ).isEqualTo( "first" );
 		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.MAP_VALUE_NODE_NAME );
-		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
+		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.TYPE_ARGUMENT );
 	}
 
 	@Test
@@ -660,7 +660,7 @@ public class TypeAnnotationConstraintTest {
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
 		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
-		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
+		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.TYPE_ARGUMENT );
 	}
 
 	@Test
@@ -808,7 +808,7 @@ public class TypeAnnotationConstraintTest {
 		Path.Node secondNode = propertyPathIterator.next();
 		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
 		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
-		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
+		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.TYPE_ARGUMENT );
 	}
 
 	@Test

@@ -105,7 +105,7 @@ public class MetaConstraints {
 			throw LOG.getNoValueExtractorFoundForTypeException( declaredType, typeParameter );
 		}
 
-		valueExtractionPath.add( ValueExtractionPathNode.of( valueExtractorDescriptor ) );
+		valueExtractionPath.add( ValueExtractionPathNode.of( typeParameter, valueExtractorDescriptor ) );
 	}
 
 	/**

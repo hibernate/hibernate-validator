@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.metadata.core;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptor
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
@@ -213,6 +215,11 @@ public class MetaConstraint<A extends Annotation> {
 		private void doValidate(Object value, String nodeName) {
 			PathImpl before = valueContext.getPropertyPath();
 
+			TypeVariable<?> typeParameter = valueExtractionPath.get( pathIndex ).typeParameter;
+			if ( typeParameter != null && !TypeVariables.isInternal( typeParameter ) ) {
+				valueContext.setTypeParameter( typeParameter );
+			}
+
 			if ( nodeName != null ) {
 				valueContext.appendTypeParameterNode( nodeName );
 			}
@@ -242,14 +249,21 @@ public class MetaConstraint<A extends Annotation> {
 	}
 
 	static final class ValueExtractionPathNode {
+		private final TypeVariable<?> typeParameter;
+
 		private final ValueExtractorDescriptor valueExtractorDescriptor;
 
-		private ValueExtractionPathNode(ValueExtractorDescriptor valueExtractorDescriptor) {
+		private ValueExtractionPathNode(TypeVariable<?> typeParameter, ValueExtractorDescriptor valueExtractorDescriptor) {
+			this.typeParameter = typeParameter;
 			this.valueExtractorDescriptor = valueExtractorDescriptor;
 		}
 
 		static ValueExtractionPathNode of(ValueExtractorDescriptor valueExtractorDescriptor) {
-			return new ValueExtractionPathNode( valueExtractorDescriptor );
+			return new ValueExtractionPathNode( null, valueExtractorDescriptor );
+		}
+
+		static ValueExtractionPathNode of(TypeVariable<?> typeParameter, ValueExtractorDescriptor valueExtractorDescriptor) {
+			return new ValueExtractionPathNode( typeParameter, valueExtractorDescriptor );
 		}
 	}
 }
