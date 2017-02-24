@@ -123,19 +123,25 @@ public class ValueExtractorDescriptor {
 
 		private final Type extractedType;
 		private final TypeVariable<?> extractedTypeParameter;
+		private final int hashCode;
 
 		public Key(Type extractedType, TypeVariable<?> extractedTypeParameter) {
 			this.extractedType = extractedType;
 			this.extractedTypeParameter = extractedTypeParameter;
+			this.hashCode = buildHashCode( extractedType, extractedTypeParameter );
 		}
 
-		@Override
-		public int hashCode() {
+		private static int buildHashCode(Type extractedType, TypeVariable<?> extractedTypeParameter) {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + extractedType.hashCode();
 			result = prime * result + extractedTypeParameter.hashCode();
 			return result;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
 		}
 
 		@Override

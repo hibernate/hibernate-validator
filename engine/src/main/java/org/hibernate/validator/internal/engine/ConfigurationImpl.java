@@ -98,7 +98,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	private boolean failFast;
 	private ClassLoader externalClassLoader;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
-	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractors = new HashMap<>();
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -206,14 +206,16 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	public HibernateValidatorConfiguration addValueExtractor(ValueExtractor<?> extractor) {
 		Contracts.assertNotNull( extractor, MESSAGES.parameterMustNotBeNull( "extractor" ) );
 
-		// TODO prevent duplicates
+		ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( extractor );
+		ValueExtractorDescriptor previous = valueExtractorDescriptors.put( descriptor.getKey(), descriptor );
+
+		if ( previous != null ) {
+			throw log.getValueExtractorForTypeAndTypeUseAlreadyPresentException( extractor, previous.getValueExtractor() );
+		}
 
 		if ( log.isDebugEnabled() ) {
 			log.debug( "Adding value extractor " + extractor );
 		}
-
-		ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( extractor );
-		valueExtractors.put( descriptor.getKey(), descriptor );
 
 		return this;
 	}
@@ -403,7 +405,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public Set<ValueExtractor<?>> getValueExtractors() {
-		return validationBootstrapParameters.getValueExtractors()
+		return validationBootstrapParameters.getValueExtractorDescriptors()
 				.values()
 				.stream()
 				.map( ValueExtractorDescriptor::getValueExtractor )
@@ -493,8 +495,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			applyXmlSettings( xmlParameters );
 		}
 
-		for ( ValueExtractorDescriptor valueExtractorDescriptor : valueExtractors.values() ) {
-			validationBootstrapParameters.addValueExtractor( valueExtractorDescriptor.getValueExtractor() );
+		for ( ValueExtractorDescriptor valueExtractorDescriptor : valueExtractorDescriptors.values() ) {
+			validationBootstrapParameters.addValueExtractorDescriptor( valueExtractorDescriptor );
 		}
 	}
 
@@ -508,7 +510,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		@SuppressWarnings("rawtypes")
 		Iterator<ValueExtractor> extractors = loader.iterator();
 		while ( extractors.hasNext() ) {
-			validationBootstrapParameters.addValueExtractor( extractors.next() );
+			validationBootstrapParameters.addValueExtractorDescriptor( new ValueExtractorDescriptor( extractors.next() ) );
 		}
 	}
 
@@ -559,8 +561,8 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			}
 		}
 
-		for ( ValueExtractorDescriptor extractor : xmlParameters.getValueExtractors().values() ) {
-			validationBootstrapParameters.addValueExtractor( extractor.getValueExtractor() );
+		for ( ValueExtractorDescriptor extractor : xmlParameters.getValueExtractorDescriptors().values() ) {
+			validationBootstrapParameters.addValueExtractorDescriptor( extractor );
 		}
 
 		validationBootstrapParameters.addAllMappings( xmlParameters.getMappings() );

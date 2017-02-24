@@ -24,6 +24,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.constraints.Size;
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.ValueExtractor;
+import javax.validation.valueextraction.ValueExtractorDeclarationException;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -217,6 +218,29 @@ public class CustomValueExtractorTest {
 
 		assertThat( guavaOptionalExtractors ).describedAs( "Extractor for Guava's Optional shouldn't be part of default extractors" )
 			.isEmpty();
+	}
+
+	@Test(expectedExceptions = ValueExtractorDeclarationException.class, expectedExceptionsMessageRegExp = "HV000208.*")
+	public void configuringMultipleExtractorsForSameTypeAndTypeUseCausesException() throws Exception {
+		Validation.byDefaultProvider()
+				.configure()
+				.addValueExtractor( new GuavaOptionalValueExtractor1() )
+				.addValueExtractor( new GuavaOptionalValueExtractor1() );
+	}
+
+	@Test(expectedExceptions = ValueExtractorDeclarationException.class, expectedExceptionsMessageRegExp = "HV000208.*")
+	public void configuringValidatorWithMultipleExtractorsForSameTypeAndTypeUseCausesException() throws Exception {
+		Validation.buildDefaultValidatorFactory()
+				.usingContext()
+				.addValueExtractor( new GuavaOptionalValueExtractor1() )
+				.addValueExtractor( new GuavaOptionalValueExtractor1() );
+	}
+
+	@Test(expectedExceptions = ValueExtractorDeclarationException.class, expectedExceptionsMessageRegExp = "HV000208.*")
+	public void configuringMultipleExtractorsForSameTypeAndTypeUseInValidationXmlCausesException() throws Exception {
+		validationXmlTestHelper.runWithCustomValidationXml(
+			"multiple-value-extractors-for-same-type-and-type-use-validation.xml",
+			() -> Validation.buildDefaultValidatorFactory() );
 	}
 
 	private static class CustomerWithMultimap {

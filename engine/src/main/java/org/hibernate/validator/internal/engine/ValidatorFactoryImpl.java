@@ -501,21 +501,27 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		private final ExecutableParameterNameProvider parameterNameProvider;
 		private final ValueExtractorManager valueExtractorManager;
 		private final MethodValidationConfiguration methodValidationConfiguration;
+		private final int hashCode;
 
 		public BeanMetaDataManagerKey(ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, MethodValidationConfiguration methodValidationConfiguration) {
 			this.parameterNameProvider = parameterNameProvider;
 			this.valueExtractorManager = valueExtractorManager;
 			this.methodValidationConfiguration = methodValidationConfiguration;
+			this.hashCode = buildHashCode( parameterNameProvider, valueExtractorManager, methodValidationConfiguration );
 		}
 
-		@Override
-		public int hashCode() {
+		private static int buildHashCode(ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, MethodValidationConfiguration methodValidationConfiguration) {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + ( ( methodValidationConfiguration == null ) ? 0 : methodValidationConfiguration.hashCode() );
 			result = prime * result + ( ( parameterNameProvider == null ) ? 0 : parameterNameProvider.hashCode() );
 			result = prime * result + ( ( valueExtractorManager == null ) ? 0 : valueExtractorManager.hashCode() );
 			return result;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
 		}
 
 		@Override

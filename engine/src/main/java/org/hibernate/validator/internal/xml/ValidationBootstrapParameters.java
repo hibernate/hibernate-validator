@@ -6,14 +6,12 @@
  */
 package org.hibernate.validator.internal.xml;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,8 +45,8 @@ public class ValidationBootstrapParameters {
 	private ClockProvider clockProvider;
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
-	private final Map<String, String> configProperties = newHashMap();
-	private final Set<InputStream> mappings = newHashSet();
+	private final Map<String, String> configProperties = new HashMap<>();
+	private final Set<InputStream> mappings = new HashSet<>();
 	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractors = new HashMap<>();
 
 	public ValidationBootstrapParameters() {
@@ -142,12 +140,11 @@ public class ValidationBootstrapParameters {
 		this.clockProvider = clockProvider;
 	}
 
-	public Map<Key, ValueExtractorDescriptor> getValueExtractors() {
+	public Map<Key, ValueExtractorDescriptor> getValueExtractorDescriptors() {
 		return valueExtractors;
 	}
 
-	public void addValueExtractor(ValueExtractor<?> valueExtractor) {
-		ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
+	public void addValueExtractorDescriptor(ValueExtractorDescriptor descriptor) {
 		valueExtractors.put( descriptor.getKey(), descriptor );
 	}
 
@@ -246,21 +243,30 @@ public class ValidationBootstrapParameters {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void setValueExtractors(Set<String> valueExtractorFqcns, ClassLoader externalClassLoader) {
 		for ( String valueExtractorFqcn : valueExtractorFqcns ) {
+			ValueExtractor<?> valueExtractor;
+
 			try {
-				@SuppressWarnings("unchecked")
 				Class<? extends ValueExtractor<?>> clazz = (Class<? extends ValueExtractor<?>>) run(
 						LoadClass.action( valueExtractorFqcn, externalClassLoader )
-						);
-				ValueExtractor<?> valueExtractor = run( NewInstance.action( clazz, "value extractor class" ) );
-				log.addingValueExtractor( clazz );
-				ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
-				valueExtractors.put( descriptor.getKey(), descriptor );
+				);
+				valueExtractor = run( NewInstance.action( clazz, "value extractor class" ) );
 			}
 			catch (ValidationException e) {
 				throw log.getUnableToInstantiateValueExtractorClassException( valueExtractorFqcn, e );
 			}
+
+
+			ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
+			ValueExtractorDescriptor previous = valueExtractors.put( descriptor.getKey(), descriptor );
+
+			if ( previous != null ) {
+				throw log.getValueExtractorForTypeAndTypeUseAlreadyPresentException( valueExtractor, previous.getValueExtractor() );
+			}
+
+			log.addingValueExtractor( (Class<? extends ValueExtractor<?>>) valueExtractor.getClass() );
 		}
 	}
 
