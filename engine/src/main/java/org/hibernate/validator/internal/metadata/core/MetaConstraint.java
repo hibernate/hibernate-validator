@@ -51,24 +51,18 @@ public class MetaConstraint<A extends Annotation> {
 	private final ConstraintLocation location;
 
 	/**
-	 * The sequence of {@link ValueExtractor}s used to navigate from the outermost container to the innermost container
-	 * and extract the value for validation.
+	 * The path used to navigate from the outermost container to the innermost container and extract the value for
+	 * validation.
 	 */
 	@Immutable
-	private final List<ValueExtractorDescriptor> valueExtractorDescriptors;
+	private final List<ValueExtractionPathNode> valueExtractionPath;
 
-	/**
-	 * @param constraintDescriptor The constraint descriptor for this constraint
-	 * @param location meta data about constraint placement
-	 * @param valueExtractorDescriptors the potential {@link ValueExtractor}s used to extract the value to validate
-	 * @param validatedValueType the type of the validated element
-	 */
-	MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location, List<ValueExtractorDescriptor> valueExtractorDescriptors,
+	MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location, List<ValueExtractionPathNode> valueExtractionPath,
 			Type validatedValueType) {
 		this.constraintTree = new ConstraintTree<>( constraintDescriptor, validatedValueType );
 		this.constraintDescriptor = constraintDescriptor;
 		this.location = location;
-		this.valueExtractorDescriptors = CollectionHelper.toImmutableList( valueExtractorDescriptors );
+		this.valueExtractionPath = CollectionHelper.toImmutableList( valueExtractionPath );
 	}
 
 	/**
@@ -91,11 +85,11 @@ public class MetaConstraint<A extends Annotation> {
 	public boolean validateConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		boolean success = true;
 		// constraint requiring value extraction to get the value to validate
-		if ( !valueExtractorDescriptors.isEmpty() ) {
+		if ( !valueExtractionPath.isEmpty() ) {
 			Object valueToValidate = valueContext.getCurrentValidatedValue();
 			if ( valueToValidate != null ) {
 				TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext );
-				( (ValueExtractor) valueExtractorDescriptors.get( 0 ).getValueExtractor() ).extractValues( valueToValidate, receiver );
+				( (ValueExtractor) valueExtractionPath.get( 0 ).valueExtractorDescriptor.getValueExtractor() ).extractValues( valueToValidate, receiver );
 				success = receiver.isSuccess();
 			}
 		}
@@ -134,7 +128,7 @@ public class MetaConstraint<A extends Annotation> {
 		if ( location != null ? !location.equals( that.location ) : that.location != null ) {
 			return false;
 		}
-		if ( valueExtractorDescriptors != null ? !valueExtractorDescriptors.equals( that.valueExtractorDescriptors ) : that.valueExtractorDescriptors != null ) {
+		if ( valueExtractionPath != null ? !valueExtractionPath.equals( that.valueExtractionPath ) : that.valueExtractionPath != null ) {
 			return false;
 		}
 
@@ -145,6 +139,7 @@ public class MetaConstraint<A extends Annotation> {
 	public int hashCode() {
 		int result = constraintDescriptor != null ? constraintDescriptor.hashCode() : 0;
 		result = 31 * result + ( location != null ? location.hashCode() : 0 );
+		result = 31 * result + valueExtractionPath.hashCode();
 		return result;
 	}
 
@@ -154,7 +149,7 @@ public class MetaConstraint<A extends Annotation> {
 		sb.append( "MetaConstraint" );
 		sb.append( "{constraintType=" ).append( StringHelper.toShortString( constraintDescriptor.getAnnotation().annotationType() ) );
 		sb.append( ", location=" ).append( location );
-		sb.append( ", valueExtractorDescriptors=" ).append( valueExtractorDescriptors );
+		sb.append( ", valueExtractionPath=" ).append( valueExtractionPath );
 		sb.append( "}" );
 		return sb.toString();
 	}
@@ -165,7 +160,7 @@ public class MetaConstraint<A extends Annotation> {
 		private final ValueContext<?, Object> valueContext;
 		private boolean success = true;
 
-		private int extractorIndex = 1;
+		private int pathIndex = 0;
 
 		public TypeParameterValueReceiver(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 			this.validationContext = validationContext;
@@ -205,14 +200,14 @@ public class MetaConstraint<A extends Annotation> {
 				valueContext.appendTypeParameterNode( nodeName );
 			}
 
-			if ( extractorIndex < valueExtractorDescriptors.size() ) {
+			if ( pathIndex + 1 < valueExtractionPath.size() ) {
 				if ( value != null ) {
-					ValueExtractorDescriptor valueExtractorDescriptor = valueExtractorDescriptors.get( extractorIndex );
-					extractorIndex++;
+					pathIndex++;
 
+					ValueExtractorDescriptor valueExtractorDescriptor = valueExtractionPath.get( pathIndex ).valueExtractorDescriptor;
 					( (ValueExtractor) valueExtractorDescriptor.getValueExtractor() ).extractValues( value, this );
 
-					extractorIndex--;
+					pathIndex--;
 				}
 			}
 			else {
@@ -226,6 +221,18 @@ public class MetaConstraint<A extends Annotation> {
 
 		public boolean isSuccess() {
 			return success;
+		}
+	}
+
+	static final class ValueExtractionPathNode {
+		private final ValueExtractorDescriptor valueExtractorDescriptor;
+
+		private ValueExtractionPathNode(ValueExtractorDescriptor valueExtractorDescriptor) {
+			this.valueExtractorDescriptor = valueExtractorDescriptor;
+		}
+
+		static ValueExtractionPathNode of(ValueExtractorDescriptor valueExtractorDescriptor) {
+			return new ValueExtractionPathNode( valueExtractorDescriptor );
 		}
 	}
 }

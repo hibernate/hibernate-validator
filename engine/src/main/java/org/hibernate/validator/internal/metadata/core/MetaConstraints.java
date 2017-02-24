@@ -17,6 +17,7 @@ import javax.validation.valueextraction.ValidateUnwrappedValue;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint.ValueExtractionPathNode;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.location.TypeArgumentConstraintLocation;
@@ -41,33 +42,33 @@ public class MetaConstraints {
 
 	public static <A extends Annotation> MetaConstraint<A> create(TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager,
 			ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location) {
-		List<ValueExtractorDescriptor> valueExtractorDescriptors = new ArrayList<>();
+		List<ValueExtractionPathNode> valueExtractionPath = new ArrayList<>();
 
 		Type typeOfValidatedElement = addValueExtractorDescriptorForWrappedValue( typeResolutionHelper, valueExtractorManager, constraintDescriptor,
-				valueExtractorDescriptors, location );
+				valueExtractionPath, location );
 
 		if ( location instanceof TypeArgumentConstraintLocation ) {
 			TypeArgumentConstraintLocation typeArgumentConstraintLocation = (TypeArgumentConstraintLocation) location;
 
-			addValueExtractorDescriptorForTypeArgumentLocation( valueExtractorManager, valueExtractorDescriptors, typeArgumentConstraintLocation );
+			addValueExtractorDescriptorForTypeArgumentLocation( valueExtractorManager, valueExtractionPath, typeArgumentConstraintLocation );
 
 			ConstraintLocation delegateLocation = typeArgumentConstraintLocation.getDelegate();
 			while ( delegateLocation instanceof TypeArgumentConstraintLocation ) {
 				typeArgumentConstraintLocation = (TypeArgumentConstraintLocation) delegateLocation;
-				addValueExtractorDescriptorForTypeArgumentLocation( valueExtractorManager, valueExtractorDescriptors, (TypeArgumentConstraintLocation) delegateLocation );
+				addValueExtractorDescriptorForTypeArgumentLocation( valueExtractorManager, valueExtractionPath, (TypeArgumentConstraintLocation) delegateLocation );
 
 				delegateLocation = typeArgumentConstraintLocation.getDelegate();
 			}
 		}
 
-		Collections.reverse( valueExtractorDescriptors );
+		Collections.reverse( valueExtractionPath );
 
-		return new MetaConstraint<A>( constraintDescriptor, location, valueExtractorDescriptors, typeOfValidatedElement );
+		return new MetaConstraint<A>( constraintDescriptor, location, valueExtractionPath, typeOfValidatedElement );
 	}
 
 	private static <A extends Annotation> Type addValueExtractorDescriptorForWrappedValue(TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager, ConstraintDescriptorImpl<A> constraintDescriptor,
-			List<ValueExtractorDescriptor> valueExtractorDescriptors, ConstraintLocation location) {
+			List<ValueExtractionPathNode> valueExtractionPath, ConstraintLocation location) {
 		if ( ValidateUnwrappedValue.NO.equals( constraintDescriptor.validateUnwrappedValue() ) ) {
 			return location.getTypeForValidatorResolution();
 		}
@@ -85,7 +86,7 @@ public class MetaConstraints {
 				throw LOG.getNoValueExtractorFoundForTypeException( declaredType, null );
 			}
 
-			valueExtractorDescriptors.add( valueExtractorDescriptorCandidate );
+			valueExtractionPath.add( ValueExtractionPathNode.of( valueExtractorDescriptorCandidate ) );
 
 			return getSingleTypeParameterBind( typeResolutionHelper,
 					location.getTypeForValidatorResolution(),
@@ -94,7 +95,7 @@ public class MetaConstraints {
 	}
 
 	private static void addValueExtractorDescriptorForTypeArgumentLocation( ValueExtractorManager valueExtractorManager,
-			List<ValueExtractorDescriptor> valueExtractorDescriptors, TypeArgumentConstraintLocation typeArgumentConstraintLocation ) {
+			List<ValueExtractionPathNode> valueExtractionPath, TypeArgumentConstraintLocation typeArgumentConstraintLocation ) {
 		Class<?> declaredType = TypeHelper.getErasedReferenceType( typeArgumentConstraintLocation.getContainerType() );
 		TypeVariable<?> typeParameter = typeArgumentConstraintLocation.getTypeParameter();
 
@@ -104,7 +105,7 @@ public class MetaConstraints {
 			throw LOG.getNoValueExtractorFoundForTypeException( declaredType, typeParameter );
 		}
 
-		valueExtractorDescriptors.add( valueExtractorDescriptor );
+		valueExtractionPath.add( ValueExtractionPathNode.of( valueExtractorDescriptor ) );
 	}
 
 	/**
