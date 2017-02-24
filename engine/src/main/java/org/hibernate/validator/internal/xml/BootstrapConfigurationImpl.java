@@ -8,13 +8,15 @@ package org.hibernate.validator.internal.xml;
 
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.validation.BootstrapConfiguration;
 import javax.validation.executable.ExecutableType;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Wrapper class for the bootstrap parameters defined in <i>validation.xml</i>
@@ -26,6 +28,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	/**
 	 * The executable types validated by default.
 	 */
+	@Immutable
 	private static final Set<ExecutableType> DEFAULT_VALIDATED_EXECUTABLE_TYPES =
 			Collections.unmodifiableSet(
 					EnumSet.of( ExecutableType.CONSTRUCTORS, ExecutableType.NON_GETTER_METHODS )
@@ -34,6 +37,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	/**
 	 * The validated executable types, when ALL is given.
 	 */
+	@Immutable
 	private static final Set<ExecutableType> ALL_VALIDATED_EXECUTABLE_TYPES =
 			Collections.unmodifiableSet(
 					EnumSet.complementOf(
@@ -53,6 +57,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	private final String traversableResolverClassName;
 	private final String parameterNameProviderClassName;
 	private final String clockProviderClassName;
+	private final Set<String> valueExtractorClassNames;
 	private final Set<String> constraintMappingResourcePaths;
 	private final Map<String, String> properties;
 	private final Set<ExecutableType> validatedExecutableTypes;
@@ -65,10 +70,11 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.traversableResolverClassName = null;
 		this.parameterNameProviderClassName = null;
 		this.clockProviderClassName = null;
+		this.valueExtractorClassNames = new HashSet<>();
 		this.validatedExecutableTypes = DEFAULT_VALIDATED_EXECUTABLE_TYPES;
 		this.isExecutableValidationEnabled = true;
-		this.constraintMappingResourcePaths = newHashSet();
-		this.properties = newHashMap();
+		this.constraintMappingResourcePaths = new HashSet<>();
+		this.properties = new HashMap<>();
 	}
 
 	public BootstrapConfigurationImpl(String defaultProviderClassName,
@@ -77,6 +83,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 									  String traversableResolverClassName,
 									  String parameterNameProviderClassName,
 									  String clockProviderClassName,
+									  Set<String> valueExtractorClassNames,
 									  EnumSet<ExecutableType> validatedExecutableTypes,
 									  boolean isExecutableValidationEnabled,
 									  Set<String> constraintMappingResourcePaths,
@@ -87,6 +94,7 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 		this.traversableResolverClassName = traversableResolverClassName;
 		this.parameterNameProviderClassName = parameterNameProviderClassName;
 		this.clockProviderClassName = clockProviderClassName;
+		this.valueExtractorClassNames = valueExtractorClassNames;
 		this.validatedExecutableTypes = prepareValidatedExecutableTypes( validatedExecutableTypes );
 		this.isExecutableValidationEnabled = isExecutableValidationEnabled;
 		this.constraintMappingResourcePaths = constraintMappingResourcePaths;
@@ -143,8 +151,13 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 	}
 
 	@Override
+	public Set<String> getValueExtractorClassNames() {
+		return new HashSet<>( valueExtractorClassNames );
+	}
+
+	@Override
 	public Set<String> getConstraintMappingResourcePaths() {
-		return newHashSet( constraintMappingResourcePaths );
+		return new HashSet<>( constraintMappingResourcePaths );
 	}
 
 	@Override
@@ -154,12 +167,12 @@ public class BootstrapConfigurationImpl implements BootstrapConfiguration {
 
 	@Override
 	public Set<ExecutableType> getDefaultValidatedExecutableTypes() {
-		return newHashSet( validatedExecutableTypes );
+		return new HashSet<>( validatedExecutableTypes );
 	}
 
 	@Override
 	public Map<String, String> getProperties() {
-		return newHashMap( properties );
+		return new HashMap<>( properties );
 	}
 
 	@Override

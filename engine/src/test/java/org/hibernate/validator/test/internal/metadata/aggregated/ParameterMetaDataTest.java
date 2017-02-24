@@ -59,7 +59,7 @@ public class ParameterMetaDataTest {
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new DefaultParameterNameProvider() ),
-				new ValueExtractorManager( Collections.emptyList() ),
+				new ValueExtractorManager( Collections.emptySet() ),
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build()
 		);
@@ -134,7 +134,7 @@ public class ParameterMetaDataTest {
 				new ExecutableHelper( new TypeResolutionHelper() ),
 				new TypeResolutionHelper(),
 				new ExecutableParameterNameProvider( new SkewedParameterNameProvider() ),
-				new ValueExtractorManager( Collections.emptyList() ),
+				new ValueExtractorManager( Collections.emptySet() ),
 				Collections.<MetaDataProvider>emptyList(),
 				new MethodValidationConfiguration.Builder().build()
 		);

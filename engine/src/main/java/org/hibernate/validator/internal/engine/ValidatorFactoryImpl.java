@@ -12,7 +12,6 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
 import javax.validation.spi.ConfigurationState;
-import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.HibernateValidatorContext;
@@ -150,6 +148,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		this.traversableResolver = configurationState.getTraversableResolver();
 		this.parameterNameProvider = new ExecutableParameterNameProvider( configurationState.getParameterNameProvider() );
 		this.clockProvider = configurationState.getClockProvider();
+		this.valueExtractorManager = new ValueExtractorManager( configurationState.getValueExtractors() );
 		this.beanMetaDataManagers = new ConcurrentHashMap<>();
 		this.constraintHelper = new ConstraintHelper();
 		this.typeResolutionHelper = new TypeResolutionHelper();
@@ -159,7 +158,6 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 		boolean tmpAllowOverridingMethodAlterParameterConstraint = false;
 		boolean tmpAllowMultipleCascadedValidationOnReturnValues = false;
 		boolean tmpAllowParallelMethodsDefineParameterConstraints = false;
-		List<ValueExtractor<?>> tmpCascadedValueExtractors = new ArrayList<>( 5 );
 
 		if ( configurationState instanceof ConfigurationImpl ) {
 			ConfigurationImpl hibernateSpecificConfig = (ConfigurationImpl) configurationState;
@@ -176,11 +174,7 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			tmpAllowParallelMethodsDefineParameterConstraints =
 					hibernateSpecificConfig.getMethodValidationConfiguration()
 							.isAllowParallelMethodsDefineParameterConstraints();
-
-			tmpCascadedValueExtractors = new ArrayList<>( hibernateSpecificConfig.getCascadedValueExtractors() );
 		}
-
-		this.valueExtractorManager = new ValueExtractorManager( tmpCascadedValueExtractors );
 
 		// HV-302; don't load XmlMappingParser if not necessary
 		if ( configurationState.getMappingStreams().isEmpty() ) {
@@ -361,13 +355,12 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 			MethodValidationConfiguration methodValidationConfiguration) {
 
 		BeanMetaDataManager beanMetaDataManager = beanMetaDataManagers.computeIfAbsent(
-				new BeanMetaDataManagerKey( parameterNameProvider, methodValidationConfiguration ),
+				new BeanMetaDataManagerKey( parameterNameProvider, valueExtractorManager, methodValidationConfiguration ),
 				key -> new BeanMetaDataManager(
 						constraintHelper,
 						executableHelper,
 						typeResolutionHelper,
 						parameterNameProvider,
-						// TODO make part of the cache key, too
 						valueExtractorManager,
 						buildDataProviders(),
 						methodValidationConfiguration
@@ -506,20 +499,29 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 
 	private static class BeanMetaDataManagerKey {
 		private final ExecutableParameterNameProvider parameterNameProvider;
+		private final ValueExtractorManager valueExtractorManager;
 		private final MethodValidationConfiguration methodValidationConfiguration;
+		private final int hashCode;
 
-		public BeanMetaDataManagerKey(ExecutableParameterNameProvider parameterNameProvider, MethodValidationConfiguration methodValidationConfiguration) {
+		public BeanMetaDataManagerKey(ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, MethodValidationConfiguration methodValidationConfiguration) {
 			this.parameterNameProvider = parameterNameProvider;
+			this.valueExtractorManager = valueExtractorManager;
 			this.methodValidationConfiguration = methodValidationConfiguration;
+			this.hashCode = buildHashCode( parameterNameProvider, valueExtractorManager, methodValidationConfiguration );
 		}
 
-		@Override
-		public int hashCode() {
+		private static int buildHashCode(ExecutableParameterNameProvider parameterNameProvider, ValueExtractorManager valueExtractorManager, MethodValidationConfiguration methodValidationConfiguration) {
 			final int prime = 31;
 			int result = 1;
 			result = prime * result + ( ( methodValidationConfiguration == null ) ? 0 : methodValidationConfiguration.hashCode() );
 			result = prime * result + ( ( parameterNameProvider == null ) ? 0 : parameterNameProvider.hashCode() );
+			result = prime * result + ( ( valueExtractorManager == null ) ? 0 : valueExtractorManager.hashCode() );
 			return result;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
 		}
 
 		@Override
@@ -534,29 +536,16 @@ public class ValidatorFactoryImpl implements HibernateValidatorFactory {
 				return false;
 			}
 			BeanMetaDataManagerKey other = (BeanMetaDataManagerKey) obj;
-			if ( methodValidationConfiguration == null ) {
-				if ( other.methodValidationConfiguration != null ) {
-					return false;
-				}
-			}
-			else if ( !methodValidationConfiguration.equals( other.methodValidationConfiguration ) ) {
-				return false;
-			}
-			if ( parameterNameProvider == null ) {
-				if ( other.parameterNameProvider != null ) {
-					return false;
-				}
-			}
-			else if ( !parameterNameProvider.equals( other.parameterNameProvider ) ) {
-				return false;
-			}
-			return true;
+
+			return methodValidationConfiguration.equals( other.methodValidationConfiguration ) &&
+					parameterNameProvider.equals( other.parameterNameProvider ) &&
+					valueExtractorManager.equals( other.valueExtractorManager );
 		}
 
 		@Override
 		public String toString() {
-			return "BeanMetaDataManagerKey [parameterNameProvider=" + parameterNameProvider + ", methodValidationConfiguration=" + methodValidationConfiguration
-					+ "]";
+			return "BeanMetaDataManagerKey [parameterNameProvider=" + parameterNameProvider + ", valueExtractorManager=" + valueExtractorManager
+					+ ", methodValidationConfiguration=" + methodValidationConfiguration + "]";
 		}
 	}
 }

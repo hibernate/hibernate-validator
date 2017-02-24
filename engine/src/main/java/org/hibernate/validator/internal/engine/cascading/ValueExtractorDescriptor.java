@@ -31,15 +31,16 @@ public class ValueExtractorDescriptor {
 
 	private static final Log LOG = LoggerFactory.make();
 
+	private final Key key;
 	private final ValueExtractor<?> valueExtractor;
-	private final Type extractedType;
-	private final TypeVariable<?> extractedTypeParameter;
 	private final boolean unwrapByDefault;
 
 	public ValueExtractorDescriptor(ValueExtractor<?> valueExtractor) {
+		this.key = new Key(
+				getExtractedType( valueExtractor.getClass() ),
+				getExtractedTypeParameter( valueExtractor.getClass() )
+		);
 		this.valueExtractor = valueExtractor;
-		this.extractedTypeParameter = getExtractedTypeParameter( valueExtractor.getClass() );
-		this.extractedType = getExtractedType( valueExtractor.getClass() );
 		this.unwrapByDefault = hasUnwrapByDefaultAnnotation( valueExtractor.getClass() );
 	}
 
@@ -93,12 +94,16 @@ public class ValueExtractorDescriptor {
 		return extractorImplementationType.isAnnotationPresent( UnwrapByDefault.class );
 	}
 
+	public Key getKey() {
+		return key;
+	}
+
 	public Type getExtractedType() {
-		return extractedType;
+		return key.extractedType;
 	}
 
 	public TypeVariable<?> getExtractedTypeParameter() {
-		return extractedTypeParameter;
+		return key.extractedTypeParameter;
 	}
 
 	public ValueExtractor<?> getValueExtractor() {
@@ -111,7 +116,54 @@ public class ValueExtractorDescriptor {
 
 	@Override
 	public String toString() {
-		return "ValueExtractorDescriptor [valueExtractor=" + StringHelper.toShortString( valueExtractor.getClass() ) + ", extractedType=" + StringHelper.toShortString( extractedType )
-				+ ", extractedTypeParameter=" + extractedTypeParameter + ", unwrapByDefault=" + unwrapByDefault + "]";
+		return "ValueExtractorDescriptor [key=" + key + ", valueExtractor=" + valueExtractor + ", unwrapByDefault=" + unwrapByDefault + "]";
+	}
+
+	public static class Key {
+
+		private final Type extractedType;
+		private final TypeVariable<?> extractedTypeParameter;
+		private final int hashCode;
+
+		public Key(Type extractedType, TypeVariable<?> extractedTypeParameter) {
+			this.extractedType = extractedType;
+			this.extractedTypeParameter = extractedTypeParameter;
+			this.hashCode = buildHashCode( extractedType, extractedTypeParameter );
+		}
+
+		private static int buildHashCode(Type extractedType, TypeVariable<?> extractedTypeParameter) {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + extractedType.hashCode();
+			result = prime * result + extractedTypeParameter.hashCode();
+			return result;
+		}
+
+		@Override
+		public int hashCode() {
+			return hashCode;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			Key other = (Key) obj;
+
+			return extractedType.equals( other.extractedType ) &&
+					extractedTypeParameter.equals( other.extractedTypeParameter );
+		}
+
+		@Override
+		public String toString() {
+			return "Key [extractedType=" + StringHelper.toShortString( extractedType ) + ", extractedTypeParameter=" + extractedTypeParameter + "]";
+		}
 	}
 }

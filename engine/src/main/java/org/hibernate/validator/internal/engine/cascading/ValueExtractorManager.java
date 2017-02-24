@@ -11,8 +11,11 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.ValidationException;
@@ -21,6 +24,7 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * @author Gunnar Morling
@@ -28,63 +32,90 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  */
 public class ValueExtractorManager {
 
-	private final List<ValueExtractorDescriptor> valueExtractors;
+	@Immutable
+	public static final Set<ValueExtractorDescriptor> SPEC_DEFINED_EXTRACTORS;
 
-	public ValueExtractorManager(Iterable<ValueExtractor<?>> externalExtractors) {
-		List<ValueExtractorDescriptor> tmpValueExtractors = new ArrayList<>();
-
-		for ( ValueExtractor<?> valueExtractor : externalExtractors ) {
-			tmpValueExtractors.add( new ValueExtractorDescriptor( valueExtractor ) );
-		}
+	static {
+		LinkedHashSet<ValueExtractorDescriptor> specDefinedExtractors = new LinkedHashSet<>();
 
 		if ( isJavaFxInClasspath() ) {
-			tmpValueExtractors.add( new ValueExtractorDescriptor( ObservableValueValueExtractor.INSTANCE ) );
+			specDefinedExtractors.add( ObservableValueValueExtractor.DESCRIPTOR );
 		}
 
-		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyListValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( ListValueExtractor.INSTANCE ) );
+		specDefinedExtractors.add( ByteArrayValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( ShortArrayValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( IntArrayValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( LongArrayValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( FloatArrayValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( DoubleArrayValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( CharArrayValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( BooleanArrayValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( ObjectArrayValueExtractor.DESCRIPTOR );
 
-		tmpValueExtractors.add( new ValueExtractorDescriptor( ByteArrayValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( ShortArrayValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( IntArrayValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( LongArrayValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( FloatArrayValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( DoubleArrayValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( CharArrayValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( BooleanArrayValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( ObjectArrayValueExtractor.INSTANCE ) );
+		specDefinedExtractors.add( LegacyListValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( ListValueExtractor.DESCRIPTOR );
 
-		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyMapValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( MapValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( MapKeyExtractor.INSTANCE ) );
+		specDefinedExtractors.add( LegacyMapValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( MapValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( MapKeyExtractor.DESCRIPTOR );
 
-		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyIterableValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( IterableValueExtractor.INSTANCE ) );
+		specDefinedExtractors.add( LegacyIterableValueExtractor.DESCRIPTOR );
+		specDefinedExtractors.add( IterableValueExtractor.DESCRIPTOR );
 
-		tmpValueExtractors.add( new ValueExtractorDescriptor( LegacyOptionalValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( OptionalValueExtractor.INSTANCE ) );
-		tmpValueExtractors.add( new ValueExtractorDescriptor( ObjectValueExtractor.INSTANCE ) );
+		specDefinedExtractors.add( OptionalValueExtractor.DESCRIPTOR );
 
-		valueExtractors = Collections.unmodifiableList( tmpValueExtractors );
+		specDefinedExtractors.add( ObjectValueExtractor.DESCRIPTOR );
+
+		SPEC_DEFINED_EXTRACTORS = Collections.unmodifiableSet( specDefinedExtractors );
+	}
+
+	@Immutable
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractors;
+
+	public ValueExtractorManager(Set<ValueExtractor<?>> externalExtractors) {
+		LinkedHashMap<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> tmpValueExtractors = new LinkedHashMap<>();
+
+		// first all built-in extractors
+		for ( ValueExtractorDescriptor descriptor : SPEC_DEFINED_EXTRACTORS ) {
+			tmpValueExtractors.put( descriptor.getKey(), descriptor );
+		}
+
+		tmpValueExtractors.put( LegacyOptionalValueExtractor.DESCRIPTOR.getKey(), LegacyOptionalValueExtractor.DESCRIPTOR );
+
+		// then any custom ones, overriding the built-in ones
+		for ( ValueExtractor<?> valueExtractor : externalExtractors ) {
+			ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
+			tmpValueExtractors.put( descriptor.getKey(), descriptor );
+		}
+
+		valueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
+	}
+
+	public ValueExtractorManager(ValueExtractorManager template, Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> externalValueExtractorDescriptors) {
+		LinkedHashMap<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> tmpValueExtractors = new LinkedHashMap<>( template.valueExtractors );
+		tmpValueExtractors.putAll( externalValueExtractorDescriptors );
+
+		valueExtractors = Collections.unmodifiableMap( tmpValueExtractors );
+	}
+
+	public static Set<ValueExtractor<?>> getDefaultValueExtractors() {
+		return SPEC_DEFINED_EXTRACTORS.stream()
+				.map( d -> d.getValueExtractor() )
+				.collect( Collectors.collectingAndThen( Collectors.toSet(), Collections::unmodifiableSet ) );
 	}
 
 	/**
 	 * Returns the most specific value extractor extracting the given type or {@code null} if none was found.
 	 */
 	public ValueExtractorDescriptor getValueExtractor(Class<?> valueType) {
-		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.stream()
+		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
+				.stream()
 				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getExtractedType() ), valueType ) )
 				.collect( Collectors.toList() );
 
 		// TODO
-		// * keep most specific one
 		// * if several extractors are found for the most specific type, e.g. key and value extractors for Map, raise an exception
-		if ( typeCompatibleExtractors.isEmpty() ) {
-			return null;
-		}
-		else {
-			return typeCompatibleExtractors.iterator().next();
-		}
+		return getMostSpecific( typeCompatibleExtractors );
 	}
 
 	public ValueExtractorDescriptor getValueExtractor(Class<?> valueType, TypeVariable<?> typeParameter) {
@@ -94,9 +125,12 @@ public class ValueExtractorManager {
 			allBindings = TypeVariableBindings.getTypeVariableBindings( (Class<?>) typeParameter.getGenericDeclaration() );
 		}
 
-		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.stream()
+		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
+				.stream()
 				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getExtractedType() ), valueType ) )
 				.collect( Collectors.toList() );
+
+		List<ValueExtractorDescriptor> typeParameterCompatibleExtractors = new ArrayList<>();
 
 		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
 			TypeVariable<?> typeParameterBoundToExtractorType;
@@ -109,13 +143,48 @@ public class ValueExtractorManager {
 			}
 
 			if ( typeParameterBoundToExtractorType.equals( extractorDescriptor.getExtractedTypeParameter() ) ) {
-				// TODO implement selection of most specific extractor per requested type parameter
-				return extractorDescriptor;
+				typeParameterCompatibleExtractors.add( extractorDescriptor );
 			}
 		}
 
-		// TODO should only happen during transition off value unwrappers
-		return null;
+		return getMostSpecific( typeParameterCompatibleExtractors );
+	}
+
+	// TODO
+	// take parallel hierarchies into account (A implements B, C; extractors present for B and C)
+	private ValueExtractorDescriptor getMostSpecific(List<ValueExtractorDescriptor> extractors) {
+		ValueExtractorDescriptor candidate = null;
+		for ( ValueExtractorDescriptor descriptor : extractors ) {
+			if ( candidate == null || TypeHelper.isAssignable( candidate.getExtractedType(), descriptor.getExtractedType() ) ) {
+				candidate = descriptor;
+			}
+		}
+
+		return candidate;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ( ( valueExtractors == null ) ? 0 : valueExtractors.hashCode() );
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ValueExtractorManager other = (ValueExtractorManager) obj;
+
+		return valueExtractors.equals( other.valueExtractors );
 	}
 
 	private TypeVariable<?> bind(TypeVariable<?> typeParameter, Map<TypeVariable<?>, TypeVariable<?>> bindings) {
@@ -128,13 +197,13 @@ public class ValueExtractorManager {
 		return bound != null ? bound : typeParameter == AnnotatedObject.INSTANCE ? AnnotatedObject.INSTANCE : ArrayElement.INSTANCE;
 	}
 
-	private boolean isJavaFxInClasspath() {
+	private static boolean isJavaFxInClasspath() {
 		return isClassPresent( "javafx.application.Application", false );
 	}
 
-	private boolean isClassPresent(String className, boolean fallbackOnTCCL) {
+	private static boolean isClassPresent(String className, boolean fallbackOnTCCL) {
 		try {
-			run( LoadClass.action( className, getClass().getClassLoader(), fallbackOnTCCL ) );
+			run( LoadClass.action( className, ValueExtractorManager.class.getClassLoader(), fallbackOnTCCL ) );
 			return true;
 		}
 		catch (ValidationException e) {
@@ -148,7 +217,7 @@ public class ValueExtractorManager {
 	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
 	 * privileged actions within HV's protection domain.
 	 */
-	private <T> T run(PrivilegedAction<T> action) {
+	private static <T> T run(PrivilegedAction<T> action) {
 		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 }

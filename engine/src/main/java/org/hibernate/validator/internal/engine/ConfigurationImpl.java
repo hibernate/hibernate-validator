@@ -14,10 +14,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
@@ -35,6 +38,8 @@ import javax.validation.valueextraction.ValueExtractor;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.internal.cfg.context.DefaultConstraintMapping;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorFactoryImpl;
 import org.hibernate.validator.internal.engine.resolver.DefaultTraversableResolver;
 import org.hibernate.validator.internal.util.Contracts;
@@ -91,9 +96,9 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	// HV-specific options
 	private final Set<DefaultConstraintMapping> programmaticMappings = newHashSet();
 	private boolean failFast;
-	private final List<ValueExtractor<?>> cascadedValueExtractors = new ArrayList<>();
 	private ClassLoader externalClassLoader;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder();
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
 
 	public ConfigurationImpl(BootstrapState state) {
 		this();
@@ -198,6 +203,24 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 	}
 
 	@Override
+	public HibernateValidatorConfiguration addValueExtractor(ValueExtractor<?> extractor) {
+		Contracts.assertNotNull( extractor, MESSAGES.parameterMustNotBeNull( "extractor" ) );
+
+		ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( extractor );
+		ValueExtractorDescriptor previous = valueExtractorDescriptors.put( descriptor.getKey(), descriptor );
+
+		if ( previous != null ) {
+			throw log.getValueExtractorForTypeAndTypeUseAlreadyPresentException( extractor, previous.getValueExtractor() );
+		}
+
+		if ( log.isDebugEnabled() ) {
+			log.debug( "Adding value extractor " + extractor );
+		}
+
+		return this;
+	}
+
+	@Override
 	public final HibernateValidatorConfiguration addMapping(InputStream stream) {
 		Contracts.assertNotNull( stream, MESSAGES.inputStreamCannotBeNull() );
 
@@ -266,14 +289,6 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return this;
 	}
 
-	@Override
-	public HibernateValidatorConfiguration addCascadedValueExtractor(ValueExtractor<?> extractor) {
-		Contracts.assertNotNull( extractor, MESSAGES.parameterMustNotBeNull( "extractor" ) );
-		cascadedValueExtractors.add( extractor );
-
-		return this;
-	}
-
 	public final ConstraintMappingContributor getServiceLoaderBasedConstraintMappingContributor() {
 		return serviceLoaderBasedConstraintMappingContributor;
 	}
@@ -288,6 +303,7 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 
 	@Override
 	public final ValidatorFactory buildValidatorFactory() {
+		loadValueExtractorsFromServiceLoader();
 		parseValidationXml();
 		ValidatorFactory factory = null;
 		try {
@@ -387,8 +403,13 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return validationBootstrapParameters.getClockProvider();
 	}
 
-	public List<ValueExtractor<?>> getCascadedValueExtractors() {
-		return cascadedValueExtractors;
+	@Override
+	public Set<ValueExtractor<?>> getValueExtractors() {
+		return validationBootstrapParameters.getValueExtractorDescriptors()
+				.values()
+				.stream()
+				.map( ValueExtractorDescriptor::getValueExtractor )
+				.collect( Collectors.toSet() );
 	}
 
 	@Override
@@ -434,6 +455,11 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 		return defaultClockProvider;
 	}
 
+	@Override
+	public Set<ValueExtractor<?>> getDefaultValueExtractors() {
+		return ValueExtractorManager.getDefaultValueExtractors();
+	}
+
 	public final Set<DefaultConstraintMapping> getProgrammaticMappings() {
 		return programmaticMappings;
 	}
@@ -467,6 +493,24 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 					getBootstrapConfiguration(), externalClassLoader
 			);
 			applyXmlSettings( xmlParameters );
+		}
+
+		for ( ValueExtractorDescriptor valueExtractorDescriptor : valueExtractorDescriptors.values() ) {
+			validationBootstrapParameters.addValueExtractorDescriptor( valueExtractorDescriptor );
+		}
+	}
+
+	private void loadValueExtractorsFromServiceLoader() {
+		@SuppressWarnings("rawtypes")
+		ServiceLoader<ValueExtractor> loader = ServiceLoader.load(
+				ValueExtractor.class,
+				externalClassLoader != null ? externalClassLoader : getClass().getClassLoader()
+		);
+
+		@SuppressWarnings("rawtypes")
+		Iterator<ValueExtractor> extractors = loader.iterator();
+		while ( extractors.hasNext() ) {
+			validationBootstrapParameters.addValueExtractorDescriptor( new ValueExtractorDescriptor( extractors.next() ) );
 		}
 	}
 
@@ -515,6 +559,10 @@ public class ConfigurationImpl implements HibernateValidatorConfiguration, Confi
 			else {
 				validationBootstrapParameters.setClockProvider( defaultClockProvider );
 			}
+		}
+
+		for ( ValueExtractorDescriptor extractor : xmlParameters.getValueExtractorDescriptors().values() ) {
+			validationBootstrapParameters.addValueExtractorDescriptor( extractor );
 		}
 
 		validationBootstrapParameters.addAllMappings( xmlParameters.getMappings() );

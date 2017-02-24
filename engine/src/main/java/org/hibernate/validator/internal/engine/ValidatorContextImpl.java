@@ -6,16 +6,23 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.validation.ClockProvider;
 import javax.validation.ConstraintValidatorFactory;
 import javax.validation.MessageInterpolator;
 import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.Validator;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.HibernateValidatorContext;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * @author Emmanuel Bernard
@@ -25,6 +32,8 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
  * @author Chris Beckey &lt;cbeckey@paypal.com&gt;
  */
 public class ValidatorContextImpl implements HibernateValidatorContext {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	private final ValidatorFactoryImpl validatorFactory;
 
@@ -36,7 +45,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	private boolean failFast;
 	private final ValueExtractorManager valueExtractorManager;
 	private final MethodValidationConfiguration.Builder methodValidationConfigurationBuilder;
-
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors;
 
 	public ValidatorContextImpl(ValidatorFactoryImpl validatorFactory) {
 		this.validatorFactory = validatorFactory;
@@ -47,8 +56,8 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 		this.clockProvider = validatorFactory.getClockProvider();
 		this.failFast = validatorFactory.isFailFast();
 		this.methodValidationConfigurationBuilder = new MethodValidationConfiguration.Builder( validatorFactory.getMethodValidationConfiguration() );
-		// TODO make overwritable per this context
 		this.valueExtractorManager = validatorFactory.getValueExtractorManager();
+		this.valueExtractorDescriptors = new HashMap<>();
 	}
 
 	@Override
@@ -107,6 +116,18 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 	}
 
 	@Override
+	public HibernateValidatorContext addValueExtractor(ValueExtractor<?> extractor) {
+		ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( extractor );
+		ValueExtractorDescriptor previous = valueExtractorDescriptors.put( descriptor.getKey(), descriptor );
+
+		if ( previous != null ) {
+			throw LOG.getValueExtractorForTypeAndTypeUseAlreadyPresentException( extractor, previous.getValueExtractor() );
+		}
+
+		return this;
+	}
+
+	@Override
 	public HibernateValidatorContext failFast(boolean failFast) {
 		this.failFast = failFast;
 		return this;
@@ -139,7 +160,7 @@ public class ValidatorContextImpl implements HibernateValidatorContext {
 				parameterNameProvider,
 				clockProvider,
 				failFast,
-				valueExtractorManager,
+				valueExtractorDescriptors.isEmpty() ? valueExtractorManager : new ValueExtractorManager( valueExtractorManager, valueExtractorDescriptors ),
 				methodValidationConfigurationBuilder.build()
 		);
 	}

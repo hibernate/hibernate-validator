@@ -6,13 +6,12 @@
  */
 package org.hibernate.validator.internal.xml;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,7 +23,10 @@ import javax.validation.ParameterNameProvider;
 import javax.validation.TraversableResolver;
 import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
+import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor.Key;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
@@ -43,8 +45,9 @@ public class ValidationBootstrapParameters {
 	private ClockProvider clockProvider;
 	private ValidationProvider<?> provider;
 	private Class<? extends ValidationProvider<?>> providerClass = null;
-	private final Map<String, String> configProperties = newHashMap();
-	private final Set<InputStream> mappings = newHashSet();
+	private final Map<String, String> configProperties = new HashMap<>();
+	private final Set<InputStream> mappings = new HashSet<>();
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractors = new HashMap<>();
 
 	public ValidationBootstrapParameters() {
 	}
@@ -56,6 +59,7 @@ public class ValidationBootstrapParameters {
 		setConstraintFactory( bootstrapConfiguration.getConstraintValidatorFactoryClassName(), externalClassLoader );
 		setParameterNameProvider( bootstrapConfiguration.getParameterNameProviderClassName(), externalClassLoader );
 		setClockProvider( bootstrapConfiguration.getClockProviderClassName(), externalClassLoader );
+		setValueExtractors( bootstrapConfiguration.getValueExtractorClassNames(), externalClassLoader );
 		setMappingStreams( bootstrapConfiguration.getConstraintMappingResourcePaths(), externalClassLoader );
 		setConfigProperties( bootstrapConfiguration.getProperties() );
 	}
@@ -134,6 +138,14 @@ public class ValidationBootstrapParameters {
 
 	public void setClockProvider(ClockProvider clockProvider) {
 		this.clockProvider = clockProvider;
+	}
+
+	public Map<Key, ValueExtractorDescriptor> getValueExtractorDescriptors() {
+		return valueExtractors;
+	}
+
+	public void addValueExtractorDescriptor(ValueExtractorDescriptor descriptor) {
+		valueExtractors.put( descriptor.getKey(), descriptor );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -228,6 +240,33 @@ public class ValidationBootstrapParameters {
 			catch (ValidationException e) {
 				throw log.getUnableToInstantiateClockProviderClassException( clockProviderFqcn, e );
 			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void setValueExtractors(Set<String> valueExtractorFqcns, ClassLoader externalClassLoader) {
+		for ( String valueExtractorFqcn : valueExtractorFqcns ) {
+			ValueExtractor<?> valueExtractor;
+
+			try {
+				Class<? extends ValueExtractor<?>> clazz = (Class<? extends ValueExtractor<?>>) run(
+						LoadClass.action( valueExtractorFqcn, externalClassLoader )
+				);
+				valueExtractor = run( NewInstance.action( clazz, "value extractor class" ) );
+			}
+			catch (ValidationException e) {
+				throw log.getUnableToInstantiateValueExtractorClassException( valueExtractorFqcn, e );
+			}
+
+
+			ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
+			ValueExtractorDescriptor previous = valueExtractors.put( descriptor.getKey(), descriptor );
+
+			if ( previous != null ) {
+				throw log.getValueExtractorForTypeAndTypeUseAlreadyPresentException( valueExtractor, previous.getValueExtractor() );
+			}
+
+			log.addingValueExtractor( (Class<? extends ValueExtractor<?>>) valueExtractor.getClass() );
 		}
 	}
 

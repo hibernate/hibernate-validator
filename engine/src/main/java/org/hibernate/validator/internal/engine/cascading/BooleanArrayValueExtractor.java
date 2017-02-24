@@ -13,7 +13,7 @@ import org.hibernate.validator.internal.engine.path.NodeImpl;
 
 class BooleanArrayValueExtractor implements ValueExtractor<boolean @ExtractedValue[]> {
 
-	static final BooleanArrayValueExtractor INSTANCE = new BooleanArrayValueExtractor();
+	static final ValueExtractorDescriptor DESCRIPTOR = new ValueExtractorDescriptor( new BooleanArrayValueExtractor() );
 
 	private BooleanArrayValueExtractor() {
 	}

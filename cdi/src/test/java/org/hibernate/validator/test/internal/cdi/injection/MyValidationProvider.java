@@ -8,6 +8,7 @@ package org.hibernate.validator.test.internal.cdi.injection;
 
 import java.io.InputStream;
 import java.util.Set;
+
 import javax.enterprise.inject.Alternative;
 import javax.validation.BootstrapConfiguration;
 import javax.validation.ClockProvider;
@@ -25,6 +26,7 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.spi.BootstrapState;
 import javax.validation.spi.ConfigurationState;
 import javax.validation.spi.ValidationProvider;
+import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.ValidatorFactoryImpl;
 
@@ -79,6 +81,11 @@ public class MyValidationProvider implements ValidationProvider<MyValidationProv
 
 		@Override
 		public MyConfiguration clockProvider(ClockProvider clockProvider) {
+			return null;
+		}
+
+		@Override
+		public MyConfiguration addValueExtractor(ValueExtractor<?> extractor) {
 			return null;
 		}
 
