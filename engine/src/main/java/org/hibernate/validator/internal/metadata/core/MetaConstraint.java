@@ -18,6 +18,7 @@ import org.hibernate.validator.internal.engine.ValidationContext;
 import org.hibernate.validator.internal.engine.ValueContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTree;
+import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.CollectionHelper;
@@ -89,7 +90,26 @@ public class MetaConstraint<A extends Annotation> {
 		return constraintDescriptor.getElementType();
 	}
 
-	public boolean validateConstraint(ValidationContext<?> executionContext, ValueContext<?, ?> valueContext) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public boolean validateConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
+		boolean success = true;
+		// constraint requiring value extraction to get the value to validate
+		if ( !valueExtractorDescriptors.isEmpty() ) {
+			Object valueToValidate = valueContext.getCurrentValidatedValue();
+			if ( valueToValidate != null ) {
+				TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext );
+				( (ValueExtractor) valueExtractorDescriptors.get( 0 ).getValueExtractor() ).extractValues( valueToValidate, receiver );
+				success = receiver.isSuccess();
+			}
+		}
+		// regular constraint
+		else {
+			success = doValidateConstraint( validationContext, valueContext );
+		}
+		return success;
+	}
+
+	private boolean doValidateConstraint(ValidationContext<?> executionContext, ValueContext<?, ?> valueContext) {
 		valueContext.setElementType( getElementType() );
 		boolean validationResult = constraintTree.validateConstraints( executionContext, valueContext );
 
@@ -98,10 +118,6 @@ public class MetaConstraint<A extends Annotation> {
 
 	public ConstraintLocation getLocation() {
 		return location;
-	}
-
-	public List<ValueExtractorDescriptor> getValueExtractorDescriptors() {
-		return valueExtractorDescriptors;
 	}
 
 	@Override
@@ -147,5 +163,75 @@ public class MetaConstraint<A extends Annotation> {
 		sb.append( ", valueExtractorDescriptors=" ).append( valueExtractorDescriptors );
 		sb.append( "}" );
 		return sb.toString();
+	}
+
+	private final class TypeParameterValueReceiver implements ValueExtractor.ValueReceiver {
+
+		private final ValidationContext<?> validationContext;
+		private final ValueContext<?, Object> valueContext;
+		private boolean success = true;
+
+		private int extractorIndex = 1;
+
+		public TypeParameterValueReceiver(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
+			this.validationContext = validationContext;
+			this.valueContext = valueContext;
+		}
+
+		@Override
+		public void value(String nodeName, Object object) {
+			doValidate( object, nodeName );
+		}
+
+		@Override
+		public void iterableValue(String nodeName, Object value) {
+			valueContext.markCurrentPropertyAsIterable();
+			doValidate( value, nodeName );
+		}
+
+		@Override
+		public void indexedValue(String nodeName, int index, Object value) {
+			valueContext.markCurrentPropertyAsIterable();
+			valueContext.setIndex( index );
+			doValidate( value, nodeName );
+		}
+
+		@Override
+		public void keyedValue(String nodeName, Object key, Object value) {
+			valueContext.markCurrentPropertyAsIterable();
+			valueContext.setKey( key );
+			doValidate( value, nodeName );
+		}
+
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		private void doValidate(Object value, String nodeName) {
+			PathImpl before = valueContext.getPropertyPath();
+
+			if ( nodeName != null ) {
+				valueContext.appendTypeParameterNode( nodeName );
+			}
+
+			if ( extractorIndex < valueExtractorDescriptors.size() ) {
+				if ( value != null ) {
+					ValueExtractorDescriptor valueExtractorDescriptor = valueExtractorDescriptors.get( extractorIndex );
+					extractorIndex++;
+
+					( (ValueExtractor) valueExtractorDescriptor.getValueExtractor() ).extractValues( value, this );
+
+					extractorIndex--;
+				}
+			}
+			else {
+				valueContext.setCurrentValidatedValue( value );
+				success &= doValidateConstraint( validationContext, valueContext );
+			}
+
+			// reset the path to the state before this call
+			valueContext.setPropertyPath( before );
+		}
+
+		public boolean isSuccess() {
+			return success;
+		}
 	}
 }
