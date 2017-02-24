@@ -37,6 +37,7 @@ import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.spi.ValidationProvider;
 import javax.validation.valueextraction.ValueExtractor;
+import javax.validation.valueextraction.ValueExtractorDeclarationException;
 import javax.validation.valueextraction.ValueExtractorDefinitionException;
 import javax.xml.stream.XMLStreamException;
 
@@ -710,4 +711,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = 207, value = "Adding value extractor %s.")
 	void addingValueExtractor(@FormatWith(ClassObjectFormatter.class) Class<? extends ValueExtractor<?>> valueExtractorClass);
+
+	@Message(id = 208, value = "Given value extractor %2$s handles the same type and type use as previously given value extractor %1$s.")
+	ValueExtractorDeclarationException getValueExtractorForTypeAndTypeUseAlreadyPresentException(ValueExtractor<?> first, ValueExtractor<?> second);
 }
