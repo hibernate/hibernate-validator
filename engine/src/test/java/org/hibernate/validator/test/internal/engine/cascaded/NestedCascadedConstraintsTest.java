@@ -105,7 +105,7 @@ public class NestedCascadedConstraintsTest {
 
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[Optional[Cinema<cinema4>]].<map key>.visitor.name"
+				"map<K>[Optional[Cinema<cinema4>]].<map key>.visitor.name"
 		);
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(

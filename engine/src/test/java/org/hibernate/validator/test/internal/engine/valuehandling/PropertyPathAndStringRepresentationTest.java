@@ -54,7 +54,7 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress[].<map key>" ); // the key is null, thus the '[]'
+		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[].<map key>" ); // the key is null, thus the '[]'
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -71,7 +71,7 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress[null, Lyon].street" );
+		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[null, Lyon].street" );
 		assertCorrectConstraintTypes( constraintViolations, NotNull.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -85,7 +85,7 @@ public class PropertyPathAndStringRepresentationTest {
 
 		constraintViolations = validator.validate( statictics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress[rue Garibaldi, L].city.name" );
+		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, L].city.name" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -103,7 +103,7 @@ public class PropertyPathAndStringRepresentationTest {
 
 		Set<ConstraintViolation<DemographicStatistics>> constraintViolations = validator.validate( statictics );
 
-		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress[rue Garibaldi, Lyon]" );
+		assertCorrectPropertyPaths( constraintViolations, "inhabitantsPerAddress<K>[rue Garibaldi, Lyon]" );
 		assertCorrectConstraintTypes( constraintViolations, ValidLyonZipCode.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()

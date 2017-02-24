@@ -53,7 +53,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		constraintViolations = validator.validate( MapOfLists.invalidKeyFoo() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[k].<map key>" );
+				"map<K>[k].<map key>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class );
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
@@ -92,7 +92,7 @@ public class NestedTypeArgumentsValueExtractorTest {
 		constraintViolations = validator.validate( MapOfLists.reallyInvalidFoo() );
 		assertCorrectPropertyPaths(
 				constraintViolations,
-				"map[k].<map key>",
+				"map<K>[k].<map key>",
 				"map[k].<map value>",
 				"map[k].<map value>[0].<iterable element>" );
 		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class, Size.class );
