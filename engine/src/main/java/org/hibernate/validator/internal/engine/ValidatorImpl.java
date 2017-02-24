@@ -71,6 +71,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -695,6 +696,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
 
+			if ( cascadingTypeParameter.getTypeParameter() != null && !TypeVariables.isInternal( cascadingTypeParameter.getTypeParameter() ) ) {
+				cascadedValueContext.setTypeParameter( cascadingTypeParameter.getTypeParameter() );
+			}
+
 			// Cascade validation
 			if ( cascadingTypeParameter.isCascading() ) {
 				validateInContext( context, cascadedValueContext, validationOrder );
@@ -703,6 +708,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// Cascade validation to nested types arguments
 			if ( !cascadingTypeParameter.getNestedCascadingTypeParameters().isEmpty() ) {
 				ValueContext<?, Object> cascadedTypeArgumentValueContext = buildNewLocalExecutionContext( valueContext, value );
+				if ( cascadingTypeParameter.getTypeParameter() != null && !TypeVariables.isInternal( cascadingTypeParameter.getTypeParameter() ) ) {
+					cascadedValueContext.setTypeParameter( cascadingTypeParameter.getTypeParameter() );
+				}
+
 				if ( nodeName != null ) {
 					cascadedTypeArgumentValueContext.appendTypeParameterNode( nodeName );
 				}

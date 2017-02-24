@@ -258,6 +258,11 @@ public final class ConstraintViolationAssert {
 			}
 			Path.Node p2Node = p2Iterator.next();
 
+			// check that the nodes are of the same type
+			if ( p1Node.getKind() != p2Node.getKind() ) {
+				return false;
+			}
+
 			// do the comparison on the node values
 			if ( p2Node.getName() == null ) {
 				if ( p1Node.getName() != null ) {
@@ -289,6 +294,24 @@ public final class ConstraintViolationAssert {
 			}
 			else if ( !p2Node.getKey().equals( p1Node.getKey() ) ) {
 				return false;
+			}
+
+			if ( p2Node.getTypeParameter() == null ) {
+				if ( p1Node.getTypeParameter() != null ) {
+					return false;
+				}
+			}
+			else if ( !p2Node.getTypeParameter().equals( p1Node.getTypeParameter() ) ) {
+				return false;
+			}
+
+			if ( p1Node.getKind() == ElementKind.PARAMETER ) {
+				int p1NodeParameterIndex = p1Node.as( Path.ParameterNode.class ).getParameterIndex();
+				int p2NodeParameterIndex = p2Node.as( Path.ParameterNode.class ).getParameterIndex();
+
+				if ( p1NodeParameterIndex != p2NodeParameterIndex ) {
+					return false;
+				}
 			}
 		}
 
@@ -398,7 +421,8 @@ public final class ConstraintViolationAssert {
 								node.isInIterable(),
 								node.getKey(),
 								node.getIndex(),
-								parameterIndex
+								parameterIndex,
+								node.getTypeParameter() != null ? node.getTypeParameter().getName() : null
 						)
 				);
 			}
@@ -409,8 +433,18 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
+		public PathExpectation property(String name, String typeParameter) {
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, false, null, null, null, typeParameter ) );
+			return this;
+		}
+
 		public PathExpectation property(String name, boolean inIterable, Object key, Integer index) {
-			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null ) );
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null, null ) );
+			return this;
+		}
+
+		public PathExpectation property(String name, boolean inIterable, Object key, Integer index, String typeParameter) {
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null, typeParameter ) );
 			return this;
 		}
 
@@ -420,7 +454,12 @@ public final class ConstraintViolationAssert {
 		}
 
 		public PathExpectation bean(boolean inIterable, Object key, Integer index) {
-			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null ) );
+			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, null ) );
+			return this;
+		}
+
+		public PathExpectation bean(boolean inIterable, Object key, Integer index, String typeParameter) {
+			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, typeParameter ) );
 			return this;
 		}
 
@@ -430,7 +469,7 @@ public final class ConstraintViolationAssert {
 		}
 
 		public PathExpectation parameter(String name, int index) {
-			nodes.add( new NodeExpectation( name, ElementKind.PARAMETER, false, null, null, index ) );
+			nodes.add( new NodeExpectation( name, ElementKind.PARAMETER, false, null, null, index, null ) );
 			return this;
 		}
 
@@ -444,9 +483,8 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
-		public PathExpectation typeArgument(String name, boolean inIterable, Object key, Integer index) {
-			// TODO HV-1245 this should be TYPE_USE once it's included in BV
-			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null ) );
+		public PathExpectation typeArgument(String name, boolean inIterable, Object key, Integer index, String typeParameter) {
+			nodes.add( new NodeExpectation( name, ElementKind.TYPE_ARGUMENT, inIterable, key, index, null, typeParameter ) );
 			return this;
 		}
 
@@ -503,25 +541,27 @@ public final class ConstraintViolationAssert {
 		private final Object key;
 		private final Integer index;
 		private final Integer parameterIndex;
+		private final String typeParameter;
 
 		private NodeExpectation(String name, ElementKind kind) {
-			this( name, kind, false, null, null, null );
+			this( name, kind, false, null, null, null, null );
 		}
 
 		private NodeExpectation(String name, ElementKind kind, boolean inIterable, Object key, Integer index,
-				Integer parameterIndex) {
+				Integer parameterIndex, String typeParameter) {
 			this.name = name;
 			this.kind = kind;
 			this.inIterable = inIterable;
 			this.key = key;
 			this.index = index;
 			this.parameterIndex = parameterIndex;
+			this.typeParameter = typeParameter;
 		}
 
 		@Override
 		public String toString() {
 			return "NodeExpectation(" + name + ", " + kind + ", " + inIterable
-					+ ", " + key + ", " + index + ", " + parameterIndex + ")";
+					+ ", " + key + ", " + index + ", " + parameterIndex + ", " + typeParameter + ")";
 		}
 
 		@Override
@@ -534,6 +574,7 @@ public final class ConstraintViolationAssert {
 			result = prime * result + ( ( kind == null ) ? 0 : kind.hashCode() );
 			result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
 			result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
+			result = prime * result + ( ( typeParameter == null ) ? 0 : typeParameter.hashCode() );
 			return result;
 		}
 
@@ -585,6 +626,14 @@ public final class ConstraintViolationAssert {
 				}
 			}
 			else if ( !parameterIndex.equals( other.parameterIndex ) ) {
+				return false;
+			}
+			if ( typeParameter == null ) {
+				if ( other.typeParameter != null ) {
+					return false;
+				}
+			}
+			else if ( !typeParameter.equals( other.typeParameter ) ) {
 				return false;
 			}
 			return true;
