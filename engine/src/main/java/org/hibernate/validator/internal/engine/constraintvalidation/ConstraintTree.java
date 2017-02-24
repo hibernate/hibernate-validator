@@ -186,7 +186,7 @@ public class ConstraintTree<A extends Annotation> {
 	private <T> boolean mainConstraintNeedsEvaluation(ValidationContext<T> executionContext,
 			Set<ConstraintViolation<T>> constraintViolations) {
 		// we are dealing with a composing constraint with no validator for the main constraint
-		if ( !descriptor.getComposingConstraints().isEmpty() && descriptor.getMatchingConstraintValidatorClasses()
+		if ( !descriptor.getComposingConstraints().isEmpty() && descriptor.getMatchingConstraintValidatorDescriptors()
 				.isEmpty() ) {
 			return false;
 		}
