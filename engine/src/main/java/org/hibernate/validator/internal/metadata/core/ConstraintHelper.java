@@ -20,8 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import javax.validation.Constraint;
 import javax.validation.ConstraintTarget;
 import javax.validation.ConstraintValidator;
@@ -351,23 +353,7 @@ public class ConstraintHelper {
 	 */
 	public <A extends Annotation> List<ConstraintValidatorDescriptor<A>> getAllValidatorDescriptors(Class<A> annotationType) {
 		Contracts.assertNotNull( annotationType, MESSAGES.classCannotBeNull() );
-
-		List<ConstraintValidatorDescriptor<A>> classes = validatorDescriptors.get( annotationType );
-
-		if ( classes == null ) {
-			classes = getDefaultValidatorDescriptors( annotationType );
-
-			List<ConstraintValidatorDescriptor<A>> cachedValidatorDescriptors = validatorDescriptors.putIfAbsent(
-					annotationType,
-					classes
-			);
-
-			if ( cachedValidatorDescriptors != null ) {
-				classes = cachedValidatorDescriptors;
-			}
-		}
-
-		return Collections.unmodifiableList( classes );
+		return validatorDescriptors.computeIfAbsent( annotationType, a -> getDefaultValidatorDescriptors( a ) );
 	}
 
 	/**
@@ -381,16 +367,9 @@ public class ConstraintHelper {
 	 * @return A list with matching validator descriptors.
 	 */
 	public <A extends Annotation> List<ConstraintValidatorDescriptor<A>> findValidatorDescriptors(Class<A> annotationType, ValidationTarget validationTarget) {
-		List<ConstraintValidatorDescriptor<A>> validatorDescriptors = getAllValidatorDescriptors( annotationType );
-		List<ConstraintValidatorDescriptor<A>> matchingValidatorDescriptors = new ArrayList<>();
-
-		for ( ConstraintValidatorDescriptor<A> descriptor : validatorDescriptors ) {
-			if ( supportsValidationTarget( descriptor, validationTarget ) ) {
-				matchingValidatorDescriptors.add( descriptor );
-			}
-		}
-
-		return matchingValidatorDescriptors;
+		return getAllValidatorDescriptors( annotationType ).stream()
+			.filter( d -> supportsValidationTarget( d, validationTarget ) )
+			.collect( Collectors.toList() );
 	}
 
 	private boolean supportsValidationTarget(ConstraintValidatorDescriptor<?> validatorDescriptor, ValidationTarget target) {
@@ -421,7 +400,7 @@ public class ConstraintHelper {
 
 		validatorDescriptorsToAdd.addAll( validatorDescriptors );
 
-		this.validatorDescriptors.put( annotationType, validatorDescriptorsToAdd );
+		this.validatorDescriptors.put( annotationType, Collections.unmodifiableList( validatorDescriptorsToAdd ) );
 	}
 
 	/**
@@ -621,7 +600,7 @@ public class ConstraintHelper {
 
 		return Stream.of( validatedBy )
 			.map( c -> ConstraintValidatorDescriptor.forClass( c ) )
-			.collect( Collectors.toList() );
+			.collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
 	}
 
 	private static boolean isClassPresent(String className) {
@@ -656,18 +635,15 @@ public class ConstraintHelper {
 
 		private final ConcurrentMap<Class<? extends Annotation>, List<? extends ConstraintValidatorDescriptor<?>>> constraintValidatorDescriptors = new ConcurrentHashMap<>();
 
-		private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> get(Class<A> annotationType) {
-			return (List<ConstraintValidatorDescriptor<A>>) constraintValidatorDescriptors.get( annotationType );
-		}
-
 		private <A extends Annotation> void put(Class<A> annotationType, List<ConstraintValidatorDescriptor<A>> validatorDescriptors) {
 			constraintValidatorDescriptors.put( annotationType, validatorDescriptors );
 		}
 
-		private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> putIfAbsent(Class<A> annotationType, List<ConstraintValidatorDescriptor<A>> classes) {
-			return (List<ConstraintValidatorDescriptor<A>>) constraintValidatorDescriptors.putIfAbsent(
+		private <A extends Annotation> List<ConstraintValidatorDescriptor<A>> computeIfAbsent(Class<A> annotationType,
+				Function<? super Class<A>, List<ConstraintValidatorDescriptor<A>>> mappingFunction) {
+			return (List<ConstraintValidatorDescriptor<A>>) constraintValidatorDescriptors.computeIfAbsent(
 					annotationType,
-					classes
+					(Function<? super Class<? extends Annotation>, ? extends List<? extends ConstraintValidatorDescriptor<?>>>) mappingFunction
 			);
 		}
 	}

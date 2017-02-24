@@ -57,6 +57,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetAnnotationParameter;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethods;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Describes a single constraint (including its composing constraints).
@@ -98,6 +99,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * The set of classes implementing the validation for this constraint. See also
 	 * {@code ConstraintValidator} resolution algorithm.
 	 */
+	@Immutable
 	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses;
 
 	private final List<ConstraintValidatorDescriptor<T>> matchingConstraintValidatorDescriptors;
@@ -184,7 +186,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.constraintValidatorClasses = constraintHelper.getAllValidatorDescriptors( annotationType )
 				.stream()
 				.map( ConstraintValidatorDescriptor::getValidatorClass )
-				.collect( Collectors.toList() );
+				.collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
 
 		List<ConstraintValidatorDescriptor<T>> crossParameterValidatorDescriptors = constraintHelper.findValidatorDescriptors(
 				annotationType,
@@ -800,19 +802,13 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			}
 
 			@SuppressWarnings("unchecked") // safe due to the check above
-					ClassIndexWrapper that = (ClassIndexWrapper) o;
+			ClassIndexWrapper that = (ClassIndexWrapper) o;
 
 			if ( index != that.index ) {
 				return false;
 			}
-			if ( clazz != null && !clazz.equals( that.clazz ) ) {
-				return false;
-			}
-			if ( clazz == null && that.clazz != null ) {
-				return false;
-			}
 
-			return true;
+			return clazz.equals( that.clazz );
 		}
 
 		@Override
