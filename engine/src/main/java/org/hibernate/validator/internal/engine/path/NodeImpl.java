@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.engine.path;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.ElementKind;
 import javax.validation.Path;
@@ -21,6 +22,7 @@ import javax.validation.Path.PropertyNode;
 import javax.validation.Path.ReturnValueNode;
 import javax.validation.Path.TypeArgumentNode;
 import javax.validation.TypeParameter;
+import javax.validation.TypeParameter.ClassGenericDeclaration;
 
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -43,6 +45,8 @@ public class NodeImpl
 
 	private static final String INDEX_OPEN = "[";
 	private static final String INDEX_CLOSE = "]";
+	private static final String TYPE_PARAMETER_OPEN = "<";
+	private static final String TYPE_PARAMETER_CLOSE = ">";
 
 	public static final String RETURN_VALUE_NODE_NAME = "<return value>";
 	public static final String CROSS_PARAMETER_NODE_NAME = "<cross-parameter>";
@@ -360,6 +364,12 @@ public class NodeImpl
 			builder.append( getName() );
 		}
 
+		if ( includeTypeParameterInformation( typeParameter ) ) {
+			builder.append( TYPE_PARAMETER_OPEN );
+			builder.append( typeParameter.getName() );
+			builder.append( TYPE_PARAMETER_CLOSE );
+		}
+
 		if ( isIterable() ) {
 			builder.append( INDEX_OPEN );
 			if ( index != null ) {
@@ -370,7 +380,25 @@ public class NodeImpl
 			}
 			builder.append( INDEX_CLOSE );
 		}
+
 		return builder.toString();
+	}
+
+	// TODO: this is used to reduce the number of differences until we agree on the string representation
+	// it introduces some inconsistent behavior e.g. you get '<V>' for a Multimap but not for a Map
+	private boolean includeTypeParameterInformation(TypeParameter typeParameter) {
+		if ( typeParameter == null ) {
+			return false;
+		}
+
+		ClassGenericDeclaration genericDeclaration = typeParameter.getGenericDeclaration().as( ClassGenericDeclaration.class );
+		if ( genericDeclaration.getTypeParameters().length < 2 ) {
+			return false;
+		}
+		if ( Map.class.getName().equals( genericDeclaration.getClassName() ) && "V".equals( typeParameter.getName() ) ) {
+			return false;
+		}
+		return true;
 	}
 
 	public final int buildHashCode() {
