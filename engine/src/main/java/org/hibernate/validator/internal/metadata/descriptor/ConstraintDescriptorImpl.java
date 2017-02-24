@@ -98,9 +98,9 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	 * The set of classes implementing the validation for this constraint. See also
 	 * {@code ConstraintValidator} resolution algorithm.
 	 */
-	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorDescriptors;
+	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses;
 
-	private final List<ConstraintValidatorDescriptor<T>> matchingConstraintValidatorClasses;
+	private final List<ConstraintValidatorDescriptor<T>> matchingConstraintValidatorDescriptors;
 
 	/**
 	 * The groups for which to apply this constraint.
@@ -181,7 +181,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		this.validateUnwrappedValue = determineValidateUnwrappedValue( this.payloads, member, annotationType );
 
-		this.constraintValidatorDescriptors = constraintHelper.getAllValidatorDescriptors( annotationType )
+		this.constraintValidatorClasses = constraintHelper.getAllValidatorDescriptors( annotationType )
 				.stream()
 				.map( ConstraintValidatorDescriptor::getValidatorClass )
 				.collect( Collectors.toList() );
@@ -212,10 +212,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		validateComposingConstraintTypes();
 
 		if ( constraintType == ConstraintType.GENERIC ) {
-			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( genericValidatorDescriptors );
+			this.matchingConstraintValidatorDescriptors = Collections.unmodifiableList( genericValidatorDescriptors );
 		}
 		else {
-			this.matchingConstraintValidatorClasses = Collections.unmodifiableList( crossParameterValidatorDescriptors );
+			this.matchingConstraintValidatorDescriptors = Collections.unmodifiableList( crossParameterValidatorDescriptors );
 		}
 
 		this.hashCode = annotation.hashCode();
@@ -271,17 +271,17 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public List<Class<? extends ConstraintValidator<T, ?>>> getConstraintValidatorClasses() {
-		return constraintValidatorDescriptors;
+		return constraintValidatorClasses;
 	}
 
 	/**
-	 * Return all constraint validators classes (either generic or cross-parameter) which are registered for the
+	 * Return all constraint validator descriptors (either generic or cross-parameter) which are registered for the
 	 * constraint of this descriptor.
 	 *
-	 * @return The validators applying to type of this constraint.
+	 * @return The constraint validator descriptors applying to type of this constraint.
 	 */
-	public List<ConstraintValidatorDescriptor<T>> getMatchingConstraintValidatorClasses() {
-		return matchingConstraintValidatorClasses;
+	public List<ConstraintValidatorDescriptor<T>> getMatchingConstraintValidatorDescriptors() {
+		return matchingConstraintValidatorDescriptors;
 	}
 
 	@Override
