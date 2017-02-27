@@ -59,7 +59,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "inhabitantsPerAddress" )
-						.typeArgument( NodeImpl.MAP_KEY_NODE_NAME, true, null, null, "K" )
+						.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, null, null, "K" )
 		);
 	}
 
@@ -125,7 +125,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addressesPerCity" )
-						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, city, null, "V" )
+						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, city, null, "V" )
 		);
 	}
 
@@ -192,7 +192,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addresses" )
-						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, "E" )
+						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, "E" )
 		);
 	}
 

@@ -483,8 +483,8 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
-		public PathExpectation typeArgument(String name, boolean inIterable, Object key, Integer index, String typeParameter) {
-			nodes.add( new NodeExpectation( name, ElementKind.TYPE_ARGUMENT, inIterable, key, index, null, typeParameter ) );
+		public PathExpectation containerElement(String name, boolean inIterable, Object key, Integer index, String typeParameter) {
+			nodes.add( new NodeExpectation( name, ElementKind.CONTAINER_ELEMENT, inIterable, key, index, null, typeParameter ) );
 			return this;
 		}
 

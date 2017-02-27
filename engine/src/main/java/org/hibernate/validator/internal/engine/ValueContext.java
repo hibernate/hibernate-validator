@@ -9,10 +9,10 @@ package org.hibernate.validator.internal.engine;
 import java.lang.annotation.ElementType;
 import java.lang.reflect.TypeVariable;
 
-import javax.validation.TypeParameter;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.engine.path.TypeParameterImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
 import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
@@ -153,7 +153,7 @@ public class ValueContext<T, V> {
 
 	public final void appendTypeParameterNode(String nodeName) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		newPath.addTypeArgumentNode( nodeName );
+		newPath.addContainerElementNode( nodeName );
 		propertyPath = newPath;
 	}
 
@@ -170,7 +170,7 @@ public class ValueContext<T, V> {
 	}
 
 	public final void setTypeParameter(TypeVariable<?> typeParameter) {
-		propertyPath.setLeafNodeTypeParameter( TypeParameter.of( typeParameter ) );
+		propertyPath.setLeafNodeTypeParameter( TypeParameterImpl.of( typeParameter ) );
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {

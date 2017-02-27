@@ -20,10 +20,10 @@ import javax.validation.Path.MethodNode;
 import javax.validation.Path.ParameterNode;
 import javax.validation.Path.PropertyNode;
 import javax.validation.Path.ReturnValueNode;
-import javax.validation.Path.TypeArgumentNode;
+import javax.validation.Path.ContainerElementNode;
 import javax.validation.TypeParameter;
-import javax.validation.TypeParameter.ClassGenericDeclaration;
 
+import org.hibernate.validator.internal.engine.path.TypeParameterImpl.ClassGenericDeclarationImpl;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -36,7 +36,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Guillaume Smet
  */
 public class NodeImpl
-		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.TypeArgumentNode,
+		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.ContainerElementNode,
 		org.hibernate.validator.path.PropertyNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
@@ -101,14 +101,14 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl createTypeArgumentNode(String name, NodeImpl parent) {
+	public static NodeImpl createContainerElementNode(String name, NodeImpl parent) {
 		return new NodeImpl(
 				name,
 				parent,
 				false,
 				null,
 				null,
-				ElementKind.TYPE_ARGUMENT,
+				ElementKind.CONTAINER_ELEMENT,
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
@@ -319,7 +319,7 @@ public class NodeImpl
 				( kind == ElementKind.PARAMETER && nodeType == ParameterNode.class ) ||
 				( kind == ElementKind.PROPERTY && ( nodeType == PropertyNode.class || nodeType == org.hibernate.validator.path.PropertyNode.class ) ) ||
 				( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class ) ||
-				( kind == ElementKind.TYPE_ARGUMENT && nodeType == TypeArgumentNode.class ) ) {
+				( kind == ElementKind.CONTAINER_ELEMENT && nodeType == ContainerElementNode.class ) ) {
 			return nodeType.cast( this );
 		}
 
@@ -391,7 +391,7 @@ public class NodeImpl
 			return false;
 		}
 
-		ClassGenericDeclaration genericDeclaration = typeParameter.getGenericDeclaration().as( ClassGenericDeclaration.class );
+		ClassGenericDeclarationImpl genericDeclaration = typeParameter.getGenericDeclaration().as( ClassGenericDeclarationImpl.class );
 		if ( genericDeclaration.getTypeParameters().length < 2 ) {
 			return false;
 		}
