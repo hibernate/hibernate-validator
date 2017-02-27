@@ -23,6 +23,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import javax.validation.Path;
+import javax.validation.TypeParameter;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.assertj.core.api.Assertions;
@@ -296,12 +297,14 @@ public final class ConstraintViolationAssert {
 				return false;
 			}
 
-			if ( p2Node.getTypeParameter() == null ) {
-				if ( p1Node.getTypeParameter() != null ) {
+			TypeParameter p1NodeTypeParameter = getTypeParameter( p1Node );
+			TypeParameter p2NodeTypeParameter = getTypeParameter( p2Node );
+			if ( p2NodeTypeParameter == null ) {
+				if ( p1NodeTypeParameter != null ) {
 					return false;
 				}
 			}
-			else if ( !p2Node.getTypeParameter().equals( p1Node.getTypeParameter() ) ) {
+			else if ( !p2NodeTypeParameter.equals( p1NodeTypeParameter ) ) {
 				return false;
 			}
 
@@ -414,6 +417,7 @@ public final class ConstraintViolationAssert {
 				if ( node.getKind() == ElementKind.PARAMETER ) {
 					parameterIndex = node.as( Path.ParameterNode.class ).getParameterIndex();
 				}
+				TypeParameter typeParameter = getTypeParameter( node );
 				nodes.add(
 						new NodeExpectation(
 								node.getName(),
@@ -422,7 +426,7 @@ public final class ConstraintViolationAssert {
 								node.getKey(),
 								node.getIndex(),
 								parameterIndex,
-								node.getTypeParameter() != null ? node.getTypeParameter().getName() : null
+								typeParameter != null ? typeParameter.getName() : null
 						)
 				);
 			}
@@ -638,5 +642,19 @@ public final class ConstraintViolationAssert {
 			}
 			return true;
 		}
+	}
+
+	private static TypeParameter getTypeParameter(Path.Node node) {
+		TypeParameter typeParameter = null;
+		if ( node.getKind() == ElementKind.PROPERTY ) {
+			typeParameter = node.as( Path.PropertyNode.class ).getTypeParameter();
+		}
+		if ( node.getKind() == ElementKind.BEAN ) {
+			typeParameter = node.as( Path.BeanNode.class ).getTypeParameter();
+		}
+		if ( node.getKind() == ElementKind.CONTAINER_ELEMENT ) {
+			typeParameter = node.as( Path.ContainerElementNode.class ).getTypeParameter();
+		}
+		return typeParameter;
 	}
 }

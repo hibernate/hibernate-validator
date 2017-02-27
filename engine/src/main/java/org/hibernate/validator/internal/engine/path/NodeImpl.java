@@ -295,6 +295,10 @@ public class NodeImpl
 
 	@Override
 	public TypeParameter getTypeParameter() {
+		Contracts.assertTrue(
+				kind == ElementKind.BEAN || kind == ElementKind.PROPERTY || kind == ElementKind.CONTAINER_ELEMENT,
+				"getTypeParameter() may only be invoked for nodes of type ElementKind.BEAN, ElementKind.PROPERTY or ElementKind.CONTAINER_ELEMENT."
+		);
 		if ( parent == null ) {
 			return null;
 		}
@@ -335,7 +339,7 @@ public class NodeImpl
 	public int getParameterIndex() {
 		Contracts.assertTrue(
 				kind == ElementKind.PARAMETER,
-				"getParameterIndex() may only be invoked for nodes of ElementKind.PARAMETER."
+				"getParameterIndex() may only be invoked for nodes of type ElementKind.PARAMETER."
 		);
 		return parameterIndex.intValue();
 	}
