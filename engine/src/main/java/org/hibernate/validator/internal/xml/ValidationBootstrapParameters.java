@@ -47,7 +47,7 @@ public class ValidationBootstrapParameters {
 	private Class<? extends ValidationProvider<?>> providerClass = null;
 	private final Map<String, String> configProperties = new HashMap<>();
 	private final Set<InputStream> mappings = new HashSet<>();
-	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractors = new HashMap<>();
+	private final Map<ValueExtractorDescriptor.Key, ValueExtractorDescriptor> valueExtractorDescriptors = new HashMap<>();
 
 	public ValidationBootstrapParameters() {
 	}
@@ -141,11 +141,11 @@ public class ValidationBootstrapParameters {
 	}
 
 	public Map<Key, ValueExtractorDescriptor> getValueExtractorDescriptors() {
-		return valueExtractors;
+		return valueExtractorDescriptors;
 	}
 
 	public void addValueExtractorDescriptor(ValueExtractorDescriptor descriptor) {
-		valueExtractors.put( descriptor.getKey(), descriptor );
+		valueExtractorDescriptors.put( descriptor.getKey(), descriptor );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -260,7 +260,7 @@ public class ValidationBootstrapParameters {
 
 
 			ValueExtractorDescriptor descriptor = new ValueExtractorDescriptor( valueExtractor );
-			ValueExtractorDescriptor previous = valueExtractors.put( descriptor.getKey(), descriptor );
+			ValueExtractorDescriptor previous = valueExtractorDescriptors.put( descriptor.getKey(), descriptor );
 
 			if ( previous != null ) {
 				throw log.getValueExtractorForTypeAndTypeUseAlreadyPresentException( valueExtractor, previous.getValueExtractor() );
