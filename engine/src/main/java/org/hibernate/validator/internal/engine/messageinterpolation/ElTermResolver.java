@@ -15,11 +15,11 @@ import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
 import javax.validation.MessageInterpolator;
 
-import org.hibernate.validator.internal.engine.MessageInterpolatorContext;
 import org.hibernate.validator.internal.engine.messageinterpolation.el.RootResolver;
 import org.hibernate.validator.internal.engine.messageinterpolation.el.SimpleELContext;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
 
 /**
  * Resolver for the el expressions.
@@ -92,23 +92,19 @@ public class ElTermResolver implements TermResolver {
 		);
 		elContext.getVariableMapper().setVariable( RootResolver.FORMATTER, valueExpression );
 
-		// map the annotation values
-		for ( Map.Entry<String, Object> entry : messageInterpolatorContext.getConstraintDescriptor()
-				.getAttributes()
-				.entrySet() ) {
-			valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
-			elContext.getVariableMapper().setVariable( entry.getKey(), valueExpression );
-		}
-
-		// check for custom parameters provided by HibernateConstraintValidatorContext
-		if ( messageInterpolatorContext instanceof MessageInterpolatorContext ) {
-			MessageInterpolatorContext internalContext = (MessageInterpolatorContext) messageInterpolatorContext;
-			for ( Map.Entry<String, Object> entry : internalContext.getMessageParameters().entrySet() ) {
-				valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
-				elContext.getVariableMapper().setVariable( entry.getKey(), valueExpression );
-			}
+		// map the expression variables provided by the annotation values and the parameters added to the context
+		addExpressionVariablesToElContext( elContext, messageInterpolatorContext.getConstraintDescriptor().getAttributes() );
+		if ( messageInterpolatorContext instanceof HibernateMessageInterpolatorContext ) {
+			addExpressionVariablesToElContext( elContext, ( (HibernateMessageInterpolatorContext) messageInterpolatorContext ).getExpressionVariables() );
 		}
 
 		return expressionFactory.createValueExpression( elContext, messageTemplate, String.class );
+	}
+
+	private void addExpressionVariablesToElContext(SimpleELContext elContext, Map<String, Object> expressionVariables) {
+		for ( Map.Entry<String, Object> entry : expressionVariables.entrySet() ) {
+			ValueExpression valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
+			elContext.getVariableMapper().setVariable( entry.getKey(), valueExpression );
+		}
 	}
 }

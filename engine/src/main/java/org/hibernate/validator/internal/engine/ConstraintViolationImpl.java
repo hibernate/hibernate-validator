@@ -32,6 +32,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	private final Object leafBeanInstance;
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final String messageTemplate;
+	private final Map<String, Object> messageParameters;
 	private final Map<String, Object> expressionVariables;
 	private final Class<T> rootBeanClass;
 	private final ElementType elementType;
@@ -41,6 +42,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	private final int hashCode;
 
 	public static <T> ConstraintViolation<T> forBeanValidation(String messageTemplate,
+															   Map<String, Object> messageParameters,
 															   Map<String, Object> expressionVariables,
 															   String interpolatedMessage,
 															   Class<T> rootBeanClass,
@@ -53,6 +55,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 															   Object dynamicPayload) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
+				messageParameters,
 				expressionVariables,
 				interpolatedMessage,
 				rootBeanClass,
@@ -69,6 +72,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	public static <T> ConstraintViolation<T> forParameterValidation(String messageTemplate,
+																	Map<String, Object> messageParameters,
 																	Map<String, Object> expressionVariables,
 																	String interpolatedMessage,
 																	Class<T> rootBeanClass,
@@ -82,6 +86,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 																	Object dynamicPayload) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
+				messageParameters,
 				expressionVariables,
 				interpolatedMessage,
 				rootBeanClass,
@@ -98,6 +103,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	public static <T> ConstraintViolation<T> forReturnValueValidation(String messageTemplate,
+																	  Map<String, Object> messageParameters,
 																	  Map<String, Object> expressionVariables,
 																	  String interpolatedMessage,
 																	  Class<T> rootBeanClass,
@@ -111,6 +117,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 																	  Object dynamicPayload) {
 		return new ConstraintViolationImpl<T>(
 				messageTemplate,
+				messageParameters,
 				expressionVariables,
 				interpolatedMessage,
 				rootBeanClass,
@@ -127,6 +134,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	private ConstraintViolationImpl(String messageTemplate,
+			Map<String, Object> messageParameters,
 			Map<String, Object> expressionVariables,
 			String interpolatedMessage,
 			Class<T> rootBeanClass,
@@ -140,6 +148,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 			Object executableReturnValue,
 			Object dynamicPayload) {
 		this.messageTemplate = messageTemplate;
+		this.messageParameters = messageParameters;
 		this.expressionVariables = expressionVariables;
 		this.interpolatedMessage = interpolatedMessage;
 		this.rootBean = rootBean;
@@ -167,7 +176,13 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	/**
-	 *
+	 * @return the message parameters added using {@link org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl#addMessageParameter(String, Object)}
+	 */
+	public Map<String, Object> getMessageParameters() {
+		return messageParameters;
+	}
+
+	/**
 	 * @return the expression variables added using {@link org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl#addExpressionVariable(String, Object)}
 	 */
 	public Map<String, Object> getExpressionVariables() {
@@ -238,10 +253,10 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 
 	/**
 	 * IMPORTANT - some behaviour of Validator depends on the correct implementation of this equals method! (HF)
-	 *
-	 * {@code expressionVariables} and {@code dynamicPayload} are not taken into account for equality. These
-	 * variables solely enrich the actual Constraint Violation with additional information e.g how we actually
-	 * got to this CV.
+	 * <p>
+	 * {@code messageParameters}, {@code expressionVariables} and {@code dynamicPayload} are not taken into account for
+	 * equality. These variables solely enrich the actual Constraint Violation with additional information e.g how we
+	 * actually got to this CV.
 	 *
 	 * @return true if the two ConstraintViolation's are considered equals; false otherwise
 	 */
