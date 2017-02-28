@@ -38,8 +38,7 @@ public class InterpolationTermState implements ParserState {
 	public void handleEndTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException {
 		tokenCollector.appendToToken( character );
 		tokenCollector.terminateToken();
-		BeginState beginState = new BeginState();
-		tokenCollector.transitionState( beginState );
+		tokenCollector.transitionState( new MessageState() );
 	}
 
 	@Override
