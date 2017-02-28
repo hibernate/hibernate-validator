@@ -66,6 +66,7 @@ public class MessageInterpolatorContextTest {
 								constraintDescriptors.iterator().next(),
 								validatedValue,
 								TestBean.class,
+								Collections.<String, Object>emptyMap(),
 								Collections.<String, Object>emptyMap()
 						)
 				)
@@ -82,13 +83,13 @@ public class MessageInterpolatorContextTest {
 
 	@Test(expectedExceptions = ValidationException.class)
 	public void testUnwrapToImplementationCausesValidationException() {
-		Context context = new MessageInterpolatorContext( null, null, null, Collections.<String, Object>emptyMap() );
+		Context context = new MessageInterpolatorContext( null, null, null, Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap() );
 		context.unwrap( MessageInterpolatorContext.class );
 	}
 
 	@Test
 	public void testUnwrapToInterfaceTypesSucceeds() {
-		Context context = new MessageInterpolatorContext( null, null, null, Collections.<String, Object>emptyMap() );
+		Context context = new MessageInterpolatorContext( null, null, null, Collections.<String, Object>emptyMap(), Collections.<String, Object>emptyMap() );
 
 		MessageInterpolator.Context asMessageInterpolatorContext = context.unwrap( MessageInterpolator.Context.class );
 		assertSame( asMessageInterpolatorContext, context );
@@ -109,6 +110,7 @@ public class MessageInterpolatorContextTest {
 				null,
 				null,
 				rootBeanType,
+				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap()
 		);
 

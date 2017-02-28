@@ -67,6 +67,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				notNullDescriptor,
 				user,
 				null,
+				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap()
 		);
 
@@ -81,6 +82,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				notNullDescriptor,
 				new User(),
 				null,
+				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap()
 		);
 
@@ -170,6 +172,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				notNullDescriptor,
 				42.00000d,
 				null,
+				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap()
 		);
 
@@ -229,6 +232,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				notNullDescriptor,
 				42.00000d,
 				null,
+				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap()
 		);
 
@@ -304,6 +308,7 @@ public class ExpressionLanguageMessageInterpolationTest {
 				descriptor,
 				null,
 				null,
+				Collections.<String, Object>emptyMap(),
 				Collections.<String, Object>emptyMap()
 		);
 	}
