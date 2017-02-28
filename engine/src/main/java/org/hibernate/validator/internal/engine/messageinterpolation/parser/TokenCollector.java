@@ -37,7 +37,7 @@ public class TokenCollector {
 			throws MessageDescriptorFormatException {
 		this.originalMessageDescriptor = originalMessageDescriptor;
 		this.interpolationTermType = interpolationTermType;
-		this.currentParserState = new BeginState();
+		this.currentParserState = new MessageState();
 		this.tokenList = newArrayList();
 
 		parse();

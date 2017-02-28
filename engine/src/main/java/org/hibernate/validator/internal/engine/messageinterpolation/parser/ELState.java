@@ -27,7 +27,7 @@ public class ELState implements ParserState {
 		tokenCollector.appendToToken( TokenCollector.EL_DESIGNATOR );
 		tokenCollector.appendToToken( character );
 		tokenCollector.terminateToken();
-		tokenCollector.transitionState( new BeginState() );
+		tokenCollector.transitionState( new MessageState() );
 	}
 
 	@Override
