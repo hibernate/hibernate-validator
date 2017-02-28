@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
+import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.EL_DESIGNATOR;
+
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -17,14 +19,14 @@ public class ELState implements ParserState {
 
 	@Override
 	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
-		tokenCollector.appendToToken( TokenCollector.EL_DESIGNATOR );
+		tokenCollector.appendToToken( EL_DESIGNATOR );
 		tokenCollector.terminateToken();
 	}
 
 	@Override
 	public void handleNonMetaCharacter(char character, TokenCollector tokenCollector)
 			throws MessageDescriptorFormatException {
-		tokenCollector.appendToToken( TokenCollector.EL_DESIGNATOR );
+		tokenCollector.appendToToken( EL_DESIGNATOR );
 		tokenCollector.appendToToken( character );
 		tokenCollector.terminateToken();
 		tokenCollector.transitionState( new BeginState() );
@@ -34,7 +36,7 @@ public class ELState implements ParserState {
 	public void handleBeginTerm(char character, TokenCollector tokenCollector) throws MessageDescriptorFormatException {
 		tokenCollector.terminateToken();
 
-		tokenCollector.appendToToken( TokenCollector.EL_DESIGNATOR );
+		tokenCollector.appendToToken( EL_DESIGNATOR );
 		tokenCollector.appendToToken( character );
 		tokenCollector.makeELToken();
 		tokenCollector.transitionState( new InterpolationTermState() );

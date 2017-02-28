@@ -6,6 +6,8 @@
  */
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
+import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.BEGIN_TERM;
+
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -19,7 +21,7 @@ public class InterpolationTermState implements ParserState {
 	public void terminate(TokenCollector tokenCollector) throws MessageDescriptorFormatException {
 		throw log.getNonTerminatedParameterException(
 				tokenCollector.getOriginalMessageDescriptor(),
-				TokenCollector.BEGIN_TERM
+				BEGIN_TERM
 		);
 	}
 
