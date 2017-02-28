@@ -26,6 +26,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.infra.Blackhole;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,7 +54,7 @@ public class CascadedValidation {
 	@Threads(50)
 	@Warmup(iterations = 10)
 	@Measurement(iterations = 50)
-	public void testCascadedValidation(CascadedValidationState state) {
+	public void testCascadedValidation(CascadedValidationState state, Blackhole bh) {
 		// TODO graphs needs to be generated and deeper
 		Person kermit = new Person( "kermit" );
 		Person piggy = new Person( "miss piggy" );
@@ -65,6 +66,8 @@ public class CascadedValidation {
 
 		Set<ConstraintViolation<Person>> violations = state.validator.validate( kermit );
 		assertThat( violations ).hasSize( 0 );
+
+		bh.consume( violations );
 	}
 
 	@Benchmark
@@ -73,10 +76,10 @@ public class CascadedValidation {
 	@Fork(value = 1)
 	@Threads(SIZE_OF_THREAD_POOL)
 	@Warmup(iterations = 10)
-	@Measurement(iterations = 50)
-	public void testCascadedValidationIterative(CascadedValidationState state) throws Exception {
+	@Measurement(iterations = NUMBER_OF_VALIDATION_ITERATIONS)
+	public void testCascadedValidationIterative(CascadedValidationState state, Blackhole bh) throws Exception {
 		for ( int i = 0; i < NUMBER_OF_VALIDATION_ITERATIONS; i++ ) {
-			testCascadedValidation( state );
+			testCascadedValidation( state, bh );
 		}
 	}
 

@@ -18,6 +18,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.infra.Blackhole;
 
 import javax.validation.Configuration;
 import javax.validation.ConstraintViolation;
@@ -72,11 +73,12 @@ public class StatisticalValidation {
 	@Threads(100)
 	@Warmup(iterations = 10)
 	@Measurement(iterations = 10)
-	public void testValidationWithStatisticalGraphDepthAndConstraintValidator(StatisticalValidationState state) throws Exception {
+	public void testValidationWithStatisticalGraphDepthAndConstraintValidator(StatisticalValidationState state, Blackhole bh) throws Exception {
 		state.entitiesUnderTest.forEach(
 				testEntity -> {
 					Set<ConstraintViolation<TestEntity>> violations = state.validator.validate( testEntity );
 					assertThat( violations ).hasSize( StatisticalConstraintValidator.threadLocalCounter.get().getFailures() );
+					bh.consume( violations );
 					StatisticalConstraintValidator.threadLocalCounter.get().reset();
 				}
 		);
