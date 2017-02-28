@@ -56,7 +56,7 @@ public class Token {
 	public void terminate() {
 		value = builder.toString();
 		if ( isEL ) {
-			// HSEARCH-834 curly braces need to be un-escaped prior to be passed to the EL engine
+			// HV-834 curly braces need to be un-escaped prior to be passed to the EL engine
 			Matcher matcher = ESCAPED_OPENING_CURLY_BRACE.matcher( value );
 			value = matcher.replaceAll( "{" );
 
