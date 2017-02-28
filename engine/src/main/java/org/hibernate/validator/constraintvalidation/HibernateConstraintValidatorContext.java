@@ -16,15 +16,55 @@ import org.hibernate.validator.spi.time.TimeProvider;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public interface HibernateConstraintValidatorContext extends ConstraintValidatorContext {
 
 	/**
-	 * Allows to set an additional named variable which can be interpolated in the constraint violation message. The
+	 * Allows to set an additional named parameter which can be interpolated in the constraint violation message. The
 	 * variable will be available for interpolation for all constraint violations generated for this constraint.
 	 * This includes the default one as well as all violations created by the {@link ConstraintViolationBuilder}.
 	 * To create multiple constraint violations with different variable values, this method can be called
 	 * between successive calls to {@link javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder#addConstraintViolation()}.
+	 * <p>
+	 * For example:
+	 * <pre>
+	 * {@code
+	 * public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
+	 *     HibernateConstraintValidatorContext context = constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class );
+	 *
+	 *     context.addMessageParameter( "foo", "bar" );
+	 *     context.buildConstraintViolationWithTemplate( "{foo}" )
+	 *            .addConstraintViolation();
+	 *
+	 *     context.addMessageParameter( "foo", "snafu" );
+	 *     context.buildConstraintViolationWithTemplate( "{foo}" )
+	 *            .addConstraintViolation();
+	 *
+	 *     return false;
+	 *  }
+	 *  }
+	 *
+	 * </pre>
+	 *
+	 * @param name the name under which to bind the parameter, cannot be {@code null}
+	 * @param value the value to be bound to the specified name
+	 *
+	 * @return a reference to itself to allow method chaining
+	 *
+	 * @throws IllegalArgumentException in case the provided name is {@code null}
+	 *
+	 * @since 5.4.1
+	 */
+	HibernateConstraintValidatorContext addMessageParameter(String name, Object value);
+
+	/**
+	 * Allows to set an additional expression variable which will be available as an EL variable during interpolation. The
+	 * variable will be available for interpolation for all constraint violations generated for this constraint.
+	 * This includes the default one as well as all violations created by the {@link ConstraintViolationBuilder}.
+	 * To create multiple constraint violations with different variable values, this method can be called
+	 * between successive calls to {@link javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder#addConstraintViolation()}.
+	 * <p>
 	 * For example:
 	 * <pre>
 	 * {@code
@@ -45,15 +85,12 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 *
 	 * </pre>
 	 *
-	 * @param name the name under which to bind the parameter, cannot be {@code null}
+	 * @param name the name under which to bind the expression variable, cannot be {@code null}
 	 * @param value the value to be bound to the specified name
 	 *
 	 * @return a reference to itself to allow method chaining
 	 *
 	 * @throws IllegalArgumentException in case the provided name is {@code null}
-	 * @hv.experimental Adding custom parameters to the context is considered experimental, especially the exact semantics
-	 * regarding to which generated constraint violation these parameters apply might change. At the moment they apply
-	 * to all violations.
 	 */
 	HibernateConstraintValidatorContext addExpressionVariable(String name, Object value);
 

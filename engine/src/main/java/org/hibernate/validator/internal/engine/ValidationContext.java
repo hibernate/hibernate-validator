@@ -13,7 +13,6 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
@@ -301,18 +300,17 @@ public class ValidationContext<T> {
 				messageTemplate,
 				localContext.getCurrentValidatedValue(),
 				descriptor,
+				constraintViolationCreationContext.getMessageParameters(),
 				constraintViolationCreationContext.getExpressionVariables()
 		);
 		// at this point we make a copy of the path to avoid side effects
 		Path path = PathImpl.createCopy( constraintViolationCreationContext.getPath() );
-		//same for expression variables
-		Map<String, Object> expressionVariables =
-				Collections.unmodifiableMap( constraintViolationCreationContext.getExpressionVariables() );
 		Object dynamicPayload = constraintViolationCreationContext.getDynamicPayload();
 		if ( executableParameters != null ) {
 			return ConstraintViolationImpl.forParameterValidation(
 					messageTemplate,
-					expressionVariables,
+					constraintViolationCreationContext.getMessageParameters(),
+					constraintViolationCreationContext.getExpressionVariables(),
 					interpolatedMessage,
 					getRootBeanClass(),
 					getRootBean(),
@@ -328,7 +326,8 @@ public class ValidationContext<T> {
 		else if ( executableReturnValue != null ) {
 			return ConstraintViolationImpl.forReturnValueValidation(
 					messageTemplate,
-					expressionVariables,
+					constraintViolationCreationContext.getMessageParameters(),
+					constraintViolationCreationContext.getExpressionVariables(),
 					interpolatedMessage,
 					getRootBeanClass(),
 					getRootBean(),
@@ -344,7 +343,8 @@ public class ValidationContext<T> {
 		else {
 			return ConstraintViolationImpl.forBeanValidation(
 					messageTemplate,
-					expressionVariables,
+					constraintViolationCreationContext.getMessageParameters(),
+					constraintViolationCreationContext.getExpressionVariables(),
 					interpolatedMessage,
 					getRootBeanClass(),
 					getRootBean(),
@@ -414,12 +414,14 @@ public class ValidationContext<T> {
 	private String interpolate(String messageTemplate,
 			Object validatedValue,
 			ConstraintDescriptor<?> descriptor,
-			Map<String, Object> messageParameters) {
+			Map<String, Object> messageParameters,
+			Map<String, Object> expressionVariables) {
 		MessageInterpolatorContext context = new MessageInterpolatorContext(
 				descriptor,
 				validatedValue,
 				getRootBeanClass(),
-				messageParameters
+				messageParameters,
+				expressionVariables
 		);
 
 		try {

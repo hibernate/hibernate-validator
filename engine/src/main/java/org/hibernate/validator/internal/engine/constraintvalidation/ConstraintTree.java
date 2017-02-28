@@ -354,7 +354,7 @@ public class ConstraintTree<A extends Annotation> {
 			// If not we create a violation
 			// using the error message in the annotation declaration at top level.
 			if ( localViolations.isEmpty() ) {
-				final String message = (String) getDescriptor().getAttributes().get( "message" );
+				final String message = getDescriptor().getMessageTemplate();
 				ConstraintViolationCreationContext constraintViolationCreationContext = new ConstraintViolationCreationContext(
 						message,
 						valueContext.getPropertyPath()
