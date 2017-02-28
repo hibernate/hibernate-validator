@@ -18,6 +18,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.infra.Blackhole;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -67,10 +68,11 @@ public class SimpleValidation {
 	@Threads(50)
 	@Warmup(iterations = 10)
 	@Measurement(iterations = 50)
-	public void testSimpleBeanValidation(ValidationState state) {
+	public void testSimpleBeanValidation(ValidationState state, Blackhole bh) {
 		DriverSetup driverSetup = new DriverSetup( state );
 		Set<ConstraintViolation<Driver>> violations = state.validator.validate( driverSetup.getDriver() );
 		assertThat( violations ).hasSize( driverSetup.getExpectedViolationCount() );
+		bh.consume( violations );
 	}
 
 	@Benchmark
@@ -80,11 +82,12 @@ public class SimpleValidation {
 	@Threads(50)
 	@Warmup(iterations = 10)
 	@Measurement(iterations = 50)
-	public void testSimpleBeanValidationRecreatingValidatorFactory(ValidationState state) {
+	public void testSimpleBeanValidationRecreatingValidatorFactory(ValidationState state, Blackhole bh) {
 		DriverSetup driverSetup = new DriverSetup( state );
 		Validator localValidator = Validation.buildDefaultValidatorFactory().getValidator();
 		Set<ConstraintViolation<Driver>> violations = localValidator.validate( driverSetup.getDriver() );
 		assertThat( violations ).hasSize( driverSetup.getExpectedViolationCount() );
+		bh.consume( violations );
 	}
 
 	public class Driver {
