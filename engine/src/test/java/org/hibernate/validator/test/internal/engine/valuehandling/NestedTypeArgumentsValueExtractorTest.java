@@ -158,6 +158,26 @@ public class NestedTypeArgumentsValueExtractorTest {
 		);
 	}
 
+	@Test
+	public void validation_of_nested_type_arguments_works_on_getter_with_map_of_list_of_optional() {
+		Set<ConstraintViolation<MapOfListsUsingGetter>> constraintViolations = validator.validate( MapOfListsUsingGetter.invalidStringFoo() );
+		assertCorrectPropertyPaths(
+				constraintViolations,
+				"map[key1].<map value>[0].<iterable element>",
+				"map[key1].<map value>[1].<iterable element>" );
+		assertCorrectConstraintTypes( constraintViolations, Size.class, Size.class );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "map" )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0 ),
+				pathWith()
+						.property( "map" )
+						.typeArgument( NodeImpl.MAP_VALUE_NODE_NAME, true, "key1", null )
+						.typeArgument( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 1 )
+		);
+	}
+
 	private static class MapOfLists {
 
 		private Map<@Size(min = 2) String, @NotNull @Size(min = 2) List<Optional<@Size(min = 3) String>>> map;
@@ -210,6 +230,22 @@ public class NestedTypeArgumentsValueExtractorTest {
 			foo.map.put( "k", list );
 
 			return foo;
+		}
+	}
+
+	private static class MapOfListsUsingGetter {
+
+		private Map<String, List<Optional<String>>> map;
+
+		static MapOfListsUsingGetter invalidStringFoo() {
+			MapOfListsUsingGetter mapOfListsUsingGetter = new MapOfListsUsingGetter();
+			mapOfListsUsingGetter.map = MapOfLists.invalidStringFoo().map;
+			return mapOfListsUsingGetter;
+		}
+
+		@SuppressWarnings("unused")
+		Map<@Size(min = 2) String, @NotNull @Size(min = 2) List<Optional<@Size(min = 3) String>>> getMap() {
+			return map;
 		}
 	}
 
