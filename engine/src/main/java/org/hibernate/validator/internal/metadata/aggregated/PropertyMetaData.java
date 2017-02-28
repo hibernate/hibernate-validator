@@ -10,7 +10,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -224,17 +226,44 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 		}
 
 		private MetaConstraint<?> withGetterLocation(MetaConstraint<?> constraint) {
-			ConstraintLocation adaptedLocation = ConstraintLocation.forGetter( (Method) constraint.getLocation().getMember() );
+			ConstraintLocation converted = null;
 
-			if ( constraint.getLocation() instanceof TypeArgumentConstraintLocation ) {
-				adaptedLocation = ConstraintLocation.forTypeArgument(
-						adaptedLocation,
-						( (TypeArgumentConstraintLocation) constraint.getLocation() ).getTypeParameter(),
-						constraint.getLocation().getTypeForValidatorResolution()
-				);
+			// fast track if it's a regular constraint
+			if ( !(constraint.getLocation() instanceof TypeArgumentConstraintLocation) ) {
+				converted = ConstraintLocation.forGetter( (Method) constraint.getLocation().getMember() );
+			}
+			else {
+				Deque<ConstraintLocation> locationStack = new ArrayDeque<>();
+
+				// 1. collect the hierarchy of delegates up to the root return value location
+				ConstraintLocation current = constraint.getLocation();
+				do {
+					locationStack.addFirst( current );
+					if ( current instanceof TypeArgumentConstraintLocation ) {
+						current = ( (TypeArgumentConstraintLocation) current ).getDelegate();
+					}
+					else {
+						current = null;
+					}
+				}
+				while ( current != null );
+
+				// 2. beginning at the root, transform each location so it references the transformed delegate
+				for ( ConstraintLocation location : locationStack ) {
+					if ( !(location instanceof TypeArgumentConstraintLocation) ) {
+						converted = ConstraintLocation.forGetter( (Method) location.getMember() );
+					}
+					else {
+						converted = ConstraintLocation.forTypeArgument(
+							converted,
+							( (TypeArgumentConstraintLocation) location ).getTypeParameter(),
+							location.getTypeForValidatorResolution()
+						);
+					}
+				}
 			}
 
-			return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraint.getDescriptor(), adaptedLocation );
+			return MetaConstraints.create( typeResolutionHelper, valueExtractorManager, constraint.getDescriptor(), converted );
 		}
 
 		private String getPropertyName(ConstrainedElement constrainedElement) {
