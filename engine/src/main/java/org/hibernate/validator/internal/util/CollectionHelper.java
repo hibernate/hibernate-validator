@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -79,6 +80,7 @@ public final class CollectionHelper {
 		return new ArrayList<T>( size );
 	}
 
+	@SafeVarargs
 	public static <T> ArrayList<T> newArrayList(Iterable<T>... iterables) {
 		ArrayList<T> resultList = newArrayList();
 		for ( Iterable<T> oneIterable : iterables ) {
@@ -89,8 +91,43 @@ public final class CollectionHelper {
 		return resultList;
 	}
 
+	@SafeVarargs
 	public static <T> Set<T> asSet(T... ts) {
 		return new HashSet<T>( Arrays.asList( ts ) );
+	}
+
+	public static <T> List<T> toImmutableList(List<T> list) {
+		switch ( list.size() ) {
+			case 0:
+				return Collections.emptyList();
+			case 1:
+				return Collections.singletonList( list.get( 0 ) );
+			default:
+				return Collections.unmodifiableList( list );
+		}
+	}
+
+	public static <T> Set<T> toImmutableSet(Set<T> set) {
+		switch ( set.size() ) {
+			case 0:
+				return Collections.emptySet();
+			case 1:
+				return Collections.singleton( set.iterator().next() );
+			default:
+				return Collections.unmodifiableSet( set );
+		}
+	}
+
+	public static <K, V> Map<K, V> toImmutableMap(Map<K, V> map) {
+		switch ( map.size() ) {
+			case 0:
+				return Collections.emptyMap();
+			case 1:
+				Entry<K, V> entry = map.entrySet().iterator().next();
+				return Collections.singletonMap( entry.getKey(), entry.getValue() );
+			default:
+				return Collections.unmodifiableMap( map );
+		}
 	}
 
 	/**
