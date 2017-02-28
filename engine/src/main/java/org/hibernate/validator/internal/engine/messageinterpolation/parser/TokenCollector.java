@@ -7,6 +7,10 @@
 package org.hibernate.validator.internal.engine.messageinterpolation.parser;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
+import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.BEGIN_TERM;
+import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.END_TERM;
+import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.ESCAPE_CHARACTER;
+import static org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper.EL_DESIGNATOR;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,10 +24,6 @@ import org.hibernate.validator.internal.engine.messageinterpolation.Interpolatio
  * @see Token
  */
 public class TokenCollector {
-	public static final char BEGIN_TERM = '{';
-	public static final char END_TERM = '}';
-	public static final char EL_DESIGNATOR = '$';
-	public static final char ESCAPE_CHARACTER = '\\';
 
 	private final String originalMessageDescriptor;
 	private final InterpolationTermType interpolationTermType;
