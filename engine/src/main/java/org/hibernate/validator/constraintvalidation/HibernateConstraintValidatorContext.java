@@ -52,7 +52,7 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 *
 	 * @throws IllegalArgumentException in case the provided name is {@code null}
 	 *
-	 * @since 6.0
+	 * @since 5.4.1
 	 */
 	HibernateConstraintValidatorContext addMessageParameter(String name, Object value);
 

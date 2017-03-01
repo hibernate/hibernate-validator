@@ -30,14 +30,14 @@ public interface HibernateMessageInterpolatorContext extends MessageInterpolator
 	/**
 	 * @return the message parameters added to this context for interpolation
 	 *
-	 * @since 6.0
+	 * @since 5.4.1
 	 */
 	Map<String, Object> getMessageParameters();
 
 	/**
 	 * @return the expression variables added to this context for EL interpolation
 	 *
-	 * @since 6.0
+	 * @since 5.4.1
 	 */
 	Map<String, Object> getExpressionVariables();
 }
