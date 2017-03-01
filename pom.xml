@@ -437,7 +437,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.6.1</version>
                     <configuration>
                         <testCompilerArgument>-parameters</testCompilerArgument>
                     </configuration>
@@ -1000,6 +1000,15 @@
             <build>
                 <pluginManagement>
                     <plugins>
+                        <plugin>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <fork>true</fork>
+                                <compilerArgs>
+                                    <arg>-J--add-modules=java.xml.ws.annotation</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </plugin>
                         <plugin>
                             <artifactId>maven-surefire-plugin</artifactId>
                             <version>${maven-surefire-plugin.version}</version>
