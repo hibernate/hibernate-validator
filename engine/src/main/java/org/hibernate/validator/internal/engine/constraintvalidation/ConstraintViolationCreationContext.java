@@ -67,6 +67,7 @@ public class ConstraintViolationCreationContext {
 		sb.append( "message='" ).append( message ).append( '\'' );
 		sb.append( ", propertyPath=" ).append( propertyPath );
 		sb.append( ", messageParameters=" ).append( messageParameters );
+		sb.append( ", expressionVariables=" ).append( expressionVariables );
 		sb.append( ", dynamicPayload=" ).append( dynamicPayload );
 		sb.append( '}' );
 		return sb.toString();

@@ -10,6 +10,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newArrayLis
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -38,8 +39,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 
 	private static final Log log = LoggerFactory.make();
 
-	private final Map<String, Object> messageParameters = newHashMap();
-	private final Map<String, Object> expressionVariables = newHashMap();
+	private Map<String, Object> messageParameters;
+	private Map<String, Object> expressionVariables;
 	private final List<String> methodParameterNames;
 	private final TimeProvider timeProvider;
 	private final List<ConstraintViolationCreationContext> constraintViolationCreationContexts = newArrayList( 3 );
@@ -87,6 +88,11 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	@Override
 	public HibernateConstraintValidatorContext addExpressionVariable(String name, Object value) {
 		Contracts.assertNotNull( name, "null is not a valid value for an expression variable name" );
+
+		if ( expressionVariables == null ) {
+			expressionVariables = newHashMap();
+		}
+
 		this.expressionVariables.put( name, value );
 		return this;
 	}
@@ -94,6 +100,11 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 	@Override
 	public HibernateConstraintValidatorContext addMessageParameter(String name, Object value) {
 		Contracts.assertNotNull( name, "null is not a valid value for a parameter name" );
+
+		if ( messageParameters == null ) {
+			messageParameters = newHashMap();
+		}
+
 		this.messageParameters.put( name, value );
 		return this;
 	}
@@ -126,8 +137,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 					new ConstraintViolationCreationContext(
 							getDefaultConstraintMessageTemplate(),
 							basePath,
-							newHashMap( messageParameters ),
-							newHashMap( expressionVariables ),
+							messageParameters != null ? newHashMap( messageParameters ) : Collections.<String, Object>emptyMap(),
+							expressionVariables != null ? newHashMap( expressionVariables ) : Collections.<String, Object>emptyMap(),
 							dynamicPayload
 					)
 			);
@@ -153,8 +164,8 @@ public class ConstraintValidatorContextImpl implements HibernateConstraintValida
 					new ConstraintViolationCreationContext(
 							messageTemplate,
 							propertyPath,
-							newHashMap( messageParameters ),
-							newHashMap( expressionVariables ),
+							messageParameters != null ? newHashMap( messageParameters ) : Collections.<String, Object>emptyMap(),
+							expressionVariables != null ? newHashMap( expressionVariables ) : Collections.<String, Object>emptyMap(),
 							dynamicPayload
 					)
 			);

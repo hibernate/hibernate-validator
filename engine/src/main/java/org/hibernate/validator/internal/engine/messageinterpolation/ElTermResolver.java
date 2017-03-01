@@ -92,17 +92,18 @@ public class ElTermResolver implements TermResolver {
 		);
 		elContext.setVariable( RootResolver.FORMATTER, valueExpression );
 
-		// map the expression variables provided by the annotation values and the parameters added to the context
-		addExpressionVariablesToElContext( elContext, messageInterpolatorContext.getConstraintDescriptor().getAttributes() );
+		// map the parameters provided by the annotation values and the parameters + expression variables explicitly
+		// added to the context
+		addVariablesToElContext( elContext, messageInterpolatorContext.getConstraintDescriptor().getAttributes() );
 		if ( messageInterpolatorContext instanceof HibernateMessageInterpolatorContext ) {
-			addExpressionVariablesToElContext( elContext, ( (HibernateMessageInterpolatorContext) messageInterpolatorContext ).getExpressionVariables() );
+			addVariablesToElContext( elContext, ( (HibernateMessageInterpolatorContext) messageInterpolatorContext ).getExpressionVariables() );
 		}
 
 		return expressionFactory.createValueExpression( elContext, messageTemplate, String.class );
 	}
 
-	private void addExpressionVariablesToElContext(SimpleELContext elContext, Map<String, Object> expressionVariables) {
-		for ( Map.Entry<String, Object> entry : expressionVariables.entrySet() ) {
+	private void addVariablesToElContext(SimpleELContext elContext, Map<String, Object> variables) {
+		for ( Map.Entry<String, Object> entry : variables.entrySet() ) {
 			ValueExpression valueExpression = expressionFactory.createValueExpression( entry.getValue(), Object.class );
 			elContext.getVariableMapper().setVariable( entry.getKey(), valueExpression );
 		}
