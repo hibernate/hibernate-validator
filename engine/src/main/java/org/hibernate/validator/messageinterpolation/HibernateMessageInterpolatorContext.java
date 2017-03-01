@@ -6,6 +6,9 @@
  */
 package org.hibernate.validator.messageinterpolation;
 
+import java.util.Collections;
+import java.util.Map;
+
 import javax.validation.MessageInterpolator;
 
 /**
@@ -13,6 +16,7 @@ import javax.validation.MessageInterpolator;
  * specific to Hibernate Validator.
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  * @since 5.0
  */
 public interface HibernateMessageInterpolatorContext extends MessageInterpolator.Context {
@@ -23,4 +27,22 @@ public interface HibernateMessageInterpolatorContext extends MessageInterpolator
 	 * @return The currently validated root bean type.
 	 */
 	Class<?> getRootBeanType();
+
+	/**
+	 * @return the message parameters added to this context for interpolation
+	 *
+	 * @since 6.0
+	 */
+	default Map<String, Object> getMessageParameters() {
+		return Collections.emptyMap();
+	}
+
+	/**
+	 * @return the expression variables added to this context for EL interpolation
+	 *
+	 * @since 6.0
+	 */
+	default Map<String, Object> getExpressionVariables() {
+		return Collections.emptyMap();
+	}
 }

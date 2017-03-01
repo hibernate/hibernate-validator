@@ -12,6 +12,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
+import org.hibernate.validator.internal.engine.messageinterpolation.util.InterpolationHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -23,6 +25,7 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 	private static final Log log = LoggerFactory.make();
 
 	private java.util.regex.Pattern pattern;
+	private String escapedRegexp;
 
 	@Override
 	public void initialize(Pattern parameters) {
@@ -38,6 +41,8 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 		catch (PatternSyntaxException e) {
 			throw log.getInvalidRegularExpressionException( e );
 		}
+
+		escapedRegexp = InterpolationHelper.escapeMessageParameter( parameters.regexp() );
 	}
 
 	@Override
@@ -45,6 +50,11 @@ public class PatternValidator implements ConstraintValidator<Pattern, CharSequen
 		if ( value == null ) {
 			return true;
 		}
+
+		if ( constraintValidatorContext instanceof HibernateConstraintValidatorContext ) {
+			constraintValidatorContext.unwrap( HibernateConstraintValidatorContext.class ).addMessageParameter( "regexp", escapedRegexp );
+		}
+
 		Matcher m = pattern.matcher( value );
 		return m.matches();
 	}

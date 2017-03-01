@@ -6,11 +6,15 @@
  */
 package org.hibernate.validator.internal.engine;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.toImmutableMap;
+
 import java.util.Map;
+
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolatorContext;
 
 /**
@@ -19,6 +23,7 @@ import org.hibernate.validator.messageinterpolation.HibernateMessageInterpolator
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class MessageInterpolatorContext implements HibernateMessageInterpolatorContext {
 
@@ -27,16 +32,21 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 	private final ConstraintDescriptor<?> constraintDescriptor;
 	private final Object validatedValue;
 	private final Class<?> rootBeanType;
+	@Immutable
 	private final Map<String, Object> messageParameters;
+	@Immutable
+	private final Map<String, Object> expressionVariables;
 
 	public MessageInterpolatorContext(ConstraintDescriptor<?> constraintDescriptor,
 			Object validatedValue,
 			Class<?> rootBeanType,
-			Map<String, Object> messageParameters) {
+			Map<String, Object> messageParameters,
+			Map<String, Object> expressionVariables) {
 		this.constraintDescriptor = constraintDescriptor;
 		this.validatedValue = validatedValue;
 		this.rootBeanType = rootBeanType;
-		this.messageParameters = messageParameters;
+		this.messageParameters = toImmutableMap( messageParameters );
+		this.expressionVariables = toImmutableMap( expressionVariables );
 	}
 
 	@Override
@@ -54,8 +64,14 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		return rootBeanType;
 	}
 
+	@Override
 	public Map<String, Object> getMessageParameters() {
 		return messageParameters;
+	}
+
+	@Override
+	public Map<String, Object> getExpressionVariables() {
+		return expressionVariables;
 	}
 
 	@Override
@@ -105,6 +121,8 @@ public class MessageInterpolatorContext implements HibernateMessageInterpolatorC
 		sb.append( "MessageInterpolatorContext" );
 		sb.append( "{constraintDescriptor=" ).append( constraintDescriptor );
 		sb.append( ", validatedValue=" ).append( validatedValue );
+		sb.append( ", messageParameters=" ).append( messageParameters );
+		sb.append( ", expressionVariables=" ).append( expressionVariables );
 		sb.append( '}' );
 		return sb.toString();
 	}

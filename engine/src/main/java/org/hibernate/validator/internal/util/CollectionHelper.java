@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -110,6 +111,18 @@ public final class CollectionHelper {
 				return Collections.singleton( set.iterator().next() );
 			default:
 				return Collections.unmodifiableSet( set );
+		}
+	}
+
+	public static <K, V> Map<K, V> toImmutableMap(Map<K, V> map) {
+		switch ( map.size() ) {
+			case 0:
+				return Collections.emptyMap();
+			case 1:
+				Entry<K, V> entry = map.entrySet().iterator().next();
+				return Collections.singletonMap( entry.getKey(), entry.getValue() );
+			default:
+				return Collections.unmodifiableMap( map );
 		}
 	}
 
