@@ -23,7 +23,7 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * variable will be available for interpolation for all constraint violations generated for this constraint.
 	 * This includes the default one as well as all violations created by the {@link ConstraintViolationBuilder}.
 	 * To create multiple constraint violations with different variable values, this method can be called
-	 * between successive calls to {@link javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder#addConstraintViolation()}.
+	 * between successive calls to {@link ConstraintViolationBuilder#addConstraintViolation()}.
 	 * <p>
 	 * For example:
 	 * <pre>
@@ -51,6 +51,8 @@ public interface HibernateConstraintValidatorContext extends ConstraintValidator
 	 * @return a reference to itself to allow method chaining
 	 *
 	 * @throws IllegalArgumentException in case the provided name is {@code null}
+	 *
+	 * @since 6.0
 	 */
 	HibernateConstraintValidatorContext addMessageParameter(String name, Object value);
 

@@ -9,10 +9,12 @@ package org.hibernate.validator.internal.engine;
 import java.io.Serializable;
 import java.lang.annotation.ElementType;
 import java.util.Map;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Path;
 import javax.validation.metadata.ConstraintDescriptor;
 
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.hibernate.validator.engine.HibernateConstraintViolation;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -53,7 +55,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 															   ConstraintDescriptor<?> constraintDescriptor,
 															   ElementType elementType,
 															   Object dynamicPayload) {
-		return new ConstraintViolationImpl<T>(
+		return new ConstraintViolationImpl<>(
 				messageTemplate,
 				messageParameters,
 				expressionVariables,
@@ -84,7 +86,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 																	ElementType elementType,
 																	Object[] executableParameters,
 																	Object dynamicPayload) {
-		return new ConstraintViolationImpl<T>(
+		return new ConstraintViolationImpl<>(
 				messageTemplate,
 				messageParameters,
 				expressionVariables,
@@ -115,7 +117,7 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 																	  ElementType elementType,
 																	  Object executableReturnValue,
 																	  Object dynamicPayload) {
-		return new ConstraintViolationImpl<T>(
+		return new ConstraintViolationImpl<>(
 				messageTemplate,
 				messageParameters,
 				expressionVariables,
@@ -176,14 +178,14 @@ public class ConstraintViolationImpl<T> implements HibernateConstraintViolation<
 	}
 
 	/**
-	 * @return the message parameters added using {@link org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl#addMessageParameter(String, Object)}
+	 * @return the message parameters added using {@link HibernateConstraintValidatorContext#addMessageParameter(String, Object)}
 	 */
 	public Map<String, Object> getMessageParameters() {
 		return messageParameters;
 	}
 
 	/**
-	 * @return the expression variables added using {@link org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl#addExpressionVariable(String, Object)}
+	 * @return the expression variables added using {@link HibernateConstraintValidatorContext#addExpressionVariable(String, Object)}
 	 */
 	public Map<String, Object> getExpressionVariables() {
 		return expressionVariables;
