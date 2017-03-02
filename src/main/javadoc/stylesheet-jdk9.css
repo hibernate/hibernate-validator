@@ -162,7 +162,7 @@ Navigation bar styles
     height:2.8em;
     padding-top:10px;
     overflow:hidden;
-    font-size:12px; 
+    font-size:12px;
 }
 .bottomNav {
     margin-top:10px;
@@ -388,7 +388,7 @@ ul.blockList li.blockList, ul.blockListLast li.blockList {
 }
 ul.blockList ul.blockList li.blockList, ul.blockList ul.blockListLast li.blockList {
     padding:0px 20px 5px 10px;
-    border:1px solid #ededed; 
+    border:1px solid #ededed;
     background-color:#f8f8f8;
 }
 ul.blockList ul.blockList ul.blockList li.blockList, ul.blockList ul.blockList ul.blockListLast li.blockList {
@@ -418,11 +418,11 @@ Table styles
 .requiresSummary, .packagesSummary, .providesSummary, .usesSummary {
     width:100%;
     border-spacing:0;
-    border-left:1px solid #EEE; 
-    border-right:1px solid #EEE; 
-    border-bottom:1px solid #EEE; 
+    border-left:1px solid #EEE;
+    border-right:1px solid #EEE;
+    border-bottom:1px solid #EEE;
 }
-.overviewSummary, .memberSummary, .requiresSummary, .packagesSummary, .providesSummary, .usesSummary  {
+.overviewSummary, .memberSummary, .requiresSummary, .packagesSummary, .providesSummary, .usesSummary {
     padding:0px;
 }
 .overviewSummary caption, .memberSummary caption, .typeSummary caption,
@@ -518,7 +518,7 @@ Table styles
     display:none;
     width:5px;
     margin-right:3px;
-    position:relative; 
+    position:relative;
     float:left;
     background-color:#F8981D;
 }
@@ -668,12 +668,12 @@ div.contentContainer ul.blockList li.blockList h2 {
 IFRAME specific styles
 */
 .mainContainer {
-    margin:0 auto; 
-    padding:0; 
-    height:100%; 
-    width:100%; 
-    position:fixed; 
-    top:0; 
+    margin:0 auto;
+    padding:0;
+    height:100%;
+    width:100%;
+    position:fixed;
+    top:0;
     left:0;
 }
 .leftContainer {
@@ -747,7 +747,7 @@ ul.ui-autocomplete {
     position:fixed;
     z-index:999999;
 }
-ul.ui-autocomplete  li {
+ul.ui-autocomplete li {
     float:left;
     clear:both;
     width:100%;
