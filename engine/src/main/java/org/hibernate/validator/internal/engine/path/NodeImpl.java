@@ -15,16 +15,15 @@ import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.Path.BeanNode;
 import javax.validation.Path.ConstructorNode;
+import javax.validation.Path.ContainerElementNode;
 import javax.validation.Path.CrossParameterNode;
 import javax.validation.Path.MethodNode;
 import javax.validation.Path.ParameterNode;
 import javax.validation.Path.PropertyNode;
 import javax.validation.Path.ReturnValueNode;
-import javax.validation.Path.ContainerElementNode;
-import javax.validation.TypeParameter;
 
-import org.hibernate.validator.internal.engine.path.TypeParameterImpl.ClassGenericDeclarationImpl;
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -66,12 +65,13 @@ public class NodeImpl
 	private final Class<?>[] parameterTypes;
 	private final Integer parameterIndex;
 	private final Object value;
-	private final TypeParameter typeParameter;
+	private final Class<?> containerClass;
+	private final Integer containerElementIndex;
 
 	private String asString;
 
 	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
-			Integer parameterIndex, Object value, TypeParameter typeParameter) {
+			Integer parameterIndex, Object value, Class<?> containerClass, Integer containerElementIndex) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
@@ -81,7 +81,8 @@ public class NodeImpl
 		this.kind = kind;
 		this.parameterTypes = parameterTypes;
 		this.parameterIndex = parameterIndex;
-		this.typeParameter = typeParameter;
+		this.containerClass = containerClass;
+		this.containerElementIndex = containerElementIndex;
 		this.hashCode = buildHashCode();
 	}
 
@@ -95,6 +96,7 @@ public class NodeImpl
 				null,
 				ElementKind.PROPERTY,
 				EMPTY_CLASS_ARRAY,
+				null,
 				null,
 				null,
 				null
@@ -112,6 +114,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				null,
 				null
 		);
 	}
@@ -126,6 +129,7 @@ public class NodeImpl
 				ElementKind.PARAMETER,
 				EMPTY_CLASS_ARRAY,
 				parameterIndex,
+				null,
 				null,
 				null
 		);
@@ -142,16 +146,17 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				null,
 				null
 		);
 	}
 
 	public static NodeImpl createMethodNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, null, null );
 	}
 
 	public static NodeImpl createConstructorNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, null, null );
 	}
 
 	public static NodeImpl createBeanNode(NodeImpl parent) {
@@ -163,6 +168,7 @@ public class NodeImpl
 				null,
 				ElementKind.BEAN,
 				EMPTY_CLASS_ARRAY,
+				null,
 				null,
 				null,
 				null
@@ -180,6 +186,7 @@ public class NodeImpl
 				EMPTY_CLASS_ARRAY,
 				null,
 				null,
+				null,
 				null
 		);
 	}
@@ -195,7 +202,8 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
-				null
+				node.containerClass,
+				node.containerElementIndex
 		);
 	}
 
@@ -210,7 +218,8 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
-				null
+				node.containerClass,
+				node.containerElementIndex
 		);
 	}
 
@@ -225,7 +234,8 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
-				null
+				node.containerClass,
+				node.containerElementIndex
 		);
 	}
 
@@ -240,11 +250,12 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				value,
-				null
+				node.containerClass,
+				node.containerElementIndex
 		);
 	}
 
-	public static NodeImpl setTypeParameter(NodeImpl node, TypeParameter typeParameter) {
+	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, int containerElementIndex) {
 		return new NodeImpl(
 				node.name,
 				node.parent,
@@ -255,7 +266,8 @@ public class NodeImpl
 				node.parameterTypes,
 				node.parameterIndex,
 				node.value,
-				typeParameter
+				containerClass,
+				containerElementIndex
 		);
 	}
 
@@ -294,15 +306,27 @@ public class NodeImpl
 	}
 
 	@Override
-	public TypeParameter getTypeParameter() {
+	public Class<?> getContainerClass() {
 		Contracts.assertTrue(
 				kind == ElementKind.BEAN || kind == ElementKind.PROPERTY || kind == ElementKind.CONTAINER_ELEMENT,
-				"getTypeParameter() may only be invoked for nodes of type ElementKind.BEAN, ElementKind.PROPERTY or ElementKind.CONTAINER_ELEMENT."
+				"getContainerClass() may only be invoked for nodes of type ElementKind.BEAN, ElementKind.PROPERTY or ElementKind.CONTAINER_ELEMENT."
 		);
 		if ( parent == null ) {
 			return null;
 		}
-		return parent.typeParameter;
+		return parent.containerClass;
+	}
+
+	@Override
+	public Integer getContainerElementIndex() {
+		Contracts.assertTrue(
+				kind == ElementKind.BEAN || kind == ElementKind.PROPERTY || kind == ElementKind.CONTAINER_ELEMENT,
+				"getContainerElementIndex() may only be invoked for nodes of type ElementKind.BEAN, ElementKind.PROPERTY or ElementKind.CONTAINER_ELEMENT."
+		);
+		if ( parent == null ) {
+			return null;
+		}
+		return parent.containerElementIndex;
 	}
 
 	public final NodeImpl getParent() {
@@ -368,9 +392,9 @@ public class NodeImpl
 			builder.append( getName() );
 		}
 
-		if ( includeTypeParameterInformation( typeParameter ) ) {
+		if ( includeTypeParameterInformation( containerClass, containerElementIndex ) ) {
 			builder.append( TYPE_PARAMETER_OPEN );
-			builder.append( typeParameter.getName() );
+			builder.append( TypeVariables.getTypeParameterName( containerClass, containerElementIndex ) );
 			builder.append( TYPE_PARAMETER_CLOSE );
 		}
 
@@ -390,16 +414,15 @@ public class NodeImpl
 
 	// TODO: this is used to reduce the number of differences until we agree on the string representation
 	// it introduces some inconsistent behavior e.g. you get '<V>' for a Multimap but not for a Map
-	private boolean includeTypeParameterInformation(TypeParameter typeParameter) {
-		if ( typeParameter == null ) {
+	private static boolean includeTypeParameterInformation(Class<?> containerClass, Integer containerElementIndex) {
+		if ( containerClass == null || containerElementIndex == null ) {
 			return false;
 		}
 
-		ClassGenericDeclarationImpl genericDeclaration = typeParameter.getGenericDeclaration().as( ClassGenericDeclarationImpl.class );
-		if ( genericDeclaration.getTypeParameters().length < 2 ) {
+		if ( containerClass.getTypeParameters().length < 2 ) {
 			return false;
 		}
-		if ( Map.class.getName().equals( genericDeclaration.getClassName() ) && "V".equals( typeParameter.getName() ) ) {
+		if ( Map.class.isAssignableFrom( containerClass ) && "V".equals( TypeVariables.getTypeParameterName( containerClass, containerElementIndex ) ) ) {
 			return false;
 		}
 		return true;
@@ -416,7 +439,8 @@ public class NodeImpl
 		result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
 		result = prime * result + ( ( parameterTypes == null ) ? 0 : parameterTypes.hashCode() );
 		result = prime * result + ( ( parent == null ) ? 0 : parent.hashCode() );
-		result = prime * result + ( ( typeParameter == null ) ? 0 : typeParameter.hashCode() );
+		result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
+		result = prime * result + ( ( containerElementIndex == null ) ? 0 : containerElementIndex.hashCode() );
 		return result;
 	}
 
@@ -456,12 +480,20 @@ public class NodeImpl
 		else if ( !key.equals( other.key ) ) {
 			return false;
 		}
-		if ( typeParameter == null ) {
-			if ( other.typeParameter != null ) {
+		if ( containerClass == null ) {
+			if ( other.containerClass != null ) {
 				return false;
 			}
 		}
-		else if ( !typeParameter.equals( other.typeParameter ) ) {
+		else if ( !containerClass.equals( other.containerClass ) ) {
+			return false;
+		}
+		if ( containerElementIndex == null ) {
+			if ( other.containerElementIndex != null ) {
+				return false;
+			}
+		}
+		else if ( !containerElementIndex.equals( other.containerElementIndex ) ) {
 			return false;
 		}
 		if ( kind != other.kind ) {

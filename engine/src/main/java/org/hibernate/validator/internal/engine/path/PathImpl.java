@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 
 import javax.validation.ElementKind;
 import javax.validation.Path;
-import javax.validation.TypeParameter;
 
 import org.hibernate.validator.internal.metadata.aggregated.ExecutableMetaData;
 import org.hibernate.validator.internal.util.Contracts;
@@ -212,8 +211,8 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	public NodeImpl setLeafNodeTypeParameter(TypeParameter typeParameter) {
-		currentLeafNode = NodeImpl.setTypeParameter( currentLeafNode, typeParameter );
+	public NodeImpl setLeafNodeTypeParameter(Class<?> containerClass, int containerElementIndex) {
+		currentLeafNode = NodeImpl.setTypeParameter( currentLeafNode, containerClass, containerElementIndex );
 
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
