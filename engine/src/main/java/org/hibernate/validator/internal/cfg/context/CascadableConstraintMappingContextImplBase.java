@@ -8,10 +8,25 @@ package org.hibernate.validator.internal.cfg.context;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.validator.cfg.context.Cascadable;
+import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ContainerElementTarget;
 import org.hibernate.validator.cfg.context.GroupConversionTargetContext;
+import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
+import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
+import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Base class for all implementations of cascadable context types.
@@ -21,8 +36,16 @@ import org.hibernate.validator.cfg.context.GroupConversionTargetContext;
 abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C>>
 		extends ConstraintMappingContextImplBase implements Cascadable<C> {
 
+	private static final Log LOG = LoggerFactory.make();
+
 	protected boolean isCascading;
-	protected Map<Class<?>, Class<?>> groupConversions = newHashMap();
+	protected final Map<Class<?>, Class<?>> groupConversions = newHashMap();
+
+	/**
+	 * Contexts for configuring nested container elements, if any. Indexed by type parameter.
+	 */
+	protected final Map<Integer, ContainerElementConstraintMappingContextImpl> containerElementContexts = new HashMap<>();
+	private final Set<ContainerElementPathKey> configuredPaths = new HashSet<>();
 
 	CascadableConstraintMappingContextImplBase(DefaultConstraintMapping mapping) {
 		super( mapping );
@@ -55,7 +78,33 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 
 	@Override
 	public GroupConversionTargetContext<C> convertGroup(Class<?> from) {
-		return new GroupConversionTargetContextImpl<C>( from, getThis(), this );
+		return new GroupConversionTargetContextImpl<>( from, getThis(), this );
+	}
+
+	public ContainerElementConstraintMappingContext containerElement(ContainerElementTarget parent, TypeConstraintMappingContextImpl<?> typeContext,
+			ConstraintLocation location, int index, int... nestedIndexes) {
+		Contracts.assertTrue( index >= 0, "Type argument index must not be negative" );
+
+		ContainerElementPathKey key = new ContainerElementPathKey( index, nestedIndexes );
+		boolean configuredBefore = !configuredPaths.add( key );
+		if ( configuredBefore ) {
+			throw LOG.getContainerElementHasAlreadyBeConfiguredViaProgrammaticApiException(
+				location.getTypeForValidatorResolution()
+			);
+		}
+
+		ContainerElementConstraintMappingContextImpl containerElementContext = new ContainerElementConstraintMappingContextImpl(
+			typeContext, parent, location, index
+		);
+
+		containerElementContexts.put( index, containerElementContext );
+
+		if ( nestedIndexes.length > 0 ) {
+			return containerElementContext.nestedContainerElement( nestedIndexes );
+		}
+		else {
+			return containerElementContext;
+		}
 	}
 
 	public boolean isCascading() {
@@ -66,4 +115,52 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 		return groupConversions;
 	}
 
+	protected Set<MetaConstraint<?>> getTypeArgumentConstraints(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
+		return containerElementContexts.values()
+			.stream()
+			.map( t -> t.build( constraintHelper, typeResolutionHelper, valueExtractorManager ) )
+			.flatMap( Set::stream )
+			.collect( Collectors.toSet() );
+	}
+
+	private static class ContainerElementPathKey {
+
+		private final int index;
+		private final int[] nestedIndexes;
+
+		public ContainerElementPathKey(int index, int[] nestedIndexes) {
+			this.index = index;
+			this.nestedIndexes = nestedIndexes;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + index;
+			result = prime * result + Arrays.hashCode( nestedIndexes );
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) {
+				return true;
+			}
+			if ( obj == null ) {
+				return false;
+			}
+			if ( getClass() != obj.getClass() ) {
+				return false;
+			}
+			ContainerElementPathKey other = (ContainerElementPathKey) obj;
+			if ( index != other.index ) {
+				return false;
+			}
+			if ( !Arrays.equals( nestedIndexes, other.nestedIndexes ) ) {
+				return false;
+			}
+			return true;
+		}
+	}
 }
