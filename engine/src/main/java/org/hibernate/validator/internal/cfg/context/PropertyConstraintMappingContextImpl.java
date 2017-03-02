@@ -11,6 +11,9 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,16 +21,21 @@ import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one bean property.
@@ -40,13 +48,25 @@ final class PropertyConstraintMappingContextImpl
 		extends CascadableConstraintMappingContextImplBase<PropertyConstraintMappingContext>
 		implements PropertyConstraintMappingContext {
 
+	private static final Log LOG = LoggerFactory.make();
+
 	private final TypeConstraintMappingContextImpl<?> typeContext;
 	private final Member member;
+	private final ConstraintLocation location;
+	private final Type validatedType;
 
 	PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Member member) {
 		super( typeContext.getConstraintMapping() );
 		this.typeContext = typeContext;
 		this.member = member;
+		if ( member instanceof Field ) {
+			this.location = ConstraintLocation.forField( (Field) member );
+			this.validatedType = ( (Field) member ).getGenericType();
+		}
+		else {
+			this.location = ConstraintLocation.forGetter( (Method) member );
+			this.validatedType = ( (Method) member ).getGenericReturnType();
+		}
 	}
 
 	@Override
@@ -94,6 +114,29 @@ final class PropertyConstraintMappingContextImpl
 		return typeContext.method( name, parameterTypes );
 	}
 
+	@Override
+	public ContainerElementConstraintMappingContext containerElement() {
+		if ( validatedType instanceof ParameterizedType ) {
+			if ( ( (ParameterizedType) validatedType ).getActualTypeArguments().length > 1 ) {
+				throw LOG.getNoTypeArgumentIndexIsGivenForTypeWithMultipleTypeArgumentsException( validatedType );
+			}
+		}
+		else if ( !TypeHelper.isArray( validatedType ) ) {
+			throw LOG.getTypeIsNotAParameterizedNorArrayTypeException( validatedType );
+		}
+
+		return (containerElement( 0 ) );
+	}
+
+	@Override
+	public ContainerElementConstraintMappingContext containerElement(int index, int... nestedIndexes) {
+		if ( !( validatedType instanceof ParameterizedType ) && !( TypeHelper.isArray( validatedType ) ) ) {
+			throw LOG.getTypeIsNotAParameterizedNorArrayTypeException( validatedType );
+		}
+
+		return super.containerElement( this, typeContext, location, index, nestedIndexes );
+	}
+
 	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
 		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		if ( member instanceof Field ) {
@@ -111,6 +154,7 @@ final class PropertyConstraintMappingContextImpl
 					ConfigurationSource.API,
 					(Executable) member,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
+					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					groupConversions,
 					getCascadedTypeParameters( (Executable) member, isCascading )
 			);
@@ -129,15 +173,23 @@ final class PropertyConstraintMappingContextImpl
 	}
 
 	private List<CascadingTypeParameter> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
+		List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
+
+		for ( ContainerElementConstraintMappingContextImpl typeArgumentContext : containerElementContexts.values() ) {
+			CascadingTypeParameter cascadingTypeParameter = typeArgumentContext.getCascadingTypeParameter();
+			if ( cascadingTypeParameter != null ) {
+				cascadingTypeParameters.add( cascadingTypeParameter );
+			}
+		}
+
 		if ( isCascaded ) {
 			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
-			return Collections.singletonList( isArray
+			cascadingTypeParameters.add( isArray
 					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( executable ) )
 					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( executable ) ) );
 		}
-		else {
-			return Collections.emptyList();
-		}
+
+		return cascadingTypeParameters;
 	}
 
 	@Override

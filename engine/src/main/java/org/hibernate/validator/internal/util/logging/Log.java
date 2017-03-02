@@ -725,4 +725,16 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 210, value = "Unable to find the type parameter %2$s in class %1$s.")
 	IllegalArgumentException getUnableToFindTypeParameterInClass(@FormatWith(ClassObjectFormatter.class) Class<?> clazz, Object typeParameterReference);
+
+	@Message(id = 211, value = "Given type is neither a parameterized nor an array type: %s.")
+	ValidationException getTypeIsNotAParameterizedNorArrayTypeException(@FormatWith(TypeFormatter.class) Type type);
+
+	@Message(id = 212, value = "Given type has no type argument with index %2$s: %1$s.")
+	ValidationException getInvalidTypeArgumentIndexException(@FormatWith(TypeFormatter.class) Type type, int index);
+
+	@Message(id = 213, value = "Given type has more than one type argument, hence an argument index must be specified: %s.")
+	ValidationException getNoTypeArgumentIndexIsGivenForTypeWithMultipleTypeArgumentsException(@FormatWith(TypeFormatter.class) Type type);
+
+	@Message(id = 214, value = "The same type argument of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getContainerElementHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(TypeFormatter.class) Type type);
 }
