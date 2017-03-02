@@ -23,7 +23,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ElementKind;
 import javax.validation.Path;
-import javax.validation.TypeParameter;
 import javax.validation.metadata.ConstraintDescriptor;
 
 import org.assertj.core.api.Assertions;
@@ -297,14 +296,25 @@ public final class ConstraintViolationAssert {
 				return false;
 			}
 
-			TypeParameter p1NodeTypeParameter = getTypeParameter( p1Node );
-			TypeParameter p2NodeTypeParameter = getTypeParameter( p2Node );
-			if ( p2NodeTypeParameter == null ) {
-				if ( p1NodeTypeParameter != null ) {
+			Class<?> p1NodeContainerClass = getContainerClass( p1Node );
+			Class<?> p2NodeContainerClass = getContainerClass( p2Node );
+			if ( p2NodeContainerClass == null ) {
+				if ( p1NodeContainerClass != null ) {
 					return false;
 				}
 			}
-			else if ( !p2NodeTypeParameter.equals( p1NodeTypeParameter ) ) {
+			else if ( !p2NodeContainerClass.equals( p1NodeContainerClass ) ) {
+				return false;
+			}
+
+			Integer p1NodeContainerElementIndex = getContainerElementIndex( p1Node );
+			Integer p2NodeContainerElementIndex = getContainerElementIndex( p2Node );
+			if ( p2NodeContainerElementIndex == null ) {
+				if ( p1NodeContainerElementIndex != null ) {
+					return false;
+				}
+			}
+			else if ( !p2NodeContainerElementIndex.equals( p1NodeContainerElementIndex ) ) {
 				return false;
 			}
 
@@ -417,7 +427,8 @@ public final class ConstraintViolationAssert {
 				if ( node.getKind() == ElementKind.PARAMETER ) {
 					parameterIndex = node.as( Path.ParameterNode.class ).getParameterIndex();
 				}
-				TypeParameter typeParameter = getTypeParameter( node );
+				Class<?> containerClass = getContainerClass( node );
+				Integer containerElementIndex = getContainerElementIndex( node );
 				nodes.add(
 						new NodeExpectation(
 								node.getName(),
@@ -426,7 +437,8 @@ public final class ConstraintViolationAssert {
 								node.getKey(),
 								node.getIndex(),
 								parameterIndex,
-								typeParameter != null ? typeParameter.getName() : null
+								containerClass,
+								containerElementIndex
 						)
 				);
 			}
@@ -437,18 +449,18 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
-		public PathExpectation property(String name, String typeParameter) {
-			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, false, null, null, null, typeParameter ) );
+		public PathExpectation property(String name, Class<?> containerClass, Integer containerElementIndex) {
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, false, null, null, null, containerClass, containerElementIndex ) );
 			return this;
 		}
 
 		public PathExpectation property(String name, boolean inIterable, Object key, Integer index) {
-			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null, null ) );
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null, null, null ) );
 			return this;
 		}
 
-		public PathExpectation property(String name, boolean inIterable, Object key, Integer index, String typeParameter) {
-			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null, typeParameter ) );
+		public PathExpectation property(String name, boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer containerElementIndex) {
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null, containerClass, containerElementIndex ) );
 			return this;
 		}
 
@@ -458,12 +470,12 @@ public final class ConstraintViolationAssert {
 		}
 
 		public PathExpectation bean(boolean inIterable, Object key, Integer index) {
-			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, null ) );
+			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, null, null ) );
 			return this;
 		}
 
-		public PathExpectation bean(boolean inIterable, Object key, Integer index, String typeParameter) {
-			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, typeParameter ) );
+		public PathExpectation bean(boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer containerElementIndex) {
+			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, containerClass, containerElementIndex ) );
 			return this;
 		}
 
@@ -473,7 +485,7 @@ public final class ConstraintViolationAssert {
 		}
 
 		public PathExpectation parameter(String name, int index) {
-			nodes.add( new NodeExpectation( name, ElementKind.PARAMETER, false, null, null, index, null ) );
+			nodes.add( new NodeExpectation( name, ElementKind.PARAMETER, false, null, null, index, null, null ) );
 			return this;
 		}
 
@@ -487,8 +499,8 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
-		public PathExpectation containerElement(String name, boolean inIterable, Object key, Integer index, String typeParameter) {
-			nodes.add( new NodeExpectation( name, ElementKind.CONTAINER_ELEMENT, inIterable, key, index, null, typeParameter ) );
+		public PathExpectation containerElement(String name, boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer containerElementIndex) {
+			nodes.add( new NodeExpectation( name, ElementKind.CONTAINER_ELEMENT, inIterable, key, index, null, containerClass, containerElementIndex ) );
 			return this;
 		}
 
@@ -545,27 +557,29 @@ public final class ConstraintViolationAssert {
 		private final Object key;
 		private final Integer index;
 		private final Integer parameterIndex;
-		private final String typeParameter;
+		private final Class<?> containerClass;
+		private final Integer containerElementIndex;
 
 		private NodeExpectation(String name, ElementKind kind) {
-			this( name, kind, false, null, null, null, null );
+			this( name, kind, false, null, null, null, null, null );
 		}
 
 		private NodeExpectation(String name, ElementKind kind, boolean inIterable, Object key, Integer index,
-				Integer parameterIndex, String typeParameter) {
+				Integer parameterIndex, Class<?> containerClass, Integer containerElementIndex) {
 			this.name = name;
 			this.kind = kind;
 			this.inIterable = inIterable;
 			this.key = key;
 			this.index = index;
 			this.parameterIndex = parameterIndex;
-			this.typeParameter = typeParameter;
+			this.containerClass = containerClass;
+			this.containerElementIndex = containerElementIndex;
 		}
 
 		@Override
 		public String toString() {
 			return "NodeExpectation(" + name + ", " + kind + ", " + inIterable
-					+ ", " + key + ", " + index + ", " + parameterIndex + ", " + typeParameter + ")";
+					+ ", " + key + ", " + index + ", " + parameterIndex + ", " + containerClass + ", " + containerElementIndex + ")";
 		}
 
 		@Override
@@ -578,7 +592,8 @@ public final class ConstraintViolationAssert {
 			result = prime * result + ( ( kind == null ) ? 0 : kind.hashCode() );
 			result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
 			result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
-			result = prime * result + ( ( typeParameter == null ) ? 0 : typeParameter.hashCode() );
+			result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
+			result = prime * result + ( ( containerElementIndex == null ) ? 0 : containerElementIndex.hashCode() );
 			return result;
 		}
 
@@ -632,29 +647,51 @@ public final class ConstraintViolationAssert {
 			else if ( !parameterIndex.equals( other.parameterIndex ) ) {
 				return false;
 			}
-			if ( typeParameter == null ) {
-				if ( other.typeParameter != null ) {
+			if ( containerClass == null ) {
+				if ( other.containerClass != null ) {
 					return false;
 				}
 			}
-			else if ( !typeParameter.equals( other.typeParameter ) ) {
+			else if ( !containerClass.equals( other.containerClass ) ) {
+				return false;
+			}
+			if ( containerElementIndex == null ) {
+				if ( other.containerElementIndex != null ) {
+					return false;
+				}
+			}
+			else if ( !containerElementIndex.equals( other.containerElementIndex ) ) {
 				return false;
 			}
 			return true;
 		}
 	}
 
-	private static TypeParameter getTypeParameter(Path.Node node) {
-		TypeParameter typeParameter = null;
+	private static Class<?> getContainerClass(Path.Node node) {
+		Class<?> containerClass = null;
 		if ( node.getKind() == ElementKind.PROPERTY ) {
-			typeParameter = node.as( Path.PropertyNode.class ).getTypeParameter();
+			containerClass = node.as( Path.PropertyNode.class ).getContainerClass();
 		}
 		if ( node.getKind() == ElementKind.BEAN ) {
-			typeParameter = node.as( Path.BeanNode.class ).getTypeParameter();
+			containerClass = node.as( Path.BeanNode.class ).getContainerClass();
 		}
 		if ( node.getKind() == ElementKind.CONTAINER_ELEMENT ) {
-			typeParameter = node.as( Path.ContainerElementNode.class ).getTypeParameter();
+			containerClass = node.as( Path.ContainerElementNode.class ).getContainerClass();
 		}
-		return typeParameter;
+		return containerClass;
+	}
+
+	private static Integer getContainerElementIndex(Path.Node node) {
+		Integer containerElementIndex = null;
+		if ( node.getKind() == ElementKind.PROPERTY ) {
+			containerElementIndex = node.as( Path.PropertyNode.class ).getContainerElementIndex();
+		}
+		if ( node.getKind() == ElementKind.BEAN ) {
+			containerElementIndex = node.as( Path.BeanNode.class ).getContainerElementIndex();
+		}
+		if ( node.getKind() == ElementKind.CONTAINER_ELEMENT ) {
+			containerElementIndex = node.as( Path.ContainerElementNode.class ).getContainerElementIndex();
+		}
+		return containerElementIndex;
 	}
 }

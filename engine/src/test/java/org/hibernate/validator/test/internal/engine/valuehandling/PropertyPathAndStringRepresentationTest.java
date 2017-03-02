@@ -59,7 +59,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "inhabitantsPerAddress" )
-						.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, null, null, "K" )
+						.containerElement( NodeImpl.MAP_KEY_NODE_NAME, true, null, null, Map.class, 0 )
 		);
 	}
 
@@ -76,7 +76,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "inhabitantsPerAddress" )
-						.property( "street", true, invalidAddress, null, "K" )
+						.property( "street", true, invalidAddress, null, Map.class, 0 )
 		);
 
 		invalidAddress = new Address( "rue Garibaldi", new City( "L" ) );
@@ -90,7 +90,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "inhabitantsPerAddress" )
-						.property( "city", true, invalidAddress, null, "K" )
+						.property( "city", true, invalidAddress, null, Map.class, 0 )
 						.property( "name" )
 		);
 	}
@@ -108,7 +108,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "inhabitantsPerAddress" )
-						.bean( true, invalidAddress, null, "K" )
+						.bean( true, invalidAddress, null, Map.class, 0 )
 		);
 	}
 
@@ -125,7 +125,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addressesPerCity" )
-						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, city, null, "V" )
+						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, city, null, Map.class, 1 )
 		);
 	}
 
@@ -143,7 +143,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addressesPerCity" )
-						.property( "street", true, city, null, "V" )
+						.property( "street", true, city, null, Map.class, 1 )
 		);
 
 		invalidAddress = new Address( "rue Garibaldi", new City( "L" ) );
@@ -157,7 +157,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addressesPerCity" )
-						.property( "city", true, city, null, "V" )
+						.property( "city", true, city, null, Map.class, 1 )
 						.property( "name" )
 		);
 	}
@@ -176,7 +176,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addressesPerCity" )
-						.bean( true, city, null, "V" )
+						.bean( true, city, null, Map.class, 1 )
 		);
 	}
 
@@ -192,7 +192,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addresses" )
-						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, "E" )
+						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
 		);
 	}
 
@@ -208,7 +208,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addresses" )
-						.property( "street", true, null, 0, "E" )
+						.property( "street", true, null, 0, List.class, 0 )
 		);
 
 		block = new Block();
@@ -221,7 +221,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addresses" )
-						.property( "city", true, null, 0, "E" )
+						.property( "city", true, null, 0, List.class, 0 )
 						.property( "name" )
 		);
 	}
@@ -238,7 +238,7 @@ public class PropertyPathAndStringRepresentationTest {
 		assertThat( constraintViolations ).containsOnlyPaths(
 				pathWith()
 						.property( "addresses" )
-						.bean( true, null, 0, "E" )
+						.bean( true, null, 0, List.class, 0 )
 		);
 	}
 

@@ -722,4 +722,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 209, value = "A composing constraint (%2$s) must not be given directly on the composed constraint (%1$s) and using the corresponding List annotation at the same time.")
 	ConstraintDeclarationException getCannotMixDirectAnnotationAndListContainerOnComposedConstraintException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> composedConstraint,
 			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> composingConstraint);
+
+	@Message(id = 210, value = "Unable to find the type parameter %2$s in class %1$s.")
+	IllegalArgumentException getUnableToFindTypeParameterInClass(@FormatWith(ClassObjectFormatter.class) Class<?> clazz, Object typeParameterReference);
 }

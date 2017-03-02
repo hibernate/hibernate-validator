@@ -12,11 +12,11 @@ import java.lang.reflect.TypeVariable;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
-import org.hibernate.validator.internal.engine.path.TypeParameterImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.TypeVariables;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -141,7 +141,7 @@ public class ValueContext<T, V> {
 	}
 
 	public final void setTypeParameter(TypeVariable<?> typeParameter) {
-		propertyPath.setLeafNodeTypeParameter( TypeParameterImpl.of( typeParameter ) );
+		propertyPath.setLeafNodeTypeParameter( TypeVariables.getDeclaringClass( typeParameter ), TypeVariables.getTypeParameterIndex( typeParameter ) );
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {

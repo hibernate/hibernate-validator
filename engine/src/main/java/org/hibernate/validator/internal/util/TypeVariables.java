@@ -10,6 +10,8 @@ import java.lang.reflect.TypeVariable;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
  * Provides some utility methods for TypeVariables.
@@ -18,6 +20,8 @@ import org.hibernate.validator.internal.engine.cascading.ArrayElement;
  */
 public class TypeVariables {
 
+	private static final Log LOG = LoggerFactory.make();
+
 	private TypeVariables() {
 	}
 
@@ -25,4 +29,24 @@ public class TypeVariables {
 		return typeParameter == AnnotatedObject.INSTANCE || typeParameter == ArrayElement.INSTANCE;
 	}
 
+	public static String getTypeParameterName(Class<?> clazz, int typeParameterIndex) {
+		if ( typeParameterIndex >= clazz.getTypeParameters().length ) {
+			throw LOG.getUnableToFindTypeParameterInClass( clazz, typeParameterIndex );
+		}
+		return clazz.getTypeParameters()[typeParameterIndex].getName();
+	}
+
+	public static int getTypeParameterIndex(TypeVariable<?> typeParameter) {
+		TypeVariable<?>[] typeParameters = typeParameter.getGenericDeclaration().getTypeParameters();
+		for ( int i = 0; i < typeParameters.length; i++ ) {
+			if ( typeParameter.getName().equals( typeParameters[i].getName() ) ) {
+				return i;
+			}
+		}
+		throw LOG.getUnableToFindTypeParameterInClass( (Class<?>) typeParameter.getGenericDeclaration(), typeParameter.getName() );
+	}
+
+	public static Class<?> getDeclaringClass(TypeVariable<?> typeParameter) {
+		return (Class<?>) typeParameter.getGenericDeclaration();
+	}
 }
