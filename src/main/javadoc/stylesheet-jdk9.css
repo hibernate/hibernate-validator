@@ -1,17 +1,13 @@
-/* Javadoc style sheet */
-/*
-Overall document style
-*/
-
-@import url('resources/fonts/dejavu.css');
-
+/**
+ * Hibernate Java 9 compliant JavaDoc stylesheet
+ */
 body {
-    background-color:#ffffff;
-    color:#353833;
-    font-family:'DejaVu Sans', Arial, Helvetica, sans-serif;
-    font-size:14px;
+    background:#FFFFFF url(resources/bkg_gradient.gif) repeat-x;
     margin:0;
+    font-family:'Lucida Grande', Geneva, Verdana, Arial, sans-serif;
+    font-size:12px;
     padding:0;
+    color:#333;
     height:100%;
     width:100%;
 }
@@ -25,15 +21,15 @@ iframe {
 }
 a:link, a:visited {
     text-decoration:none;
-    color:#4A6782;
+    color:#455e60;
 }
 a:hover, a:focus {
     text-decoration:none;
-    color:#bb7a2a;
+    color:#BCAE79;
 }
 a:active {
     text-decoration:none;
-    color:#4A6782;
+    color:#455e60;
 }
 a[name] {
     color:#353833;
@@ -58,41 +54,44 @@ pre {
     font-size:14px;
 }
 h1 {
-    font-size:20px;
+    background:url(resources/h1_hdr.png) no-repeat;
+    line-height:1.2em;
+    color:#586464;
+    font-size:16pt;
+    padding:17pt;
+    margin-top:0;
+    text-align:left;
 }
 h2 {
-    font-size:18px;
+    color:#586464;
+    font-size:1.5em;
 }
 h3 {
-    font-size:16px;
-    font-style:italic;
+    font-size:1.4em;
 }
 h4 {
-    font-size:13px;
+    font-size:1.3em;
 }
 h5 {
-    font-size:12px;
+    font-size:1.2em;
 }
 h6 {
-    font-size:11px;
+    font-size:1.1em;
 }
 ul {
     list-style-type:disc;
 }
 code, tt {
-    font-family:'DejaVu Sans Mono', monospace;
     font-size:14px;
     padding-top:4px;
     margin-top:8px;
     line-height:1.4em;
 }
 dt code {
-    font-family:'DejaVu Sans Mono', monospace;
     font-size:14px;
     padding-top:4px;
 }
 table tr td dt code {
-    font-family:'DejaVu Sans Mono', monospace;
     font-size:14px;
     vertical-align:top;
     padding-top:4px;
@@ -105,12 +104,12 @@ Document title and Copyright styles
 */
 .clear {
     clear:both;
-    height:0px;
+    height:0;
     overflow:hidden;
 }
 .aboutLanguage {
     float:right;
-    padding:0px 21px;
+    padding:0 21px;
     font-size:11px;
     z-index:200;
     margin-top:-9px;
@@ -123,10 +122,13 @@ Document title and Copyright styles
     text-decoration:none;
 }
 .bar a:hover, .bar a:focus {
-    color:#bb7a2a;
+    color:#BCAE79;
 }
 .tab {
     background-color:#0066FF;
+    background-image:url(resources/bkgheader.png);
+    background-position:left top;
+    background-repeat:no-repeat;
     color:#ffffff;
     padding:8px;
     width:5em;
@@ -136,7 +138,7 @@ Document title and Copyright styles
 Navigation bar styles
 */
 .bar {
-    background-color:#4D7A97;
+    background:url(resources/bkgheader.png) repeat-x;
     color:#FFFFFF;
     padding:.8em .5em .4em .8em;
     height:auto;/*height:1.8em;*/
@@ -153,32 +155,30 @@ Navigation bar styles
     background-color:#ffffff;
 }
 .topNav {
-    background-color:#4D7A97;
+    background:url(resources/bkgheader.png) repeat-x;
     color:#FFFFFF;
     float:left;
-    padding:0;
     width:100%;
     clear:right;
     height:2.8em;
-    padding-top:10px;
+    padding:10px 0 0;
     overflow:hidden;
     font-size:12px;
 }
 .bottomNav {
-    margin-top:10px;
-    background-color:#4D7A97;
+    background:url(resources/bkgheader.png) repeat-x;
     color:#FFFFFF;
     float:left;
-    padding:0;
     width:100%;
     clear:right;
     height:2.8em;
-    padding-top:10px;
+    padding:10px 0 0;
     overflow:hidden;
     font-size:12px;
 }
 .subNav {
-    background-color:#dee3e9;
+    background-color:#cccdc7;
+    border-bottom:1px solid #949c9c;
     float:left;
     width:100%;
     overflow:hidden;
@@ -227,13 +227,13 @@ ul.subNavList li {
 }
 .topNav a:hover, .bottomNav a:hover {
     text-decoration:none;
-    color:#bb7a2a;
-    text-transform:uppercase;
+    color:#BCAE79;
 }
 .navBarCell1Rev {
-    background-color:#F8981D;
-    color:#253441;
-    margin: auto 5px;
+    background:#ab9d69 url(resources/tab.gif);
+    color:#FFFFFF;
+    margin:auto 5px;
+    border:1px solid #ab9d69;
 }
 .skipNav {
     position:absolute;
@@ -289,14 +289,16 @@ Page header and footer styles
 Heading styles
 */
 div.details ul.blockList ul.blockList ul.blockList li.blockList h4, div.details ul.blockList ul.blockList ul.blockListLast li.blockList h4 {
-    background-color:#dee3e9;
-    border:1px solid #d0d9e0;
+    background-color:#cccdc7;
+    border-top:1px solid #949c9c;
+    border-bottom:1px solid #949c9c;
     margin:0 0 6px -8px;
     padding:7px 5px;
 }
 ul.blockList ul.blockList ul.blockList li.blockList h3 {
-    background-color:#dee3e9;
-    border:1px solid #d0d9e0;
+    background-color:#cccdc7;
+    border-top:1px solid #949c9c;
+    border-bottom:1px solid #949c9c;
     margin:0 0 6px -8px;
     padding:7px 5px;
 }
@@ -305,7 +307,7 @@ ul.blockList ul.blockList li.blockList h3 {
     margin:15px 0;
 }
 ul.blockList li.blockList h2 {
-    padding:0px 0 20px 0;
+    padding:0 0 20px 0;
 }
 /*
 Page layout container styles
@@ -339,7 +341,7 @@ Page layout container styles
     color:#4E4E4E;
 }
 .contentContainer .description dl dd, .contentContainer .details dl dd, .serializedFormContainer dl dd {
-    margin:5px 0 10px 0px;
+    margin:5px 0 10px 0;
     font-size:14px;
     font-family:'DejaVu Serif', Georgia, "Times New Roman", Times, serif;
 }
@@ -387,20 +389,21 @@ ul.blockList li.blockList, ul.blockListLast li.blockList {
     line-height:1.4;
 }
 ul.blockList ul.blockList li.blockList, ul.blockList ul.blockListLast li.blockList {
-    padding:0px 20px 5px 10px;
-    border:1px solid #ededed;
-    background-color:#f8f8f8;
+    padding:0 20px 5px 10px;
+    border:1px solid #949c9c;
+    background-color:#f9f9f9;
 }
 ul.blockList ul.blockList ul.blockList li.blockList, ul.blockList ul.blockList ul.blockListLast li.blockList {
     padding:0 0 5px 8px;
     background-color:#ffffff;
-    border:none;
+    border:1px solid #949c9c;
 }
 ul.blockList ul.blockList ul.blockList ul.blockList li.blockList {
     margin-left:0;
     padding-left:0;
     padding-bottom:15px;
     border:none;
+    border-bottom:1px solid #949c9c;
 }
 ul.blockList ul.blockList ul.blockList ul.blockList li.blockListLast {
     list-style:none;
@@ -414,6 +417,10 @@ table tr td dl, table tr td dl dt, table tr td dl dd {
 /*
 Table styles
 */
+.contentContainer table, .classUseContainer table, .constantValuesContainer table {
+    border-bottom:1px solid #949c9c;
+    width:100%;
+}
 .overviewSummary, .memberSummary, .typeSummary, .useSummary, .constantsSummary, .deprecatedSummary,
 .requiresSummary, .packagesSummary, .providesSummary, .usesSummary {
     width:100%;
@@ -423,7 +430,7 @@ Table styles
     border-bottom:1px solid #EEE;
 }
 .overviewSummary, .memberSummary, .requiresSummary, .packagesSummary, .providesSummary, .usesSummary {
-    padding:0px;
+    padding:0;
 }
 .overviewSummary caption, .memberSummary caption, .typeSummary caption,
 .useSummary caption, .constantsSummary caption, .deprecatedSummary caption,
@@ -435,27 +442,25 @@ Table styles
     font-weight:bold;
     clear:none;
     overflow:hidden;
-    padding:0px;
-    padding-top:10px;
-    padding-left:1px;
-    margin:0px;
+    padding:10px 0 0 1px;
+    margin:0;
     white-space:pre;
 }
 .overviewSummary caption a:link, .memberSummary caption a:link, .typeSummary caption a:link,
 .useSummary caption a:link, .constantsSummary caption a:link, .deprecatedSummary caption a:link,
-.requiresSummary caption a:link, .packagesSummary caption a:link, providesSummary caption a:link,
+.requiresSummary caption a:link, .packagesSummary caption a:link, .providesSummary caption a:link,
 .usesSummary caption a:link,
 .overviewSummary caption a:hover, .memberSummary caption a:hover, .typeSummary caption a:hover,
 .useSummary caption a:hover, .constantsSummary caption a:hover, .deprecatedSummary caption a:hover,
-.requiresSummary caption a:hover, .packagesSummary caption a:hover, providesSummary caption a:hover,
+.requiresSummary caption a:hover, .packagesSummary caption a:hover, .providesSummary caption a:hover,
 .usesSummary caption a:hover,
 .overviewSummary caption a:active, .memberSummary caption a:active, .typeSummary caption a:active,
 .useSummary caption a:active, .constantsSummary caption a:active, .deprecatedSummary caption a:active,
-.requiresSummary caption a:active, .packagesSummary caption a:active, providesSummary caption a:active,
+.requiresSummary caption a:active, .packagesSummary caption a:active, .providesSummary caption a:active,
 .usesSummary caption a:active,
 .overviewSummary caption a:visited, .memberSummary caption a:visited, .typeSummary caption a:visited,
-.useSummary caption a:visited, .constantsSummary caption a:visited, .deprecatedSummary caption a:visited
-.requiresSummary caption a:visited, .packagesSummary caption a:visited, providesSummary caption a:visited,
+.useSummary caption a:visited, .constantsSummary caption a:visited, .deprecatedSummary caption a:visited,
+.requiresSummary caption a:visited, .packagesSummary caption a:visited, .providesSummary caption a:visited,
 .usesSummary caption a:visited {
     color:#FFFFFF;
 }
@@ -464,43 +469,38 @@ Table styles
 .requiresSummary caption span, .packagesSummary caption span, .providesSummary caption span,
 .usesSummary caption span {
     white-space:nowrap;
-    padding-top:5px;
-    padding-left:12px;
-    padding-right:12px;
-    padding-bottom:7px;
+    padding:5px 6px 7px 12px;
     display:inline-block;
     float:left;
-    background-color:#F8981D;
-    border: none;
+    background-image:url(resources/titlebar.gif);
+    border:none;
     height:16px;
 }
 .memberSummary caption span.activeTableTab span, .packagesSummary caption span.activeTableTab span {
     white-space:nowrap;
     padding-top:5px;
     padding-left:12px;
-    padding-right:12px;
-    margin-right:3px;
+    padding-right:6px;
     display:inline-block;
     float:left;
-    background-color:#F8981D;
+    background-image:url(resources/titlebar.gif);
     height:16px;
 }
 .memberSummary caption span.tableTab span, .packagesSummary caption span.tableTab span {
     white-space:nowrap;
     padding-top:5px;
     padding-left:12px;
-    padding-right:12px;
-    margin-right:3px;
+    padding-right:6px;
     display:inline-block;
     float:left;
-    background-color:#4D7A97;
+    background-image:url(resources/titlebar.gif);
     height:16px;
 }
 .memberSummary caption span.tableTab, .memberSummary caption span.activeTableTab,
 .packagesSummary caption span.tableTab, .packagesSummary caption span.activeTableTab {
-    padding-top:0px;
-    padding-left:0px;
-    padding-right:0px;
+    padding-top:0;
+    padding-left:0;
+    padding-right:0;
     background-image:none;
     float:none;
     display:inline;
@@ -508,26 +508,30 @@ Table styles
 .overviewSummary .tabEnd, .memberSummary .tabEnd, .typeSummary .tabEnd,
 .useSummary .tabEnd, .constantsSummary .tabEnd, .deprecatedSummary .tabEnd,
 .requiresSummary .tabEnd, .packagesSummary .tabEnd, .providesSummary .tabEnd, .usesSummary .tabEnd {
-    display:none;
-    width:5px;
+    width:0;
+    margin-right:3px;
+    margin-left:0;
+    padding-left:0;
     position:relative;
+    background:url(resources/titlebar_end.gif) no-repeat top right;
     float:left;
-    background-color:#F8981D;
 }
 .memberSummary .activeTableTab .tabEnd, .packagesSummary .activeTableTab .tabEnd {
-    display:none;
-    width:5px;
+    width:0;
     margin-right:3px;
+    margin-left:0;
+    padding-left:0;
     position:relative;
     float:left;
-    background-color:#F8981D;
+    background:url(resources/titlebar_end.gif) no-repeat top right;
 }
 .memberSummary .tableTab .tabEnd, .packagesSummary .tableTab .tabEnd {
-    display:none;
-    width:5px;
+    width:0;
     margin-right:3px;
+    margin-left:0;
+    padding-left:0;
     position:relative;
-    background-color:#4D7A97;
+    background:url(resources/titlebar_end.gif) no-repeat top right;
     float:left;
 
 }
@@ -538,17 +542,25 @@ Table styles
 .useSummary td, .constantsSummary td, .deprecatedSummary td,
 .requiresSummary td, .packagesSummary td, .providesSummary td, .usesSummary td {
     text-align:left;
-    padding:0px 0px 12px 10px;
+    padding:0 0 12px 10px;
 }
 th.colFirst, th.colSecond, th.colLast, .useSummary th, .constantsSummary th, .packagesSummary th,
 td.colFirst, td.colSecond, td.colLast, .useSummary td, .constantsSummary td {
     vertical-align:top;
-    padding-right:0px;
+    padding-right:0;
     padding-top:8px;
     padding-bottom:3px;
 }
+th.colFirst, td.colFirst {
+    border-left:1px solid #949c9c;
+}
+th.colFirst, th.colSecond, th.colLast, .constantsSummary th, .packagesSummary th,
+td.colFirst, td.colSecond, td.colLast, .constantsSummary td, .packagesSummary td {
+    border-right:1px solid #949c9c;
+    border-top:1px solid #949c9c;
+}
 th.colFirst, th.colSecond, th.colLast, .constantsSummary th, .packagesSummary th {
-    background:#dee3e9;
+    background:#cccdc7;
     text-align:left;
     padding:8px 3px 3px 7px;
 }
@@ -574,7 +586,7 @@ td.colSecond, th.colSecond, td.colLast, th.colLast {
 .providesSummary td.colFirst, .providesSummary th.colFirst,
 .memberSummary td.colFirst, .memberSummary th.colFirst,
 .memberSummary td.colSecond, .memberSummary th.colSecond,
-.typeSummary td.colFirst{
+.typeSummary td.colFirst {
     vertical-align:top;
 }
 .packagesSummary th.colLast, .packagesSummary td.colLast {
@@ -593,10 +605,10 @@ td.colLast a:link, td.colLast a:active, td.colLast a:visited, td.colLast a:hover
     background-color:#EEEEFF;
 }
 .altColor, .altColor th {
-    background-color:#FFFFFF;
+    background-color:#dad7ce;
 }
 .rowColor, .rowColor th {
-    background-color:#EEEEEF;
+    background-color:#e8e6e0;
 }
 /*
 Content styles
@@ -622,7 +634,7 @@ div.block {
 }
 
 td.colLast div {
-    padding-top:0px;
+    padding-top:0;
 }
 
 
@@ -643,7 +655,7 @@ h1.hidden {
 }
 .block {
     display:block;
-    margin:3px 10px 2px 0px;
+    margin:3px 10px 2px 0;
     color:#474747;
 }
 .deprecatedLabel, .descfrmTypeLabel, .implementationLabel, .memberNameLabel, .memberNameLink,
@@ -662,7 +674,7 @@ div.block div.block span.interfaceName {
 }
 
 div.contentContainer ul.blockList li.blockList h2 {
-    padding-bottom:0px;
+    padding-bottom:0;
 }
 /*
 IFRAME specific styles
@@ -729,7 +741,7 @@ main, nav, header, footer, section {
     font-weight:bold;
     font-size:15px;
     padding:7px 0 7px 3px;
-    background-color:#4D7A97;
+    background-color:#ab9d69;
     color:#FFFFFF;
 }
 .resultItem {
@@ -741,7 +753,11 @@ main, nav, header, footer, section {
     overflow-y:scroll;
     overflow-x:scroll;
     white-space:nowrap;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    box-shadow:0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+input[type=text]:focus {
+    outline:none !important;
+    box-shadow:0 0 10px #BCAE79, 0 0 10px #ab9d69;
 }
 ul.ui-autocomplete {
     position:fixed;
@@ -765,16 +781,13 @@ ul.ui-autocomplete li {
     right:-18px;
 }
 #reset {
-    background-color: rgb(255,255,255);
     border:0 none;
-    width:16px;
-    height:17px;
+    width:15px;
+    height:16px;
     position:relative;
     left:-2px;
-    background-image:url('resources/x.png');
-    background-repeat:no-repeat;
     background-size:12px;
-    background-position:center;
+    background:rgb(255, 255, 255) url('resources/x.png') no-repeat center;
 }
 .watermark {
     color:#888;
