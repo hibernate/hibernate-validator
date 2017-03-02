@@ -390,7 +390,7 @@ ul.blockList li.blockList, ul.blockListLast li.blockList {
 }
 ul.blockList ul.blockList li.blockList, ul.blockList ul.blockListLast li.blockList {
     padding:0 20px 5px 10px;
-    border:1px solid #949c9c;
+    border:1px solid #dddddd;
     background-color:#f9f9f9;
 }
 ul.blockList ul.blockList ul.blockList li.blockList, ul.blockList ul.blockList ul.blockListLast li.blockList {
@@ -565,7 +565,6 @@ th.colFirst, th.colSecond, th.colLast, .constantsSummary th, .packagesSummary th
     padding:8px 3px 3px 7px;
 }
 td.colFirst, th.colFirst {
-    white-space:nowrap;
     font-size:13px;
 }
 td.colSecond, th.colSecond, td.colLast, th.colLast {
