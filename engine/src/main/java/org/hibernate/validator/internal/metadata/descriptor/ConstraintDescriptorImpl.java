@@ -25,6 +25,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,7 +71,7 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
 public class ConstraintDescriptorImpl<T extends Annotation> implements ConstraintDescriptor<T>, Serializable {
 
 	private static final long serialVersionUID = -2563102960314069246L;
-	private static final Log log = LoggerFactory.make();
+	private static final Log LOG = LoggerFactory.make();
 	private static final int OVERRIDES_PARAMETER_DEFAULT_INDEX = -1;
 
 	/**
@@ -198,7 +199,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		);
 
 		if ( crossParameterValidatorDescriptors.size() > 1 ) {
-			throw log.getMultipleCrossParameterValidatorClassesException( annotationType );
+			throw LOG.getMultipleCrossParameterValidatorClassesException( annotationType );
 		}
 
 		this.constraintType = determineConstraintType(
@@ -398,7 +399,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		//target explicitly set to RETURN_VALUE
 		if ( constraintTarget == ConstraintTarget.RETURN_VALUE ) {
 			if ( !isExecutable ) {
-				throw log.getParametersOrReturnValueConstraintTargetGivenAtNonExecutableException(
+				throw LOG.getParametersOrReturnValueConstraintTargetGivenAtNonExecutableException(
 						annotationType,
 						ConstraintTarget.RETURN_VALUE
 				);
@@ -408,7 +409,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		//target explicitly set to PARAMETERS
 		else if ( constraintTarget == ConstraintTarget.PARAMETERS ) {
 			if ( !isExecutable ) {
-				throw log.getParametersOrReturnValueConstraintTargetGivenAtNonExecutableException(
+				throw LOG.getParametersOrReturnValueConstraintTargetGivenAtNonExecutableException(
 						annotationType,
 						ConstraintTarget.PARAMETERS
 				);
@@ -454,7 +455,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 		// Now we are out of luck
 		if ( constraintType == null ) {
-			throw log.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType );
+			throw LOG.getImplicitConstraintTargetInAmbiguousConfigurationException( annotationType );
 		}
 
 		if ( constraintType == ConstraintType.CROSS_PARAMETER ) {
@@ -467,7 +468,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private static ValidateUnwrappedValue determineValidateUnwrappedValue(Set<Class<? extends Payload>> payloads, Member member, Class<? extends Annotation> annotationType) {
 		if ( payloads.contains( Unwrapping.Unwrap.class ) ) {
 			if ( payloads.contains( Unwrapping.Skip.class ) ) {
-				throw log.getInvalidUnwrappingConfigurationForConstraintException( member, annotationType );
+				throw LOG.getInvalidUnwrappingConfigurationForConstraintException( member, annotationType );
 			}
 
 			return ValidateUnwrappedValue.YES;
@@ -482,16 +483,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	private void validateCrossParameterConstraintType(Member member, boolean hasCrossParameterValidator) {
 		if ( !hasCrossParameterValidator ) {
-			throw log.getCrossParameterConstraintHasNoValidatorException( annotationType );
+			throw LOG.getCrossParameterConstraintHasNoValidatorException( annotationType );
 		}
 		else if ( member == null ) {
-			throw log.getCrossParameterConstraintOnClassException( annotationType );
+			throw LOG.getCrossParameterConstraintOnClassException( annotationType );
 		}
 		else if ( member instanceof Field ) {
-			throw log.getCrossParameterConstraintOnFieldException( annotationType, member );
+			throw LOG.getCrossParameterConstraintOnFieldException( annotationType, member );
 		}
 		else if ( !hasParameters( member ) ) {
-			throw log.getCrossParameterConstraintOnMethodWithoutParametersException(
+			throw LOG.getCrossParameterConstraintOnMethodWithoutParametersException(
 					annotationType,
 					(Executable) member
 			);
@@ -505,7 +506,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private void validateComposingConstraintTypes() {
 		for ( ConstraintDescriptorImpl<?> composingConstraint : composingConstraints ) {
 			if ( composingConstraint.constraintType != constraintType ) {
-				throw log.getComposedAndComposingConstraintsHaveDifferentTypesException(
+				throw LOG.getComposedAndComposingConstraintsHaveDifferentTypesException(
 						annotationType,
 						composingConstraint.annotationType,
 						constraintType,
@@ -637,11 +638,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private void ensureAttributeIsOverridable(Method m, OverridesAttribute overridesAttribute) {
 		final Method method = run( GetMethod.action( overridesAttribute.constraint(), overridesAttribute.name() ) );
 		if ( method == null ) {
-			throw log.getOverriddenConstraintAttributeNotFoundException( overridesAttribute.name() );
+			throw LOG.getOverriddenConstraintAttributeNotFoundException( overridesAttribute.name() );
 		}
 		Class<?> returnTypeOfOverriddenConstraint = method.getReturnType();
 		if ( !returnTypeOfOverriddenConstraint.equals( m.getReturnType() ) ) {
-			throw log.getWrongAttributeTypeForOverriddenConstraintException(
+			throw LOG.getWrongAttributeTypeForOverriddenConstraintException(
 					returnTypeOfOverriddenConstraint,
 					m.getReturnType()
 			);
@@ -651,6 +652,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	private Set<ConstraintDescriptorImpl<?>> parseComposingConstraints(Member member, ConstraintHelper constraintHelper, ConstraintType constraintType) {
 		Set<ConstraintDescriptorImpl<?>> composingConstraintsSet = newHashSet();
 		Map<ClassIndexWrapper, Map<String, Object>> overrideParameters = parseOverrideParameters();
+		Map<Class<? extends Annotation>, ComposingConstraintAnnotationLocation> composingConstraintLocations = new HashMap<>();
 
 		for ( Annotation declaredAnnotation : annotationType.getDeclaredAnnotations() ) {
 			Class<? extends Annotation> declaredAnnotationType = declaredAnnotation.annotationType();
@@ -660,6 +662,11 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			}
 
 			if ( constraintHelper.isConstraintAnnotation( declaredAnnotationType ) ) {
+				if ( composingConstraintLocations.containsKey( declaredAnnotationType )
+						&& !ComposingConstraintAnnotationLocation.DIRECT.equals( composingConstraintLocations.get( declaredAnnotationType ) ) ) {
+					throw LOG.getCannotMixDirectAnnotationAndListContainerOnComposedConstraintException( annotationType, declaredAnnotationType );
+				}
+
 				ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
 						member,
 						overrideParameters,
@@ -669,12 +676,18 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 						constraintHelper
 				);
 				composingConstraintsSet.add( descriptor );
-				log.debugf( "Adding composing constraint: %s.", descriptor );
+				composingConstraintLocations.put( declaredAnnotationType, ComposingConstraintAnnotationLocation.DIRECT );
+				LOG.debugf( "Adding composing constraint: %s.", descriptor );
 			}
 			else if ( constraintHelper.isMultiValueConstraint( declaredAnnotationType ) ) {
 				List<Annotation> multiValueConstraints = constraintHelper.getConstraintsFromMultiValueConstraint( declaredAnnotation );
 				int index = 0;
 				for ( Annotation constraintAnnotation : multiValueConstraints ) {
+					if ( composingConstraintLocations.containsKey( constraintAnnotation.annotationType() )
+							&& !ComposingConstraintAnnotationLocation.IN_CONTAINER.equals( composingConstraintLocations.get( constraintAnnotation.annotationType() ) ) ) {
+						throw LOG.getCannotMixDirectAnnotationAndListContainerOnComposedConstraintException( annotationType, constraintAnnotation.annotationType() );
+					}
+
 					ConstraintDescriptorImpl<?> descriptor = createComposingConstraintDescriptor(
 							member,
 							overrideParameters,
@@ -684,7 +697,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 							constraintHelper
 					);
 					composingConstraintsSet.add( descriptor );
-					log.debugf( "Adding composing constraint: %s.", descriptor );
+					composingConstraintLocations.put( constraintAnnotation.annotationType(), ComposingConstraintAnnotationLocation.IN_CONTAINER );
+					LOG.debugf( "Adding composing constraint: %s.", descriptor );
 					index++;
 				}
 			}
@@ -701,8 +715,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			}
 
 			if ( constraintHelper.isConstraintComposition( declaredAnnotationType ) ) {
-				if ( log.isDebugEnabled() ) {
-					log.debugf( "Adding Bool %s.", declaredAnnotationType.getName() );
+				if ( LOG.isDebugEnabled() ) {
+					LOG.debugf( "Adding Bool %s.", declaredAnnotationType.getName() );
 				}
 				return ( (ConstraintComposition) declaredAnnotation ).value();
 			}
@@ -837,5 +851,20 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		 * A cross parameter constraint.
 		 */
 		CROSS_PARAMETER
+	}
+
+	/**
+	 * The location of a composing constraint.
+	 */
+	private enum ComposingConstraintAnnotationLocation {
+		/**
+		 * The annotation is located directly on the class.
+		 */
+		DIRECT,
+
+		/**
+		 * The annotation is defined in a container, typically a List container.
+		 */
+		IN_CONTAINER
 	}
 }
