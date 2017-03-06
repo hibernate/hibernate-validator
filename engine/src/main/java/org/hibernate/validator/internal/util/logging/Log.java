@@ -720,6 +720,6 @@ public interface Log extends BasicLogger {
 	ValueExtractorDeclarationException getValueExtractorForTypeAndTypeUseAlreadyPresentException(ValueExtractor<?> first, ValueExtractor<?> second);
 
 	@Message(id = 209, value = "A composing constraint (%2$s) must not be given directly on the composed constraint (%1$s) and using the corresponding List annotation at the same time.")
-	ConstraintDeclarationException getCannotMixDirectAnnotationAndListContainerOnComposedConstraintException(Class<? extends Annotation> composedConstraint,
-			Class<? extends Annotation> composingConstraint);
+	ConstraintDeclarationException getCannotMixDirectAnnotationAndListContainerOnComposedConstraintException(@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> composedConstraint,
+			@FormatWith(ClassObjectFormatter.class) Class<? extends Annotation> composingConstraint);
 }
