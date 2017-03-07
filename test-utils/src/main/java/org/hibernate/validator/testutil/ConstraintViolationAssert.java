@@ -64,7 +64,7 @@ public final class ConstraintViolationAssert {
 	 */
 	public static void assertCorrectConstraintViolationMessages(Set<? extends ConstraintViolation<?>> violations,
 			String... expectedMessages) {
-		List<String> actualMessages = new ArrayList<String>();
+		List<String> actualMessages = new ArrayList<>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualMessages.add( violation.getMessage() );
 		}
@@ -86,7 +86,7 @@ public final class ConstraintViolationAssert {
 	 */
 	public static void assertCorrectConstraintTypes(Set<? extends ConstraintViolation<?>> violations,
 			Class<?>... expectedConstraintTypes) {
-		List<Class<? extends Annotation>> actualConstraintTypes = new ArrayList<Class<? extends Annotation>>();
+		List<Class<? extends Annotation>> actualConstraintTypes = new ArrayList<>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualConstraintTypes.add( violation.getConstraintDescriptor().getAnnotation().annotationType() );
 		}
@@ -104,7 +104,7 @@ public final class ConstraintViolationAssert {
 			String... expectedPropertyPaths) {
 		List<String> expectedPathsAsList = Arrays.asList( expectedPropertyPaths );
 
-		List<String> actualPaths = new ArrayList<String>();
+		List<String> actualPaths = new ArrayList<>();
 		for ( ConstraintViolation<?> violation : violations ) {
 			actualPaths.add( violation.getPropertyPath().toString() );
 		}
@@ -202,7 +202,7 @@ public final class ConstraintViolationAssert {
 
 	public static void assertConstraintTypes(Set<? extends ConstraintDescriptor<?>> descriptors,
 			Class<?>... expectedConstraintTypes) {
-		List<Class<? extends Annotation>> actualConstraintTypes = new ArrayList<Class<? extends Annotation>>();
+		List<Class<? extends Annotation>> actualConstraintTypes = new ArrayList<>();
 
 		for ( ConstraintDescriptor<?> descriptor : descriptors ) {
 			actualConstraintTypes.add( descriptor.getAnnotation().annotationType() );
@@ -316,12 +316,12 @@ public final class ConstraintViolationAssert {
 	 */
 	private static <T> void assertCorrectConstraintTypes(Iterable<Class<? extends Annotation>> actualConstraintTypes,
 			Class<?>... expectedConstraintTypes) {
-		List<String> expectedConstraintTypeNames = new ArrayList<String>();
+		List<String> expectedConstraintTypeNames = new ArrayList<>();
 		for ( Class<?> expectedConstraintType : expectedConstraintTypes ) {
 			expectedConstraintTypeNames.add( expectedConstraintType.getName() );
 		}
 
-		List<String> actualConstraintTypeNames = new ArrayList<String>();
+		List<String> actualConstraintTypeNames = new ArrayList<>();
 		for ( Class<?> actualConstraintType : actualConstraintTypes ) {
 			actualConstraintTypeNames.add( actualConstraintType.getName() );
 		}
@@ -374,7 +374,7 @@ public final class ConstraintViolationAssert {
 		public void containsPath(PathExpectation expectedPath) {
 			isNotNull();
 
-			List<PathExpectation> actualPaths = new ArrayList<PathExpectation>();
+			List<PathExpectation> actualPaths = new ArrayList<>();
 			for ( ConstraintViolation<?> violation : actual ) {
 				PathExpectation actual = new PathExpectation( violation.getPropertyPath() );
 				if ( actual.equals( expectedPath ) ) {
@@ -398,7 +398,7 @@ public final class ConstraintViolationAssert {
 	 */
 	public static class PathExpectation {
 
-		private final List<NodeExpectation> nodes = new ArrayList<NodeExpectation>();
+		private final List<NodeExpectation> nodes = new ArrayList<>();
 
 		private PathExpectation() {
 		}
