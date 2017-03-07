@@ -14,14 +14,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
-import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
@@ -51,6 +50,8 @@ final class PropertyConstraintMappingContextImpl
 	private static final Log LOG = LoggerFactory.make();
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
+
+	// either Field or Method
 	private final Member member;
 	private final ConstraintLocation location;
 	private final Type validatedType;
@@ -138,15 +139,14 @@ final class PropertyConstraintMappingContextImpl
 	}
 
 	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
-		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		if ( member instanceof Field ) {
 			return new ConstrainedField(
 					ConfigurationSource.API,
 					(Field) member,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					Collections.emptySet(),
+					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					groupConversions,
-					getCascadedTypeParameters( (Field) member, isCascading )
+					getCascadedTypeParameters( (Field) member )
 			);
 		}
 		else {
@@ -156,23 +156,12 @@ final class PropertyConstraintMappingContextImpl
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					groupConversions,
-					getCascadedTypeParameters( (Executable) member, isCascading )
+					getCascadedTypeParameters( (Method) member )
 			);
 		}
 	}
 
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Field field, boolean isCascaded) {
-		if ( isCascaded ) {
-			return Collections.singletonList( field.getType().isArray()
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( field ) )
-					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( field ) ) );
-		}
-		else {
-			return Collections.emptyList();
-		}
-	}
-
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
+	private List<CascadingTypeParameter> getCascadedTypeParameters(Field field) {
 		List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
 
 		for ( ContainerElementConstraintMappingContextImpl typeArgumentContext : containerElementContexts.values() ) {
@@ -182,11 +171,31 @@ final class PropertyConstraintMappingContextImpl
 			}
 		}
 
-		if ( isCascaded ) {
-			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
+		if ( isCascading ) {
+			boolean isArray = ( field ).getType().isArray();
 			cascadingTypeParameters.add( isArray
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( executable ) )
-					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( executable ) ) );
+					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( field ) )
+					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( field ) ) );
+		}
+
+		return cascadingTypeParameters;
+	}
+
+	private List<CascadingTypeParameter> getCascadedTypeParameters(Method getter) {
+		List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
+
+		for ( ContainerElementConstraintMappingContextImpl typeArgumentContext : containerElementContexts.values() ) {
+			CascadingTypeParameter cascadingTypeParameter = typeArgumentContext.getCascadingTypeParameter();
+			if ( cascadingTypeParameter != null ) {
+				cascadingTypeParameters.add( cascadingTypeParameter );
+			}
+		}
+
+		if ( isCascading ) {
+			boolean isArray = ( getter ).getReturnType().isArray();
+			cascadingTypeParameters.add( isArray
+					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( getter ) )
+					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( getter ) ) );
 		}
 
 		return cascadingTypeParameters;

@@ -7,7 +7,7 @@
 
 package org.hibernate.validator.test.cfg;
 
-import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 
@@ -22,7 +22,6 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
-import javax.validation.constraints.Size;
 
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
@@ -35,7 +34,10 @@ import org.hibernate.validator.testutil.TestForIssue;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class ProgrammaticContainerElementConstraintsTest {
+/**
+ * @author Gunnar Morling
+ */
+public class ProgrammaticContainerElementConstraintsForFieldTest {
 
 	private HibernateValidatorConfiguration config;
 
@@ -46,14 +48,14 @@ public class ProgrammaticContainerElementConstraintsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1239")
-	public void canDeclareContainerElementConstraintsForGetterProgrammatically() {
+	public void canDeclareContainerElementConstraintsForFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "model", METHOD )
+				.property( "model", FIELD )
 					.containerElement()
 						.constraint( new SizeDef().max( 5 ) )
-				.property( "fishCountByType", METHOD )
+				.property( "fishCountByType", FIELD )
 					.containerElement( 0 )
 						.constraint( new SizeDef().min( 3 ).max( 10 ) )
 					.containerElement( 1 )
@@ -76,11 +78,11 @@ public class ProgrammaticContainerElementConstraintsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1239")
-	public void canDeclareNestedContainerElementConstraintsForGetterProgrammatically() {
+	public void canDeclareNestedContainerElementConstraintsForFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishOfTheMonth", METHOD )
+				.property( "fishOfTheMonth", FIELD )
 					.containerElement( 1, 0 )
 						.constraint( new NotNullDef() );
 
@@ -97,11 +99,11 @@ public class ProgrammaticContainerElementConstraintsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1239")
-	public void canDeclareDeeplyNestedContainerElementConstraintsForGetterProgrammatically() {
+	public void canDeclareDeeplyNestedContainerElementConstraintsForFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "tagsOfFishOfTheMonth", METHOD )
+				.property( "tagsOfFishOfTheMonth", FIELD )
 					.containerElement( 0, 1, 0 )
 						.constraint( new NotNullDef() );
 
@@ -118,15 +120,15 @@ public class ProgrammaticContainerElementConstraintsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1239")
-	public void canDeclareContainerElementCascadesForGetterProgrammatically() {
+	public void canDeclareContainerElementCascadesForFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "boss", METHOD )
+				.property( "boss", FIELD )
 					.containerElement()
 						.valid()
 			.type( Fish.class )
-				.property( "name", METHOD )
+				.property( "name", FIELD )
 					.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
@@ -142,11 +144,11 @@ public class ProgrammaticContainerElementConstraintsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1239")
-	public void canDeclareContainerElementConstraintsForArrayTypedGetterProgrammatically() {
+	public void canDeclareContainerElementConstraintsForArrayTypedFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishNames", METHOD )
+				.property( "fishNames", FIELD )
 					.containerElement()
 						.constraint( new SizeDef().max( 5 ) );
 
@@ -163,11 +165,11 @@ public class ProgrammaticContainerElementConstraintsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1239")
-	public void canDeclareContainerElementConstraintsForListContainingArrayTypeGetterProgrammatically() {
+	public void canDeclareContainerElementConstraintsForListContainingArrayTypeFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishNamesByMonth", METHOD )
+				.property( "fishNamesByMonth", FIELD )
 					.containerElement( 0, 0 )
 						.constraint( new SizeDef().max( 5 ) );
 
@@ -184,11 +186,11 @@ public class ProgrammaticContainerElementConstraintsTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HV-1239")
-	public void canDeclareContainerElementConstraintsForMultiDimensionalArrayTypeGetterProgrammatically() {
+	public void canDeclareContainerElementConstraintsForMultiDimensionalArrayTypeFieldProgrammatically() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishNamesByMonthAsArray", METHOD )
+				.property( "fishNamesByMonthAsArray", FIELD )
 					.containerElement( 0, 0 )
 						.constraint( new SizeDef().max( 5 ) );
 
@@ -205,41 +207,41 @@ public class ProgrammaticContainerElementConstraintsTest {
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000211.*")
 	@TestForIssue(jiraKey = "HV-1239")
-	public void declaringContainerElementConstraintOnNonGenericGetterCausesException() {
+	public void declaringContainerElementConstraintOnNonGenericFieldCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "size", METHOD )
+				.property( "size", FIELD )
 					.containerElement( 1 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
 	@TestForIssue(jiraKey = "HV-1239")
-	public void declaringContainerElementConstraintForNonExistingTypeArgumentIndexOnGetterCausesException() {
+	public void declaringContainerElementConstraintForNonExistingTypeArgumentIndexOnFieldCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "model", METHOD )
+				.property( "model", FIELD )
 					.containerElement( 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
 	@TestForIssue(jiraKey = "HV-1239")
-	public void declaringContainerElementConstraintForNonExistingNestedTypeArgumentIndexOnGetterCausesException() {
+	public void declaringContainerElementConstraintForNonExistingNestedTypeArgumentIndexOnFieldCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishOfTheMonth", METHOD )
+				.property( "fishOfTheMonth", FIELD )
 					.containerElement( 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
 	@TestForIssue(jiraKey = "HV-1239")
-	public void omittingTypeArgumentForMultiTypeArgumentTypeOnGetterCausesException() {
+	public void omittingTypeArgumentForMultiTypeArgumentTypeOnFieldCausesException() {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "fishCountByType", METHOD )
+				.property( "fishCountByType", FIELD )
 					.containerElement();
 	}
 
@@ -249,7 +251,7 @@ public class ProgrammaticContainerElementConstraintsTest {
 		ConstraintMapping newMapping = config.createConstraintMapping();
 		newMapping
 			.type( FishTank.class )
-				.property( "tagsOfFishOfTheMonth", METHOD )
+				.property( "tagsOfFishOfTheMonth", FIELD )
 					.containerElement( 0, 1, 0 )
 						.constraint( new NotNullDef() )
 					.containerElement( 0, 1, 0 );
@@ -257,59 +259,33 @@ public class ProgrammaticContainerElementConstraintsTest {
 
 	public static class FishTank {
 
-		public Optional<String> getModel() {
-			return Optional.of( "Too long" );
-		}
+		public Optional<String> model = Optional.of( "Too long" );
+		public Optional<Fish> boss = Optional.of( new Fish() );
+		public Map<String, Integer> fishCountByType;
+		public Map<String, List<Fish>> fishOfTheMonth;
+		public List<Map<String, Set<String>>> tagsOfFishOfTheMonth;
+		public String[] fishNames = new String[] { "Too Long" };
+		public List<String[]> fishNamesByMonth;
+		public String[][] fishNamesByMonthAsArray = new String[][]{ new String[] { "Too Long" } };
+		public int size = 0;
 
-		public Optional<Fish> getBoss() {
-			return Optional.of( new Fish() );
-		}
+		public FishTank() {
+			fishCountByType = new HashMap<>();
+			fishCountByType.put( "A", -1 );
+			fishCountByType.put( "BB", -2 );
 
-		public Map<String, Integer> getFishCountByType() {
-			Map<String, Integer> fishCount = new HashMap<>();
-			fishCount.put( "A", -1 );
-			fishCount.put( "BB", -2 );
-			return fishCount;
-		}
-
-		public Map<String, List<Fish>> getFishOfTheMonth() {
-			Map<String, List<Fish>> fishOfTheMonth = new HashMap<>();
-
+			fishOfTheMonth = new HashMap<>();
 			List<Fish> january = Arrays.asList( null, new Fish() );
 			fishOfTheMonth.put( "january", january );
 
-			return fishOfTheMonth;
-		}
-
-		public List<Map<String, Set<String>>> getTagsOfFishOfTheMonth() {
 			Set<String> bobsTags = CollectionHelper.asSet( (String) null );
+			Map<String, Set<String>> januaryTags = new HashMap<>();
+			januaryTags.put( "bob", bobsTags );
+			tagsOfFishOfTheMonth = new ArrayList<>();
+			tagsOfFishOfTheMonth.add( januaryTags );
 
-			Map<String, Set<String>> january = new HashMap<>();
-			january.put( "bob", bobsTags );
-
-			List<Map<String, Set<String>>> tagsOfFishOfTheMonth = new ArrayList<>();
-			tagsOfFishOfTheMonth.add( january );
-
-			return tagsOfFishOfTheMonth;
-		}
-
-		public String[] getFishNames() {
-			return new String[] { "Too Long" };
-		}
-
-		public List<String[]> getFishNamesByMonth() {
-			List<String[]> names = new ArrayList<>();
-			names.add(  new String[] { "Too Long" } );
-			return names;
-		}
-
-		public String[][] getFishNamesByMonthAsArray() {
-			String[][] names = new String[][]{ new String[] { "Too Long" } };
-			return names;
-		}
-
-		public int getSize() {
-			return 0;
+			fishNamesByMonth = new ArrayList<>();
+			fishNamesByMonth.add(  new String[] { "Too Long" } );
 		}
 	}
 
@@ -318,15 +294,6 @@ public class ProgrammaticContainerElementConstraintsTest {
 		public Fish() {
 		}
 
-		public String getName() {
-			return null;
-		}
-	}
-
-	public static class JellyFish {
-
-		public List<@Size(min = 4, max = 20) String> getFriendNames() {
-			return Arrays.asList( "Bob", "Bif" );
-		}
+		public String name;
 	}
 }
