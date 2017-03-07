@@ -349,26 +349,13 @@ public final class ConstraintViolationAssert {
 		public void containsOnlyPaths(PathExpectation... paths) {
 			isNotNull();
 
-			List<PathExpectation> expectedPaths = Arrays.asList( paths );
-			List<PathExpectation> actualPaths = new ArrayList<PathExpectation>();
+			List<PathExpectation> actualPaths = new ArrayList<>();
 
 			for ( ConstraintViolation<?> violation : actual ) {
 				actualPaths.add( new PathExpectation( violation.getPropertyPath() ) );
 			}
 
-			List<PathExpectation> actualPathsTmp = new ArrayList<PathExpectation>( actualPaths );
-			actualPathsTmp.removeAll( expectedPaths );
-
-			if ( !actualPathsTmp.isEmpty() ) {
-				fail( String.format( "Found unexpected path(s): <%s>. Expected: <%s>", actualPathsTmp, expectedPaths ) );
-			}
-
-			List<PathExpectation> expectedPathsTmp = new ArrayList<PathExpectation>( expectedPaths );
-			expectedPathsTmp.removeAll( actualPaths );
-
-			if ( !expectedPathsTmp.isEmpty() ) {
-				fail( String.format( "Missing expected path(s) <%s>. Actual paths: <%s>", expectedPathsTmp, actualPaths ) );
-			}
+			Assertions.assertThat( actualPaths ).containsOnly( paths );
 		}
 
 		public void containsPath(PathExpectation expectedPath) {
