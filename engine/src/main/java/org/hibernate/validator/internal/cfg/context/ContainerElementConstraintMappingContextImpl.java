@@ -134,7 +134,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 
 	ContainerElementConstraintMappingContext nestedContainerElement(int[] nestedIndexes) {
 		if ( !( configuredType instanceof ParameterizedType ) && !( TypeHelper.isArray( configuredType ) ) ) {
-			throw LOG.getTypeIsNotAParameterizedNorArrayTypeException(  configuredType );
+			throw LOG.getTypeIsNotAParameterizedNorArrayTypeException( configuredType );
 		}
 
 		ContainerElementConstraintMappingContextImpl nestedContext = new ContainerElementConstraintMappingContextImpl(

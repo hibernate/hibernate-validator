@@ -11,8 +11,8 @@ import javax.validation.ValidationException;
 import org.hibernate.validator.Incubating;
 
 /**
- * Facet of a constraint mapping creational context which allows to the select a type argument or the component type of
- * the (return) type of the current property, parameter or method as target for the next operations.
+ * Facet of a constraint mapping creational context which allows to select a type argument or the component type of the
+ * (return) type of the current property, parameter or method as target for the next operations.
  *
  * @author Gunnar Morling
  * @since 6.0
