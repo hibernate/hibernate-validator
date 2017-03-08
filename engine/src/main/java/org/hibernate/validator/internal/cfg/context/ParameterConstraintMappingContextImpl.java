@@ -7,10 +7,10 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
@@ -18,6 +18,7 @@ import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -99,9 +100,28 @@ final class ParameterConstraintMappingContextImpl
 		return executableContext.getTypeContext().method( name, parameterTypes );
 	}
 
+	@Override
+	public ContainerElementConstraintMappingContext containerElement() {
+		return super.containerElement(
+				this,
+				executableContext.getTypeContext(),
+				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex )
+		);
+	}
+
+	@Override
+	public ContainerElementConstraintMappingContext containerElement(int index, int... nestedIndexes) {
+		return super.containerElement(
+				this,
+				executableContext.getTypeContext(),
+				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex ),
+				index,
+				nestedIndexes
+		);
+	}
+
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager) {
-		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		Type parameterType = ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex );
 
 		return new ConstrainedParameter(
@@ -110,7 +130,7 @@ final class ParameterConstraintMappingContextImpl
 				parameterType,
 				parameterIndex,
 				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-				Collections.emptySet(),
+				getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				groupConversions,
 				getCascadedTypeParameters()
 		);

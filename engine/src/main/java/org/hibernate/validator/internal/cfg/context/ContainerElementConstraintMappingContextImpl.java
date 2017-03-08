@@ -24,6 +24,8 @@ import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ContainerElementTarget;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ParameterTarget;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
@@ -50,7 +52,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 	private static final Log LOG = LoggerFactory.make();
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
-	private final ContainerElementTarget parent;
+	private final ContainerElementTarget parentContainerElementTarget;
 	private final ConstraintLocation parentLocation;
 
 	/**
@@ -75,11 +77,11 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 
 	private final Set<ConfiguredConstraint<?>> constraints;
 
-	ContainerElementConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, ContainerElementTarget parent, ConstraintLocation parentLocation,
-			int index) {
+	ContainerElementConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, ContainerElementTarget parentContainerElementTarget,
+			ConstraintLocation parentLocation, int index) {
 		super( typeContext.getConstraintMapping(), parentLocation.getTypeForValidatorResolution() );
 		this.typeContext = typeContext;
-		this.parent = parent;
+		this.parentContainerElementTarget = parentContainerElementTarget;
 		this.parentLocation = parentLocation;
 		this.configuredType = parentLocation.getTypeForValidatorResolution();
 
@@ -123,13 +125,23 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 	}
 
 	@Override
+	public ParameterConstraintMappingContext parameter(int index) {
+		if ( parentContainerElementTarget instanceof ParameterTarget ) {
+			return ( (ParameterTarget) parentContainerElementTarget ).parameter( index );
+		}
+		else {
+			throw new RuntimeException();
+		}
+	}
+
+	@Override
 	public ContainerElementConstraintMappingContext containerElement() {
-		return parent.containerElement( 0 );
+		return parentContainerElementTarget.containerElement( 0 );
 	}
 
 	@Override
 	public ContainerElementConstraintMappingContext containerElement(int index, int... nestedIndexes) {
-		return parent.containerElement( index, nestedIndexes );
+		return parentContainerElementTarget.containerElement( index, nestedIndexes );
 	}
 
 	ContainerElementConstraintMappingContext nestedContainerElement(int[] nestedIndexes) {
@@ -139,7 +151,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 
 		ContainerElementConstraintMappingContextImpl nestedContext = new ContainerElementConstraintMappingContextImpl(
 			typeContext,
-			parent,
+			parentContainerElementTarget,
 			ConstraintLocation.forTypeArgument( parentLocation, typeParameter, getContainerElementType() ),
 			nestedIndexes[0]
 		);
