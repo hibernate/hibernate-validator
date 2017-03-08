@@ -104,14 +104,13 @@ abstract class ExecutableConstraintMappingContextImpl {
 
 	public ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager) {
-		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedExecutable(
 				ConfigurationSource.API,
 				executable,
 				getParameters( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				crossParameterContext != null ? crossParameterContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
-				Collections.emptySet(),
+				returnValueContext != null ? returnValueContext.getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
 				returnValueContext != null ? returnValueContext.getCascadedTypeParameters() : Collections.emptyList()
 		);

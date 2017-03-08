@@ -8,11 +8,13 @@ package org.hibernate.validator.internal.cfg.context;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
@@ -73,6 +75,24 @@ final class ReturnValueConstraintMappingContextImpl
 	@Override
 	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
 		return executableContext.getTypeContext().constructor( parameterTypes );
+	}
+
+	@Override
+	public ContainerElementConstraintMappingContext containerElement() {
+		return super.containerElement(
+				this, executableContext.getTypeContext(), ConstraintLocation.forReturnValue( executableContext.getExecutable() )
+		);
+	}
+
+	@Override
+	public ContainerElementConstraintMappingContext containerElement(int index, int... nestedIndexes) {
+		return super.containerElement(
+				this,
+				executableContext.getTypeContext(),
+				ConstraintLocation.forReturnValue( executableContext.getExecutable()  ),
+				index,
+				nestedIndexes
+		);
 	}
 
 	@Override
