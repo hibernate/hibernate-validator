@@ -66,12 +66,12 @@ public class NodeImpl
 	private final Integer parameterIndex;
 	private final Object value;
 	private final Class<?> containerClass;
-	private final Integer containerElementIndex;
+	private final Integer typeArgumentIndex;
 
 	private String asString;
 
 	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
-			Integer parameterIndex, Object value, Class<?> containerClass, Integer containerElementIndex) {
+			Integer parameterIndex, Object value, Class<?> containerClass, Integer typeArgumentIndex) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
@@ -82,7 +82,7 @@ public class NodeImpl
 		this.parameterTypes = parameterTypes;
 		this.parameterIndex = parameterIndex;
 		this.containerClass = containerClass;
-		this.containerElementIndex = containerElementIndex;
+		this.typeArgumentIndex = typeArgumentIndex;
 		this.hashCode = buildHashCode();
 	}
 
@@ -203,7 +203,7 @@ public class NodeImpl
 				node.parameterIndex,
 				node.value,
 				node.containerClass,
-				node.containerElementIndex
+				node.typeArgumentIndex
 		);
 	}
 
@@ -219,7 +219,7 @@ public class NodeImpl
 				node.parameterIndex,
 				node.value,
 				node.containerClass,
-				node.containerElementIndex
+				node.typeArgumentIndex
 		);
 	}
 
@@ -235,7 +235,7 @@ public class NodeImpl
 				node.parameterIndex,
 				node.value,
 				node.containerClass,
-				node.containerElementIndex
+				node.typeArgumentIndex
 		);
 	}
 
@@ -251,11 +251,11 @@ public class NodeImpl
 				node.parameterIndex,
 				value,
 				node.containerClass,
-				node.containerElementIndex
+				node.typeArgumentIndex
 		);
 	}
 
-	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, int containerElementIndex) {
+	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, int typeArgumentIndex) {
 		return new NodeImpl(
 				node.name,
 				node.parent,
@@ -267,7 +267,7 @@ public class NodeImpl
 				node.parameterIndex,
 				node.value,
 				containerClass,
-				containerElementIndex
+				typeArgumentIndex
 		);
 	}
 
@@ -318,15 +318,15 @@ public class NodeImpl
 	}
 
 	@Override
-	public Integer getContainerElementIndex() {
+	public Integer getTypeArgumentIndex() {
 		Contracts.assertTrue(
 				kind == ElementKind.BEAN || kind == ElementKind.PROPERTY || kind == ElementKind.CONTAINER_ELEMENT,
-				"getContainerElementIndex() may only be invoked for nodes of type ElementKind.BEAN, ElementKind.PROPERTY or ElementKind.CONTAINER_ELEMENT."
+				"getTypeArgumentIndex() may only be invoked for nodes of type ElementKind.BEAN, ElementKind.PROPERTY or ElementKind.CONTAINER_ELEMENT."
 		);
 		if ( parent == null ) {
 			return null;
 		}
-		return parent.containerElementIndex;
+		return parent.typeArgumentIndex;
 	}
 
 	public final NodeImpl getParent() {
@@ -392,9 +392,9 @@ public class NodeImpl
 			builder.append( getName() );
 		}
 
-		if ( includeTypeParameterInformation( containerClass, containerElementIndex ) ) {
+		if ( includeTypeParameterInformation( containerClass, typeArgumentIndex ) ) {
 			builder.append( TYPE_PARAMETER_OPEN );
-			builder.append( TypeVariables.getTypeParameterName( containerClass, containerElementIndex ) );
+			builder.append( TypeVariables.getTypeParameterName( containerClass, typeArgumentIndex ) );
 			builder.append( TYPE_PARAMETER_CLOSE );
 		}
 
@@ -414,15 +414,15 @@ public class NodeImpl
 
 	// TODO: this is used to reduce the number of differences until we agree on the string representation
 	// it introduces some inconsistent behavior e.g. you get '<V>' for a Multimap but not for a Map
-	private static boolean includeTypeParameterInformation(Class<?> containerClass, Integer containerElementIndex) {
-		if ( containerClass == null || containerElementIndex == null ) {
+	private static boolean includeTypeParameterInformation(Class<?> containerClass, Integer typeArgumentIndex) {
+		if ( containerClass == null || typeArgumentIndex == null ) {
 			return false;
 		}
 
 		if ( containerClass.getTypeParameters().length < 2 ) {
 			return false;
 		}
-		if ( Map.class.isAssignableFrom( containerClass ) && "V".equals( TypeVariables.getTypeParameterName( containerClass, containerElementIndex ) ) ) {
+		if ( Map.class.isAssignableFrom( containerClass ) && "V".equals( TypeVariables.getTypeParameterName( containerClass, typeArgumentIndex ) ) ) {
 			return false;
 		}
 		return true;
@@ -440,7 +440,7 @@ public class NodeImpl
 		result = prime * result + ( ( parameterTypes == null ) ? 0 : parameterTypes.hashCode() );
 		result = prime * result + ( ( parent == null ) ? 0 : parent.hashCode() );
 		result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
-		result = prime * result + ( ( containerElementIndex == null ) ? 0 : containerElementIndex.hashCode() );
+		result = prime * result + ( ( typeArgumentIndex == null ) ? 0 : typeArgumentIndex.hashCode() );
 		return result;
 	}
 
@@ -488,12 +488,12 @@ public class NodeImpl
 		else if ( !containerClass.equals( other.containerClass ) ) {
 			return false;
 		}
-		if ( containerElementIndex == null ) {
-			if ( other.containerElementIndex != null ) {
+		if ( typeArgumentIndex == null ) {
+			if ( other.typeArgumentIndex != null ) {
 				return false;
 			}
 		}
-		else if ( !containerElementIndex.equals( other.containerElementIndex ) ) {
+		else if ( !typeArgumentIndex.equals( other.typeArgumentIndex ) ) {
 			return false;
 		}
 		if ( kind != other.kind ) {
