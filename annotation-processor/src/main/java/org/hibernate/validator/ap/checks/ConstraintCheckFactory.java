@@ -192,6 +192,7 @@ public class ConstraintCheckFactory {
 				new MultiValuedChecks(
 						constraintHelper,
 						new AnnotationTypeCheck( constraintHelper ),
+						new MixDirectAndListAnnotationCheck( constraintHelper ),
 						new AnnotationParametersSizeLengthCheck( annotationApiHelper ),
 						new AnnotationParametersPatternCheck( annotationApiHelper ),
 						new AnnotationParametersScriptAssertCheck( annotationApiHelper ),
