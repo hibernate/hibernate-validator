@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.List;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
@@ -17,7 +16,6 @@ import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -40,7 +38,10 @@ final class ParameterConstraintMappingContextImpl
 	private final int parameterIndex;
 
 	ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
-		super( executableContext.getTypeContext().getConstraintMapping() );
+		super(
+			executableContext.getTypeContext().getConstraintMapping(),
+			executableContext.executable.getGenericParameterTypes()[parameterIndex]
+		);
 
 		this.executableContext = executableContext;
 		this.parameterIndex = parameterIndex;
@@ -111,18 +112,8 @@ final class ParameterConstraintMappingContextImpl
 				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				Collections.emptySet(),
 				groupConversions,
-				getCascadedTypeParameters( parameterType, isCascading )
+				getCascadedTypeParameters()
 		);
-	}
-
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Type parameterType, boolean isCascaded) {
-		if ( isCascaded ) {
-			return Collections.singletonList( ReflectionHelper.getClassFromType( parameterType ).isArray() ?
-					CascadingTypeParameter.arrayElement( parameterType ) : CascadingTypeParameter.annotatedObject( parameterType ) );
-		}
-		else {
-			return Collections.emptyList();
-		}
 	}
 
 	@Override

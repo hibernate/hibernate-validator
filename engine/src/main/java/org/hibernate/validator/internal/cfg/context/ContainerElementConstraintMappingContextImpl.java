@@ -77,7 +77,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 
 	ContainerElementConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, ContainerElementTarget parent, ConstraintLocation parentLocation,
 			int index) {
-		super( typeContext.getConstraintMapping() );
+		super( typeContext.getConstraintMapping(), parentLocation.getTypeForValidatorResolution() );
 		this.typeContext = typeContext;
 		this.parent = parent;
 		this.parentLocation = parentLocation;

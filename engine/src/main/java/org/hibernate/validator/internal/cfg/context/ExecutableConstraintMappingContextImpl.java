@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.cfg.context;
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
 
 import java.lang.reflect.Executable;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,7 +16,6 @@ import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContex
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
@@ -115,7 +113,7 @@ abstract class ExecutableConstraintMappingContextImpl {
 				returnValueContext != null ? returnValueContext.getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ) : Collections.<MetaConstraint<?>>emptySet(),
 				Collections.emptySet(),
 				returnValueContext != null ? returnValueContext.getGroupConversions() : Collections.<Class<?>, Class<?>>emptyMap(),
-				getCascadedTypeParameters( executable, returnValueContext != null && returnValueContext.isCascading() )
+				returnValueContext != null ? returnValueContext.getCascadedTypeParameters() : Collections.emptyList()
 		);
 	}
 
@@ -141,17 +139,5 @@ abstract class ExecutableConstraintMappingContextImpl {
 		}
 
 		return constrainedParameters;
-	}
-
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
-		if ( isCascaded ) {
-			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
-			return Collections.singletonList( isArray
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( executable ) )
-					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( executable ) ) );
-		}
-		else {
-			return Collections.emptyList();
-		}
 	}
 }
