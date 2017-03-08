@@ -7,6 +7,7 @@
 package org.hibernate.validator.internal.engine.cascading;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedArrayType;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -15,12 +16,57 @@ import java.lang.reflect.TypeVariable;
  * A pseudo type variable which is used to represent constraints applied to the elements of an array.
  *
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ArrayElement implements TypeVariable<Class<?>> {
 
-	public static final ArrayElement INSTANCE = new ArrayElement();
+	private final Class<?> containerClass;
 
-	private ArrayElement() {
+	public ArrayElement(AnnotatedArrayType annotatedArrayType) {
+		Type arrayElementType = annotatedArrayType.getAnnotatedGenericComponentType().getType();
+		if ( arrayElementType == boolean.class ) {
+			containerClass = boolean[].class;
+		}
+		else if ( arrayElementType == int.class ) {
+			containerClass = int[].class;
+		}
+		else if ( arrayElementType == long.class ) {
+			containerClass = long[].class;
+		}
+		else if ( arrayElementType == double.class ) {
+			containerClass = double[].class;
+		}
+		else if ( arrayElementType == float.class ) {
+			containerClass = float[].class;
+		}
+		else if ( arrayElementType == byte.class ) {
+			containerClass = byte[].class;
+		}
+		else if ( arrayElementType == short.class ) {
+			containerClass = short[].class;
+		}
+		else if ( arrayElementType == char.class ) {
+			containerClass = char[].class;
+		}
+		else {
+			containerClass = Object[].class;
+		}
+	}
+
+	public ArrayElement(Class<?> containerClass) {
+		if ( containerClass == boolean[].class ||
+				containerClass == int[].class ||
+				containerClass == long[].class ||
+				containerClass == double[].class ||
+				containerClass == float[].class ||
+				containerClass == byte[].class ||
+				containerClass == short[].class ||
+				containerClass == char[].class ) {
+			this.containerClass = containerClass;
+		}
+		else {
+			this.containerClass = Object[].class;
+		}
 	}
 
 	@Override
@@ -58,8 +104,41 @@ public class ArrayElement implements TypeVariable<Class<?>> {
 		throw new UnsupportedOperationException();
 	}
 
+	public Class<?> getContainerClass() {
+		return containerClass;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj ) {
+			return true;
+		}
+		if ( obj == null ) {
+			return false;
+		}
+		if ( getClass() != obj.getClass() ) {
+			return false;
+		}
+		ArrayElement other = (ArrayElement) obj;
+
+		return this.containerClass.equals( other.containerClass );
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + containerClass.hashCode();
+		return result;
+	}
+
 	@Override
 	public String toString() {
-		return "ArrayElement.INSTANCE";
+		StringBuilder sb = new StringBuilder();
+		sb.append( getClass().getSimpleName() )
+				.append( "<" )
+				.append( containerClass )
+				.append( ">" );
+		return sb.toString();
 	}
 }

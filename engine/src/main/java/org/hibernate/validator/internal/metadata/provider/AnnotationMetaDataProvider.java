@@ -742,7 +742,8 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		boolean isCascading = annotatedArrayType.isAnnotationPresent( Valid.class );
 
-		CascadingTypeParameter cascadingTypeParameter = new CascadingTypeParameter( validatedType, ArrayElement.INSTANCE,
+		CascadingTypeParameter cascadingTypeParameter = new CascadingTypeParameter( validatedType,
+				new ArrayElement( annotatedArrayType ),
 				isCascading, nestedCascadingTypeParameters );
 
 		if ( isCascading || !nestedCascadingTypeParameters.isEmpty() ) {
@@ -785,8 +786,9 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		if ( currentAnnotatedType instanceof AnnotatedArrayType ) {
 			AnnotatedArrayType annotatedArrayType = (AnnotatedArrayType) currentAnnotatedType;
 			Type validatedType = annotatedArrayType.getAnnotatedGenericComponentType().getType();
+			TypeVariable<?> arrayElementTypeArgument = new ArrayElement( annotatedArrayType );
 
-			typeArgumentConstraints.addAll( findTypeUseConstraints( member, annotatedArrayType, ArrayElement.INSTANCE, location, validatedType ) );
+			typeArgumentConstraints.addAll( findTypeUseConstraints( member, annotatedArrayType, arrayElementTypeArgument, location, validatedType ) );
 
 			currentAnnotatedType = annotatedArrayType.getAnnotatedGenericComponentType();
 			if ( !( currentAnnotatedType instanceof AnnotatedParameterizedType ) ) {
@@ -795,7 +797,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			}
 			else {
 				currentTypeParameters = ReflectionHelper.getClassFromType( validatedType ).getTypeParameters();
-				currentLocation = new NestedTypeArgumentLocation( location, ArrayElement.INSTANCE, validatedType );
+				currentLocation = new NestedTypeArgumentLocation( location, arrayElementTypeArgument, validatedType );
 			}
 		}
 

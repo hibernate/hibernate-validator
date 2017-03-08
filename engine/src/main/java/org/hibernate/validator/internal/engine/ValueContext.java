@@ -11,6 +11,7 @@ import java.lang.reflect.TypeVariable;
 
 import javax.validation.groups.Default;
 
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
@@ -141,7 +142,15 @@ public class ValueContext<T, V> {
 	}
 
 	public final void setTypeParameter(TypeVariable<?> typeParameter) {
-		propertyPath.setLeafNodeTypeParameter( TypeVariables.getDeclaringClass( typeParameter ), TypeVariables.getTypeParameterIndex( typeParameter ) );
+		if ( TypeVariables.isAnnotatedObject( typeParameter ) ) {
+			return;
+		}
+		else if ( TypeVariables.isArrayElement( typeParameter ) ) {
+			propertyPath.setLeafNodeTypeParameter( ( (ArrayElement) typeParameter ).getContainerClass(), null );
+		}
+		else {
+			propertyPath.setLeafNodeTypeParameter( TypeVariables.getDeclaringClass( typeParameter ), TypeVariables.getTypeParameterIndex( typeParameter ) );
+		}
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {

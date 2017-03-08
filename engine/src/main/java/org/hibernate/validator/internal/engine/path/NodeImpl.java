@@ -255,7 +255,7 @@ public class NodeImpl
 		);
 	}
 
-	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, int typeArgumentIndex) {
+	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, Integer typeArgumentIndex) {
 		return new NodeImpl(
 				node.name,
 				node.parent,

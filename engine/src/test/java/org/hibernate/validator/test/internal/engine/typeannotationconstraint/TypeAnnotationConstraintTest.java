@@ -6,12 +6,13 @@
  */
 package org.hibernate.validator.test.internal.engine.typeannotationconstraint;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintTypes;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectPropertyPaths;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertThat;
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.pathWith;
 import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
 
 import java.lang.reflect.Constructor;
@@ -19,7 +20,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,8 +27,6 @@ import java.util.Set;
 
 import javax.validation.ConstraintDeclarationException;
 import javax.validation.ConstraintViolation;
-import javax.validation.ElementKind;
-import javax.validation.Path;
 import javax.validation.Valid;
 import javax.validation.Validator;
 import javax.validation.constraints.Min;
@@ -167,17 +165,11 @@ public class TypeAnnotationConstraintTest {
 
 		assertNumberOfViolations( constraintViolations, 1 );
 
-		Iterator<Path.Node> propertyPathIterator = constraintViolations.iterator().next().getPropertyPath().iterator();
-
-		Path.Node firstNode = propertyPathIterator.next();
-		assertThat( firstNode.getIndex() ).isNull();
-		assertThat( firstNode.getName() ).isEqualTo( "names" );
-		assertThat( firstNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
-
-		Path.Node secondNode = propertyPathIterator.next();
-		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
-		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
-		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.CONTAINER_ELEMENT );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "names" )
+						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, List.class, 0 )
+		);
 	}
 
 	@Test
@@ -476,19 +468,11 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithMap1>> constraintViolations = validator.validate( m );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-
-		Iterator<Path.Node> propertyPathIterator = constraintViolations.iterator().next().getPropertyPath().iterator();
-
-		Path.Node firstNode = propertyPathIterator.next();
-		assertThat( firstNode.getKey() ).isNull();
-		assertThat( firstNode.getName() ).isEqualTo( "nameMap" );
-		assertThat( firstNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
-
-		Path.Node secondNode = propertyPathIterator.next();
-		assertThat( secondNode.getKey() ).isEqualTo( "first" );
-		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.MAP_VALUE_NODE_NAME );
-		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.CONTAINER_ELEMENT );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "nameMap" )
+						.containerElement( NodeImpl.MAP_VALUE_NODE_NAME, true, "first", null, Map.class, 1 )
+		);
 	}
 
 	@Test
@@ -648,19 +632,11 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithArray1>> constraintViolations = validator.validate( a );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-
-		Iterator<Path.Node> propertyPathIterator = constraintViolations.iterator().next().getPropertyPath().iterator();
-
-		Path.Node firstNode = propertyPathIterator.next();
-		assertThat( firstNode.getIndex() ).isNull();
-		assertThat( firstNode.getName() ).isEqualTo( "names" );
-		assertThat( firstNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
-
-		Path.Node secondNode = propertyPathIterator.next();
-		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
-		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
-		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.CONTAINER_ELEMENT );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "names" )
+						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, Object[].class, null )
+		);
 	}
 
 	@Test
@@ -796,19 +772,11 @@ public class TypeAnnotationConstraintTest {
 
 		Set<ConstraintViolation<TypeWithArrayOfPrimitives1>> constraintViolations = validator.validate( a );
 
-		assertNumberOfViolations( constraintViolations, 1 );
-
-		Iterator<Path.Node> propertyPathIterator = constraintViolations.iterator().next().getPropertyPath().iterator();
-
-		Path.Node firstNode = propertyPathIterator.next();
-		assertThat( firstNode.getIndex() ).isNull();
-		assertThat( firstNode.getName() ).isEqualTo( "ints" );
-		assertThat( firstNode.getKind() ).isEqualTo( ElementKind.PROPERTY );
-
-		Path.Node secondNode = propertyPathIterator.next();
-		assertThat( secondNode.getIndex() ).isEqualTo( 0 );
-		assertThat( secondNode.getName() ).isEqualTo( NodeImpl.ITERABLE_ELEMENT_NODE_NAME );
-		assertThat( secondNode.getKind() ).isEqualTo( ElementKind.CONTAINER_ELEMENT );
+		assertThat( constraintViolations ).containsOnlyPaths(
+				pathWith()
+						.property( "ints" )
+						.containerElement( NodeImpl.ITERABLE_ELEMENT_NODE_NAME, true, null, 0, int[].class, null )
+		);
 	}
 
 	@Test
