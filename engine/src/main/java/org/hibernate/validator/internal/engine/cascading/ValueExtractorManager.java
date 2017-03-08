@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -142,7 +143,7 @@ public class ValueExtractorManager {
 				typeParameterBoundToExtractorType = typeParameter;
 			}
 
-			if ( typeParameterBoundToExtractorType.equals( extractorDescriptor.getExtractedTypeParameter() ) ) {
+			if ( Objects.equals( extractorDescriptor.getExtractedTypeParameter(), typeParameterBoundToExtractorType ) ) {
 				typeParameterCompatibleExtractors.add( extractorDescriptor );
 			}
 		}
@@ -188,13 +189,7 @@ public class ValueExtractorManager {
 	}
 
 	private TypeVariable<?> bind(TypeVariable<?> typeParameter, Map<TypeVariable<?>, TypeVariable<?>> bindings) {
-		TypeVariable<?> bound = null;
-
-		if ( bindings != null ) {
-			bound = bindings.get( typeParameter );
-		}
-
-		return bound != null ? bound : typeParameter == AnnotatedObject.INSTANCE ? AnnotatedObject.INSTANCE : ArrayElement.INSTANCE;
+		return bindings != null ? bindings.get( typeParameter ) : null;
 	}
 
 	private static boolean isJavaFxInClasspath() {
