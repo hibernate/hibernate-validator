@@ -307,14 +307,14 @@ public final class ConstraintViolationAssert {
 				return false;
 			}
 
-			Integer p1NodeContainerElementIndex = getContainerElementIndex( p1Node );
-			Integer p2NodeContainerElementIndex = getContainerElementIndex( p2Node );
-			if ( p2NodeContainerElementIndex == null ) {
-				if ( p1NodeContainerElementIndex != null ) {
+			Integer p1NodeTypeArgumentIndex = getTypeArgumentIndex( p1Node );
+			Integer p2NodeTypeArgumentIndex = getTypeArgumentIndex( p2Node );
+			if ( p2NodeTypeArgumentIndex == null ) {
+				if ( p1NodeTypeArgumentIndex != null ) {
 					return false;
 				}
 			}
-			else if ( !p2NodeContainerElementIndex.equals( p1NodeContainerElementIndex ) ) {
+			else if ( !p2NodeTypeArgumentIndex.equals( p1NodeTypeArgumentIndex ) ) {
 				return false;
 			}
 
@@ -428,7 +428,7 @@ public final class ConstraintViolationAssert {
 					parameterIndex = node.as( Path.ParameterNode.class ).getParameterIndex();
 				}
 				Class<?> containerClass = getContainerClass( node );
-				Integer containerElementIndex = getContainerElementIndex( node );
+				Integer typeArgumentIndex = getTypeArgumentIndex( node );
 				nodes.add(
 						new NodeExpectation(
 								node.getName(),
@@ -438,7 +438,7 @@ public final class ConstraintViolationAssert {
 								node.getIndex(),
 								parameterIndex,
 								containerClass,
-								containerElementIndex
+								typeArgumentIndex
 						)
 				);
 			}
@@ -449,8 +449,8 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
-		public PathExpectation property(String name, Class<?> containerClass, Integer containerElementIndex) {
-			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, false, null, null, null, containerClass, containerElementIndex ) );
+		public PathExpectation property(String name, Class<?> containerClass, Integer typeArgumentIndex) {
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, false, null, null, null, containerClass, typeArgumentIndex ) );
 			return this;
 		}
 
@@ -459,8 +459,8 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
-		public PathExpectation property(String name, boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer containerElementIndex) {
-			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null, containerClass, containerElementIndex ) );
+		public PathExpectation property(String name, boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer typeArgumentIndex) {
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null, containerClass, typeArgumentIndex ) );
 			return this;
 		}
 
@@ -474,8 +474,8 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
-		public PathExpectation bean(boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer containerElementIndex) {
-			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, containerClass, containerElementIndex ) );
+		public PathExpectation bean(boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer typeArgumentIndex) {
+			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, containerClass, typeArgumentIndex ) );
 			return this;
 		}
 
@@ -499,8 +499,8 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
-		public PathExpectation containerElement(String name, boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer containerElementIndex) {
-			nodes.add( new NodeExpectation( name, ElementKind.CONTAINER_ELEMENT, inIterable, key, index, null, containerClass, containerElementIndex ) );
+		public PathExpectation containerElement(String name, boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer typeArgumentIndex) {
+			nodes.add( new NodeExpectation( name, ElementKind.CONTAINER_ELEMENT, inIterable, key, index, null, containerClass, typeArgumentIndex ) );
 			return this;
 		}
 
@@ -558,14 +558,14 @@ public final class ConstraintViolationAssert {
 		private final Integer index;
 		private final Integer parameterIndex;
 		private final Class<?> containerClass;
-		private final Integer containerElementIndex;
+		private final Integer typeArgumentIndex;
 
 		private NodeExpectation(String name, ElementKind kind) {
 			this( name, kind, false, null, null, null, null, null );
 		}
 
 		private NodeExpectation(String name, ElementKind kind, boolean inIterable, Object key, Integer index,
-				Integer parameterIndex, Class<?> containerClass, Integer containerElementIndex) {
+				Integer parameterIndex, Class<?> containerClass, Integer typeArgumentIndex) {
 			this.name = name;
 			this.kind = kind;
 			this.inIterable = inIterable;
@@ -573,13 +573,13 @@ public final class ConstraintViolationAssert {
 			this.index = index;
 			this.parameterIndex = parameterIndex;
 			this.containerClass = containerClass;
-			this.containerElementIndex = containerElementIndex;
+			this.typeArgumentIndex = typeArgumentIndex;
 		}
 
 		@Override
 		public String toString() {
 			return "NodeExpectation(" + name + ", " + kind + ", " + inIterable
-					+ ", " + key + ", " + index + ", " + parameterIndex + ", " + containerClass + ", " + containerElementIndex + ")";
+					+ ", " + key + ", " + index + ", " + parameterIndex + ", " + containerClass + ", " + typeArgumentIndex + ")";
 		}
 
 		@Override
@@ -593,7 +593,7 @@ public final class ConstraintViolationAssert {
 			result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
 			result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
 			result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
-			result = prime * result + ( ( containerElementIndex == null ) ? 0 : containerElementIndex.hashCode() );
+			result = prime * result + ( ( typeArgumentIndex == null ) ? 0 : typeArgumentIndex.hashCode() );
 			return result;
 		}
 
@@ -655,12 +655,12 @@ public final class ConstraintViolationAssert {
 			else if ( !containerClass.equals( other.containerClass ) ) {
 				return false;
 			}
-			if ( containerElementIndex == null ) {
-				if ( other.containerElementIndex != null ) {
+			if ( typeArgumentIndex == null ) {
+				if ( other.typeArgumentIndex != null ) {
 					return false;
 				}
 			}
-			else if ( !containerElementIndex.equals( other.containerElementIndex ) ) {
+			else if ( !typeArgumentIndex.equals( other.typeArgumentIndex ) ) {
 				return false;
 			}
 			return true;
@@ -681,17 +681,17 @@ public final class ConstraintViolationAssert {
 		return containerClass;
 	}
 
-	private static Integer getContainerElementIndex(Path.Node node) {
-		Integer containerElementIndex = null;
+	private static Integer getTypeArgumentIndex(Path.Node node) {
+		Integer typeArgumentIndex = null;
 		if ( node.getKind() == ElementKind.PROPERTY ) {
-			containerElementIndex = node.as( Path.PropertyNode.class ).getContainerElementIndex();
+			typeArgumentIndex = node.as( Path.PropertyNode.class ).getTypeArgumentIndex();
 		}
 		if ( node.getKind() == ElementKind.BEAN ) {
-			containerElementIndex = node.as( Path.BeanNode.class ).getContainerElementIndex();
+			typeArgumentIndex = node.as( Path.BeanNode.class ).getTypeArgumentIndex();
 		}
 		if ( node.getKind() == ElementKind.CONTAINER_ELEMENT ) {
-			containerElementIndex = node.as( Path.ContainerElementNode.class ).getContainerElementIndex();
+			typeArgumentIndex = node.as( Path.ContainerElementNode.class ).getTypeArgumentIndex();
 		}
-		return containerElementIndex;
+		return typeArgumentIndex;
 	}
 }

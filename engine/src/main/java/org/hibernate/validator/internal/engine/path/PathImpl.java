@@ -211,8 +211,8 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	public NodeImpl setLeafNodeTypeParameter(Class<?> containerClass, int containerElementIndex) {
-		currentLeafNode = NodeImpl.setTypeParameter( currentLeafNode, containerClass, containerElementIndex );
+	public NodeImpl setLeafNodeTypeParameter(Class<?> containerClass, int typeArgumentIndex) {
+		currentLeafNode = NodeImpl.setTypeParameter( currentLeafNode, containerClass, typeArgumentIndex );
 
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );
