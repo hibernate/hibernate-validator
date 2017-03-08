@@ -13,6 +13,7 @@ import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method return value.
@@ -28,7 +29,10 @@ final class ReturnValueConstraintMappingContextImpl
 	private final ExecutableConstraintMappingContextImpl executableContext;
 
 	ReturnValueConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
-		super( executableContext.getTypeContext().getConstraintMapping() );
+		super(
+			executableContext.getTypeContext().getConstraintMapping(),
+			ReflectionHelper.typeOf( executableContext.getExecutable() )
+		);
 		this.executableContext = executableContext;
 	}
 
