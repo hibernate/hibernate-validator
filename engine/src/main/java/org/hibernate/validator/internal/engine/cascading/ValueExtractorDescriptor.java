@@ -54,7 +54,7 @@ public class ValueExtractorDescriptor {
 
 		if ( extractedType.isAnnotationPresent( ExtractedValue.class ) ) {
 			if ( extractedType instanceof AnnotatedArrayType ) {
-				extractedTypeParameter = ArrayElement.INSTANCE;
+				extractedTypeParameter = new ArrayElement( (AnnotatedArrayType) extractedType );
 			}
 			else {
 				extractedTypeParameter = AnnotatedObject.INSTANCE;

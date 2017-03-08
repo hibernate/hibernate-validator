@@ -38,8 +38,6 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
-import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
-import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
@@ -627,11 +625,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * super-type.
 	 */
 	private List<TypeVariable<?>> getCorrespondingTypeParametersInSubType(Class<?> subType, Class<?> superType, TypeVariable<?> typeParameterOfSuperType) {
-		if ( typeParameterOfSuperType == AnnotatedObject.INSTANCE ) {
-			return Collections.singletonList( AnnotatedObject.INSTANCE );
-		}
-		else if ( typeParameterOfSuperType == ArrayElement.INSTANCE ) {
-			return Collections.singletonList( ArrayElement.INSTANCE );
+		if ( TypeVariables.isInternal( typeParameterOfSuperType ) ) {
+			return Collections.singletonList( typeParameterOfSuperType );
 		}
 
 		List<TypeVariable<?>> correspondingTypeParameters = new ArrayList<>();
@@ -699,7 +694,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
 
-			if ( cascadingTypeParameter.getTypeParameter() != null && !TypeVariables.isInternal( cascadingTypeParameter.getTypeParameter() ) ) {
+			if ( cascadingTypeParameter.getTypeParameter() != null ) {
 				cascadedValueContext.setTypeParameter( cascadingTypeParameter.getTypeParameter() );
 			}
 

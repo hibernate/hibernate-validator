@@ -26,7 +26,15 @@ public class TypeVariables {
 	}
 
 	public static boolean isInternal(TypeVariable<?> typeParameter) {
-		return typeParameter == AnnotatedObject.INSTANCE || typeParameter == ArrayElement.INSTANCE;
+		return isAnnotatedObject( typeParameter ) || isArrayElement( typeParameter );
+	}
+
+	public static boolean isAnnotatedObject(TypeVariable<?> typeParameter) {
+		return typeParameter == AnnotatedObject.INSTANCE;
+	}
+
+	public static boolean isArrayElement(TypeVariable<?> typeParameter) {
+		return typeParameter instanceof ArrayElement;
 	}
 
 	public static String getTypeParameterName(Class<?> clazz, int typeParameterIndex) {

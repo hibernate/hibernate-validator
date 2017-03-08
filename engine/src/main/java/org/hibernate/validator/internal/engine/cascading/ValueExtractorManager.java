@@ -24,6 +24,7 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -122,7 +123,7 @@ public class ValueExtractorManager {
 	public ValueExtractorDescriptor getValueExtractor(Class<?> valueType, TypeVariable<?> typeParameter) {
 		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = null;
 
-		if ( typeParameter != AnnotatedObject.INSTANCE && typeParameter != ArrayElement.INSTANCE ) {
+		if ( !TypeVariables.isAnnotatedObject( typeParameter ) && !TypeVariables.isArrayElement( typeParameter ) ) {
 			allBindings = TypeVariableBindings.getTypeVariableBindings( (Class<?>) typeParameter.getGenericDeclaration() );
 		}
 
@@ -135,7 +136,8 @@ public class ValueExtractorManager {
 
 		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
 			TypeVariable<?> typeParameterBoundToExtractorType;
-			if ( typeParameter != AnnotatedObject.INSTANCE && typeParameter != ArrayElement.INSTANCE ) {
+
+			if ( !TypeVariables.isInternal( typeParameter ) ) {
 				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( extractorDescriptor.getExtractedType() );
 				typeParameterBoundToExtractorType = bind( typeParameter, bindingsForExtractorType );
 			}
