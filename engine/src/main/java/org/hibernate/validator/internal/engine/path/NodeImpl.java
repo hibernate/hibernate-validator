@@ -422,7 +422,7 @@ public class NodeImpl
 		if ( containerClass.getTypeParameters().length < 2 ) {
 			return false;
 		}
-		if ( Map.class.isAssignableFrom( containerClass ) && "V".equals( TypeVariables.getTypeParameterName( containerClass, typeArgumentIndex ) ) ) {
+		if ( Map.class.isAssignableFrom( containerClass ) && typeArgumentIndex == 1 ) {
 			return false;
 		}
 		return true;
