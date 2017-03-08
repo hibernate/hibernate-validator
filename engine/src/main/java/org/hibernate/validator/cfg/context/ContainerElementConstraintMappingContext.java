@@ -21,5 +21,6 @@ public interface ContainerElementConstraintMappingContext extends Constrainable<
 	ConstructorTarget,
 	MethodTarget,
 	ContainerElementTarget,
+	ParameterTarget,
 	Cascadable<ContainerElementConstraintMappingContext> {
 }

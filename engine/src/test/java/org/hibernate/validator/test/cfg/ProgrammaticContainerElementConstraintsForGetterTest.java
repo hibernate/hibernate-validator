@@ -229,7 +229,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "fishOfTheMonth", METHOD )
-					.containerElement( 2 );
+					.containerElement( 1, 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
