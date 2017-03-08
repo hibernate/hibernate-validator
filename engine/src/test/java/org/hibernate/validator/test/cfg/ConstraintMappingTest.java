@@ -275,7 +275,7 @@ public class ConstraintMappingTest {
 
 	@Test(
 			expectedExceptions = ValidationException.class,
-			expectedExceptionsMessageRegExp = "HV[0-9]*: The class class org.hibernate.validator.test.cfg.Marathon does not have a property 'numberOfHelpers' with access METHOD."
+			expectedExceptionsMessageRegExp = "HV000013.*"
 	)
 	public void testSingleConstraintWrongAccessType() throws Throwable {
 		mapping.type( Marathon.class )
