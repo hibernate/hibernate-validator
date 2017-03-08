@@ -27,6 +27,8 @@ import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterTarget;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ReturnValueTarget;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
@@ -130,7 +132,17 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 			return ( (ParameterTarget) parentContainerElementTarget ).parameter( index );
 		}
 		else {
-			throw new RuntimeException();
+			throw LOG.getParameterIsNotAValidCallException();
+		}
+	}
+
+	@Override
+	public ReturnValueConstraintMappingContext returnValue() {
+		if ( parentContainerElementTarget instanceof ReturnValueTarget ) {
+			return ( (ReturnValueTarget) parentContainerElementTarget ).returnValue();
+		}
+		else {
+			throw LOG.getReturnValueIsNotAValidCallException();
 		}
 	}
 
