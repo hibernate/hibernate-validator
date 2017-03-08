@@ -23,12 +23,13 @@ import org.hibernate.validator.ap.testmodel.constrainttypes.ConstraintsWithoutVa
 import org.hibernate.validator.ap.testmodel.constrainttypes.DummyValidator;
 import org.hibernate.validator.ap.testmodel.constrainttypes.ValidCustomerNumber;
 import org.hibernate.validator.ap.testmodel.crossparameters.DoubleValidatorConstraint;
+import org.hibernate.validator.ap.testmodel.crossparameters.DoubleValidatorDummyValidator;
 import org.hibernate.validator.ap.testmodel.crossparameters.GenericCrossParameterValidator;
 import org.hibernate.validator.ap.testmodel.crossparameters.GenericCrossParameterValidatorObjectArray;
 import org.hibernate.validator.ap.testmodel.crossparameters.GenericNormalValidator;
-import org.hibernate.validator.ap.testmodel.crossparameters.DoubleValidatorDummyValidator;
 import org.hibernate.validator.ap.testmodel.crossparameters.InvalidValidator;
 import org.hibernate.validator.ap.testmodel.crossparameters.InvalidValidatorConstraint;
+import org.hibernate.validator.ap.testmodel.crossparameters.MixDirectAnnotationAndListContainerAnnotation;
 import org.hibernate.validator.ap.testmodel.crossparameters.ValidCrossParameterAndNormalConstraint;
 import org.hibernate.validator.ap.testmodel.crossparameters.ValidCrossParameterConstraint;
 import org.hibernate.validator.ap.testmodel.crossparameters.ValidCrossParameterConstraintWithObjectArrayValidator;
@@ -36,6 +37,8 @@ import org.hibernate.validator.ap.testmodel.crossparameters.WrongValidationAppli
 import org.hibernate.validator.ap.testmodel.crossparameters.WrongValidationAppliesToConstraintWithInvalidReturnType;
 import org.hibernate.validator.ap.testmodel.crossparameters.WrongValidationAppliesToConstraintWithMissingAttribute;
 import org.hibernate.validator.ap.util.DiagnosticExpectation;
+import org.hibernate.validator.testutil.TestForIssue;
+
 import org.testng.annotations.Test;
 
 /**
@@ -277,6 +280,21 @@ public class AnnotationTypeValidationTest extends ConstraintValidationProcessorT
 				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFiles );
 
 		assertTrue( compilationResult );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1275")
+	public void testMixDirectAnnotationAndListContainer() {
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics,
+										compilerHelper.getSourceFile( MixDirectAnnotationAndListContainerAnnotation.class )
+				);
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 37 )
+		);
 	}
 
 }
