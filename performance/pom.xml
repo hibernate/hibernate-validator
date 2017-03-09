@@ -32,10 +32,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
         </dependency>
@@ -48,6 +44,11 @@
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-generator-annprocess</artifactId>
             <version>${jmh.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -78,7 +79,7 @@
                             <finalName>hibernate-validator-performance</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>org.hibernate.validator.performance.TestRunner</mainClass>
+                                    <mainClass>org.hibernate.validator.performance.BenchmarkRunner</mainClass>
                                 </transformer>
                             </transformers>
                             <filters>
@@ -121,6 +122,10 @@
             </activation>
             <dependencies>
                 <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                </dependency>
+                <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>hibernate-validator</artifactId>
                 </dependency>
@@ -146,13 +151,19 @@
                 </property>
             </activation>
             <properties>
-                <validator.version>5.4.0.Final</validator.version>
+                <validation-api.version>1.1.0.Final</validation-api.version>
+                <hibernate-validator.version>5.4.0.Final</hibernate-validator.version>
             </properties>
             <dependencies>
                 <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
+                </dependency>
+                <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
-                    <version>${validator.version}</version>
+                    <version>${hibernate-validator.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.glassfish</groupId>
@@ -173,17 +184,30 @@
                 </property>
             </activation>
             <properties>
-                <validator.version>5.3.4.Final</validator.version>
+                <validation-api.version>1.1.0.Final</validation-api.version>
+                <hibernate-validator.version>5.3.4.Final</hibernate-validator.version>
+                <javax-el.version>2.2.4</javax-el.version>
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                    <version>${validator.version}</version>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.glassfish</groupId>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${hibernate-validator.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.el</groupId>
+                    <artifactId>javax.el-api</artifactId>
+                    <version>${javax-el.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.web</groupId>
                     <artifactId>javax.el</artifactId>
+                    <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -200,17 +224,30 @@
                 </property>
             </activation>
             <properties>
-                <validator.version>5.2.4.Final</validator.version>
+                <validation-api.version>1.1.0.Final</validation-api.version>
+                <hibernate-validator.version>5.2.4.Final</hibernate-validator.version>
+                <javax-el.version>2.2.4</javax-el.version>
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                    <version>${validator.version}</version>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.glassfish</groupId>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${hibernate-validator.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.el</groupId>
+                    <artifactId>javax.el-api</artifactId>
+                    <version>${javax-el.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.web</groupId>
                     <artifactId>javax.el</artifactId>
+                    <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -227,17 +264,30 @@
                 </property>
             </activation>
             <properties>
-                <validator.version>5.1.3.Final</validator.version>
+                <validation-api.version>1.1.0.Final</validation-api.version>
+                <hibernate-validator.version>5.1.3.Final</hibernate-validator.version>
+                <javax-el.version>2.2.4</javax-el.version>
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                    <version>${validator.version}</version>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.glassfish</groupId>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${hibernate-validator.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.el</groupId>
+                    <artifactId>javax.el-api</artifactId>
+                    <version>${javax-el.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.web</groupId>
                     <artifactId>javax.el</artifactId>
+                    <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -254,17 +304,30 @@
                 </property>
             </activation>
             <properties>
-                <validator.version>5.0.1.Final</validator.version>
+                <validation-api.version>1.1.0.Final</validation-api.version>
+                <hibernate-validator.version>5.0.1.Final</hibernate-validator.version>
+                <javax-el.version>2.2.4</javax-el.version>
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-validator</artifactId>
-                    <version>${validator.version}</version>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.glassfish</groupId>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${hibernate-validator.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>javax.el</groupId>
+                    <artifactId>javax.el-api</artifactId>
+                    <version>${javax-el.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.web</groupId>
                     <artifactId>javax.el</artifactId>
+                    <version>${javax-el.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -281,13 +344,19 @@
                 </property>
             </activation>
             <properties>
-                <validator.version>4.3.0.Final</validator.version>
+                <validation-api.version>1.0.0.GA</validation-api.version>
+                <hibernate-validator.version>4.3.0.Final</hibernate-validator.version>
             </properties>
             <dependencies>
                 <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
+                </dependency>
+                <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
-                    <version>${validator.version}</version>
+                    <version>${hibernate-validator.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>log4j</groupId>
@@ -304,13 +373,19 @@
                 </property>
             </activation>
             <properties>
-                <validator.version>4.2.0.Final</validator.version>
+                <validation-api.version>1.0.0.GA</validation-api.version>
+                <hibernate-validator.version>4.2.0.Final</hibernate-validator.version>
             </properties>
             <dependencies>
                 <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
+                </dependency>
+                <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
-                    <version>${validator.version}</version>
+                    <version>${hibernate-validator.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
@@ -328,13 +403,19 @@
                 </property>
             </activation>
             <properties>
-                <validator.version>4.1.0.Final</validator.version>
+                <validation-api.version>1.0.0.GA</validation-api.version>
+                <hibernate-validator.version>4.1.0.Final</hibernate-validator.version>
             </properties>
             <dependencies>
                 <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
+                </dependency>
+                <dependency>
                     <groupId>org.hibernate</groupId>
                     <artifactId>hibernate-validator</artifactId>
-                    <version>${validator.version}</version>
+                    <version>${hibernate-validator.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.slf4j</groupId>
@@ -352,13 +433,19 @@
                 </property>
             </activation>
             <properties>
-                <validator.version>1.1.2</validator.version>
+                <validation-api.version>1.1.0.Final</validation-api.version>
+                <apache-bval.version>1.1.2</apache-bval.version>
             </properties>
             <dependencies>
                 <dependency>
+                    <groupId>javax.validation</groupId>
+                    <artifactId>validation-api</artifactId>
+                    <version>${validation-api.version}</version>
+                </dependency>
+                <dependency>
                     <groupId>org.apache.bval</groupId>
                     <artifactId>bval-jsr</artifactId>
-                    <version>${validator.version}</version>
+                    <version>${apache-bval.version}</version>
                 </dependency>
             </dependencies>
         </profile>
