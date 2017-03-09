@@ -56,6 +56,8 @@ public class MetaConstraint<A extends Annotation> {
 	@Immutable
 	private final List<ValueExtractorDescriptor> valueExtractorDescriptors;
 
+	private final int hashCode;
+
 	/**
 	 * @param constraintDescriptor The constraint descriptor for this constraint
 	 * @param location meta data about constraint placement
@@ -68,6 +70,7 @@ public class MetaConstraint<A extends Annotation> {
 		this.constraintDescriptor = constraintDescriptor;
 		this.location = location;
 		this.valueExtractorDescriptors = CollectionHelper.toImmutableList( valueExtractorDescriptors );
+		this.hashCode = buildHashCode( constraintDescriptor, location, valueExtractorDescriptors );
 	}
 
 	/**
@@ -112,24 +115,27 @@ public class MetaConstraint<A extends Annotation> {
 
 		MetaConstraint<?> that = (MetaConstraint<?>) o;
 
-		if ( constraintDescriptor != null ? !constraintDescriptor.equals( that.constraintDescriptor ) : that.constraintDescriptor != null ) {
+		if ( !constraintDescriptor.equals( that.constraintDescriptor ) ) {
 			return false;
 		}
-		if ( location != null ? !location.equals( that.location ) : that.location != null ) {
-			return false;
-		}
-		if ( valueExtractorDescriptors != null ? !valueExtractorDescriptors.equals( that.valueExtractorDescriptors ) : that.valueExtractorDescriptors != null ) {
+		if ( !location.equals( that.location ) ) {
 			return false;
 		}
 
 		return true;
 	}
 
+	private static int buildHashCode(ConstraintDescriptorImpl<?> constraintDescriptor, ConstraintLocation location, List<ValueExtractorDescriptor> valueExtractorDescriptors) {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + constraintDescriptor.hashCode();
+		result = prime * result + location.hashCode();
+		return result;
+	}
+
 	@Override
 	public int hashCode() {
-		int result = constraintDescriptor != null ? constraintDescriptor.hashCode() : 0;
-		result = 31 * result + ( location != null ? location.hashCode() : 0 );
-		return result;
+		return hashCode;
 	}
 
 	@Override
