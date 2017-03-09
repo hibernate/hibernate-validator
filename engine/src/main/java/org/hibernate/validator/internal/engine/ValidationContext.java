@@ -32,6 +32,8 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintViolationCreationContext;
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.IdentitySet;
@@ -47,6 +49,7 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  * @author Hardy Ferentschik
  * @author Emmanuel Bernard
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ValidationContext<T> {
 
@@ -66,6 +69,11 @@ public class ValidationContext<T> {
 	 * The root bean class of the validation.
 	 */
 	private final Class<T> rootBeanClass;
+
+	/**
+	 * The metadata of the root bean.
+	 */
+	private final BeanMetaData<T> rootBeanMetaData;
 
 	/**
 	 * The method of the current validation call in case of executable validation.
@@ -147,6 +155,7 @@ public class ValidationContext<T> {
 			boolean failFast,
 			T rootBean,
 			Class<T> rootBeanClass,
+			BeanMetaData<T> rootBeanMetaData,
 			Executable executable,
 			Object[] executableParameters,
 			Object executableReturnValue) {
@@ -160,6 +169,7 @@ public class ValidationContext<T> {
 
 		this.rootBean = rootBean;
 		this.rootBeanClass = rootBeanClass;
+		this.rootBeanMetaData = rootBeanMetaData;
 		this.executable = executable;
 		this.executableParameters = executableParameters;
 		this.executableReturnValue = executableReturnValue;
@@ -170,7 +180,8 @@ public class ValidationContext<T> {
 		this.failingConstraintViolations = newHashSet();
 	}
 
-	public static ValidationContextBuilder getValidationContext(
+	public static ValidationContextBuilder getValidationContextBuilder(
+			BeanMetaDataManager beanMetaDataManager,
 			ConstraintValidatorManager constraintValidatorManager,
 			MessageInterpolator messageInterpolator,
 			ConstraintValidatorFactory constraintValidatorFactory,
@@ -179,6 +190,7 @@ public class ValidationContext<T> {
 			boolean failFast) {
 
 		return new ValidationContextBuilder(
+				beanMetaDataManager,
 				constraintValidatorManager,
 				messageInterpolator,
 				constraintValidatorFactory,
@@ -194,6 +206,10 @@ public class ValidationContext<T> {
 
 	public Class<T> getRootBeanClass() {
 		return rootBeanClass;
+	}
+
+	public BeanMetaData<T> getRootBeanMetaData() {
+		return rootBeanMetaData;
 	}
 
 	public Executable getExecutable() {
@@ -462,6 +478,7 @@ public class ValidationContext<T> {
 	 * @author Gunnar Morling
 	 */
 	public static class ValidationContextBuilder {
+		private final BeanMetaDataManager beanMetaDataManager;
 		private final ConstraintValidatorManager constraintValidatorManager;
 		private final MessageInterpolator messageInterpolator;
 		private final ConstraintValidatorFactory constraintValidatorFactory;
@@ -470,12 +487,14 @@ public class ValidationContext<T> {
 		private final boolean failFast;
 
 		private ValidationContextBuilder(
+				BeanMetaDataManager beanMetaDataManager,
 				ConstraintValidatorManager constraintValidatorManager,
 				MessageInterpolator messageInterpolator,
 				ConstraintValidatorFactory constraintValidatorFactory,
 				TraversableResolver traversableResolver,
 				ClockProvider clockProvider,
 				boolean failFast) {
+			this.beanMetaDataManager = beanMetaDataManager;
 			this.constraintValidatorManager = constraintValidatorManager;
 			this.messageInterpolator = messageInterpolator;
 			this.constraintValidatorFactory = constraintValidatorFactory;
@@ -492,13 +511,14 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
-					null, //parameter name provider,
-					clockProvider,
+					null,
+					clockProvider, //parameter name provider,
 					failFast,
 					rootBean,
 					rootBeanClass,
+					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
+					null,
 					null, //executable
-					null, //executable parameters
 					null //executable return value
 			);
 		}
@@ -511,13 +531,14 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
-					null, //parameter name provider,
-					clockProvider,
+					null,
+					clockProvider, //parameter name provider,
 					failFast,
 					rootBean,
 					rootBeanClass,
+					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
+					null,
 					null, //executable
-					null, //executable parameters
 					null //executable return value
 			);
 		}
@@ -528,13 +549,14 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
-					null, //parameter name provider
-					clockProvider,
+					null,
+					clockProvider, //parameter name provider
 					failFast,
-					null, //root bean
-					rootBeanClass,
+					null,
+					rootBeanClass, //root bean
+					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
+					null,
 					null, //executable
-					null, //executable parameters
 					null //executable return value
 			);
 		}
@@ -556,6 +578,7 @@ public class ValidationContext<T> {
 					failFast,
 					rootBean,
 					rootBeanClass,
+					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					executable,
 					executableParameters,
 					null //executable return value
@@ -573,13 +596,14 @@ public class ValidationContext<T> {
 					messageInterpolator,
 					constraintValidatorFactory,
 					traversableResolver,
-					null, //parameter name provider
-					clockProvider,
+					null,
+					clockProvider, //parameter name provider
 					failFast,
 					rootBean,
 					rootBeanClass,
+					beanMetaDataManager.getBeanMetaData( rootBeanClass ),
 					executable,
-					null, //executable parameters
+					null,
 					executableReturnValue
 			);
 		}
