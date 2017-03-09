@@ -83,11 +83,11 @@ public class ValueExtractorDescriptor {
 		return extractedTypeParameter;
 	}
 
-	private static Type getExtractedType(Class<?> extractorImplementationType) {
+	private static Class<?> getExtractedType(Class<?> extractorImplementationType) {
 		// TODO deal with indirect implementations (MyExtractor -> BaseExtractor -> ValueExtractor)
 		AnnotatedType genericInterface = extractorImplementationType.getAnnotatedInterfaces()[0];
 		AnnotatedType extractedType = ( (AnnotatedParameterizedType) genericInterface ).getAnnotatedActualTypeArguments()[0];
-		return extractedType.getType();
+		return TypeHelper.getErasedReferenceType( extractedType.getType() );
 	}
 
 	private static boolean hasUnwrapByDefaultAnnotation(Class<?> extractorImplementationType) {
@@ -98,7 +98,7 @@ public class ValueExtractorDescriptor {
 		return key;
 	}
 
-	public Type getExtractedType() {
+	public Class<?> getExtractedType() {
 		return key.extractedType;
 	}
 
@@ -121,11 +121,11 @@ public class ValueExtractorDescriptor {
 
 	public static class Key {
 
-		private final Type extractedType;
+		private final Class<?> extractedType;
 		private final TypeVariable<?> extractedTypeParameter;
 		private final int hashCode;
 
-		public Key(Type extractedType, TypeVariable<?> extractedTypeParameter) {
+		public Key(Class<?> extractedType, TypeVariable<?> extractedTypeParameter) {
 			this.extractedType = extractedType;
 			this.extractedTypeParameter = extractedTypeParameter;
 			this.hashCode = buildHashCode( extractedType, extractedTypeParameter );

@@ -127,7 +127,7 @@ public class ValueExtractorManager {
 
 		List<ValueExtractorDescriptor> typeCompatibleExtractors = valueExtractors.values()
 				.stream()
-				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getExtractedType() ), valueType ) )
+				.filter( e -> TypeHelper.isAssignable( e.getExtractedType(), valueType ) )
 				.collect( Collectors.toList() );
 
 		List<ValueExtractorDescriptor> typeParameterCompatibleExtractors = new ArrayList<>();
@@ -135,7 +135,7 @@ public class ValueExtractorManager {
 		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
 			TypeVariable<?> typeParameterBoundToExtractorType;
 			if ( typeParameter != AnnotatedObject.INSTANCE && typeParameter != ArrayElement.INSTANCE ) {
-				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( TypeHelper.getErasedReferenceType( extractorDescriptor.getExtractedType() ) );
+				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( extractorDescriptor.getExtractedType() );
 				typeParameterBoundToExtractorType = bind( typeParameter, bindingsForExtractorType );
 			}
 			else {

@@ -111,9 +111,9 @@ public class MetaConstraints {
 	 * Returns the sub-types binding for the single type parameter of the super-type. E.g. for {@code IntegerProperty}
 	 * and {@code Property<T>}, {@code Integer} would be returned.
 	 */
-	static Class<?> getSingleTypeParameterBind(TypeResolutionHelper typeResolutionHelper, Type subType, Type superType) {
+	static Class<?> getSingleTypeParameterBind(TypeResolutionHelper typeResolutionHelper, Type subType, Class<?> superType) {
 		ResolvedType resolvedType = typeResolutionHelper.getTypeResolver().resolve( subType );
-		List<ResolvedType> resolvedTypeParameters = resolvedType.typeParametersFor( TypeHelper.getErasedReferenceType( superType ) );
+		List<ResolvedType> resolvedTypeParameters = resolvedType.typeParametersFor( superType );
 
 		if ( resolvedTypeParameters.isEmpty() ) {
 			throw LOG.getNoValueExtractorFoundForUnwrapException( subType );
