@@ -12,14 +12,15 @@ Choosing a profile executes the tests against the specified Hibernate Validator 
 defined profiles are:
 
 * hv-current (Hibernate Validator 6.0.0-SNAPSHOT)
-* hv-5.3 (Hibernate Validator 5.3.0.CR1)
+* hv-5.4 (Hibernate Validator 5.4.0.Final)
+* hv-5.3 (Hibernate Validator 5.3.4.Final)
 * hv-5.2 (Hibernate Validator 5.2.4.Final)
 * hv-5.1 (Hibernate Validator 5.1.3.Final)
 * hv-5.0 (Hibernate Validator 5.0.1.Final)
 * hv-4.3 (Hibernate Validator 4.3.0.Final)
 * hv-4.2 (Hibernate Validator 4.2.0.Final)
 * hv-4.1 (Hibernate Validator 4.1.0.Final)
-* bval-0.5 (Apache BVAl 0.5)
+* bval-1.1.2 (Apache BVal 1.1.2)
 
 ## Executing the performance tests
 
@@ -60,10 +61,10 @@ If you want to run one of those profilers - pass it as parameter when running a 
 
     > java -jar target/hibernate-validator-performance.jar STACK
 
-#### Creating reports for all major Validator versions
+#### Creating reports for all major Hibernate Validator versions
 
     > mkdir reports
-    > for i in "hv-4.3" "hv-4.2" "hv-4.1" "hv-5.0" "hv-5.1" "hv-5.2" "hv-5.3" "hv-current"
+    > for i in "hv-4.1" "hv-4.2" "hv-4.3" "hv-5.0" "hv-5.1" "hv-5.2" "hv-5.3" "hv-5.4" "hv-current"
     > do
     > mvn -P $i clean package ; java -jar target/hibernate-validator-performance.jar ; cp target/JmhResults.json reports/$iJmhResults.json;
     > done

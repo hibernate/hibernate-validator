@@ -138,6 +138,33 @@
             </properties>
         </profile>
         <profile>
+            <id>hv-5.4</id>
+            <activation>
+                <property>
+                    <name>validator</name>
+                    <value>hv-5.4</value>
+                </property>
+            </activation>
+            <properties>
+                <validator.version>5.4.0.Final</validator.version>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-validator</artifactId>
+                    <version>${validator.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish</groupId>
+                    <artifactId>javax.el</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>hv-5.3</id>
             <activation>
                 <property>
@@ -317,25 +344,20 @@
             </dependencies>
         </profile>
         <profile>
-            <id>bval-0.5</id>
+            <id>bval-1.1.2</id>
             <activation>
                 <property>
                     <name>validator</name>
-                    <value>bval-0.5</value>
+                    <value>bval-1.1.2</value>
                 </property>
             </activation>
             <properties>
-                <validator.version>0.5</validator.version>
+                <validator.version>1.1.2</validator.version>
             </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.apache.bval</groupId>
-                    <artifactId>${validator.version}</artifactId>
-                    <version>0.5</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.bval</groupId>
-                    <artifactId>bval-jsr303</artifactId>
+                    <artifactId>bval-jsr</artifactId>
                     <version>${validator.version}</version>
                 </dependency>
             </dependencies>
