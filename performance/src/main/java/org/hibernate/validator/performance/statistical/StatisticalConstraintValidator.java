@@ -65,5 +65,3 @@ public class StatisticalConstraintValidator implements ConstraintValidator<Annot
 		}
 	}
 }
-
-

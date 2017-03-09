@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @author Hardy Ferentschik
  */
 public class SimpleValidation {
+
 	private static final String[] names = {
 			null,
 			"Jacob",
@@ -92,10 +93,10 @@ public class SimpleValidation {
 
 	public class Driver {
 		@NotNull
-		String name;
+		private String name;
 
 		@Min(18)
-		int age;
+		private int age;
 
 		@AssertTrue
 		private boolean hasDrivingLicense;
@@ -153,6 +154,3 @@ public class SimpleValidation {
 		}
 	}
 }
-
-
-
