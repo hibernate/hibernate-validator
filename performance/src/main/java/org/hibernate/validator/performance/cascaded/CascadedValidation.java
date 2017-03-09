@@ -34,8 +34,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Hardy Ferentschik
  */
 public class CascadedValidation {
-	private static final int NUMBER_OF_VALIDATION_ITERATIONS = 1000;
-	private static final int SIZE_OF_THREAD_POOL = 50;
 
 	@State(Scope.Benchmark)
 	public static class CascadedValidationState {
@@ -74,13 +72,11 @@ public class CascadedValidation {
 	@BenchmarkMode(Mode.All)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	@Fork(value = 1)
-	@Threads(SIZE_OF_THREAD_POOL)
+	@Threads(50)
 	@Warmup(iterations = 10)
-	@Measurement(iterations = NUMBER_OF_VALIDATION_ITERATIONS)
+	@Measurement(iterations = 50, batchSize = 1_000)
 	public void testCascadedValidationIterative(CascadedValidationState state, Blackhole bh) throws Exception {
-		for ( int i = 0; i < NUMBER_OF_VALIDATION_ITERATIONS; i++ ) {
-			testCascadedValidation( state, bh );
-		}
+		testCascadedValidation( state, bh );
 	}
 
 	public class Person {
