@@ -98,16 +98,6 @@ public class BeanMetaDataManagerTest {
 	}
 
 	@Test
-	public void testIsConstrainedForConstrainedEntity() {
-		assertTrue( metaDataManager.isConstrained( Engine.class ) );
-	}
-
-	@Test
-	public void testIsConstrainedForUnConstrainedEntity() {
-		assertFalse( metaDataManager.isConstrained( UnconstrainedEntity.class ) );
-	}
-
-	@Test
 	public void testGetMetaDataForConstrainedEntity() {
 		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( Engine.class );
 		assertTrue( beanMetaData instanceof BeanMetaDataImpl );
@@ -116,8 +106,6 @@ public class BeanMetaDataManagerTest {
 
 	@Test
 	public void testGetMetaDataForUnConstrainedEntity() {
-		assertFalse( metaDataManager.isConstrained( UnconstrainedEntity.class ) );
-
 		BeanMetaData<?> beanMetaData = metaDataManager.getBeanMetaData( UnconstrainedEntity.class );
 		assertTrue(
 				beanMetaData instanceof BeanMetaDataImpl,
@@ -189,6 +177,7 @@ public class BeanMetaDataManagerTest {
 	}
 
 	public static class UnconstrainedEntity {
+		@SuppressWarnings("unused")
 		private String foo;
 	}
 }

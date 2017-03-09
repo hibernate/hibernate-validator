@@ -151,10 +151,6 @@ public class BeanMetaDataManager {
 		this.metaDataProviders.add( defaultProvider );
 	}
 
-	public boolean isConstrained(Class<?> beanClass) {
-		return getOrCreateBeanMetaData( beanClass, true ).hasConstraints();
-	}
-
 	public <T> BeanMetaData<T> getBeanMetaData(Class<T> beanClass) {
 		return getOrCreateBeanMetaData( beanClass, false );
 	}

@@ -11,6 +11,8 @@ import java.lang.annotation.ElementType;
 import javax.validation.groups.Default;
 
 import org.hibernate.validator.internal.engine.path.PathImpl;
+import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
+import org.hibernate.validator.internal.metadata.aggregated.BeanMetaData;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
@@ -22,6 +24,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ValueContext<T, V> {
 
@@ -36,6 +39,11 @@ public class ValueContext<T, V> {
 	 * The class of the current bean.
 	 */
 	private final Class<T> currentBeanType;
+
+	/**
+	 * The metadata of the current bean.
+	 */
+	private final BeanMetaData<T> currentBeanMetaData;
 
 	/**
 	 * The current property path we are validating.
@@ -59,20 +67,37 @@ public class ValueContext<T, V> {
 	 */
 	private ElementType elementType;
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathImpl propertyPath) {
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(BeanMetaDataManager beanMetaDataManager,
+			ExecutableParameterNameProvider parameterNameProvider, T value, Validatable validatable, PathImpl propertyPath) {
 		@SuppressWarnings("unchecked")
-		Class<T> rootBeanClass = (Class<T>) value.getClass();
-		return new ValueContext<>( parameterNameProvider, value, rootBeanClass, validatable, propertyPath );
+		Class<T> rootBeanType = (Class<T>) value.getClass();
+		return new ValueContext<>( parameterNameProvider, value, rootBeanType, beanMetaDataManager.getBeanMetaData( rootBeanType ), validatable, propertyPath );
 	}
 
-	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, Class<T> type, Validatable validatable, PathImpl propertyPath) {
-		return new ValueContext<>( parameterNameProvider, null, type, validatable, propertyPath );
+	@SuppressWarnings("unchecked")
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, T value,
+			BeanMetaData<?> currentBeanMetaData, PathImpl propertyPath) {
+		Class<T> rootBeanType = (Class<T>) value.getClass();
+		return new ValueContext<>( parameterNameProvider, value, rootBeanType, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
 	}
 
-	private ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Class<T> currentBeanType, Validatable validatable, PathImpl propertyPath) {
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(BeanMetaDataManager beanMetaDataManager,
+			ExecutableParameterNameProvider parameterNameProvider, Class<T> rootBeanType, Validatable validatable, PathImpl propertyPath) {
+		BeanMetaData<T> rootBeanMetaData = rootBeanType != null ? beanMetaDataManager.getBeanMetaData( rootBeanType ) : null;
+		return new ValueContext<>( parameterNameProvider, null, rootBeanType, rootBeanMetaData, validatable, propertyPath );
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T, V> ValueContext<T, V> getLocalExecutionContext(ExecutableParameterNameProvider parameterNameProvider, Class<T> currentBeanType,
+			BeanMetaData<?> currentBeanMetaData, PathImpl propertyPath) {
+		return new ValueContext<>( parameterNameProvider, null, currentBeanType, (BeanMetaData<T>) currentBeanMetaData, currentBeanMetaData, propertyPath );
+	}
+
+	private ValueContext(ExecutableParameterNameProvider parameterNameProvider, T currentBean, Class<T> currentBeanType, BeanMetaData<T> currentBeanMetaData, Validatable validatable, PathImpl propertyPath) {
 		this.parameterNameProvider = parameterNameProvider;
 		this.currentBean = currentBean;
 		this.currentBeanType = currentBeanType;
+		this.currentBeanMetaData = currentBeanMetaData;
 		this.currentValidatable = validatable;
 		this.propertyPath = propertyPath;
 	}
@@ -91,6 +116,10 @@ public class ValueContext<T, V> {
 
 	public final Class<T> getCurrentBeanType() {
 		return currentBeanType;
+	}
+
+	public final BeanMetaData<T> getCurrentBeanMetaData() {
+		return currentBeanMetaData;
 	}
 
 	public Validatable getCurrentValidatable() {
