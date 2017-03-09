@@ -34,39 +34,43 @@ versions of Hibernate Validator using the same tests. This allows to detect and 
 
 The following command line will run all performance tests listed in the main method of TestRunner class:
 
-    > mvn clean package -P hv-current
+    > mvn clean package -Phv-current
     > java -jar target/hibernate-validator-performance.jar
 
-It will generate a set of reports from each test execution. Currently, all test results information is inside the following generated file:
+It will generate a set of reports from each test execution. Currently, all test results information are inside the following generated file:
 
-    > JmhResults.json
+    > target/jmh-results.json
 
 #### Profiling
 
 List of available profilers:
 
-| Parameter Name | Description |
-| :---: | :--- |
-| CL | Classloader profiling via standard MBeans |
-| COMP | JIT compiler profiling via standard MBeans |
-| GC | GC profiling via standard MBeans |
-| HS_CL | HotSpot ™ classloader profiling via implementation-specific MBeans |
-| HS_COMP | HotSpot ™ JIT compiler profiling via implementation-specific MBeans |
-| HS_GC | HotSpot ™ memory manager (GC) profiling via implementation-specific MBeans |
-| HS_RT | HotSpot ™ runtime profiling via implementation-specific MBeans |
-| HS_THR | HotSpot ™ threading subsystem via implementation-specific MBeans |
-| STACK | Simple and naive Java stack profiler |
+| Profiler | Description |
+| :--- | :--- |
+| org.openjdk.jmh.profile.ClassloaderProfiler | Classloader profiling via standard MBeans |
+| org.openjdk.jmh.profile.CompilerProfiler | JIT compiler profiling via standard MBeans |
+| org.openjdk.jmh.profile.GCProfiler | GC profiling via standard MBeans |
+| org.openjdk.jmh.profile.HotspotClassloadingProfiler | HotSpot ™ classloader profiling via implementation-specific MBeans |
+| org.openjdk.jmh.profile.HotspotCompilationProfiler | HotSpot ™ JIT compiler profiling via implementation-specific MBeans |
+| org.openjdk.jmh.profile.HotspotMemoryProfiler | HotSpot ™ memory manager (GC) profiling via implementation-specific MBeans |
+| org.openjdk.jmh.profile.HotspotRuntimeProfiler | HotSpot ™ runtime profiling via implementation-specific MBeans |
+| org.openjdk.jmh.profile.HotspotThreadProfiler | HotSpot ™ threading subsystem via implementation-specific MBeans |
+| org.openjdk.jmh.profile.StackProfiler | Simple and naive Java stack profiler |
 
 If you want to run one of those profilers - pass it as parameter when running a jar file. For example:
 
-    > java -jar target/hibernate-validator-performance.jar STACK
+    > java -jar target/hibernate-validator-performance.jar -prof org.openjdk.jmh.profile.StackProfiler
+
+To run a specific benchmark:
+
+    > java -jar target/hibernate-validator-performance.jar CascadedValidation
 
 #### Creating reports for all major Hibernate Validator versions
 
     > mkdir reports
-    > for i in "hv-4.1" "hv-4.2" "hv-4.3" "hv-5.0" "hv-5.1" "hv-5.2" "hv-5.3" "hv-5.4" "hv-current"
+    > for profile in "hv-4.1" "hv-4.2" "hv-4.3" "hv-5.0" "hv-5.1" "hv-5.2" "hv-5.3" "hv-5.4" "hv-current"
     > do
-    > mvn -P $i clean package ; java -jar target/hibernate-validator-performance.jar ; cp target/JmhResults.json reports/$iJmhResults.json;
+    > mvn -P${profile} clean package ; java -jar target/hibernate-validator-performance.jar -rff reports/${profile}-jmh-results.json
     > done
 
 ## Existing tests
