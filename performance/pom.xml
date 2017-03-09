@@ -27,7 +27,7 @@
         -->
         <profilingOptions>-showversion</profilingOptions>
         <history.directory>${project.basedir}/history</history.directory>
-        <jmh.version>1.14.1</jmh.version>
+        <jmh.version>1.17.5</jmh.version>
     </properties>
 
     <dependencies>
