@@ -13,11 +13,11 @@ import static org.testng.Assert.assertTrue;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -100,21 +100,12 @@ public final class ConstraintViolationAssert {
 	 */
 	public static void assertCorrectPropertyPaths(Set<? extends ConstraintViolation<?>> violations,
 			String... expectedPropertyPaths) {
-		List<String> expectedPathsAsList = Arrays.asList( expectedPropertyPaths );
+		Set<String> actualPaths = violations.stream()
+			.map( ConstraintViolation::getPropertyPath )
+			.map( Path::toString )
+			.collect( Collectors.toSet() );
 
-		List<String> actualPaths = new ArrayList<>();
-		for ( ConstraintViolation<?> violation : violations ) {
-			actualPaths.add( violation.getPropertyPath().toString() );
-		}
-
-		Collections.sort( expectedPathsAsList );
-		Collections.sort( actualPaths );
-
-		assertEquals(
-				actualPaths,
-				expectedPathsAsList,
-				String.format( "Expected %s, but got %s", expectedPathsAsList, actualPaths )
-		);
+		Assertions.assertThat( actualPaths ).containsOnly( expectedPropertyPaths );
 	}
 
 	public static ConstraintViolationSetAssert assertThat(Set<? extends ConstraintViolation<?>> actualViolations) {
