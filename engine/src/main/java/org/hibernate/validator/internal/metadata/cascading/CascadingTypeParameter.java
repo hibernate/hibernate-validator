@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
-import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 
 /**
@@ -56,9 +55,8 @@ public class CascadingTypeParameter {
 		return new CascadingTypeParameter( cascadableType, AnnotatedObject.INSTANCE, true, Collections.emptyList() );
 	}
 
-	public static CascadingTypeParameter arrayElement(Type cascadableType) {
-		return new CascadingTypeParameter( cascadableType, new ArrayElement( ReflectionHelper.getClassFromType( cascadableType ) ), true,
-				Collections.emptyList() );
+	public static CascadingTypeParameter arrayElement(Class<?> arrayType) {
+		return new CascadingTypeParameter( arrayType, new ArrayElement( arrayType ), true, Collections.emptyList() );
 	}
 
 	public TypeVariable<?> getTypeParameter() {

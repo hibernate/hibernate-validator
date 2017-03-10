@@ -11,17 +11,16 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.PropertyConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
@@ -41,12 +40,21 @@ final class PropertyConstraintMappingContextImpl
 		implements PropertyConstraintMappingContext {
 
 	private final TypeConstraintMappingContextImpl<?> typeContext;
+
+	// either Field or Method
 	private final Member member;
+	private final ConstraintLocation location;
 
 	PropertyConstraintMappingContextImpl(TypeConstraintMappingContextImpl<?> typeContext, Member member) {
-		super( typeContext.getConstraintMapping() );
+		super( typeContext.getConstraintMapping(), ReflectionHelper.typeOf( member ) );
 		this.typeContext = typeContext;
 		this.member = member;
+		if ( member instanceof Field ) {
+			this.location = ConstraintLocation.forField( (Field) member );
+		}
+		else {
+			this.location = ConstraintLocation.forGetter( (Method) member );
+		}
 	}
 
 	@Override
@@ -94,16 +102,25 @@ final class PropertyConstraintMappingContextImpl
 		return typeContext.method( name, parameterTypes );
 	}
 
+	@Override
+	public ContainerElementConstraintMappingContext containerElementType() {
+		return super.containerElement( this, typeContext, location );
+	}
+
+	@Override
+	public ContainerElementConstraintMappingContext containerElementType(int index, int... nestedIndexes) {
+		return super.containerElement( this, typeContext, location, index, nestedIndexes );
+	}
+
 	ConstrainedElement build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper, ValueExtractorManager valueExtractorManager) {
-		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		if ( member instanceof Field ) {
 			return new ConstrainedField(
 					ConfigurationSource.API,
 					(Field) member,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-					Collections.emptySet(),
+					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					groupConversions,
-					getCascadedTypeParameters( (Field) member, isCascading )
+					getCascadedTypeParameters()
 			);
 		}
 		else {
@@ -111,32 +128,10 @@ final class PropertyConstraintMappingContextImpl
 					ConfigurationSource.API,
 					(Executable) member,
 					getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
+					getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 					groupConversions,
-					getCascadedTypeParameters( (Executable) member, isCascading )
+					getCascadedTypeParameters()
 			);
-		}
-	}
-
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Field field, boolean isCascaded) {
-		if ( isCascaded ) {
-			return Collections.singletonList( field.getType().isArray()
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( field ) )
-					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( field ) ) );
-		}
-		else {
-			return Collections.emptyList();
-		}
-	}
-
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
-		if ( isCascaded ) {
-			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
-			return Collections.singletonList( isArray
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( executable ) )
-					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( executable ) ) );
-		}
-		else {
-			return Collections.emptyList();
 		}
 	}
 

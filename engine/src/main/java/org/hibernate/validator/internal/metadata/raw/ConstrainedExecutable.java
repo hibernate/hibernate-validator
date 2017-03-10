@@ -59,6 +59,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	 * @param source The source of meta data.
 	 * @param executable The represented executable.
 	 * @param returnValueConstraints Type arguments constraints, if any.
+	 * @param typeArgumentConstraints The type argument constraints on the return value of the represented executable,
+	 * if any.
 	 * @param groupConversions The group conversions of the represented executable, if any.
 	 * @param cascadingTypeParameters The type parameters marked for cascaded validation, if any.
 	 */
@@ -66,6 +68,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			ConfigurationSource source,
 			Executable executable,
 			Set<MetaConstraint<?>> returnValueConstraints,
+			Set<MetaConstraint<?>> typeArgumentConstraints,
 			Map<Class<?>, Class<?>> groupConversions,
 			List<CascadingTypeParameter> cascadingTypeParameters) {
 		this(
@@ -74,7 +77,7 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 				Collections.<ConstrainedParameter>emptyList(),
 				Collections.<MetaConstraint<?>>emptySet(),
 				returnValueConstraints,
-				Collections.emptySet(),
+				typeArgumentConstraints,
 				groupConversions,
 				cascadingTypeParameters
 		);

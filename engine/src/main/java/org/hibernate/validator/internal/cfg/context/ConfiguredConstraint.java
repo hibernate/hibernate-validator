@@ -12,6 +12,8 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Map;
 
 import org.hibernate.validator.cfg.ConstraintDef;
@@ -78,6 +80,14 @@ class ConfiguredConstraint<A extends Annotation> {
 	public static <A extends Annotation> ConfiguredConstraint<A> forCrossParameter(ConstraintDef<?, A> constraint, Executable executable) {
 		return new ConfiguredConstraint<>(
 				constraint, ConstraintLocation.forCrossParameter( executable ), ExecutableHelper.getElementType( executable )
+		);
+	}
+
+	public static <A extends Annotation> ConfiguredConstraint<A> forTypeArgument(ConstraintDef<?, A> constraint,ConstraintLocation delegate, TypeVariable<?> typeArgument, Type typeOfAnnotatedElement) {
+		return new ConfiguredConstraint<>(
+				constraint,
+				ConstraintLocation.forTypeArgument( delegate, typeArgument, typeOfAnnotatedElement ),
+				ElementType.TYPE_USE
 		);
 	}
 

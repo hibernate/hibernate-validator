@@ -635,7 +635,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		try {
 			if ( parameter.isAnnotationPresent( Valid.class ) ) {
 				cascadingTypeParameters.add( parameter.getType().isArray()
-						? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ) )
+						? CascadingTypeParameter.arrayElement( parameter.getType() )
 						: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( parameter.getDeclaringExecutable(), i ) ) );
 			}
 		}
@@ -654,7 +654,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		if ( field.isAnnotationPresent( Valid.class ) ) {
 			cascadingTypeParameters.add( field.getType().isArray()
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( field ) )
+					? CascadingTypeParameter.arrayElement( field.getType() )
 					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( field ) ) );
 		}
 
@@ -679,7 +679,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 
 		if ( executable.isAnnotationPresent( Valid.class ) ) {
 			cascadingTypeParameters.add( isArray
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( executable ) )
+					? CascadingTypeParameter.arrayElement( ( (Method) executable ).getReturnType() )
 					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( executable ) ) );
 		}
 

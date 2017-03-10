@@ -7,19 +7,18 @@
 package org.hibernate.validator.internal.cfg.context;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.List;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
-import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ReflectionHelper;
@@ -40,7 +39,10 @@ final class ParameterConstraintMappingContextImpl
 	private final int parameterIndex;
 
 	ParameterConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext, int parameterIndex) {
-		super( executableContext.getTypeContext().getConstraintMapping() );
+		super(
+			executableContext.getTypeContext().getConstraintMapping(),
+			executableContext.executable.getGenericParameterTypes()[parameterIndex]
+		);
 
 		this.executableContext = executableContext;
 		this.parameterIndex = parameterIndex;
@@ -98,9 +100,28 @@ final class ParameterConstraintMappingContextImpl
 		return executableContext.getTypeContext().method( name, parameterTypes );
 	}
 
+	@Override
+	public ContainerElementConstraintMappingContext containerElementType() {
+		return super.containerElement(
+				this,
+				executableContext.getTypeContext(),
+				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex )
+		);
+	}
+
+	@Override
+	public ContainerElementConstraintMappingContext containerElementType(int index, int... nestedIndexes) {
+		return super.containerElement(
+				this,
+				executableContext.getTypeContext(),
+				ConstraintLocation.forParameter( executableContext.getExecutable(), parameterIndex ),
+				index,
+				nestedIndexes
+		);
+	}
+
 	public ConstrainedParameter build(ConstraintHelper constraintHelper, TypeResolutionHelper typeResolutionHelper,
 			ValueExtractorManager valueExtractorManager) {
-		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		Type parameterType = ReflectionHelper.typeOf( executableContext.getExecutable(), parameterIndex );
 
 		return new ConstrainedParameter(
@@ -109,20 +130,10 @@ final class ParameterConstraintMappingContextImpl
 				parameterType,
 				parameterIndex,
 				getConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
-				Collections.emptySet(),
+				getTypeArgumentConstraints( constraintHelper, typeResolutionHelper, valueExtractorManager ),
 				groupConversions,
-				getCascadedTypeParameters( parameterType, isCascading )
+				getCascadedTypeParameters()
 		);
-	}
-
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Type parameterType, boolean isCascaded) {
-		if ( isCascaded ) {
-			return Collections.singletonList( ReflectionHelper.getClassFromType( parameterType ).isArray() ?
-					CascadingTypeParameter.arrayElement( parameterType ) : CascadingTypeParameter.annotatedObject( parameterType ) );
-		}
-		else {
-			return Collections.emptyList();
-		}
 	}
 
 	@Override

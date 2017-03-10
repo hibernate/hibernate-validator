@@ -100,7 +100,7 @@ class ConstrainedFieldBuilder {
 	private List<CascadingTypeParameter> getCascadedTypeParameters(Field field, boolean isCascaded) {
 		if ( isCascaded ) {
 			return Collections.singletonList( field.getType().isArray()
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( field ) )
+					? CascadingTypeParameter.arrayElement( field.getType() )
 					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( field ) ) );
 		}
 		else {

@@ -8,11 +8,14 @@ package org.hibernate.validator.internal.cfg.context;
 
 import org.hibernate.validator.cfg.ConstraintDef;
 import org.hibernate.validator.cfg.context.ConstructorConstraintMappingContext;
+import org.hibernate.validator.cfg.context.ContainerElementConstraintMappingContext;
 import org.hibernate.validator.cfg.context.CrossParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.MethodConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ParameterConstraintMappingContext;
 import org.hibernate.validator.cfg.context.ReturnValueConstraintMappingContext;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * Constraint mapping creational context which allows to configure the constraints for one method return value.
@@ -28,7 +31,10 @@ final class ReturnValueConstraintMappingContextImpl
 	private final ExecutableConstraintMappingContextImpl executableContext;
 
 	ReturnValueConstraintMappingContextImpl(ExecutableConstraintMappingContextImpl executableContext) {
-		super( executableContext.getTypeContext().getConstraintMapping() );
+		super(
+			executableContext.getTypeContext().getConstraintMapping(),
+			ReflectionHelper.typeOf( executableContext.getExecutable() )
+		);
 		this.executableContext = executableContext;
 	}
 
@@ -69,6 +75,24 @@ final class ReturnValueConstraintMappingContextImpl
 	@Override
 	public ConstructorConstraintMappingContext constructor(Class<?>... parameterTypes) {
 		return executableContext.getTypeContext().constructor( parameterTypes );
+	}
+
+	@Override
+	public ContainerElementConstraintMappingContext containerElementType() {
+		return super.containerElement(
+				this, executableContext.getTypeContext(), ConstraintLocation.forReturnValue( executableContext.getExecutable() )
+		);
+	}
+
+	@Override
+	public ContainerElementConstraintMappingContext containerElementType(int index, int... nestedIndexes) {
+		return super.containerElement(
+				this,
+				executableContext.getTypeContext(),
+				ConstraintLocation.forReturnValue( executableContext.getExecutable()  ),
+				index,
+				nestedIndexes
+		);
 	}
 
 	@Override

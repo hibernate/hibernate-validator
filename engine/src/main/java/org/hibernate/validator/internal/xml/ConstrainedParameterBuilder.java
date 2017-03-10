@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.ParameterType;
 
@@ -99,8 +100,8 @@ class ConstrainedParameterBuilder {
 
 	private List<CascadingTypeParameter> getCascadedTypeParameters(Type parameterType, boolean isCascaded) {
 		if ( isCascaded ) {
-			return Collections.singletonList( ReflectionHelper.getClassFromType( parameterType ).isArray()
-					? CascadingTypeParameter.arrayElement( parameterType )
+			return Collections.singletonList( TypeHelper.isArray( parameterType )
+					? CascadingTypeParameter.arrayElement( (Class<?>) parameterType )
 					: CascadingTypeParameter.annotatedObject( parameterType ) );
 		}
 		else {

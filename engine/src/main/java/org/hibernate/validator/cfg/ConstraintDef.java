@@ -12,6 +12,8 @@ import java.util.Map;
 
 import javax.validation.Payload;
 
+import org.hibernate.validator.internal.util.StringHelper;
+
 /**
  * Base class for all constraint definition types. Each sub type represents a
  * single constraint annotation type and allows to add this constraint to a bean
@@ -46,7 +48,7 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 
 	protected ConstraintDef(Class<A> constraintType) {
 		this.constraintType = constraintType;
-		this.parameters = new HashMap<String, Object>();
+		this.parameters = new HashMap<>();
 	}
 
 	protected ConstraintDef(ConstraintDef<?, A> original) {
@@ -84,7 +86,7 @@ public abstract class ConstraintDef<C extends ConstraintDef<C, A>, A extends Ann
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( this.getClass().getName() );
-		sb.append( ", constraintType=" ).append( constraintType );
+		sb.append( ", constraintType=" ).append( StringHelper.toShortString( constraintType ) );
 		sb.append( ", parameters=" ).append( parameters );
 		sb.append( '}' );
 		return sb.toString();

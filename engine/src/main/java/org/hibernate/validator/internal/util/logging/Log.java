@@ -112,7 +112,7 @@ public interface Log extends BasicLogger {
 	ValidationException getUnableToCreateAnnotationForConfiguredConstraintException(@Cause RuntimeException e);
 
 	@Message(id = 13, value = "The class %1$s does not have a property '%2$s' with access %3$s.")
-	ValidationException getUnableToFindPropertyWithAccessException(Class<?> beanClass, String property, ElementType elementType);
+	ValidationException getUnableToFindPropertyWithAccessException(@FormatWith(ClassObjectFormatter.class) Class<?> beanClass, String property, ElementType elementType);
 
 	@Message(id = 16, value = "%s does not represent a valid BigDecimal format.")
 	IllegalArgumentException getInvalidBigDecimalFormatException(String value, @Cause NumberFormatException e);
@@ -725,4 +725,22 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 210, value = "Unable to find the type parameter %2$s in class %1$s.")
 	IllegalArgumentException getUnableToFindTypeParameterInClass(@FormatWith(ClassObjectFormatter.class) Class<?> clazz, Object typeParameterReference);
+
+	@Message(id = 211, value = "Given type is neither a parameterized nor an array type: %s.")
+	ValidationException getTypeIsNotAParameterizedNorArrayTypeException(@FormatWith(TypeFormatter.class) Type type);
+
+	@Message(id = 212, value = "Given type has no type argument with index %2$s: %1$s.")
+	ValidationException getInvalidTypeArgumentIndexException(@FormatWith(TypeFormatter.class) Type type, int index);
+
+	@Message(id = 213, value = "Given type has more than one type argument, hence an argument index must be specified: %s.")
+	ValidationException getNoTypeArgumentIndexIsGivenForTypeWithMultipleTypeArgumentsException(@FormatWith(TypeFormatter.class) Type type);
+
+	@Message(id = 214, value = "The same type argument of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getContainerElementHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(TypeFormatter.class) Type type);
+
+	@Message(id = 215, value = "Calling parameter() is not allowed for the current element.")
+	ValidationException getParameterIsNotAValidCallException();
+
+	@Message(id = 216, value = "Calling returnValue() is not allowed for the current element.")
+	ValidationException getReturnValueIsNotAValidCallException();
 }

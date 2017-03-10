@@ -53,9 +53,9 @@ public class ArrayElement implements TypeVariable<Class<?>> {
 		}
 	}
 
-	public ArrayElement(Class<?> containerClass) {
-		if ( containerClass.getComponentType().isPrimitive() ) {
-			this.containerClass = containerClass;
+	public ArrayElement(Class<?> arrayClass) {
+		if ( arrayClass.getComponentType().isPrimitive() ) {
+			this.containerClass = arrayClass;
 		}
 		else {
 			this.containerClass = Object[].class;
