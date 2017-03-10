@@ -38,8 +38,6 @@ import javax.validation.metadata.BeanDescriptor;
 import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.ValidationContext.ValidationContextBuilder;
-import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
-import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorManager;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorManager;
@@ -71,6 +69,7 @@ import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -523,7 +522,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		}
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private boolean validateMetaConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, Object parent, MetaConstraint<?> metaConstraint) {
 		PathImpl currentPath = valueContext.getPropertyPath();
 		valueContext.appendNode( metaConstraint.getLocation() );
@@ -540,19 +538,7 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 				valueToValidate = valueContext.getCurrentValidatedValue();
 			}
 
-			// constraint requiring a ValueExtractor
-			if ( !metaConstraint.getValueExtractorDescriptors().isEmpty() ) {
-				if ( valueToValidate != null ) {
-					TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext,
-							metaConstraint, metaConstraint.getValueExtractorDescriptors() );
-					( (ValueExtractor) metaConstraint.getValueExtractorDescriptors().get( 0 ).getValueExtractor() ).extractValues( valueToValidate, receiver );
-					success = receiver.isSuccess();
-				}
-			}
-			// regular constraint
-			else {
-				success = metaConstraint.validateConstraint( validationContext, valueContext );
-			}
+			success = metaConstraint.validateConstraint( validationContext, valueContext );
 
 			validationContext.markConstraintProcessed( valueContext.getCurrentBean(), valueContext.getPropertyPath(), metaConstraint );
 		}
@@ -561,81 +547,6 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 		valueContext.setPropertyPath( currentPath );
 
 		return success;
-	}
-
-	private final class TypeParameterValueReceiver implements ValueExtractor.ValueReceiver {
-
-		private final ValidationContext<?> validationContext;
-		private final ValueContext<?, Object> valueContext;
-		private final MetaConstraint<?> metaConstraint;
-		private boolean success = true;
-		private final List<ValueExtractorDescriptor> valueExtractorDescriptors;
-
-		private int extractorIndex = 1;
-
-		public TypeParameterValueReceiver(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, MetaConstraint<?> metaConstraint,
-				List<ValueExtractorDescriptor> valueExtractorDescriptors) {
-			this.validationContext = validationContext;
-			this.valueContext = valueContext;
-			this.metaConstraint = metaConstraint;
-			this.valueExtractorDescriptors = valueExtractorDescriptors;
-		}
-
-		@Override
-		public void value(String nodeName, Object object) {
-			doValidate( object, nodeName );
-		}
-
-		@Override
-		public void iterableValue(String nodeName, Object value) {
-			valueContext.markCurrentPropertyAsIterable();
-			doValidate( value, nodeName );
-		}
-
-		@Override
-		public void indexedValue(String nodeName, int index, Object value) {
-			valueContext.markCurrentPropertyAsIterable();
-			valueContext.setIndex( index );
-			doValidate( value, nodeName );
-		}
-
-		@Override
-		public void keyedValue(String nodeName, Object key, Object value) {
-			valueContext.markCurrentPropertyAsIterable();
-			valueContext.setKey( key );
-			doValidate( value, nodeName );
-		}
-
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		private void doValidate(Object value, String nodeName) {
-			PathImpl before = valueContext.getPropertyPath();
-
-			if ( nodeName != null ) {
-				valueContext.appendTypeParameterNode( nodeName );
-			}
-
-			if ( extractorIndex < valueExtractorDescriptors.size() ) {
-				if ( value != null ) {
-					ValueExtractorDescriptor valueExtractorDescriptor = valueExtractorDescriptors.get( extractorIndex );
-					extractorIndex++;
-
-					( (ValueExtractor) valueExtractorDescriptor.getValueExtractor() ).extractValues( value, this );
-
-					extractorIndex--;
-				}
-			}
-			else {
-				valueContext.setCurrentValidatedValue( value );
-				success &= metaConstraint.validateConstraint( validationContext, valueContext );
-			}
-
-			// reset the path to the state before this call
-			valueContext.setPropertyPath( before );
-		}
-
-		public boolean isSuccess() {
-			return success;
-		}
 	}
 
 	/**
@@ -711,11 +622,8 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 	 * super-type.
 	 */
 	private List<TypeVariable<?>> getCorrespondingTypeParametersInSubType(Class<?> subType, Class<?> superType, TypeVariable<?> typeParameterOfSuperType) {
-		if ( typeParameterOfSuperType == AnnotatedObject.INSTANCE ) {
-			return Collections.singletonList( AnnotatedObject.INSTANCE );
-		}
-		else if ( typeParameterOfSuperType == ArrayElement.INSTANCE ) {
-			return Collections.singletonList( ArrayElement.INSTANCE );
+		if ( TypeVariables.isInternal( typeParameterOfSuperType ) ) {
+			return Collections.singletonList( typeParameterOfSuperType );
 		}
 
 		List<TypeVariable<?>> correspondingTypeParameters = new ArrayList<>();
@@ -783,6 +691,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 
 			ValueContext<?, Object> cascadedValueContext = buildNewLocalExecutionContext( valueContext, value );
 
+			if ( cascadingTypeParameter.getTypeParameter() != null ) {
+				cascadedValueContext.setTypeParameter( cascadingTypeParameter.getTypeParameter() );
+			}
+
 			// Cascade validation
 			if ( cascadingTypeParameter.isCascading() ) {
 				validateInContext( context, cascadedValueContext, validationOrder );
@@ -791,6 +703,10 @@ public class ValidatorImpl implements Validator, ExecutableValidator {
 			// Cascade validation to nested types arguments
 			if ( !cascadingTypeParameter.getNestedCascadingTypeParameters().isEmpty() ) {
 				ValueContext<?, Object> cascadedTypeArgumentValueContext = buildNewLocalExecutionContext( valueContext, value );
+				if ( cascadingTypeParameter.getTypeParameter() != null && !TypeVariables.isInternal( cascadingTypeParameter.getTypeParameter() ) ) {
+					cascadedValueContext.setTypeParameter( cascadingTypeParameter.getTypeParameter() );
+				}
+
 				if ( nodeName != null ) {
 					cascadedTypeArgumentValueContext.appendTypeParameterNode( nodeName );
 				}

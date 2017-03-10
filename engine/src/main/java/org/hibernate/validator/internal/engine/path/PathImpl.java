@@ -119,9 +119,9 @@ public final class PathImpl implements Path, Serializable {
 		return currentLeafNode;
 	}
 
-	public NodeImpl addTypeParameterNode(String nodeName) {
+	public NodeImpl addContainerElementNode(String nodeName) {
 		NodeImpl parent = nodeList.isEmpty() ? null : (NodeImpl) nodeList.get( nodeList.size() - 1 );
-		currentLeafNode = NodeImpl.createTypeParameterNode( nodeName, parent );
+		currentLeafNode = NodeImpl.createContainerElementNode( nodeName, parent );
 		nodeList.add( currentLeafNode );
 		hashCode = -1;
 		return currentLeafNode;
@@ -204,6 +204,15 @@ public final class PathImpl implements Path, Serializable {
 
 	public NodeImpl setLeafNodeValue(Object value) {
 		currentLeafNode = NodeImpl.setPropertyValue( currentLeafNode, value );
+
+		nodeList.remove( nodeList.size() - 1 );
+		nodeList.add( currentLeafNode );
+		hashCode = -1;
+		return currentLeafNode;
+	}
+
+	public NodeImpl setLeafNodeTypeParameter(Class<?> containerClass, Integer typeArgumentIndex) {
+		currentLeafNode = NodeImpl.setTypeParameter( currentLeafNode, containerClass, typeArgumentIndex );
 
 		nodeList.remove( nodeList.size() - 1 );
 		nodeList.add( currentLeafNode );

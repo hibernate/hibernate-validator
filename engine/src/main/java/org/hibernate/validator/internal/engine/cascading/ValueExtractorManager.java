@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -121,7 +123,7 @@ public class ValueExtractorManager {
 	public ValueExtractorDescriptor getValueExtractor(Class<?> valueType, TypeVariable<?> typeParameter) {
 		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = null;
 
-		if ( typeParameter != AnnotatedObject.INSTANCE && typeParameter != ArrayElement.INSTANCE ) {
+		if ( !TypeVariables.isAnnotatedObject( typeParameter ) && !TypeVariables.isArrayElement( typeParameter ) ) {
 			allBindings = TypeVariableBindings.getTypeVariableBindings( (Class<?>) typeParameter.getGenericDeclaration() );
 		}
 
@@ -134,7 +136,7 @@ public class ValueExtractorManager {
 
 		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
 			TypeVariable<?> typeParameterBoundToExtractorType;
-			if ( typeParameter != AnnotatedObject.INSTANCE && typeParameter != ArrayElement.INSTANCE ) {
+			if ( !TypeVariables.isInternal( typeParameter ) ) {
 				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( TypeHelper.getErasedReferenceType( extractorDescriptor.getExtractedType() ) );
 				typeParameterBoundToExtractorType = bind( typeParameter, bindingsForExtractorType );
 			}
@@ -142,7 +144,7 @@ public class ValueExtractorManager {
 				typeParameterBoundToExtractorType = typeParameter;
 			}
 
-			if ( typeParameterBoundToExtractorType.equals( extractorDescriptor.getExtractedTypeParameter() ) ) {
+			if ( Objects.equals( extractorDescriptor.getExtractedTypeParameter(), typeParameterBoundToExtractorType ) ) {
 				typeParameterCompatibleExtractors.add( extractorDescriptor );
 			}
 		}
@@ -188,13 +190,7 @@ public class ValueExtractorManager {
 	}
 
 	private TypeVariable<?> bind(TypeVariable<?> typeParameter, Map<TypeVariable<?>, TypeVariable<?>> bindings) {
-		TypeVariable<?> bound = null;
-
-		if ( bindings != null ) {
-			bound = bindings.get( typeParameter );
-		}
-
-		return bound != null ? bound : typeParameter == AnnotatedObject.INSTANCE ? AnnotatedObject.INSTANCE : ArrayElement.INSTANCE;
+		return bindings != null ? bindings.get( typeParameter ) : null;
 	}
 
 	private static boolean isJavaFxInClasspath() {

@@ -9,11 +9,13 @@ package org.hibernate.validator.internal.engine.path;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.ElementKind;
 import javax.validation.Path;
 import javax.validation.Path.BeanNode;
 import javax.validation.Path.ConstructorNode;
+import javax.validation.Path.ContainerElementNode;
 import javax.validation.Path.CrossParameterNode;
 import javax.validation.Path.MethodNode;
 import javax.validation.Path.ParameterNode;
@@ -21,6 +23,7 @@ import javax.validation.Path.PropertyNode;
 import javax.validation.Path.ReturnValueNode;
 
 import org.hibernate.validator.internal.util.Contracts;
+import org.hibernate.validator.internal.util.TypeVariables;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
@@ -29,9 +32,11 @@ import org.hibernate.validator.internal.util.logging.LoggerFactory;
  *
  * @author Hardy Ferentschik
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class NodeImpl
-		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, org.hibernate.validator.path.PropertyNode, Serializable {
+		implements Path.PropertyNode, Path.MethodNode, Path.ConstructorNode, Path.BeanNode, Path.ParameterNode, Path.ReturnValueNode, Path.CrossParameterNode, Path.ContainerElementNode,
+		org.hibernate.validator.path.PropertyNode, Serializable {
 	private static final long serialVersionUID = 2075466571633860499L;
 	private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[]{};
 
@@ -39,6 +44,8 @@ public class NodeImpl
 
 	private static final String INDEX_OPEN = "[";
 	private static final String INDEX_CLOSE = "]";
+	private static final String TYPE_PARAMETER_OPEN = "<";
+	private static final String TYPE_PARAMETER_CLOSE = ">";
 
 	public static final String RETURN_VALUE_NODE_NAME = "<return value>";
 	public static final String CROSS_PARAMETER_NODE_NAME = "<cross-parameter>";
@@ -58,10 +65,13 @@ public class NodeImpl
 	private final Class<?>[] parameterTypes;
 	private final Integer parameterIndex;
 	private final Object value;
+	private final Class<?> containerClass;
+	private final Integer typeArgumentIndex;
 
 	private String asString;
 
-	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes, Integer parameterIndex, Object value) {
+	private NodeImpl(String name, NodeImpl parent, boolean isIterable, Integer index, Object key, ElementKind kind, Class<?>[] parameterTypes,
+			Integer parameterIndex, Object value, Class<?> containerClass, Integer typeArgumentIndex) {
 		this.name = name;
 		this.parent = parent;
 		this.index = index;
@@ -71,6 +81,8 @@ public class NodeImpl
 		this.kind = kind;
 		this.parameterTypes = parameterTypes;
 		this.parameterIndex = parameterIndex;
+		this.containerClass = containerClass;
+		this.typeArgumentIndex = typeArgumentIndex;
 		this.hashCode = buildHashCode();
 	}
 
@@ -85,19 +97,23 @@ public class NodeImpl
 				ElementKind.PROPERTY,
 				EMPTY_CLASS_ARRAY,
 				null,
+				null,
+				null,
 				null
 		);
 	}
 
-	public static NodeImpl createTypeParameterNode(String name, NodeImpl parent) {
+	public static NodeImpl createContainerElementNode(String name, NodeImpl parent) {
 		return new NodeImpl(
 				name,
 				parent,
 				false,
 				null,
 				null,
-				ElementKind.PROPERTY, // TODO HV-1245 this should be TYPE_USE once it's included in BV
+				ElementKind.CONTAINER_ELEMENT,
 				EMPTY_CLASS_ARRAY,
+				null,
+				null,
 				null,
 				null
 		);
@@ -113,6 +129,8 @@ public class NodeImpl
 				ElementKind.PARAMETER,
 				EMPTY_CLASS_ARRAY,
 				parameterIndex,
+				null,
+				null,
 				null
 		);
 	}
@@ -127,16 +145,18 @@ public class NodeImpl
 				ElementKind.CROSS_PARAMETER,
 				EMPTY_CLASS_ARRAY,
 				null,
+				null,
+				null,
 				null
 		);
 	}
 
 	public static NodeImpl createMethodNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.METHOD, parameterTypes, null, null, null, null );
 	}
 
 	public static NodeImpl createConstructorNode(String name, NodeImpl parent, Class<?>[] parameterTypes) {
-		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null );
+		return new NodeImpl( name, parent, false, null, null, ElementKind.CONSTRUCTOR, parameterTypes, null, null, null, null );
 	}
 
 	public static NodeImpl createBeanNode(NodeImpl parent) {
@@ -148,6 +168,8 @@ public class NodeImpl
 				null,
 				ElementKind.BEAN,
 				EMPTY_CLASS_ARRAY,
+				null,
+				null,
 				null,
 				null
 		);
@@ -163,6 +185,8 @@ public class NodeImpl
 				ElementKind.RETURN_VALUE,
 				EMPTY_CLASS_ARRAY,
 				null,
+				null,
+				null,
 				null
 		);
 	}
@@ -177,8 +201,9 @@ public class NodeImpl
 				node.kind,
 				node.parameterTypes,
 				node.parameterIndex,
-				node.value
-
+				node.value,
+				node.containerClass,
+				node.typeArgumentIndex
 		);
 	}
 
@@ -192,7 +217,9 @@ public class NodeImpl
 				node.kind,
 				node.parameterTypes,
 				node.parameterIndex,
-				node.value
+				node.value,
+				node.containerClass,
+				node.typeArgumentIndex
 		);
 	}
 
@@ -206,7 +233,9 @@ public class NodeImpl
 				node.kind,
 				node.parameterTypes,
 				node.parameterIndex,
-				node.value
+				node.value,
+				node.containerClass,
+				node.typeArgumentIndex
 		);
 	}
 
@@ -220,7 +249,25 @@ public class NodeImpl
 				node.kind,
 				node.parameterTypes,
 				node.parameterIndex,
-				value
+				value,
+				node.containerClass,
+				node.typeArgumentIndex
+		);
+	}
+
+	public static NodeImpl setTypeParameter(NodeImpl node, Class<?> containerClass, Integer typeArgumentIndex) {
+		return new NodeImpl(
+				node.name,
+				node.parent,
+				node.isIterable,
+				node.index,
+				node.key,
+				node.kind,
+				node.parameterTypes,
+				node.parameterIndex,
+				node.value,
+				containerClass,
+				typeArgumentIndex
 		);
 	}
 
@@ -258,6 +305,30 @@ public class NodeImpl
 		}
 	}
 
+	@Override
+	public Class<?> getContainerClass() {
+		Contracts.assertTrue(
+				kind == ElementKind.BEAN || kind == ElementKind.PROPERTY || kind == ElementKind.CONTAINER_ELEMENT,
+				"getContainerClass() may only be invoked for nodes of type ElementKind.BEAN, ElementKind.PROPERTY or ElementKind.CONTAINER_ELEMENT."
+		);
+		if ( parent == null ) {
+			return null;
+		}
+		return parent.containerClass;
+	}
+
+	@Override
+	public Integer getTypeArgumentIndex() {
+		Contracts.assertTrue(
+				kind == ElementKind.BEAN || kind == ElementKind.PROPERTY || kind == ElementKind.CONTAINER_ELEMENT,
+				"getTypeArgumentIndex() may only be invoked for nodes of type ElementKind.BEAN, ElementKind.PROPERTY or ElementKind.CONTAINER_ELEMENT."
+		);
+		if ( parent == null ) {
+			return null;
+		}
+		return parent.typeArgumentIndex;
+	}
+
 	public final NodeImpl getParent() {
 		return parent;
 	}
@@ -275,7 +346,8 @@ public class NodeImpl
 				( kind == ElementKind.METHOD && nodeType == MethodNode.class ) ||
 				( kind == ElementKind.PARAMETER && nodeType == ParameterNode.class ) ||
 				( kind == ElementKind.PROPERTY && ( nodeType == PropertyNode.class || nodeType == org.hibernate.validator.path.PropertyNode.class ) ) ||
-				( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class ) ) {
+				( kind == ElementKind.RETURN_VALUE && nodeType == ReturnValueNode.class ) ||
+				( kind == ElementKind.CONTAINER_ELEMENT && nodeType == ContainerElementNode.class ) ) {
 			return nodeType.cast( this );
 		}
 
@@ -291,7 +363,7 @@ public class NodeImpl
 	public int getParameterIndex() {
 		Contracts.assertTrue(
 				kind == ElementKind.PARAMETER,
-				"getParameterIndex() may only be invoked for nodes of ElementKind.PARAMETER."
+				"getParameterIndex() may only be invoked for nodes of type ElementKind.PARAMETER."
 		);
 		return parameterIndex.intValue();
 	}
@@ -320,6 +392,12 @@ public class NodeImpl
 			builder.append( getName() );
 		}
 
+		if ( includeTypeParameterInformation( containerClass, typeArgumentIndex ) ) {
+			builder.append( TYPE_PARAMETER_OPEN );
+			builder.append( TypeVariables.getTypeParameterName( containerClass, typeArgumentIndex ) );
+			builder.append( TYPE_PARAMETER_CLOSE );
+		}
+
 		if ( isIterable() ) {
 			builder.append( INDEX_OPEN );
 			if ( index != null ) {
@@ -330,7 +408,24 @@ public class NodeImpl
 			}
 			builder.append( INDEX_CLOSE );
 		}
+
 		return builder.toString();
+	}
+
+	// TODO: this is used to reduce the number of differences until we agree on the string representation
+	// it introduces some inconsistent behavior e.g. you get '<V>' for a Multimap but not for a Map
+	private static boolean includeTypeParameterInformation(Class<?> containerClass, Integer typeArgumentIndex) {
+		if ( containerClass == null || typeArgumentIndex == null ) {
+			return false;
+		}
+
+		if ( containerClass.getTypeParameters().length < 2 ) {
+			return false;
+		}
+		if ( Map.class.isAssignableFrom( containerClass ) && typeArgumentIndex == 1 ) {
+			return false;
+		}
+		return true;
 	}
 
 	public final int buildHashCode() {
@@ -344,6 +439,8 @@ public class NodeImpl
 		result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
 		result = prime * result + ( ( parameterTypes == null ) ? 0 : parameterTypes.hashCode() );
 		result = prime * result + ( ( parent == null ) ? 0 : parent.hashCode() );
+		result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
+		result = prime * result + ( ( typeArgumentIndex == null ) ? 0 : typeArgumentIndex.hashCode() );
 		return result;
 	}
 
@@ -381,6 +478,22 @@ public class NodeImpl
 			}
 		}
 		else if ( !key.equals( other.key ) ) {
+			return false;
+		}
+		if ( containerClass == null ) {
+			if ( other.containerClass != null ) {
+				return false;
+			}
+		}
+		else if ( !containerClass.equals( other.containerClass ) ) {
+			return false;
+		}
+		if ( typeArgumentIndex == null ) {
+			if ( other.typeArgumentIndex != null ) {
+				return false;
+			}
+		}
+		else if ( !typeArgumentIndex.equals( other.typeArgumentIndex ) ) {
 			return false;
 		}
 		if ( kind != other.kind ) {

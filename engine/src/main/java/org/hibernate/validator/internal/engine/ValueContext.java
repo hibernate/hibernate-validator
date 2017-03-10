@@ -7,14 +7,17 @@
 package org.hibernate.validator.internal.engine;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.TypeVariable;
 
 import javax.validation.groups.Default;
 
+import org.hibernate.validator.internal.engine.cascading.ArrayElement;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
+import org.hibernate.validator.internal.util.TypeVariables;
 
 /**
  * An instance of this class is used to collect all the relevant information for validating a single class, property or
@@ -122,7 +125,7 @@ public class ValueContext<T, V> {
 
 	public final void appendTypeParameterNode(String nodeName) {
 		PathImpl newPath = PathImpl.createCopy( propertyPath );
-		newPath.addTypeParameterNode( nodeName );
+		newPath.addContainerElementNode( nodeName );
 		propertyPath = newPath;
 	}
 
@@ -136,6 +139,18 @@ public class ValueContext<T, V> {
 
 	public final void setIndex(Integer index) {
 		propertyPath.setLeafNodeIndex( index );
+	}
+
+	public final void setTypeParameter(TypeVariable<?> typeParameter) {
+		if ( TypeVariables.isAnnotatedObject( typeParameter ) ) {
+			return;
+		}
+		else if ( TypeVariables.isArrayElement( typeParameter ) ) {
+			propertyPath.setLeafNodeTypeParameter( ( (ArrayElement) typeParameter ).getContainerClass(), null );
+		}
+		else {
+			propertyPath.setLeafNodeTypeParameter( TypeVariables.getDeclaringClass( typeParameter ), TypeVariables.getTypeParameterIndex( typeParameter ) );
+		}
 	}
 
 	public final void setCurrentGroup(Class<?> currentGroup) {

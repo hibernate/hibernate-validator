@@ -18,8 +18,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -139,10 +137,7 @@ public final class ConstraintViolationAssert {
 	 */
 	public static void assertConstraintViolation(ConstraintViolation<?> violation, String errorMessage,
 			Class<?> rootBeanClass, Object invalidValue, String propertyPath) {
-		assertTrue(
-				pathsAreEqual( violation.getPropertyPath(), PathImpl.createNewPath( propertyPath ) ),
-				"Wrong propertyPath"
-		);
+		assertEquals( violation.getPropertyPath().toString(), propertyPath );
 		assertConstraintViolation( violation, errorMessage, rootBeanClass, invalidValue );
 	}
 
@@ -263,6 +258,11 @@ public final class ConstraintViolationAssert {
 			}
 			Path.Node p2Node = p2Iterator.next();
 
+			// check that the nodes are of the same type
+			if ( p1Node.getKind() != p2Node.getKind() ) {
+				return false;
+			}
+
 			// do the comparison on the node values
 			if ( p2Node.getName() == null ) {
 				if ( p1Node.getName() != null ) {
@@ -294,6 +294,37 @@ public final class ConstraintViolationAssert {
 			}
 			else if ( !p2Node.getKey().equals( p1Node.getKey() ) ) {
 				return false;
+			}
+
+			Class<?> p1NodeContainerClass = getContainerClass( p1Node );
+			Class<?> p2NodeContainerClass = getContainerClass( p2Node );
+			if ( p2NodeContainerClass == null ) {
+				if ( p1NodeContainerClass != null ) {
+					return false;
+				}
+			}
+			else if ( !p2NodeContainerClass.equals( p1NodeContainerClass ) ) {
+				return false;
+			}
+
+			Integer p1NodeTypeArgumentIndex = getTypeArgumentIndex( p1Node );
+			Integer p2NodeTypeArgumentIndex = getTypeArgumentIndex( p2Node );
+			if ( p2NodeTypeArgumentIndex == null ) {
+				if ( p1NodeTypeArgumentIndex != null ) {
+					return false;
+				}
+			}
+			else if ( !p2NodeTypeArgumentIndex.equals( p1NodeTypeArgumentIndex ) ) {
+				return false;
+			}
+
+			if ( p1Node.getKind() == ElementKind.PARAMETER ) {
+				int p1NodeParameterIndex = p1Node.as( Path.ParameterNode.class ).getParameterIndex();
+				int p2NodeParameterIndex = p2Node.as( Path.ParameterNode.class ).getParameterIndex();
+
+				if ( p1NodeParameterIndex != p2NodeParameterIndex ) {
+					return false;
+				}
 			}
 		}
 
@@ -396,6 +427,8 @@ public final class ConstraintViolationAssert {
 				if ( node.getKind() == ElementKind.PARAMETER ) {
 					parameterIndex = node.as( Path.ParameterNode.class ).getParameterIndex();
 				}
+				Class<?> containerClass = getContainerClass( node );
+				Integer typeArgumentIndex = getTypeArgumentIndex( node );
 				nodes.add(
 						new NodeExpectation(
 								node.getName(),
@@ -403,7 +436,9 @@ public final class ConstraintViolationAssert {
 								node.isInIterable(),
 								node.getKey(),
 								node.getIndex(),
-								parameterIndex
+								parameterIndex,
+								containerClass,
+								typeArgumentIndex
 						)
 				);
 			}
@@ -414,8 +449,18 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
+		public PathExpectation property(String name, Class<?> containerClass, Integer typeArgumentIndex) {
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, false, null, null, null, containerClass, typeArgumentIndex ) );
+			return this;
+		}
+
 		public PathExpectation property(String name, boolean inIterable, Object key, Integer index) {
-			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null ) );
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null, null, null ) );
+			return this;
+		}
+
+		public PathExpectation property(String name, boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer typeArgumentIndex) {
+			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null, containerClass, typeArgumentIndex ) );
 			return this;
 		}
 
@@ -425,7 +470,12 @@ public final class ConstraintViolationAssert {
 		}
 
 		public PathExpectation bean(boolean inIterable, Object key, Integer index) {
-			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null ) );
+			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, null, null ) );
+			return this;
+		}
+
+		public PathExpectation bean(boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer typeArgumentIndex) {
+			nodes.add( new NodeExpectation( null, ElementKind.BEAN, inIterable, key, index, null, containerClass, typeArgumentIndex ) );
 			return this;
 		}
 
@@ -435,7 +485,7 @@ public final class ConstraintViolationAssert {
 		}
 
 		public PathExpectation parameter(String name, int index) {
-			nodes.add( new NodeExpectation( name, ElementKind.PARAMETER, false, null, null, index ) );
+			nodes.add( new NodeExpectation( name, ElementKind.PARAMETER, false, null, null, index, null, null ) );
 			return this;
 		}
 
@@ -449,9 +499,8 @@ public final class ConstraintViolationAssert {
 			return this;
 		}
 
-		public PathExpectation typeArgument(String name, boolean inIterable, Object key, Integer index) {
-			// TODO HV-1245 this should be TYPE_USE once it's included in BV
-			nodes.add( new NodeExpectation( name, ElementKind.PROPERTY, inIterable, key, index, null ) );
+		public PathExpectation containerElement(String name, boolean inIterable, Object key, Integer index, Class<?> containerClass, Integer typeArgumentIndex) {
+			nodes.add( new NodeExpectation( name, ElementKind.CONTAINER_ELEMENT, inIterable, key, index, null, containerClass, typeArgumentIndex ) );
 			return this;
 		}
 
@@ -508,25 +557,29 @@ public final class ConstraintViolationAssert {
 		private final Object key;
 		private final Integer index;
 		private final Integer parameterIndex;
+		private final Class<?> containerClass;
+		private final Integer typeArgumentIndex;
 
 		private NodeExpectation(String name, ElementKind kind) {
-			this( name, kind, false, null, null, null );
+			this( name, kind, false, null, null, null, null, null );
 		}
 
 		private NodeExpectation(String name, ElementKind kind, boolean inIterable, Object key, Integer index,
-				Integer parameterIndex) {
+				Integer parameterIndex, Class<?> containerClass, Integer typeArgumentIndex) {
 			this.name = name;
 			this.kind = kind;
 			this.inIterable = inIterable;
 			this.key = key;
 			this.index = index;
 			this.parameterIndex = parameterIndex;
+			this.containerClass = containerClass;
+			this.typeArgumentIndex = typeArgumentIndex;
 		}
 
 		@Override
 		public String toString() {
 			return "NodeExpectation(" + name + ", " + kind + ", " + inIterable
-					+ ", " + key + ", " + index + ", " + parameterIndex + ")";
+					+ ", " + key + ", " + index + ", " + parameterIndex + ", " + containerClass + ", " + typeArgumentIndex + ")";
 		}
 
 		@Override
@@ -539,6 +592,8 @@ public final class ConstraintViolationAssert {
 			result = prime * result + ( ( kind == null ) ? 0 : kind.hashCode() );
 			result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
 			result = prime * result + ( ( parameterIndex == null ) ? 0 : parameterIndex.hashCode() );
+			result = prime * result + ( ( containerClass == null ) ? 0 : containerClass.hashCode() );
+			result = prime * result + ( ( typeArgumentIndex == null ) ? 0 : typeArgumentIndex.hashCode() );
 			return result;
 		}
 
@@ -592,218 +647,51 @@ public final class ConstraintViolationAssert {
 			else if ( !parameterIndex.equals( other.parameterIndex ) ) {
 				return false;
 			}
+			if ( containerClass == null ) {
+				if ( other.containerClass != null ) {
+					return false;
+				}
+			}
+			else if ( !containerClass.equals( other.containerClass ) ) {
+				return false;
+			}
+			if ( typeArgumentIndex == null ) {
+				if ( other.typeArgumentIndex != null ) {
+					return false;
+				}
+			}
+			else if ( !typeArgumentIndex.equals( other.typeArgumentIndex ) ) {
+				return false;
+			}
 			return true;
 		}
 	}
 
-	public static class PathImpl implements Path {
-		/**
-		 * Regular expression used to split a string path into its elements.
-		 *
-		 * @see <a href="http://www.regexplanet.com/simple/index.jsp">Regular expression tester</a>
-		 */
-		private static final Pattern pathPattern = Pattern.compile(
-				"(\\w+)(\\[(\\w*)\\])?(\\.(.*))*"
-		);
-		private static final int PROPERTY_NAME_GROUP = 1;
-		private static final int INDEXED_GROUP = 2;
-		private static final int INDEX_GROUP = 3;
-		private static final int REMAINING_STRING_GROUP = 5;
-
-		private static final String PROPERTY_PATH_SEPARATOR = ".";
-		private static final String INDEX_OPEN = "[";
-		private static final String INDEX_CLOSE = "]";
-
-		private final List<Node> nodeList;
-
-		/**
-		 * Returns a {@code Path} instance representing the path described by the given string. To create a root node the empty string should be passed.
-		 *
-		 * @param propertyPath the path as string representation.
-		 *
-		 * @return a {@code Path} instance representing the path described by the given string.
-		 *
-		 * @throws IllegalArgumentException in case {@code property == null} or {@code property} cannot be parsed.
-		 */
-		public static PathImpl createPathFromString(String propertyPath) {
-			if ( propertyPath == null ) {
-				throw new IllegalArgumentException( "null is not allowed as property path." );
-			}
-
-			if ( propertyPath.length() == 0 ) {
-				return createNewPath( null );
-			}
-
-			return parseProperty( propertyPath );
+	private static Class<?> getContainerClass(Path.Node node) {
+		Class<?> containerClass = null;
+		if ( node.getKind() == ElementKind.PROPERTY ) {
+			containerClass = node.as( Path.PropertyNode.class ).getContainerClass();
 		}
-
-		public static PathImpl createNewPath(String name) {
-			PathImpl path = new PathImpl();
-			NodeImpl node = new NodeImpl( name );
-			path.addNode( node );
-			return path;
+		if ( node.getKind() == ElementKind.BEAN ) {
+			containerClass = node.as( Path.BeanNode.class ).getContainerClass();
 		}
-
-		private PathImpl() {
-			nodeList = new ArrayList<Node>();
+		if ( node.getKind() == ElementKind.CONTAINER_ELEMENT ) {
+			containerClass = node.as( Path.ContainerElementNode.class ).getContainerClass();
 		}
-
-		public void addNode(Node node) {
-			nodeList.add( node );
-		}
-
-		@Override
-		public Iterator<Path.Node> iterator() {
-			return nodeList.iterator();
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder();
-			Iterator<Path.Node> iter = iterator();
-			boolean first = true;
-			while ( iter.hasNext() ) {
-				Node node = iter.next();
-				if ( node.isInIterable() ) {
-					appendIndex( builder, node );
-				}
-				if ( node.getName() != null ) {
-					if ( !first ) {
-						builder.append( PROPERTY_PATH_SEPARATOR );
-					}
-					builder.append( node.getName() );
-				}
-				first = false;
-			}
-			return builder.toString();
-		}
-
-		private void appendIndex(StringBuilder builder, Node node) {
-			builder.append( INDEX_OPEN );
-			if ( node.getIndex() != null ) {
-				builder.append( node.getIndex() );
-			}
-			else if ( node.getKey() != null ) {
-				builder.append( node.getKey() );
-			}
-			builder.append( INDEX_CLOSE );
-		}
-
-		private static PathImpl parseProperty(String property) {
-			PathImpl path = new PathImpl();
-			String tmp = property;
-			boolean indexed = false;
-			String indexOrKey = null;
-			do {
-				Matcher matcher = pathPattern.matcher( tmp );
-				if ( matcher.matches() ) {
-					String value = matcher.group( PROPERTY_NAME_GROUP );
-
-					NodeImpl node = new NodeImpl( value );
-					path.addNode( node );
-
-					// need to look backwards!!
-					if ( indexed ) {
-						updateNodeIndexOrKey( indexOrKey, node );
-					}
-
-					indexed = matcher.group( INDEXED_GROUP ) != null;
-					indexOrKey = matcher.group( INDEX_GROUP );
-
-					tmp = matcher.group( REMAINING_STRING_GROUP );
-				}
-				else {
-					throw new IllegalArgumentException( "Unable to parse property path " + property );
-				}
-			} while ( tmp != null );
-
-			// check for a left over indexed node
-			if ( indexed ) {
-				NodeImpl node = new NodeImpl( (String) null );
-				updateNodeIndexOrKey( indexOrKey, node );
-				path.addNode( node );
-			}
-			return path;
-		}
-
-		private static void updateNodeIndexOrKey(String indexOrKey, NodeImpl node) {
-			node.setInIterable( true );
-			if ( indexOrKey != null && indexOrKey.length() > 0 ) {
-				try {
-					Integer i = Integer.parseInt( indexOrKey );
-					node.setIndex( i );
-				}
-				catch (NumberFormatException e) {
-					node.setKey( indexOrKey );
-				}
-			}
-		}
+		return containerClass;
 	}
 
-	public static class NodeImpl implements Path.Node {
-		private final String name;
-		private boolean isInIterable;
-		private Integer index;
-		private Object key;
-
-		public NodeImpl(String name) {
-			this.name = name;
+	private static Integer getTypeArgumentIndex(Path.Node node) {
+		Integer typeArgumentIndex = null;
+		if ( node.getKind() == ElementKind.PROPERTY ) {
+			typeArgumentIndex = node.as( Path.PropertyNode.class ).getTypeArgumentIndex();
 		}
-
-		@Override
-		public String getName() {
-			return name;
+		if ( node.getKind() == ElementKind.BEAN ) {
+			typeArgumentIndex = node.as( Path.BeanNode.class ).getTypeArgumentIndex();
 		}
-
-		@Override
-		public boolean isInIterable() {
-			return isInIterable;
+		if ( node.getKind() == ElementKind.CONTAINER_ELEMENT ) {
+			typeArgumentIndex = node.as( Path.ContainerElementNode.class ).getTypeArgumentIndex();
 		}
-
-		public void setInIterable(boolean inIterable) {
-			isInIterable = inIterable;
-		}
-
-		@Override
-		public Integer getIndex() {
-			return index;
-		}
-
-		public void setIndex(Integer index) {
-			isInIterable = true;
-			this.index = index;
-		}
-
-		@Override
-		public Object getKey() {
-			return key;
-		}
-
-		@Override
-		public ElementKind getKind() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public <T extends Path.Node> T as(Class<T> nodeType) {
-			throw new UnsupportedOperationException();
-		}
-
-		public void setKey(Object key) {
-			isInIterable = true;
-			this.key = key;
-		}
-
-		@Override
-		public String toString() {
-			final StringBuilder sb = new StringBuilder();
-			sb.append( "NodeImpl" );
-			sb.append( "{index=" ).append( index );
-			sb.append( ", name='" ).append( name ).append( '\'' );
-			sb.append( ", isInIterable=" ).append( isInIterable );
-			sb.append( ", key=" ).append( key );
-			sb.append( '}' );
-			return sb.toString();
-		}
+		return typeArgumentIndex;
 	}
 }
