@@ -322,7 +322,7 @@ class ConstrainedExecutableBuilder {
 		if ( isCascaded ) {
 			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
 			return Collections.singletonList( isArray
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( executable ) )
+					? CascadingTypeParameter.arrayElement( ( (Method) executable ).getReturnType() )
 					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( executable ) ) );
 		}
 		else {

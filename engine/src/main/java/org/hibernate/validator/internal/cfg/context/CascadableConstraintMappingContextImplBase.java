@@ -163,7 +163,7 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 		if ( isCascading ) {
 			boolean isArray = TypeHelper.isArray( configuredType );
 			cascadingTypeParameters.add( isArray
-					? CascadingTypeParameter.arrayElement( configuredType )
+					? CascadingTypeParameter.arrayElement( (Class<?>) configuredType )
 					: CascadingTypeParameter.annotatedObject( configuredType ) );
 		}
 

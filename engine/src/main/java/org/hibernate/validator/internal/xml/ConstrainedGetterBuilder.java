@@ -104,7 +104,7 @@ class ConstrainedGetterBuilder {
 	private List<CascadingTypeParameter> getCascadedTypeParameters(Method method, boolean isCascaded) {
 		if ( isCascaded ) {
 			return Collections.singletonList( method.getReturnType().isArray()
-					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( method ) )
+					? CascadingTypeParameter.arrayElement( method.getReturnType() )
 					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( method ) ) );
 		}
 		else {
