@@ -101,7 +101,7 @@ final class ParameterConstraintMappingContextImpl
 	}
 
 	@Override
-	public ContainerElementConstraintMappingContext containerElement() {
+	public ContainerElementConstraintMappingContext containerElementType() {
 		return super.containerElement(
 				this,
 				executableContext.getTypeContext(),
@@ -110,7 +110,7 @@ final class ParameterConstraintMappingContextImpl
 	}
 
 	@Override
-	public ContainerElementConstraintMappingContext containerElement(int index, int... nestedIndexes) {
+	public ContainerElementConstraintMappingContext containerElementType(int index, int... nestedIndexes) {
 		return super.containerElement(
 				this,
 				executableContext.getTypeContext(),

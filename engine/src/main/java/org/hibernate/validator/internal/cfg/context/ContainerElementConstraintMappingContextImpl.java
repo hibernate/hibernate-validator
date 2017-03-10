@@ -147,13 +147,13 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 	}
 
 	@Override
-	public ContainerElementConstraintMappingContext containerElement() {
-		return parentContainerElementTarget.containerElement( 0 );
+	public ContainerElementConstraintMappingContext containerElementType() {
+		return parentContainerElementTarget.containerElementType( 0 );
 	}
 
 	@Override
-	public ContainerElementConstraintMappingContext containerElement(int index, int... nestedIndexes) {
-		return parentContainerElementTarget.containerElement( index, nestedIndexes );
+	public ContainerElementConstraintMappingContext containerElementType(int index, int... nestedIndexes) {
+		return parentContainerElementTarget.containerElementType( index, nestedIndexes );
 	}
 
 	ContainerElementConstraintMappingContext nestedContainerElement(int[] nestedIndexes) {

@@ -29,7 +29,7 @@ public interface ContainerElementTarget {
 	 * @throws ValidationException If the given element (property, return value or parameter) is not of a generic type
 	 * nor of an array type or is a generic type but has more than one type argument.
 	 */
-	ContainerElementConstraintMappingContext containerElement();
+	ContainerElementConstraintMappingContext containerElementType();
 
 	/**
 	 * Selects the single type argument of the current element's generic type as the target for the next operations.
@@ -43,5 +43,5 @@ public interface ContainerElementTarget {
 	 * @throws ValidationException If the given element (property, return value or parameter) is not of a generic type
 	 * nor of an array type or is a generic type but has no type argument with the given index.
 	 */
-	ContainerElementConstraintMappingContext containerElement(int index, int... nestedIndexes);
+	ContainerElementConstraintMappingContext containerElementType(int index, int... nestedIndexes);
 }

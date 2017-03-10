@@ -56,9 +56,9 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( IFishTank.class )
 				.method( "test1" )
 					.returnValue()
-						.containerElement( 0 )
+						.containerElementType( 0 )
 							.constraint( new SizeDef().min( 3 ).max( 10 ) )
-						.containerElement( 1 )
+						.containerElementType( 1 )
 							.constraint( new MinDef().value( 1 ) );
 
 		config.addMapping( newMapping );
@@ -91,7 +91,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( IFishTank.class )
 				.method( "test2" )
 					.returnValue()
-						.containerElement( 1, 0 )
+						.containerElementType( 1, 0 )
 							.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
@@ -120,7 +120,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( IFishTank.class )
 				.method( "test3" )
 					.returnValue()
-						.containerElement( 0, 1, 0 )
+						.containerElementType( 0, 1, 0 )
 							.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
@@ -149,7 +149,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( IFishTank.class )
 				.method( "test4" )
 					.returnValue()
-						.containerElement()
+						.containerElementType()
 							.valid()
 			.type( Fish.class )
 				.property( "name", FIELD )
@@ -181,7 +181,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( IFishTank.class )
 				.method( "test5" )
 					.returnValue()
-						.containerElement()
+						.containerElementType()
 							.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
@@ -210,7 +210,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( IFishTank.class )
 				.method( "test6" )
 					.returnValue()
-						.containerElement( 0, 0 )
+						.containerElementType( 0, 0 )
 							.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
@@ -239,7 +239,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( IFishTank.class )
 				.method( "test7" )
 					.returnValue()
-						.containerElement( 0, 0 )
+						.containerElementType( 0, 0 )
 							.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
@@ -268,7 +268,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( IFishTank.class )
 				.method( "getSize" )
 					.returnValue()
-						.containerElement( 1 );
+						.containerElementType( 1 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -279,7 +279,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( FishTank.class )
 				.method( "test1" )
 					.returnValue()
-						.containerElement( 2 );
+						.containerElementType( 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -290,7 +290,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( FishTank.class )
 				.method( "test2" )
 					.returnValue()
-						.containerElement( 1, 2 );
+						.containerElementType( 1, 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
@@ -301,7 +301,7 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( FishTank.class )
 				.method( "test1" )
 					.returnValue()
-						.containerElement();
+						.containerElementType();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000214.*")
@@ -312,9 +312,9 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 			.type( FishTank.class )
 				.method( "test3" )
 					.returnValue()
-						.containerElement( 0, 1, 0 )
+						.containerElementType( 0, 1, 0 )
 							.constraint( new NotNullDef() )
-						.containerElement( 0, 1, 0 );
+						.containerElementType( 0, 1, 0 );
 	}
 
 	public interface IFishTank {
