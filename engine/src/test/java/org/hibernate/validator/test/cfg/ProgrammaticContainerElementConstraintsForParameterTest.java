@@ -56,12 +56,12 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( IFishTank.class )
 				.method( "test1", Optional.class, Map.class )
 					.parameter( 0 )
-						.containerElement()
+						.containerElementType()
 							.constraint( new SizeDef().max( 5 ) )
 					.parameter( 1 )
-					.containerElement( 0 )
+					.containerElementType( 0 )
 						.constraint( new SizeDef().min( 3 ).max( 10 ) )
-					.containerElement( 1 )
+					.containerElementType( 1 )
 						.constraint( new MinDef().value( 1 ) );
 
 		config.addMapping( newMapping );
@@ -99,7 +99,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( IFishTank.class )
 				.method( "test2", Map.class )
 					.parameter( 0 )
-						.containerElement( 1, 0 )
+						.containerElementType( 1, 0 )
 							.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
@@ -132,7 +132,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( IFishTank.class )
 				.method( "test3", List.class )
 					.parameter( 0 )
-						.containerElement( 0, 1, 0 )
+						.containerElementType( 0, 1, 0 )
 							.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
@@ -167,7 +167,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( IFishTank.class )
 				.method( "test4", Optional.class )
 					.parameter( 0 )
-						.containerElement()
+						.containerElementType()
 							.valid()
 			.type( Fish.class )
 				.property( "name", FIELD )
@@ -199,7 +199,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( IFishTank.class )
 				.method( "test5", String[].class )
 					.parameter( 0 )
-						.containerElement()
+						.containerElementType()
 							.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
@@ -228,7 +228,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( IFishTank.class )
 				.method( "test6", List.class )
 					.parameter( 0 )
-						.containerElement( 0, 0 )
+						.containerElementType( 0, 0 )
 							.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
@@ -260,7 +260,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( IFishTank.class )
 				.method( "test7", String[][].class )
 					.parameter( 0 )
-						.containerElement( 0, 0 )
+						.containerElementType( 0, 0 )
 							.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
@@ -291,7 +291,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( IFishTank.class )
 				.method( "setSize", int.class )
 					.parameter( 0 )
-						.containerElement( 1 );
+						.containerElementType( 1 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -302,7 +302,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( FishTank.class )
 				.method( "test1", Optional.class, Map.class )
 					.parameter( 0 )
-						.containerElement( 2 );
+						.containerElementType( 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -313,7 +313,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( FishTank.class )
 				.method( "test2", Map.class )
 					.parameter( 0 )
-					.containerElement( 1, 2 );
+					.containerElementType( 1, 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
@@ -324,7 +324,7 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( FishTank.class )
 				.method( "test1", Optional.class, Map.class )
 					.parameter( 1 )
-						.containerElement();
+						.containerElementType();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000214.*")
@@ -335,9 +335,9 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 			.type( FishTank.class )
 				.method( "test3", List.class )
 					.parameter( 0 )
-						.containerElement( 0, 1, 0 )
+						.containerElementType( 0, 1, 0 )
 							.constraint( new NotNullDef() )
-						.containerElement( 0, 1, 0 );
+						.containerElementType( 0, 1, 0 );
 	}
 
 	public interface IFishTank {

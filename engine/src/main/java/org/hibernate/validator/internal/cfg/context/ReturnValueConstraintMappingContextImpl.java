@@ -78,14 +78,14 @@ final class ReturnValueConstraintMappingContextImpl
 	}
 
 	@Override
-	public ContainerElementConstraintMappingContext containerElement() {
+	public ContainerElementConstraintMappingContext containerElementType() {
 		return super.containerElement(
 				this, executableContext.getTypeContext(), ConstraintLocation.forReturnValue( executableContext.getExecutable() )
 		);
 	}
 
 	@Override
-	public ContainerElementConstraintMappingContext containerElement(int index, int... nestedIndexes) {
+	public ContainerElementConstraintMappingContext containerElementType(int index, int... nestedIndexes) {
 		return super.containerElement(
 				this,
 				executableContext.getTypeContext(),

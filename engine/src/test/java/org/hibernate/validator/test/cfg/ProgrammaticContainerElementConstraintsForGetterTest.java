@@ -50,12 +50,12 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "model", METHOD )
-					.containerElement()
+					.containerElementType()
 						.constraint( new SizeDef().max( 5 ) )
 				.property( "fishCountByType", METHOD )
-					.containerElement( 0 )
+					.containerElementType( 0 )
 						.constraint( new SizeDef().min( 3 ).max( 10 ) )
-					.containerElement( 1 )
+					.containerElementType( 1 )
 						.constraint( new MinDef().value( 1 ) );
 
 		config.addMapping( newMapping );
@@ -80,7 +80,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "fishOfTheMonth", METHOD )
-					.containerElement( 1, 0 )
+					.containerElementType( 1, 0 )
 						.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
@@ -101,7 +101,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "tagsOfFishOfTheMonth", METHOD )
-					.containerElement( 0, 1, 0 )
+					.containerElementType( 0, 1, 0 )
 						.constraint( new NotNullDef() );
 
 		config.addMapping( newMapping );
@@ -122,7 +122,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "boss", METHOD )
-					.containerElement()
+					.containerElementType()
 						.valid()
 			.type( Fish.class )
 				.property( "name", METHOD )
@@ -146,7 +146,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "fishNames", METHOD )
-					.containerElement()
+					.containerElementType()
 						.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
@@ -167,7 +167,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "fishNamesByMonth", METHOD )
-					.containerElement( 0, 0 )
+					.containerElementType( 0, 0 )
 						.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
@@ -188,7 +188,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "fishNamesByMonthAsArray", METHOD )
-					.containerElement( 0, 0 )
+					.containerElementType( 0, 0 )
 						.constraint( new SizeDef().max( 5 ) );
 
 		config.addMapping( newMapping );
@@ -209,7 +209,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "size", METHOD )
-					.containerElement( 1 );
+					.containerElementType( 1 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -219,7 +219,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "model", METHOD )
-					.containerElement( 2 );
+					.containerElementType( 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000212.*")
@@ -229,7 +229,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "fishOfTheMonth", METHOD )
-					.containerElement( 1, 2 );
+					.containerElementType( 1, 2 );
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000213.*")
@@ -239,7 +239,7 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "fishCountByType", METHOD )
-					.containerElement();
+					.containerElementType();
 	}
 
 	@Test(expectedExceptions = ValidationException.class, expectedExceptionsMessageRegExp = "HV000214.*")
@@ -249,9 +249,9 @@ public class ProgrammaticContainerElementConstraintsForGetterTest {
 		newMapping
 			.type( FishTank.class )
 				.property( "tagsOfFishOfTheMonth", METHOD )
-					.containerElement( 0, 1, 0 )
+					.containerElementType( 0, 1, 0 )
 						.constraint( new NotNullDef() )
-					.containerElement( 0, 1, 0 );
+					.containerElementType( 0, 1, 0 );
 	}
 
 	public static class FishTank {
