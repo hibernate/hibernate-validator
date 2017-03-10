@@ -544,6 +544,10 @@ public class ConstraintHelper {
 		return ConstraintCheckResult.ALLOWED;
 	}
 
+	public Types getTypeUtils() {
+		return typeUtils;
+	}
+
 	// ==================================
 	// private API below
 	// ==================================
@@ -774,7 +778,7 @@ public class ConstraintHelper {
 		return validationAppliesTo.accept(
 			new SimpleAnnotationValueVisitor6<AnnotationProcessorConstraintTarget, Void>() {
 
-				private TypeMirror constraintTargetMirror = annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.CONSTRAINT_TARGET );
+				private final TypeMirror constraintTargetMirror = annotationApiHelper.getDeclaredTypeByName( BeanValidationTypes.CONSTRAINT_TARGET );
 
 				@Override
 				public AnnotationProcessorConstraintTarget visitEnumConstant(VariableElement c, Void p) {
@@ -1018,7 +1022,7 @@ public class ConstraintHelper {
 		Set<TypeMirror> types = supportedTypesByConstraint.get( key );
 
 		if ( types == null ) {
-			supportedTypesByConstraint.put( key, new HashSet<TypeMirror>( supportedTypes ) );
+			supportedTypesByConstraint.put( key, new HashSet<>( supportedTypes ) );
 		}
 		else {
 			types.addAll( supportedTypes );
@@ -1078,7 +1082,7 @@ public class ConstraintHelper {
 
 	private List<TypeMirror> asMirrors(Class<?>... types) {
 
-		List<TypeMirror> mirrors = new ArrayList<TypeMirror>( types.length );
+		List<TypeMirror> mirrors = new ArrayList<>( types.length );
 
 		for ( Class<?> oneType : types ) {
 
@@ -1094,7 +1098,7 @@ public class ConstraintHelper {
 
 	private List<TypeMirror> asMirrors(String... typeNames) {
 
-		List<TypeMirror> mirrors = new ArrayList<TypeMirror>( typeNames.length );
+		List<TypeMirror> mirrors = new ArrayList<>( typeNames.length );
 
 		for ( String oneTypeName : typeNames ) {
 

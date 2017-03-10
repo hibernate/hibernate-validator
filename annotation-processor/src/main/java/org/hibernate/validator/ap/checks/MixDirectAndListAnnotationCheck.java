@@ -12,12 +12,13 @@ import java.util.Set;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Types;
 
 import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
 
 /**
- * Checks, that only there is no mix usage of direct annotation and it's list container.
+ * Checks, that there is no mixed usage of direct annotation and its list container.
  * Only one kind should be present for a constraint.
  *
  * @author Marko Bekhta
@@ -46,9 +47,11 @@ public class MixDirectAndListAnnotationCheck extends AbstractConstraintCheck {
 		return Collections.emptySet();
 	}
 
-	private boolean containsDirectAnnotation(TypeElement element, AnnotationMirror multiValuedAnnotation) {
+	private boolean containsDirectAnnotation(TypeElement element, AnnotationMirror elementOfMultiValuedAnnotation) {
+		Types typeUtils = constraintHelper.getTypeUtils();
+
 		for ( AnnotationMirror annotationMirror : element.getAnnotationMirrors() ) {
-			if ( getAnnotationQualifiedName( annotationMirror ).equals( getAnnotationQualifiedName( multiValuedAnnotation ) ) ) {
+			if ( typeUtils.isSameType( annotationMirror.getAnnotationType(), elementOfMultiValuedAnnotation.getAnnotationType() ) ) {
 				return true;
 			}
 		}
