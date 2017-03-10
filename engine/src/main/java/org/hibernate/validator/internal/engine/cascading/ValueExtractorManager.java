@@ -121,9 +121,10 @@ public class ValueExtractorManager {
 	}
 
 	public ValueExtractorDescriptor getValueExtractor(Class<?> valueType, TypeVariable<?> typeParameter) {
+		boolean isInternal = TypeVariables.isInternal( typeParameter );
 		Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings = null;
 
-		if ( !TypeVariables.isAnnotatedObject( typeParameter ) && !TypeVariables.isArrayElement( typeParameter ) ) {
+		if ( !isInternal ) {
 			allBindings = TypeVariableBindings.getTypeVariableBindings( (Class<?>) typeParameter.getGenericDeclaration() );
 		}
 
@@ -137,7 +138,7 @@ public class ValueExtractorManager {
 		for ( ValueExtractorDescriptor extractorDescriptor : typeCompatibleExtractors ) {
 			TypeVariable<?> typeParameterBoundToExtractorType;
 
-			if ( !TypeVariables.isInternal( typeParameter ) ) {
+			if ( !isInternal ) {
 				Map<TypeVariable<?>, TypeVariable<?>> bindingsForExtractorType = allBindings.get( extractorDescriptor.getExtractedType() );
 				typeParameterBoundToExtractorType = bind( typeParameter, bindingsForExtractorType );
 			}

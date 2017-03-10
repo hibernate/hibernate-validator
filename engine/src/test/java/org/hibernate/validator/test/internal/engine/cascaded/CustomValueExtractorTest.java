@@ -102,6 +102,7 @@ public class CustomValueExtractorTest {
 		} );
 	}
 
+	@Test
 	public void canUseCustomValueExtractorPerValidatorForMultimaps() throws Exception {
 		CustomerWithStringStringMultimap bob = new CustomerWithStringStringMultimap();
 
@@ -112,7 +113,7 @@ public class CustomValueExtractorTest {
 
 		Set<ConstraintViolation<CustomerWithStringStringMultimap>> violations = validator.validate( bob );
 
-		assertCorrectPropertyPaths( violations, "addressByType[work].multimap_value", "addressByType[work].multimap_value" );
+		assertCorrectPropertyPaths( violations, "addressByType<V>[work].multimap_value", "addressByType<V>[work].multimap_value" );
 	}
 
 	@Test

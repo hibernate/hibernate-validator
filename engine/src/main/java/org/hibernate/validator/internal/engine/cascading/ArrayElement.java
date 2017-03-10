@@ -54,14 +54,7 @@ public class ArrayElement implements TypeVariable<Class<?>> {
 	}
 
 	public ArrayElement(Class<?> containerClass) {
-		if ( containerClass == boolean[].class ||
-				containerClass == int[].class ||
-				containerClass == long[].class ||
-				containerClass == double[].class ||
-				containerClass == float[].class ||
-				containerClass == byte[].class ||
-				containerClass == short[].class ||
-				containerClass == char[].class ) {
+		if ( containerClass.getComponentType().isPrimitive() ) {
 			this.containerClass = containerClass;
 		}
 		else {
