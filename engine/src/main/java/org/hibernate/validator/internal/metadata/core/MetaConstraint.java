@@ -11,6 +11,7 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.validation.valueextraction.ValueExtractor;
@@ -22,7 +23,6 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintTr
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
 import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
-import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -51,7 +51,7 @@ public class MetaConstraint<A extends Annotation> {
 	 * validation.
 	 */
 	@Immutable
-	private final List<ValueExtractionPathNode> valueExtractionPath;
+	private final ValueExtractionPathNode valueExtractionPath;
 
 	private final int hashCode;
 
@@ -61,12 +61,20 @@ public class MetaConstraint<A extends Annotation> {
 	 * @param valueExtractorDescriptors the potential {@link ValueExtractor}s used to extract the value to validate
 	 * @param validatedValueType the type of the validated element
 	 */
-	MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location, List<ValueExtractionPathNode> valueExtractionPath,
+	MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location, List<TypeParameterAndExtractor> valueExtractionPath,
 			Type validatedValueType) {
 		this.constraintTree = new ConstraintTree<>( constraintDescriptor, validatedValueType );
 		this.location = location;
-		this.valueExtractionPath = CollectionHelper.toImmutableList( valueExtractionPath );
+		this.valueExtractionPath = getValueExtractionPath( valueExtractionPath );
 		this.hashCode = buildHashCode( constraintDescriptor, location );
+	}
+
+	private static ValueExtractionPathNode getValueExtractionPath(List<TypeParameterAndExtractor> valueExtractionPath) {
+		switch ( valueExtractionPath.size() ) {
+			case 0: return null;
+			case 1: return new SingleValueExtractionPathNode( valueExtractionPath.iterator().next() );
+			default: return new LinkedValueExtractionPathNode( null, valueExtractionPath );
+		}
 	}
 
 	/**
@@ -89,11 +97,11 @@ public class MetaConstraint<A extends Annotation> {
 	public boolean validateConstraint(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
 		boolean success = true;
 		// constraint requiring value extraction to get the value to validate
-		if ( !valueExtractionPath.isEmpty() ) {
+		if ( valueExtractionPath != null ) {
 			Object valueToValidate = valueContext.getCurrentValidatedValue();
 			if ( valueToValidate != null ) {
-				TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext );
-				( (ValueExtractor) valueExtractionPath.get( 0 ).valueExtractorDescriptor.getValueExtractor() ).extractValues( valueToValidate, receiver );
+				TypeParameterValueReceiver receiver = new TypeParameterValueReceiver( validationContext, valueContext, valueExtractionPath );
+				( (ValueExtractor) valueExtractionPath.getValueExtractorDescriptor().getValueExtractor() ).extractValues( valueToValidate, receiver );
 				success = receiver.isSuccess();
 			}
 		}
@@ -166,12 +174,12 @@ public class MetaConstraint<A extends Annotation> {
 		private final ValidationContext<?> validationContext;
 		private final ValueContext<?, Object> valueContext;
 		private boolean success = true;
+		private ValueExtractionPathNode currentValueExtractionPathNode;
 
-		private int pathIndex = 0;
-
-		public TypeParameterValueReceiver(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext) {
+		public TypeParameterValueReceiver(ValidationContext<?> validationContext, ValueContext<?, Object> valueContext, ValueExtractionPathNode currentValueExtractionPathNode) {
 			this.validationContext = validationContext;
 			this.valueContext = valueContext;
+			this.currentValueExtractionPathNode = currentValueExtractionPathNode;
 		}
 
 		@Override
@@ -203,7 +211,7 @@ public class MetaConstraint<A extends Annotation> {
 		private void doValidate(Object value, String nodeName) {
 			PathImpl before = valueContext.getPropertyPath();
 
-			TypeVariable<?> typeParameter = valueExtractionPath.get( pathIndex ).typeParameter;
+			TypeVariable<?> typeParameter = currentValueExtractionPathNode.getTypeParameter();
 			if ( typeParameter != null ) {
 				valueContext.setTypeParameter( typeParameter );
 			}
@@ -212,14 +220,14 @@ public class MetaConstraint<A extends Annotation> {
 				valueContext.appendTypeParameterNode( nodeName );
 			}
 
-			if ( pathIndex + 1 < valueExtractionPath.size() ) {
+			if ( currentValueExtractionPathNode.hasNext() ) {
 				if ( value != null ) {
-					pathIndex++;
+					currentValueExtractionPathNode = currentValueExtractionPathNode.getNext();
 
-					ValueExtractorDescriptor valueExtractorDescriptor = valueExtractionPath.get( pathIndex ).valueExtractorDescriptor;
+					ValueExtractorDescriptor valueExtractorDescriptor = currentValueExtractionPathNode.getValueExtractorDescriptor();
 					( (ValueExtractor) valueExtractorDescriptor.getValueExtractor() ).extractValues( value, this );
 
-					pathIndex--;
+					currentValueExtractionPathNode = currentValueExtractionPathNode.getPrevious();
 				}
 			}
 			else {
@@ -236,27 +244,123 @@ public class MetaConstraint<A extends Annotation> {
 		}
 	}
 
-	static final class ValueExtractionPathNode {
+	static final class TypeParameterAndExtractor {
 
 		private final TypeVariable<?> typeParameter;
 		private final ValueExtractorDescriptor valueExtractorDescriptor;
 
-		private ValueExtractionPathNode(TypeVariable<?> typeParameter, ValueExtractorDescriptor valueExtractorDescriptor) {
+		private TypeParameterAndExtractor(TypeVariable<?> typeParameter, ValueExtractorDescriptor valueExtractorDescriptor) {
 			this.typeParameter = typeParameter;
 			this.valueExtractorDescriptor = valueExtractorDescriptor;
 		}
 
-		static ValueExtractionPathNode of(ValueExtractorDescriptor valueExtractorDescriptor) {
-			return new ValueExtractionPathNode( null, valueExtractorDescriptor );
+		static TypeParameterAndExtractor of(ValueExtractorDescriptor valueExtractorDescriptor) {
+			return new TypeParameterAndExtractor( null, valueExtractorDescriptor );
 		}
 
-		static ValueExtractionPathNode of(TypeVariable<?> typeParameter, ValueExtractorDescriptor valueExtractorDescriptor) {
-			return new ValueExtractionPathNode( typeParameter, valueExtractorDescriptor );
+		static TypeParameterAndExtractor of(TypeVariable<?> typeParameter, ValueExtractorDescriptor valueExtractorDescriptor) {
+			return new TypeParameterAndExtractor( typeParameter, valueExtractorDescriptor );
 		}
 
 		@Override
 		public String toString() {
-			return "ValueExtractionPathNode [typeParameter=" + typeParameter + ", valueExtractorDescriptor=" + valueExtractorDescriptor + "]";
+			return "TypeParameterAndExtractor [typeParameter=" + typeParameter + ", valueExtractorDescriptor=" + valueExtractorDescriptor + "]";
+		}
+	}
+
+	private interface ValueExtractionPathNode {
+		boolean hasNext();
+		ValueExtractionPathNode getPrevious();
+		ValueExtractionPathNode getNext();
+		TypeVariable<?> getTypeParameter();
+		ValueExtractorDescriptor getValueExtractorDescriptor();
+	}
+
+	private static final class SingleValueExtractionPathNode implements ValueExtractionPathNode {
+
+		private final TypeVariable<?> typeParameter;
+		private final ValueExtractorDescriptor valueExtractorDescriptor;
+
+		public SingleValueExtractionPathNode(TypeParameterAndExtractor typeParameterAndExtractor) {
+			this.typeParameter = typeParameterAndExtractor.typeParameter;
+			this.valueExtractorDescriptor = typeParameterAndExtractor.valueExtractorDescriptor;
+		}
+
+		@Override
+		public boolean hasNext() {
+			return false;
+		}
+
+		@Override
+		public ValueExtractionPathNode getPrevious() {
+			throw new NoSuchElementException();
+		}
+
+		@Override
+		public ValueExtractionPathNode getNext() {
+			throw new NoSuchElementException();
+		}
+
+		@Override
+		public TypeVariable<?> getTypeParameter() {
+			return typeParameter;
+		}
+
+		@Override
+		public ValueExtractorDescriptor getValueExtractorDescriptor() {
+			return valueExtractorDescriptor;
+		}
+	}
+
+	private static final class LinkedValueExtractionPathNode implements ValueExtractionPathNode {
+
+		private final ValueExtractionPathNode previous;
+		private final ValueExtractionPathNode next;
+		private final TypeVariable<?> typeParameter;
+		private final ValueExtractorDescriptor valueExtractorDescriptor;
+
+		private LinkedValueExtractionPathNode( ValueExtractionPathNode previous, List<TypeParameterAndExtractor> elements) {
+			TypeParameterAndExtractor first = elements.get( 0 );
+			this.typeParameter = first.typeParameter;
+			this.valueExtractorDescriptor = first.valueExtractorDescriptor;
+			this.previous = previous;
+
+			if ( elements.size() == 1 ) {
+				this.next = null;
+			}
+			else {
+				this.next = new LinkedValueExtractionPathNode( this, elements.subList( 1, elements.size() ) );
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			return next != null;
+		}
+
+		@Override
+		public ValueExtractionPathNode getPrevious() {
+			return previous;
+		}
+
+		@Override
+		public ValueExtractionPathNode getNext() {
+			return next;
+		}
+
+		@Override
+		public TypeVariable<?> getTypeParameter() {
+			return typeParameter;
+		}
+
+		@Override
+		public ValueExtractorDescriptor getValueExtractorDescriptor() {
+			return valueExtractorDescriptor;
+		}
+
+		@Override
+		public String toString() {
+			return "LinkedValueExtractionPathNode [typeParameter=" + typeParameter + ", valueExtractorDescriptor=" + valueExtractorDescriptor + "]";
 		}
 	}
 }
