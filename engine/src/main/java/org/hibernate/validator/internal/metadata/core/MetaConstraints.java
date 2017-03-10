@@ -47,23 +47,21 @@ public class MetaConstraints {
 		Type typeOfValidatedElement = addValueExtractorDescriptorForWrappedValue( typeResolutionHelper, valueExtractorManager, constraintDescriptor,
 				valueExtractionPath, location );
 
-		if ( location instanceof TypeArgumentConstraintLocation ) {
-			TypeArgumentConstraintLocation typeArgumentConstraintLocation = (TypeArgumentConstraintLocation) location;
-
-			addValueExtractorDescriptorForTypeArgumentLocation( valueExtractorManager, valueExtractionPath, typeArgumentConstraintLocation );
-
-			ConstraintLocation delegateLocation = typeArgumentConstraintLocation.getDelegate();
-			while ( delegateLocation instanceof TypeArgumentConstraintLocation ) {
-				typeArgumentConstraintLocation = (TypeArgumentConstraintLocation) delegateLocation;
-				addValueExtractorDescriptorForTypeArgumentLocation( valueExtractorManager, valueExtractionPath, (TypeArgumentConstraintLocation) delegateLocation );
-
-				delegateLocation = typeArgumentConstraintLocation.getDelegate();
+		ConstraintLocation current = location;
+		do {
+			if ( current instanceof TypeArgumentConstraintLocation ) {
+				addValueExtractorDescriptorForTypeArgumentLocation( valueExtractorManager, valueExtractionPath, (TypeArgumentConstraintLocation) current );
+				current = ( (TypeArgumentConstraintLocation) current ).getDelegate();
+			}
+			else {
+				current = null;
 			}
 		}
+		while ( current != null );
 
 		Collections.reverse( valueExtractionPath );
 
-		return new MetaConstraint<A>( constraintDescriptor, location, valueExtractionPath, typeOfValidatedElement );
+		return new MetaConstraint<>( constraintDescriptor, location, valueExtractionPath, typeOfValidatedElement );
 	}
 
 	private static <A extends Annotation> Type addValueExtractorDescriptorForWrappedValue(TypeResolutionHelper typeResolutionHelper,
