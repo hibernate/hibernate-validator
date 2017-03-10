@@ -42,11 +42,6 @@ public class MetaConstraint<A extends Annotation> {
 	private final ConstraintTree<A> constraintTree;
 
 	/**
-	 * The constraint descriptor.
-	 */
-	private final ConstraintDescriptorImpl<A> constraintDescriptor;
-
-	/**
 	 * The location at which this constraint is defined.
 	 */
 	private final ConstraintLocation location;
@@ -69,10 +64,9 @@ public class MetaConstraint<A extends Annotation> {
 	MetaConstraint(ConstraintDescriptorImpl<A> constraintDescriptor, ConstraintLocation location, List<ValueExtractionPathNode> valueExtractionPath,
 			Type validatedValueType) {
 		this.constraintTree = new ConstraintTree<>( constraintDescriptor, validatedValueType );
-		this.constraintDescriptor = constraintDescriptor;
 		this.location = location;
 		this.valueExtractionPath = CollectionHelper.toImmutableList( valueExtractionPath );
-		this.hashCode = buildHashCode( constraintDescriptor, location, valueExtractionPath );
+		this.hashCode = buildHashCode( constraintDescriptor, location );
 	}
 
 	/**
@@ -80,15 +74,15 @@ public class MetaConstraint<A extends Annotation> {
 	 *         it is not explicitly specified, but part of the redefined default group list of the hosting bean.
 	 */
 	public final Set<Class<?>> getGroupList() {
-		return constraintDescriptor.getGroups();
+		return constraintTree.getDescriptor().getGroups();
 	}
 
 	public final ConstraintDescriptorImpl<A> getDescriptor() {
-		return constraintDescriptor;
+		return constraintTree.getDescriptor();
 	}
 
 	public final ElementType getElementType() {
-		return constraintDescriptor.getElementType();
+		return constraintTree.getDescriptor().getElementType();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -132,7 +126,7 @@ public class MetaConstraint<A extends Annotation> {
 
 		MetaConstraint<?> that = (MetaConstraint<?>) o;
 
-		if ( !constraintDescriptor.equals( that.constraintDescriptor ) ) {
+		if ( !constraintTree.getDescriptor().equals( that.constraintTree.getDescriptor() ) ) {
 			return false;
 		}
 
@@ -140,19 +134,14 @@ public class MetaConstraint<A extends Annotation> {
 			return false;
 		}
 
-		if ( valueExtractionPath != null ? !valueExtractionPath.equals( that.valueExtractionPath ) : that.valueExtractionPath != null ) {
-			return false;
-		}
-
 		return true;
 	}
 
-	private static int buildHashCode(ConstraintDescriptorImpl<?> constraintDescriptor, ConstraintLocation location, List<ValueExtractionPathNode> valueExtractionPath) {
+	private static int buildHashCode(ConstraintDescriptorImpl<?> constraintDescriptor, ConstraintLocation location) {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + constraintDescriptor.hashCode();
 		result = prime * result + location.hashCode();
-		result = prime * result + valueExtractionPath.hashCode();
 		return result;
 	}
 
@@ -165,7 +154,7 @@ public class MetaConstraint<A extends Annotation> {
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
 		sb.append( "MetaConstraint" );
-		sb.append( "{constraintType=" ).append( StringHelper.toShortString( constraintDescriptor.getAnnotation().annotationType() ) );
+		sb.append( "{constraintType=" ).append( StringHelper.toShortString( constraintTree.getDescriptor().getAnnotation().annotationType() ) );
 		sb.append( ", location=" ).append( location );
 		sb.append( ", valueExtractionPath=" ).append( valueExtractionPath );
 		sb.append( "}" );
@@ -248,8 +237,8 @@ public class MetaConstraint<A extends Annotation> {
 	}
 
 	static final class ValueExtractionPathNode {
-		private final TypeVariable<?> typeParameter;
 
+		private final TypeVariable<?> typeParameter;
 		private final ValueExtractorDescriptor valueExtractorDescriptor;
 
 		private ValueExtractionPathNode(TypeVariable<?> typeParameter, ValueExtractorDescriptor valueExtractorDescriptor) {
@@ -263,6 +252,11 @@ public class MetaConstraint<A extends Annotation> {
 
 		static ValueExtractionPathNode of(TypeVariable<?> typeParameter, ValueExtractorDescriptor valueExtractorDescriptor) {
 			return new ValueExtractionPathNode( typeParameter, valueExtractorDescriptor );
+		}
+
+		@Override
+		public String toString() {
+			return "ValueExtractionPathNode [typeParameter=" + typeParameter + ", valueExtractorDescriptor=" + valueExtractorDescriptor + "]";
 		}
 	}
 }
