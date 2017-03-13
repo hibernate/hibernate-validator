@@ -59,8 +59,8 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 						.containerElementType()
 							.constraint( new SizeDef().max( 5 ) )
 					.parameter( 1 )
-					.containerElementType( 0 )
-						.constraint( new SizeDef().min( 3 ).max( 10 ) )
+						.containerElementType( 0 )
+							.constraint( new SizeDef().min( 3 ).max( 10 ) )
 					.containerElementType( 1 )
 						.constraint( new MinDef().value( 1 ) );
 
