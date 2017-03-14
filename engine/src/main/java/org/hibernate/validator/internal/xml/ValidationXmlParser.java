@@ -73,7 +73,11 @@ public class ValidationXmlParser {
 			return BootstrapConfigurationImpl.getDefaultBootstrapConfiguration();
 		}
 
+		ClassLoader previousTccl = Thread.currentThread().getContextClassLoader();
+
 		try {
+			Thread.currentThread().setContextClassLoader( ValidationXmlParser.class.getClassLoader() );
+
 			// HV-970 The parser helper is only loaded if there actually is a validation.xml file;
 			// this avoids accessing javax.xml.stream.* (which does not exist on Android) when not actually
 			// working with the XML configuration
@@ -87,6 +91,7 @@ public class ValidationXmlParser {
 			return createBootstrapConfiguration( validationConfig );
 		}
 		finally {
+			Thread.currentThread().setContextClassLoader( previousTccl );
 			closeStream( inputStream );
 		}
 	}
