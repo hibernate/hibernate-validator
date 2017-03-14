@@ -104,6 +104,7 @@ The following shows how to do this via a http://docs.oracle.com/javase/8/docs/te
 grant codeBase "file:path/to/hibernate-validator-{hvVersion}.jar" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
+    permission java.lang.RuntimePermission "setContextClassLoader";
 
     // Only needed when working with XML descriptors (validation.xml or XML constraint mappings)
     permission java.util.PropertyPermission "mapAnyUriToUri", "read";
@@ -321,4 +322,3 @@ To learn more about the validation of beans and properties, just continue readin
 <<chapter-bean-constraints>>. If you are interested in using Bean Validation for the validation of
 method pre- and postcondition refer to <<chapter-method-constraints>>. In case your application has
 specific validation requirements have a look at <<validator-customconstraints>>.
-
