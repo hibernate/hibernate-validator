@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -30,7 +31,9 @@ import javax.xml.validation.Validator;
 import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
+import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
 import org.hibernate.validator.internal.xml.binding.DefaultValidatedExecutableTypesType;
 import org.hibernate.validator.internal.xml.binding.ExecutableValidationType;
@@ -78,7 +81,11 @@ public class ValidationXmlParser {
 			return BootstrapConfigurationImpl.getDefaultBootstrapConfiguration();
 		}
 
+		ClassLoader previousTccl = run( GetClassLoader.fromContext() );
+
 		try {
+			run( SetContextClassLoader.action( ValidationXmlParser.class.getClassLoader() ) );
+
 			// HV-970 The parser helper is only loaded if there actually is a validation.xml file;
 			// this avoids accessing javax.xml.stream.* (which does not exist on Android) when not actually
 			// working with the XML configuration
@@ -112,6 +119,7 @@ public class ValidationXmlParser {
 			throw log.getUnableToParseValidationXmlFileException( VALIDATION_XML_FILE, e );
 		}
 		finally {
+			run( SetContextClassLoader.action( previousTccl ) );
 			closeStream( in );
 		}
 	}
@@ -219,6 +227,16 @@ public class ValidationXmlParser {
 		executableTypes.addAll( validatedExecutables.getExecutableType() );
 
 		return executableTypes;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**

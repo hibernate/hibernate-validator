@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +45,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
+import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
 import org.hibernate.validator.internal.xml.binding.BeanType;
 import org.hibernate.validator.internal.xml.binding.ConstraintDefinitionType;
@@ -142,30 +145,7 @@ public class MappingXmlParser {
 
 			Set<String> alreadyProcessedConstraintDefinitions = newHashSet();
 			for ( InputStream in : mappingStreams ) {
-				// the InputStreams passed in parameters support mark and reset
-				in.mark( Integer.MAX_VALUE );
-
-				XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
-				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", xmlEventReader );
-				xmlEventReader.close();
-
-				in.reset();
-
-				// The validation is done first as we manipulate the XML document before pushing it to the unmarshaller
-				// and it might not be valid anymore as we might have switched the namespace to the latest namespace
-				// supported.
-				String schemaResourceName = getSchemaResourceName( schemaVersion );
-				Schema schema = xmlParserHelper.getSchema( schemaResourceName );
-				Validator validator = schema.newValidator();
-				validator.validate( new StreamSource( new CloseIgnoringInputStream( in ) ) );
-
-				in.reset();
-
-				xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
-				Unmarshaller unmarshaller = jc.createUnmarshaller();
-				ConstraintMappingsType mapping = getValidationConfig( xmlEventReader, unmarshaller );
-				xmlEventReader.close();
-
+				ConstraintMappingsType mapping = unmarshal( jc, in );
 				String defaultPackage = mapping.getDefaultPackage();
 
 				parseConstraintDefinitions(
@@ -190,6 +170,43 @@ public class MappingXmlParser {
 		}
 		catch (JAXBException | SAXException | IOException | XMLStreamException e) {
 			throw log.getErrorParsingMappingFileException( e );
+		}
+	}
+
+	private ConstraintMappingsType unmarshal(JAXBContext jc, InputStream in) throws JAXBException, XMLStreamException, IOException, SAXException {
+		ClassLoader previousTccl = run( GetClassLoader.fromContext() );
+
+		try {
+			run( SetContextClassLoader.action( MappingXmlParser.class.getClassLoader() ) );
+
+			// the InputStreams passed in parameters support mark and reset
+			in.mark( Integer.MAX_VALUE );
+
+			XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
+			String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", xmlEventReader );
+			xmlEventReader.close();
+
+			in.reset();
+
+			// The validation is done first as we manipulate the XML document before pushing it to the unmarshaller
+			// and it might not be valid anymore as we might have switched the namespace to the latest namespace
+			// supported.
+			String schemaResourceName = getSchemaResourceName( schemaVersion );
+			Schema schema = xmlParserHelper.getSchema( schemaResourceName );
+			Validator validator = schema.newValidator();
+			validator.validate( new StreamSource( new CloseIgnoringInputStream( in ) ) );
+
+			in.reset();
+
+			xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
+			Unmarshaller unmarshaller = jc.createUnmarshaller();
+			ConstraintMappingsType mapping = getValidationConfig( xmlEventReader, unmarshaller );
+			xmlEventReader.close();
+
+			return mapping;
+		}
+		finally {
+			run( SetContextClassLoader.action( previousTccl ) );
 		}
 	}
 
@@ -377,6 +394,16 @@ public class MappingXmlParser {
 		}
 
 		return schemaResource;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**
