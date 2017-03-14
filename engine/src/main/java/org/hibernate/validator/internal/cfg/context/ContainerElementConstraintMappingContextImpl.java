@@ -68,7 +68,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 	private final int index;
 
 	/**
-	 * The type parameter configured through this context. {@link ArrayElement#INSTANCE} in case of an array type.
+	 * The type parameter configured through this context. An instance of {@link ArrayElement} in case of an array type.
 	 */
 	private final TypeVariable<?> typeParameter;
 
@@ -98,7 +98,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 			}
 		}
 		else {
-			typeParameter = new ArrayElement( (Class<?>) configuredType );
+			typeParameter = new ArrayElement( configuredType );
 		}
 
 		this.index = index;
@@ -189,7 +189,7 @@ public class ContainerElementConstraintMappingContextImpl extends CascadableCons
 			return ( (ParameterizedType) configuredType ).getActualTypeArguments()[index];
 		}
 		else {
-			return ( (Class<?>) configuredType ).getComponentType();
+			return TypeHelper.getComponentType( configuredType );
 		}
 	}
 

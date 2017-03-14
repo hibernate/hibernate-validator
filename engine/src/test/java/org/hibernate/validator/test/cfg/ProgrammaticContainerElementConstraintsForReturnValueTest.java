@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 
@@ -317,6 +318,42 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 						.containerElementType( 0, 1, 0 );
 	}
 
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	@TestForIssue(jiraKey = "HV-1279")
+	public void configuringConstraintsOnGenericTypeArgumentOfListThrowsException() {
+		ConstraintMapping newMapping = config.createConstraintMapping();
+		newMapping
+			.type( IFishTank.class )
+				.method( "test8", List.class )
+					.returnValue()
+						.containerElementType( 0 )
+							.constraint( new SizeDef().max( 5 ) );
+
+		config.addMapping( newMapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+		fishTank.test8( Arrays.asList( "Too long" ) );
+	}
+
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	@TestForIssue(jiraKey = "HV-1279")
+	public void configuringConstraintsOnGenericTypeArgumentOfArrayThrowsException() {
+		ConstraintMapping newMapping = config.createConstraintMapping();
+		newMapping
+			.type( IFishTank.class )
+				.method( "test9", Object[].class )
+					.returnValue()
+						.containerElementType( 0 )
+							.constraint( new SizeDef().max( 5 ) );
+
+		config.addMapping( newMapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+		fishTank.test9( new String[]{ "Too long" } );
+	}
+
 	public interface IFishTank {
 		Map<String, Integer> test1();
 		Map<String, List<Fish>> test2();
@@ -325,6 +362,8 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 		String[] test5();
 		List<String[]> test6();
 		String[][]  test7();
+		<T> List<T> test8(List<T> list);
+		<T> T[] test9(T[] array);
 		int getSize();
 	}
 
@@ -379,6 +418,16 @@ public class ProgrammaticContainerElementConstraintsForReturnValueTest {
 		@Override
 		public String[][] test7() {
 			return new String[][]{ new String[] { "Too Long" } };
+		}
+
+		@Override
+		public <T> List<T> test8(List<T> list) {
+			return list;
+		}
+
+		@Override
+		public <T> T[] test9(T[] array) {
+			return array;
 		}
 
 		@Override

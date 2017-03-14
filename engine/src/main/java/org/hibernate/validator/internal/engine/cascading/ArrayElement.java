@@ -9,8 +9,11 @@ package org.hibernate.validator.internal.engine.cascading;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedArrayType;
 import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+
+import org.hibernate.validator.internal.util.ReflectionHelper;
 
 /**
  * A pseudo type variable which is used to represent constraints applied to the elements of an array.
@@ -53,12 +56,18 @@ public class ArrayElement implements TypeVariable<Class<?>> {
 		}
 	}
 
-	public ArrayElement(Class<?> containerClass) {
-		if ( containerClass.getComponentType().isPrimitive() ) {
-			this.containerClass = containerClass;
+	public ArrayElement(Type arrayType) {
+		if ( arrayType instanceof GenericArrayType ) {
+			this.containerClass = Object[].class;
 		}
 		else {
-			this.containerClass = Object[].class;
+			Class<?> arrayClass = ReflectionHelper.getClassFromType( arrayType );
+			if ( arrayClass.getComponentType().isPrimitive() ) {
+				this.containerClass = arrayClass;
+			}
+			else {
+				this.containerClass = Object[].class;
+			}
 		}
 	}
 

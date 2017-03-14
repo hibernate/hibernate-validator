@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.UnexpectedTypeException;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
 
@@ -340,6 +341,42 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 						.containerElementType( 0, 1, 0 );
 	}
 
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	@TestForIssue(jiraKey = "HV-1279")
+	public void configuringConstraintsOnGenericTypeArgumentOfListThrowsException() {
+		ConstraintMapping newMapping = config.createConstraintMapping();
+		newMapping
+			.type( IFishTank.class )
+				.method( "test8", List.class )
+					.parameter( 0 )
+						.containerElementType( 0 )
+							.constraint( new SizeDef().max( 5 ) );
+
+		config.addMapping( newMapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+		fishTank.test8( Arrays.asList( "Too long" ) );
+	}
+
+	@Test(expectedExceptions = UnexpectedTypeException.class, expectedExceptionsMessageRegExp = "HV000030:.*")
+	@TestForIssue(jiraKey = "HV-1279")
+	public void configuringConstraintsOnGenericTypeArgumentOfArrayThrowsException() {
+		ConstraintMapping newMapping = config.createConstraintMapping();
+		newMapping
+			.type( IFishTank.class )
+				.method( "test9", Object[].class )
+					.parameter( 0 )
+						.containerElementType( 0 )
+							.constraint( new SizeDef().max( 5 ) );
+
+		config.addMapping( newMapping );
+		Validator validator = config.buildValidatorFactory().getValidator();
+
+		IFishTank fishTank = ValidatorUtil.getValidatingProxy( new FishTank(), validator );
+		fishTank.test9( new String[]{ "Too long" } );
+	}
+
 	public interface IFishTank {
 		void test1(Optional<String> model, Map<String, Integer> fishCountByType);
 		void test2(Map<String, List<Fish>> fishOfTheMonth);
@@ -349,6 +386,8 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 		void test6(List<String[]> fishNamesByMonth);
 		void test7(String[][] fishNamesByMonthAsArray);
 		void setSize(int size);
+		<T> void test8(List<T> fishNames);
+		<T> void test9(T[] fishNames);
 	}
 
 	public static class FishTank implements IFishTank {
@@ -379,6 +418,14 @@ public class ProgrammaticContainerElementConstraintsForParameterTest {
 
 		@Override
 		public void test7(String[][] fishNamesByMonthAsArray) {
+		}
+
+		@Override
+		public <T> void test8(List<T> fishNames) {
+		}
+
+		@Override
+		public <T> void test9(T[] fishNames) {
 		}
 
 		@Override
