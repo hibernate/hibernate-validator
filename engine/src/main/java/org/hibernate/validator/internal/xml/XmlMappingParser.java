@@ -137,15 +137,7 @@ public class XmlMappingParser {
 					in.mark( Integer.MAX_VALUE );
 				}
 
-				XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
-				String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", xmlEventReader );
-				String schemaResourceName = getSchemaResourceName( schemaVersion );
-				Schema schema = xmlParserHelper.getSchema( schemaResourceName );
-
-				Unmarshaller unmarshaller = jc.createUnmarshaller();
-				unmarshaller.setSchema( schema );
-
-				ConstraintMappingsType mapping = getValidationConfig( xmlEventReader, unmarshaller );
+				ConstraintMappingsType mapping = unmarshal( jc, in );
 				String defaultPackage = mapping.getDefaultPackage();
 
 				parseConstraintDefinitions(
@@ -177,6 +169,27 @@ public class XmlMappingParser {
 		}
 		catch (JAXBException e) {
 			throw log.getErrorParsingMappingFileException( e );
+		}
+	}
+
+	private ConstraintMappingsType unmarshal(JAXBContext jc, InputStream in) throws JAXBException {
+		ClassLoader previousTccl = Thread.currentThread().getContextClassLoader();
+
+		try {
+			Thread.currentThread().setContextClassLoader( ValidationXmlParser.class.getClassLoader() );
+
+			XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
+			String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", xmlEventReader );
+			String schemaResourceName = getSchemaResourceName( schemaVersion );
+			Schema schema = xmlParserHelper.getSchema( schemaResourceName );
+
+			Unmarshaller unmarshaller = jc.createUnmarshaller();
+			unmarshaller.setSchema( schema );
+
+			return getValidationConfig( xmlEventReader, unmarshaller );
+		}
+		finally {
+			Thread.currentThread().setContextClassLoader( previousTccl );
 		}
 	}
 
