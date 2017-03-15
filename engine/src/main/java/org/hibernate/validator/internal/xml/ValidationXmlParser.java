@@ -9,6 +9,7 @@ package org.hibernate.validator.internal.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import javax.xml.validation.Schema;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
+import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
 import org.hibernate.validator.internal.xml.binding.DefaultValidatedExecutableTypesType;
 import org.hibernate.validator.internal.xml.binding.ExecutableValidationType;
@@ -76,7 +78,7 @@ public class ValidationXmlParser {
 		ClassLoader previousTccl = Thread.currentThread().getContextClassLoader();
 
 		try {
-			Thread.currentThread().setContextClassLoader( ValidationXmlParser.class.getClassLoader() );
+			run( SetContextClassLoader.action( ValidationXmlParser.class.getClassLoader() ) );
 
 			// HV-970 The parser helper is only loaded if there actually is a validation.xml file;
 			// this avoids accessing javax.xml.stream.* (which does not exist on Android) when not actually
@@ -91,7 +93,7 @@ public class ValidationXmlParser {
 			return createBootstrapConfiguration( validationConfig );
 		}
 		finally {
-			Thread.currentThread().setContextClassLoader( previousTccl );
+			run( SetContextClassLoader.action( previousTccl ) );
 			closeStream( inputStream );
 		}
 	}
@@ -198,6 +200,16 @@ public class ValidationXmlParser {
 		executableTypes.addAll( validatedExecutables.getExecutableType() );
 
 		return executableTypes;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**
