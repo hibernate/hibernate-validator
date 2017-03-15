@@ -166,20 +166,15 @@
                 <configuration>
                     <packageName>org.hibernate.validator.internal.xml</packageName>
                     <extension>true</extension>
-                    <schemaFiles>validation-configuration-1.1.xsd,validation-mapping-1.1.xsd</schemaFiles>
+                    <!-- Generate correct getters for Boolean properties -->
+                    <enableIntrospection>true</enableIntrospection>
+                    <!-- Makes sure the generated code is compatible with JAXB 2.1 which is what comes with Java 1.6 -->
+                    <target>2.1</target>
+                    <sources>
+                        <source>src/main/xsd/validation-configuration-1.1.xsd</source>
+                        <source>src/main/xsd/validation-mapping-1.1.xsd</source>
+                    </sources>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>javax.xml.bind</groupId>
-                        <artifactId>jaxb-api</artifactId>
-                        <version>2.2.5</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.sun.xml.bind</groupId>
-                        <artifactId>jaxb-impl</artifactId>
-                        <version>2.1.13</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
