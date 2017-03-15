@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +44,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
+import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
 import org.hibernate.validator.internal.xml.binding.BeanType;
 import org.hibernate.validator.internal.xml.binding.ConstraintDefinitionType;
@@ -181,7 +183,7 @@ public class MappingXmlParser {
 		ClassLoader previousTccl = Thread.currentThread().getContextClassLoader();
 
 		try {
-			Thread.currentThread().setContextClassLoader( ValidationXmlParser.class.getClassLoader() );
+			run( SetContextClassLoader.action( ValidationXmlParser.class.getClassLoader() ) );
 
 			XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
 			String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", xmlEventReader );
@@ -194,7 +196,7 @@ public class MappingXmlParser {
 			return getValidationConfig( xmlEventReader, unmarshaller );
 		}
 		finally {
-			Thread.currentThread().setContextClassLoader( previousTccl );
+			run( SetContextClassLoader.action( previousTccl ) );
 		}
 	}
 
@@ -385,6 +387,16 @@ public class MappingXmlParser {
 		}
 
 		return schemaResource;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**

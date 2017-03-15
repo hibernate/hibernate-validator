@@ -26,6 +26,7 @@
 grant codeBase "file:${localRepository}/org/hibernate/hibernate-validator/${project.version}/hibernate-validator-${project.version}.jar" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
+    permission java.lang.RuntimePermission "setContextClassLoader";
 
     // JAXB
     permission java.util.PropertyPermission "mapAnyUriToUri", "read";
@@ -36,6 +37,7 @@ grant codeBase "file:${localRepository}/org/hibernate/hibernate-validator/${proj
 grant codeBase "file:${basedir}/../engine/target/hibernate-validator-${project.version}.jar" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessDeclaredMembers";
+    permission java.lang.RuntimePermission "setContextClassLoader";
 
     // JAXB
     permission java.util.PropertyPermission "mapAnyUriToUri", "read";
