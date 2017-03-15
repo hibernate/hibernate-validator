@@ -37,9 +37,9 @@ import org.testng.annotations.Test;
  *
  * @author Gunnar Morling
  */
-public class JaxpContainedinDeploymentIT extends AbstractArquillianIT {
+public class JaxpContainedInDeploymentIT extends AbstractArquillianIT {
 
-	private static final String WAR_FILE_NAME = JaxpContainedinDeploymentIT.class.getSimpleName() + ".war";
+	private static final String WAR_FILE_NAME = JaxpContainedInDeploymentIT.class.getSimpleName() + ".war";
 
 	@ArquillianResource
 	private Deployer deployer;
