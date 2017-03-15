@@ -1,6 +1,23 @@
 Hibernate Validator Changelog
 =============================
 
+5.3.5.Final (15-03-2017)
+-------------------------
+
+** Bug
+    * HV-1284 - build         - Reenable testing under the security manager
+    * HV-1220 - engine        - Programmatically defined cross parameter method constraints don't work on method returning void
+
+** Improvement
+    * HV-1187 - build, engine - Support JDK9 ea+148
+
+** New Feature
+    * HV-1280 -               - Class loading conflict when custom Xerces is part of a deployment
+
+** Task
+    * HV-1266 - build         - Update build instructions as per latest Java 9 releases
+    * HV-1210 - build         - Upgrade to Groovy 2.4.8
+
 5.3.4.Final (08-12-2016)
 -------------------------
 
