@@ -1,6 +1,20 @@
 Hibernate Validator Changelog
 =============================
 
+5.2.5.Final (15-03-2017)
+-------------------------
+
+** Bug
+    * HV-1280 -            - Class loading conflict when custom Xerces is part of a deployment
+    * HV-1220 - engine     - Programmatically defined cross parameter method constraints don't work on method returning void
+    * HV-1140 - engine     - StringHelper#decapitalize not working properly on turkish locale
+    * HV-1098 - tck-runner - Adapt test.policy file of TCK runner for reading "validation.provider" property
+    * HV-1032 - engine     - Infinite Loop when validating custom type constraint under certain inheritance scheme
+
+** Improvement
+    * HV-1282 - build      - Update JAXB maven plugin to 2.2 for the 5.2 branch
+    * HV-1281 - build      - Make 5.2 compatible with the new release process
+
 5.2.4.Final ( 17.02.2016)
 ------------------------
 
