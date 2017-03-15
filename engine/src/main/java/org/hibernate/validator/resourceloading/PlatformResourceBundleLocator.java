@@ -6,7 +6,11 @@
  */
 package org.hibernate.validator.resourceloading;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -20,12 +24,10 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
+import org.hibernate.validator.internal.util.privilegedactions.GetMethod;
 import org.hibernate.validator.internal.util.privilegedactions.GetResources;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 import org.jboss.logging.Logger;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
 
 /**
  * A resource bundle locator, that loads resource bundles by invoking {@code ResourceBundle.loadBundle(String, Local, ClassLoader)}.
@@ -164,21 +166,42 @@ public class PlatformResourceBundleLocator implements ResourceBundleLocator {
 	}
 
 	/**
+	 * Check whether ResourceBundle.Control is available, which is needed for bundle aggregation. If not, we'll skip
+	 * resource aggregation.
+	 * <p>
+	 * It is *not* available
+	 * <ul>
+	 * <li>in the Google App Engine environment</li>
+	 * <li>when running HV as Java 9 named module (which would be the case when adding a module-info descriptor to the
+	 * HV JAR)</li>
+	 * </ul>
 	 *
-	 * In an Google App Engine environment bundle aggregation is not possible, since ResourceBundle.Control
-	 * is not on the list of white listed classes in this environment.
-	 * to create AggregateResourceBundle.CONTROL proactively, if it fails skip resource aggregation.
-	 *
-	 * @see <a href="http://code.google.com/appengine/docs/java/jrewhitelist.html">JRE whitelist</a>
+	 * @see <a href="http://code.google.com/appengine/docs/java/jrewhitelist.html">GAE JRE whitelist</a>
 	 * @see <a href="https://hibernate.atlassian.net/browse/HV-1023">HV-1023</a>
+	 * @see <a href="http://download.java.net/java/jdk9/docs/api/java/util/ResourceBundle.Control.html>ResourceBundle.Control</a>
 	 */
 	private static boolean determineAvailabilityOfResourceBundleControl() {
 		try {
-			@SuppressWarnings("unused")
 			ResourceBundle.Control dummyControl = AggregateResourceBundle.CONTROL;
-			return true;
+
+			if ( dummyControl == null ) {
+				return false;
+			}
+
+			Method getModule = run( GetMethod.action( Class.class, "getModule" ) );
+			// not on Java 9
+			if ( getModule == null ) {
+				return true;
+			}
+
+			// on Java 9, check whether HV is a named module
+			Object module = getModule.invoke( PlatformResourceBundleLocator.class );
+			Method isNamedMethod = run( GetMethod.action( module.getClass(), "isNamed" ) );
+			boolean isNamed = (Boolean) isNamedMethod.invoke( module );
+
+			return !isNamed;
 		}
-		catch (NoClassDefFoundError e) {
+		catch (Throwable e) {
 			log.info( MESSAGES.unableToUseResourceBundleAggregation() );
 			return false;
 		}
