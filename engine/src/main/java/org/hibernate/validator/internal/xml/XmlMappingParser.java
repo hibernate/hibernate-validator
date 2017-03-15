@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +38,9 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.NewJaxbContext;
+import org.hibernate.validator.internal.util.privilegedactions.SetContextClassLoader;
 import org.hibernate.validator.internal.util.privilegedactions.Unmarshal;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
@@ -173,10 +176,10 @@ public class XmlMappingParser {
 	}
 
 	private ConstraintMappingsType unmarshal(JAXBContext jc, InputStream in) throws JAXBException {
-		ClassLoader previousTccl = Thread.currentThread().getContextClassLoader();
+		ClassLoader previousTccl = run( GetClassLoader.fromContext() );
 
 		try {
-			Thread.currentThread().setContextClassLoader( ValidationXmlParser.class.getClassLoader() );
+			run( SetContextClassLoader.action( XmlMappingParser.class.getClassLoader() ) );
 
 			XMLEventReader xmlEventReader = xmlParserHelper.createXmlEventReader( "constraint mapping file", new CloseIgnoringInputStream( in ) );
 			String schemaVersion = xmlParserHelper.getSchemaVersion( "constraint mapping file", xmlEventReader );
@@ -189,7 +192,7 @@ public class XmlMappingParser {
 			return getValidationConfig( xmlEventReader, unmarshaller );
 		}
 		finally {
-			Thread.currentThread().setContextClassLoader( previousTccl );
+			run( SetContextClassLoader.action( previousTccl ) );
 		}
 	}
 
@@ -380,6 +383,16 @@ public class XmlMappingParser {
 		}
 
 		return schemaResource;
+	}
+
+	/**
+	 * Runs the given privileged action, using a privileged block if required.
+	 * <p>
+	 * <b>NOTE:</b> This must never be changed into a publicly available method to avoid execution of arbitrary
+	 * privileged actions within HV's protection domain.
+	 */
+	private static <T> T run(PrivilegedAction<T> action) {
+		return System.getSecurityManager() != null ? AccessController.doPrivileged( action ) : action.run();
 	}
 
 	/**
