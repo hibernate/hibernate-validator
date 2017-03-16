@@ -1,6 +1,29 @@
 Hibernate Validator Changelog
 =============================
 
+5.4.1.Final (16-03-2017)
+-------------------------
+
+** Bug
+    * HV-1284 - build                - Reenable testing under the security manager
+    * HV-1280 - engine               - Class loading conflict when custom Xerces is part of a deployment
+    * HV-1264 - engine               - Message interpolation fails with single opening or closing brace in regex character class
+    * HV-1253 - validators           - Constraints shouldn't be declared TYPE_USE in the 5.4 branch
+    * HV-1252 - annotation-processor - Annotation processor is not aware of new constraint @Currency and validators for type MonetaryAmount
+    * HV-1242 - documentation        - Don't mention JSR 380 in HV 5.4 reference guide
+    * HV-1088 - engine               - Unexpected behavior multi threads accessing ConstraintValidatorManager
+
+** Improvement
+    * HV-1283 - engine               - Make HV engine more friendly towards usage as a Java 9 named module
+    * HV-1262 - engine               - Add affected validator classes to exception messages if there are multiple matching ones
+    * HV-1244 - translations         - Add translation for Persian language
+    * HV-1235 - validators           - Javadoc for PESEL mentions NIP
+
+** Task
+    * HV-1266 - build                - Update build instructions as per latest Java 9 releases
+    * HV-1233 - documentation        - Convert tabs to space in rendered doc to have a consistent behavior across browsers
+    * HV-1228 - documentation        - Switch to the common AsciiDoctor theme for the documentation
+
 5.4.0.Final (01-02-2017)
 -------------------------
 
