@@ -13,7 +13,6 @@ import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +30,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
 import org.hibernate.validator.internal.util.privilegedactions.SetAccessibility;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * A {@link Cascadable} backed by a field of a Java bean.
@@ -42,6 +42,7 @@ public class FieldCascadable implements Cascadable {
 	private final Field field;
 	private final String propertyName;
 	private final Type cascadableType;
+	@Immutable
 	private final List<CascadingTypeParameter> cascadingTypeParameters;
 	private final GroupConversionHelper groupConversionHelper;
 
@@ -49,7 +50,7 @@ public class FieldCascadable implements Cascadable {
 		this.field = field;
 		this.propertyName = field.getName();
 		this.cascadableType = ReflectionHelper.typeOf( field );
-		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
+		this.cascadingTypeParameters = CollectionHelper.toImmutableList( cascadingTypeParameters );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( !cascadingTypeParameters.isEmpty(), field.toString() );
 	}

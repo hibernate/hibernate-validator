@@ -24,7 +24,6 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +49,7 @@ import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.core.ConstraintOrigin;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
@@ -103,27 +103,32 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 	@Immutable
 	private final List<Class<? extends ConstraintValidator<T, ?>>> constraintValidatorClasses;
 
+	@Immutable
 	private final List<ConstraintValidatorDescriptor<T>> matchingConstraintValidatorDescriptors;
 
 	/**
 	 * The groups for which to apply this constraint.
 	 */
+	@Immutable
 	private final Set<Class<?>> groups;
 
 	/**
 	 * The constraint parameters as map. The key is the parameter name and the value the
 	 * parameter value as specified in the constraint.
 	 */
+	@Immutable
 	private final Map<String, Object> attributes;
 
 	/**
 	 * The specified payload of the constraint.
 	 */
+	@Immutable
 	private final Set<Class<? extends Payload>> payloads;
 
 	/**
 	 * The composing constraints for this constraint.
 	 */
+	@Immutable
 	private final Set<ConstraintDescriptorImpl<?>> composingConstraints;
 
 	/**
@@ -187,16 +192,16 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		this.constraintValidatorClasses = constraintHelper.getAllValidatorDescriptors( annotationType )
 				.stream()
 				.map( ConstraintValidatorDescriptor::getValidatorClass )
-				.collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
+				.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
 
-		List<ConstraintValidatorDescriptor<T>> crossParameterValidatorDescriptors = constraintHelper.findValidatorDescriptors(
+		List<ConstraintValidatorDescriptor<T>> crossParameterValidatorDescriptors = CollectionHelper.toImmutableList( constraintHelper.findValidatorDescriptors(
 				annotationType,
 				ValidationTarget.PARAMETERS
-		);
-		List<ConstraintValidatorDescriptor<T>> genericValidatorDescriptors = constraintHelper.findValidatorDescriptors(
+		) );
+		List<ConstraintValidatorDescriptor<T>> genericValidatorDescriptors = CollectionHelper.toImmutableList( constraintHelper.findValidatorDescriptors(
 				annotationType,
 				ValidationTarget.ANNOTATED_ELEMENT
-		);
+		) );
 
 		if ( crossParameterValidatorDescriptors.size() > 1 ) {
 			throw LOG.getMultipleCrossParameterValidatorClassesException( annotationType );
@@ -215,10 +220,10 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		validateComposingConstraintTypes();
 
 		if ( constraintType == ConstraintType.GENERIC ) {
-			this.matchingConstraintValidatorDescriptors = Collections.unmodifiableList( genericValidatorDescriptors );
+			this.matchingConstraintValidatorDescriptors = CollectionHelper.toImmutableList( genericValidatorDescriptors );
 		}
 		else {
-			this.matchingConstraintValidatorDescriptors = Collections.unmodifiableList( crossParameterValidatorDescriptors );
+			this.matchingConstraintValidatorDescriptors = CollectionHelper.toImmutableList( crossParameterValidatorDescriptors );
 		}
 
 		this.hashCode = annotation.hashCode();
@@ -294,7 +299,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 
 	@Override
 	public Set<ConstraintDescriptor<?>> getComposingConstraints() {
-		return Collections.<ConstraintDescriptor<?>>unmodifiableSet( composingConstraints );
+		return CollectionHelper.<ConstraintDescriptor<?>>toImmutableSet( composingConstraints );
 	}
 
 	public Set<ConstraintDescriptorImpl<?>> getComposingConstraintImpls() {
@@ -566,7 +571,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		if ( payloadFromAnnotation != null ) {
 			payloadSet.addAll( Arrays.asList( payloadFromAnnotation ) );
 		}
-		return Collections.unmodifiableSet( payloadSet );
+		return CollectionHelper.toImmutableSet( payloadSet );
 	}
 
 	private Set<Class<?>> buildGroupSet(Class<?> implicitGroup) {
@@ -585,7 +590,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 		if ( implicitGroup != null && groupSet.contains( Default.class ) ) {
 			groupSet.add( implicitGroup );
 		}
-		return Collections.unmodifiableSet( groupSet );
+		return CollectionHelper.toImmutableSet( groupSet );
 	}
 
 	private Map<String, Object> buildAnnotationParameterMap(Annotation annotation) {
@@ -595,7 +600,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			Object value = run( GetAnnotationParameter.action( annotation, m.getName(), Object.class ) );
 			parameters.put( m.getName(), value );
 		}
-		return Collections.unmodifiableMap( parameters );
+		return CollectionHelper.toImmutableMap( parameters );
 	}
 
 	private Map<ClassIndexWrapper, Map<String, Object>> parseOverrideParameters() {
@@ -703,7 +708,7 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 				}
 			}
 		}
-		return Collections.unmodifiableSet( composingConstraintsSet );
+		return CollectionHelper.toImmutableSet( composingConstraintsSet );
 	}
 
 	private CompositionType parseCompositionType(ConstraintHelper constraintHelper) {

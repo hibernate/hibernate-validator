@@ -6,18 +6,20 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.util.Collections;
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.validation.GroupSequence;
 import javax.validation.metadata.GroupConversionDescriptor;
 
 import org.hibernate.validator.internal.metadata.descriptor.GroupConversionDescriptorImpl;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Provides group conversion functionality to {@link org.hibernate.validator.cfg.context.Cascadable}s.
@@ -26,10 +28,11 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
  */
 public class GroupConversionHelper {
 	private static final Log log = LoggerFactory.make();
+	@Immutable
 	private final Map<Class<?>, Class<?>> groupConversions;
 
 	public GroupConversionHelper(Map<Class<?>, Class<?>> groupConversions) {
-		this.groupConversions = Collections.unmodifiableMap( groupConversions );
+		this.groupConversions = CollectionHelper.toImmutableMap( groupConversions );
 	}
 
 	/**
@@ -66,7 +69,7 @@ public class GroupConversionHelper {
 			);
 		}
 
-		return Collections.unmodifiableSet( descriptors );
+		return CollectionHelper.toImmutableSet( descriptors );
 	}
 
 	public void validateGroupConversions(boolean isCascaded, String location) {

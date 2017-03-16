@@ -10,7 +10,6 @@ import java.lang.annotation.ElementType;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,8 +28,10 @@ import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.ConstrainedElementKind;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * An aggregated view of the constraint related meta data for a single method
@@ -43,6 +44,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 	private final GroupConversionHelper groupConversionHelper;
 	private final int index;
+	@Immutable
 	private final List<CascadingTypeParameter> cascadingTypeParameters;
 
 	private ParameterMetaData(int index,
@@ -62,7 +64,7 @@ public class ParameterMetaData extends AbstractConstraintMetaData implements Cas
 
 		this.index = index;
 
-		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
+		this.cascadingTypeParameters = CollectionHelper.toImmutableList( cascadingTypeParameters );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}

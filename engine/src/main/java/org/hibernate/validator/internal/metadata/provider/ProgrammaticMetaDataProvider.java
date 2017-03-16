@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.metadata.provider;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +18,7 @@ import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOption
 import org.hibernate.validator.internal.metadata.core.AnnotationProcessingOptionsImpl;
 import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -45,7 +45,7 @@ public class ProgrammaticMetaDataProvider implements MetaDataProvider {
 										Set<DefaultConstraintMapping> constraintMappings) {
 		Contracts.assertNotNull( constraintMappings );
 
-		configuredBeans = Collections.unmodifiableMap(
+		configuredBeans = CollectionHelper.toImmutableMap(
 				createBeanConfigurations( constraintMappings, constraintHelper, typeResolutionHelper, valueExtractorManager )
 		);
 

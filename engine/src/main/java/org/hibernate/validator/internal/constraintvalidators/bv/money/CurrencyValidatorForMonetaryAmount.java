@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.constraintvalidators.bv.money;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.money.CurrencyUnit;
@@ -17,6 +16,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraints.Currency;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Check that the validated {@link MonetaryAmount} is in the right {@link CurrencyUnit}.
@@ -25,6 +26,7 @@ import org.hibernate.validator.constraints.Currency;
  */
 public class CurrencyValidatorForMonetaryAmount implements ConstraintValidator<Currency, MonetaryAmount> {
 
+	@Immutable
 	private List<CurrencyUnit> acceptedCurrencies;
 
 	@Override
@@ -33,7 +35,7 @@ public class CurrencyValidatorForMonetaryAmount implements ConstraintValidator<C
 		for ( String currencyCode : currency.value() ) {
 			acceptedCurrencies.add( Monetary.getCurrency( currencyCode ) );
 		}
-		this.acceptedCurrencies = Collections.unmodifiableList( acceptedCurrencies );
+		this.acceptedCurrencies = CollectionHelper.toImmutableList( acceptedCurrencies );
 	}
 
 	@Override

@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.xml;
 import java.io.InputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,6 +26,7 @@ import javax.validation.valueextraction.ValueExtractor;
 
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor;
 import org.hibernate.validator.internal.engine.cascading.ValueExtractorDescriptor.Key;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
@@ -117,11 +117,11 @@ public class ValidationBootstrapParameters {
 	}
 
 	public final Set<InputStream> getMappings() {
-		return Collections.unmodifiableSet( mappings );
+		return CollectionHelper.toImmutableSet( mappings );
 	}
 
 	public final Map<String, String> getConfigProperties() {
-		return Collections.unmodifiableMap( configProperties );
+		return CollectionHelper.toImmutableMap( configProperties );
 	}
 
 	public ParameterNameProvider getParameterNameProvider() {

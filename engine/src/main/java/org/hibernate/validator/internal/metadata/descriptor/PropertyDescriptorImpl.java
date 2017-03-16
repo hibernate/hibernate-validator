@@ -7,11 +7,14 @@
 package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
+
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Describes a validated property.
@@ -22,6 +25,7 @@ import javax.validation.metadata.PropertyDescriptor;
 public class PropertyDescriptorImpl extends ElementDescriptorImpl implements PropertyDescriptor {
 	private final boolean cascaded;
 	private final String property;
+	@Immutable
 	private final Set<GroupConversionDescriptor> groupConversions;
 
 	public PropertyDescriptorImpl(Type returnType,
@@ -34,7 +38,7 @@ public class PropertyDescriptorImpl extends ElementDescriptorImpl implements Pro
 
 		this.property = propertyName;
 		this.cascaded = cascaded;
-		this.groupConversions = Collections.unmodifiableSet( groupConversions );
+		this.groupConversions = CollectionHelper.toImmutableSet( groupConversions );
 	}
 
 	@Override

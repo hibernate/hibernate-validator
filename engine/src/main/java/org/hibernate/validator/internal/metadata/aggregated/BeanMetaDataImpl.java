@@ -46,6 +46,7 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
@@ -53,6 +54,7 @@ import org.hibernate.validator.internal.util.classhierarchy.ClassHierarchyHelper
 import org.hibernate.validator.internal.util.classhierarchy.Filters;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
 
 /**
@@ -88,11 +90,13 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * Set of all constraints for this bean type (defined on any implemented interfaces or super types)
 	 */
+	@Immutable
 	private final Set<MetaConstraint<?>> allMetaConstraints;
 
 	/**
 	 * Set of all constraints which are directly defined on the bean or any of the directly implemented interfaces
 	 */
+	@Immutable
 	private final Set<MetaConstraint<?>> directMetaConstraints;
 
 	/**
@@ -105,16 +109,19 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	 * method {@code foo(T)} and an overriding sub-type method {@code foo(String)} two entries for the same executable
 	 * meta-data will be stored).
 	 */
+	@Immutable
 	private final Map<String, ExecutableMetaData> executableMetaDataMap;
 
 	/**
 	 * Property meta data keyed against the property name
 	 */
+	@Immutable
 	private final Map<String, PropertyMetaData> propertyMetaDataMap;
 
 	/**
 	 * The cascaded properties of this bean.
 	 */
+	@Immutable
 	private final Set<Cascadable> cascadedProperties;
 
 	/**
@@ -125,6 +132,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	/**
 	 * The default groups sequence for this bean class.
 	 */
+	@Immutable
 	private final List<Class<?>> defaultGroupSequence;
 
 	/**
@@ -136,10 +144,12 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 	private final DefaultGroupSequenceProvider<? super T> defaultGroupSequenceProvider;
 
 	private final ValidationOrder validationOrder;
+
 	/**
 	 * The class hierarchy for this class starting with the class itself going up the inheritance chain. Interfaces
 	 * are not included.
 	 */
+	@Immutable
 	private final List<Class<? super T>> classHierarchyWithoutInterfaces;
 
 	/**
@@ -185,22 +195,22 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 		}
 
 		this.hasConstraints = hasConstraints;
-		this.cascadedProperties = Collections.unmodifiableSet( cascadedProperties );
-		this.allMetaConstraints = Collections.unmodifiableSet( allMetaConstraints );
+		this.cascadedProperties = CollectionHelper.toImmutableSet( cascadedProperties );
+		this.allMetaConstraints = CollectionHelper.toImmutableSet( allMetaConstraints );
 
-		this.classHierarchyWithoutInterfaces = ClassHierarchyHelper.getHierarchy(
+		this.classHierarchyWithoutInterfaces = CollectionHelper.toImmutableList( ClassHierarchyHelper.getHierarchy(
 				beanClass,
 				Filters.excludeInterfaces()
-		);
+		) );
 
 		DefaultGroupSequenceContext<? super T> defaultGroupContext = getDefaultGroupSequenceData( beanClass, defaultGroupSequence, defaultGroupSequenceProvider, validationOrderGenerator );
 		this.defaultGroupSequenceProvider = defaultGroupContext.defaultGroupSequenceProvider;
-		this.defaultGroupSequence = Collections.unmodifiableList( defaultGroupContext.defaultGroupSequence );
+		this.defaultGroupSequence = CollectionHelper.toImmutableList( defaultGroupContext.defaultGroupSequence );
 		this.validationOrder = defaultGroupContext.validationOrder;
 
 		this.directMetaConstraints = getDirectConstraints();
 
-		this.executableMetaDataMap = Collections.unmodifiableMap( bySignature( executableMetaDataSet ) );
+		this.executableMetaDataMap = CollectionHelper.toImmutableMap( bySignature( executableMetaDataSet ) );
 
 		boolean defaultGroupSequenceIsRedefined = defaultGroupSequenceIsRedefined();
 		List<Class<?>> resolvedDefaultGroupSequence = getDefaultGroupSequence( null );
@@ -415,7 +425,7 @@ public final class BeanMetaDataImpl<T> implements BeanMetaData<T> {
 			}
 		}
 
-		return Collections.unmodifiableSet( constraints );
+		return CollectionHelper.toImmutableSet( constraints );
 	}
 
 	/**

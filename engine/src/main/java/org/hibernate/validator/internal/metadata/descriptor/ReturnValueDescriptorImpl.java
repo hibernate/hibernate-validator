@@ -7,11 +7,14 @@
 package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
+
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * @author Hardy Ferentschik
@@ -19,6 +22,7 @@ import javax.validation.metadata.ReturnValueDescriptor;
 public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 		implements ReturnValueDescriptor {
 	private final boolean cascaded;
+	@Immutable
 	private final Set<GroupConversionDescriptor> groupConversions;
 
 	public ReturnValueDescriptorImpl(Type returnType,
@@ -35,7 +39,7 @@ public class ReturnValueDescriptorImpl extends ElementDescriptorImpl
 		);
 
 		this.cascaded = cascaded;
-		this.groupConversions = Collections.unmodifiableSet( groupConversions );
+		this.groupConversions = CollectionHelper.toImmutableSet( groupConversions );
 	}
 
 	@Override

@@ -7,7 +7,6 @@
 package org.hibernate.validator.resourceloading;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
 
@@ -78,7 +78,7 @@ public class AggregateResourceBundleLocator extends DelegatingResourceBundleLoca
 		super( delegate );
 		Contracts.assertValueNotNull( bundleNames, "bundleNames" );
 
-		this.bundleNames = Collections.unmodifiableList( bundleNames );
+		this.bundleNames = CollectionHelper.toImmutableList( bundleNames );
 		this.classLoader = classLoader;
 	}
 

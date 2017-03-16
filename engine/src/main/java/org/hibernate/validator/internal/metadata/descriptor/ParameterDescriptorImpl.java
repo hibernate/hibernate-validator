@@ -7,11 +7,14 @@
 package org.hibernate.validator.internal.metadata.descriptor;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.metadata.GroupConversionDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
+
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Describes a validated method parameter.
@@ -23,6 +26,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 	private final int index;
 	private final String name;
 	private final boolean cascaded;
+	@Immutable
 	private final Set<GroupConversionDescriptor> groupConversions;
 
 	public ParameterDescriptorImpl(Type type,
@@ -37,7 +41,7 @@ public class ParameterDescriptorImpl extends ElementDescriptorImpl implements Pa
 		this.index = index;
 		this.name = name;
 		this.cascaded = isCascaded;
-		this.groupConversions = Collections.unmodifiableSet( groupConversions );
+		this.groupConversions = CollectionHelper.toImmutableSet( groupConversions );
 	}
 
 	@Override

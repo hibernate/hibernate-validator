@@ -87,11 +87,10 @@ public class ElementDescriptorTest {
 		}
 
 		try {
-			constraintDescriptors.remove( null );
+			constraintDescriptors.remove( constraintDescriptors.iterator().next() );
 			fail( "Set should be immutable" );
 		}
 		catch (UnsupportedOperationException e) {
-			// success
 		}
 	}
 

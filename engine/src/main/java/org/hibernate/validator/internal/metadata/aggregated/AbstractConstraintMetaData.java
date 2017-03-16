@@ -9,7 +9,6 @@ package org.hibernate.validator.internal.metadata.aggregated;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -17,6 +16,8 @@ import javax.validation.ElementKind;
 
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Base implementation for {@link ConstraintMetaData} with attributes common
@@ -29,6 +30,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 	private final String name;
 	private final Type type;
 	private final ElementKind constrainedMetaDataKind;
+	@Immutable
 	private final Set<MetaConstraint<?>> constraints;
 	private final boolean isCascading;
 	private final boolean isConstrained;
@@ -41,7 +43,7 @@ public abstract class AbstractConstraintMetaData implements ConstraintMetaData {
 									  boolean isConstrained) {
 		this.name = name;
 		this.type = type;
-		this.constraints = Collections.unmodifiableSet( constraints );
+		this.constraints = CollectionHelper.toImmutableSet( constraints );
 		this.constrainedMetaDataKind = constrainedMetaDataKind;
 		this.isCascading = isCascading;
 		this.isConstrained = isConstrained;

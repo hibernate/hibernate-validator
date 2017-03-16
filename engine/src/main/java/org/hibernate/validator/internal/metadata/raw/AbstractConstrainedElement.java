@@ -14,6 +14,8 @@ import java.util.Set;
 
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Base implementation of with functionality common to all {@link ConstrainedElement} implementations.
@@ -24,9 +26,13 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 public abstract class AbstractConstrainedElement implements ConstrainedElement {
 	private final ConstrainedElementKind kind;
 	protected final ConfigurationSource source;
+	@Immutable
 	protected final Set<MetaConstraint<?>> constraints;
+	@Immutable
 	protected final Map<Class<?>, Class<?>> groupConversions;
+	@Immutable
 	protected final List<CascadingTypeParameter> cascadingTypeParameters;
+	@Immutable
 	protected final Set<MetaConstraint<?>> typeArgumentConstraints;
 
 	public AbstractConstrainedElement(ConfigurationSource source,
@@ -37,10 +43,10 @@ public abstract class AbstractConstrainedElement implements ConstrainedElement {
 									  List<CascadingTypeParameter> cascadingTypeParameters) {
 		this.kind = kind;
 		this.source = source;
-		this.constraints = constraints != null ? Collections.unmodifiableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
-		this.typeArgumentConstraints = typeArgumentConstraints != null ? Collections.unmodifiableSet( typeArgumentConstraints ) : Collections.<MetaConstraint<?>>emptySet();
-		this.groupConversions = Collections.unmodifiableMap( groupConversions );
-		this.cascadingTypeParameters = cascadingTypeParameters;
+		this.constraints = constraints != null ? CollectionHelper.toImmutableSet( constraints ) : Collections.<MetaConstraint<?>>emptySet();
+		this.typeArgumentConstraints = typeArgumentConstraints != null ? CollectionHelper.toImmutableSet( typeArgumentConstraints ) : Collections.<MetaConstraint<?>>emptySet();
+		this.groupConversions = CollectionHelper.toImmutableMap( groupConversions );
+		this.cascadingTypeParameters = CollectionHelper.toImmutableList( cascadingTypeParameters );
 	}
 
 	@Override

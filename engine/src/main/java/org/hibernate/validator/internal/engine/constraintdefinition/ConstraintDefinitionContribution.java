@@ -7,10 +7,11 @@
 package org.hibernate.validator.internal.engine.constraintdefinition;
 
 import java.lang.annotation.Annotation;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Type-safe wrapper class for a constraint annotation and its potential list of constraint validators.
@@ -19,6 +20,7 @@ import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintVa
  */
 public class ConstraintDefinitionContribution<A extends Annotation> {
 	private final Class<A> constraintType;
+	@Immutable
 	private final List<ConstraintValidatorDescriptor<A>> validatorDescriptors;
 	private final boolean includeExisting;
 
@@ -26,7 +28,7 @@ public class ConstraintDefinitionContribution<A extends Annotation> {
 			List<ConstraintValidatorDescriptor<A>> validatorDescriptors,
 			boolean includeExisting) {
 		this.constraintType = constraintType;
-		this.validatorDescriptors = Collections.unmodifiableList( validatorDescriptors );
+		this.validatorDescriptors = CollectionHelper.toImmutableList( validatorDescriptors );
 		this.includeExisting = includeExisting;
 	}
 

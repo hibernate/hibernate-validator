@@ -13,7 +13,9 @@ import java.util.List;
 
 import org.hibernate.validator.internal.engine.cascading.AnnotatedObject;
 import org.hibernate.validator.internal.engine.cascading.ArrayElement;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * A type parameter that is marked for cascaded validation and/or has one or more nested type parameters marked for
@@ -36,6 +38,7 @@ public class CascadingTypeParameter {
 	/**
 	 * Possibly the cascading type parameters corresponding to this type parameter if it is a parameterized type.
 	 */
+	@Immutable
 	private final List<CascadingTypeParameter> nestedCascadingTypeParameters;
 
 	/**
@@ -48,7 +51,7 @@ public class CascadingTypeParameter {
 		this.enclosingType = enclosingType;
 		this.typeParameter = typeParameter;
 		this.cascading = cascading;
-		this.nestedCascadingTypeParameters = Collections.unmodifiableList( nestedCascadingTypeParameters );
+		this.nestedCascadingTypeParameters = CollectionHelper.toImmutableList( nestedCascadingTypeParameters );
 	}
 
 	public static CascadingTypeParameter annotatedObject(Type cascadableType) {

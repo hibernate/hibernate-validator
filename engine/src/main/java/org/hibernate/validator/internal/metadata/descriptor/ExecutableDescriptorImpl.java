@@ -10,11 +10,15 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
 import javax.validation.metadata.ConstructorDescriptor;
 import javax.validation.metadata.CrossParameterDescriptor;
 import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.ReturnValueDescriptor;
+
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Describes a validated constructor or method.
@@ -24,6 +28,7 @@ import javax.validation.metadata.ReturnValueDescriptor;
 public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		implements ConstructorDescriptor, MethodDescriptor {
 	private final String name;
+	@Immutable
 	private final List<ParameterDescriptor> parameters;
 	private final CrossParameterDescriptor crossParameterDescriptor;
 	private final ReturnValueDescriptor returnValueDescriptor;
@@ -46,7 +51,7 @@ public class ExecutableDescriptorImpl extends ElementDescriptorImpl
 		);
 
 		this.name = name;
-		this.parameters = Collections.unmodifiableList( parameters );
+		this.parameters = CollectionHelper.toImmutableList( parameters );
 		this.returnValueDescriptor = returnValueDescriptor;
 		this.crossParameterDescriptor = new CrossParameterDescriptorImpl(
 				crossParameterConstraints,

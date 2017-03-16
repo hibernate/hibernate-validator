@@ -8,7 +8,6 @@ package org.hibernate.validator.internal.engine;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +17,7 @@ import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethods
 import org.hibernate.validator.internal.metadata.aggregated.rule.ParallelMethodsMustNotDefineParameterConstraints;
 import org.hibernate.validator.internal.metadata.aggregated.rule.ReturnValueMayOnlyBeMarkedOnceAsCascadedPerHierarchyLine;
 import org.hibernate.validator.internal.metadata.aggregated.rule.VoidMethodsMustNotBeReturnValueConstrained;
+import org.hibernate.validator.internal.util.CollectionHelper;
 
 /**
  * These properties modify the behavior of the {@code }Validator} with respect to the Bean Validation
@@ -95,7 +95,7 @@ public class MethodValidationConfiguration {
 
 		result.add( new ParallelMethodsMustNotDefineGroupConversionForCascadedReturnValue() );
 
-		return Collections.unmodifiableSet( result );
+		return CollectionHelper.toImmutableSet( result );
 	}
 
 	@Override

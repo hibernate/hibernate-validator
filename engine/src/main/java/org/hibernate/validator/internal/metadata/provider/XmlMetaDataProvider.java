@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.metadata.provider;
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +17,7 @@ import org.hibernate.validator.internal.metadata.core.ConstraintHelper;
 import org.hibernate.validator.internal.metadata.raw.BeanConfiguration;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 import org.hibernate.validator.internal.xml.MappingXmlParser;
@@ -47,7 +47,7 @@ public class XmlMetaDataProvider implements MetaDataProvider {
 				externalClassLoader );
 		mappingParser.parse( mappingStreams );
 
-		configuredBeans = Collections.unmodifiableMap( createBeanConfigurations( mappingParser ) );
+		configuredBeans = CollectionHelper.toImmutableMap( createBeanConfigurations( mappingParser ) );
 		annotationProcessingOptions = mappingParser.getAnnotationProcessingOptions();
 	}
 
