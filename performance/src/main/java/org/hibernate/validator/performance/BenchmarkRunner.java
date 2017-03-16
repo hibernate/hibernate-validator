@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.performance;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.hibernate.validator.performance.cascaded.CascadedValidation;
+import org.hibernate.validator.performance.simple.MultiLevelContainerValidation;
 import org.hibernate.validator.performance.simple.SimpleValidation;
 import org.hibernate.validator.performance.statistical.StatisticalValidation;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -29,10 +29,11 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
  */
 public final class BenchmarkRunner {
 
-	private static final List<Class<?>> DEFAULT_TEST_CLASSES = Arrays.asList(
+	private static final Stream<Class<?>> DEFAULT_TEST_CLASSES = Stream.of(
 			SimpleValidation.class,
 			CascadedValidation.class,
-			StatisticalValidation.class
+			StatisticalValidation.class,
+			MultiLevelContainerValidation.class
 	);
 
 	private BenchmarkRunner() {
@@ -49,7 +50,7 @@ public final class BenchmarkRunner {
 			builder.resultFormat( ResultFormatType.JSON );
 		}
 		if ( commandLineOptions.getIncludes().isEmpty() ) {
-			DEFAULT_TEST_CLASSES.stream().forEach( testClass -> builder.include( testClass.getName() ) );
+			DEFAULT_TEST_CLASSES.forEach( testClass -> builder.include( testClass.getName() ) );
 		}
 
 		Options opt = builder.build();
