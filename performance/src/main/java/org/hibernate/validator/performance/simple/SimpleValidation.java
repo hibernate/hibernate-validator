@@ -63,7 +63,7 @@ public class SimpleValidation {
 	}
 
 	@Benchmark
-	@BenchmarkMode(Mode.All)
+	@BenchmarkMode(Mode.Throughput)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	@Fork(value = 1)
 	@Threads(50)
@@ -77,7 +77,7 @@ public class SimpleValidation {
 	}
 
 	@Benchmark
-	@BenchmarkMode(Mode.All)
+	@BenchmarkMode(Mode.Throughput)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	@Fork(value = 1)
 	@Threads(50)
