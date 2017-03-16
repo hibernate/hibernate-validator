@@ -6,8 +6,11 @@
  */
 package org.hibernate.validator.internal.metadata.descriptor;
 
+import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,12 +21,10 @@ import javax.validation.metadata.MethodDescriptor;
 import javax.validation.metadata.MethodType;
 import javax.validation.metadata.PropertyDescriptor;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.ExecutableHelper;
-
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Describes a validated bean.
@@ -33,8 +34,11 @@ import static org.hibernate.validator.internal.util.logging.Messages.MESSAGES;
  * @author Gunnar Morling
  */
 public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDescriptor {
+	@Immutable
 	private final Map<String, PropertyDescriptor> constrainedProperties;
+	@Immutable
 	private final Map<String, ExecutableDescriptorImpl> constrainedMethods;
+	@Immutable
 	private final Map<String, ConstructorDescriptor> constrainedConstructors;
 
 	public BeanDescriptorImpl(Type beanClass,
@@ -46,9 +50,9 @@ public class BeanDescriptorImpl extends ElementDescriptorImpl implements BeanDes
 							  List<Class<?>> defaultGroupSequence) {
 		super( beanClass, classLevelConstraints, defaultGroupSequenceRedefined, defaultGroupSequence );
 
-		this.constrainedProperties = Collections.unmodifiableMap( constrainedProperties );
-		this.constrainedMethods = Collections.unmodifiableMap( constrainedMethods );
-		this.constrainedConstructors = Collections.unmodifiableMap( constrainedConstructors );
+		this.constrainedProperties = CollectionHelper.toImmutableMap( constrainedProperties );
+		this.constrainedMethods = CollectionHelper.toImmutableMap( constrainedMethods );
+		this.constrainedConstructors = CollectionHelper.toImmutableMap( constrainedConstructors );
 	}
 
 	@Override

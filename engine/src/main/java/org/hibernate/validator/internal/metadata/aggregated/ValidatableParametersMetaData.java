@@ -6,12 +6,13 @@
  */
 package org.hibernate.validator.internal.metadata.aggregated;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Represents the constraint related meta data of the arguments of a method or
@@ -21,13 +22,14 @@ import org.hibernate.validator.internal.metadata.facets.Validatable;
  */
 public class ValidatableParametersMetaData implements Validatable {
 
-	@SuppressWarnings("unused")
+	@Immutable
 	private final List<ParameterMetaData> parameterMetaData;
+	@Immutable
 	private final Iterable<Cascadable> cascadables;
 
 	public ValidatableParametersMetaData(List<ParameterMetaData> parameterMetaData) {
-		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
-		this.cascadables = Collections.unmodifiableList( parameterMetaData.stream()
+		this.parameterMetaData = CollectionHelper.toImmutableList( parameterMetaData );
+		this.cascadables = CollectionHelper.toImmutableList( parameterMetaData.stream()
 				.filter( p -> p.isCascading() )
 				.collect( Collectors.toList() ) );
 	}

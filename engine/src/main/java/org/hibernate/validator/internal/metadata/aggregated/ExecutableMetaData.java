@@ -36,10 +36,12 @@ import org.hibernate.validator.internal.metadata.descriptor.ExecutableDescriptor
 import org.hibernate.validator.internal.metadata.raw.ConstrainedElement;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ExecutableHelper;
 import org.hibernate.validator.internal.util.ExecutableParameterNameProvider;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * An aggregated view of the constraint related meta data for a given method or
@@ -61,7 +63,9 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
 public class ExecutableMetaData extends AbstractConstraintMetaData {
 
 	private final Class<?>[] parameterTypes;
+	@Immutable
 	private final List<ParameterMetaData> parameterMetaDataList;
+	@Immutable
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
 	private final boolean isGetter;
 
@@ -97,8 +101,8 @@ public class ExecutableMetaData extends AbstractConstraintMetaData {
 		);
 
 		this.parameterTypes = parameterTypes;
-		this.parameterMetaDataList = Collections.unmodifiableList( parameterMetaData );
-		this.crossParameterConstraints = Collections.unmodifiableSet( crossParameterConstraints );
+		this.parameterMetaDataList = CollectionHelper.toImmutableList( parameterMetaData );
+		this.crossParameterConstraints = CollectionHelper.toImmutableSet( crossParameterConstraints );
 		this.signatures = signatures;
 		this.returnValueMetaData = new ReturnValueMetaData(
 				returnType,

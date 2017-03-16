@@ -42,7 +42,7 @@ public class TypeVariableBindings {
 
 		allBindings.put( Object.class, Collections.emptyMap() );
 
-		return Collections.unmodifiableMap( allBindings );
+		return CollectionHelper.toImmutableMap( allBindings );
 	}
 
 	private static void collectTypeBindings(Class<?> subType, Map<Class<?>, Map<TypeVariable<?>, TypeVariable<?>>> allBindings, Map<TypeVariable<?>, TypeVariable<?>> bindings) {

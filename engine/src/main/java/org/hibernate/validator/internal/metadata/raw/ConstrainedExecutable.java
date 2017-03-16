@@ -23,10 +23,12 @@ import javax.validation.metadata.ConstraintDescriptor;
 
 import org.hibernate.validator.internal.metadata.cascading.CascadingTypeParameter;
 import org.hibernate.validator.internal.metadata.core.MetaConstraint;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Represents a method or constructor of a Java type and all its associated
@@ -45,10 +47,12 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 	/**
 	 * Constrained-related meta data for this executable's parameters.
 	 */
+	@Immutable
 	private final List<ConstrainedParameter> parameterMetaData;
 
 	private final boolean hasParameterConstraints;
 
+	@Immutable
 	private final Set<MetaConstraint<?>> crossParameterConstraints;
 
 	private final boolean isGetterMethod;
@@ -126,8 +130,8 @@ public class ConstrainedExecutable extends AbstractConstrainedElement {
 			);
 		}
 
-		this.crossParameterConstraints = crossParameterConstraints;
-		this.parameterMetaData = Collections.unmodifiableList( parameterMetaData );
+		this.crossParameterConstraints = CollectionHelper.toImmutableSet( crossParameterConstraints );
+		this.parameterMetaData = CollectionHelper.toImmutableList( parameterMetaData );
 		this.hasParameterConstraints = hasParameterConstraints( parameterMetaData ) || !crossParameterConstraints.isEmpty();
 		this.isGetterMethod = ReflectionHelper.isGetterMethod( executable );
 	}

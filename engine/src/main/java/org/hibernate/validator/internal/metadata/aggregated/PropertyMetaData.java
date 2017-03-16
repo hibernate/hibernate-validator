@@ -36,8 +36,10 @@ import org.hibernate.validator.internal.metadata.raw.ConstrainedElement.Constrai
 import org.hibernate.validator.internal.metadata.raw.ConstrainedExecutable;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedField;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedType;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.TypeResolutionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Represents the constraint related meta data for a JavaBeans property.
@@ -56,6 +58,7 @@ import org.hibernate.validator.internal.util.TypeResolutionHelper;
  */
 public class PropertyMetaData extends AbstractConstraintMetaData {
 
+	@Immutable
 	private final Set<Cascadable> cascadables;
 
 	private PropertyMetaData(String propertyName,
@@ -71,7 +74,7 @@ public class PropertyMetaData extends AbstractConstraintMetaData {
 				!cascadables.isEmpty() || !constraints.isEmpty()
 		);
 
-		this.cascadables = cascadables;
+		this.cascadables = CollectionHelper.toImmutableSet( cascadables );
 	}
 
 	@Override

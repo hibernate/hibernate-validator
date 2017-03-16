@@ -92,7 +92,7 @@ public final class CollectionHelper {
 		return new HashSet<>( Arrays.asList( ts ) );
 	}
 
-	public static <T> List<T> toImmutableList(List<T> list) {
+	public static <T> List<T> toImmutableList(List<? extends T> list) {
 		switch ( list.size() ) {
 			case 0:
 				return Collections.emptyList();
@@ -103,7 +103,7 @@ public final class CollectionHelper {
 		}
 	}
 
-	public static <T> Set<T> toImmutableSet(Set<T> set) {
+	public static <T> Set<T> toImmutableSet(Set<? extends T> set) {
 		switch ( set.size() ) {
 			case 0:
 				return Collections.emptySet();

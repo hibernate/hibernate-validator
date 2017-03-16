@@ -151,6 +151,7 @@ import org.hibernate.validator.internal.constraintvalidators.hv.pl.REGONValidato
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMaxValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.time.DurationMinValidator;
 import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorDescriptor;
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.Contracts;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
@@ -317,7 +318,7 @@ public class ConstraintHelper {
 				.map( ConstraintValidatorDescriptor::forClass )
 				.collect( Collectors.toList() );
 
-		validators.put( constraintType, Collections.unmodifiableList( descriptors ) );
+		validators.put( constraintType, CollectionHelper.toImmutableList( descriptors ) );
 	}
 
 	private static <A extends Annotation> void putConstraints(Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> validators, Class<A> constraintType, List<Class<? extends ConstraintValidator<A, ?>>> validatorDescriptors) {
@@ -325,7 +326,7 @@ public class ConstraintHelper {
 				.map( ConstraintValidatorDescriptor::forClass )
 				.collect( Collectors.toList() );
 
-		validators.put( constraintType, Collections.unmodifiableList( descriptors ) );
+		validators.put( constraintType, CollectionHelper.toImmutableList( descriptors ) );
 	}
 
 	private boolean isBuiltinConstraint(Class<? extends Annotation> annotationType) {
@@ -400,7 +401,7 @@ public class ConstraintHelper {
 
 		validatorDescriptorsToAdd.addAll( validatorDescriptors );
 
-		this.validatorDescriptors.put( annotationType, Collections.unmodifiableList( validatorDescriptorsToAdd ) );
+		this.validatorDescriptors.put( annotationType, CollectionHelper.toImmutableList( validatorDescriptorsToAdd ) );
 	}
 
 	/**
@@ -600,7 +601,7 @@ public class ConstraintHelper {
 
 		return Stream.of( validatedBy )
 			.map( c -> ConstraintValidatorDescriptor.forClass( c ) )
-			.collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
+			.collect( Collectors.collectingAndThen( Collectors.toList(), CollectionHelper::toImmutableList ) );
 	}
 
 	private static boolean isClassPresent(String className) {

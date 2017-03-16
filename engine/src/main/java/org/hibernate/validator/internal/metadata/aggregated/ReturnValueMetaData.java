@@ -24,6 +24,8 @@ import org.hibernate.validator.internal.metadata.core.MetaConstraint;
 import org.hibernate.validator.internal.metadata.descriptor.ReturnValueDescriptorImpl;
 import org.hibernate.validator.internal.metadata.facets.Cascadable;
 import org.hibernate.validator.internal.metadata.facets.Validatable;
+import org.hibernate.validator.internal.util.CollectionHelper;
+import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
 /**
  * Represents the constraint related meta data of the return value of a method
@@ -36,9 +38,10 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 
 	private static final String RETURN_VALUE_NODE_NAME = null;
 
+	@Immutable
 	private final List<Cascadable> cascadables;
 	private final GroupConversionHelper groupConversionHelper;
-
+	@Immutable
 	private final List<CascadingTypeParameter> cascadingTypeParameters;
 
 	public ReturnValueMetaData(Type type,
@@ -54,8 +57,8 @@ public class ReturnValueMetaData extends AbstractConstraintMetaData
 				!constraints.isEmpty() || !cascadingTypeParameters.isEmpty()
 		);
 
-		this.cascadingTypeParameters = Collections.unmodifiableList( cascadingTypeParameters );
-		this.cascadables = Collections.unmodifiableList( isCascading() ? Arrays.<Cascadable>asList( this ) : Collections.<Cascadable>emptyList() );
+		this.cascadingTypeParameters = CollectionHelper.toImmutableList( cascadingTypeParameters );
+		this.cascadables = CollectionHelper.toImmutableList( isCascading() ? Arrays.<Cascadable>asList( this ) : Collections.<Cascadable>emptyList() );
 		this.groupConversionHelper = new GroupConversionHelper( groupConversions );
 		this.groupConversionHelper.validateGroupConversions( isCascading(), this.toString() );
 	}
