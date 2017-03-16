@@ -10,7 +10,7 @@
     <parent>
         <artifactId>hibernate-validator-parent</artifactId>
         <groupId>org.hibernate</groupId>
-        <version>5.4.1-SNAPSHOT</version>
+        <version>5.4.1.Final</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
