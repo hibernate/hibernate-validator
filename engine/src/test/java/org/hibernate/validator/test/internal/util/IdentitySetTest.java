@@ -6,13 +6,13 @@
  */
 package org.hibernate.validator.test.internal.util;
 
+import static org.testng.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.testng.Assert.assertTrue;
-import org.testng.annotations.Test;
-
 import org.hibernate.validator.internal.util.IdentitySet;
+import org.testng.annotations.Test;
 
 /**
  * @author Hardy Ferentschik
@@ -35,7 +35,8 @@ public class IdentitySetTest {
 				return counter++;
 			}
 
-			public boolean equals() {
+			@Override
+			public boolean equals(Object other) {
 				return false;
 			}
 		};
@@ -57,7 +58,8 @@ public class IdentitySetTest {
 				return counter++;
 			}
 
-			public boolean equals() {
+			@Override
+			public boolean equals(Object other) {
 				return false;
 			}
 		};

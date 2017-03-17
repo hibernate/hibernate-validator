@@ -14,12 +14,12 @@
         <version>6.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    
+
     <artifactId>hibernate-validator-build-config</artifactId>
-    
+
     <name>Hibernate Validator Build Configuration</name>
     <description>Configuration for the build of Hibernate Validator</description>
-    
+
     <build>
         <plugins>
             <plugin>

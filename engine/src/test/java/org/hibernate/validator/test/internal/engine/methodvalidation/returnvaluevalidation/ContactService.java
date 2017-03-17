@@ -12,5 +12,5 @@ import javax.validation.Valid;
  * @author Hardy Ferentschik
  */
 public interface ContactService {
-	void validateValidBeanParamConstraint(@Valid final ContactBean bean);
+	void validateValidBeanParamConstraint(@Valid ContactBean bean);
 }
