@@ -81,26 +81,27 @@ public class MultiLevelContainerValidation {
 			this.map = map;
 		}
 
+		@SuppressWarnings("unused")
 		public Map<Optional<Cinema>, List<EmailAddress>> getMap() {
 			return map;
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class Cinema {
 
 		private final String name;
 
 		private final Reference<@Valid Visitor> visitor;
 
-		Cinema(String name, Reference<Visitor> visitor) {
+		public Cinema(String name, Reference<Visitor> visitor) {
 			this.name = name;
 			this.visitor = visitor;
 		}
 
-		static Cinema generate() {
+		public static Cinema generate() {
 			return new Cinema( RandomDataGenerator.randomString(), new SomeReference<>( Visitor.generate() ) );
 		}
-
 	}
 
 	private interface Reference<T> {
@@ -127,18 +128,20 @@ public class MultiLevelContainerValidation {
 		@NotNull
 		private final String name;
 
-		Visitor(String name) {
+		public Visitor(String name) {
 			this.name = name;
 		}
 
-		static Visitor generate() {
+		public static Visitor generate() {
 			return new Visitor( RandomDataGenerator.randomString() );
 		}
-
 	}
 
 	private static class EmailAddress {
 
+		// we use these simple constraints here for 2 reasons:
+		// - @Email is not part of Bean Validation 1.x
+		// - we don't want to use expensive constraints
 		@Size(max = 50)
 		@NotNull
 		private final String email;
@@ -163,7 +166,6 @@ public class MultiLevelContainerValidation {
 			}
 			return addresses;
 		}
-
 	}
 
 	/**
@@ -174,7 +176,6 @@ public class MultiLevelContainerValidation {
 		private static final Random RANDOM = new Random();
 
 		private RandomDataGenerator() {
-
 		}
 
 		public static Map<Optional<Cinema>, List<EmailAddress>> prepareTestData(int maxEntries, int maxListEntries) {
@@ -193,5 +194,4 @@ public class MultiLevelContainerValidation {
 			return String.valueOf( chars );
 		}
 	}
-
 }
