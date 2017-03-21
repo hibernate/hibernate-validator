@@ -11,11 +11,14 @@ import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.validation.valueextraction.ExtractedValue;
 import javax.validation.valueextraction.UnwrapByDefault;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.logging.Log;
@@ -44,10 +47,10 @@ public class ValueExtractorDescriptor {
 		this.unwrapByDefault = hasUnwrapByDefaultAnnotation( valueExtractor.getClass() );
 	}
 
-	private static TypeVariable<?> getExtractedTypeParameter(Class<?> extractorImplementationType) {
-		// TODO deal with indirect implementations (MyExtractor -> BaseExtractor -> ValueExtractor)
-		AnnotatedType genericInterface = extractorImplementationType.getAnnotatedInterfaces()[0];
-		AnnotatedType extractedType = ( (AnnotatedParameterizedType) genericInterface ).getAnnotatedActualTypeArguments()[0];
+	@SuppressWarnings("rawtypes")
+	private static TypeVariable<?> getExtractedTypeParameter(Class<? extends ValueExtractor> extractorImplementationType) {
+		AnnotatedParameterizedType valueExtractorDefinition = getValueExtractorDefinition( extractorImplementationType );
+		AnnotatedType extractedType = valueExtractorDefinition.getAnnotatedActualTypeArguments()[0];
 		Class<?> extractedTypeRaw = (Class<?>) TypeHelper.getErasedType( extractedType.getType() );
 
 		TypeVariable<?> extractedTypeParameter = null;
@@ -83,11 +86,48 @@ public class ValueExtractorDescriptor {
 		return extractedTypeParameter;
 	}
 
-	private static Class<?> getExtractedType(Class<?> extractorImplementationType) {
-		// TODO deal with indirect implementations (MyExtractor -> BaseExtractor -> ValueExtractor)
-		AnnotatedType genericInterface = extractorImplementationType.getAnnotatedInterfaces()[0];
-		AnnotatedType extractedType = ( (AnnotatedParameterizedType) genericInterface ).getAnnotatedActualTypeArguments()[0];
+	@SuppressWarnings("rawtypes")
+	private static Class<?> getExtractedType(Class<? extends ValueExtractor> extractorImplementationType) {
+		AnnotatedParameterizedType genericInterface = getValueExtractorDefinition( extractorImplementationType );
+		AnnotatedType extractedType = genericInterface.getAnnotatedActualTypeArguments()[0];
 		return TypeHelper.getErasedReferenceType( extractedType.getType() );
+	}
+
+	private static AnnotatedParameterizedType getValueExtractorDefinition(Class<?> extractorImplementationType) {
+		List<AnnotatedType> valueExtractorAnnotatedTypes = new ArrayList<>();
+
+		determineValueExtractorDefinitions( valueExtractorAnnotatedTypes, extractorImplementationType );
+
+		if ( valueExtractorAnnotatedTypes.size() == 1 ) {
+			return (AnnotatedParameterizedType) valueExtractorAnnotatedTypes.get( 0 );
+		}
+		else if ( valueExtractorAnnotatedTypes.size() > 1 ) {
+			throw LOG.getParallelDefinitionsOfValueExtractorException( extractorImplementationType );
+		}
+		else {
+			throw new AssertionError( extractorImplementationType.getName() + " should be a subclass of " + ValueExtractor.class.getSimpleName() );
+		}
+	}
+
+	private static void determineValueExtractorDefinitions(List<AnnotatedType> valueExtractorDefinitions, Class<?> extractorImplementationType) {
+		if ( !ValueExtractor.class.isAssignableFrom( extractorImplementationType ) ) {
+			return;
+		}
+
+		Class<?> superClass = extractorImplementationType.getSuperclass();
+		if ( superClass != null && !Object.class.equals( superClass ) ) {
+			determineValueExtractorDefinitions( valueExtractorDefinitions, superClass );
+		}
+		for ( Class<?> implementedInterface : extractorImplementationType.getInterfaces() ) {
+			if ( !ValueExtractor.class.equals( implementedInterface ) ) {
+				determineValueExtractorDefinitions( valueExtractorDefinitions, implementedInterface );
+			}
+		}
+		for ( AnnotatedType annotatedInterface : extractorImplementationType.getAnnotatedInterfaces() ) {
+			if ( ValueExtractor.class.equals( ReflectionHelper.getClassFromType( annotatedInterface.getType() ) ) ) {
+				valueExtractorDefinitions.add( annotatedInterface );
+			}
+		}
 	}
 
 	private static boolean hasUnwrapByDefaultAnnotation(Class<?> extractorImplementationType) {
