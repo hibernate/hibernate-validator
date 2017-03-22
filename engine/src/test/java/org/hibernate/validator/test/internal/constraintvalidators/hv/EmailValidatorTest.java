@@ -12,7 +12,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 import java.util.Set;
 
@@ -225,7 +225,7 @@ public class EmailValidatorTest {
 			builder.append( 'a' );
 		}
 		String s = builder.toString();
-		assertEquals( length, s.getBytes().length );
+		assertEquals( s.getBytes().length, length );
 		return s;
 	}
 
@@ -241,7 +241,7 @@ public class EmailValidatorTest {
 			}
 		}
 		String s = builder.toString();
-		assertEquals( length, s.getBytes().length );
+		assertEquals( s.getBytes().length, length );
 		return s;
 	}
 

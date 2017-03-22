@@ -163,6 +163,11 @@
             <property name="illegalPkgs" value="java.awt, sun, org.slf4j, junit.framework, org.junit"/>
         </module>
 
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="import static org\.testng\.AssertJUnit*" />
+            <property name="message" value="Nobody should be using AssertJUnit asserts" />
+        </module>
+
     </module>
 
     <module name="RegexpSingleline">

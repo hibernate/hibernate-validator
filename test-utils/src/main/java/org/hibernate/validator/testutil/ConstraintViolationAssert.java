@@ -6,10 +6,10 @@
  */
 package org.hibernate.validator.testutil;
 
-import static org.assertj.core.api.Fail.fail;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;

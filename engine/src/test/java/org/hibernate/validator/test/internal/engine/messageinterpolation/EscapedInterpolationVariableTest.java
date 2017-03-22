@@ -25,7 +25,7 @@ import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
-import static org.testng.AssertJUnit.fail;
+import static org.testng.Assert.fail;
 
 /**
  * @author Hardy Ferentschik
