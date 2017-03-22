@@ -8,7 +8,7 @@
 package org.hibernate.validator.test.cfg;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static org.assertj.core.api.Assertions.fail;
+import static org.testng.Assert.fail;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertCorrectConstraintViolationMessages;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 

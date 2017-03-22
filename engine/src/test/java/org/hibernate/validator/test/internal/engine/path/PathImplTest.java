@@ -10,7 +10,7 @@ import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertN
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.Assert.assertNotNull;
 
 import java.lang.reflect.Method;
 import java.util.Collections;

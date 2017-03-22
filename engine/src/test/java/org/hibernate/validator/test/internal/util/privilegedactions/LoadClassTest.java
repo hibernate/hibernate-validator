@@ -15,7 +15,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import static java.lang.Thread.currentThread;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.fail;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author <a href="mailto:cdewolf@redhat.com">Carlo de Wolf</a>
@@ -48,8 +48,8 @@ public class LoadClassTest {
 		catch (ValidationException e) {
 			String expectedMessageId = "HV000065";
 			assertTrue(
-					"Wrong error message. Expected " + expectedMessageId + " ,but got " + e.getMessage(),
-					e.getMessage().startsWith( expectedMessageId )
+					e.getMessage().startsWith( expectedMessageId ),
+					"Wrong error message. Expected " + expectedMessageId + " ,but got " + e.getMessage()
 			);
 			assertNotNull( e.getCause(), "HV-1026: exception cause should be set" );
 		}
