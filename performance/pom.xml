@@ -58,6 +58,29 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <!-- adding sources for BV 2.0 tests -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>add-source</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>${project.basedir}/src/main/java-bv2</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -154,6 +177,15 @@
                     <artifactId>log4j</artifactId>
                 </dependency>
             </dependencies>
+            <!-- adding sources for BV 2.0 tests -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>hv-5.4</id>

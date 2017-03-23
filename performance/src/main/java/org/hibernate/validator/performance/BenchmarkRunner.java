@@ -6,12 +6,13 @@
  */
 package org.hibernate.validator.performance;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.hibernate.validator.performance.cascaded.CascadedValidation;
-import org.hibernate.validator.performance.simple.MultiLevelContainerValidation;
 import org.hibernate.validator.performance.simple.SimpleValidation;
 import org.hibernate.validator.performance.statistical.StatisticalValidation;
+
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -29,12 +30,14 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
  */
 public final class BenchmarkRunner {
 
-	private static final Stream<Class<?>> DEFAULT_TEST_CLASSES = Stream.of(
-			SimpleValidation.class,
-			CascadedValidation.class,
-			StatisticalValidation.class,
-			MultiLevelContainerValidation.class
-	);
+	private static final Stream<? extends Class<?>> DEFAULT_TEST_CLASSES = Stream.of(
+			SimpleValidation.class.getName(),
+			CascadedValidation.class.getName(),
+			StatisticalValidation.class.getName(),
+			// Benchmarks specific to Bean Validation 2.0
+			// Tests are located in a separate source folder only added for implementations compatible with BV 2.0
+			"org.hibernate.validator.performance.multilevel.MultiLevelContainerValidation"
+	).map( BenchmarkRunner::classForName ).filter( Objects::nonNull );
 
 	private BenchmarkRunner() {
 	}
@@ -55,6 +58,16 @@ public final class BenchmarkRunner {
 
 		Options opt = builder.build();
 		new Runner( opt ).run();
+	}
+
+	private static Class<?> classForName(String qualifiedName) {
+		try {
+			return Class.forName( qualifiedName );
+		}
+		catch (ClassNotFoundException e) {
+			// silently ignore the error
+		}
+		return null;
 	}
 
 }
