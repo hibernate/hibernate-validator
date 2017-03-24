@@ -7,12 +7,12 @@
 package org.hibernate.validator.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Type;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +24,7 @@ import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.metadata.raw.ConfigurationSource;
 import org.hibernate.validator.internal.metadata.raw.ConstrainedParameter;
 import org.hibernate.validator.internal.util.ReflectionHelper;
+import org.hibernate.validator.internal.xml.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.ParameterType;
 
@@ -31,6 +32,7 @@ import org.hibernate.validator.internal.xml.binding.ParameterType;
  * Builder for constraint parameters.
  *
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 class ConstrainedParameterBuilder {
 
@@ -53,7 +55,9 @@ class ConstrainedParameterBuilder {
 		int i = 0;
 		for ( ParameterType parameterType : parameterList ) {
 			ConstraintLocation constraintLocation = ConstraintLocation.forParameter( executable, i );
-			Set<MetaConstraint<?>> metaConstraints = newHashSet();
+			Type type = ReflectionHelper.typeOf( executable, i );
+
+			Set<MetaConstraint<?>> metaConstraints = new HashSet<>();
 			for ( ConstraintType constraint : parameterType.getConstraint() ) {
 				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,
@@ -64,6 +68,16 @@ class ConstrainedParameterBuilder {
 				);
 				metaConstraints.add( metaConstraint );
 			}
+
+			ContainerElementTypeConfigurationBuilder containerElementTypeConfigurationBuilder = new ContainerElementTypeConfigurationBuilder(
+					metaConstraintBuilder, constraintLocation, defaultPackage );
+			ContainerElementTypeConfiguration containerElementTypeConfiguration = containerElementTypeConfigurationBuilder
+					.build( parameterType.getContainerElementType(), type );
+
+			List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>( containerElementTypeConfiguration.getCascadingTypeParameters().size() + 1 );
+			cascadingTypeParameters.addAll( containerElementTypeConfiguration.getCascadingTypeParameters() );
+			addCascadedTypeParameterForParameter( cascadingTypeParameters, type, parameterType.getValid() != null );
+
 			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
 					parameterType.getConvertGroup(),
 					defaultPackage
@@ -78,17 +92,15 @@ class ConstrainedParameterBuilder {
 				);
 			}
 
-			Type type = ReflectionHelper.typeOf( executable, i );
-			// TODO HV-919 Support specification of type parameter constraints via XML and API
 			ConstrainedParameter constrainedParameter = new ConstrainedParameter(
 					ConfigurationSource.XML,
 					executable,
 					type,
 					i,
 					metaConstraints,
-					Collections.emptySet(),
+					containerElementTypeConfiguration.getMetaConstraints(),
 					groupConversions,
-					getCascadedTypeParameters( type, parameterType.getValid() != null )
+					cascadingTypeParameters
 			);
 			constrainedParameters.add( constrainedParameter );
 			i++;
@@ -97,14 +109,11 @@ class ConstrainedParameterBuilder {
 		return constrainedParameters;
 	}
 
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Type parameterType, boolean isCascaded) {
+	private void addCascadedTypeParameterForParameter(List<CascadingTypeParameter> cascadingTypeParameters, Type parameterType, boolean isCascaded) {
 		if ( isCascaded ) {
-			return Collections.singletonList( ReflectionHelper.getClassFromType( parameterType ).isArray()
+			cascadingTypeParameters.add( ReflectionHelper.getClassFromType( parameterType ).isArray()
 					? CascadingTypeParameter.arrayElement( parameterType )
 					: CascadingTypeParameter.annotatedObject( parameterType ) );
-		}
-		else {
-			return Collections.emptyList();
 		}
 	}
 }
