@@ -12,6 +12,7 @@ import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetMethodFromPropertyName;
+import org.hibernate.validator.internal.xml.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.GetterType;
 
@@ -35,6 +37,7 @@ import org.hibernate.validator.internal.xml.binding.GetterType;
  * Builder for constraint getters.
  *
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 class ConstrainedGetterBuilder {
 	private static final Log log = LoggerFactory.make();
@@ -71,21 +74,30 @@ class ConstrainedGetterBuilder {
 				);
 				metaConstraints.add( metaConstraint );
 			}
+
+			ContainerElementTypeConfigurationBuilder containerElementTypeConfigurationBuilder = new ContainerElementTypeConfigurationBuilder(
+					metaConstraintBuilder, constraintLocation, defaultPackage );
+			ContainerElementTypeConfiguration containerElementTypeConfiguration = containerElementTypeConfigurationBuilder
+					.build( getterType.getContainerElementType(), ReflectionHelper.typeOf( getter ) );
+
+			List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>( containerElementTypeConfiguration.getCascadingTypeParameters().size() + 1 );
+			cascadingTypeParameters.addAll( containerElementTypeConfiguration.getCascadingTypeParameters() );
+			addCascadedTypeParameterForGetter( cascadingTypeParameters, getter, getterType.getValid() != null );
+
 			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
 					getterType.getConvertGroup(),
 					defaultPackage
 			);
 
-			// TODO HV-919 Support specification of type parameter constraints via XML and API
 			ConstrainedExecutable constrainedGetter = new ConstrainedExecutable(
 					ConfigurationSource.XML,
 					getter,
 					Collections.<ConstrainedParameter>emptyList(),
 					Collections.<MetaConstraint<?>>emptySet(),
 					metaConstraints,
-					Collections.emptySet(),
+					containerElementTypeConfiguration.getMetaConstraints(),
 					groupConversions,
-					getCascadedTypeParameters( getter, getterType.getValid() != null )
+					cascadingTypeParameters
 			);
 			constrainedExecutables.add( constrainedGetter );
 
@@ -101,14 +113,11 @@ class ConstrainedGetterBuilder {
 		return constrainedExecutables;
 	}
 
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Method method, boolean isCascaded) {
+	private void addCascadedTypeParameterForGetter(List<CascadingTypeParameter> cascadingTypeParameters, Method method, boolean isCascaded) {
 		if ( isCascaded ) {
-			return Collections.singletonList( method.getReturnType().isArray()
+			cascadingTypeParameters.add( method.getReturnType().isArray()
 					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( method ) )
 					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( method ) ) );
-		}
-		else {
-			return Collections.emptyList();
 		}
 	}
 
