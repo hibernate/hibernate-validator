@@ -43,11 +43,13 @@ import javax.xml.stream.XMLStreamException;
 
 import org.hibernate.validator.internal.engine.messageinterpolation.parser.MessageDescriptorFormatException;
 import org.hibernate.validator.internal.metadata.descriptor.ConstraintDescriptorImpl.ConstraintType;
+import org.hibernate.validator.internal.metadata.location.ConstraintLocation;
 import org.hibernate.validator.internal.util.logging.formatter.ClassObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfClassesObjectFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.CollectionOfObjectsToStringFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.ExecutableFormatter;
 import org.hibernate.validator.internal.util.logging.formatter.TypeFormatter;
+import org.hibernate.validator.internal.xml.ContainerElementTypePath;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
@@ -743,4 +745,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 216, value = "Calling returnValue() is not allowed for the current element.")
 	ValidationException getReturnValueIsNotAValidCallException();
+
+	@Message(id = 217, value = "The same container element type %2$s is configured more than once for location %1$s via the XML mapping configuration.")
+	ValidationException getContainerElementTypeHasAlreadyBeenConfiguredViaXmlMappingConfigurationException(ConstraintLocation rootConstraintLocation,
+			ContainerElementTypePath path);
 }

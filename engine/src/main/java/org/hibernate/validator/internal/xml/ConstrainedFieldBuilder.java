@@ -6,13 +6,11 @@
  */
 package org.hibernate.validator.internal.xml;
 
-import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
-
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +25,7 @@ import org.hibernate.validator.internal.util.ReflectionHelper;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredField;
+import org.hibernate.validator.internal.xml.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.FieldType;
 
@@ -34,6 +33,7 @@ import org.hibernate.validator.internal.xml.binding.FieldType;
  * Builder for constraint fields.
  *
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 class ConstrainedFieldBuilder {
 	private static final Log log = LoggerFactory.make();
@@ -52,12 +52,13 @@ class ConstrainedFieldBuilder {
 	Set<ConstrainedField> buildConstrainedFields(List<FieldType> fields,
 															   Class<?> beanClass,
 															   String defaultPackage) {
-		Set<ConstrainedField> constrainedFields = newHashSet();
-		List<String> alreadyProcessedFieldNames = newArrayList();
+		Set<ConstrainedField> constrainedFields = new HashSet<>();
+		List<String> alreadyProcessedFieldNames = new ArrayList<>();
 		for ( FieldType fieldType : fields ) {
 			Field field = findField( beanClass, fieldType.getName(), alreadyProcessedFieldNames );
 			ConstraintLocation constraintLocation = ConstraintLocation.forField( field );
-			Set<MetaConstraint<?>> metaConstraints = newHashSet();
+			Set<MetaConstraint<?>> metaConstraints = new HashSet<>();
+
 			for ( ConstraintType constraint : fieldType.getConstraint() ) {
 				MetaConstraint<?> metaConstraint = metaConstraintBuilder.buildMetaConstraint(
 						constraintLocation,
@@ -68,22 +69,30 @@ class ConstrainedFieldBuilder {
 				);
 				metaConstraints.add( metaConstraint );
 			}
+
+			ContainerElementTypeConfigurationBuilder containerElementTypeConfigurationBuilder = new ContainerElementTypeConfigurationBuilder(
+					metaConstraintBuilder, constraintLocation, defaultPackage );
+			ContainerElementTypeConfiguration containerElementTypeConfiguration = containerElementTypeConfigurationBuilder
+					.build( fieldType.getContainerElementType(), ReflectionHelper.typeOf( field ) );
+
+			List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>( containerElementTypeConfiguration.getCascadingTypeParameters().size() + 1 );
+			cascadingTypeParameters.addAll( containerElementTypeConfiguration.getCascadingTypeParameters() );
+			addCascadedTypeParameterForField( cascadingTypeParameters, field, fieldType.getValid() != null );
+
 			Map<Class<?>, Class<?>> groupConversions = groupConversionBuilder.buildGroupConversionMap(
 					fieldType.getConvertGroup(),
 					defaultPackage
 			);
 
-			// TODO HV-919 Support specification of type parameter constraints via XML and API
 			ConstrainedField constrainedField = new ConstrainedField(
 					ConfigurationSource.XML,
 					field,
 					metaConstraints,
-					Collections.emptySet(),
+					containerElementTypeConfiguration.getMetaConstraints(),
 					groupConversions,
-					getCascadedTypeParameters( field, fieldType.getValid() != null )
+					cascadingTypeParameters
 			);
 			constrainedFields.add( constrainedField );
-
 
 			// ignore annotations
 			if ( fieldType.getIgnoreAnnotations() != null ) {
@@ -97,14 +106,11 @@ class ConstrainedFieldBuilder {
 		return constrainedFields;
 	}
 
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Field field, boolean isCascaded) {
+	private void addCascadedTypeParameterForField(List<CascadingTypeParameter> cascadingTypeParameters, Field field, boolean isCascaded) {
 		if ( isCascaded ) {
-			return Collections.singletonList( field.getType().isArray()
+			cascadingTypeParameters.add( field.getType().isArray()
 					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( field ) )
 					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( field ) ) );
-		}
-		else {
-			return Collections.emptyList();
 		}
 	}
 
