@@ -7,7 +7,6 @@
 package org.hibernate.validator.internal.xml;
 
 import static org.hibernate.validator.internal.util.CollectionHelper.newArrayList;
-import static org.hibernate.validator.internal.util.CollectionHelper.newHashMap;
 import static org.hibernate.validator.internal.util.CollectionHelper.newHashSet;
 
 import java.lang.reflect.Constructor;
@@ -15,7 +14,9 @@ import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredConstructor;
 import org.hibernate.validator.internal.util.privilegedactions.GetDeclaredMethod;
+import org.hibernate.validator.internal.xml.ContainerElementTypeConfigurationBuilder.ContainerElementTypeConfiguration;
 import org.hibernate.validator.internal.xml.binding.ConstraintType;
 import org.hibernate.validator.internal.xml.binding.ConstructorType;
 import org.hibernate.validator.internal.xml.binding.CrossParameterType;
@@ -47,6 +49,7 @@ import org.hibernate.validator.internal.xml.binding.ReturnValueType;
  * Builder for constrained methods and constructors.
  *
  * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
 class ConstrainedExecutableBuilder {
 
@@ -204,27 +207,29 @@ class ConstrainedExecutableBuilder {
 		);
 
 		// parse the return value
-		Set<MetaConstraint<?>> returnValueConstraints = newHashSet();
-		Map<Class<?>, Class<?>> groupConversions = newHashMap();
-		boolean isCascaded = parseReturnValueType(
+		Set<MetaConstraint<?>> returnValueConstraints = new HashSet<>();
+		Set<MetaConstraint<?>> returnValueTypeArgumentConstraints = new HashSet<>();
+		List<CascadingTypeParameter> cascadingTypeParameters = new ArrayList<>();
+		Map<Class<?>, Class<?>> groupConversions = new HashMap<>();
+		parseReturnValueType(
 				returnValueType,
 				executable,
 				returnValueConstraints,
+				returnValueTypeArgumentConstraints,
+				cascadingTypeParameters,
 				groupConversions,
 				defaultPackage
-
 		);
 
-		// TODO HV-919 Support specification of type parameter constraints via XML and API
 		return new ConstrainedExecutable(
 				ConfigurationSource.XML,
 				executable,
 				parameterMetaData,
 				crossParameterConstraints,
 				returnValueConstraints,
-				Collections.emptySet(),
+				returnValueTypeArgumentConstraints,
 				groupConversions,
-				getCascadedTypeParameters( executable, isCascaded )
+				cascadingTypeParameters
 		);
 	}
 
@@ -261,13 +266,15 @@ class ConstrainedExecutableBuilder {
 		return crossParameterConstraints;
 	}
 
-	private boolean parseReturnValueType(ReturnValueType returnValueType,
+	private void parseReturnValueType(ReturnValueType returnValueType,
 												Executable executable,
 												Set<MetaConstraint<?>> returnValueConstraints,
+												Set<MetaConstraint<?>> returnValueTypeArgumentConstraints,
+												List<CascadingTypeParameter> cascadingTypeParameters,
 												Map<Class<?>, Class<?>> groupConversions,
 												String defaultPackage) {
 		if ( returnValueType == null ) {
-			return false;
+			return;
 		}
 
 		ConstraintLocation constraintLocation = ConstraintLocation.forReturnValue( executable );
@@ -281,6 +288,16 @@ class ConstrainedExecutableBuilder {
 			);
 			returnValueConstraints.add( metaConstraint );
 		}
+
+		ContainerElementTypeConfigurationBuilder containerElementTypeConfigurationBuilder = new ContainerElementTypeConfigurationBuilder(
+				metaConstraintBuilder, constraintLocation, defaultPackage );
+		ContainerElementTypeConfiguration containerElementTypeConfiguration = containerElementTypeConfigurationBuilder
+				.build( returnValueType.getContainerElementType(), ReflectionHelper.typeOf( executable ) );
+
+		returnValueTypeArgumentConstraints.addAll( containerElementTypeConfiguration.getMetaConstraints() );
+		cascadingTypeParameters.addAll( containerElementTypeConfiguration.getCascadingTypeParameters() );
+		addCascadedTypeParameterForReturnValue( cascadingTypeParameters, executable, returnValueType.getValid() != null );
+
 		groupConversions.putAll(
 				groupConversionBuilder.buildGroupConversionMap(
 						returnValueType.getConvertGroup(),
@@ -295,8 +312,6 @@ class ConstrainedExecutableBuilder {
 					returnValueType.getIgnoreAnnotations()
 			);
 		}
-
-		return returnValueType.getValid() != null;
 	}
 
 	private List<Class<?>> createParameterTypes(List<ParameterType> parameterList,
@@ -318,15 +333,12 @@ class ConstrainedExecutableBuilder {
 		return parameterTypes;
 	}
 
-	private List<CascadingTypeParameter> getCascadedTypeParameters(Executable executable, boolean isCascaded) {
+	private void addCascadedTypeParameterForReturnValue(List<CascadingTypeParameter> cascadingTypeParameters, Executable executable, boolean isCascaded) {
 		if ( isCascaded ) {
 			boolean isArray = executable instanceof Method && ( (Method) executable ).getReturnType().isArray();
-			return Collections.singletonList( isArray
+			cascadingTypeParameters.add( isArray
 					? CascadingTypeParameter.arrayElement( ReflectionHelper.typeOf( executable ) )
 					: CascadingTypeParameter.annotatedObject( ReflectionHelper.typeOf( executable ) ) );
-		}
-		else {
-			return Collections.emptyList();
 		}
 	}
 

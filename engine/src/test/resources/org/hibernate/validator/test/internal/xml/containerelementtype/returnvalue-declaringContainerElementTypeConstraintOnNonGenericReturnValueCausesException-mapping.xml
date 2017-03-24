@@ -1,0 +1,17 @@
+<constraint-mappings
+        xmlns="http://xmlns.jcp.org/xml/ns/validation/mapping"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/validation/mapping validation-mapping-2.0.xsd"
+        version="2.0">
+
+    <default-package>org.hibernate.validator.internal.xml.containerelementtype</default-package>
+
+    <bean class="org.hibernate.validator.test.internal.xml.containerelementtype.ContainerElementTypeConstraintsForReturnValueXmlMappingTest$IFishTank" ignore-annotations="false">
+        <method name="getSize">
+            <return-value>
+                <containerElementType typeArgumentIndex="1">
+                </containerElementType>
+            </return-value>
+        </method>
+    </bean>
+</constraint-mappings>
