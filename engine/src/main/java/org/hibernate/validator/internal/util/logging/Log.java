@@ -737,8 +737,8 @@ public interface Log extends BasicLogger {
 	@Message(id = 213, value = "Given type has more than one type argument, hence an argument index must be specified: %s.")
 	ValidationException getNoTypeArgumentIndexIsGivenForTypeWithMultipleTypeArgumentsException(@FormatWith(TypeFormatter.class) Type type);
 
-	@Message(id = 214, value = "The same type argument of type %1$s is configured more than once via the programmatic constraint declaration API.")
-	ValidationException getContainerElementHasAlreadyBeConfiguredViaProgrammaticApiException(@FormatWith(TypeFormatter.class) Type type);
+	@Message(id = 214, value = "The same container element type of type %1$s is configured more than once via the programmatic constraint declaration API.")
+	ValidationException getContainerElementTypeHasAlreadyBeenConfiguredViaProgrammaticApiException(@FormatWith(TypeFormatter.class) Type type);
 
 	@Message(id = 215, value = "Calling parameter() is not allowed for the current element.")
 	ValidationException getParameterIsNotAValidCallException();

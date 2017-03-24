@@ -115,7 +115,7 @@ abstract class CascadableConstraintMappingContextImplBase<C extends Cascadable<C
 		ContainerElementPathKey key = new ContainerElementPathKey( index, nestedIndexes );
 		boolean configuredBefore = !configuredPaths.add( key );
 		if ( configuredBefore ) {
-			throw LOG.getContainerElementHasAlreadyBeConfiguredViaProgrammaticApiException(
+			throw LOG.getContainerElementTypeHasAlreadyBeenConfiguredViaProgrammaticApiException(
 				location.getTypeForValidatorResolution()
 			);
 		}
