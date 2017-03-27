@@ -36,6 +36,7 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
@@ -84,6 +85,18 @@ import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMax
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMinValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MaxValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MinValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArray;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfBoolean;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfByte;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfChar;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfDouble;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfFloat;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfInt;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfLong;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfShort;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForCharSequence;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForCollection;
+import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForMap;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArray;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfBoolean;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfByte;
@@ -242,6 +255,21 @@ public class ConstraintHelper {
 			putConstraints( tmpConstraints, Max.class, MaxValidatorForNumber.class, MaxValidatorForCharSequence.class );
 			putConstraints( tmpConstraints, Min.class, MinValidatorForNumber.class, MinValidatorForCharSequence.class );
 		}
+
+		List<Class<? extends ConstraintValidator<NotEmpty, ?>>> notEmptyValidators = new ArrayList<>( 11 );
+		notEmptyValidators.add( NotEmptyValidatorForCharSequence.class );
+		notEmptyValidators.add( NotEmptyValidatorForCollection.class );
+		notEmptyValidators.add( NotEmptyValidatorForArray.class );
+		notEmptyValidators.add( NotEmptyValidatorForMap.class );
+		notEmptyValidators.add( NotEmptyValidatorForArraysOfBoolean.class );
+		notEmptyValidators.add( NotEmptyValidatorForArraysOfByte.class );
+		notEmptyValidators.add( NotEmptyValidatorForArraysOfChar.class );
+		notEmptyValidators.add( NotEmptyValidatorForArraysOfDouble.class );
+		notEmptyValidators.add( NotEmptyValidatorForArraysOfFloat.class );
+		notEmptyValidators.add( NotEmptyValidatorForArraysOfInt.class );
+		notEmptyValidators.add( NotEmptyValidatorForArraysOfLong.class );
+		notEmptyValidators.add( NotEmptyValidatorForArraysOfShort.class );
+		putConstraints( tmpConstraints, NotEmpty.class, notEmptyValidators );
 
 		putConstraint( tmpConstraints, NotNull.class, NotNullValidator.class );
 		putConstraint( tmpConstraints, Null.class, NullValidator.class );

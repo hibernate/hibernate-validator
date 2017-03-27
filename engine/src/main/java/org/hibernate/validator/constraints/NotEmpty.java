@@ -32,6 +32,8 @@ import org.hibernate.validator.constraints.NotEmpty.List;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ *
+ * @deprecated use the standard {@link javax.validation.constraints.NotEmpty} constraint instead
  */
 @Documented
 @Constraint(validatedBy = { })
@@ -41,6 +43,7 @@ import org.hibernate.validator.constraints.NotEmpty.List;
 @ReportAsSingleViolation
 @NotNull
 @Size(min = 1)
+@Deprecated
 public @interface NotEmpty {
 	String message() default "{org.hibernate.validator.constraints.NotEmpty.message}";
 
