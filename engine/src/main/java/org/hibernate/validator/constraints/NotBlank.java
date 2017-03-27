@@ -31,6 +31,8 @@ import org.hibernate.validator.constraints.NotBlank.List;
  * The difference to {@code NotEmpty} is that trailing whitespaces are getting ignored.
  *
  * @author Hardy Ferentschik
+ *
+ * @deprecated use the standard {@link javax.validation.constraints.NotBlank} constraint instead
  */
 @Documented
 @Constraint(validatedBy = { })
@@ -39,6 +41,7 @@ import org.hibernate.validator.constraints.NotBlank.List;
 @ReportAsSingleViolation
 @NotNull
 @Repeatable(List.class)
+@Deprecated
 public @interface NotBlank {
 	String message() default "{org.hibernate.validator.constraints.NotBlank.message}";
 

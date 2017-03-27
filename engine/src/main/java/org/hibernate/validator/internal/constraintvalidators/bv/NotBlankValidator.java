@@ -4,33 +4,32 @@
  * License: Apache License, Version 2.0
  * See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
  */
-package org.hibernate.validator.internal.constraintvalidators.hv;
+package org.hibernate.validator.internal.constraintvalidators.bv;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-import org.hibernate.validator.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 
 /**
- * Check that a character sequence's (e.g. string) trimmed length is not empty.
+ * Check that a character sequence is not {@code null} nor empty after removing any leading or trailing whitespace.
  *
- * @author Hardy Ferentschik
+ * @author Guillaume Smet
  */
-@SuppressWarnings("deprecation")
 public class NotBlankValidator implements ConstraintValidator<NotBlank, CharSequence> {
 
 	/**
-	 * Checks that the trimmed string is not empty.
+	 * Checks that the character sequence is not {@code null} nor empty after removing any leading or trailing
+	 * whitespace.
 	 *
 	 * @param charSequence the character sequence to validate
 	 * @param constraintValidatorContext context in which the constraint is evaluated
-	 * @return returns <code>true</code> if the string is <code>null</code> or the length of the trimmed
-	 * <code>charSequence</code> is strictly superior to 0, <code>false</code> otherwise
+	 * @return returns {@code true} if the string is not {@code null} and the length of the trimmed
+	 * {@code charSequence} is strictly superior to 0, {@code false} otherwise
 	 */
 	@Override
 	public boolean isValid(CharSequence charSequence, ConstraintValidatorContext constraintValidatorContext) {
 		if ( charSequence == null ) {
-			return true;
+			return false;
 		}
 
 		return charSequence.toString().trim().length() > 0;

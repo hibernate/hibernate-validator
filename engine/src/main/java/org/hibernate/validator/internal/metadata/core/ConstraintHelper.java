@@ -36,6 +36,7 @@ import javax.validation.constraints.Digits;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
@@ -53,7 +54,6 @@ import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
 import org.hibernate.validator.constraints.Mod11Check;
 import org.hibernate.validator.constraints.ModCheck;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.ParameterScriptAssert;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.ScriptAssert;
@@ -77,6 +77,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForC
 import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.NotBlankValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
@@ -152,7 +153,6 @@ import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidat
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod11CheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ModCheckValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ParameterScriptAssertValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.SafeHtmlValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.ScriptAssertValidator;
@@ -256,6 +256,8 @@ public class ConstraintHelper {
 			putConstraints( tmpConstraints, Min.class, MinValidatorForNumber.class, MinValidatorForCharSequence.class );
 		}
 
+		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
+
 		List<Class<? extends ConstraintValidator<NotEmpty, ?>>> notEmptyValidators = new ArrayList<>( 11 );
 		notEmptyValidators.add( NotEmptyValidatorForCharSequence.class );
 		notEmptyValidators.add( NotEmptyValidatorForCollection.class );
@@ -327,7 +329,8 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, REGON.class, REGONValidator.class );
 		putConstraint( tmpConstraints, NIP.class, NIPValidator.class );
 		putConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
-		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
+
+		putConstraint( tmpConstraints, org.hibernate.validator.constraints.NotBlank.class, org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator.class );
 		putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
 		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
 		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
