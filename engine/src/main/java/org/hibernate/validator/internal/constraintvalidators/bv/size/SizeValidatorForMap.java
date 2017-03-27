@@ -15,7 +15,7 @@ import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 
 /**
- * Check that a string's length is between min and max.
+ * Check that a map's size is between min and max.
  *
  * @author Hardy Ferentschik
  */
