@@ -32,6 +32,8 @@ import org.hibernate.validator.constraints.Email.List;
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
+ *
+ * @deprecated use the standard {@link javax.validation.constraints.Email} constraint instead
  */
 @Documented
 @Constraint(validatedBy = { })
@@ -40,6 +42,7 @@ import org.hibernate.validator.constraints.Email.List;
 @Repeatable(List.class)
 @ReportAsSingleViolation
 @Pattern(regexp = "")
+@Deprecated
 public @interface Email {
 	String message() default "{org.hibernate.validator.constraints.Email.message}";
 

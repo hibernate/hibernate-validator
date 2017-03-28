@@ -33,6 +33,7 @@ import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -48,7 +49,6 @@ import javax.validation.constraintvalidation.ValidationTarget;
 import org.hibernate.validator.constraints.ConstraintComposition;
 import org.hibernate.validator.constraints.Currency;
 import org.hibernate.validator.constraints.EAN;
-import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.LuhnCheck;
 import org.hibernate.validator.constraints.Mod10Check;
@@ -73,6 +73,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValida
 import org.hibernate.validator.internal.constraintvalidators.bv.DecimalMinValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.DigitsValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
@@ -147,7 +148,6 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastVa
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForYearMonth;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.PastValidatorForZonedDateTime;
 import org.hibernate.validator.internal.constraintvalidators.hv.EANValidator;
-import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LengthValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.LuhnCheckValidator;
 import org.hibernate.validator.internal.constraintvalidators.hv.Mod10CheckValidator;
@@ -321,6 +321,7 @@ public class ConstraintHelper {
 
 		putConstraint( tmpConstraints, EAN.class, EANValidator.class );
 		putConstraint( tmpConstraints, Email.class, EmailValidator.class );
+		putConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class, org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
 		putConstraint( tmpConstraints, Length.class, LengthValidator.class );
 		putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
 		putConstraint( tmpConstraints, LuhnCheck.class, LuhnCheckValidator.class );
