@@ -180,6 +180,7 @@ import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
  * @author Hardy Ferentschik
  * @author Alaa Nassef
  * @author Gunnar Morling
+ * @author Guillaume Smet
  */
 public class ConstraintHelper {
 	public static final String GROUPS = "groups";
@@ -201,13 +202,12 @@ public class ConstraintHelper {
 	public ConstraintHelper() {
 		Map<Class<? extends Annotation>, List<ConstraintValidatorDescriptor<?>>> tmpConstraints = new HashMap<>();
 
+		// Bean Validation constraints
+
 		putConstraint( tmpConstraints, AssertFalse.class, AssertFalseValidator.class );
 		putConstraint( tmpConstraints, AssertTrue.class, AssertTrueValidator.class );
-		putConstraint( tmpConstraints, CNPJ.class, CNPJValidator.class );
-		putConstraint( tmpConstraints, CPF.class, CPFValidator.class );
 
 		if ( isJavaMoneyInClasspath() ) {
-			putConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );
 			putConstraints( tmpConstraints, DecimalMax.class, Arrays.asList( DecimalMaxValidatorForNumber.class,
 					DecimalMaxValidatorForCharSequence.class, DecimalMaxValidatorForMonetaryAmount.class ) );
 			putConstraints( tmpConstraints, DecimalMin.class, Arrays.asList( DecimalMinValidatorForNumber.class,
@@ -219,6 +219,7 @@ public class ConstraintHelper {
 		}
 
 		putConstraints( tmpConstraints, Digits.class, DigitsValidatorForCharSequence.class, DigitsValidatorForNumber.class );
+		putConstraint( tmpConstraints, Email.class, EmailValidator.class );
 
 		List<Class<? extends ConstraintValidator<Future, ?>>> futureValidators = new ArrayList<>( 18 );
 		futureValidators.add( FutureValidatorForCalendar.class );
@@ -316,11 +317,18 @@ public class ConstraintHelper {
 		sizeValidators.add( SizeValidatorForArraysOfInt.class );
 		sizeValidators.add( SizeValidatorForArraysOfLong.class );
 		sizeValidators.add( SizeValidatorForArraysOfShort.class );
-
 		putConstraints( tmpConstraints, Size.class, sizeValidators );
 
+		// Hibernate Validator specific constraints
+
+		putConstraint( tmpConstraints, CNPJ.class, CNPJValidator.class );
+		putConstraint( tmpConstraints, CPF.class, CPFValidator.class );
+		if ( isJavaMoneyInClasspath() ) {
+			putConstraint( tmpConstraints, Currency.class, CurrencyValidatorForMonetaryAmount.class );
+		}
+		putConstraint( tmpConstraints, DurationMax.class, DurationMaxValidator.class );
+		putConstraint( tmpConstraints, DurationMin.class, DurationMinValidator.class );
 		putConstraint( tmpConstraints, EAN.class, EANValidator.class );
-		putConstraint( tmpConstraints, Email.class, EmailValidator.class );
 		putConstraint( tmpConstraints, org.hibernate.validator.constraints.Email.class, org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator.class );
 		putConstraint( tmpConstraints, Length.class, LengthValidator.class );
 		putConstraint( tmpConstraints, ModCheck.class, ModCheckValidator.class );
@@ -330,15 +338,11 @@ public class ConstraintHelper {
 		putConstraint( tmpConstraints, REGON.class, REGONValidator.class );
 		putConstraint( tmpConstraints, NIP.class, NIPValidator.class );
 		putConstraint( tmpConstraints, PESEL.class, PESELValidator.class );
-
 		putConstraint( tmpConstraints, org.hibernate.validator.constraints.NotBlank.class, org.hibernate.validator.internal.constraintvalidators.hv.NotBlankValidator.class );
 		putConstraint( tmpConstraints, ParameterScriptAssert.class, ParameterScriptAssertValidator.class );
 		putConstraint( tmpConstraints, SafeHtml.class, SafeHtmlValidator.class );
 		putConstraint( tmpConstraints, ScriptAssert.class, ScriptAssertValidator.class );
 		putConstraint( tmpConstraints, URL.class, URLValidator.class );
-
-		putConstraint( tmpConstraints, DurationMax.class, DurationMaxValidator.class );
-		putConstraint( tmpConstraints, DurationMin.class, DurationMinValidator.class );
 
 		this.builtinConstraints = Collections.unmodifiableMap( tmpConstraints );
 	}
