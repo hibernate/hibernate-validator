@@ -92,6 +92,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidat
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfFloat;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfInt;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfLong;
+import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForArraysOfShort;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForCollection;
 import org.hibernate.validator.internal.constraintvalidators.bv.size.SizeValidatorForMap;
@@ -284,6 +285,7 @@ public class ConstraintHelper {
 		sizeValidators.add( SizeValidatorForArraysOfFloat.class );
 		sizeValidators.add( SizeValidatorForArraysOfInt.class );
 		sizeValidators.add( SizeValidatorForArraysOfLong.class );
+		sizeValidators.add( SizeValidatorForArraysOfShort.class );
 
 		putConstraints( tmpConstraints, Size.class, sizeValidators );
 
