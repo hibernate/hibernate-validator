@@ -37,12 +37,14 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Negative;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import javax.validation.constraintvalidation.ValidationTarget;
 
@@ -78,10 +80,12 @@ import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForC
 import org.hibernate.validator.internal.constraintvalidators.bv.MaxValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForCharSequence;
 import org.hibernate.validator.internal.constraintvalidators.bv.MinValidatorForNumber;
+import org.hibernate.validator.internal.constraintvalidators.bv.NegativeValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotBlankValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NotNullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.NullValidator;
 import org.hibernate.validator.internal.constraintvalidators.bv.PatternValidator;
+import org.hibernate.validator.internal.constraintvalidators.bv.PositiveValidatorForNumber;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.CurrencyValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMaxValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMinValidatorForMonetaryAmount;
@@ -257,6 +261,7 @@ public class ConstraintHelper {
 			putConstraints( tmpConstraints, Min.class, MinValidatorForNumber.class, MinValidatorForCharSequence.class );
 		}
 
+		putConstraint( tmpConstraints, Negative.class, NegativeValidatorForNumber.class );
 		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
 
 		List<Class<? extends ConstraintValidator<NotEmpty, ?>>> notEmptyValidators = new ArrayList<>( 11 );
@@ -303,6 +308,7 @@ public class ConstraintHelper {
 		putConstraints( tmpConstraints, Past.class, pastValidators );
 
 		putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
+		putConstraint( tmpConstraints, Positive.class, PositiveValidatorForNumber.class );
 
 		List<Class<? extends ConstraintValidator<Size, ?>>> sizeValidators = new ArrayList<>( 11 );
 		sizeValidators.add( SizeValidatorForCharSequence.class );
