@@ -145,6 +145,15 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
+                        <configuration>
+                            <archive>
+                                <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                                <manifestEntries>
+                                    <Specification-Title>Bean Validation</Specification-Title>
+                                    <Specification-Version>2.0</Specification-Version>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -160,8 +169,8 @@
                             javax.interceptor.*;version="[1.2,2.0)",
                             javax.enterprise.*;version="[1.2,2.0)"
                         </Import-Package>
-                        <Export-Package>org.hibernate.validator.cdi</Export-Package>
-                        <Private-Package>org.hibernate.validator.internal.*</Private-Package>
+                        <Export-Package>org.hibernate.validator.cdi;version="${project.version}"</Export-Package>
+                        <Private-Package>org.hibernate.validator.internal.*;version="${project.version}"</Private-Package>
                     </instructions>
                 </configuration>
                 <executions>
