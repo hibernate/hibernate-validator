@@ -6,7 +6,6 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.size;
 
-import java.lang.reflect.Array;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.Size;
@@ -32,7 +31,6 @@ public class SizeValidatorForArraysOfChar extends SizeValidatorForArraysOfPrimit
 		if ( array == null ) {
 			return true;
 		}
-		int length = Array.getLength( array );
-		return length >= min && length <= max;
+		return array.length >= min && array.length <= max;
 	}
 }
