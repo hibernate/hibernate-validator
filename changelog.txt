@@ -1,6 +1,60 @@
 Hibernate Validator Changelog
 =============================
 
+6.0.0.Alpha2 (30-03-2017)
+-------------------------
+
+** Bug
+    * HV-1293 - validators           - @Size validator is not declared for short[]
+    * HV-1284 - build                - Reenable testing under the security manager
+    * HV-1280 - engine               - Class loading conflict when custom Xerces is part of a deployment
+    * HV-1265 - engine               - Supported nested container element constraints on property getters
+    * HV-1264 - engine               - Message interpolation fails with single opening or closing brace in regex character class
+    * HV-1258 - engine               - Make sure method validation options are correctly handled when given via ValidatorContext
+    * HV-1252 - annotation-processor - Annotation processor is not aware of new constraint @Currency and validators for type MonetaryAmount
+
+** Improvement
+    * HV-1294 - build                - hibernate-validator-cdi artefact is not OSGI'ed
+    * HV-1286 - performance          - Improve performance tests
+    * HV-1285 - engine               - Use the new toImmutable helpers where it makes sense
+    * HV-1283 - engine               - Make HV engine more friendly towards usage as a Java 9 named module
+    * HV-1279 - engine, tests        - Ensure that adding constraint on a generic type argument throw a proper exception
+    * HV-1277 - engine               - HV 6 massive performance regression in cascaded validation
+    * HV-1269 - performance          - Modify JMH performance tests to prevent JVM optimisation skewing results
+    * HV-1262 - engine               - Add affected validator classes to exception messages if there are multiple matching ones
+    * HV-1259 - engine               - Don't rely on descriptor model for BeanMetaDataImpl#hasConstraints()
+
+** New Feature
+    * HV-1292 - validators           - Support new spec constraints @NotEmpty, @NotBlank, @Email, @Positive, @Negative
+    * HV-1278 - performance          - Add performance test for multi-level container element validation
+    * HV-1275 - annotation-processor - Annotation processor should detect if composed annotation has direct and List annotations of the same kind
+    * HV-1270 - engine               - Throw an exception if a composed annotation has, for one given constraint type, a direct annotation and annotations in a List container
+    * HV-1256 - engine               - Implement discovery of value extractors via service loader
+    * HV-1245 - engine               - Use ElementKind.CONTAINER_ELEMENT for constraints located in type arguments
+    * HV-1239 - engine               - Expand API for programmatic constraint definition to support type-argument constraints and cascades
+
+** Sub-task
+    * HV-1291 - engine               - Support container element type constraints definition via XML
+    * HV-1290 - engine               - Support exploring the parent classes and interfaces to search the ValueExtractor definition
+    * HV-1261 - engine               - Allow value extractors to be contributed using service loader mechanism
+    * HV-1260 - engine               - Allow to specify value extractors using validation.xml
+    * HV-1257 - engine               - Implement Configuration#addValueExtractor() and ValidatorContext#addValueExtractor()
+
+** Task
+    * HV-1301 - tck-runner           - Upgrade TCK to 2.0.0.Alpha3
+    * HV-1299 - tck-runner           - Upgrade TCK to 2.0.0.Alpha2
+    * HV-1295 - build                - Update to validation-api 2.0.0.Alpha2
+    * HV-1287 - build                - Upgrade to CheckStyle 7.6
+    * HV-1276 - performance          - Performance tests infrastructure updates and fixes
+    * HV-1273 - tests                - Improve output in case ConstraintViolationSetAssert#containsOnlyPaths() fails
+    * HV-1266 - build                - Update build instructions as per latest Java 9 releases
+    * HV-1255 - build                - Remove obsolete "chronos-jmeter-maven-plugin" plug-in
+    * HV-1254 - engine               - Remove unused ConstrainedElementKind TYPE_USE
+    * HV-1251 - tck-runner           - Ensure we don't release anything with snapshot dependencies
+    * HV-1247 - engine               - Follow-up to-dos around value extractor implementation
+    * HV-1230 - documentation        - Update the groupId in README.md once the first alpha release of HV 6 is released
+    * HV-1152 - documentation        - Make JavaDoc render correctly with Java 9
+
 6.0.0.Alpha1 (15-02-2017)
 -------------------------
 
