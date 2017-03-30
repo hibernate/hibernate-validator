@@ -6,8 +6,6 @@
  */
 package org.hibernate.validator.internal.constraintvalidators.bv.notempty;
 
-import java.lang.reflect.Array;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.NotEmpty;
@@ -31,6 +29,6 @@ public class NotEmptyValidatorForArray implements ConstraintValidator<NotEmpty, 
 		if ( array == null ) {
 			return false;
 		}
-		return Array.getLength( array ) > 0;
+		return array.length > 0;
 	}
 }
