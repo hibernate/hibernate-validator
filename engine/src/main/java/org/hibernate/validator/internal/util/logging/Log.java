@@ -749,4 +749,7 @@ public interface Log extends BasicLogger {
 	@Message(id = 217, value = "The same container element type %2$s is configured more than once for location %1$s via the XML mapping configuration.")
 	ValidationException getContainerElementTypeHasAlreadyBeenConfiguredViaXmlMappingConfigurationException(ConstraintLocation rootConstraintLocation,
 			ContainerElementTypePath path);
+
+	@Message(id = 218, value = "Having parallel definitions of ValueExtractor on a given class is not allowed: %s.")
+	ValueExtractorDefinitionException getParallelDefinitionsOfValueExtractorException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorImplementationType);
 }
