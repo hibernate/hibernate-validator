@@ -11,16 +11,20 @@ import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Negative;
+import javax.validation.constraints.Positive;
 
 import org.hibernate.validator.constraints.Currency;
 
 public class ModelWithJavaMoneyTypes {
 
 	@Currency("EUR")
+	@Negative(strict = true)
 	public MonetaryAmount monetaryAmountEuro;
 
 	@DecimalMax("1000.00")
 	@DecimalMin("0.00")
+	@Positive
 	public MonetaryAmount monetaryAmount;
 
 	@Max(1000L)

@@ -91,6 +91,8 @@ import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMax
 import org.hibernate.validator.internal.constraintvalidators.bv.money.DecimalMinValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MaxValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.money.MinValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.NegativeValidatorForMonetaryAmount;
+import org.hibernate.validator.internal.constraintvalidators.bv.money.PositiveValidatorForMonetaryAmount;
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArray;
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfBoolean;
 import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArraysOfByte;
@@ -261,7 +263,13 @@ public class ConstraintHelper {
 			putConstraints( tmpConstraints, Min.class, MinValidatorForNumber.class, MinValidatorForCharSequence.class );
 		}
 
-		putConstraint( tmpConstraints, Negative.class, NegativeValidatorForNumber.class );
+		if ( isJavaMoneyInClasspath() ) {
+			putConstraints( tmpConstraints, Negative.class, Arrays.asList( NegativeValidatorForNumber.class,
+					NegativeValidatorForMonetaryAmount.class ) );
+		}
+		else {
+			putConstraint( tmpConstraints, Negative.class, NegativeValidatorForNumber.class );
+		}
 		putConstraint( tmpConstraints, NotBlank.class, NotBlankValidator.class );
 
 		List<Class<? extends ConstraintValidator<NotEmpty, ?>>> notEmptyValidators = new ArrayList<>( 11 );
@@ -308,7 +316,13 @@ public class ConstraintHelper {
 		putConstraints( tmpConstraints, Past.class, pastValidators );
 
 		putConstraint( tmpConstraints, Pattern.class, PatternValidator.class );
-		putConstraint( tmpConstraints, Positive.class, PositiveValidatorForNumber.class );
+		if ( isJavaMoneyInClasspath() ) {
+			putConstraints( tmpConstraints, Positive.class, Arrays.asList( PositiveValidatorForNumber.class,
+					PositiveValidatorForMonetaryAmount.class ) );
+		}
+		else {
+			putConstraint( tmpConstraints, Positive.class, PositiveValidatorForNumber.class );
+		}
 
 		List<Class<? extends ConstraintValidator<Size, ?>>> sizeValidators = new ArrayList<>( 11 );
 		sizeValidators.add( SizeValidatorForCharSequence.class );

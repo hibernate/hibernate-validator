@@ -494,6 +494,11 @@ impact portability of your application between Bean Validation providers.
 	Supported data types::: Any type
 	Hibernate metadata impact::: Column(s) are not nullable
 
+`@Negative(strict=)`:: Checks if the element is negative. If `strict=true` zero values are considered invalid, otherwise they are valid.
+	Supported data types::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
+	Hibernate metadata impact::: None
+
+
 `@Null`:: Checks that the annotated value is `null`
 	Supported data types::: Any type
 	Hibernate metadata impact::: None
@@ -504,6 +509,10 @@ impact portability of your application between Bean Validation providers.
 
 `@Pattern(regex=, flags=)`:: Checks if the annotated string matches the regular expression `regex` considering the given flag `match`
 	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
+`@Positive(strict=)`:: Checks if the element is positive. If `strict=true` zero values are considered invalid, otherwise they are valid.
+	Supported data types::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
 	Hibernate metadata impact::: None
 
 `@Size(min=, max=)`:: Checks if the annotated element's size is between `min` and `max` (inclusive)

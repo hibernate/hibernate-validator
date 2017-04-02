@@ -9,50 +9,36 @@ package org.hibernate.validator.internal.constraintvalidators.bv;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.Positive;
-
 /**
  * Check that the number being validated is positive.
  *
  * @author Hardy Ferentschik
  * @author Xavier Sosnovsky
  * @author Guillaume Smet
+ * @author Marko Bekhta
  */
-public class PositiveValidatorForNumber implements ConstraintValidator<Positive, Number> {
+public class PositiveValidatorForNumber extends BasePositiveValidator<Number> {
 
 	private static final short SHORT_ZERO = (short) 0;
 	private static final byte BYTE_ZERO = (byte) 0;
 
-	private boolean strict;
-
 	@Override
-	public void initialize(Positive positive) {
-		this.strict = positive.strict();
-	}
-
-	@Override
-	public boolean isValid(Number value, ConstraintValidatorContext constraintValidatorContext) {
-		// null values are valid
-		if ( value == null ) {
-			return true;
-		}
+	protected int compare(Number value) {
 		// handling of NaN, positive infinity and negative infinity
-		else if ( value instanceof Double ) {
+		if ( value instanceof Double ) {
 			if ( (Double) value == Double.POSITIVE_INFINITY ) {
-				return true;
+				return 1;
 			}
 			else if ( Double.isNaN( (Double) value ) || (Double) value == Double.NEGATIVE_INFINITY ) {
-				return false;
+				return -1;
 			}
 		}
 		else if ( value instanceof Float ) {
 			if ( (Float) value == Float.POSITIVE_INFINITY ) {
-				return true;
+				return 1;
 			}
 			else if ( Float.isNaN( (Float) value ) || (Float) value == Float.NEGATIVE_INFINITY ) {
-				return false;
+				return -1;
 			}
 		}
 
@@ -82,8 +68,8 @@ public class PositiveValidatorForNumber implements ConstraintValidator<Positive,
 			comparisonResult = ( (Byte) value ).compareTo( BYTE_ZERO );
 		}
 		else {
-			return strict ? value.doubleValue() > 0 : value.doubleValue() >= 0;
+			return Double.compare( value.doubleValue(), 0D );
 		}
-		return strict ? comparisonResult > 0 : comparisonResult >= 0;
+		return comparisonResult;
 	}
 }
