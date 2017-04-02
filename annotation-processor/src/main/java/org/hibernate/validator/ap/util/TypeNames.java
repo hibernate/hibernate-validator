@@ -33,13 +33,18 @@ public class TypeNames {
 		public static final String DECIMAL_MAX = JAVAX_VALIDATION_CONSTRAINTS + ".DecimalMax";
 		public static final String DECIMAL_MIN = JAVAX_VALIDATION_CONSTRAINTS + ".DecimalMin";
 		public static final String DIGITS = JAVAX_VALIDATION_CONSTRAINTS + ".Digits";
+		public static final String EMAIL = JAVAX_VALIDATION_CONSTRAINTS + ".Email";
 		public static final String FUTURE = JAVAX_VALIDATION_CONSTRAINTS + ".Future";
 		public static final String MAX = JAVAX_VALIDATION_CONSTRAINTS + ".Max";
 		public static final String MIN = JAVAX_VALIDATION_CONSTRAINTS + ".Min";
+		public static final String NEGATIVE = JAVAX_VALIDATION_CONSTRAINTS + ".Negative";
+		public static final String NOT_BLANK = JAVAX_VALIDATION_CONSTRAINTS + ".NotBlank";
+		public static final String NOT_EMPTY = JAVAX_VALIDATION_CONSTRAINTS + ".NotEmpty";
 		public static final String NOT_NULL = JAVAX_VALIDATION_CONSTRAINTS + ".NotNull";
 		public static final String NULL = JAVAX_VALIDATION_CONSTRAINTS + ".Null";
 		public static final String PAST = JAVAX_VALIDATION_CONSTRAINTS + ".Past";
 		public static final String PATTERN = JAVAX_VALIDATION_CONSTRAINTS + ".Pattern";
+		public static final String POSITIVE = JAVAX_VALIDATION_CONSTRAINTS + ".Positive";
 		public static final String SIZE = JAVAX_VALIDATION_CONSTRAINTS + ".Size";
 
 		public static final String CONSTRAINTVALIDATION = "javax.validation.constraintvalidation";
@@ -68,6 +73,7 @@ public class TypeNames {
 		public static final String NIP_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.NIP";
 		public static final String PESEL_CHECK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".pl.PESEL";
 		public static final String NOT_BLANK = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotBlank";
+		public static final String NOT_EMPTY = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".NotEmpty";
 		public static final String SAFE_HTML = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".SafeHtml";
 		public static final String SCRIPT_ASSERT = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".ScriptAssert";
 		public static final String URL = ORG_HIBERNATE_VALIDATOR_CONSTRAINTS + ".URL";

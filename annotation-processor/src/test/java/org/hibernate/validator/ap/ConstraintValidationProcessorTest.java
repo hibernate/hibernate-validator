@@ -51,6 +51,7 @@ import org.hibernate.validator.ap.testmodel.crossparameters.GenericNormalValidat
 import org.hibernate.validator.ap.testmodel.crossparameters.MethodLevelValidationUsingCrossParameterConstraints;
 import org.hibernate.validator.ap.testmodel.crossparameters.ValidCrossParameterAndNormalConstraint;
 import org.hibernate.validator.ap.testmodel.crossparameters.ValidCrossParameterConstraint;
+import org.hibernate.validator.ap.testmodel.customconstraints.BeanValidationConstraints;
 import org.hibernate.validator.ap.testmodel.customconstraints.CaseMode;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCase;
 import org.hibernate.validator.ap.testmodel.customconstraints.CheckCaseValidator;
@@ -169,6 +170,28 @@ public class ConstraintValidationProcessorTest extends ConstraintValidationProce
 				new DiagnosticExpectation( Kind.ERROR, 85 ),
 				new DiagnosticExpectation( Kind.ERROR, 86 ),
 				new DiagnosticExpectation( Kind.ERROR, 87 )
+		);
+	}
+
+	@Test
+	@TestForIssue( jiraKey = "HV-1297" )
+	public void beanValidationConstraints() {
+		File sourceFile = compilerHelper.getSourceFile( BeanValidationConstraints.class );
+
+		boolean compilationResult =
+				compilerHelper.compile( new ConstraintValidationProcessor(), diagnostics, sourceFile );
+
+		assertFalse( compilationResult );
+		assertThatDiagnosticsMatch(
+				diagnostics,
+				new DiagnosticExpectation( Kind.ERROR, 39 ),
+				new DiagnosticExpectation( Kind.ERROR, 40 ),
+				new DiagnosticExpectation( Kind.ERROR, 41 ),
+				new DiagnosticExpectation( Kind.ERROR, 42 ),
+				new DiagnosticExpectation( Kind.ERROR, 45 ),
+				new DiagnosticExpectation( Kind.ERROR, 46 ),
+				new DiagnosticExpectation( Kind.ERROR, 47 ),
+				new DiagnosticExpectation( Kind.ERROR, 50 )
 		);
 	}
 

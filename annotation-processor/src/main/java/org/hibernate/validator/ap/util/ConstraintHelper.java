@@ -193,6 +193,23 @@ public class ConstraintHelper {
 		YearMonth.class,
 		ZonedDateTime.class
 	};
+	/**
+	 * Types supported by {@code @Size} and {@NotEmpty} annotations.
+	 */
+	private static final Class<?>[] JAVA_TIME_TYPES_SUPPORTED_BY_SIZE_AND_NOT_EMPTY_ANNOTATIONS = new Class<?>[] {
+		Object[].class,
+		boolean[].class,
+		byte[].class,
+		char[].class,
+		double[].class,
+		float[].class,
+		int[].class,
+		long[].class,
+		short[].class,
+		Collection.class,
+		Map.class,
+		CharSequence.class
+	};
 
 	/**
 	 * Contains the supported types for given constraints. Keyed by constraint
@@ -231,6 +248,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DECIMAL_MIN, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DECIMAL_MIN, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.DIGITS, Number.class, String.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.EMAIL, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, Calendar.class, Date.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, JodaTypes.READABLE_PARTIAL, JodaTypes.READABLE_INSTANT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.FUTURE, JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS );
@@ -238,27 +256,17 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MAX, JavaMoneyTypes.MONETARY_AMOUNT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, Number.class, String.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.MIN, JavaMoneyTypes.MONETARY_AMOUNT );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NEGATIVE, Number.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_BLANK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_EMPTY, JAVA_TIME_TYPES_SUPPORTED_BY_SIZE_AND_NOT_EMPTY_ANNOTATIONS );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NOT_NULL, Object.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.NULL, Object.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, Calendar.class, Date.class );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, JodaTypes.READABLE_PARTIAL, JodaTypes.READABLE_INSTANT );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PAST, JAVA_TIME_TYPES_SUPPORTED_BY_FUTURE_AND_PAST_ANNOTATIONS );
 		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.PATTERN, String.class );
-		registerAllowedTypesForBuiltInConstraint(
-				BeanValidationTypes.SIZE,
-				Object[].class,
-				boolean[].class,
-				byte[].class,
-				char[].class,
-				double[].class,
-				float[].class,
-				int[].class,
-				long[].class,
-				short[].class,
-				Collection.class,
-				Map.class,
-				String.class
-		);
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.POSITIVE, Number.class );
+		registerAllowedTypesForBuiltInConstraint( BeanValidationTypes.SIZE, JAVA_TIME_TYPES_SUPPORTED_BY_SIZE_AND_NOT_EMPTY_ANNOTATIONS );
 
 		//register HV-specific constraints
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.CURRENCY, JavaMoneyTypes.MONETARY_AMOUNT );
@@ -274,6 +282,7 @@ public class ConstraintHelper {
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NIP_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.PESEL_CHECK, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NOT_BLANK, CharSequence.class );
+		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.NOT_EMPTY, JAVA_TIME_TYPES_SUPPORTED_BY_SIZE_AND_NOT_EMPTY_ANNOTATIONS );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SAFE_HTML, CharSequence.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.SCRIPT_ASSERT, Object.class );
 		registerAllowedTypesForBuiltInConstraint( HibernateValidatorTypes.URL, CharSequence.class );
