@@ -478,6 +478,10 @@ impact portability of your application between Bean Validation providers.
 	Supported data types::: BigDecimal, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `Number`
 	Hibernate metadata impact::: Defines column precision and scale
 
+`@Email`:: Checks whether the specified character sequence is a valid email address. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the email must match.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
 `@Future`:: Checks whether the annotated date is in the future
 	Supported data types::: `java.util.Date`, `java.util.Calendar`, `java.time.Instant`, `java.time.LocalDate`, `java.time.LocalDateTime`, `java.time.LocalTime`, `java.time.MonthDay`, `java.time.OffsetDateTime`, `java.time.OffsetTime`, `java.time.Year`, `java.time.YearMonth`, `java.time.ZonedDateTime`, `java.time.chrono.HijrahDate`, `java.time.chrono.JapaneseDate`, `java.time.chrono.MinguoDate`, `java.time.chrono.ThaiBuddhistDate`; additionally supported by HV, if the http://www.joda.org/joda-time/[Joda Time] date/time API is on the classpath: any implementations of `ReadablePartial` and `ReadableInstant`
 	Hibernate metadata impact::: None
@@ -490,6 +494,14 @@ impact portability of your application between Bean Validation providers.
 	Supported data types::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
 	Hibernate metadata impact::: Adds a check constraint on the column
 
+`@NotBlank`:: Checks that the annotated character sequence is not null and the trimmed length is greater than 0. The difference to `@NotEmpty` is that this constraint can only be applied on character sequences and that trailing white-spaces are ignored.
+	Supported data types::: `CharSequence`
+	Hibernate metadata impact::: None
+
+`@NotEmpty`:: Checks whether the annotated element is not null nor empty
+	Supported data types::: `CharSequence`, `Collection`, `Map` and arrays
+	Hibernate metadata impact::: None
+
 `@NotNull`:: Checks that the annotated value is not `null`
 	Supported data types::: Any type
 	Hibernate metadata impact::: Column(s) are not nullable
@@ -497,7 +509,6 @@ impact portability of your application between Bean Validation providers.
 `@Negative(strict=)`:: Checks if the element is negative. If `strict=true` zero values are considered invalid, otherwise they are valid.
 	Supported data types::: `BigDecimal`, `BigInteger`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types; additionally supported by HV: any sub-type of `CharSequence` (the numeric value represented by the character sequence is evaluated), any sub-type of `Number` and `javax.money.MonetaryAmount`
 	Hibernate metadata impact::: None
-
 
 `@Null`:: Checks that the annotated value is `null`
 	Supported data types::: Any type
@@ -555,7 +566,7 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
-`@Email`:: Checks whether the specified character sequence is a valid email address. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the email must match.
+`@Email`:: Checks whether the specified character sequence is a valid email address. The optional parameters `regexp` and `flags` allow to specify an additional regular expression (including regular expression flags) which the email must match. Is *deprecated* in favor of corresponding Bean Validation annotation (see <<validator-defineconstraints-spec>>).
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
@@ -575,11 +586,11 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
-`@NotBlank`:: Checks that the annotated character sequence is not null and the trimmed length is greater than 0. The difference to `@NotEmpty` is that this constraint can only be applied on strings and that trailing white-spaces are ignored.
+`@NotBlank`:: Checks that the annotated character sequence is not null and the trimmed length is greater than 0. The difference to `@NotEmpty` is that this constraint can only be applied on strings and that trailing white-spaces are ignored.  Is *deprecated* in favor of corresponding Bean Validation annotation (see <<validator-defineconstraints-spec>>).
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
 
-`@NotEmpty`:: Checks whether the annotated element is not null nor empty
+`@NotEmpty`:: Checks whether the annotated element is not null nor empty.  Is *deprecated* in favor of corresponding Bean Validation annotation (see <<validator-defineconstraints-spec>>).
 	Supported data types::: `CharSequence`, `Collection`, `Map` and arrays
 	Hibernate metadata impact::: None
 
