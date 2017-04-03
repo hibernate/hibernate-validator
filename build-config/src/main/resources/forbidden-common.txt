@@ -1,0 +1,26 @@
+# Hibernate Validator, declare and validate application constraints
+#
+# License: Apache License, Version 2.0
+#  See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+
+# This file contains forbidden API signatures common to all modules
+
+@ignoreUnresolvable
+@defaultMessage Should not be used
+
+################################################################################################################
+# Some packages that should not be used
+java.awt.**
+sun.**
+org.slf4j.**
+junit.framework.**
+
+################################################################################################################
+# org.testng.Assert#fail() should be used
+org.assertj.core.api.Fail#fail()
+org.testng.FileAssert#fail()
+org.assertj.core.api.Assertions#fail()
+
+################################################################################################################
+# Nobody should be using StringBuffer anymore
+java.lang.StringBuffer

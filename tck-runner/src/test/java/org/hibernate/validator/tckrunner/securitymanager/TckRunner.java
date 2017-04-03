@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.beanvalidation.tck.util.IntegrationTestsMethodSelector;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
+
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
@@ -36,6 +38,7 @@ import org.testng.xml.XmlTest;
  */
 public class TckRunner {
 
+	@IgnoreForbiddenApisErrors(reason = "Console application that uses System.out and print stack traces.")
 	public static void main(String[] args) {
 		XmlSuite suite = new XmlSuite();
 		suite.setName( "JSR-380-TCK" );

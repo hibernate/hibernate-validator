@@ -15,6 +15,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.bootstrap.GenericBootstrap;
 
 import org.hibernate.validator.HibernateValidatorConfiguration;
+import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.hibernate.validator.internal.engine.MethodValidationConfiguration;
 import org.hibernate.validator.internal.engine.ValidatorImpl;
 import org.hibernate.validator.internal.metadata.BeanMetaDataManager;
@@ -133,6 +134,7 @@ public class ConfigurationFilePropertiesTest {
 	 *
 	 * @return
 	 */
+	@IgnoreForbiddenApisErrors(reason = "Prints the stacktrace in case an exception is raised")
 	private <T extends Object> T findPropertyOfType(Object subject, Class<T> clazz) {
 		Field[] fields = subject.getClass().getDeclaredFields();
 		for ( Field field : fields ) {
