@@ -184,6 +184,8 @@
 
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
+
+        <hibernate-validator-parent.basedir>.</hibernate-validator-parent.basedir>
     </properties>
 
     <prerequisites>
@@ -416,6 +418,13 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -553,6 +562,44 @@
                                 <goal>testCheck</goal>
                             </goals>
                             <phase>verify</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>3.0</version>
+                    <configuration>
+                        <header>${hibernate-validator-parent.basedir}/build-config/src/main/resources/license.header</header>
+                        <strictCheck>true</strictCheck>
+                        <headerDefinitions>
+                            <headerDefinition>${hibernate-validator-parent.basedir}/build-config/src/main/resources/java-header-style.xml</headerDefinition>
+                            <headerDefinition>${hibernate-validator-parent.basedir}/build-config/src/main/resources/xml-header-style.xml</headerDefinition>
+                        </headerDefinitions>
+                        <mapping>
+                            <java>JAVA_CLASS_STYLE</java>
+                            <xml>XML_FILE_STYLE</xml>
+                        </mapping>
+                        <excludes>
+                            <!-- Next two classes are copied from other project and have different headers -->
+                            <exclude>**/org/hibernate/validator/internal/util/TypeHelper.java</exclude>
+                            <exclude>**/org/hibernate/validator/test/internal/util/TypeHelperTest.java</exclude>
+                            <exclude>**/settings-example.xml</exclude>
+                            <exclude>**/src/test/resources/org/hibernate/validator/referenceguide/**/*.*</exclude>
+                            <exclude>**/org/hibernate/validator/referenceguide/**/*.*</exclude>
+                            <exclude>**/src/test/resources/org/hibernate/validator/test/internal/xml/**/*.xml</exclude>
+                        </excludes>
+                        <includes>
+                            <include>**/*.java</include>
+                            <include>**/*.xml</include>
+                        </includes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>java-headers</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
                         </execution>
                     </executions>
                 </plugin>
