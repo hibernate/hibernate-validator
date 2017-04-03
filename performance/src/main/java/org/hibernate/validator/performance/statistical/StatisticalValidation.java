@@ -54,7 +54,7 @@ public class StatisticalValidation {
 				assertThat( factory ).isNotNull();
 			}
 			catch (IOException e) {
-				e.printStackTrace();
+				throw new IllegalStateException( "Mappings cannot be read. Validation factory cannot be configured correctly.", e );
 			}
 
 			validator = factory.getValidator();

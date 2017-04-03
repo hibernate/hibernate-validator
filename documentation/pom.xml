@@ -39,6 +39,8 @@
         <!-- Skip artifact deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven-surefire-plugin.argLine>-Duser.language=en</maven-surefire-plugin.argLine>
+
+        <forbiddenapis-junit.path>forbidden-allow-junit.txt</forbiddenapis-junit.path>
     </properties>
 
     <dependencies>
@@ -82,9 +84,10 @@
             </plugin>
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <configLocation>checkstyle-documentation.xml</configLocation>
-                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
             </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>

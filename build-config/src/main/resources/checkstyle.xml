@@ -10,16 +10,6 @@
 
 <module name="Checker">
 
-    <module name="RegexpHeader">
-        <property name="headerFile" value="/java.header"/>
-        <property name="fileExtensions" value="java"/>
-    </module>
-
-    <module name="RegexpHeader">
-        <property name="headerFile" value="/xml.header"/>
-        <property name="fileExtensions" value="xml"/>
-    </module>
-
     <module name="TreeWalker">
         <property name="cacheFile" value="${checkstyle.cache.file}"/>
 
@@ -141,32 +131,8 @@
             <property name="option" value="space"/>
         </module>
 
-        <module name="RegexpSinglelineJava">
-            <property name="format" value="System\.(out)|(err)\.print(ln)?\(" />
-            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
-            <property name="message" value="Not allowed to print to System.out: if you're damn sure you want it, disable Checkstyle on this line. [not required for tests]" />
-            <property name="ignoreComments" value="true" />
-        </module>
-
-        <!-- Nobody should be using StringBuffer anymore -->
-        <module name="RegexpSinglelineJava">
-            <property name="format" value=" StringBuffer" />
-            <!-- The last sentence of the message is a keyword to trigger exclusion: see ExcludeTestPackages -->
-            <property name="message" value="Nobody should be using StringBuffer anymore" />
-        </module>
-
         <!-- Required to get SuppressionCommentFilter to work -->
         <module name="FileContentsHolder" />
-
-        <!--  Avoid some import statements -->
-        <module name="IllegalImport">
-            <property name="illegalPkgs" value="java.awt, sun, org.slf4j, junit.framework, org.junit"/>
-        </module>
-
-        <module name="RegexpSinglelineJava">
-            <property name="format" value="import static org\.testng\.AssertJUnit*" />
-            <property name="message" value="Nobody should be using AssertJUnit asserts" />
-        </module>
 
     </module>
 
