@@ -8,7 +8,7 @@ package org.hibernate.validator.ap;
 
 import static org.hibernate.validator.ap.testutil.CompilerTestHelper.assertThatDiagnosticsMatch;
 import static org.testng.Assert.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 

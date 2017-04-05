@@ -17,7 +17,7 @@ import org.hibernate.validator.internal.engine.groups.Group;
 import org.hibernate.validator.internal.engine.groups.Sequence;
 import org.testng.annotations.Test;
 
-import static org.testng.FileAssert.fail;
+import static org.testng.Assert.fail;
 
 /**
  * @author Hardy Ferentschik

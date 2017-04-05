@@ -6,7 +6,7 @@
  */
 package org.hibernate.validator.testutil;
 
-import static org.assertj.core.api.Fail.fail;
+import static org.testng.Assert.fail;
 
 import org.assertj.core.api.IterableAssert;
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
+<additionalHeaders>
+	<java_class_style>
+		<firstLine>/*</firstLine>
+		<beforeEachLine> * </beforeEachLine>
+		<endLine> */</endLine>
+		<!--<afterEachLine></afterEachLine>-->
+		<!--skipLine></skipLine-->
+		<firstLineDetectionPattern>(\s|\t)*/\*.*$</firstLineDetectionPattern>
+		<lastLineDetectionPattern>.*\*/(\s|\t)*$</lastLineDetectionPattern>
+		<allowBlankLines>false</allowBlankLines>
+		<isMultiline>true</isMultiline>
+		<padLines>false</padLines>
+	</java_class_style>
+</additionalHeaders>

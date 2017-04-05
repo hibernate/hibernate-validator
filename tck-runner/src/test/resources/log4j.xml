@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<!--
+  ~ Hibernate Validator, declare and validate application constraints
+  ~
+  ~ License: Apache License, Version 2.0
+  ~ See the license.txt file in the root directory or <http://www.apache.org/licenses/LICENSE-2.0>.
+  -->
 
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
 

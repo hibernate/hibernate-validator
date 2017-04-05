@@ -14,8 +14,8 @@ import org.testng.annotations.Test;
 import org.hibernate.validator.internal.util.ModUtil;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 /**
  * Tests for the {@code ModUtil}.

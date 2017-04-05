@@ -23,6 +23,8 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
+
+        <forbiddenapis-junit.path>forbidden-allow-junit.txt</forbiddenapis-junit.path>
     </properties>
 
     <dependencies>
@@ -148,17 +150,18 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <configLocation>checkstyle-junit.xml</configLocation>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <reuseForks>false</reuseForks>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
             </plugin>
         </plugins>
     </build>

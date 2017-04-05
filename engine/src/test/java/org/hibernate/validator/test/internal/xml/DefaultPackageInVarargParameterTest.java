@@ -19,7 +19,7 @@ import javax.validation.metadata.ParameterDescriptor;
 import org.hibernate.validator.testutils.ValidatorUtil;
 import org.testng.annotations.Test;
 
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Test that arrays and varargs can be specified in XML with and without default package
@@ -42,12 +42,12 @@ public class DefaultPackageInVarargParameterTest {
 
 		BeanDescriptor beanDescriptor = validator.getConstraintsForClass( Foo.class );
 		Set<MethodDescriptor> methodDescriptors = beanDescriptor.getConstrainedMethods( MethodType.NON_GETTER );
-		assertTrue( "There should be two constrained methods", methodDescriptors.size() == 2 );
+		assertTrue( methodDescriptors.size() == 2, "There should be two constrained methods" );
 		for ( MethodDescriptor methodDescriptor : methodDescriptors ) {
-			assertTrue( "Parameter should be constrained", methodDescriptor.hasConstrainedParameters() );
+			assertTrue( methodDescriptor.hasConstrainedParameters(), "Parameter should be constrained" );
 			List<ParameterDescriptor> parameterDescriptorList = methodDescriptor.getParameterDescriptors();
 			for ( ParameterDescriptor parameterDescriptor : parameterDescriptorList ) {
-				assertTrue( "Parameter should be constrained", parameterDescriptor.isCascaded() );
+				assertTrue( parameterDescriptor.isCascaded(), "Parameter should be constrained" );
 			}
 		}
 	}

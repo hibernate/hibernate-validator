@@ -15,7 +15,7 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory
 import org.hibernate.validator.testutil.MyCustomStringImpl;
 
 import static org.testng.Assert.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Tests for the {@code ModCheckValidator}.

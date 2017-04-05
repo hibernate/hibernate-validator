@@ -23,8 +23,8 @@ import org.hibernate.validator.test.internal.xml.mixedconfiguration.annotation.T
 import org.hibernate.validator.testutil.DummyTraversableResolver;
 import org.hibernate.validator.testutils.ValidatorUtil;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.FileAssert.fail;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 
 /**

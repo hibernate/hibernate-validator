@@ -94,6 +94,7 @@
 
         <!-- see http://maven.apache.org/general.html -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- No need to build the javadocs per module. Aggregated javadocs are build in the distribution module. See also HV-894 -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
@@ -181,6 +182,11 @@
         <!-- JavaDoc stylesheet name -->
         <!-- styles for jdk8 and jdk9 are different-->
         <javadoc-stylesheet-name>stylesheet.css</javadoc-stylesheet-name>
+
+        <!-- Forbidden API related properties -->
+        <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
+
+        <build-config-resources.path>${project.build.directory}/build-config-resources</build-config-resources.path>
     </properties>
 
     <prerequisites>
@@ -413,6 +419,13 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -501,6 +514,116 @@
                         <execution>
                             <id>check-style</id>
                             <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>de.thetaphi</groupId>
+                    <artifactId>forbiddenapis</artifactId>
+                    <version>2.3</version>
+                    <configuration>
+                        <!-- if the used Java version is too new, don't fail, just do nothing: -->
+                        <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                        <suppressAnnotations>
+                            <annotation>**.SuppressForbidden</annotation>
+                        </suppressAnnotations>
+                        <bundledSignatures>
+                            <!--
+                              This will automatically choose the right
+                              signatures based on 'maven.compiler.target':
+                            -->
+                            <bundledSignature>jdk-deprecated</bundledSignature>
+                            <!-- disallow printing to System.out or System.err -->
+                            <bundledSignature>jdk-system-out</bundledSignature>
+                        </bundledSignatures>
+                        <signaturesArtifacts>
+                            <signaturesArtifact>
+                                <groupId>org.hibernate.validator</groupId>
+                                <artifactId>hibernate-validator-build-config</artifactId>
+                                <version>${project.version}</version>
+                                <type>jar</type>
+                                <path>forbidden-common.txt</path>
+                            </signaturesArtifact>
+                            <signaturesArtifact>
+                                <groupId>org.hibernate.validator</groupId>
+                                <artifactId>hibernate-validator-build-config</artifactId>
+                                <version>${project.version}</version>
+                                <type>jar</type>
+                                <path>${forbiddenapis-junit.path}</path>
+                            </signaturesArtifact>
+                        </signaturesArtifacts>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                                <goal>testCheck</goal>
+                            </goals>
+                            <phase>verify</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-remote-resources-plugin</artifactId>
+                    <version>1.5</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.hibernate.validator</groupId>
+                            <artifactId>hibernate-validator-build-config</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <resourceBundles>
+                            <resourceBundle>org.hibernate.validator:hibernate-validator-build-config:${project.version}</resourceBundle>
+                        </resourceBundles>
+                        <outputDirectory>${build-config-resources.path}</outputDirectory>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>process</goal>
+                            </goals>
+                            <phase>generate-resources</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>3.0</version>
+                    <configuration>
+                        <header>${build-config-resources.path}/license.header</header>
+                        <strictCheck>true</strictCheck>
+                        <headerDefinitions>
+                            <headerDefinition>${build-config-resources.path}/java-header-style.xml</headerDefinition>
+                            <headerDefinition>${build-config-resources.path}/xml-header-style.xml</headerDefinition>
+                        </headerDefinitions>
+                        <mapping>
+                            <java>JAVA_CLASS_STYLE</java>
+                            <xml>XML_FILE_STYLE</xml>
+                        </mapping>
+                        <excludes>
+                            <!-- Next two classes are copied from other project and have different headers -->
+                            <exclude>**/org/hibernate/validator/internal/util/TypeHelper.java</exclude>
+                            <exclude>**/org/hibernate/validator/test/internal/util/TypeHelperTest.java</exclude>
+                            <exclude>**/settings-example.xml</exclude>
+                            <exclude>**/src/test/resources/org/hibernate/validator/referenceguide/**/*.*</exclude>
+                            <exclude>**/org/hibernate/validator/referenceguide/**/*.*</exclude>
+                            <exclude>**/src/test/resources/org/hibernate/validator/test/internal/xml/**/*.xml</exclude>
+                        </excludes>
+                        <includes>
+                            <include>**/*.java</include>
+                            <include>**/*.xml</include>
+                        </includes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>license-headers</id>
                             <goals>
                                 <goal>check</goal>
                             </goals>

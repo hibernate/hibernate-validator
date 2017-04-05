@@ -27,7 +27,7 @@ import static java.lang.annotation.ElementType.FIELD;
 import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
 import static org.hibernate.validator.testutils.ValidatorUtil.getConfiguration;
 import static org.testng.Assert.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Tests for the {@code Mod11CheckValidator}.
