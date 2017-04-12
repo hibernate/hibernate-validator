@@ -11,6 +11,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -22,9 +23,12 @@ import java.util.stream.Collectors;
 import javax.validation.ValidationException;
 import javax.validation.valueextraction.ValueExtractor;
 
+import org.hibernate.validator.internal.util.CollectionHelper;
 import org.hibernate.validator.internal.util.TypeHelper;
 import org.hibernate.validator.internal.util.TypeVariableBindings;
 import org.hibernate.validator.internal.util.TypeVariables;
+import org.hibernate.validator.internal.util.logging.Log;
+import org.hibernate.validator.internal.util.logging.LoggerFactory;
 import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.hibernate.validator.internal.util.stereotypes.Immutable;
 
@@ -33,6 +37,8 @@ import org.hibernate.validator.internal.util.stereotypes.Immutable;
  * @author Guillaume Smet
  */
 public class ValueExtractorManager {
+
+	private static final Log LOG = LoggerFactory.make();
 
 	@Immutable
 	public static final Set<ValueExtractorDescriptor> SPEC_DEFINED_EXTRACTORS;
@@ -123,9 +129,7 @@ public class ValueExtractorManager {
 				.filter( e -> TypeHelper.isAssignable( TypeHelper.getErasedReferenceType( e.getExtractedType() ), valueType ) )
 				.collect( Collectors.toList() );
 
-		// TODO
-		// * if several extractors are found for the most specific type, e.g. key and value extractors for Map, raise an exception
-		return getMostSpecific( typeCompatibleExtractors );
+		return getMostSpecific( valueType, typeCompatibleExtractors );
 	}
 
 	public ValueExtractorDescriptor getValueExtractor(Class<?> valueType, TypeVariable<?> typeParameter) {
@@ -159,20 +163,46 @@ public class ValueExtractorManager {
 			}
 		}
 
-		return getMostSpecific( typeParameterCompatibleExtractors );
+		return getMostSpecific( valueType, typeParameterCompatibleExtractors );
 	}
 
-	// TODO
-	// take parallel hierarchies into account (A implements B, C; extractors present for B and C)
-	private ValueExtractorDescriptor getMostSpecific(List<ValueExtractorDescriptor> extractors) {
-		ValueExtractorDescriptor candidate = null;
+	private ValueExtractorDescriptor getMostSpecific(Class<?> valueType, List<ValueExtractorDescriptor> extractors) {
+		Set<ValueExtractorDescriptor> candidates = CollectionHelper.newHashSet( extractors.size() );
+
 		for ( ValueExtractorDescriptor descriptor : extractors ) {
-			if ( candidate == null || TypeHelper.isAssignable( candidate.getExtractedType(), descriptor.getExtractedType() ) ) {
-				candidate = descriptor;
+			if ( candidates.isEmpty() ) {
+				candidates.add( descriptor );
+				continue;
+			}
+			Iterator<ValueExtractorDescriptor> candidatesIterator = candidates.iterator();
+			boolean isNewRoot = true;
+			while ( candidatesIterator.hasNext() ) {
+				ValueExtractorDescriptor candidate = candidatesIterator.next();
+				if ( TypeHelper.isAssignable( candidate.getExtractedType(), descriptor.getExtractedType() ) ) {
+					candidatesIterator.remove();
+				}
+				else if ( TypeHelper.isAssignable( descriptor.getExtractedType(), candidate.getExtractedType() ) ) {
+					isNewRoot = false;
+				}
+			}
+			if ( isNewRoot ) {
+				candidates.add( descriptor );
 			}
 		}
 
-		return candidate;
+		if ( candidates.isEmpty() ) {
+			return null;
+		}
+		else if ( candidates.size() == 1 ) {
+			return candidates.iterator().next();
+		}
+		else {
+			@SuppressWarnings("rawtypes")
+			List<Class<? extends ValueExtractor>> valueExtractorCandidates = candidates.stream()
+					.map( valueExtractorDescriptor -> valueExtractorDescriptor.getValueExtractor().getClass() )
+					.collect( Collectors.toList() );
+			throw LOG.unableToGetMostSpecificValueExtractorDueToSeveralValueExtractorsDefinedForParallelHierarchies( valueType, valueExtractorCandidates );
+		}
 	}
 
 	@Override
