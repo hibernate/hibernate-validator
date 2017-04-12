@@ -18,7 +18,7 @@ public class CollectionOfClassesObjectFormatter {
 
 	private final String stringRepresentation;
 
-	public CollectionOfClassesObjectFormatter(Collection<Class<?>> classes) {
+	public CollectionOfClassesObjectFormatter(Collection<? extends Class<?>> classes) {
 		this.stringRepresentation = classes.stream()
 				.map( c -> c.getName() )
 				.collect( Collectors.joining( ", " ) );

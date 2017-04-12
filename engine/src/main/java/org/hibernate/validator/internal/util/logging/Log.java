@@ -752,4 +752,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = 218, value = "Having parallel definitions of ValueExtractor on a given class is not allowed: %s.")
 	ValueExtractorDefinitionException getParallelDefinitionsOfValueExtractorException(@FormatWith(ClassObjectFormatter.class) Class<?> extractorImplementationType);
+
+	@SuppressWarnings("rawtypes")
+	@Message(id = 219, value = "Unable to get the most specific value extractor for type %1$s as several value extractors are defined in this type's parallel hierarchies: %2$s.")
+	ConstraintDeclarationException unableToGetMostSpecificValueExtractorDueToSeveralValueExtractorsDefinedForParallelHierarchies(@FormatWith(ClassObjectFormatter.class) Class<?> valueType,
+			@FormatWith(CollectionOfClassesObjectFormatter.class) Collection<Class<? extends ValueExtractor>> valueExtractors);
 }
