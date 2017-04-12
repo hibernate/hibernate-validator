@@ -17,6 +17,7 @@ import javafx.beans.value.ObservableValue;
  *
  * @author Gunnar Morling
  */
+@SuppressWarnings("restriction")
 @UnwrapByDefault
 public class ObservableValueValueExtractor implements ValueExtractor<ObservableValue<@ExtractedValue ?>> {
 

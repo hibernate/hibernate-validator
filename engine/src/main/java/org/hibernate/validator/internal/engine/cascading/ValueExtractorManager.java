@@ -42,6 +42,14 @@ public class ValueExtractorManager {
 
 		if ( isJavaFxInClasspath() ) {
 			specDefinedExtractors.add( ObservableValueValueExtractor.DESCRIPTOR );
+			specDefinedExtractors.add( ListPropertyValueExtractor.DESCRIPTOR );
+			specDefinedExtractors.add( ReadOnlyListPropertyValueExtractor.DESCRIPTOR );
+			specDefinedExtractors.add( MapPropertyValueExtractor.DESCRIPTOR );
+			specDefinedExtractors.add( ReadOnlyMapPropertyValueExtractor.DESCRIPTOR );
+			specDefinedExtractors.add( MapPropertyKeyExtractor.DESCRIPTOR );
+			specDefinedExtractors.add( ReadOnlyMapPropertyKeyExtractor.DESCRIPTOR );
+			specDefinedExtractors.add( SetPropertyValueExtractor.DESCRIPTOR );
+			specDefinedExtractors.add( ReadOnlySetPropertyValueExtractor.DESCRIPTOR );
 		}
 
 		specDefinedExtractors.add( ByteArrayValueExtractor.DESCRIPTOR );
