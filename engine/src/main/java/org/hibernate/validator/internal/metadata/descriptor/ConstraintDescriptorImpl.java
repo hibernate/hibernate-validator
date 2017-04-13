@@ -83,7 +83,8 @@ public class ConstraintDescriptorImpl<T extends Annotation> implements Constrain
 			Target.class.getName(),
 			Constraint.class.getName(),
 			ReportAsSingleViolation.class.getName(),
-			Repeatable.class.getName()
+			Repeatable.class.getName(),
+			Deprecated.class.getName()
 	);
 
 	/**
