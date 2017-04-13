@@ -39,4 +39,3 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 	}
 
 }
-
