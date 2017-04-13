@@ -598,7 +598,7 @@ With one exception also these constraints apply to the field/property level, onl
 	Supported data types::: `BigDecimal`, `BigInteger`, `CharSequence`, `byte`, `short`, `int`, `long` and the respective wrappers of the primitive types
 	Hibernate metadata impact::: None
 
-`@SafeHtml(whitelistType= , additionalTags=, additionalTagsWithAttributes=, baseURI=)`:: Checks whether the annotated value contains potentially malicious fragments such as `<script/>`. In order to use this constraint, the http://jsoup.org/[jsoup] library must be part of the class path. With the `whitelistType` attribute a predefined whitelist type can be chosen which can be refined via `additionalTags` or `additionalTagsWithAttributes`. The former allows to add tags without any attributes, whereas the latter allows to specify tags and optionally allowed attributes using the annotation `@SafeHtml.Tag`.
+`@SafeHtml(whitelistType= , additionalTags=, additionalTagsWithAttributes=, baseURI=)`:: Checks whether the annotated value contains potentially malicious fragments such as `<script/>`. In order to use this constraint, the http://jsoup.org/[jsoup] library must be part of the class path. With the `whitelistType` attribute a predefined whitelist type can be chosen which can be refined via `additionalTags` or `additionalTagsWithAttributes`. The former allows to add tags without any attributes, whereas the latter allows to specify tags and optionally allowed attributes, as well as additional protocols for parameters of those attributes using the annotation `@SafeHtml.Tag`.
 In addition, `baseURI` allows to specify the base URI used to resolve relative URIs.
 	Supported data types::: `CharSequence`
 	Hibernate metadata impact::: None
