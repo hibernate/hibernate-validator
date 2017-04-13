@@ -6,12 +6,14 @@
  */
 package org.hibernate.validator.test.internal.constraintvalidators.hv;
 
+import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
+import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
@@ -20,10 +22,8 @@ import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescrip
 import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.TestForIssue;
 
-import static org.hibernate.validator.testutil.ConstraintViolationAssert.assertNumberOfViolations;
-import static org.hibernate.validator.testutils.ValidatorUtil.getValidator;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Unit test for {@link SafeHtmlValidator}.
@@ -154,6 +154,27 @@ public class SafeHtmlValidatorTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HV-1302")
+	public void testAdditionalProtocols() {
+		Validator validator = getValidator();
+
+		assertNumberOfViolations( validator.validate( new Bar( "<img src='data:image/png;base64,100101' />" ) ), 0 );
+		assertNumberOfViolations( validator.validate( new Bar( "<img/>" ) ), 0 );
+		assertNumberOfViolations( validator.validate( new Bar( "<img src='not_data:image/png;base64,100101' />" ) ), 1 );
+		assertNumberOfViolations( validator.validate( new Bar( "<img not_src='data:image/png;base64,100101' />" ) ), 1 );
+		assertNumberOfViolations( validator.validate( new Bar( "<div src='data:image/png;base64,100101' />" ) ), 1 );
+		assertNumberOfViolations( validator.validate( new Bar( "<div src='data:image/png;base64,100101' />" ) ), 1 );
+		assertNumberOfViolations( validator.validate( new Bar(
+				"<custom>" +
+						"  <img src='data:image/png;base64,100101' />" +
+						"  <custom attr1='strange_protocol:some_text' />" +
+						"  <custom><img /></custom>" +
+						"  <section id='sec1' attr='val'></section>" +
+						"  <custom attr1='dataprotocol:some_text' attr2='strange_protocol:some_text' />" +
+						"</custom>" ) ), 0 );
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HV-1303")
 	public void testPreserveRelativeLinks() throws Exception {
 		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
@@ -182,6 +203,22 @@ public class SafeHtmlValidatorTest {
 		String source;
 
 		public Foo(String source) {
+			this.source = source;
+		}
+	}
+
+	public static class Bar {
+		@SafeHtml(
+				whitelistType = WhiteListType.BASIC,
+				additionalTagsWithAttributes = {
+						@SafeHtml.Tag(name = "img", attributes = "src", protocols = { "data" }),
+						@SafeHtml.Tag(name = "custom", attributes = { "attr1", "attr2" }, protocols = { "dataprotocol", "strange_protocol" }),
+						@SafeHtml.Tag(name = "section", attributes = { "attr", "id" })
+				}
+		)
+		String source;
+
+		public Bar(String source) {
 			this.source = source;
 		}
 	}
