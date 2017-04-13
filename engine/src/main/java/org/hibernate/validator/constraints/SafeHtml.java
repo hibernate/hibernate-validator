@@ -65,6 +65,14 @@ public @interface SafeHtml {
 	Tag[] additionalTagsWithAttributes() default { };
 
 	/**
+	 * @return Base URI used to resolve relative URIs to absolute ones. If not set, validation
+	 * of HTML containing relative URIs will fail.
+	 *
+	 * @since 6.0
+	 */
+	String baseURI() default "";
+
+	/**
 	 * Allows to specify whitelist tags with specified optional attributes. Adding a tag with a given attribute also
 	 * whitelists the tag itself without any attribute.
 	 */

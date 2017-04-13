@@ -30,6 +30,7 @@ import static org.testng.Assert.assertTrue;
  *
  * @author George Gastaldi
  * @author Hardy Ferentschik
+ * @author Marko Bekhta
  */
 public class SafeHtmlValidatorTest {
 
@@ -150,6 +151,20 @@ public class SafeHtmlValidatorTest {
 		descriptor.setValue( "whitelistType", WhiteListType.NONE );
 
 		assertTrue( getSafeHtmlValidator().isValid( "Foobar", null ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HV-1303")
+	public void testPreserveRelativeLinks() throws Exception {
+		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
+		descriptor.setValue( "baseURI", "http://127.0.0.1" );
+
+		assertTrue( getSafeHtmlValidator().isValid( "<img src='/some/relative/url/image.png' />", null ) );
+
+		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
+		descriptor.setValue( "baseURI", "" );
+
+		assertFalse( getSafeHtmlValidator().isValid( "<img src='/some/relative/url/image.png' />", null ) );
 	}
 
 	private SafeHtmlValidator getSafeHtmlValidator() {

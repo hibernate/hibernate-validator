@@ -33,5 +33,10 @@ public class SafeHtmlDef extends ConstraintDef<SafeHtmlDef, SafeHtml> {
 		return this;
 	}
 
+	public SafeHtmlDef baseURI(String baseURI) {
+		addParameter( "baseURI", baseURI );
+		return this;
+	}
+
 }
 

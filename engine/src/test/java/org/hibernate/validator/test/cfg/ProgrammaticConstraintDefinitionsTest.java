@@ -61,6 +61,11 @@ public class ProgrammaticConstraintDefinitionsTest {
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ), "test", 0 );
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<td>1234qwer</td>", 0 );
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ).additionalTags( "td" ), "<td>1234qwer</td>", 0 );
+
+		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<img src='/some/relative/url/image.png' />", 1 );
+		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ).baseURI( "http://localhost" ),
+				"<img src='/some/relative/url/image.png' />", 0
+		);
 	}
 
 	@Test

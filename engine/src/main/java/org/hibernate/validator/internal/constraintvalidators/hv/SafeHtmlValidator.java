@@ -26,9 +26,12 @@ import org.hibernate.validator.constraints.SafeHtml;
  *
  * @author George Gastaldi
  * @author Hardy Ferentschik
+ * @author Marko Bekhta
  */
 public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequence> {
 	private Whitelist whitelist;
+
+	private String baseURI;
 
 	@Override
 	public void initialize(SafeHtml safeHtmlAnnotation) {
@@ -49,6 +52,7 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 				whitelist = Whitelist.simpleText();
 				break;
 		}
+		baseURI = safeHtmlAnnotation.baseURI();
 		whitelist.addTags( safeHtmlAnnotation.additionalTags() );
 
 		for ( SafeHtml.Tag tag : safeHtmlAnnotation.additionalTagsWithAttributes() ) {
@@ -72,8 +76,8 @@ public class SafeHtmlValidator implements ConstraintValidator<SafeHtml, CharSequ
 		// using the XML parser ensures that all elements in the input are retained, also if they actually are not allowed at the given
 		// location; E.g. a <td> element isn't allowed directly within the <body> element, so it would be used by the default HTML parser.
 		// we need to retain it though to apply the given white list properly; See HV-873
-		Document fragment = Jsoup.parse( value.toString(), "", Parser.xmlParser() );
-		Document document = Document.createShell( "" );
+		Document fragment = Jsoup.parse( value.toString(), baseURI, Parser.xmlParser() );
+		Document document = Document.createShell( baseURI );
 
 		// add the fragment's nodes to the body of resulting document
 		Iterator<Element> nodes = fragment.children().iterator();
