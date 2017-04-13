@@ -19,6 +19,10 @@
 
     <name>Hibernate Validator Annotation Processor</name>
 
+    <properties>
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

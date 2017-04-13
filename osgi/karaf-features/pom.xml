@@ -21,6 +21,10 @@
     <name>Hibernate Validator Karaf Features</name>
     <description>Hibernate Validator features for Apache Karaf</description>
 
+    <properties>
+        <hibernate-validator-parent.path>../..</hibernate-validator-parent.path>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

@@ -20,6 +20,10 @@
     <name>Hibernate Validator Build Configuration</name>
     <description>Configuration for the build of Hibernate Validator</description>
 
+    <properties>
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -30,49 +34,6 @@
                 <configuration>
                     <skip>true</skip>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-remote-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includes>
-                        <include>**/*.txt</include>
-                        <include>**/*.xml</include>
-                        <include>**/*.header</include>
-                    </includes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <version>3.0</version>
-                <configuration>
-                    <header>src/main/resources/license.header</header>
-                    <strictCheck>true</strictCheck>
-                    <headerDefinitions>
-                        <headerDefinition>src/main/resources/xml-header-style.xml</headerDefinition>
-                    </headerDefinitions>
-                    <mapping>
-                        <xml>XML_FILE_STYLE</xml>
-                    </mapping>
-                    <includes>
-                        <include>**/*.xml</include>
-                    </includes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>license-headers</id>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

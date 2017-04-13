@@ -32,6 +32,8 @@
         <!-- default values, overridden per profile -->
         <beanvalidation-impl.name>none</beanvalidation-impl.name>
         <beanvalidation-impl.version>none</beanvalidation-impl.version>
+
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
     <dependencies>

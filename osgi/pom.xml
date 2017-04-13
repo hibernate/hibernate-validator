@@ -21,6 +21,10 @@
     <name>Hibernate Validator OSGi Modules</name>
     <description>Hibernate Validator OSGi modules aggregator</description>
 
+    <properties>
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+    </properties>
+
     <modules>
         <module>karaf-features</module>
         <module>integrationtest</module>

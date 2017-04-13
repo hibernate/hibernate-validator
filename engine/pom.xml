@@ -20,6 +20,10 @@
     <name>Hibernate Validator Engine</name>
     <description>Hibernate's Bean Validation (JSR-380) reference implementation.</description>
 
+    <properties>
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+    </properties>
+
     <distributionManagement>
         <site>
             <id>site</id>

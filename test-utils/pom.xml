@@ -16,6 +16,10 @@
 
     <name>Hibernate Validator Test Utils</name>
 
+    <properties>
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+    </properties>
+
     <build>
         <plugins>
             <plugin>

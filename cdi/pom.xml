@@ -20,6 +20,10 @@
     <name>Hibernate Validator Portable Extension</name>
     <description>Hibernate Validator CDI Portable Extension</description>
 
+    <properties>
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
+    </properties>
+
     <dependencies>
         <!--
         Compile time dependencies

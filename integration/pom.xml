@@ -23,6 +23,7 @@
     <properties>
         <wildflyTargetDir>${basedir}/target/wildfly-${wildfly.version}</wildflyTargetDir>
         <wildflyModulesDir>${wildflyTargetDir}/modules/system/layers/base</wildflyModulesDir>
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
     <dependencies>

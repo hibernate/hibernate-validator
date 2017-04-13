@@ -186,7 +186,7 @@
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
 
-        <build-config-resources.path>${project.build.directory}/build-config-resources</build-config-resources.path>
+        <hibernate-validator-parent.path>.</hibernate-validator-parent.path>
     </properties>
 
     <prerequisites>
@@ -422,14 +422,6 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <configuration>
-                    <header>build-config/src/main/resources/license.header</header>
-                    <strictCheck>true</strictCheck>
-                    <headerDefinitions>
-                        <headerDefinition>build-config/src/main/resources/java-header-style.xml</headerDefinition>
-                        <headerDefinition>build-config/src/main/resources/xml-header-style.xml</headerDefinition>
-                    </headerDefinitions>
-                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -572,40 +564,15 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-remote-resources-plugin</artifactId>
-                    <version>1.5</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.hibernate.validator</groupId>
-                            <artifactId>hibernate-validator-build-config</artifactId>
-                            <version>${project.version}</version>
-                        </dependency>
-                    </dependencies>
-                    <configuration>
-                        <resourceBundles>
-                            <resourceBundle>org.hibernate.validator:hibernate-validator-build-config:${project.version}</resourceBundle>
-                        </resourceBundles>
-                        <outputDirectory>${build-config-resources.path}</outputDirectory>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>process</goal>
-                            </goals>
-                            <phase>generate-resources</phase>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>3.0</version>
                     <configuration>
-                        <header>${build-config-resources.path}/license.header</header>
+                        <header>${hibernate-validator-parent.path}/build-config/src/main/resources/license.header</header>
                         <strictCheck>true</strictCheck>
                         <headerDefinitions>
-                            <headerDefinition>${build-config-resources.path}/java-header-style.xml</headerDefinition>
-                            <headerDefinition>${build-config-resources.path}/xml-header-style.xml</headerDefinition>
+                            <headerDefinition>${hibernate-validator-parent.path}/build-config/src/main/resources/java-header-style.xml</headerDefinition>
+                            <headerDefinition>${hibernate-validator-parent.path}/build-config/src/main/resources/xml-header-style.xml</headerDefinition>
                         </headerDefinitions>
                         <mapping>
                             <java>JAVA_CLASS_STYLE</java>

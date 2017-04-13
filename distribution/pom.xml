@@ -24,6 +24,7 @@
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <javadoc.additional.param></javadoc.additional.param>
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
     <dependencies>

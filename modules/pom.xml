@@ -31,6 +31,8 @@
         <patchFile>${project.build.directory}/hv-patch.zip</patchFile>
 
         <patch-gen-maven-plugin.argLine.add-opens></patch-gen-maven-plugin.argLine.add-opens>
+
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
     <dependencyManagement/>

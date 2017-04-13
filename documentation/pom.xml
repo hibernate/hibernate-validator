@@ -41,6 +41,7 @@
         <maven-surefire-plugin.argLine>-Duser.language=en</maven-surefire-plugin.argLine>
 
         <forbiddenapis-junit.path>forbidden-allow-junit.txt</forbiddenapis-junit.path>
+        <hibernate-validator-parent.path>..</hibernate-validator-parent.path>
     </properties>
 
     <dependencies>
