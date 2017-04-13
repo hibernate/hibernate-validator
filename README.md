@@ -79,7 +79,7 @@ There are more build options available as well. For more information refer to [C
 
 To build Hibernate Validator with JDK 9, export the following environment variable:
 
-    export MAVEN_OPTS="--add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED"
+    export MAVEN_OPTS="--add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-modules=java.xml.bind"
 
 Then the build can be started like this:
 
@@ -87,10 +87,11 @@ Then the build can be started like this:
 
 Also the OSGi integration tests will fail on Java 9 currently, hence the "osgi" module is excluded automatically when building on JDK 9. We are waiting for the release of a Karaf version supporting the latest Java 9 builds.
 
-Here are the reasons why we added the various --add-opens options:
+Here are the reasons why we added the various build options:
 
- * java.security: required by wildfly-maven-plugin:execute-commands (for the WildFly integration tests and the TCK runner running in container mode)
- * java.lang: required by JRuby for Asciidoc processing
+ * add-opens java.security: required by wildfly-maven-plugin:execute-commands (for the WildFly integration tests and the TCK runner running in container mode)
+ * add-opens java.lang: required by JRuby for Asciidoc processing
+ * add-modules java.xml.bind: required by the forbiddenapis Maven plugin
 
 ## Continuous Integration
 
