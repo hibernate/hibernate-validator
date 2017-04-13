@@ -76,6 +76,11 @@ public class ProgrammaticConstraintDefinitionsTest {
 		protocolDescriptor.setValue( "protocols", new String[]{ "data" } );
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
 				.additionalTagsWithAttributes( AnnotationFactory.create( protocolDescriptor ) ), "<img src='data:image/png;base64,100101' />", 0 );
+
+		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<img src='/some/relative/url/image.png' />", 1 );
+		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ).baseURI( "http://localhost" ),
+				"<img src='/some/relative/url/image.png' />", 0
+		);
 	}
 
 	@Test

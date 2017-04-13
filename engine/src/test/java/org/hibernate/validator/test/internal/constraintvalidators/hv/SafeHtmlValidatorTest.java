@@ -173,6 +173,20 @@ public class SafeHtmlValidatorTest {
 				"</custom>" ) ), 0 );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1303")
+	public void testPreserveRelativeLinks() throws Exception {
+		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
+		descriptor.setValue( "baseURI", "http://127.0.0.1" );
+
+		assertTrue( getSafeHtmlValidator().isValid( "<img src='/some/relative/url/image.png' />", null ) );
+
+		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
+		descriptor.setValue( "baseURI", "" );
+
+		assertFalse( getSafeHtmlValidator().isValid( "<img src='/some/relative/url/image.png' />", null ) );
+	}
+
 	private SafeHtmlValidator getSafeHtmlValidator() {
 		SafeHtml p = AnnotationFactory.create( descriptor );
 		SafeHtmlValidator validator = new SafeHtmlValidator();
