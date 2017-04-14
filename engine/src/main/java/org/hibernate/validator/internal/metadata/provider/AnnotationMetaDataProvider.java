@@ -596,8 +596,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		return findTypeArgumentsConstraints(
 			field,
 			new TypeArgumentFieldLocation( field ),
-			field.getAnnotatedType(),
-			field.getType().getTypeParameters()
+			field.getAnnotatedType()
 		);
 	}
 
@@ -605,19 +604,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 	 * Finds type arguments constraints for method return values.
 	 */
 	protected Set<MetaConstraint<?>> findTypeAnnotationConstraints(Executable executable) {
-		TypeVariable<?>[] typeParameters;
-		if ( executable instanceof Method ) {
-			typeParameters = ( (Method) executable ).getReturnType().getTypeParameters();
-		}
-		else {
-			typeParameters = new TypeVariable<?>[0];
-		}
-
 		return findTypeArgumentsConstraints(
 			executable,
 			new TypeArgumentReturnValueLocation( executable ),
-			executable.getAnnotatedReturnType(),
-			typeParameters
+			executable.getAnnotatedReturnType()
 		);
 	}
 
@@ -761,8 +751,7 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			return findTypeArgumentsConstraints(
 					executable,
 					new TypeArgumentExecutableParameterLocation( executable, i ),
-					parameter.getAnnotatedType(),
-					parameter.getType().getTypeParameters()
+					parameter.getAnnotatedType()
 			);
 		}
 		catch (ArrayIndexOutOfBoundsException ex) {
@@ -771,37 +760,30 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 		}
 	}
 
-	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, TypeArgumentLocation location, AnnotatedType annotatedType, TypeVariable<?>[] typeParameters) {
+	private Set<MetaConstraint<?>> findTypeArgumentsConstraints(Member member, TypeArgumentLocation location, AnnotatedType annotatedType) {
+		if ( !(annotatedType instanceof AnnotatedArrayType) && !(annotatedType instanceof AnnotatedParameterizedType) ) {
+			return Collections.emptySet();
+		}
+
 		Set<MetaConstraint<?>> typeArgumentConstraints = new HashSet<>();
 
-		AnnotatedType currentAnnotatedType = annotatedType;
-		TypeVariable<?>[] currentTypeParameters = typeParameters;
-		TypeArgumentLocation currentLocation = location;
-
 		// if we have an array, we need to unwrap the array first
-		if ( currentAnnotatedType instanceof AnnotatedArrayType ) {
-			AnnotatedArrayType annotatedArrayType = (AnnotatedArrayType) currentAnnotatedType;
+		if ( annotatedType instanceof AnnotatedArrayType ) {
+			AnnotatedArrayType annotatedArrayType = (AnnotatedArrayType) annotatedType;
 			Type validatedType = annotatedArrayType.getAnnotatedGenericComponentType().getType();
 			TypeVariable<?> arrayElementTypeArgument = new ArrayElement( annotatedArrayType );
 
 			typeArgumentConstraints.addAll( findTypeUseConstraints( member, annotatedArrayType, arrayElementTypeArgument, location, validatedType ) );
 
-			currentAnnotatedType = annotatedArrayType.getAnnotatedGenericComponentType();
-			if ( !( currentAnnotatedType instanceof AnnotatedParameterizedType ) ) {
-				// return fast if we don't have to go further (the ReflectionHelper.getClassFromType call will fail on primitive types)
-				return typeArgumentConstraints.isEmpty() ? Collections.emptySet() : typeArgumentConstraints;
-			}
-			else {
-				currentTypeParameters = ReflectionHelper.getClassFromType( validatedType ).getTypeParameters();
-				currentLocation = new NestedTypeArgumentLocation( location, arrayElementTypeArgument, validatedType );
-			}
+			typeArgumentConstraints.addAll( findTypeArgumentsConstraints( member,
+					new NestedTypeArgumentLocation( location, arrayElementTypeArgument, validatedType ),
+					annotatedArrayType.getAnnotatedGenericComponentType() ) );
 		}
-
-		if ( currentAnnotatedType instanceof AnnotatedParameterizedType ) {
-			AnnotatedParameterizedType annotatedParameterizedType = (AnnotatedParameterizedType) currentAnnotatedType;
+		else if ( annotatedType instanceof AnnotatedParameterizedType ) {
+			AnnotatedParameterizedType annotatedParameterizedType = (AnnotatedParameterizedType) annotatedType;
 
 			int i = 0;
-			for ( TypeVariable<?> typeVariable : currentTypeParameters ) {
+			for ( TypeVariable<?> typeVariable : ReflectionHelper.getClassFromType( annotatedType.getType() ).getTypeParameters() ) {
 				AnnotatedType annotatedTypeParameter = annotatedParameterizedType.getAnnotatedActualTypeArguments()[i];
 
 				// HV-925
@@ -811,13 +793,12 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 				// In the latter case a value unwrapping has to occur
 				Type validatedType = annotatedTypeParameter.getType();
 
-				typeArgumentConstraints.addAll( findTypeUseConstraints( member, annotatedTypeParameter, typeVariable, currentLocation, validatedType ) );
+				typeArgumentConstraints.addAll( findTypeUseConstraints( member, annotatedTypeParameter, typeVariable, location, validatedType ) );
 
 				if ( validatedType instanceof ParameterizedType ) {
 					typeArgumentConstraints.addAll( findTypeArgumentsConstraints( member,
-							new NestedTypeArgumentLocation( currentLocation, typeVariable, validatedType ),
-							annotatedTypeParameter,
-							ReflectionHelper.getClassFromType( validatedType ).getTypeParameters() ) );
+							new NestedTypeArgumentLocation( location, typeVariable, validatedType ),
+							annotatedTypeParameter ) );
 				}
 
 				i++;
