@@ -152,6 +152,21 @@ public class SafeHtmlValidatorTest {
 		assertTrue( getSafeHtmlValidator().isValid( "Foobar", null ) );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HV-1302")
+	public void testValidationOfAdditionalProtocols() throws Exception {
+		AnnotationDescriptor<SafeHtml.Protocol> protocolDescriptor = new AnnotationDescriptor<SafeHtml.Protocol>( SafeHtml.Protocol.class );
+		protocolDescriptor.setValue( "tag", "img" );
+		protocolDescriptor.setValue( "attribute", "src" );
+		protocolDescriptor.setValue( "protocols", new String[] { "data" } );
+		SafeHtml.Protocol protocol = AnnotationFactory.create( protocolDescriptor );
+
+		descriptor.setValue( "whitelistType", WhiteListType.RELAXED );
+		descriptor.setValue( "additionalProtocols", new SafeHtml.Protocol[]{protocol} );
+
+		assertTrue( getSafeHtmlValidator().isValid( "<img src=\"data:image/png;base64,......\" />", null ) );
+	}
+
 	private SafeHtmlValidator getSafeHtmlValidator() {
 		SafeHtml p = AnnotationFactory.create( descriptor );
 		SafeHtmlValidator validator = new SafeHtmlValidator();
