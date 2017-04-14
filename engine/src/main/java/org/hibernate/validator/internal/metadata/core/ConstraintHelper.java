@@ -471,6 +471,10 @@ public class ConstraintHelper {
 	 *         otherwise.
 	 */
 	public boolean isMultiValueConstraint(Class<? extends Annotation> annotationType) {
+		if ( isJdkAnnotation( annotationType ) ) {
+			return false;
+		}
+
 		boolean isMultiValueConstraint = false;
 		final Method method = run( GetMethod.action( annotationType, "value" ) );
 		if ( method != null ) {
@@ -624,6 +628,12 @@ public class ConstraintHelper {
 
 	public boolean isConstraintComposition(Class<? extends Annotation> annotationType) {
 		return annotationType == ConstraintComposition.class;
+	}
+
+	public boolean isJdkAnnotation(Class<? extends Annotation> annotation) {
+		Package pakkage = annotation.getPackage();
+		return pakkage != null && pakkage.getName() != null &&
+				( pakkage.getName().startsWith( "java." ) || pakkage.getName().startsWith( "jdk.internal" ) );
 	}
 
 	private static boolean isJodaTimeInClasspath() {

@@ -515,9 +515,10 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			A annotation,
 			ElementType type) {
 
-		// HV-1049 Ignore annotations from jdk.internal.*; They cannot be constraint annotations so skip them right
-		// here, as for the proper check we'd need package access permission for "jdk.internal"
-		if ( isJdkInternalType( annotation ) ) {
+		// HV-1049 and HV-1311 - Ignore annotations from the JDK (jdk.internal.* and java.*); They cannot be constraint
+		// annotations so skip them right here, as for the proper check we'd need package access permission for
+		// "jdk.internal" and "java".
+		if ( constraintHelper.isJdkAnnotation( annotation.annotationType() ) ) {
 			return Collections.emptyList();
 		}
 
@@ -539,11 +540,6 @@ public class AnnotationMetaDataProvider implements MetaDataProvider {
 			constraintDescriptors.add( constraintDescriptor );
 		}
 		return constraintDescriptors;
-	}
-
-	private <A extends Annotation> boolean isJdkInternalType(A annotation) {
-		Package pakkage = annotation.annotationType().getPackage();
-		return pakkage != null && "jdk.internal".equals( pakkage.getName() );
 	}
 
 	private Map<Class<?>, Class<?>> getGroupConversions(ConvertGroup groupConversion, ConvertGroup.List groupConversionList) {

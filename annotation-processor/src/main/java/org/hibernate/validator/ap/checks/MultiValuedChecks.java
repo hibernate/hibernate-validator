@@ -14,7 +14,7 @@ import org.hibernate.validator.ap.util.CollectionHelper;
 import org.hibernate.validator.ap.util.ConstraintHelper;
 
 /**
- * A {@link ConstraintChecks} implementation, that executed the contained checks
+ * A {@link ConstraintChecks} implementation that executes the contained checks
  * against all parts of given multi-valued annotations.
  *
  * @author Gunnar Morling
