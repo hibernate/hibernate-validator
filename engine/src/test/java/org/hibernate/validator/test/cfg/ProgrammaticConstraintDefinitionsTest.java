@@ -33,6 +33,8 @@ import org.hibernate.validator.cfg.defs.pl.NIPDef;
 import org.hibernate.validator.cfg.defs.pl.PESELDef;
 import org.hibernate.validator.cfg.defs.pl.REGONDef;
 import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationDescriptor;
+import org.hibernate.validator.internal.util.annotationfactory.AnnotationFactory;
 import org.hibernate.validator.testutil.PrefixableParameterNameProvider;
 
 import org.testng.annotations.Test;
@@ -61,6 +63,24 @@ public class ProgrammaticConstraintDefinitionsTest {
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ), "test", 0 );
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<td>1234qwer</td>", 0 );
 		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE ).additionalTags( "td" ), "<td>1234qwer</td>", 0 );
+
+		AnnotationDescriptor<SafeHtml.Tag> tagDescriptor = new AnnotationDescriptor( SafeHtml.Tag.class );
+		tagDescriptor.setValue( "name", "td" );
+		tagDescriptor.setValue( "attributes", new String[]{ "class", "id" } );
+		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+				.additionalTagsWithAttributes( AnnotationFactory.create( tagDescriptor ) ), "<td class='class' id='tableId'>1234qwer</td>", 0 );
+
+		AnnotationDescriptor<SafeHtml.Tag> protocolDescriptor = new AnnotationDescriptor( SafeHtml.Tag.class );
+		protocolDescriptor.setValue( "name", "img" );
+		protocolDescriptor.setValue( "attributes", new String[]{ "src" } );
+		protocolDescriptor.setValue( "protocols", new String[]{ "data" } );
+		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.NONE )
+				.additionalTagsWithAttributes( AnnotationFactory.create( protocolDescriptor ) ), "<img src='data:image/png;base64,100101' />", 0 );
+
+		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ), "<img src='/some/relative/url/image.png' />", 1 );
+		doProgrammaticTest( new SafeHtmlDef().whitelistType( SafeHtml.WhiteListType.RELAXED ).baseURI( "http://localhost" ),
+				"<img src='/some/relative/url/image.png' />", 0
+		);
 	}
 
 	@Test
